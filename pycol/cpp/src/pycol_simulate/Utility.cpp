@@ -51,3 +51,25 @@ MatrixXcd cast_y0_matrixcd(std::complex<double>* y0, size_t size)
     }
     return _y0;
 }
+
+std::vector<VectorXcd> cast_y0_vector_vectorcd(std::complex<double>* y0, size_t y0_size, size_t size)
+{
+    std::vector<VectorXcd> _y0 = std::vector<VectorXcd>(y0_size, VectorXcd::Zero(size));
+    for (size_t i = 0; i < y0_size; ++i)
+    {
+        for (size_t j = 0; j < size; ++j) _y0.at(i)(j) = y0[size * i + j];
+    }
+    return _y0;
+}
+
+size_t gen_index(VectorXd p, std::uniform_real_distribution<double>& d, std::mt19937& gen)
+{
+    double r = d(gen);
+    double sum = 0;
+    for (size_t i = 0; i < p.size(); ++i)
+    {
+        sum += p(i);
+        if (r < sum) return i;
+    }
+    return 0;
+}

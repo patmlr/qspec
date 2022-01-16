@@ -57,4 +57,6 @@ public:
 	double get_freq();
 	void set_freq(double _freq_0);
 
+	Vector3d* get_k();
+
 };

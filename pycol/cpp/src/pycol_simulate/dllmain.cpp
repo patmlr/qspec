@@ -523,9 +523,37 @@ extern "C"
         return interaction->master(n, _y0);
     }
 
-    __declspec(dllexport) Result* interaction_master_mc(Interaction* interaction, double t)
+    __declspec(dllexport) Result* interaction_master_mc(Interaction* interaction, double t, size_t num)
     {
-        return interaction->master_mc(t);
+        return interaction->master_mc(t, num);
+    }
+
+    __declspec(dllexport) Result* interaction_master_mc_v(Interaction* interaction, double* v, size_t v_size, double t)
+    {
+        size_t n = interaction->arange_t(t);
+        VectorXd delta = VectorXd::Zero(interaction->get_lasers()->size());
+        std::vector<Vector3d> _v = cast_v(v, v_size);
+        return interaction->master_mc(n, delta, _v);
+    }
+
+    __declspec(dllexport) Result* interaction_master_mc_y0(Interaction* interaction, double t, size_t num,
+        std::complex<double>* y0, size_t y0_size)
+    {
+        size_t n = interaction->arange_t(t);
+        size_t size = interaction->get_atom()->get_size();
+        std::vector<VectorXcd> _y0 = cast_y0_vector_vectorcd(y0, y0_size, size);
+        return interaction->master_mc(n, _y0, num);
+    }
+
+    __declspec(dllexport) Result* interaction_master_mc_v_y0(Interaction* interaction, double* v, size_t v_size, double t,
+        std::complex<double>* y0, size_t y0_size)
+    {
+        size_t n = interaction->arange_t(t);
+        size_t size = interaction->get_atom()->get_size();
+        std::vector<VectorXcd> _y0 = cast_y0_vector_vectorcd(y0, y0_size, size);
+        VectorXd delta = VectorXd::Zero(interaction->get_lasers()->size());
+        std::vector<Vector3d> _v = cast_v(v, v_size);
+        return interaction->master_mc(n, _y0, delta, _v);
     }
 
     __declspec(dllexport) Result* interaction_mean_v(Interaction* interaction, double* v, size_t v_size,
@@ -647,6 +675,11 @@ extern "C"
         return result->get_y_numpy()->data();
     }
 
+    __declspec(dllexport) double* result_get_v(Result* result)
+    {
+        return result->get_v_numpy()->data();
+    }
+
     __declspec(dllexport) size_t result_get_x_size(Result* result)
     {
 
@@ -656,6 +689,11 @@ extern "C"
     __declspec(dllexport) size_t result_get_y_size(Result* result)
     {
         return result->get_y_size();
+    }
+
+    __declspec(dllexport) size_t result_get_v_size(Result* result)
+    {
+        return result->get_v_size();
     }
 
 

@@ -651,6 +651,12 @@ class Result:
         """
         return dll.result_get_y_size(self.instance)
 
+    def _v_size(self):
+        """
+        :returns: The dimension of the image space.
+        """
+        return dll.result_get_v_size(self.instance)
+
     @property
     def x(self):
         """
@@ -668,6 +674,17 @@ class Result:
         matrix_result_d_p = np.ctypeslib.ndpointer(dtype=np.float64, shape=(self._x_size(), self._y_size()))
         set_restype(dll.result_get_y, matrix_result_d_p)
         return dll.result_get_y(self.instance)
+
+    @property
+    def v(self):
+        """
+        :returns: The entries of the image space (y-axes) as an array. This has shape (n, m).
+        """
+        if self._v_size() == 0:
+            return None
+        matrix_result_d_p = np.ctypeslib.ndpointer(dtype=np.float64, shape=(self._v_size(), 3))
+        set_restype(dll.result_get_v, matrix_result_d_p)
+        return dll.result_get_v(self.instance)
 
 
 class Spectrum:
@@ -798,6 +815,20 @@ def _cast_y0(y0: array_like, size: int, solver: int):
             y0 /= np.sum(y0)
             y0 = np.diag(y0)
         return y0.ctypes.data_as(c_complex_p)
+    elif solver == 3:
+        y0 = np.asarray(y0, dtype=complex)
+        if (len(y0.shape) < 2 and y0.shape != (size, )) or len(y0.shape) > 2:
+            raise ValueError('\'y0\' must have shape (., {}) or {} but has shape {}.'
+                             .format(size, (size, ), y0.shape))
+        if len(y0.shape) == 2:
+            if y0.shape[1] != size:
+                raise ValueError('\'y0\' must have shape (., {}) or {} but has shape {}.'
+                                 .format(size, (size, ), y0.shape))
+            y0 /= np.expand_dims(tools.absolute_complex(y0, axis=1), axis=1)
+        else:
+            y0 /= tools.absolute_complex(y0)
+            y0 = np.expand_dims(y0, axis=0)
+        return y0.ctypes.data_as(c_complex_p), y0.shape[0]
 
 
 class Interaction:
@@ -999,26 +1030,46 @@ class Interaction:
     def rates(self, t: scalar, y0: array_like = None):
         if y0 is None:
             return Result(instance=dll.interaction_rate_equations(self.instance, c_double(float(t))))
-        y0 = _cast_y0(y0, self.atom.size, 0)
+        _y0 = _cast_y0(y0, self.atom.size, 0)
         return Result(instance=dll.interaction_rate_equations_y0(
-            self.instance, c_double(float(t)), y0.ctypes.data_as(c_double_p)))
+            self.instance, c_double(float(t)), _y0))
 
     def schroedinger(self, t: scalar, y0: array_like = None):
         if y0 is None:
             return Result(instance=dll.interaction_schroedinger(self.instance, c_double(float(t))))
-        y0 = _cast_y0(y0, self.atom.size, 1)
+        _y0 = _cast_y0(y0, self.atom.size, 1)
         return Result(instance=dll.interaction_schroedinger_y0(
-            self.instance, c_double(float(t)), y0.ctypes.data_as(c_complex_p)))
+            self.instance, c_double(float(t)), _y0))
 
     def master(self, t: scalar, y0: array_like = None):
         if y0 is None:
             return Result(instance=dll.interaction_master(self.instance, c_double(float(t))))
-        y0 = _cast_y0(y0, self.atom.size, 2)
+        _y0 = _cast_y0(y0, self.atom.size, 2)
         return Result(instance=dll.interaction_master_y0(
-            self.instance, c_double(float(t)), y0.ctypes.data_as(c_complex_p)))
+            self.instance, c_double(float(t)), _y0))
 
-    def master_mc(self, t: scalar):
-        return Result(instance=dll.interaction_master_mc(self.instance, c_double(float(t))))
+    def master_mc(self, t: scalar, y0: array_like = None, ntraj: int = 500, v: array_like = None,
+                  dynamics: bool = False):
+        if self.controlled:
+            raise ValueError('Controlled steppers are not supported with \'master_mc\' yet.'
+                  ' Decrease the step size if necessary.')
+        v = tools.asarray_optional(v, dtype=float)
+        if y0 is None:
+            if v is None:
+                instance = dll.interaction_master_mc(self.instance, c_double(float(t)), c_size_t(ntraj))
+            else:
+                instance = dll.interaction_master_mc_v(self.instance, v.ctypes.data_as(c_double_p),
+                                                       c_size_t(v.shape[0]), c_double(float(t)))
+        else:
+            _y0, size = _cast_y0(y0, self.atom.size, 3)
+            if v is None:
+                instance = dll.interaction_master_mc_y0(
+                    self.instance, c_double(float(t)), c_size_t(ntraj), _y0, c_size_t(size))
+            else:
+                instance = dll.interaction_master_mc_v_y0(
+                    self.instance, v.ctypes.data_as(c_double_p), c_size_t(v.shape[0]), c_double(float(t)),
+                    _y0, c_size_t(size))
+        return Result(instance=instance)
 
     def mean_v(self, t: scalar, v: array_like, y0: array_like = None, solver: str = None):
         v = np.asarray(v, dtype=float)

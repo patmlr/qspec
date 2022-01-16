@@ -20,6 +20,7 @@ extern double sc::pi = 3.14159265359;
 extern double sc::h = 6.62607015e-34;
 extern double sc::c = 299792458.;
 extern double sc::e = 1.602176634e-19;
+extern double sc::amu = 1.66053906660e-27;
 extern double sc::epsilon_0 = 8.8541878128e-12;
 extern double sc::g_s = -2.00231930436256;
 extern double sc::mu_B = 9.2740100783e-24;

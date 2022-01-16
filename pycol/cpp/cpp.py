@@ -210,12 +210,17 @@ dll.atom_get_L1.restype = c_double_p
 dll.result_construct.restype = ResultHandler
 dll.result_destruct.argtypes = (ResultHandler, )
 
+dll.result_get_x.argtypes = (ResultHandler, )
 dll.result_get_x_size.argtypes = (ResultHandler, )
 dll.result_get_x_size.restype = c_size_t
+
+dll.result_get_y.argtypes = (ResultHandler, )
 dll.result_get_y_size.argtypes = (ResultHandler, )
 dll.result_get_y_size.restype = c_size_t
-dll.result_get_x.argtypes = (ResultHandler, )
-dll.result_get_y.argtypes = (ResultHandler, )
+
+dll.result_get_v.argtypes = (ResultHandler, )
+dll.result_get_v_size.argtypes = (ResultHandler, )
+dll.result_get_v_size.restype = c_size_t
 
 
 # Spectrum
@@ -284,8 +289,14 @@ dll.interaction_master.restype = ResultHandler
 dll.interaction_master_y0.argtypes = (InteractionHandler, c_double, c_complex_p)
 dll.interaction_master_y0.restype = ResultHandler
 
-dll.interaction_master_mc.argtypes = (InteractionHandler, c_double)
+dll.interaction_master_mc.argtypes = (InteractionHandler, c_double, c_size_t)
 dll.interaction_master_mc.restype = ResultHandler
+dll.interaction_master_mc_v.argtypes = (InteractionHandler, c_double_p, c_size_t, c_double)
+dll.interaction_master_mc_v.restype = ResultHandler
+dll.interaction_master_mc_y0.argtypes = (InteractionHandler, c_double, c_size_t, c_complex_p, c_size_t)
+dll.interaction_master_mc_y0.restype = ResultHandler
+dll.interaction_master_mc_v_y0.argtypes = (InteractionHandler, c_double_p, c_size_t, c_double, c_complex_p, c_size_t)
+dll.interaction_master_mc_v_y0.restype = ResultHandler
 
 dll.interaction_mean_v.argtypes = (InteractionHandler, c_double_p, c_size_t, c_double, c_int)
 dll.interaction_mean_v.restype = ResultHandler

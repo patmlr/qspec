@@ -14,6 +14,7 @@ extern double pi;
 extern double h;
 extern double c;
 extern double e;
+extern double amu;
 extern double epsilon_0;
 extern double g_s;
 extern double mu_B;

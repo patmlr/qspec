@@ -395,6 +395,19 @@ State* Atom::get(size_t index)
 	return states[index];
 }
 
+Vector3d Atom::gen_velocity_change(size_t i, size_t j, size_t f, Vector3d& k, std::mt19937& gen)
+{
+	std::normal_distribution<double> d(0, 1);
+	Vector3d e_r;
+	e_r << d(gen), d(gen), d(gen);
+	e_r /= e_r.norm();
+
+	double freq_up = states.at(j)->get_freq() - states.at(i)->get_freq();
+	double freq_down = states.at(j)->get_freq() - states.at(f)->get_freq();
+
+	return sc::h / (mass * sc::amu * sc::c) * (freq_up * k - freq_down * e_r) * 1e6;
+}
+
 
 double* get_f(double i, double j)
 {

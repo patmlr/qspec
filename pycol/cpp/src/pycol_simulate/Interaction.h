@@ -4,6 +4,7 @@
 #include "Matter.h"
 #include "Light.h"
 #include "Results.h"
+#include "Utility.h"
 #include <set>
 #include <queue>
 #include <random>
@@ -59,7 +60,7 @@ protected:
 	std::vector<std::vector<size_t>>* con_list;
 	MatrixXd deltamap;
 	MatrixXd atommap;
-	std::vector<ArrayXb> tmap;
+	std::vector<ArrayXi> tmap;
 
 public:
 	int n_history;
@@ -94,6 +95,7 @@ public:
 	VectorXd* gen_w(const VectorXd& delta);
 	VectorXd* gen_w(const Vector3d& v);
 	VectorXd* gen_w(const VectorXd& delta, const Vector3d& v);
+	void update_w(VectorXd& w, const VectorXd& delta, const Vector3d& v);
 	VectorXd gen_delta(VectorXd& atom_freqs, VectorXd& laser_freqs);
 
 	MatrixXd* gen_rates(VectorXd& w0, VectorXd& w);
@@ -140,10 +142,12 @@ public:
 	Result* master(size_t n);
 	Result* master(double t);
 
+	Result* master_mc(size_t n, std::vector<VectorXcd>& x0, const VectorXd& delta, std::vector<Vector3d>& v);
+	Result* master_mc(size_t n, std::vector<VectorXcd>& x0, const VectorXd& delta, const Vector3d& v, size_t num);
+	Result* master_mc(size_t n, const VectorXd& delta, std::vector<Vector3d>& v);
 	Result* master_mc(size_t n, std::vector<VectorXcd>& x0, size_t num);
-	Result* master_mc(size_t n, std::vector<VectorXcd>& x0);
-	Result* master_mc(size_t n);
-	Result* master_mc(double t);
+	Result* master_mc(size_t n, size_t num);
+	Result* master_mc(double t, size_t num);
 
 	Result* call_solver_v(size_t n, VectorXd& x0, const VectorXd& delta, const Vector3d& v, int solver);
 	Result* call_solver_v(size_t n, VectorXcd& x0, const VectorXd& delta, const Vector3d& v, int solver);

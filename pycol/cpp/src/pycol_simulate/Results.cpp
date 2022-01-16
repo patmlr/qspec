@@ -8,6 +8,8 @@ Result::~Result()
 	std::vector<double>().swap(x);
 	std::vector<VectorXd>().swap(y);
 	std::vector<double>().swap(y_numpy);
+	std::vector<Vector3d>().swap(v);
+	std::vector<double>().swap(v_numpy);
 }
 
 
@@ -23,7 +25,9 @@ void Result::update()
 {
 	x_size = x.size();
 	y_size = y.at(0).size();
+	v_size = v.size();
 	y_numpy.clear();
+	v_numpy.clear();
 }
 
 void Result::add(double _x, const VectorXd& _y)
@@ -36,6 +40,11 @@ void Result::add(double _x, const VectorXd& _y)
 std::vector<double>* Result::get_x()
 {
 	return &x;
+}
+
+size_t Result::get_x_size()
+{
+	return x_size;
 }
 
 std::vector<VectorXd>* Result::get_y()
@@ -58,14 +67,40 @@ std::vector<double>* Result::get_y_numpy()
 	return &y_numpy;
 }
 
-size_t Result::get_x_size()
-{
-	return x_size;
-}
-
 size_t Result::get_y_size()
 {
 	return y_size;
+}
+
+std::vector<Vector3d>* Result::get_v()
+{
+	return &v;
+}
+
+void Result::set_v(std::vector<Vector3d> _v)
+{
+	v = _v;
+	v_size = v.size();
+}
+
+std::vector<double>* Result::get_v_numpy()
+{
+	if (v_numpy.size() == 0)
+	{
+		for (int i = 0; i < v_size; ++i)
+		{
+			for (int j = 0; j < 3; ++j)
+			{
+				v_numpy.push_back(v.at(i)(j));
+			}
+		}
+	}
+	return &v_numpy;
+}
+
+size_t Result::get_v_size()
+{
+	return v_size;
 }
 
 

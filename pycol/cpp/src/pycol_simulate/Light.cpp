@@ -125,3 +125,8 @@ void Laser::set_freq(double _freq)
 {
 	freq = _freq;
 }
+
+Vector3d* Laser::get_k()
+{
+	return &k;
+}
