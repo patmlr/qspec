@@ -18,6 +18,7 @@ using namespace std::complex_literals;
 extern std::complex<double> sc::i = 1i;
 extern double sc::pi = 3.14159265359;
 extern double sc::h = 6.62607015e-34;
+extern double sc::hbar = 1.054571817e-34;
 extern double sc::c = 299792458.;
 extern double sc::e = 1.602176634e-19;
 extern double sc::amu = 1.66053906660e-27;
@@ -239,4 +240,9 @@ double gamma(double v)
 double doppler(double x, double v, double angle)
 {
     return x * gamma(v) * (1 - v / sc::c * std::cos(angle));
+}
+
+double recoil(double freq, double mass)
+{
+    return sc::h * std::pow(freq, 2) / (2 * mass * sc::amu * std::pow(sc::c, 2)) * 1e12;
 }

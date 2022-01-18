@@ -53,11 +53,11 @@ class TestPhysics(ut.TestCase):
     # result = inter.rates(0.4)
     # result = inter.schroedinger(0.4)
     # result = inter.master(0.4, y0=None)
-    result = inter.master_mc(0.4, y0=None, ntraj=500, v=v, dynamics=False)
+    result = inter.master_mc(0.4, y0=None, ntraj=500, v=None, dynamics=True)
     print('Time: {} s'.format(time() - t))
-    v_ph = sc.h * p[0].freq / (atom.mass * sc.atomic_mass * sc.c) * 1e6
     x = result.x
     y = result.y
+    v_ph = sc.h * p[0].freq / (atom.mass * sc.atomic_mass * sc.c) * 1e6
     v = result.v / v_ph
     plt.hist(v[:, 0], bins=100)
     plt.hist(v[:, 1], bins=100)

@@ -446,31 +446,51 @@ VectorXd* Interaction::gen_w0(Environment& env)
 	return atom->get_w0();
 }
 
-VectorXd* Interaction::gen_w()
+VectorXd* Interaction::gen_w(bool dynamics)
 {
 	VectorXd* w = new VectorXd(lasers.size());
-	for (size_t m = 0; m < lasers.size(); ++m) (*w)(m) = 2 * sc::pi * lasers.at(m)->get_freq();
+	for (size_t m = 0; m < lasers.size(); ++m)
+	{
+		(*w)(m) = lasers.at(m)->get_freq();
+		if (dynamics) (*w)(m) -= recoil((*w)(m), atom->get_mass());
+		(*w)(m) *= 2 * sc::pi;
+	}
 	return w;
 }
 
-VectorXd* Interaction::gen_w(const VectorXd& delta)
+VectorXd* Interaction::gen_w(const VectorXd& delta, bool dynamics)
 {
 	VectorXd* w = new VectorXd(lasers.size());
-	for (size_t m = 0; m < lasers.size(); ++m) (*w)(m) = 2 * sc::pi * (lasers.at(m)->get_freq() + delta(m));
+	for (size_t m = 0; m < lasers.size(); ++m)
+	{
+		(*w)(m) = (lasers.at(m)->get_freq() + delta(m));
+		if (dynamics) (*w)(m) -= recoil((*w)(m), atom->get_mass());
+		(*w)(m) *= 2 * sc::pi;
+	}
 	return w;
 }
 
-VectorXd* Interaction::gen_w(const Vector3d& v)
+VectorXd* Interaction::gen_w(const Vector3d& v, bool dynamics)
 {
 	VectorXd* w = new VectorXd(lasers.size());
-	for (size_t m = 0; m < lasers.size(); ++m) (*w)(m) = 2 * sc::pi * lasers.at(m)->get_detuned(v);
+	for (size_t m = 0; m < lasers.size(); ++m)
+	{
+		(*w)(m) = lasers.at(m)->get_detuned(v);
+		if (dynamics) (*w)(m) -= recoil((*w)(m), atom->get_mass());
+		(*w)(m) *= 2 * sc::pi;
+	}
 	return w;
 }
 
-VectorXd* Interaction::gen_w(const VectorXd& delta, const Vector3d& v)
+VectorXd* Interaction::gen_w(const VectorXd& delta, const Vector3d& v, bool dynamics)
 {
 	VectorXd* w = new VectorXd(lasers.size());
-	for (size_t m = 0; m < lasers.size(); ++m) (*w)(m) = 2 * sc::pi * lasers.at(m)->get_detuned(delta(m), v);
+	for (size_t m = 0; m < lasers.size(); ++m)
+	{
+		(*w)(m) = lasers.at(m)->get_detuned(delta(m), v);
+		if (dynamics) (*w)(m) -= recoil((*w)(m), atom->get_mass());
+		(*w)(m) *= 2 * sc::pi;
+	}
 	return w;
 }
 
@@ -945,9 +965,8 @@ Result* Interaction::master(double t)
 	return master(n);
 }
 
-Result* Interaction::master_mc(size_t n, std::vector<VectorXcd>& x0, const VectorXd& delta, std::vector<Vector3d>& v)
+Result* Interaction::master_mc(size_t n, std::vector<VectorXcd>& x0, const VectorXd& delta, std::vector<Vector3d>& v, bool dynamics)
 {
-	bool dynamics = true;
 	std::vector<size_t> c_i;
 	std::vector<size_t> c_j;
 	std::vector<double> c_a;
@@ -966,7 +985,8 @@ Result* Interaction::master_mc(size_t n, std::vector<VectorXcd>& x0, const Vecto
 
 	std::vector<double> t = std::vector<double>(n + 1);
 	std::vector<VectorXd> x = std::vector<VectorXd>(n + 1);
-	std::vector<Vector3d> v_res = std::vector<Vector3d>(v.size() * x0.size(), Vector3d::Zero());
+	std::vector<Vector3d> v_res;
+	if (dynamics) v_res = std::vector<Vector3d>(v.size() * x0.size(), Vector3d::Zero());
 	for (int n_t = 0; n_t < n + 1; ++n_t)
 	{
 		t.at(n_t) = n_t * dt_var;
@@ -1047,14 +1067,14 @@ Result* Interaction::master_mc(size_t n, std::vector<VectorXcd>& x0, const Vecto
 						r = d(gen);
 					}
 				}
-				v_res.at(_n_psi * v.size() + i_v++) = v_temp;
+				if (dynamics) v_res.at(_n_psi * v.size() + i_v++) = v_temp;
 			}
 			
 			delete w;
 		});
 
 	Result* _result = new Result();
-	_result->set_v(v_res);
+	if (dynamics) _result->set_v(v_res);
 	for (size_t n_t = 0; n_t < n + 1; ++n_t)
 	{
 		_result->add(t.at(n_t), x.at(n_t) / v.size() / atom->get_gs()->size());
@@ -1158,7 +1178,7 @@ Result* Interaction::master_mc(size_t n, std::vector<VectorXcd>& x0, const Vecto
 	return _result;
 }
 
-Result* Interaction::master_mc(size_t n, const VectorXd& delta, std::vector<Vector3d>& v)
+Result* Interaction::master_mc(size_t n, const VectorXd& delta, std::vector<Vector3d>& v, bool dynamics)
 {
 	std::vector<VectorXcd> x0(atom->get_gs()->size(), VectorXcd::Zero(atom->get_size()));
 	size_t i = 0;
@@ -1167,19 +1187,28 @@ Result* Interaction::master_mc(size_t n, const VectorXd& delta, std::vector<Vect
 		x0.at(i)(gs) = 1.;
 		++i;
 	}
-	return master_mc(n, x0, delta, v);
+	return master_mc(n, x0, delta, v, dynamics);
 }
 
-Result* Interaction::master_mc(size_t n, std::vector<VectorXcd>& x0, size_t num)
+Result* Interaction::master_mc(size_t n, std::vector<VectorXcd>& x0, size_t num, bool dynamics)
 {
 	VectorXd delta(lasers.size());
 	delta = VectorXd::Zero(lasers.size());
-	Vector3d v;
-	v = Vector3d::Zero();
-	return master_mc(n, x0, delta, v, num);
+	if (dynamics)
+	{
+		std::vector<Vector3d> v;
+		v = std::vector<Vector3d>(num, Vector3d::Zero());
+		return master_mc(n, x0, delta, v, true);
+	}
+	else
+	{
+		Vector3d v;
+		v = Vector3d::Zero();
+		return master_mc(n, x0, delta, v, num);
+	}
 }
 
-Result* Interaction::master_mc(size_t n, size_t num)
+Result* Interaction::master_mc(size_t n, size_t num, bool dynamics)
 {
 	std::vector<VectorXcd> x0(atom->get_gs()->size(), VectorXcd::Zero(atom->get_size()));
 	size_t i = 0;
@@ -1188,13 +1217,13 @@ Result* Interaction::master_mc(size_t n, size_t num)
 		x0.at(i)(gs) = 1.;
 		++i;
 	}
-	return master_mc(n, x0, num);
+	return master_mc(n, x0, num, dynamics);
 }
 
-Result* Interaction::master_mc(double t, size_t num)
+Result* Interaction::master_mc(double t, size_t num, bool dynamics)
 {
 	size_t n = arange_t(t);
-	return master_mc(n, num);
+	return master_mc(n, num, dynamics);
 }
 
 Result* Interaction::call_solver_v(size_t n, VectorXd& x0, const VectorXd& delta, const Vector3d& v, int solver)

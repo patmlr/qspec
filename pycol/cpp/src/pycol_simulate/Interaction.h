@@ -91,10 +91,10 @@ public:
 
 	VectorXd* gen_w0();
 	VectorXd* gen_w0(Environment& env);
-	VectorXd* gen_w();
-	VectorXd* gen_w(const VectorXd& delta);
-	VectorXd* gen_w(const Vector3d& v);
-	VectorXd* gen_w(const VectorXd& delta, const Vector3d& v);
+	VectorXd* gen_w(bool dynamics = false);
+	VectorXd* gen_w(const VectorXd& delta, bool dynamics = false);
+	VectorXd* gen_w(const Vector3d& v, bool dynamics = false);
+	VectorXd* gen_w(const VectorXd& delta, const Vector3d& v, bool dynamics = false);
 	void update_w(VectorXd& w, const VectorXd& delta, const Vector3d& v);
 	VectorXd gen_delta(VectorXd& atom_freqs, VectorXd& laser_freqs);
 
@@ -142,12 +142,12 @@ public:
 	Result* master(size_t n);
 	Result* master(double t);
 
-	Result* master_mc(size_t n, std::vector<VectorXcd>& x0, const VectorXd& delta, std::vector<Vector3d>& v);
+	Result* master_mc(size_t n, std::vector<VectorXcd>& x0, const VectorXd& delta, std::vector<Vector3d>& v, bool dynamics = false);
 	Result* master_mc(size_t n, std::vector<VectorXcd>& x0, const VectorXd& delta, const Vector3d& v, size_t num);
-	Result* master_mc(size_t n, const VectorXd& delta, std::vector<Vector3d>& v);
-	Result* master_mc(size_t n, std::vector<VectorXcd>& x0, size_t num);
-	Result* master_mc(size_t n, size_t num);
-	Result* master_mc(double t, size_t num);
+	Result* master_mc(size_t n, const VectorXd& delta, std::vector<Vector3d>& v, bool dynamics = false);
+	Result* master_mc(size_t n, std::vector<VectorXcd>& x0, size_t num, bool dynamics = false);
+	Result* master_mc(size_t n, size_t num, bool dynamics = false);
+	Result* master_mc(double t, size_t num, bool dynamics = false);
 
 	Result* call_solver_v(size_t n, VectorXd& x0, const VectorXd& delta, const Vector3d& v, int solver);
 	Result* call_solver_v(size_t n, VectorXcd& x0, const VectorXd& delta, const Vector3d& v, int solver);

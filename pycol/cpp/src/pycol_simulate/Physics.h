@@ -12,6 +12,7 @@ namespace sc
 extern std::complex<double> i;
 extern double pi;
 extern double h;
+extern double hbar;
 extern double c;
 extern double e;
 extern double amu;
@@ -40,3 +41,4 @@ double hyper_zeeman(double i, double s, double ll, double j,
 double lorentz(double w, double w0, double a, double rabi_square);
 double gamma(double v);
 double doppler(double x, double v, double angle);
+double recoil(double freq, double mass);
