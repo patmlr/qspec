@@ -91,11 +91,11 @@ public:
 
 	VectorXd* gen_w0();
 	VectorXd* gen_w0(Environment& env);
-	VectorXd* gen_w(bool dynamics = false);
-	VectorXd* gen_w(const VectorXd& delta, bool dynamics = false);
-	VectorXd* gen_w(const Vector3d& v, bool dynamics = false);
-	VectorXd* gen_w(const VectorXd& delta, const Vector3d& v, bool dynamics = false);
-	void update_w(VectorXd& w, const VectorXd& delta, const Vector3d& v);
+	VectorXd* gen_w(const bool dynamics = false);
+	VectorXd* gen_w(const VectorXd& delta, const bool dynamics = false);
+	VectorXd* gen_w(const Vector3d& v, const bool dynamics = false);
+	VectorXd* gen_w(const VectorXd& delta, const Vector3d& v, const bool dynamics = false);
+	void update_w(VectorXd& w, const VectorXd& delta, const Vector3d& v, const bool dynamics = false);
 	VectorXd gen_delta(VectorXd& atom_freqs, VectorXd& laser_freqs);
 
 	MatrixXd* gen_rates(VectorXd& w0, VectorXd& w);
@@ -142,7 +142,7 @@ public:
 	Result* master(size_t n);
 	Result* master(double t);
 
-	Result* master_mc(size_t n, std::vector<VectorXcd>& x0, const VectorXd& delta, std::vector<Vector3d>& v, bool dynamics = false);
+	Result* master_mc(size_t n, std::vector<VectorXcd>& x0, const VectorXd& delta, const std::vector<Vector3d>& v, const bool dynamics = false);
 	Result* master_mc(size_t n, std::vector<VectorXcd>& x0, const VectorXd& delta, const Vector3d& v, size_t num);
 	Result* master_mc(size_t n, const VectorXd& delta, std::vector<Vector3d>& v, bool dynamics = false);
 	Result* master_mc(size_t n, std::vector<VectorXcd>& x0, size_t num, bool dynamics = false);
@@ -168,10 +168,12 @@ public:
 	Spectrum* spectrum(const std::vector<VectorXd>& delta, size_t n, T& y0, int solver);
 	Spectrum* spectrum(const std::vector<VectorXd>& delta, size_t n, int solver);
 	Spectrum* spectrum(const std::vector<VectorXd>& delta, double t, int solver);
+	Spectrum* spectrum_mc(const std::vector<VectorXd>& delta, double t, int solver, bool dynamics = false);
 	template<typename T>
 	Spectrum* spectrum(const std::vector<VectorXd>& delta, const std::vector<Vector3d>& v, size_t n, T& y0, int solver);
 	Spectrum* spectrum(const std::vector<VectorXd>& delta, const std::vector<Vector3d>& v, size_t n, int solver);
 	Spectrum* spectrum(const std::vector<VectorXd>& delta, const std::vector<Vector3d>& v, double t, int solver);
+	Spectrum* spectrum_mc(const std::vector<VectorXd>& delta, const std::vector<Vector3d>& v, size_t n, std::vector<VectorXcd>& y0, int solver, bool dynamics = false);
 
 	void set_result(Result* _result);
 	Result* get_result();

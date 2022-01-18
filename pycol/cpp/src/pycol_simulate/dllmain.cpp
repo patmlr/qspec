@@ -352,6 +352,16 @@ extern "C"
         return atom->get_size();
     }
 
+    __declspec(dllexport) size_t atom_get_gs_size(Atom* atom)
+    {
+        return atom->get_gs()->size();
+    }
+
+    __declspec(dllexport) size_t* atom_get_gs(Atom* atom)
+    {
+        return atom->get_gs()->data();
+    }
+
     __declspec(dllexport) double* atom_get_m_dipole(Atom* atom, size_t i)
     {
         return atom->get_m_dipole()->at(i).data();
@@ -510,7 +520,7 @@ extern "C"
         return interaction->master(t);
     }
 
-    __declspec(dllexport) Result* interaction_master_y0(Interaction* interaction, double t, std::complex<double>* y0)
+    __declspec(dllexport) Result* interaction_master_y0(Interaction* interaction, double t, std::complex<double>* y0, bool dynamics)
     {
         size_t n = interaction->arange_t(t);
         size_t size = interaction->get_atom()->get_size();
@@ -523,37 +533,37 @@ extern "C"
         return interaction->master(n, _y0);
     }
 
-    __declspec(dllexport) Result* interaction_master_mc(Interaction* interaction, double t, size_t num)
+    __declspec(dllexport) Result* interaction_master_mc(Interaction* interaction, double t, size_t num, bool dynamics)
     {
-        return interaction->master_mc(t, num);
+        return interaction->master_mc(t, num, dynamics);
     }
 
-    __declspec(dllexport) Result* interaction_master_mc_v(Interaction* interaction, double* v, size_t v_size, double t)
+    __declspec(dllexport) Result* interaction_master_mc_v(Interaction* interaction, double* v, size_t v_size, double t, bool dynamics)
     {
         size_t n = interaction->arange_t(t);
         VectorXd delta = VectorXd::Zero(interaction->get_lasers()->size());
         std::vector<Vector3d> _v = cast_v(v, v_size);
-        return interaction->master_mc(n, delta, _v);
+        return interaction->master_mc(n, delta, _v, dynamics);
     }
 
     __declspec(dllexport) Result* interaction_master_mc_y0(Interaction* interaction, double t, size_t num,
-        std::complex<double>* y0, size_t y0_size)
+        std::complex<double>* y0, size_t y0_size, bool dynamics)
     {
         size_t n = interaction->arange_t(t);
         size_t size = interaction->get_atom()->get_size();
         std::vector<VectorXcd> _y0 = cast_y0_vector_vectorcd(y0, y0_size, size);
-        return interaction->master_mc(n, _y0, num);
+        return interaction->master_mc(n, _y0, num, dynamics);
     }
 
     __declspec(dllexport) Result* interaction_master_mc_v_y0(Interaction* interaction, double* v, size_t v_size, double t,
-        std::complex<double>* y0, size_t y0_size)
+        std::complex<double>* y0, size_t y0_size, bool dynamics)
     {
         size_t n = interaction->arange_t(t);
         size_t size = interaction->get_atom()->get_size();
         std::vector<VectorXcd> _y0 = cast_y0_vector_vectorcd(y0, y0_size, size);
         VectorXd delta = VectorXd::Zero(interaction->get_lasers()->size());
         std::vector<Vector3d> _v = cast_v(v, v_size);
-        return interaction->master_mc(n, _y0, delta, _v);
+        return interaction->master_mc(n, _y0, delta, _v, dynamics);
     }
 
     __declspec(dllexport) Result* interaction_mean_v(Interaction* interaction, double* v, size_t v_size,
@@ -651,6 +661,15 @@ extern "C"
         MatrixXcd _y0 = cast_y0_matrixcd(y0, interaction->get_atom()->get_size());
         const std::vector<VectorXd> _delta = cast_delta(delta, delta_size, interaction->get_lasers()->size());
         return interaction->spectrum(_delta, cast_v(v, v_size), n, _y0, 2);
+    }
+
+    __declspec(dllexport) Spectrum* interaction_spectrum_mean_v_y0_vector_vectorcd(Interaction* interaction, double* delta, size_t delta_size,
+        double* v, size_t v_size, double t, std::complex<double>* y0, size_t y0_size, bool dynamics)
+    {
+        size_t n = interaction->arange_t(t);
+        std::vector<VectorXcd> _y0 = cast_y0_vector_vectorcd(y0, y0_size, interaction->get_atom()->get_size());
+        const std::vector<VectorXd> _delta = cast_delta(delta, delta_size, interaction->get_lasers()->size());
+        return interaction->spectrum_mc(_delta, cast_v(v, v_size), n, _y0, 2, dynamics);
     }
 
 

@@ -557,6 +557,15 @@ class Atom:
         return dll.atom_get_size(self.instance)
 
     @property
+    def gs(self) -> ndarray:
+        """
+        :returns: The indices of the ground states.
+        """
+        vector_i_p = np.ctypeslib.ndpointer(dtype=c_size_t, shape=(dll.atom_get_gs_size(self.instance), ))
+        set_restype(dll.atom_get_gs, vector_i_p)
+        return dll.atom_get_gs(self.instance)
+
+    @property
     def dipoles(self):
         """
         :returns: The dipole strengths between the atomic states in the 3 basis-components
@@ -781,30 +790,63 @@ def _cast_delta(delta: array_like, m: Optional[int], size: int) -> ndarray:
     return delta
 
 
-def _choose_solver_index(solver: Optional[str]) -> int:
-    if solver is None:
-        return 0
-    solvers = ['rates', 'schroedinger', 'master']
+def _choose_solver(solver: str, **kwargs) -> (int, list):
+    """
+    :param solver: The solver. Can be one of ['rates', 'schroedinger', 'master', 'master_mc'].
+    :param kwargs: Keyword arguments to be passed to the chosen solver.
+    :returns: The index of the solver and additional arguments that may be required.
+    """
+    solvers = {'rates': 0, 'schroedinger': 1, 'master': 2, 'master_mc': 3}
+    _a = {0: [], 1: [], 2: [], 3: ['dynamics']}
+    _d = {'dynamics': False}
+    _t = {'dynamics': c_bool}
     try:
-        return solvers.index(solver.lower())
+        index = solvers[solver.lower()]
     except ValueError:
-        raise ValueError('Solver {} is not available. Use one of {}.'.format(solver, solvers))
+        raise ValueError('Solver {} is not available. Use one of {}.'
+                         .format(solver, ['rates', 'schroedinger', 'master', 'master_mc']))
+    _args = [_t[_arg](kwargs.get(_arg, _d[_arg])) for _arg in _a[index]]
+    return index, _args
 
 
-def _cast_y0(y0: array_like, size: int, solver: int):
-    if solver == 0:
+def _cast_y0(y0: Optional[array_like], i_solver: int, atom: Atom):
+    """
+    :param y0: The initial state of an ensemble of atoms. Depending on the solver, this must be (...).
+    :param atom: The atom.
+    :param i_solver: The index of the solver.
+    :returns: The correctly shaped 'y0' for the chosen solver and its C type.
+    """
+    size = atom.size
+    gs = atom.gs
+
+    if i_solver == 0:  # Rate equations.
+        if y0 is None:
+            y0 = np.zeros(size, dtype=float)
+            y0[gs] = 1 / gs.size
+            return y0, c_double_p
         y0 = np.asarray(y0, dtype=float)
         if y0.shape != (size, ):
             raise ValueError('\'y0\' must have shape {} but has shape {}.'.format((size, ), y0.shape))
         y0 /= np.sum(y0)
-        return y0.ctypes.data_as(c_double_p)
-    elif solver == 1:
+        return y0, c_double_p
+
+    elif i_solver == 1:  # Schroedinger equation.
+        if y0 is None:
+            y0 = np.zeros(size, dtype=complex)
+            y0[gs[0]] = 1
+            return y0, c_complex_p
         y0 = np.asarray(y0, dtype=complex)
         if y0.shape != (size, ):
             raise ValueError('\'y0\' must have shape {} but has shape {}.'.format((size, ), y0.shape))
         y0 /= tools.absolute_complex(y0)
-        return y0.ctypes.data_as(c_complex_p)
-    elif solver == 2:
+        return y0, c_complex_p
+
+    elif i_solver == 2:  # Master equation.
+        if y0 is None:
+            y0 = np.zeros(size, dtype=complex)
+            y0[gs] = 1 / gs.size
+            y0 = np.diag(y0)
+            return y0, c_complex_p
         y0 = np.asarray(y0, dtype=complex)
         if y0.shape != (size, size) and y0.shape != (size, ):
             raise ValueError('\'y0\' must have shape {} or {} but has shape {}.'
@@ -814,8 +856,14 @@ def _cast_y0(y0: array_like, size: int, solver: int):
         else:
             y0 /= np.sum(y0)
             y0 = np.diag(y0)
-        return y0.ctypes.data_as(c_complex_p)
-    elif solver == 3:
+        return y0, c_complex_p
+
+    elif i_solver == 3:  # Monte Carlo "master equation".
+        if y0 is None:
+            y0 = np.zeros((gs.size, size), dtype=complex)
+            y0[gs, gs] = 1
+            y0 = np.diag(y0)
+            return y0, c_complex_p
         y0 = np.asarray(y0, dtype=complex)
         if (len(y0.shape) < 2 and y0.shape != (size, )) or len(y0.shape) > 2:
             raise ValueError('\'y0\' must have shape (., {}) or {} but has shape {}.'
@@ -828,8 +876,31 @@ def _cast_y0(y0: array_like, size: int, solver: int):
         else:
             y0 /= tools.absolute_complex(y0)
             y0 = np.expand_dims(y0, axis=0)
-        return y0.ctypes.data_as(c_complex_p), y0.shape[0]
 
+        return y0, c_complex_p
+
+
+def _cast_v(v: Optional[array_like]):
+    """
+    :param v: Atom velocities. Must be a scalar or have shape (n, ) or (n, 3). In the first two cases,
+     the velocity vector(s) is assumed to be aligned with the x-axis.
+    :returns: The correctly shaped velocities with shape (n, 3).
+    :raises ValueError: If 'v' has the wrong shape.
+    """
+    if v is None:
+        return np.array([[0, 0, 0]], dtype=float)
+    v = np.asarray(v, dtype=float)
+    if len(v.shape) == 0:
+        return np.array([[v, 0, 0]], dtype=float)
+    elif len(v.shape) == 1:
+        ret = np.zeros((v.size, 3), dtype=float)
+        ret[:, 0] = v
+        return ret
+    elif len(v.shape) == 2:
+        if v.shape[1] == 3:
+            return v
+    raise ValueError('\'v\' must be a scalar or have shape (n, ) or (n, 3) but has shape {}.'.format(v.shape))
+    
 
 class Interaction:
     """
@@ -1028,89 +1099,110 @@ class Interaction:
         return dll.interaction_get_history(self.instance)
 
     def rates(self, t: scalar, y0: array_like = None):
-        if y0 is None:
-            return Result(instance=dll.interaction_rate_equations(self.instance, c_double(float(t))))
-        _y0 = _cast_y0(y0, self.atom.size, 0)
+        """
+        :param t: The final time of the solution. The number of time steps is determined
+         by the step size Interaction.dt.
+        :param y0: The initial state of an ensemble of atoms. This must be None or an 1d-array of size
+         Interaction.atom.size. If None, the ground states are populated equally.
+        :returns: The integrated rate equations as a 'Result' object.
+        """
+        _y0, ctype = _cast_y0(y0, 0, self.atom)
         return Result(instance=dll.interaction_rate_equations_y0(
-            self.instance, c_double(float(t)), _y0))
+            self.instance, c_double(float(t)), _y0.ctypes.data_as(ctype)))
 
     def schroedinger(self, t: scalar, y0: array_like = None):
-        if y0 is None:
-            return Result(instance=dll.interaction_schroedinger(self.instance, c_double(float(t))))
-        _y0 = _cast_y0(y0, self.atom.size, 1)
+        """
+        :param t: The final time of the solution. The number of time steps is determined
+         by the step size Interaction.dt.
+        :param y0: The initial state of an ensemble of atoms. This must be None or an 1d-array of size
+         Interaction.atom.size. 'y0' can be complex valued. If None, only the first ground state is populated.
+         'y0' should be a coherent state vector. However, this is up to the user.
+        :returns: The integrated Schroedinger equation as a 'Result' object.
+        """
+        _y0, ctype = _cast_y0(y0, 1, self.atom)
         return Result(instance=dll.interaction_schroedinger_y0(
-            self.instance, c_double(float(t)), _y0))
+            self.instance, c_double(float(t)), _y0.ctypes.data_as(ctype)))
 
     def master(self, t: scalar, y0: array_like = None):
-        if y0 is None:
-            return Result(instance=dll.interaction_master(self.instance, c_double(float(t))))
-        _y0 = _cast_y0(y0, self.atom.size, 2)
+        """
+        :param t: The final time of the solution. The number of time steps is determined
+         by the step size Interaction.dt.
+        :param y0: The initial state of an ensemble of atoms. This must be None, an 1d-array of size
+         Interaction.atom.size or a 2d-array with shape (Interaction.atom.size, Interaction.atom.size).
+         'y0' can be complex valued. If None, the ground states are populated equally.
+        :returns: The integrated master equation as a 'Result' object.
+        """
+        _y0, ctype = _cast_y0(y0, 2, self.atom)
         return Result(instance=dll.interaction_master_y0(
-            self.instance, c_double(float(t)), _y0))
+            self.instance, c_double(float(t)), _y0.ctypes.data_as(ctype)))
 
     def master_mc(self, t: scalar, y0: array_like = None, ntraj: int = 500, v: array_like = None,
                   dynamics: bool = False):
+        """
+        :param t: The final time of the solution. The number of time steps is determined
+         by the step size Interaction.dt.
+        :param y0: The initial state of an ensemble of atoms. This must be None, an 1d-array of size
+         Interaction.atom.size or a 2d-array (i.e. a list of coherent state vectors)
+         with shape (n, Interaction.atom.size). 'y0' can be complex valued.
+         If None, the ground states are populated equally.
+        :param ntraj: The number of trajectories to average over.
+        :param v: Atom velocities. This overwrites 'ntraj'.
+         Each individual velocity directly corresponds to one trajectory.
+        :param dynamics: Whether to simulate the mechanical dynamics of the atom in the laser field.
+        :returns: The integrated Monte-Carlo master equation as a 'Result' object.
+        """
         if self.controlled:
             raise ValueError('Controlled steppers are not supported with \'master_mc\' yet.'
                   ' Decrease the step size if necessary.')
-        v = tools.asarray_optional(v, dtype=float)
-        if y0 is None:
-            if v is None:
-                instance = dll.interaction_master_mc(self.instance, c_double(float(t)), c_size_t(ntraj))
-            else:
-                instance = dll.interaction_master_mc_v(self.instance, v.ctypes.data_as(c_double_p),
-                                                       c_size_t(v.shape[0]), c_double(float(t)))
+        _y0, ctype = _cast_y0(y0, 3, self.atom)
+        if v is None:
+            instance = dll.interaction_master_mc_y0(self.instance, c_double(float(t)), c_size_t(ntraj),
+                                                    _y0.ctypes.data_as(ctype), c_size_t(_y0.shape[0]), c_bool(dynamics))
         else:
-            _y0, size = _cast_y0(y0, self.atom.size, 3)
-            if v is None:
-                instance = dll.interaction_master_mc_y0(
-                    self.instance, c_double(float(t)), c_size_t(ntraj), _y0, c_size_t(size))
-            else:
-                instance = dll.interaction_master_mc_v_y0(
-                    self.instance, v.ctypes.data_as(c_double_p), c_size_t(v.shape[0]), c_double(float(t)),
-                    _y0, c_size_t(size))
+            v = _cast_v(v)
+            instance = dll.interaction_master_mc_v_y0(
+                self.instance, v.ctypes.data_as(c_double_p), c_size_t(v.shape[0]), c_double(float(t)),
+                _y0.ctypes.data_as(ctype), c_size_t(_y0.shape[0]), c_bool(dynamics))
         return Result(instance=instance)
 
-    def mean_v(self, t: scalar, v: array_like, y0: array_like = None, solver: str = None):
+    def mean_v(self, t: scalar, v: array_like, y0: array_like = None, solver: str = 'rates', **kwargs):
         v = np.asarray(v, dtype=float)
-        _solver = _choose_solver_index(solver)
+        _solver, _args = _choose_solver(solver, **kwargs)
         if y0 is None:
             return Result(instance=dll.interaction_mean_v(
                 self.instance, v.ctypes.data_as(c_double_p), c_size_t(v.shape[0]), c_double(t), c_int(_solver)))
-        _y0 = _cast_y0(y0, self.atom.size, _solver)
+        _y0, ctype = _cast_y0(y0, _solver, self.atom)
         dll_funcs = [dll.interaction_mean_v_y0_vectord, dll.interaction_mean_v_y0_vectorcd,
                      dll.interaction_mean_v_y0_matrixcd]
-        return Result(instance=dll_funcs[_solver](
-                self.instance, v.ctypes.data_as(c_double_p), c_size_t(v.shape[0]), c_double(t), _y0))
+        return Result(instance=dll_funcs[_solver](self.instance, v.ctypes.data_as(c_double_p), c_size_t(v.shape[0]),
+                                                  c_double(t), _y0.ctypes.data_as(ctype)))
 
     def spectrum(self, t: scalar, delta: array_like, m: Optional[int] = 0, v: array_like = None, y0: array_like = None,
-                 solver: str = None):
+                 solver: str = 'rates', v_mode: str = 'mean', **kwargs):
 
         delta = _cast_delta(delta, m, len(self.lasers))
-        _solver = _choose_solver_index(solver)
+        _solver, _args = _choose_solver(solver, **kwargs)
         v = tools.asarray_optional(v, dtype=float)
-
-        if y0 is None:
-            if v is None:
-                instance = dll.interaction_spectrum(self.instance, delta.ctypes.data_as(c_double_p),
-                                                    c_size_t(delta.shape[0]), c_double(t), c_int(_solver))
+        _y0, ctype = _cast_y0(y0, _solver, self.atom)
+        if v is None:
+            dll_funcs = [dll.interaction_spectrum_y0_vectord, dll.interaction_spectrum_y0_vectorcd,
+                         dll.interaction_spectrum_y0_matrixcd]
+            if _solver == 3:
+                instance = None
             else:
-                instance = dll.interaction_spectrum_mean_v(
-                    self.instance, delta.ctypes.data_as(c_double_p), c_size_t(delta.shape[0]),
-                    v.ctypes.data_as(c_double_p), c_size_t(v.shape[0]), c_double(t), c_int(_solver))
-
-        else:
-            _y0 = _cast_y0(y0, self.atom.size, _solver)
-            if v is None:
-                dll_funcs = [dll.interaction_spectrum_y0_vectord, dll.interaction_spectrum_y0_vectorcd,
-                             dll.interaction_spectrum_y0_matrixcd]
                 instance = dll_funcs[_solver](self.instance, delta.ctypes.data_as(c_double_p), c_size_t(delta.shape[0]),
-                                              c_double(t), _y0)
+                                              c_double(t), _y0.ctypes.data_as(ctype))
+        else:
+            dll_funcs = [dll.interaction_spectrum_mean_v_y0_vectord, dll.interaction_spectrum_mean_v_y0_vectorcd,
+                         dll.interaction_spectrum_mean_v_y0_matrixcd]
+            if _solver == 3:
+                instance = dll.interaction_spectrum_mean_v_y0_vector_vectorcd(
+                    self.instance, delta.ctypes.data_as(c_double_p), c_size_t(delta.shape[0]),
+                    v.ctypes.data_as(c_double_p), c_size_t(v.shape[0]), c_double(t), _y0.ctypes.data_as(ctype),
+                    _y0.shape[0], *_args)
             else:
-                dll_funcs = [dll.interaction_spectrum_mean_v_y0_vectord, dll.interaction_spectrum_mean_v_y0_vectorcd,
-                             dll.interaction_spectrum_mean_v_y0_matrixcd]
                 instance = dll_funcs[_solver](
                     self.instance, delta.ctypes.data_as(c_double_p), c_size_t(delta.shape[0]),
-                    v.ctypes.data_as(c_double_p), c_size_t(v.shape[0]), c_double(t), _y0)
+                    v.ctypes.data_as(c_double_p), c_size_t(v.shape[0]), c_double(t), _y0.ctypes.data_as(ctype))
 
         return Spectrum(instance=instance)

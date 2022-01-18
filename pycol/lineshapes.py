@@ -448,7 +448,7 @@ class Model:
         """
         self.shape = shape
         if not isinstance(self.shape, Shape):
-            self.shape = Shape(**kwargs)
+            self.shape = Shape(func=shape, **kwargs)
 
         self.n_shape, self.arg_map, self.x_cuts, self.offset_order = 1, {}, [], 0
 

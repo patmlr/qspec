@@ -446,7 +446,7 @@ VectorXd* Interaction::gen_w0(Environment& env)
 	return atom->get_w0();
 }
 
-VectorXd* Interaction::gen_w(bool dynamics)
+VectorXd* Interaction::gen_w(const bool dynamics)
 {
 	VectorXd* w = new VectorXd(lasers.size());
 	for (size_t m = 0; m < lasers.size(); ++m)
@@ -458,7 +458,7 @@ VectorXd* Interaction::gen_w(bool dynamics)
 	return w;
 }
 
-VectorXd* Interaction::gen_w(const VectorXd& delta, bool dynamics)
+VectorXd* Interaction::gen_w(const VectorXd& delta, const bool dynamics)
 {
 	VectorXd* w = new VectorXd(lasers.size());
 	for (size_t m = 0; m < lasers.size(); ++m)
@@ -470,7 +470,7 @@ VectorXd* Interaction::gen_w(const VectorXd& delta, bool dynamics)
 	return w;
 }
 
-VectorXd* Interaction::gen_w(const Vector3d& v, bool dynamics)
+VectorXd* Interaction::gen_w(const Vector3d& v, const bool dynamics)
 {
 	VectorXd* w = new VectorXd(lasers.size());
 	for (size_t m = 0; m < lasers.size(); ++m)
@@ -482,7 +482,7 @@ VectorXd* Interaction::gen_w(const Vector3d& v, bool dynamics)
 	return w;
 }
 
-VectorXd* Interaction::gen_w(const VectorXd& delta, const Vector3d& v, bool dynamics)
+VectorXd* Interaction::gen_w(const VectorXd& delta, const Vector3d& v, const bool dynamics)
 {
 	VectorXd* w = new VectorXd(lasers.size());
 	for (size_t m = 0; m < lasers.size(); ++m)
@@ -494,7 +494,7 @@ VectorXd* Interaction::gen_w(const VectorXd& delta, const Vector3d& v, bool dyna
 	return w;
 }
 
-void Interaction::update_w(VectorXd& w, const VectorXd& delta, const Vector3d& v)
+void Interaction::update_w(VectorXd& w, const VectorXd& delta, const Vector3d& v, const bool dynamics)
 {
 	for (size_t m = 0; m < lasers.size(); ++m) w(m) = 2 * sc::pi * lasers.at(m)->get_detuned(delta(m), v);
 }
@@ -965,7 +965,7 @@ Result* Interaction::master(double t)
 	return master(n);
 }
 
-Result* Interaction::master_mc(size_t n, std::vector<VectorXcd>& x0, const VectorXd& delta, std::vector<Vector3d>& v, bool dynamics)
+Result* Interaction::master_mc(size_t n, std::vector<VectorXcd>& x0, const VectorXd& delta, const std::vector<Vector3d>& v, const bool dynamics)
 {
 	std::vector<size_t> c_i;
 	std::vector<size_t> c_j;
@@ -1002,7 +1002,7 @@ Result* Interaction::master_mc(size_t n, std::vector<VectorXcd>& x0, const Vecto
 			// d_dopri5_vcd_type dopri5 = make_dense_output(1e-5, 1e-5, dt_var, dopri5_vcd_type());
 
 			VectorXd* w0 = gen_w0();
-			VectorXd* w = gen_w(delta, v.at(0));
+			VectorXd* w = gen_w(delta, v.at(0), dynamics);
 			MatrixXcd H(atom->get_size(), atom->get_size());
 			H = MatrixXcd::Zero(atom->get_size(), atom->get_size());
 			update_hamiltonian_off(H);
@@ -1021,10 +1021,10 @@ Result* Interaction::master_mc(size_t n, std::vector<VectorXcd>& x0, const Vecto
 
 			size_t i_v = 0;
 			x.at(0) += x0.at(_n_psi).cwiseAbs2() * v.size();
-			for (Vector3d& _v: v)
+			for (const Vector3d& _v: v)
 			{
 				Vector3d v_temp = _v;
-				update_w(*w, delta, v_temp);
+				update_w(*w, delta, v_temp, dynamics);
 				if (!time_dependent) update_hamiltonian_leaky_diag(H, *w0, *w);
 
 				size_t i = gen_index(x0.at(_n_psi).cwiseAbs2(), d, gen);
@@ -1054,7 +1054,7 @@ Result* Interaction::master_mc(size_t n, std::vector<VectorXcd>& x0, const Vecto
 								if (dynamics)
 								{
 									v_temp += atom->gen_velocity_change(i, c_i.at(j), c_j.at(j), *lasers.at(0)->get_k(), gen);
-									update_w(*w, delta, v_temp);
+									update_w(*w, delta, v_temp, dynamics);
 									if (!time_dependent) update_hamiltonian_leaky_diag(H, *w0, *w);
 								}
 
@@ -1490,4 +1490,34 @@ Spectrum* Interaction::spectrum(const std::vector<VectorXd>& delta, const std::v
 {
 	size_t n = arange_t(t);
 	return spectrum(delta, v, n, solver);
+}
+
+Spectrum* Interaction::spectrum_mc(const std::vector<VectorXd>& delta, const std::vector<Vector3d>& v, size_t n, std::vector<VectorXcd>& y0, int solver, bool dynamics)
+{
+	std::vector<Result*> results(delta.size());
+	std::vector<size_t> n_d_vector(delta.size());
+	std::vector<VectorXd> x = std::vector<VectorXd>(delta.size());
+	for (size_t n_d = 0; n_d < delta.size(); ++n_d)
+	{
+		n_d_vector.at(n_d) = n_d;
+		x.at(n_d) = VectorXd::Zero(atom->get_size());
+	}
+
+	std::for_each(std::execution::par_unseq, n_d_vector.begin(), n_d_vector.end(), [this, n, solver, &y0, &delta, &v, dynamics, &x, &results](size_t n_d)
+		{
+			Result* _result_temp = master_mc(n, y0, delta.at(n_d), v, dynamics);
+			results.at(n_d) = _result_temp;
+			printf("\r\033[92mProgress: %zi / %zi. \033[0m", n_d + 1, delta.size());
+		}
+	);
+	printf("\r\033[92mProgress: %zi / %zi. \033[0m", delta.size(), delta.size());
+	printf("\n");
+
+	Spectrum* _spectrum = new Spectrum(delta, results);
+	for (auto p : results)
+	{
+		delete p;
+	}
+	results.clear();
+	return _spectrum;
 }
