@@ -221,6 +221,16 @@ bool Interaction::get_loop()
 	return loop;
 }
 
+bool Interaction::get_time_dependent()
+{
+	return time_dependent;
+}
+
+void Interaction::set_time_dependent(bool _time_dependent)
+{
+	time_dependent = _time_dependent;
+}
+
 MatrixXi* Interaction::get_summap()
 {
 	return &lasermap.at(2).at(0);

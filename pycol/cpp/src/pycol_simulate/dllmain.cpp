@@ -475,6 +475,16 @@ extern "C"
         return interaction->get_loop();
     }
 
+    __declspec(dllexport) bool interaction_get_time_dependent(Interaction* interaction)
+    {
+        return interaction->get_time_dependent();
+    }
+
+    __declspec(dllexport) void interaction_set_time_dependent(Interaction* interaction, bool time_dependent)
+    {
+        interaction->set_time_dependent(time_dependent);
+    }
+
     __declspec(dllexport) size_t* interaction_get_history(Interaction* interaction)
     {
         return interaction->history.data();

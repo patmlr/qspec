@@ -168,7 +168,6 @@ public:
 	Spectrum* spectrum(const std::vector<VectorXd>& delta, size_t n, T& y0, int solver);
 	Spectrum* spectrum(const std::vector<VectorXd>& delta, size_t n, int solver);
 	Spectrum* spectrum(const std::vector<VectorXd>& delta, double t, int solver);
-	Spectrum* spectrum_mc(const std::vector<VectorXd>& delta, double t, int solver, bool dynamics = false);
 	template<typename T>
 	Spectrum* spectrum(const std::vector<VectorXd>& delta, const std::vector<Vector3d>& v, size_t n, T& y0, int solver);
 	Spectrum* spectrum(const std::vector<VectorXd>& delta, const std::vector<Vector3d>& v, size_t n, int solver);
@@ -179,6 +178,8 @@ public:
 	Result* get_result();
 
 	bool get_loop();
+	bool get_time_dependent();
+	void set_time_dependent(bool _time_dependent);
 	MatrixXi* get_summap();
 	MatrixXd* get_atommap();
 	MatrixXd* get_deltamap();

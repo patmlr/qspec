@@ -275,6 +275,10 @@ dll.interaction_get_history.argtypes = (InteractionHandler, )
 dll.interaction_get_loop.argtypes = (InteractionHandler, )
 dll.interaction_get_loop.restype = c_bool
 
+dll.interaction_get_time_dependent.argtypes = (InteractionHandler, )
+dll.interaction_get_time_dependent.restype = c_bool
+dll.interaction_set_time_dependent.argtypes = (InteractionHandler, c_bool)
+
 dll.interaction_get_summap.argtypes = (InteractionHandler, )
 dll.interaction_get_atommap.argtypes = (InteractionHandler, )
 dll.interaction_get_deltamap.argtypes = (InteractionHandler, )

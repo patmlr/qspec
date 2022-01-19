@@ -1054,6 +1054,21 @@ class Interaction:
         return dll.interaction_get_loop(self.instance)
 
     @property
+    def time_dependent(self):
+        """
+        :returns: Whether the system hamiltonian is allowed to be time dependent.
+        """
+        return dll.interaction_get_time_dependent(self.instance)
+
+    @time_dependent.setter
+    def time_dependent(self, value: bool):
+        """
+        :param value: Set whether the system hamiltonian is allowed to be time dependent.
+        :returns: None.
+        """
+        dll.interaction_set_time_dependent(self.instance, c_bool(value))
+
+    @property
     def summap(self):
         """
         :returns: A (atom.size x atom.size)-matrix indicating the states which are laser-connected.
@@ -1188,11 +1203,16 @@ class Interaction:
             dll_funcs = [dll.interaction_spectrum_y0_vectord, dll.interaction_spectrum_y0_vectorcd,
                          dll.interaction_spectrum_y0_matrixcd]
             if _solver == 3:
-                instance = None
+                v = np.zeros((kwargs.get('ntraj', 500), 3), dtype=float)
+                instance = dll.interaction_spectrum_mean_v_y0_vector_vectorcd(
+                    self.instance, delta.ctypes.data_as(c_double_p), c_size_t(delta.shape[0]),
+                    v.ctypes.data_as(c_double_p), c_size_t(v.shape[0]), c_double(t), _y0.ctypes.data_as(ctype),
+                    _y0.shape[0], *_args)
             else:
                 instance = dll_funcs[_solver](self.instance, delta.ctypes.data_as(c_double_p), c_size_t(delta.shape[0]),
                                               c_double(t), _y0.ctypes.data_as(ctype))
         else:
+            v = _cast_v(v)
             dll_funcs = [dll.interaction_spectrum_mean_v_y0_vectord, dll.interaction_spectrum_mean_v_y0_vectorcd,
                          dll.interaction_spectrum_mean_v_y0_matrixcd]
             if _solver == 3:
