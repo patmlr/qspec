@@ -181,6 +181,7 @@ public:
 	bool get_time_dependent();
 	void set_time_dependent(bool _time_dependent);
 	MatrixXi* get_summap();
+	std::vector<MatrixXcd>* get_rabimap();
 	MatrixXd* get_atommap();
 	MatrixXd* get_deltamap();
 };

@@ -10,6 +10,7 @@ Classes and methods for the 'simulate' module using the Python/C++ interface.
 """
 
 import numpy as np
+from matplotlib import cm
 import matplotlib.pyplot as plt
 
 from .types import *
@@ -129,7 +130,8 @@ class Laser:
     Class representing a laser.
     """
 
-    def __init__(self, freq: scalar, intensity: scalar = 1., polarization: Polarization = None, instance=None):
+    def __init__(self, freq: scalar, intensity: scalar = 1., polarization: Polarization = None,
+                 k: array_like = None, instance=None):
         """
         :param freq: The frequency of the laser (MHz).
         :param intensity: The intensity of the laser (uW / mm**2 = W / m**2).
@@ -144,6 +146,9 @@ class Laser:
             if self.polarization is None:
                 self._polarization = Polarization()
             dll.laser_init(self.instance, c_double(freq), c_double(intensity), polarization.instance)
+            if k is None:
+                k = tools.unit_vector(0, 3)
+            self.k = k
         else:
             self._polarization = Polarization(instance=dll.laser_get_polarization(self.instance))
 
@@ -195,6 +200,24 @@ class Laser:
         """
         self._polarization = value
         dll.laser_set_polarization(self.instance, value.instance)
+
+    @property
+    def k(self):
+        """
+        :returns: The direction of the laser. The default direction is ( 1, 0, 0 ).
+        """
+        return dll.laser_get_k(self.instance)
+
+    @k.setter
+    def k(self, value: array_like):
+        """
+        :param value: The new direction of the laser.
+        :return: None.
+        """
+        _value = np.asarray(value, dtype=float)
+        if _value.size != 3:
+            raise ValueError('Interaction.k must be a 3d-vector, but has shape {}.'.format(_value.shape))
+        dll.laser_set_k(self.instance, _value.flatten())
 
 
 def _process_hyper_const(hyper_const: array_like) -> ndarray:
@@ -249,6 +272,10 @@ class State:
 
     def __del__(self):
         dll.state_destruct(self.instance)
+
+    def __repr__(self):
+        return '{}({})'.format(self.label, ('{}, ' * 6)[:-2]) \
+            .format(*[tools.half_integer_to_str(qn, '/') for qn in [self.s, self.l, self.j, self.i, self.f, self.m]])
 
     def update(self):
         """
@@ -396,6 +423,27 @@ def construct_electronic_state(freq_0: scalar, s: scalar, l: scalar, j: scalar, 
     return [State(freq_0, s, l, j, i, _f, _m, hyper_const=hyper_const, g=g, label=label) for (_f, _m) in fm]
 
 
+def construct_hyperfine_state(freq_0: scalar, s: scalar, l: scalar, j: scalar, i: scalar, f: scalar,
+                              hyper_const: Iterable[scalar] = None, g: scalar = 0, label: str = None):
+    """
+    Creates all substates of a fine-structure state using a common label.
+
+    :param freq_0: The energetic position of the state without the hyperfine structure or the magnetic field (MHz).
+    :param s: The electron spin quantum number S.
+    :param l: The electronic angular momentum quantum number L.
+    :param j: The electronic total angular momentum quantum number J.
+    :param i: The nuclear spin quantum number I.
+    :param f: The hyperfine structure total angular momentum quantum number F.
+    :param hyper_const: The hyperfine-structure constants. Currently, constants up to the electric quadrupole order are
+     supported (A, B). If 'hyper_const' is a scalar, it is assumed to be the constant A and the other orders are 0.
+    :param g: The nuclear g-factor.
+    :param label: The label of the states. The labels are used to link states via decay maps.
+    :returns: A list of the created states.
+    """
+    m = ph.get_m(f)
+    return [State(freq_0, s, l, j, i, f, _m, hyper_const=hyper_const, g=g, label=label) for _m in m]
+
+
 class DecayMap:
     """
     Class linking sets of atomic states via Einstein-A coefficients.
@@ -456,6 +504,23 @@ class DecayMap:
         return dll.decaymap_get_size(self.instance)
 
 
+def _gen_label_map(atom):
+    """
+    :param atom: The atom.
+    :returns: A dictionary with state labels as keys
+     and an array of the indices of the states with the labels as values.
+    """
+    if isinstance(atom, int):
+        return {'States 0 - {}'.format(atom): np.arange(atom, dtype=int)}
+    all_labels = [s.label for s in atom]
+    labels = []
+    for s in all_labels:
+        if s not in labels:
+            labels.append(s)
+    label_map = {s: np.array([i for i, _s in enumerate(all_labels) if _s == s]) for s in labels}
+    return label_map
+
+
 class Atom:
     """
     Class representing an Atom and its inner structure.
@@ -479,6 +544,7 @@ class Atom:
             self.states = list(states)
             self.decay_map = decay_map
             self.mass = mass
+            self.label_map = None
             self.update()
         else:
             self._states = None
@@ -497,6 +563,7 @@ class Atom:
         :returns: None.
         """
         dll.atom_update(self.instance)
+        self.label_map = _gen_label_map(self)
 
     @property
     def states(self):
@@ -586,6 +653,18 @@ class Atom:
         a = dll.atom_get_L1(self.instance)
         return np.ctypeslib.as_array(a, (self.size, self.size)).T
 
+    def get_y0(self, ground_state_labels: Union[Iterable[str], str] = None) -> np.ndarray:
+        """
+        :param ground_state_labels: An Iterable of labels belonging to ground states.
+        :returns: The initial population of the atom.
+        """
+        y0 = np.zeros(self.size)
+        if ground_state_labels is None:
+            ground_state_labels = [self.states[0].label]
+        indices = np.array([i for i, state in enumerate(self) if state.label in ground_state_labels])
+        y0[indices] = 1 / indices.size
+        return y0
+
     def plot(self, indices: array_like = None, draw_bounds: bool = False, show: bool = True):
         """
         Plot a term scheme of the atom.
@@ -634,136 +713,14 @@ class Atom:
         return ret_x, ret_y, d
 
 
-class Result:
-    """
-    Class serving as a container for results from Interaction instances.
-    """
-
-    def __init__(self, instance=None):
-        """
-        :param instance: A pointer to an existing Result instance.
-        """
-        self.instance = instance
-
-    def __del__(self):
-        dll.result_destruct(self.instance)
-
-    def _x_size(self):
-        """
-        :returns: The number of entries in the definition space.
-        """
-        return dll.result_get_x_size(self.instance)
-
-    def _y_size(self):
-        """
-        :returns: The dimension of the image space.
-        """
-        return dll.result_get_y_size(self.instance)
-
-    def _v_size(self):
-        """
-        :returns: The dimension of the image space.
-        """
-        return dll.result_get_v_size(self.instance)
-
-    @property
-    def x(self):
-        """
-        :returns: The entries of the definition space (x-axis) as an array. This has shape (n, ).
-        """
-        vector_result_d_p = np.ctypeslib.ndpointer(dtype=np.float64, shape=(self._x_size(),))
-        set_restype(dll.result_get_x, vector_result_d_p)
-        return dll.result_get_x(self.instance)
-
-    @property
-    def y(self):
-        """
-        :returns: The entries of the image space (y-axes) as an array. This has shape (n, m).
-        """
-        matrix_result_d_p = np.ctypeslib.ndpointer(dtype=np.float64, shape=(self._x_size(), self._y_size()))
-        set_restype(dll.result_get_y, matrix_result_d_p)
-        return dll.result_get_y(self.instance)
-
-    @property
-    def v(self):
-        """
-        :returns: The entries of the image space (y-axes) as an array. This has shape (n, m).
-        """
-        if self._v_size() == 0:
-            return None
-        matrix_result_d_p = np.ctypeslib.ndpointer(dtype=np.float64, shape=(self._v_size(), 3))
-        set_restype(dll.result_get_v, matrix_result_d_p)
-        return dll.result_get_v(self.instance)
-
-
-class Spectrum:
-    """
-    Class serving as a container for spectra.
-    """
-
-    def __init__(self, instance=None):
-        """
-        :param instance: A pointer to an existing Spectrum instance.
-        """
-        self.instance = instance
-
-    def __del__(self):
-        dll.spectrum_destruct(self.instance)
-
-    def _m_size(self):
-        """
-        :returns: The number of lasers.
-        """
-        return dll.spectrum_get_m_size(self.instance)
-
-    def _x_size(self):
-        """
-        :returns: The number of detunings.
-        """
-        return dll.spectrum_get_x_size(self.instance)
-
-    def _t_size(self):
-        """
-        :returns: The number of times.
-        """
-        return dll.spectrum_get_t_size(self.instance)
-
-    def _y_size(self):
-        """
-        :returns: The number of atomic states.
-        """
-        return dll.spectrum_get_y_size(self.instance)
-
-    @property
-    def x(self):
-        """
-        :returns: The entries of the first definition space (delta-axis) as an array.
-         This has shape (n_delta, n_lasers).
-        """
-        matrix_d_p = np.ctypeslib.ndpointer(dtype=np.float64, shape=(self._x_size(), self._m_size()))
-        set_restype(dll.spectrum_get_x, matrix_d_p)
-        return dll.spectrum_get_x(self.instance)
-
-    @property
-    def t(self):
-        """
-        :returns: The entries of the second definition space (t-axis) as an array. This has shape (n_t, ).
-        """
-        vector_d_p = np.ctypeslib.ndpointer(dtype=np.float64, shape=(self._t_size(),))
-        set_restype(dll.spectrum_get_t, vector_d_p)
-        return dll.spectrum_get_t(self.instance)
-
-    @property
-    def y(self):
-        """
-        :returns: The entries of the image space (y-axes) as an array. This has shape (n_delta, n_t, n_states).
-        """
-        tensor_d_p = np.ctypeslib.ndpointer(dtype=np.float64, shape=(self._x_size(), self._t_size(), self._y_size()))
-        set_restype(dll.spectrum_get_y, tensor_d_p)
-        return dll.spectrum_get_y(self.instance)
-
-
 def _cast_delta(delta: array_like, m: Optional[int], size: int) -> ndarray:
+    """
+    :param delta: An array of frequency shifts for the laser(s). 'delta' must be a scalar or an 1d- or 2d-array
+     with shapes (., ) or (., #lasers), respectively.
+    :param m: The index of the shifted laser. If delta is a 2d-array, 'm' ist omitted.
+    :param size: The number of available lasers.
+    :returns: An array of vectors with size 'size' containing frequency shifts for the lasers.
+    """
     delta = np.asarray(delta, dtype=float)
     if len(delta.shape) != 2 and not -size <= m < size:
         raise IndexError('Laser index \'m\' is out of bounds. Must be {} <= m < {} or None but is {}.'
@@ -952,6 +909,17 @@ class Interaction:
         return [Laser(0, instance=dll.interaction_get_laser(self.instance, m))
                 for m in range(dll.interaction_get_lasers_size(self.instance))]
 
+    def _result(self, instance, **kwargs):
+        """
+        :param instance: A C++ result instance.
+        :returns: The result including the label_map.
+        """
+        result = Result(instance=instance)
+        result.label_map = _gen_label_map(self.atom)
+        if kwargs.get('show', True):
+            result.plot()
+        return result
+
     def update(self):
         """
         Updates the Interaction.
@@ -959,6 +927,33 @@ class Interaction:
         :returns: None.
         """
         dll.interaction_update(self.instance)
+
+    def resonance_info(self):
+        """
+        Prints the detunings of the base frequencies of the lasers in the given atomic system.
+        In particular useful for systems with a hyperfine structure. Here
+
+        .. math:: \\Delta = \\nu_0 - \\nu_L.
+
+        :returns: None.
+        """
+        print('Resonance info:\n<label>(S, L, J, I, F, m) -> <label\'>(S\', L\', J\', I\', F\', m\')')
+        for k, (laser, laser_m) in enumerate(zip(self.lasers, self.get_rabi())):
+            n = 0
+            print('Laser {} @ {} MHz:'.format(k, laser.freq))
+            for i, state_i in enumerate(self.atom):
+                for j, state_j in enumerate(self.atom):
+                    if np.abs(laser_m)[i, j] != 0 and i < j:
+                        if state_i.freq < state_j.freq:
+                            print('{} -> {}: {} MHz'.format(repr(state_i), repr(state_j),
+                                                            state_j.freq - state_i.freq - laser.freq))
+                        else:
+                            print('{} -> {}: {} MHz'.format(repr(state_j), repr(state_i),
+                                                            state_i.freq - state_j.freq - laser.freq))
+                        n += 1
+            if n == 0:
+                print('No resonances!')
+        print()
 
     @property
     def atom(self):
@@ -1068,6 +1063,19 @@ class Interaction:
         """
         dll.interaction_set_time_dependent(self.instance, c_bool(value))
 
+    def get_rabi(self, m: int = None):
+        """
+        :param m: The laser number 'm'. If None, the Rabi frequencies are returned for all lasers
+         as an array with shape (#lasers, atom.size, atom.size).
+        :returns: The Rabi frequencies (generated by the laser 'm').
+        """
+        matrix_cd_p = np.ctypeslib.ndpointer(dtype=np.complex128, shape=(self.atom.size, self.atom.size))
+        set_restype(dll.interaction_get_rabi, matrix_cd_p)
+        if m is None:
+            return np.array([dll.interaction_get_rabi(self.instance, c_size_t(_m))
+                             for _m in range(len(self.lasers))], dtype=complex)
+        return dll.interaction_get_rabi(self.instance, c_size_t(m))
+
     @property
     def summap(self):
         """
@@ -1113,46 +1121,49 @@ class Interaction:
         set_restype(dll.interaction_get_history, vector_i_p)
         return dll.interaction_get_history(self.instance)
 
-    def rates(self, t: scalar, y0: array_like = None):
+    def rates(self, t: scalar, y0: array_like = None, **kwargs):
         """
         :param t: The final time of the solution. The number of time steps is determined
          by the step size Interaction.dt.
         :param y0: The initial state of an ensemble of atoms. This must be None or an 1d-array of size
          Interaction.atom.size. If None, the ground states are populated equally.
+        :param kwargs: Keyword arguments to be passed to the chosen solver or plot function.
         :returns: The integrated rate equations as a 'Result' object.
         """
         _y0, ctype = _cast_y0(y0, 0, self.atom)
-        return Result(instance=dll.interaction_rate_equations_y0(
-            self.instance, c_double(float(t)), _y0.ctypes.data_as(ctype)))
+        return self._result(dll.interaction_rate_equations_y0(
+            self.instance, c_double(float(t)), _y0.ctypes.data_as(ctype)), **kwargs)
 
-    def schroedinger(self, t: scalar, y0: array_like = None):
+    def schroedinger(self, t: scalar, y0: array_like = None, **kwargs):
         """
         :param t: The final time of the solution. The number of time steps is determined
          by the step size Interaction.dt.
         :param y0: The initial state of an ensemble of atoms. This must be None or an 1d-array of size
          Interaction.atom.size. 'y0' can be complex valued. If None, only the first ground state is populated.
          'y0' should be a coherent state vector. However, this is up to the user.
+        :param kwargs: Keyword arguments to be passed to the chosen solver or plot function.
         :returns: The integrated Schroedinger equation as a 'Result' object.
         """
         _y0, ctype = _cast_y0(y0, 1, self.atom)
-        return Result(instance=dll.interaction_schroedinger_y0(
-            self.instance, c_double(float(t)), _y0.ctypes.data_as(ctype)))
+        return self._result(dll.interaction_schroedinger_y0(
+            self.instance, c_double(float(t)), _y0.ctypes.data_as(ctype)), **kwargs)
 
-    def master(self, t: scalar, y0: array_like = None):
+    def master(self, t: scalar, y0: array_like = None, **kwargs):
         """
         :param t: The final time of the solution. The number of time steps is determined
          by the step size Interaction.dt.
         :param y0: The initial state of an ensemble of atoms. This must be None, an 1d-array of size
          Interaction.atom.size or a 2d-array with shape (Interaction.atom.size, Interaction.atom.size).
          'y0' can be complex valued. If None, the ground states are populated equally.
+        :param kwargs: Keyword arguments to be passed to the chosen solver or plot function.
         :returns: The integrated master equation as a 'Result' object.
         """
         _y0, ctype = _cast_y0(y0, 2, self.atom)
-        return Result(instance=dll.interaction_master_y0(
-            self.instance, c_double(float(t)), _y0.ctypes.data_as(ctype)))
+        return self._result(dll.interaction_master_y0(
+            self.instance, c_double(float(t)), _y0.ctypes.data_as(ctype)), **kwargs)
 
     def master_mc(self, t: scalar, y0: array_like = None, ntraj: int = 500, v: array_like = None,
-                  dynamics: bool = False):
+                  dynamics: bool = False, **kwargs):
         """
         :param t: The final time of the solution. The number of time steps is determined
          by the step size Interaction.dt.
@@ -1164,6 +1175,7 @@ class Interaction:
         :param v: Atom velocities. This overwrites 'ntraj'.
          Each individual velocity directly corresponds to one trajectory.
         :param dynamics: Whether to simulate the mechanical dynamics of the atom in the laser field.
+        :param kwargs: Keyword arguments to be passed to the chosen solver or plot function.
         :returns: The integrated Monte-Carlo master equation as a 'Result' object.
         """
         if self.controlled:
@@ -1178,23 +1190,51 @@ class Interaction:
             instance = dll.interaction_master_mc_v_y0(
                 self.instance, v.ctypes.data_as(c_double_p), c_size_t(v.shape[0]), c_double(float(t)),
                 _y0.ctypes.data_as(ctype), c_size_t(_y0.shape[0]), c_bool(dynamics))
-        return Result(instance=instance)
+        return self._result(instance, **kwargs)
 
     def mean_v(self, t: scalar, v: array_like, y0: array_like = None, solver: str = 'rates', **kwargs):
-        v = np.asarray(v, dtype=float)
+        """
+        :param t: The final time of the solution. The number of time steps is determined
+         by the step size Interaction.dt.
+        :param v: Atom velocities. Must be a scalar or have shape (n, ) or (n, 3). In the first two cases,
+         the velocity vector(s) are assumed to be aligned with the x-axis.
+        :param y0: The initial state of an ensemble of atoms. This must be None, an 1d-array of size
+         Interaction.atom.size or a 2d-array (i.e. a list of coherent state vectors)
+         with shape (n, Interaction.atom.size). 'y0' can be complex valued.
+         If None, the ground states are populated according to the chosen solver.
+        :param solver: The solver. Can be one of ['rates', 'schroedinger', 'master', 'master_mc'].
+        :param kwargs: Keyword arguments to be passed to the chosen solver or plot function.
+        :returns: The mean of the solutions for the specified velocities and solver as a 'Result' object.
+        """
         _solver, _args = _choose_solver(solver, **kwargs)
-        if y0 is None:
-            return Result(instance=dll.interaction_mean_v(
-                self.instance, v.ctypes.data_as(c_double_p), c_size_t(v.shape[0]), c_double(t), c_int(_solver)))
+        if _solver == 3:
+            return self.master_mc(t, y0, v=v, dynamics=kwargs.get('dynamics', False))
+        v = _cast_v(v)
         _y0, ctype = _cast_y0(y0, _solver, self.atom)
         dll_funcs = [dll.interaction_mean_v_y0_vectord, dll.interaction_mean_v_y0_vectorcd,
                      dll.interaction_mean_v_y0_matrixcd]
-        return Result(instance=dll_funcs[_solver](self.instance, v.ctypes.data_as(c_double_p), c_size_t(v.shape[0]),
-                                                  c_double(t), _y0.ctypes.data_as(ctype)))
+        return self._result(dll_funcs[_solver](self.instance, v.ctypes.data_as(c_double_p), c_size_t(v.shape[0]),
+                                               c_double(t), _y0.ctypes.data_as(ctype)), **kwargs)
 
     def spectrum(self, t: scalar, delta: array_like, m: Optional[int] = 0, v: array_like = None, y0: array_like = None,
                  solver: str = 'rates', v_mode: str = 'mean', **kwargs):
-
+        """
+        :param t: The final time of the solution. The number of time steps is determined
+         by the step size Interaction.dt.
+        :param delta: An array of frequency shifts for the laser(s). 'delta' must be a scalar or an 1d- or 2d-array
+         with shapes (., ) or (., #lasers), respectively.
+        :param m: The index of the shifted laser. If delta is a 2d-array, 'm' ist omitted.
+        :param v: Atom velocities. Must be a scalar or have shape (n, ) or (n, 3). In the first two cases,
+         the velocity vector(s) is assumed to be aligned with the x-axis.
+        :param y0: The initial state of an ensemble of atoms. This must be None, an 1d-array of size
+         Interaction.atom.size or a 2d-array (i.e. a list of coherent state vectors)
+         with shape (n, Interaction.atom.size). 'y0' can be complex valued.
+         If None, the ground states are populated according to the chosen solver.
+        :param solver: The solver. Can be one of ['rates', 'schroedinger', 'master', 'master_mc'].
+        :param v_mode: The mode how to combine the different velocities. Available modes are ['mean', ].
+        :param kwargs: Keyword arguments to be passed to the chosen solver.
+        :returns: The results for the different frequency shifts as a 'Spectrum' object.
+        """
         delta = _cast_delta(delta, m, len(self.lasers))
         _solver, _args = _choose_solver(solver, **kwargs)
         v = tools.asarray_optional(v, dtype=float)
@@ -1226,3 +1266,191 @@ class Interaction:
                     v.ctypes.data_as(c_double_p), c_size_t(v.shape[0]), c_double(t), _y0.ctypes.data_as(ctype))
 
         return Spectrum(instance=instance)
+
+
+class Result:
+    """
+    Class serving as a container for results from Interaction instances.
+    """
+
+    def __init__(self, instance=None):
+        """
+        :param instance: A pointer to an existing Result instance.
+        """
+        self.instance = instance
+        self.label_map = _gen_label_map(self._y_size())
+
+    def __del__(self):
+        dll.result_destruct(self.instance)
+
+    def _x_size(self):
+        """
+        :returns: The number of entries in the definition space.
+        """
+        return dll.result_get_x_size(self.instance)
+
+    def _y_size(self):
+        """
+        :returns: The dimension of the image space.
+        """
+        return dll.result_get_y_size(self.instance)
+
+    def _v_size(self):
+        """
+        :returns: The dimension of the image space.
+        """
+        return dll.result_get_v_size(self.instance)
+
+    @property
+    def x(self):
+        """
+        :returns: The entries of the definition space (x-axis) as an array. This has shape (n, ).
+        """
+        vector_result_d_p = np.ctypeslib.ndpointer(dtype=np.float64, shape=(self._x_size(),))
+        set_restype(dll.result_get_x, vector_result_d_p)
+        return dll.result_get_x(self.instance)
+
+    @property
+    def y(self):
+        """
+        :returns: The entries of the image space (y-axes) as an array. This has shape (n, m).
+        """
+        matrix_result_d_p = np.ctypeslib.ndpointer(dtype=np.float64, shape=(self._x_size(), self._y_size()))
+        set_restype(dll.result_get_y, matrix_result_d_p)
+        return dll.result_get_y(self.instance)
+
+    @property
+    def v(self):
+        """
+        :returns: The entries of the image space (y-axes) as an array. This has shape (n, m).
+        """
+        if self._v_size() == 0:
+            return None
+        matrix_result_d_p = np.ctypeslib.ndpointer(dtype=np.float64, shape=(self._v_size(), 3))
+        set_restype(dll.result_get_v, matrix_result_d_p)
+        return dll.result_get_v(self.instance)
+
+    def plot(self, labels: Iterable[str] = None, show: bool = True, colormap: str = None):
+        """
+        :param labels: An Iterable of state labels to include in the plot if a system is known.
+         Default is None which plots all states.
+        :param show: Whether to show the plot.
+        :param colormap: A matplotlib colormap to use for the plot colors.
+        :returns: The newly created figure.
+        """
+        fig, ax = plt.subplots()
+        x, y = self.x, self.y
+        colors = _define_colors(y.shape[1], self.label_map, colormap=colormap)
+
+        for label, indices in self.label_map.items():
+            if labels is not None and label not in labels:
+                continue
+            for i, index in enumerate(indices):
+                ax.plot(x, y[:, index], c=colors[index], ls='--')
+            ax.plot(x, np.sum(y[:, indices], axis=1), label=label,
+                    c=colors[indices[0]], ls='-')
+        ax.set_ylim(-0.03, 1.03)
+        ax.set_xlabel(r'Time ($\mu$s)')
+        ax.set_ylabel(r'State population')
+        plt.legend()
+        if show:
+            plt.show()
+        return fig
+
+
+class Spectrum:
+    """
+    Class serving as a container for spectra.
+    """
+
+    def __init__(self, instance=None):
+        """
+        :param instance: A pointer to an existing Spectrum instance.
+        """
+        self.instance = instance
+        self.label_map = _gen_label_map(self._y_size())
+
+    def __del__(self):
+        dll.spectrum_destruct(self.instance)
+
+    def _m_size(self):
+        """
+        :returns: The number of lasers.
+        """
+        return dll.spectrum_get_m_size(self.instance)
+
+    def _x_size(self):
+        """
+        :returns: The number of detunings.
+        """
+        return dll.spectrum_get_x_size(self.instance)
+
+    def _t_size(self):
+        """
+        :returns: The number of times.
+        """
+        return dll.spectrum_get_t_size(self.instance)
+
+    def _y_size(self):
+        """
+        :returns: The number of atomic states.
+        """
+        return dll.spectrum_get_y_size(self.instance)
+
+    @property
+    def x(self):
+        """
+        :returns: The entries of the first definition space (delta-axis) as an array.
+         This has shape (n_delta, n_lasers).
+        """
+        matrix_d_p = np.ctypeslib.ndpointer(dtype=np.float64, shape=(self._x_size(), self._m_size()))
+        set_restype(dll.spectrum_get_x, matrix_d_p)
+        return dll.spectrum_get_x(self.instance)
+
+    @property
+    def t(self):
+        """
+        :returns: The entries of the second definition space (t-axis) as an array. This has shape (n_t, ).
+        """
+        vector_d_p = np.ctypeslib.ndpointer(dtype=np.float64, shape=(self._t_size(),))
+        set_restype(dll.spectrum_get_t, vector_d_p)
+        return dll.spectrum_get_t(self.instance)
+
+    @property
+    def y(self):
+        """
+        :returns: The entries of the image space (y-axes) as an array. This has shape (n_delta, n_t, n_states).
+        """
+        tensor_d_p = np.ctypeslib.ndpointer(dtype=np.float64, shape=(self._x_size(), self._t_size(), self._y_size()))
+        set_restype(dll.spectrum_get_y, tensor_d_p)
+        return dll.spectrum_get_y(self.instance)
+
+    def plot(self, labels: Iterable[str] = None, show: bool = True, **kwargs):
+        """
+        :param labels: An Iterable of state labels to include in the plot if a system is known.
+         Default is None which plots all states.
+        :param show: Whether to show the plot.
+        :returns: The newly created figure.
+        """
+        pass
+
+
+def _define_colors(n: int, label_map: dict, colormap: str = None):
+    """
+    :param n: The size of the system.
+    :param label_map: A dictionary with state labels as keys
+     and an array of the indices of the states with the labels as values.
+    :param colormap: A matplotlib colormap.
+    :returns: A list of colors with size n.
+    """
+    cmap = cm.get_cmap(colormap)
+    labels = [(k, v) for k, v in label_map.items()]
+    labels = sorted(labels, key=lambda kv: min(kv[1]))
+    colors = ['', ] * n
+    for i, (label, indices) in enumerate(labels):
+        for index in indices:
+            if colormap is None:
+                colors[index] = tools.COLORS.PYPLOT[i % 10]
+            else:
+                colors[index] = cmap(i / (len(labels) - 1))
+    return colors

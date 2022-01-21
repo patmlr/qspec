@@ -236,6 +236,11 @@ MatrixXi* Interaction::get_summap()
 	return &lasermap.at(2).at(0);
 }
 
+std::vector<MatrixXcd>* Interaction::get_rabimap()
+{
+	return &rabimap;
+}
+
 MatrixXd* Interaction::get_atommap()
 {
 	return &atommap;
@@ -421,11 +426,13 @@ void Interaction::propagate(size_t i, size_t i0, std::set<size_t>& visited, cons
 			else pm = -1;
 			if (visited.find(j) != visited.end())  // If j already visited, do this.
 			{
-				k = std::distance(path.at(0).begin(), std::find(path.at(0).begin(), path.at(0).end(), j));
-				if (k >= path.at(1).size()) continue;  // If j is not in the current path, continue.
+				k = std::distance(path.at(0).begin(), std::find(path.at(0).begin(), path.at(0).end(), j));  // The index of j in the current path.
+				printf("%zi\n", k);
+				if (k >= path.at(1).size()) continue;  // If j was not exited via a laser in the current path, continue.
 				loop = loop || path.at(1).at(k) != m;  // If j was previously not left via m in the current path, recognize loop.
 				if (path.at(1).at(k) != m)  // If a loop is completed with the current path, ...
 				{
+					printf("%zi, %zi, %zi\n", i, j, m);
 					tmap.at(m)(i, j) = pm;  // ... set tmap entry to true.
 					tmap.at(m)(j, i) = -pm;
 				};

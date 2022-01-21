@@ -47,7 +47,7 @@ class TestSimulate(ut.TestCase):
     laser_1 = sim.Laser(f_sp, intensity=1000, polarization=pol_1)
     laser_2 = sim.Laser(f_sp, intensity=10, polarization=pol_2)
     # laser_3 = sim.Laser(f_sp - f_dp, intensity=500, polarization=pol)
-    inter = sim.Interaction(atom, [laser_1, laser_2], delta_max=2000)
+    inter = sim.Interaction(atom, [laser_1, ], delta_max=2000)
     inter.controlled = False
     inter.dt = 1e-3
 
@@ -61,22 +61,20 @@ class TestSimulate(ut.TestCase):
     v = np.linspace(-20, 20, n)
 
     t = time()
-    # result = inter.rates(3)
+    result = inter.rates(1)
     # result = inter.schroedinger(0.4)
-    result = inter.master(3, y0=None)
+    # result = inter.master(1)
     # result = inter.master_mc(0.4, y0=None, ntraj=500, v=None, dynamics=False)
+    # result = inter.mean_v(0.4, v, solver='schroedinger')
     print('Time: {} s'.format(time() - t))
-    x = result.x
-    y = result.y
+    result.plot()
     # v_ph = sc.h * p[0].freq / (atom.mass * sc.atomic_mass * sc.c) * 1e6
     # v = result.v / v_ph
     # plt.hist(v[:, 0], bins=100)
     # plt.hist(v[:, 1], bins=100)
     # plt.hist(v[:, 2], bins=100)
     # plt.show()
-    plt.plot(x, y)
-    plt.plot(x, np.sum(y, axis=1), 'k--')
-    plt.show()
+    quit()
 
     delta = np.linspace(-200., 200., 200)
     # inter.time_dependent = False

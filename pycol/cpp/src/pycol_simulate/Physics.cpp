@@ -1,9 +1,5 @@
 /*
 * PyCLS.Physics.cpp
-*
-* Created on 15.11.2021
-*
-* @author: Patrick Mueller
 * 
 * Factorial, GCcoeff, ThreeJSymbol, SixJSymbol and NineJSymbol taken from
 * https://nukephysik101.wordpress.com/2019/01/30/3j-6j-9j-symbol-fro-c/

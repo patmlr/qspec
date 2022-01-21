@@ -113,6 +113,10 @@ dll.laser_get_polarization.argtypes = (LaserHandler, )
 dll.laser_get_polarization.restype = PolarizationHandler
 dll.laser_set_polarization.argtypes = (LaserHandler, PolarizationHandler)
 
+dll.laser_get_k.argtypes = (LaserHandler, )
+dll.laser_get_k.restype = vector3d_p
+dll.laser_set_k.argtypes = (LaserHandler, vector3d_p)
+
 
 # State
 dll.state_construct.restype = StateHandler
@@ -280,6 +284,7 @@ dll.interaction_get_time_dependent.restype = c_bool
 dll.interaction_set_time_dependent.argtypes = (InteractionHandler, c_bool)
 
 dll.interaction_get_summap.argtypes = (InteractionHandler, )
+dll.interaction_get_rabi.argtypes = (InteractionHandler, c_size_t)
 dll.interaction_get_atommap.argtypes = (InteractionHandler, )
 dll.interaction_get_deltamap.argtypes = (InteractionHandler, )
 

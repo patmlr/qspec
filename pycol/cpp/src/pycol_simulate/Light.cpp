@@ -130,3 +130,8 @@ Vector3d* Laser::get_k()
 {
 	return &k;
 }
+
+void Laser::set_k(Vector3d _k)
+{
+	k = _k;
+}

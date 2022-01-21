@@ -789,8 +789,8 @@ def boost(x: array_like, v: array_like, axis=-1) -> array_like:
     bet = beta(v)
     bet_abs = beta(tools.absolute(v, axis=axis))
     tools.check_shape_like(np.sum(x, axis=axis), bet_abs, allow_scalar=False)
-    if bet_abs == 0:
-        return x
+    bet_abs[bet_abs == 0] = 1
+
     gam = gamma_3d(v, axis=axis)
     b_xyz = np.array([[1. + (gam - 1.) * np.take(bet, i, axis=axis) * np.take(bet, j, axis=axis) / (bet_abs ** 2)
                        if i == j else (gam - 1.) * np.take(bet, i, axis=axis) * np.take(bet, j, axis=axis)

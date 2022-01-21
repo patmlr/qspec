@@ -115,6 +115,19 @@ extern "C"
         return laser->set_polarization(polarization);
     }
 
+    __declspec(dllexport) double* laser_get_k(Laser* laser)
+    {
+        return laser->get_k()->data();
+    }
+
+    __declspec(dllexport) void laser_set_k(Laser* laser, double* k)
+    {
+        Vector3d _k;
+        _k << k[0], k[1], k[2];
+        _k /= _k.norm();
+        return laser->set_k(_k);
+    }
+
 
     // State
     __declspec(dllexport) State* state_construct()
@@ -458,6 +471,13 @@ extern "C"
     __declspec(dllexport) int* interaction_get_summap(Interaction* interaction)
     {
         return interaction->get_summap()->data();
+    }
+
+    __declspec(dllexport) std::complex<double>* interaction_get_rabi(Interaction* interaction, size_t m)
+    {
+        MatrixXcd* rabi = new MatrixXcd(interaction->get_atom()->get_size(), interaction->get_atom()->get_size());
+        *rabi = interaction->get_rabimap()->at(m) * 2;
+        return rabi->data();
     }
 
     __declspec(dllexport) double* interaction_get_atommap(Interaction* interaction)

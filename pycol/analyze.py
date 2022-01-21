@@ -1125,7 +1125,7 @@ class King:
          If given, the 'x' parameter can be omitted when fitting (in 'fit' and 'fit_nd')
          and is determined automatically as the difference between the mass numbers 'a' and 'a_ref'.
          Must have shape (len(a), 2) or (len(a), n, 2) where n is the number of dimensions of the king plot without 'y'.
-        :param y_abs: Absolute values of the x-axis corresponding to the mass numbers a.
+        :param y_abs: Absolute values of the y-axis corresponding to the mass numbers a.
          If given, the 'y' parameter can be omitted when fitting (in 'fit')
          and is determined automatically as the difference between the mass numbers 'a' and 'a_ref'.
          Must have shape (len(a), 2).
