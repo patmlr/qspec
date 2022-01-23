@@ -73,3 +73,15 @@ size_t gen_index(VectorXd p, std::uniform_real_distribution<double>& d, std::mt1
     }
     return 0;
 }
+
+bool check_loop(size_t i, size_t j, size_t m, int pm, std::vector<MatrixXd>& shifts)
+{
+    VectorXd _shift;
+    _shift = shifts.at(i).row(m) - shifts.at(j).row(m);
+    _shift(m) += pm;
+    for (size_t _m = 0; _m < _shift.size(); ++_m)
+    {
+        if (_shift(_m) != 0) return true; // printf("m=%zi: %1.1f\n", _m, _shift(_m));
+    }
+    return false;
+}

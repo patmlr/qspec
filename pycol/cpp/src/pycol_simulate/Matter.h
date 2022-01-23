@@ -11,11 +11,23 @@ using namespace Eigen;
 
 class Environment
 {
-public:
-	double B;
+protected:
 	double E;
+	double B;
+	Vector3d e_E;
+	Vector3d e_B;
+public:
 	Environment();
-	~Environment();
+	double get_E();
+	double get_B();
+	Vector3d* get_e_E();
+	Vector3d* get_e_B();
+
+	void set_E(double _E);
+	void set_E(Vector3d _E);
+
+	void set_B(double _B);
+	void set_B(Vector3d _B);
 };
 
 
@@ -125,6 +137,7 @@ public:
 	void gen_w0();
 	VectorXd* get_w0();
 
+	std::vector<State*>* get_states();
 	DecayMap* get_decay_map();
 	void set_decay_map(DecayMap* _decays);
 	double get_mass();

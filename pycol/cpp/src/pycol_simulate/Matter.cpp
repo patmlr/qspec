@@ -4,6 +4,57 @@
 #include "Physics.h"
 
 
+Environment::Environment()
+{
+	E = 0.;
+	B = 0.;
+	e_E << 1, 0, 0;
+	e_B << 0, 0, 1;
+}
+
+double Environment::get_E()
+{
+	return E;
+}
+
+double Environment::get_B()
+{
+	return B;
+}
+
+Vector3d* Environment::get_e_E()
+{
+	return &e_E;
+}
+
+Vector3d* Environment::get_e_B()
+{
+	return &e_B;
+}
+
+void Environment::set_E(double _E)
+{
+	E = _E;
+}
+
+void Environment::set_E(Vector3d _E)
+{
+	E = _E.norm();
+	e_E = _E / E;
+}
+
+void Environment::set_B(double _B)
+{
+	B = _B;
+}
+
+void Environment::set_B(Vector3d _B)
+{
+	B = _B.norm();
+	e_B = _B / B;
+}
+
+
 State::State()
 {
 	freq_j = 0.;
@@ -58,14 +109,7 @@ void State::update()
 
 void State::update(Environment* env)
 {
-	double B = 0;
-	double E = 0;
-	if (env)
-	{
-		B = env->B;
-		E = env->E;
-	}
-	freq = freq_j + hyper_zeeman(i, s, l, j, f, m, g, hyper_const, B, false);
+	freq = freq_j + hyper_zeeman(i, s, l, j, f, m, g, hyper_const, env->get_B(), false);
 }
 
 double State::get_shift()
@@ -338,6 +382,11 @@ void Atom::gen_w0()
 {
 	w0.resize(size);
 	for (size_t i = 0; i < size; ++i) w0(i) = 2 * sc::pi * get(i)->get_freq();
+}
+
+std::vector<State*>* Atom::get_states()
+{
+	return &states;
 }
 
 DecayMap* Atom::get_decay_map()

@@ -11,6 +11,7 @@ Example script / Guide for the PyCLS.simulate module.
 
 import numpy as np
 import scipy.constants as sc
+
 import pycol.physics as ph
 import pycol.algebra as al
 import pycol.simulate as sim
@@ -38,19 +39,18 @@ decay = sim.DecayMap(labels=[('s', 'p'), ('p', 'd')], a=[a_sp, a_dp])
 
 ca40 = sim.Atom(states=s + p + d, decay_map=decay)  # The Atom with all states and the decay information.
 
-pol = sim.Polarization([1, 1, 0], q_axis=2)
+pol = sim.Polarization([1, 1, 1], q_axis=2)
 laser_sp = sim.Laser(freq=f_sp, polarization=pol, intensity=500)  # Linear polarized laser for the two
 laser_dp = sim.Laser(freq=f_dp, polarization=pol, intensity=500)  # transitions, with 500 uW / mm**2.
 
 inter = sim.Interaction(atom=ca40, lasers=[laser_sp, laser_dp])  # The interaction.
-print(inter.history)
-quit()
-inter.resonance_info()  # Print the detuning of the lasers from the considered transitions.
+# inter.resonance_info()  # Print the detuning of the lasers from the considered transitions.
+inter.environment = sim.Environment(B=[0, 0, 0.01])
 
 inter.master(t=0.5)  # Solve the master equation for 0.5 us, assuming equal population in all s-states.
 # (Here the s-states are the first in the list and they all have the same label.)
 # inter.master(t=0.5, dissipation=False)  # Without spontaneous emission.
-
+quit()
 """
 Example 2: Interaction between a singly-charged calcium ion and two lasers.
 
@@ -64,10 +64,11 @@ p3_hyper = [-31., -6.9]
 d3_hyper = [-47.3, -3.7]
 
 s = sim.construct_electronic_state(freq_0=0, s=0.5, l=0, j=0.5, i=3.5, hyper_const=s_hyper, label='s')
-p = sim.construct_electronic_state(f_sp, 0.5, 0, 0.5, i=3.5, hyper_const=p1_hyper, label='p')
-d = sim.construct_electronic_state(f_sp - f_dp, 0.5, 0, 0.5, i=3.5, hyper_const=d3_hyper, label='d')
+p = sim.construct_electronic_state(f_sp, 0.5, 1, 0.5, i=3.5, hyper_const=p1_hyper, label='p')
+d = sim.construct_electronic_state(f_sp - f_dp, 0.5, 2, 1.5, i=3.5, hyper_const=d3_hyper, label='d')
 
-ca43 = sim.Atom(states=s + p + d, decay_map=decay)  # The Atom with all states and the decay information from above.
+states = s + p + d
+ca43 = sim.Atom(states=states, decay_map=decay)  # The Atom with all states and the decay information from above.
 
 pol_sp = sim.Polarization([1, 1, 1], q_axis=2)
 pol_dp = sim.Polarization([0, 1, 0], q_axis=2)
@@ -75,8 +76,11 @@ laser_sp = sim.Laser(freq=f_sp - 1487, polarization=pol_sp, intensity=500)
 laser_dp = sim.Laser(freq=f_dp - 172, polarization=pol_dp, intensity=500)
 
 inter = sim.Interaction(atom=ca43, lasers=[laser_sp, laser_dp], delta_max=400.)  # Laser excitations with transitions
+# inter.resonance_info()  # Print the detuning of the lasers from the considered transitions.
+
 # off by less than 400 MHz are considered.
-inter.resonance_info()  # Print the detuning of the lasers from the considered transitions.
+inter.controlled = True  # Use an error controlled solver to deal with fast dynamics.
+# inter.dt = 1e-4  # Alternatively, decrease the step size.
 
 inter.master(t=0.5)  # Solve the master equation for 0.5 us, assuming equal population in all s-states.
 # (Here the s-states are the first in the list and they all have the same label.)
@@ -115,8 +119,7 @@ print('Saturation s(red): {}'.format(ph.saturation(i_r, f, a, al.a(1.5, 1, 2.5, 
 # The saturation intensity can be compared easily to the specified values in the paper.
 
 inter = sim.Interaction(atom=li7, lasers=[laser_b, laser_r])
-inter.dt = 1e-3  # Set the time steps to 1 ns.
-inter.resonance_info()
+# inter.resonance_info()
 
 delta = np.linspace(-2., 2., 11)
 y0 = li7.get_y0(['s3', 's5'])

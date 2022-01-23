@@ -587,6 +587,7 @@ class ScatteringRate:
         :param b: The external magnetic field. Can be a vector or a scalar.
          In the latter case, the magnetic field is aligned with the z-axis.
         """
+        self.environment = Environment()
         self.atom = atom
         self.i_decay = i_decay
         self.state_l, self.state_u = None, None
@@ -608,7 +609,7 @@ class ScatteringRate:
         self.set_geometry(geometry)
         self.set_polarization(polarization)
         self.generate_dipoles()
-        # self.set_b(b) TODO: Implement Environments in C++.
+        self.set_b(b)  # TODO: Implement Environments in C++.
     
     def check_atom(self):
         """
@@ -723,9 +724,9 @@ class ScatteringRate:
         self.R = np.dot(self.geometry.rotation.R, self.R_b)
         self.e_l = np.dot(self.R_b, self.polarization.x)
         self.polarization.def_q_axis(self.e_r_b)
+        self.environment = Environment(B=self.b)
         for state in self.atom:
-            state.b = self.b_abs
-            state.set_freq()
+            state.update(self.environment)
         self.set_x0()
 
     def generate_x(self, width: scalar = 20., step: scalar = None):

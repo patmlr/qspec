@@ -129,6 +129,62 @@ extern "C"
     }
 
 
+    //Environment
+    __declspec(dllexport) Environment* environment_construct()
+    {
+        return new Environment();
+    }
+
+    __declspec(dllexport) void environment_destruct(Environment* env)
+    {
+        delete env;
+    }
+
+    __declspec(dllexport) double environment_get_E(Environment* env)
+    {
+        return env->get_E();
+    }
+
+    __declspec(dllexport) double environment_get_B(Environment* env)
+    {
+        return env->get_B();
+    }
+
+    __declspec(dllexport) double* environment_get_e_E(Environment* env)
+    {
+        return env->get_e_E()->data();
+    }
+
+    __declspec(dllexport) double* environment_get_e_B(Environment* env)
+    {
+        return env->get_e_B()->data();
+    }
+
+    __declspec(dllexport) void environment_set_E(Environment* env, double* E)
+    {
+        Vector3d _E;
+        _E << E[0], E[1], E[2];
+        env->set_E(_E);
+    }
+
+    __declspec(dllexport) void environment_set_B(Environment* env, double* B)
+    {
+        Vector3d _B;
+        _B << B[0], B[1], B[2];
+        env->set_B(_B);
+    }
+
+    __declspec(dllexport) void environment_set_E_double(Environment* env, double E)
+    {
+        env->set_E(E);
+    }
+
+    __declspec(dllexport) void environment_set_B_double(Environment* env, double B)
+    {
+        env->set_B(B);
+    }
+
+
     // State
     __declspec(dllexport) State* state_construct()
     {
@@ -407,6 +463,16 @@ extern "C"
         interaction->update();
     }
 
+    __declspec(dllexport) Environment* interaction_get_environment(Interaction* interaction)
+    {
+        return interaction->get_env();
+    }
+
+    __declspec(dllexport) void interaction_set_environment(Interaction* interaction, Environment* environment)
+    {
+        interaction->set_env(environment);
+    }
+
     __declspec(dllexport) Atom* interaction_get_atom(Interaction* interaction)
     {
         return interaction->get_atom();
@@ -488,6 +554,13 @@ extern "C"
     __declspec(dllexport) double* interaction_get_deltamap(Interaction* interaction)
     {
         return interaction->get_deltamap()->data();
+    }
+
+    __declspec(dllexport) double* interaction_get_delta(Interaction* interaction)
+    {
+        VectorXd* delta = new VectorXd(interaction->get_atom()->get_size());
+        *delta = interaction->gen_delta(*interaction->gen_w0(), *interaction->gen_w());
+        return delta->data();
     }
 
     __declspec(dllexport) bool interaction_get_loop(Interaction* interaction)

@@ -152,6 +152,13 @@ struct f_master_t
 };
 
 
+Interaction::Interaction()
+{
+	atom = nullptr;
+	lasers = std::vector<Laser*>();
+	env = new Environment();
+}
+
 Atom* Interaction::get_atom()
 {
 	return atom;
@@ -160,10 +167,6 @@ Atom* Interaction::get_atom()
 void Interaction::set_atom(Atom* _atom)
 {
 	atom = _atom;
-
-	summap = MatrixXi::Zero(atom->get_size(), atom->get_size());
-	trees = new std::vector<std::vector<size_t>>(0, std::vector<size_t>(0));
-	con_list = new std::vector<std::vector<size_t>>(atom->get_size(), std::vector<size_t>(0));
 }
 
 void Interaction::clear_lasers()
@@ -184,6 +187,18 @@ void Interaction::add_laser(Laser* _laser)
 		lasermap.at(q_i).push_back(MatrixXi::Zero(atom->get_size(), atom->get_size()));
 		rabimap.push_back(MatrixXcd::Zero(atom->get_size(), atom->get_size()));
 	}
+}
+
+Environment* Interaction::get_env()
+{
+	return env;
+}
+
+void Interaction::set_env(Environment* _env)
+{
+	env = _env;
+	for (State* state : *atom->get_states()) state->update(env);
+	update();
 }
 
 double Interaction::get_delta_max()
@@ -233,7 +248,7 @@ void Interaction::set_time_dependent(bool _time_dependent)
 
 MatrixXi* Interaction::get_summap()
 {
-	return &lasermap.at(2).at(0);
+	return &summap;
 }
 
 std::vector<MatrixXcd>* Interaction::get_rabimap()
@@ -253,14 +268,24 @@ MatrixXd* Interaction::get_deltamap()
 
 void Interaction::update()
 {
+	gen_coordinates();
 	gen_rabi();
 	gen_trees();
 	gen_conlist();
 	gen_deltamap();
 }
 
+void Interaction::gen_coordinates()
+{
+	for (Laser* laser: lasers)
+	{
+		laser->get_polarization()->def_q_axis(*env->get_e_B(), false);
+	}
+}
+
 void Interaction::gen_rabi()
 {
+	summap = MatrixXi::Zero(atom->get_size(), atom->get_size());
 	for (size_t q = 0; q < 3; ++q)
 	{
 		double q_val = static_cast<double>(q) - 1;
@@ -302,15 +327,15 @@ void Interaction::gen_rabi()
 
 void Interaction::gen_trees()
 {
+	trees = std::vector<std::vector<size_t>>(0, std::vector<size_t>(0));
 	size_t i = 0;
 	size_t j = 0;
 	std::set<size_t> visited;
-	trees->resize(0);
 	std::queue<size_t> queue;
 
 	while (visited.size() < atom->get_size())
 	{
-		trees->push_back(std::vector<size_t>(1, i));
+		trees.push_back(std::vector<size_t>(1, i));
 		visited.insert(i);
 		for (size_t row = 0; row < atom->get_size(); ++row)
 		{
@@ -324,7 +349,7 @@ void Interaction::gen_trees()
 		{
 			j = queue.front();
 			queue.pop();
-			trees->back().push_back(j);
+			trees.back().push_back(j);
 			for (size_t row = 0; row < atom->get_size(); ++row)
 			{
 				if (summap(row, j) != 0 && visited.find(row) == visited.end())
@@ -342,15 +367,16 @@ void Interaction::gen_trees()
 
 void Interaction::gen_conlist()
 {
+	con_list = std::vector<std::vector<size_t>>(atom->get_size(), std::vector<size_t>(0));
 	for (int i = 0; i < atom->get_size(); ++i)
 	{
 		for (int m = 0; m < lasers.size(); ++m)
 		{
 			for (size_t q = 0; q < 3; ++q)
 			{
-				if (!lasermap.at(q).at(m).col(i).any())
+				if (lasermap.at(q).at(m).col(i).any())
 				{
-					con_list->at(i).push_back(m);
+					con_list.at(i).push_back(m);
 					break;
 				}
 			}
@@ -361,7 +387,7 @@ void Interaction::gen_conlist()
 void Interaction::gen_deltamap()
 {
 	n_history = 0;
-	size_t i0 = 0;
+	loop = false;
 	deltamap = MatrixXd::Zero(atom->get_size(), lasers.size());
 	atommap = MatrixXd::Zero(atom->get_size(), atom->get_size());
 	tmap.resize(0);
@@ -377,8 +403,10 @@ void Interaction::gen_deltamap()
 		shifts.at(j) = MatrixXd::Zero(lasers.size(), lasers.size());
 		atommap(j, j) = 1;
 	}
+
+	size_t i0 = 0;
 	std::array<std::vector<size_t>, 2> path;
-	for (std::vector<size_t>& tree : *trees)  // Go through all trees separately.
+	for (const std::vector<size_t>& tree : trees)  // Go through all trees separately.
 	{
 		i0 = tree.at(0);
 		propagate(i0, i0, visited, tree, path, shifts);
@@ -426,13 +454,21 @@ void Interaction::propagate(size_t i, size_t i0, std::set<size_t>& visited, cons
 			else pm = -1;
 			if (visited.find(j) != visited.end())  // If j already visited, do this.
 			{
-				k = std::distance(path.at(0).begin(), std::find(path.at(0).begin(), path.at(0).end(), j));  // The index of j in the current path.
-				printf("%zi\n", k);
-				if (k >= path.at(1).size()) continue;  // If j was not exited via a laser in the current path, continue.
-				loop = loop || path.at(1).at(k) != m;  // If j was previously not left via m in the current path, recognize loop.
-				if (path.at(1).at(k) != m)  // If a loop is completed with the current path, ...
+				//k = std::distance(path.at(0).begin(), std::find(path.at(0).begin(), path.at(0).end(), j));  // The index of j in the current path.
+				//printf("%zi\n", k);
+				//if (k >= path.at(1).size()) continue;  // If j was not exited via a laser in the current path, continue.
+				//loop = loop || path.at(1).at(k) != m;  // If j was previously not left via m in the current path, recognize loop.
+				//if (path.at(1).at(k) != m)  // If a loop is completed with the current path, ...
+				//{
+				//	printf("%zi, %zi, %zi\n", i, j, m);
+				//	printf("shifts: %zi, %zi, %zi\n", i, j, m);
+				//	tmap.at(m)(i, j) = pm;  // ... set tmap entry to true.
+				//	tmap.at(m)(j, i) = -pm;
+				//};
+				bool _loop = check_loop(i, j, m, pm, shifts);  // Check whether a loop is not closed perfectly.
+				loop = loop || _loop;
+				if (_loop)  // If a loop is completed with the current path, ...
 				{
-					printf("%zi, %zi, %zi\n", i, j, m);
 					tmap.at(m)(i, j) = pm;  // ... set tmap entry to true.
 					tmap.at(m)(j, i) = -pm;
 				};
@@ -440,7 +476,7 @@ void Interaction::propagate(size_t i, size_t i0, std::set<size_t>& visited, cons
 			}
 			deltamap.row(j) += shifts.at(i).row(m);  // Store the information for the transformation of the hamiltonian.
 			deltamap(j, m) += pm;
-			for (size_t _m : con_list->at(j))
+			for (size_t _m : con_list.at(j))
 			{
 				shifts.at(j).row(_m) += shifts.at(i).row(m);  // All other lasers connected to the transformed state are affected as well.
 				shifts.at(j)(_m, m) += pm;
@@ -516,7 +552,14 @@ void Interaction::update_w(VectorXd& w, const VectorXd& delta, const Vector3d& v
 	for (size_t m = 0; m < lasers.size(); ++m) w(m) = 2 * sc::pi * lasers.at(m)->get_detuned(delta(m), v);
 }
 
-VectorXd Interaction::gen_delta(VectorXd& w0, VectorXd& w)
+//VectorXd Interaction::gen_delta(VectorXd& w0, VectorXd& w)
+//{
+//	VectorXd delta_diag(atom->get_size());
+//	delta_diag = (atommap * w0) + (deltamap * w);
+//	return delta_diag;
+//}
+
+VectorXd Interaction::gen_delta(const VectorXd& w0, const VectorXd& w)
 {
 	VectorXd delta_diag(atom->get_size());
 	delta_diag = (atommap * w0) + (deltamap * w);

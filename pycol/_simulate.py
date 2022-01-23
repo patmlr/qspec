@@ -238,6 +238,59 @@ def _process_hyper_const(hyper_const: array_like) -> ndarray:
     return np.asarray(hyper_const, dtype=float)[:3]
 
 
+# noinspection PyPep8Naming
+class Environment:
+    """
+    Class representing an electromagnetic environment.
+    """
+
+    def __init__(self, E: array_like = None, B: array_like = None, instance=None):
+        self.instance = instance
+        if self.instance is None:
+            self.instance = dll.environment_construct()
+            self.E = E
+            self.B = B
+
+    def __del__(self):
+        dll.environment_destruct(self.instance)
+
+    @property
+    def E(self):
+        return dll.environment_get_E(self.instance) * dll.environment_get_e_E(self.instance)
+    
+    @E.setter
+    def E(self, value: array_like):
+        if value is None:
+            dll.environment_set_E(self.instance, np.asarray([1, 0, 0], dtype=float))
+            dll.environment_set_E_double(self.instance, c_double(0.))
+        else:
+            value = np.asarray(value, dtype=float)
+            if not value.shape:
+                dll.environment_set_E_double(self.instance, value)
+            elif value.shape == (3, ):
+                dll.environment_set_E(self.instance, value)
+            else:
+                raise ValueError('E must be a scalar, 3d-vector or None, but has shape {}'.format(value.shape))
+
+    @property
+    def B(self):
+        return dll.environment_get_B(self.instance) * dll.environment_get_e_B(self.instance)
+    
+    @B.setter
+    def B(self, value: array_like):
+        if value is None:
+            dll.environment_set_B(self.instance, np.array([0, 0, 1], dtype=float))
+            dll.environment_set_B_double(self.instance, c_double(0.))
+        else:
+            value = np.asarray(value, dtype=float)
+            if not value.shape:
+                dll.environment_set_B_double(self.instance, value)
+            elif value.shape == (3, ):
+                dll.environment_set_B(self.instance, value)
+            else:
+                raise ValueError('B must be a scalar, 3d-vector or None, but has shape {}'.format(value.shape))
+
+
 class State:
     """
     Class representing an atomic quantum state :math:`|(\\mathrm{label})SLJIFm\\rangle`.
@@ -277,13 +330,16 @@ class State:
         return '{}({})'.format(self.label, ('{}, ' * 6)[:-2]) \
             .format(*[tools.half_integer_to_str(qn, '/') for qn in [self.s, self.l, self.j, self.i, self.f, self.m]])
 
-    def update(self):
+    def update(self, environment: Environment = None):
         """
         Update the shifted frequency of the state.
 
         :returns: None.
         """
-        dll.state_update(self.instance)
+        if environment is None:
+            dll.state_update(self.instance)
+        else:
+            dll.state_update_env(self.instance, environment.instance)
 
     def get_shift(self):
         """
@@ -555,6 +611,9 @@ class Atom:
     def __iter__(self):
         for state in self.states:
             yield state
+
+    def __getitem__(self, key: int):
+        return self.states[key]
 
     def update(self):
         """
@@ -879,6 +938,7 @@ class Interaction:
         self.instance = instance
         if self.instance is None:
             self.instance = dll.interaction_construct()
+            self._environment = self._get_environemnt()
             if atom is None:
                 atom = Atom()
             if lasers is None:
@@ -889,12 +949,19 @@ class Interaction:
             self.controlled = controlled
             self.update()
         else:
+            self._environment = self._get_environemnt()
             self._atom = self._get_atom()
             self._lasers = self._get_lasers()
             self.update()
 
     def __del__(self):
         dll.interaction_destruct(self.instance)
+
+    def _get_environemnt(self):
+        """
+        :return: The environment used in the C++ class.
+        """
+        return Environment(instance=dll.interaction_get_environment(self.instance))
 
     def _get_atom(self):
         """
@@ -954,6 +1021,22 @@ class Interaction:
             if n == 0:
                 print('No resonances!')
         print()
+
+    @property
+    def environment(self):
+        """
+        :returns: The environment of the interaction.
+        """
+        return self._environment
+
+    @environment.setter
+    def environment(self, value: Environment):
+        """
+        :param value: The new environment of the interaction.
+        :returns: None.
+        """
+        self._environment = value
+        dll.interaction_set_environment(self.instance, value.instance)
 
     @property
     def atom(self):
@@ -1104,6 +1187,11 @@ class Interaction:
         matrix_d_p = np.ctypeslib.ndpointer(dtype=float, shape=(len(self.lasers), self.atom.size))
         set_restype(dll.interaction_get_deltamap, matrix_d_p)
         return dll.interaction_get_deltamap(self.instance).T
+
+    def get_delta(self):
+        vector_d_p = np.ctypeslib.ndpointer(dtype=float, shape=(self.atom.size, ))
+        set_restype(dll.interaction_get_delta, vector_d_p)
+        return dll.interaction_get_delta(self.instance)
 
     @property
     def history_size(self):

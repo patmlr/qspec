@@ -29,13 +29,13 @@ void Polarization::calc_R()
 	double angle = acos(z.dot(q_axis) / sqrt(z.dot(z) * q_axis.dot(q_axis)));
 	Vector3d rot_axis = z.cross(q_axis);
 	if (rot_axis.sum() == 0) rot_axis(2) = 1;
-	rot_axis /= sqrt(rot_axis.dot(rot_axis));
+	rot_axis /= rot_axis.norm();
 	R = AngleAxisd(angle, rot_axis);
 }
 
 void Polarization::def_q_axis(Vector3d _q_axis, bool q_fixed)
 {
-	q_axis = _q_axis / sqrt((_q_axis).dot(_q_axis));
+	q_axis = _q_axis / _q_axis.norm();
 	calc_R();
 	if (q_fixed) infer_x();
 	else infer_q();

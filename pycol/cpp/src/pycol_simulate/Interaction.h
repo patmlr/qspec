@@ -45,6 +45,7 @@ class Interaction
 protected:
 	Atom* atom;
 	std::vector<Laser*> lasers;
+	Environment* env;
 
 	double dt = 1e-3;
 	double dt_var = 1e-3;
@@ -56,8 +57,8 @@ protected:
 	std::array<std::vector<MatrixXi>, 3> lasermap;
 	MatrixXi summap;
 	std::vector<MatrixXcd> rabimap;
-	std::vector<std::vector<size_t>>* trees;
-	std::vector<std::vector<size_t>>* con_list;
+	std::vector<std::vector<size_t>> trees;
+	std::vector<std::vector<size_t>> con_list;
 	MatrixXd deltamap;
 	MatrixXd atommap;
 	std::vector<ArrayXi> tmap;
@@ -67,13 +68,20 @@ public:
 	std::vector<size_t> history;
 	int info = 0;
 
-	void init(Atom* _atom, std::vector<Laser*> _lasers);
+	Interaction();
+
+	void init(Atom* _atom, std::vector<Laser*> _lasers, Environment* _env);
 
 	Atom* get_atom();
 	void set_atom(Atom* _atom);
+
 	void clear_lasers();
 	std::vector<Laser*>* get_lasers();
 	void add_laser(Laser* laser);
+
+	Environment* get_env();
+	void set_env(Environment* _env);
+
 	double get_delta_max();
 	void set_delta_max(double _delta_max);
 	bool get_controlled();
@@ -82,6 +90,7 @@ public:
 	void set_dt(double _dt);
 
 	void update();
+	void gen_coordinates();
 	void gen_rabi();
 	void gen_trees();
 	void gen_conlist();
@@ -96,7 +105,8 @@ public:
 	VectorXd* gen_w(const Vector3d& v, const bool dynamics = false);
 	VectorXd* gen_w(const VectorXd& delta, const Vector3d& v, const bool dynamics = false);
 	void update_w(VectorXd& w, const VectorXd& delta, const Vector3d& v, const bool dynamics = false);
-	VectorXd gen_delta(VectorXd& atom_freqs, VectorXd& laser_freqs);
+	// VectorXd gen_delta(VectorXd& w0, VectorXd& w);
+	VectorXd gen_delta(const VectorXd& w0, const VectorXd& w);
 
 	MatrixXd* gen_rates(VectorXd& w0, VectorXd& w);
 	VectorXd* gen_rates_sum(MatrixXd& R);
