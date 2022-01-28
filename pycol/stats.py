@@ -47,8 +47,8 @@ class Observable(float):
             try:
                 self.est = estimate_skewnorm(float(self), self.std, self.std_2)
             except ValueError as e:
-                print(repr(e))
-                print('The real PDF might not be sufficiently described by a skew normal distribution.')
+                tools.printw(repr(e))
+                tools.printw('The real PDF might not be sufficiently described by a skew normal distribution.')
 
     def __repr__(self):
         return 'Observable({}, {}, {}, \'{}\')'.format(super().__repr__(), self.std, self.std_2, self.label)
@@ -64,11 +64,20 @@ class Observable(float):
     def __add__(self, other):
         return propagate(add, [self, other])
 
+    def __radd__(self, other):
+        return propagate(add, [other, self])
+
     def __mul__(self, other):
-        return propagate(mul, [self, other], show=True)
+        return propagate(mul, [self, other])
+
+    def __rmul__(self, other):
+        return propagate(mul, [other, self])
 
     def __pow__(self, power, modulo=None):
-        return propagate(pow, [self, power], show=True)
+        return propagate(pow, [self, power])
+
+    def __rpow__(self, power, modulo=None):
+        return propagate(pow, [power, self])
 
     def set_popt(self, popt: array_like = None):
         """
@@ -202,7 +211,7 @@ def average(a: array_like, std: array_like = None, cov: array_iter = None, axis:
 
 def median(a: array_like, axis: int = None) -> (ndarray, ndarray, ndarray):
     """
-    :param a: The uncorrelated sample data.
+    :param a: The sample data.
     :param axis: The axis along which the three percentiles are computed.
     :returns: The median (0.5-percentile) as well as the left- (~0.1587) and right-sided (~0.8413) 1-sigma percentile
      relative to the median of a given sample 'a' along the specified 'axis'.
@@ -253,7 +262,7 @@ def propagate(f: Callable, x: Union[array_like, Observable], x_d: array_like = N
      a multivariate normal distribution with covariance 'cov'.
     :param unc_places: The number of significant decimal places the result will be rounded to.
      If None, the result is not rounded.
-    :param sample_size: The number of random variates (default is 1,000,000) used for the calculation.
+    :param sample_size: The number of random variates used for the calculation. The default is 1,000,000.
     :param rtol: The relative tolerance, with respect to the median of the resulting sample,
      with which the left- and right-sided uncertainties can deviate before asymmetric uncertainties are used.
     :param atol: The absolute tolerance with which the left- and right-sided uncertainties can deviate,
@@ -335,6 +344,23 @@ def propagate(f: Callable, x: Union[array_like, Observable], x_d: array_like = N
         return ob
 
 
+def propagate_fit(f: Callable, x: array_like, popt: array_like, pcov: array_like, sample_size: int = 1000000):
+    """
+    :param f: The function to compute. 'f' needs to be vectorized.
+    :param x: The input values.
+    :param popt: An array of the fitted parameters (compare curve_fit).
+    :param pcov: A 2d-array of the estimated covariances (compare curve_fit).
+    :param sample_size: The number of random variates used for the calculation. The default is 1,000,000.
+    :returns: f(x, *popt), (f - 1sigma)(x, *), (f + 1sigma)(x, *).
+    """
+    x = np.asarray(x)
+    _x = np.expand_dims(x, axis=-1)
+    _popt = st.multivariate_normal.rvs(mean=popt, cov=pcov, size=sample_size).T
+    _popt = [np.expand_dims(p, axis=tuple(range(len(x.shape)))) for p in _popt]
+    med, per_0, per_1 = median(f(_x, *_popt), axis=-1)
+    return med, med - per_0, med + per_1
+
+
 def combined_pdf(z: array_like, pdf_1: Callable = st.norm.pdf, pdf_2: Callable = st.norm.pdf,
                  loc_1: float = 0., scale_1: float = 1., loc_2: float = 0., scale_2: float = 1.,
                  operator: str = '+', n: int = 10) -> ndarray:
@@ -383,7 +409,13 @@ def combined_pdf(z: array_like, pdf_1: Callable = st.norm.pdf, pdf_2: Callable =
 
 
 def relevant_interval(dist: Callable, *args, show: bool = False, **kwargs):
-    """"""
+    """
+    :param dist: The probability distribution function (pdf).
+    :param args: Additional arguments for the pdf.
+    :param show: Whether to show the pdf in the determined interval.
+    :param kwargs: Additional keyword arguments for the pdf.
+    :returns: An estimation of the interval where most of the probability lies in.
+    """
     k = 10
     scale = 1.
 
@@ -472,7 +504,6 @@ def uniform_pumped(x, width, gamma_u, depth) -> ndarray:
 
 def info():
     """
-
     Plots the 1-sigma percentiles (and their ratio) of a skew normal distribution relative to its median
     for different values of the parameter alpha.
     The plot shows that the ratio between the two 1-sigma percentiles cannot exceed 1.5.

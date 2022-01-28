@@ -37,6 +37,42 @@ class COLORS:
     PYPLOT = ['C{}'.format(i) for i in range(10)]
 
 
+def printh(*values, **kwargs):
+    """
+    Print with the HEADER color (pink).
+
+    :param values: The values to print.
+    :param kwargs: See print().
+    :returns: None.
+    """
+    _values = (COLORS.HEADER, ) + values + (COLORS.ENDC, )
+    print('{}{}{}'.format(*_values), **kwargs)
+
+
+def printw(*values, **kwargs):
+    """
+    Print with the HEADER color (pink).
+
+    :param values: The values to print.
+    :param kwargs: See print().
+    :returns: None.
+    """
+    _values = (COLORS.WARNING, ) + values + (COLORS.ENDC, )
+    print('{}{}{}'.format(*_values), **kwargs)
+
+
+def printf(*values, **kwargs):
+    """
+    Print with the HEADER color (pink).
+
+    :param values: The values to print.
+    :param kwargs: See print().
+    :returns: None.
+    """
+    _values = (COLORS.FAIL, ) + values + (COLORS.ENDC, )
+    print('{}{}{}'.format(*_values), **kwargs)
+
+
 """ System operations """
 
 

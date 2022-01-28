@@ -600,7 +600,7 @@ def mass_factor(m: array_like, m_ref: array_like, m_d: array_like = 0, m_ref_d: 
     :param m_ref_d: The uncertainty of the mass of the reference isotope (amu).
      Must be a scalar or have the same shape as 'm'.
     :param k_inf: Whether the normal mass-shift factor K(NMS) is defined mass independently
-     as m_e * T(inf) or as m_e * T(A_ref). Compare (6.4) with (3.17)
+     as m_e * T(inf) (= True) or as m_e * T(A_ref) (= False). Compare (6.4) with (3.17)
      in [W. H. King, Isotope shifts in atomic spectra (1984)].
     :returns: the mass factor and its uncertainty needed to calculate modified isotope shifts or charge radii.
     """
@@ -622,8 +622,8 @@ def mass_factor(m: array_like, m_ref: array_like, m_d: array_like = 0, m_ref_d: 
     return mu, np.sqrt(mu_d)
 
 
-def delta_r2(r: float, r_d: float, r_ref: float, r_ref_d: float,
-             delta_r: float, delta_r_d: float, v2: float, v2_ref: float):
+def delta_r2(r: array_like, r_d: array_like, r_ref: array_like, r_ref_d: array_like,
+             delta_r: array_like, delta_r_d: array_like, v2: array_like, v2_ref: array_like):
     """
     :param r: The Barrett radius of an isotope.
     :param r_d: The uncertainty of the Barrett radius.
@@ -636,6 +636,11 @@ def delta_r2(r: float, r_d: float, r_ref: float, r_ref_d: float,
     :param v2_ref: The V2 factor of the reference isotope.
     :returns: The difference of the mean square nuclear charge radius between two isotopes and its uncertainty.
     """
+    r, r_d = np.asarray(r, dtype=float), np.asarray(r_d, dtype=float)
+    r_ref, r_ref_d = np.asarray(r_ref, dtype=float), np.asarray(r_ref_d, dtype=float)
+    delta_r, delta_r_d = np.asarray(delta_r, dtype=float), np.asarray(delta_r_d, dtype=float)
+    v2, v2_ref = np.asarray(v2, dtype=float), np.asarray(v2_ref, dtype=float)
+
     sum_term = (r / v2 + r_ref / v2_ref) / v2
     delta_term = delta_r + r_ref * (1. - v2 / v2_ref)
     val = sum_term * delta_term  # (r/v2)**2 - (r_ref/v2_ref)**2
@@ -646,8 +651,8 @@ def delta_r2(r: float, r_d: float, r_ref: float, r_ref_d: float,
     return val, np.sqrt(err)
 
 
-def delta_r4(r: float, r_d: float, r_ref: float, r_ref_d: float,
-             delta_r: float, delta_r_d: float, v4: float, v4_ref: float):
+def delta_r4(r: array_like, r_d: array_like, r_ref: array_like, r_ref_d: array_like,
+             delta_r: array_like, delta_r_d: array_like, v4: array_like, v4_ref: array_like):
     """
     :param r: The Barrett radius of an isotope.
     :param r_d: The uncertainty of the Barrett radius.
@@ -660,6 +665,11 @@ def delta_r4(r: float, r_d: float, r_ref: float, r_ref_d: float,
     :param v4_ref: The V4 factor of the reference isotope.
     :returns: The difference of the mean quartic nuclear charge radius between two isotopes and its uncertainty.
     """
+    r, r_d = np.asarray(r, dtype=float), np.asarray(r_d, dtype=float)
+    r_ref, r_ref_d = np.asarray(r_ref, dtype=float), np.asarray(r_ref_d, dtype=float)
+    delta_r, delta_r_d = np.asarray(delta_r, dtype=float), np.asarray(delta_r_d, dtype=float)
+    v4, v4_ref = np.asarray(v4, dtype=float), np.asarray(v4_ref, dtype=float)
+
     sum_term = (r / v4) ** 2 + (r_ref / v4_ref) ** 2
     delta_term = delta_r2(r, r_d, r_ref, r_ref_d, delta_r, delta_r_d, v4, v4_ref)
     val = sum_term * delta_term[0]  # (r/v4)**4 - (r_ref/v4_ref)**4
@@ -670,8 +680,8 @@ def delta_r4(r: float, r_d: float, r_ref: float, r_ref_d: float,
     return val, np.sqrt(err)
 
 
-def delta_r6(r: float, r_d: float, r_ref: float, r_ref_d: float,
-             delta_r: float, delta_r_d: float, v6: float, v6_ref: float):
+def delta_r6(r: array_like, r_d: array_like, r_ref: array_like, r_ref_d: array_like,
+             delta_r: array_like, delta_r_d: array_like, v6: array_like, v6_ref: array_like):
     """
     :param r: The Barrett radius of an isotope.
     :param r_d: The uncertainty of the Barrett radius.
@@ -684,6 +694,11 @@ def delta_r6(r: float, r_d: float, r_ref: float, r_ref_d: float,
     :param v6_ref: The V6 factor of the reference isotope.
     :returns: The difference of the mean sextic nuclear charge radius between two isotopes and its uncertainty.
     """
+    r, r_d = np.asarray(r, dtype=float), np.asarray(r_d, dtype=float)
+    r_ref, r_ref_d = np.asarray(r_ref, dtype=float), np.asarray(r_ref_d, dtype=float)
+    delta_r, delta_r_d = np.asarray(delta_r, dtype=float), np.asarray(delta_r_d, dtype=float)
+    v6, v6_ref = np.asarray(v6, dtype=float), np.asarray(v6_ref, dtype=float)
+
     sum_term = (v6 / r) * ((r / v6) ** 3 + (r_ref / v6_ref) ** 3)
     delta = delta_r4(r, r_d, r_ref, r_ref_d, delta_r, delta_r_d, v6, v6_ref)
     delta_term = delta[0] + (r_ref / v6_ref) ** 4 * (1. - (r / v6) * (v6_ref / r_ref))

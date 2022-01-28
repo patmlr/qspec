@@ -191,7 +191,7 @@ def weight(sigma):
 
 
 def york(x: array_iter, y: array_iter, sigma_x: array_iter = None, sigma_y: array_iter = None,
-         corr: array_iter = None, iter_max: int = 200, report: bool = True, show: bool = False):
+         corr: array_iter = None, iter_max: int = 200, report: bool = False, show: bool = False):
     """
     A linear regression algorithm to find the best straight line, given normally distributed errors for x and y
     and correlation coefficients between errors in x and y. The algorithm is described in
@@ -261,7 +261,8 @@ def york(x: array_iter, y: array_iter, sigma_x: array_iter = None, sigma_y: arra
     if report:
         if n == iter_max:
             print('\nMaximum number of iterations ({}) was reached.'.format(iter_max))
-        print('\nFit result:\na: {} +- {}\nb: {} +- {}\ncorr_ab: {}\nchi2: {}'
+        tools.printh('York-fit result:')
+        print('a: {} +/- {}\nb: {} +/- {}\ncorr_ab: {}\nchi2: {}'
               .format(a, sigma_a, b, sigma_b, corr_ab, chi2))
     if show:
         x_cont = np.linspace(np.min(x) - 0.1 * (np.max(x) - np.min(x)), np.max(x) + 0.1 * (np.max(x) - np.min(x)), 1001)
@@ -311,7 +312,7 @@ def linear_monte_carlo(x: array_iter, y: array_iter, sigma_x: array_iter = None,
     mean = np.concatenate((np.expand_dims(x, axis=1), np.expand_dims(y, axis=1)), axis=1)
     cov = np.array([[[s_x ** 2, r * s_x * s_y],
                      [r * s_y * s_x, s_y ** 2]] for s_x, s_y, r in zip(sigma_x, sigma_y, corr)])
-    a, b, sigma_a, sigma_b, corr_ab = linear_monte_carlo_nd(mean, cov=cov, p_axis=0, n=n, report=report, show=show)
+    a, b, sigma_a, sigma_b, corr_ab = linear_monte_carlo_nd(mean, cov=cov, axis=0, n=n, report=report, show=show)
     return a[0], b[0], sigma_a[0], sigma_b[0], corr_ab[0, 1]
 
 
@@ -370,23 +371,26 @@ def _generate_collinear_points(x: ndarray, cov: ndarray, n: int):
     return p, dr, accepted
 
 
-def linear_monte_carlo_nd(x: array_iter, cov: array_iter = None, p_axis: int = None,
+def linear_monte_carlo_nd(x: array_iter, cov: array_iter = None, axis: int = None,
                           n: int = 1000000, full_output: bool = False, report: bool = True, show: bool = False):
     """
     A Monte-Carlo fitter that finds a straight line in n-dimensional space.
 
     :param x: The x data. 'x' is an iterable of vectors with arbitrary but fixed dimension.
     :param cov: The covariance matrices of the x data vectors. Must have shape (x.shape[0], x.shape[1], x.shape[1]).
-    :param p_axis: The axis to use for the parametrization. If None, the directional vector is normalized.
+    :param axis: The axis to use for the parametrization. If None, the directional vector is normalized.
     :param n: The number of samples generated for each data point.
     :param full_output: Whether to also return the generated points 'p' and a mask for the 'accepted' points.
      The accepted points are p[accepted]. p has shape (n, x.shape).
     :param report: Whether to print the result of the fit.
     :param show: Whether to plot the fit result.
-    :returns: A list of (a, b, sigma_a, sigma_b, corr_ab). The best y-intercepts and slopes,
+    :returns: A list of results as defined by the routine 'linear_monte_carlo_nd':
+     A tuple (a, b, sigma_a, sigma_b, corr_ab) of arrays. The best y-intercepts and slopes,
      their respective 1-sigma uncertainties and their correlation matrix.
-     The y-intercepts and slopes are defined through 'p_axis' by a(x[p_axis] == 0)
-     and b(dx[i != p_axis] / dx[p_axis]), respectively.
+     The y-intercepts and slopes are defined through 'axis' by a(x[axis] == 0)
+     and b(dx[i != axis] / dx[axis]), respectively.
+     Additionally, a second tuple with the accepted points, offsets, slopes and a mask
+     for the accepted points is returned if full_output == True.
     """
     x = np.asarray(x)
     if len(x.shape) != 2:
@@ -421,13 +425,13 @@ def linear_monte_carlo_nd(x: array_iter, cov: array_iter = None, p_axis: int = N
         plt.show()
 
     mask = [True, ] * x.shape[1]
-    if p_axis is not None:
-        if p_axis == -1:
-            p_axis = x.shape[1] - 1
-        mask = np.arange(x.shape[1]) != p_axis
-        t = -p_0[:, p_axis] / dr[:, p_axis]
+    if axis is not None:
+        if axis == -1:
+            axis = x.shape[1] - 1
+        mask = np.arange(x.shape[1]) != axis
+        t = -p_0[:, axis] / dr[:, axis]
         p_0 = p_0 + np.expand_dims(t, axis=-1) * dr
-        dr = dr / dr[:, [p_axis]]
+        dr = dr / dr[:, [axis]]
     a = np.mean(p_0, axis=0)[mask]
     b = np.mean(dr, axis=0)[mask]
     sigma_a = np.std(p_0, axis=0, ddof=1)[mask]
@@ -437,7 +441,8 @@ def linear_monte_carlo_nd(x: array_iter, cov: array_iter = None, p_axis: int = N
     # plt.plot(p[accepted, :, 0], dr[:, 1], '.')
     # plt.show()
     if report:
-        print('\nFit result:\nAccepted samples: {} / {} ({}%)\na: {} +- {}\nb: {} +- {}\ncorr_ab:\n{}'
+        tools.printh('Linear Monte-Carlo-fit result:')
+        print('Accepted samples: {} / {} ({}%)\na: {} +- {}\nb: {} +- {}\ncorr_ab:\n{}'
               .format(n_accepted, n, np.around(n_accepted / n * 100, decimals=2),
                       a, sigma_a, b, sigma_b, corr_ab))
     if full_output:
@@ -487,7 +492,7 @@ def linear_alpha(x: array_iter, y: array_iter, sigma_x: array_like = None, sigma
 def curve_fit(f: Callable, x: Union[array_like, object], y: array_like, p0: array_iter = None,
               p0_fixed: array_iter = None, sigma: array_iter = None, absolute_sigma: bool = False,
               check_finite: bool = True, bounds: (ndarray, ndarray) = (-np.inf, np.inf), method: str = None,
-              jac: Union[Callable, str] = None, **kwargs) -> (ndarray, ndarray):
+              jac: Union[Callable, str] = None, report: bool = False, **kwargs) -> (ndarray, ndarray):
     """
     :param f: The model function to fit to the data.
     :param x: The x data.
@@ -503,43 +508,49 @@ def curve_fit(f: Callable, x: Union[array_like, object], y: array_like, p0: arra
     :param bounds: See scipy.optimize.curve_fit.
     :param method: See scipy.optimize.curve_fit.
     :param jac: See scipy.optimize.curve_fit.
+    :param report: Whether to print the result of the fit.
     :param kwargs: See scipy.optimize.curve_fit.
     :returns: popt, pcov. The optimal parameters and their covariance matrix.
     """
     if p0_fixed is None or all(not p for p in p0_fixed):
-        return so.curve_fit(f, x, y, p0=p0, sigma=sigma, absolute_sigma=absolute_sigma,
-                            check_finite=check_finite, bounds=bounds, method=method, jac=jac, **kwargs)
+        popt, pcov = so.curve_fit(f, x, y, p0=p0, sigma=sigma, absolute_sigma=absolute_sigma,
+                                  check_finite=check_finite, bounds=bounds, method=method, jac=jac, **kwargs)
+    elif p0 is None:
+        raise ValueError('Please specify the initial parameters when any of the parameters shall be fixed.')
     else:
-        if p0 is None:
-            raise ValueError('Please specify the initial parameters when any of the parameters shall be fixed.')
-    # noinspection PyTypeChecker
-    p0, p0_fixed = np.asarray(p0), np.asarray(p0_fixed).astype(bool)
-    if p0_fixed.shape != p0.shape:
-        raise ValueError('\'p0_fixed\' must have the same shape as \'p0\'.')
-    _p0 = p0[~p0_fixed]
-    _bounds = (np.asarray(bounds[0]), np.asarray(bounds[1]))
-    if len(_bounds[0].shape) > 0 and _bounds[0].size == p0.size:
-        _bounds = (_bounds[0][~p0_fixed], _bounds[1][~p0_fixed])
+        # noinspection PyTypeChecker
+        p0, p0_fixed = np.asarray(p0), np.asarray(p0_fixed).astype(bool)
+        if p0_fixed.shape != p0.shape:
+            raise ValueError('\'p0_fixed\' must have the same shape as \'p0\'.')
+        _p0 = p0[~p0_fixed]
+        _bounds = (np.asarray(bounds[0]), np.asarray(bounds[1]))
+        if len(_bounds[0].shape) > 0 and _bounds[0].size == p0.size:
+            _bounds = (_bounds[0][~p0_fixed], _bounds[1][~p0_fixed])
 
-    def _f(_x, *args):
-        _args = p0
-        _args[~p0_fixed] = np.asarray(args)
-        return f(_x, *_args)
+        def _f(_x, *args):
+            _args = p0
+            _args[~p0_fixed] = np.asarray(args)
+            return f(_x, *_args)
 
-    popt, pcov = np.ones_like(p0, dtype=float), np.zeros((p0.size, p0.size), dtype=float)
-    pcov_mask = ~(np.expand_dims(p0_fixed, axis=1) + np.expand_dims(p0_fixed, axis=0))
-    popt[p0_fixed] = p0[p0_fixed]
-    _popt, _pcov = so.curve_fit(_f, x, y, p0=_p0, sigma=sigma, absolute_sigma=absolute_sigma,
-                                check_finite=check_finite, bounds=_bounds, method=method, jac=jac, **kwargs)
-    popt[~p0_fixed] = _popt
-    # noinspection PyUnresolvedReferences
-    pcov[pcov_mask] = _pcov.flatten()
+        popt, pcov = np.ones_like(p0, dtype=float), np.zeros((p0.size, p0.size), dtype=float)
+        pcov_mask = ~(np.expand_dims(p0_fixed, axis=1) + np.expand_dims(p0_fixed, axis=0))
+        popt[p0_fixed] = p0[p0_fixed]
+        _popt, _pcov = so.curve_fit(_f, x, y, p0=_p0, sigma=sigma, absolute_sigma=absolute_sigma,
+                                    check_finite=check_finite, bounds=_bounds, method=method, jac=jac, **kwargs)
+        popt[~p0_fixed] = _popt
+        # noinspection PyUnresolvedReferences
+        pcov[pcov_mask] = _pcov.flatten()
+
+    if report:
+        tools.printh('curve_fit result:')
+        for i, (val, err) in enumerate(zip(popt, np.sqrt(np.diag(pcov)))):
+            print('{}: {} +/- {}'.format(i, val, err))
     return popt, pcov
 
 
 def odr_fit(f: Callable, x: array_iter, y: array_iter, sigma_x: array_iter = None, sigma_y: array_iter = None,
-            p0: array_iter = None, p0_d: array_iter = None, p0_fixed: array_iter = None, **kwargs) \
-        -> (ndarray, ndarray):
+            p0: array_iter = None, p0_d: array_iter = None, p0_fixed: array_iter = None,
+            report: bool = False, **kwargs) -> (ndarray, ndarray):
     """
     :param f: The model function to fit to the data.
     :param x: The x data.
@@ -553,6 +564,7 @@ def odr_fit(f: Callable, x: array_iter, y: array_iter, sigma_x: array_iter = Non
      Must have the same length as p0.
     :param p0_fixed: A numpy array or an Iterable of bool values specifying, whether to fix a parameter.
      Must have the same length as p0.
+    :param report: Whether to print the result of the fit.
     :param kwargs: Keyword arguments passed to odr.ODR.
     :returns: popt, pcov. The optimal parameters and their covariance matrix.
     """
@@ -589,6 +601,11 @@ def odr_fit(f: Callable, x: array_iter, y: array_iter, sigma_x: array_iter = Non
     model = odr.Model(lambda beta, x_i: f(x_i, *beta))
     odr_i = odr.ODR(data, model, beta0=p0, delta0=p0_d, ifixb=ifixb, **kwargs)
     out = odr_i.run()
+
+    if report:
+        tools.printh('odr_fit result:')
+        for i, (val, err) in enumerate(zip(out.beta, np.sqrt(np.diag(out.cov_beta)))):
+            print('{}: {} +/- {}'.format(i, val, err))
     return out.beta, out.cov_beta
 
 
@@ -1116,7 +1133,7 @@ def odr_fit(f: Callable, x: array_iter, y: array_iter, sigma_x: array_iter = Non
 
 
 class King:
-    def __init__(self, a: array_iter, m: array_iter, x_abs: array_iter = None, y_abs: array_iter = None,
+    def __init__(self, a: array_iter, m: array_iter, x_abs: array_iter = None,
                  subtract_electrons: scalar = 0., element_label: str = None):
         """
         :param a: An Iterable of the mass numbers of the used isotopes.
@@ -1125,10 +1142,6 @@ class King:
          If given, the 'x' parameter can be omitted when fitting (in 'fit' and 'fit_nd')
          and is determined automatically as the difference between the mass numbers 'a' and 'a_ref'.
          Must have shape (len(a), 2) or (len(a), n, 2) where n is the number of dimensions of the king plot without 'y'.
-        :param y_abs: Absolute values of the y-axis corresponding to the mass numbers a.
-         If given, the 'y' parameter can be omitted when fitting (in 'fit')
-         and is determined automatically as the difference between the mass numbers 'a' and 'a_ref'.
-         Must have shape (len(a), 2).
         :param subtract_electrons: The number of electron masses
          that should be subtracted from the specified isotope masses. If the ionization energy must be considered,
          less electrons can be subtracted. 'subtract_electrons' does not have to be an integer.
@@ -1147,14 +1160,11 @@ class King:
             self.x_abs = np.asarray(x_abs)
             if len(self.x_abs.shape) < 3:
                 self.x_abs = np.expand_dims(self.x_abs, axis=1)
-        self.y_abs = y_abs
-        if self.y_abs is not None:
-            self.y_abs = np.asarray(y_abs)
         self.m: Union[object, list, ndarray] = np.asarray(m, dtype=float).tolist()
         self.m = np.array([[m_i[0] - self.subtract_electrons * ph.m_e_u,
                             np.sqrt(m_i[1] ** 2 + (self.subtract_electrons * ph.m_e_u_d) ** 2)] for m_i in self.m])
         tools.check_shape((len(a), 2), self.m, allow_scalar=False)
-        self.m_mod = np.array([[list(ph.mass_factor(_m[0], _m_ref[0], m_d=_m[1], m_ref_d=_m_ref[1]))
+        self.m_mod = np.array([[list(ph.mass_factor(_m[0], _m_ref[0], m_d=_m[1], m_ref_d=_m_ref[1], k_inf=True))
                                 if _i != _j else [0., 0.]
                                 for _j, _m in enumerate(self.m)] for _i, _m_ref in enumerate(self.m)])
         self.m_sample = None
@@ -1181,7 +1191,7 @@ class King:
         self.m_sample = st.norm.rvs(loc=self.m[:, 0], scale=self.m[:, 1], size=(self.n, self.m.shape[0])).T
         x = st.norm.rvs(loc=self.x[:, 0], scale=self.x[:, 1], size=(self.n, self.x.shape[0])).T
         y = st.norm.rvs(loc=self.y[:, 0], scale=self.y[:, 1], size=(self.n, self.y.shape[0])).T
-        m_mod_sample = ph.mass_factor(self.m_sample[i], self.m_sample[i_ref])[0]
+        m_mod_sample = ph.mass_factor(self.m_sample[i], self.m_sample[i_ref], k_inf=True)[0]
         x_mod = m_mod_sample * x
         y_mod = m_mod_sample * y
         self.corr = np.diag(np.corrcoef(x_mod, y_mod)[:x_mod.shape[0], x_mod.shape[0]:])
@@ -1196,27 +1206,28 @@ class King:
         x_nd = st.norm.rvs(loc=self.x_nd[:, :, 0], scale=self.x_nd[:, :, 1],
                            size=(self.n, self.x_nd.shape[0], self.x_nd.shape[1]))
         x_nd = np.transpose(x_nd, axes=[1, 2, 0])
-        m_mod_sample = ph.mass_factor(self.m_sample[i], self.m_sample[i_ref])[0]
+        m_mod_sample = ph.mass_factor(self.m_sample[i], self.m_sample[i_ref], k_inf=True)[0]
         x_mod = np.expand_dims(m_mod_sample, axis=1) * x_nd
         self.cov = np.array([np.cov(x_mod_i) for x_mod_i in x_mod])
 
     def fit(self, a: array_iter, a_ref: array_iter, x: array_iter = None, y: array_iter = None,
-            func: Callable = york, alpha: scalar = 0, find_alpha: bool = False, axis: int = 0,
+            xy: Iterable[int] = None, func: Callable = york, alpha: scalar = 0, find_alpha: bool = False,
             show: bool = True, **kwargs):
         """
         :param a: An Iterable of the mass numbers of the used isotopes.
         :param a_ref: An Iterable of the mass numbers of the used reference isotopes.
         :param x: The x-values and their uncertainties of the King-fit to be performed. If 'mode' is "radii",
          this must contain the differences of mean square nuclear charge radii or the Lambda-factor.
-         'x' must have shape (len(a), 2). Units: (fm^2) or (MHz).
+         'x' must have shape (len(a), 2). Units: (fm ** 2) or (MHz).
         :param y: The isotope shifts and their uncertainties of the King-fit to be performed.
          'y' must have shape (len(a), 2). If None, 'y' is tried to be inherited from 'self.f'. Units: (MHz).
+        :param xy: A 2-tuple of indices (ix, iy) which select the axes to use for the King-fit from 'King.x_abs'
+         if x or y is not specified. The default value is (0, 1), fitting the second against the first axis.
         :param func: The fitting routine.
         :param alpha: An x-axis offset to reduce the correlation coefficient between the y-intercept and the slope.
          Unit: (u fm ** 2) or (u MHz).
         :param find_alpha: Whether to search for the best 'alpha'. Uses the given 'alpha' as a starting point.
          May not give the desired result if 'alpha' was initialized to far from its optimal value.
-        :param axis: The axis to use if 'x_abs' was specified and is multidimensional.
         :param show: Whether to plot the fit result.
         :param kwargs: Additional keyword arguments are passed to 'self.plot'.
         :returns: A list of results as defined by the routine 'linear_alpha':
@@ -1226,16 +1237,18 @@ class King:
         self.a_fit, self.a_ref = np.asarray(a), np.asarray(a_ref)
         i = np.array([self.a.index(a_i) for a_i in self.a_fit])
         i_ref = np.array([self.a.index(a_i) for a_i in self.a_ref])
+        if xy is None:
+            xy = (0, 1)
         if x is None:
             self.x = np.zeros((self.a_fit.size, 2), dtype=float)
-            self.x[:, 0] = self.x_abs[i, axis, 0] - self.x_abs[i_ref, axis, 0]
-            self.x[:, 1] = np.sqrt(self.x_abs[i, axis, 1] ** 2 + self.x_abs[i_ref, axis, 1] ** 2)
+            self.x[:, 0] = self.x_abs[i, xy[0], 0] - self.x_abs[i_ref, xy[0], 0]
+            self.x[:, 1] = np.sqrt(self.x_abs[i, xy[0], 1] ** 2 + self.x_abs[i_ref, xy[0], 1] ** 2)
         else:
             self.x = np.asarray(x)
         if y is None:
             self.y = np.zeros((self.a_fit.size, 2), dtype=float)
-            self.y[:, 0] = self.y_abs[i, 0] - self.y_abs[i_ref, 0]
-            self.y[:, 1] = np.sqrt(self.y_abs[i, 1] ** 2 + self.y_abs[i_ref, 1] ** 2)
+            self.y[:, 0] = self.x_abs[i, xy[1], 0] - self.x_abs[i_ref, xy[1], 0]
+            self.y[:, 1] = np.sqrt(self.x_abs[i, xy[1], 1] ** 2 + self.x_abs[i_ref, xy[1], 1] ** 2)
         else:
             self.y = np.asarray(y)
         m_mod = self.m_mod[i_ref, i, :]
@@ -1262,9 +1275,11 @@ class King:
          of two transitions ['D1', 'D2'], yields the slope F_D2 / F_D1 if 'axis' == 0.
         :param show: Whether to plot the fit result.
         :param kwargs: Additional keyword arguments are passed to 'self.plot_nd'.
-        :returns: A list of results as defined by the routine 'linear_alpha':
-         a, b, sigma_a, sigma_b, corr_ab, (alpha). The best y-intercept and slope,
-         their respective 1-sigma uncertainties, their correlation coefficient( and the used alpha).
+        :returns: A list of results as defined by the routine 'linear_monte_carlo_nd':
+         A tuple (a, b, sigma_a, sigma_b, corr_ab) of arrays. The best y-intercepts and slopes,
+         their respective 1-sigma uncertainties and their correlation matrix.
+         Additionally, a second tuple with the accepted points, offsets, slopes and a mask
+         for the accepted points is returned if full_output == True.
         """
         self.axis = axis
         if axis is None:
@@ -1278,30 +1293,25 @@ class King:
             self.x_nd = np.zeros((self.a_fit.size, self.x_abs.shape[1], 2), dtype=float)
             self.x_nd[:, :, 0] = self.x_abs[i, :, 0] - self.x_abs[i_ref, :, 0]
             self.x_nd[:, :, 1] = np.sqrt(self.x_abs[i, :, 1] ** 2 + self.x_abs[i_ref, :, 1] ** 2)
-            if self.y_abs is not None:
-                y_nd = np.zeros((self.a_fit.size, 1, 2), dtype=float)
-                y_nd[:, 0, 0] = self.y_abs[i, 0] - self.y_abs[i_ref, 0]
-                y_nd[:, 0, 1] = np.sqrt(self.y_abs[i, 1] ** 2 + self.y_abs[i_ref, 1] ** 2)
-                self.x_nd = np.concatenate((self.x_nd, y_nd), axis=1)
         else:
             self.x_nd = np.asarray(x)
         m_mod = np.expand_dims(self.m_mod[i_ref, i, 0], axis=1)
         self.x_nd_mod = m_mod * self.x_nd[:, :, 0]
         self._correlation_nd()
         self.results_nd, self.x_results = linear_monte_carlo_nd(self.x_nd_mod, cov=self.cov,
-                                                                p_axis=axis, full_output=True, show=False)
+                                                                axis=axis, full_output=True, show=False)
         # plt.plot(self.x_results[0][self.x_results[1], :, 0], self.x_results[1][self.x_results[1], :, 1], '.')
         # plt.show()
         if show:
             self.plot_nd(axis=self.axis, **kwargs)
         return self.results_nd, self.x_results
 
-    def get_fk(self) -> (ndarray, ndarray):
+    def get_popt(self) -> (ndarray, ndarray):
         """
-        :returns: The slope, y-intercept of the performed fit and their correlation,
+        :returns: The y-intercept and slope of the performed fit and their correlation,
          if alpha was zero (Only changes the y-intercept).
-         This returns the field-shift and mass-shift factors F and K if the x-axis are radii
-         and the field-shift ratio Fy/Fx and the y-intercept Ky - Fy/Fx * Kx if the x-axis are isotope shifts.
+         This returns the mass- and field-shift factors K and F if the x-axis are radii
+         and the y-intercept Ky - Fy/Fx * Kx and field-shift ratio Fy/Fx if the x-axis are isotope shifts.
         """
         if self.results is None:
             print('There are no results yet. Please use one of the fitting options.')
@@ -1309,15 +1319,16 @@ class King:
         (a, b, sigma_a, sigma_b, corr, alpha) = self.results
         f = [b, sigma_b]
         k = [a - b * alpha, np.sqrt(sigma_a ** 2 + (alpha * sigma_b) ** 2)]
-        print('\nf\t{}\t{}\nk\t{}\t{}'.format(*f, *k))
-        return np.array(f), np.array(k), corr
+        tools.printh('\npopt:')
+        print('f = {} +/- {}\nk = {} +/- {}\ncorr = {}'.format(*f, *k, corr))
+        return np.array(k), np.array(f), corr
 
-    def get_fk_nd(self) -> (ndarray, ndarray):
+    def get_popt_nd(self) -> (ndarray, ndarray):
         """
         :returns: The slopes and y-intercepts of the performed fit.
-         This returns the field-shift and mass-shift factors F and K if the x-axis are radii
-         and the field-shift ratio Fy/Fx and the y-intercept Ky - Fy/Fx * Kx if the x-axis are isotope shifts.
-         The returned arrays f and k have shape (n, 2) were n is number of dimensions of the King-fit.
+         This returns the mass- and field-shift factors K and F if the x-axis are radii
+         and the y-intercept Ky - Fy/Fx * Kx and field-shift ratio Fy/Fx if the x-axis are isotope shifts.
+         The returned arrays k and f have shape (n, 2) were n is number of dimensions of the King-fit.
         """
         if self.results_nd is None:
             print('There are no results yet. Please use one of the fitting options.')
@@ -1326,9 +1337,11 @@ class King:
         f = [b, sigma_b]
         k = [a, sigma_a]
         r = np.diag(corr[a.size:, :a.size])
+        tools.printh('\npopt_nd:')
         for i in range(b.size):
-            print('\nf\t{}\t{}\nk\t{}\t{}\ncorr\t{}'.format(f[0][i], f[1][i], k[0][i], k[1][i], r[i]))
-        return np.array(f).T, np.array(k).T, r
+            print('{}{}:{}'.format(tools.COLORS.OKCYAN, i, tools.COLORS.ENDC))
+            print('f = {}\t{}\nk = {}\t{}\ncorr = {}'.format(f[0][i], f[1][i], k[0][i], k[1][i], r[i]))
+        return np.array(k).T, np.array(f).T, r
 
     def get_unmodified_x(self, a: array_iter, a_ref: array_iter, y: array_iter, results: tuple = None,
                          show: bool = False, **kwargs) -> Union[ndarray, None]:
@@ -1363,7 +1376,7 @@ class King:
             add_xy = np.array([x_mod, x_mod_d, y_mod, y_mod_d]).T
             add_a = np.array([a, a_ref]).T
             self.plot(add_xy=add_xy, add_a=add_a, **kwargs)
-        return np.array([x_mod / m_mod[:, 0], x_mod_d / m_mod[:, 0]]).T
+        return np.array([x_mod / m_mod[:, 0], np.abs(x_mod_d / m_mod[:, 0])]).T
 
     def get_unmodified_y(self, a: array_iter, a_ref: array_iter, x: array_iter, results: tuple = None) \
             -> Union[ndarray, None]:
@@ -1402,7 +1415,7 @@ class King:
             return None
         i = np.array([self.a.index(a_i) for a_i in self.a_fit])
         i_ref = np.array([self.a.index(a_i) for a_i in self.a_ref])
-        m_mod_sample = ph.mass_factor(self.m_sample[i], self.m_sample[i_ref])[0]
+        m_mod_sample = ph.mass_factor(self.m_sample[i], self.m_sample[i_ref], k_inf=True)[0]
         x = self.x_results[0] / np.expand_dims(m_mod_sample.T[self.x_results[-1]], axis=-1)
         return np.transpose(np.array([np.mean(x, axis=0), np.std(x, ddof=1, axis=0)]), axes=[1, 2, 0])
 
@@ -1426,7 +1439,7 @@ class King:
         m = m[:, self.x_results[-1]]
         m_ref = self.m_sample[i_ref, :]
         m_ref = m_ref[:, self.x_results[-1]]
-        m_mod_sample = ph.mass_factor(m, m_ref)[0].T
+        m_mod_sample = ph.mass_factor(m, m_ref, k_inf=True)[0].T
         y_sample = st.norm.rvs(loc=y[:, 0], scale=y[:, 1], size=(m_mod_sample.shape[0], len(a)))
         y_sample = m_mod_sample * y_sample
         x_sample = straight(y_sample, -_a[:, :, axis] / b[:, :, axis], 1. / b[:, :, axis])
@@ -1498,6 +1511,8 @@ class King:
                          horizontalalignment='right', verticalalignment='bottom' if b > 0 else 'top')
 
         min_x, max_x = np.min(self.x_mod[:, 0]), np.max(self.x_mod[:, 0])
+        if add_xy is not None:
+            min_x, max_x = np.min([min_x, np.min(add_xy[:, 0])]), np.max([max_x, np.max(add_xy[:, 0])])
         x_cont = np.linspace(min_x - 0.1 * (max_x - min_x), max_x + 0.1 * (max_x - min_x), 1001) - alpha
         plt.plot(x_cont * scale_x, straight(x_cont, a, b) * self.scale_y, 'b-', label='Fit')
         y_min = straight(x_cont, a, b) - straight_std(x_cont, sigma_a, sigma_b, corr)
@@ -1533,6 +1548,7 @@ class King:
             return
         (a, b, sigma_a, sigma_b, corr) = self.results_nd
         alpha = 0
+
         scale_x = 1e-3
         offset_str = ' - {}'.format(round(alpha * scale_x, 1)) if alpha != 0 else ''
         xlabel = 'x{} (mode=\'shifts\' or =\'radii\' for right x-label)'.format(offset_str)
@@ -1560,6 +1576,7 @@ class King:
                 plt.errorbar((self.x_nd_mod[:, axis] - alpha) * scale_x, self.x_nd_mod[:, i] * self.scale_y,
                              xerr=np.sqrt(self.cov[:, axis, axis]) * scale_x,
                              yerr=np.sqrt(self.cov[:, i, i]) * self.scale_y, fmt='k.', label='Data')
+
             for j in range(len(self.a_fit)):
                 pm = -1. if b[row] > 0 else 1.
                 plt.text((self.x_nd_mod[j, axis] + 1. * np.sqrt(self.cov[j, axis, axis]) - alpha) * scale_x,
@@ -1569,9 +1586,13 @@ class King:
 
             min_x, max_x = np.min(self.x_nd_mod[:, axis]), np.max(self.x_nd_mod[:, axis])
             x_cont = np.linspace(min_x - 0.1 * (max_x - min_x), max_x + 0.1 * (max_x - min_x), 1001) - alpha
+
             plt.plot(x_cont * scale_x, straight(x_cont, a[row], b[row]) * self.scale_y, 'b-', label='Fit')
-            y_min = straight(x_cont, a[row], b[row]) - straight_std(x_cont, sigma_a[row], sigma_b[row], corr[i, axis])
-            y_max = straight(x_cont, a[row], b[row]) + straight_std(x_cont, sigma_a[row], sigma_b[row], corr[i, axis])
+
+            y_min = straight(x_cont, a[row], b[row]) \
+                - straight_std(x_cont, sigma_a[row], sigma_b[row], corr[row, row + n_rows])
+            y_max = straight(x_cont, a[row], b[row]) \
+                + straight_std(x_cont, sigma_a[row], sigma_b[row], corr[row, row + n_rows])
             plt.fill_between(x_cont * scale_x, y_min * self.scale_y, y_max * self.scale_y,
                              color='b', alpha=0.3, antialiased=True)
 
@@ -1580,10 +1601,9 @@ class King:
                        fontsize=self.fontsize)
             plt.xticks(fontsize=self.fontsize)
             plt.yticks(fontsize=self.fontsize)
-
             plt.legend(numpoints=1, loc='best', fontsize=self.fontsize)
             plt.margins(0.1)
-            plt.tight_layout()
+            # plt.tight_layout()
 
         plt.show()
         plt.gcf().clear()

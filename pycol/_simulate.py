@@ -984,7 +984,7 @@ class Interaction:
         result = Result(instance=instance)
         result.label_map = _gen_label_map(self.atom)
         if kwargs.get('show', True):
-            result.plot()
+            result.plot(**kwargs)
         return result
 
     def update(self):
@@ -1418,12 +1418,13 @@ class Result:
         set_restype(dll.result_get_v, matrix_result_d_p)
         return dll.result_get_v(self.instance)
 
-    def plot(self, labels: Iterable[str] = None, show: bool = True, colormap: str = None):
+    def plot(self, labels: Iterable[str] = None, show: bool = True, colormap: str = None, x_scale: str = 'linear'):
         """
         :param labels: An Iterable of state labels to include in the plot if a system is known.
          Default is None which plots all states.
         :param show: Whether to show the plot.
         :param colormap: A matplotlib colormap to use for the plot colors.
+        :param x_scale: The scale of the time axis. Takes the same arguments as matplotlibs 'ax.set_xscale'.
         :returns: The newly created figure.
         """
         fig, ax = plt.subplots()
@@ -1437,6 +1438,8 @@ class Result:
                 ax.plot(x, y[:, index], c=colors[index], ls='--')
             ax.plot(x, np.sum(y[:, indices], axis=1), label=label,
                     c=colors[indices[0]], ls='-')
+
+        ax.set_xscale(x_scale)
         ax.set_ylim(-0.03, 1.03)
         ax.set_xlabel(r'Time ($\mu$s)')
         ax.set_ylabel(r'State population')
