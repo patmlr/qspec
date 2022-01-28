@@ -49,13 +49,13 @@ def example(n: Union[set, int] = None):
         # it is more efficient/necessary to use propagate and define the function (see 'sin' above):
 
         x, a, b, c = 0.2, 3, 10, 5
-        print('\n1. sin = {}', st.propagate(sin, [x, f, a, b, c]))
+        print('\n1. sin = {}'.format(st.propagate(sin, [x, f, a, b, c])))
 
         x = st.Observable(x, 0.01)  # All values with uncertainties.
         a = st.Observable(a, 0.2, 0.18)
         b = st.Observable(b, 0.8)
         c = st.Observable(c, 1, 1.1)
-        print('2. sin = {}', st.propagate(sin, [x, f, a, b, c]))
+        print('2. sin = {}'.format(st.propagate(sin, [x, f, a, b, c])))
 
         num = 101
         x = np.linspace(-0.2, 0.2, num)
@@ -100,4 +100,4 @@ def example(n: Union[set, int] = None):
 
 
 if __name__ == '__main__':
-    example({1, })
+    example({0, 1, })

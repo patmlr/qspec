@@ -129,7 +129,37 @@ def example(n: Union[set, int] = None):
         """
         Example 2: Calculation of optical parameters.
         """
-        pass
+
+        w = np.linspace(0.2, 1, 1001)
+
+        # Thorlabs UV fused silica
+        mat0 = [[0.6961663, 0.4079426, 0.8974794],
+                [4.67914826e-3, 1.35120631e-2, 97.9340025]]
+        n0 = ph.sellmeier(w, mat0[0], mat0[1])
+
+        # EdmundOptics UV fused silica
+        mat1 = [[0.683740494, 0.420323613, 0.58502748],
+                [0.00460352869, 0.01339688560, 64.49327320000]]
+        n1 = ph.sellmeier(w, mat1[0], mat1[1])
+
+        # Suprasil-family, Spectrosil
+        mat2 = [[0.473115591, 0.631038719, 0.906404498],
+                [0.0129957170, 4.12809220e-3, 98.7685322]]
+        n2 = ph.sellmeier(w, mat2[0], mat2[1])
+
+        # HPFS Grade 8655 Corning Fused Silica @ 22°C
+        mat3 = [[3.550277875e-2, 7.353314507e-1, 3.334560303e-1, 9.269506614e-1],
+                [-4.826183477e-3, 5.808687673e-3, 1.399572492e-2, 1.012182926e2]]
+        n3 = ph.sellmeier(w, mat3[0], mat3[1])
+
+        plt.plot(w, n0, 'r-', label='Thorlabs')
+        plt.plot(w, n1, 'y-', label='EdmundOptics')
+        plt.plot(w, n2, 'b-', label='Suprasil')
+        plt.plot(w, n3, 'm-', label='HPFS 8655')
+        plt.xlabel(r'Wavelength ($\mu$m)')
+        plt.ylabel('Refractive index')
+        plt.legend()
+        plt.show()
 
     if 3 in n:
         """
@@ -153,4 +183,4 @@ def example(n: Union[set, int] = None):
 
 
 if __name__ == '__main__':
-    example({3})
+    example({2, })

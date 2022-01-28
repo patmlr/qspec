@@ -214,12 +214,12 @@ def median(a: array_like, axis: int = None) -> (ndarray, ndarray, ndarray):
     :param a: The sample data.
     :param axis: The axis along which the three percentiles are computed.
     :returns: The median (0.5-percentile) as well as the left- (~0.1587) and right-sided (~0.8413) 1-sigma percentile
-     relative to the median of a given sample 'a' along the specified 'axis'.
+     of a given sample 'a' along the specified 'axis'.
     """
     med = np.median(a, axis=axis)
     neg = np.percentile(a, 15.8655254, axis=axis)
     pos = np.percentile(a, 84.1344746, axis=axis)
-    return med, med - neg, pos - med
+    return med, neg, pos
 
 
 def estimate_skewnorm(med: scalar, per_0: scalar, per_1: scalar):
@@ -317,7 +317,7 @@ def propagate(f: Callable, x: Union[array_like, Observable], x_d: array_like = N
             per_1, dec_1 = tools.round_to_n(per_1, unc_places)
             dec = np.max([dec_0, dec_1])
             med = np.around(med, decimals=dec)
-        ob = Observable(med, label=label, std=float(per_0), std_2=float(per_1))
+        ob = Observable(med, label=label, std=float(med - per_0), std_2=float(per_1 - med))
         try:
             popt, _ = curve_fit(st.skewnorm.pdf, bins, n, p0=[0., mean, std])
             ob.set_popt(popt)
@@ -326,13 +326,15 @@ def propagate(f: Callable, x: Union[array_like, Observable], x_d: array_like = N
                   ' Using an estimation if possible.')
     
     if show:
-        print('Median(sample data): {} (-{} +{})'.format(med, per_0, per_1))
+        print('Median(sample data): {} (-{} +{})'.format(med, med - per_0, per_1 - med))
         plt.plot(bins, st.norm.pdf(bins, loc=mean, scale=std), 'C0', label='Est. normal')
         if ob.popt is not None:
-            print('Median(Fit. skew normal): {}'.format(median(st.skewnorm.rvs(*ob.popt, size=sample_size))))
+            med, per_0, per_1 = median(st.skewnorm.rvs(*ob.popt, size=sample_size))
+            print('Median(Fit. skew normal): {} (-{} +{})'.format(med, med - per_0, per_1 - med))
             plt.plot(bins, st.skewnorm.pdf(bins, *ob.popt), 'C1', label='Fit. skew normal')
         if ob.est is not None:
-            print('Median(Est. skew normal): {}'.format(median(st.skewnorm.rvs(*ob.est, size=sample_size))))
+            med, per_0, per_1 = median(st.skewnorm.rvs(*ob.est, size=sample_size))
+            print('Median(Est. skew normal): {} (-{} +{})'.format(med, med - per_0, per_1 - med))
             plt.plot(bins, st.skewnorm.pdf(bins, *ob.est), 'C2', label='Est. skew normal')
         plt.legend(loc=1)
         plt.show()
@@ -358,7 +360,7 @@ def propagate_fit(f: Callable, x: array_like, popt: array_like, pcov: array_like
     _popt = st.multivariate_normal.rvs(mean=popt, cov=pcov, size=sample_size).T
     _popt = [np.expand_dims(p, axis=tuple(range(len(x.shape)))) for p in _popt]
     med, per_0, per_1 = median(f(_x, *_popt), axis=-1)
-    return med, med - per_0, med + per_1
+    return med, per_0, per_1
 
 
 def combined_pdf(z: array_like, pdf_1: Callable = st.norm.pdf, pdf_2: Callable = st.norm.pdf,
