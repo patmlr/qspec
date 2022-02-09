@@ -107,6 +107,27 @@ def pseudo_voigt(x, gamma, a):
     return a * lorentz(x, gamma) + (1. - a) * gauss(x, sigma)
 
 
+# def lorentz_recoil(x, gamma, t, s, dx_rec):
+#     """
+#     :param x: The x quantile.
+#     :param gamma: The full width at half maximum of the Lorentz profile.
+#     :param t: The duration of the interaction.
+#     :param s: The saturation parameter.
+#     :param dx_rec: The frequency shift caused by the recoil of a photon absorption.
+#     :returns: The value of a Lorentz profile at the value 'x' including distortions due to photon recoils.
+#     """
+#     gamma_sat = gamma * np.sqrt(1 + s)
+#     gamma = 2 * np.pi * gamma
+#     rate = ph.scattering_rate(2 * np.pi * x, gamma, s)
+#     mu = rate * t
+#     k = [np.arange(np.max([np.ones_like(_mu, dtype=int), _mu - 3 * np.sqrt(_mu) - 2], axis=0),
+#                    _mu + 3 * np.sqrt(_mu) + 2, dtype=int) for _mu in mu]
+#     dist = [st.poisson.pmf(_k, _mu) for _k, _mu in zip(k, mu)]
+#     dist = [_dist / np.sum(_dist) for _dist in dist]
+#     y = np.array([np.sum(_dist * lorentz(_x - (2 * _k - 1) * dx_rec, gamma_sat)) for _x, _k, _dist in zip(x, k, dist)])
+#     return y
+
+
 def lorentz_convolved(dist: Callable, k_max: int = 15):
     """
     :param dist: A one-dimensional probability density function. Its integral over all real numbers must equate to one.
@@ -416,6 +437,39 @@ class HyperfineShape(Shape):
             y += np.sum([2 * self._calc_int_qi(i, *args) * lorentz_qi(x, *self._calc_x0_qi(i, *args), args[0], args[0])
                          for i in range(len(self.f_qi))], axis=0)
         return y
+
+
+# class RecoilShape(Shape):
+#     def __init__(self, func: Union[Callable, str] = 'lorentz', func_args: Iterable[str] = None):
+#         super().__init__(func=func, func_args=func_args)
+#
+#         self.definition = {}
+#         self.arg_list = []
+#         self.arg_dict = {}
+#         self.n = 0
+#         self.define()
+#
+#     def define(self, recoil_dist: Union[Callable, str] = 'poisson', **kwargs):
+#         self.func_args = ['s_{}'.format(arg) if arg[:2] != 's_' else arg for arg in self.func_args]
+#         self.arg_list = self.func_args.copy()
+#
+#         self.arg_list.append('t')
+#         self.arg_list.append('s')
+#
+#         self.arg_dict = {arg: self.arg_list.index(arg) for arg in self.arg_list}
+#         self.n = len(self.arg_list)
+#
+#     def __call__(self, x, *args, **kwargs):
+#         """
+#         :param x: The x quantiles.
+#         :param args: The parameters.
+#         :param kwargs: Additional keyword arguments. Currently not used.
+#         :returns: The shape at the specified x values.
+#         """
+#         x = np.asarray(x)
+#         func_args = [args[self.arg_dict[arg]] for arg in self.func_args]
+#         y = self.func(x, *func_args)
+#         return y
 
 
 class Model:

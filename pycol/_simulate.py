@@ -987,6 +987,17 @@ class Interaction:
             result.plot(**kwargs)
         return result
 
+    def _spectrum(self, instance, **kwargs):
+        """
+        :param instance: A C++ result instance.
+        :returns: The result including the label_map.
+        """
+        spectrum = Spectrum(instance=instance)
+        spectrum.label_map = _gen_label_map(self.atom)
+        if kwargs.get('show', True):
+            spectrum.plot(**kwargs)
+        return spectrum
+
     def update(self):
         """
         Updates the Interaction.
@@ -1353,7 +1364,7 @@ class Interaction:
                     self.instance, delta.ctypes.data_as(c_double_p), c_size_t(delta.shape[0]),
                     v.ctypes.data_as(c_double_p), c_size_t(v.shape[0]), c_double(t), _y0.ctypes.data_as(ctype))
 
-        return Spectrum(instance=instance)
+        return self._spectrum(instance=instance, t=(0, t), **kwargs)
 
 
 class Result:
@@ -1516,14 +1527,37 @@ class Spectrum:
         set_restype(dll.spectrum_get_y, tensor_d_p)
         return dll.spectrum_get_y(self.instance)
 
-    def plot(self, labels: Iterable[str] = None, show: bool = True, **kwargs):
+    def plot(self, t: Union[tuple, list], labels: Iterable[str] = None, show: bool = True, colormap: str = None):
         """
+
+        :param t: A time interval which is summed over to display the spectrum. TODO
         :param labels: An Iterable of state labels to include in the plot if a system is known.
          Default is None which plots all states.
         :param show: Whether to show the plot.
+        :param colormap: A matplotlib colormap to use for the plot colors.
         :returns: The newly created figure.
         """
-        pass
+        fig, ax = plt.subplots()
+        x, _t = self.x[:, 1], self.t
+        in_t = np.nonzero(~((_t < t[0]) + (_t > t[1])))[0]
+        y = np.sum(self.y[:, in_t, :], axis=1) * (_t[1] - _t[0])
+        colors = _define_colors(y.shape[1], self.label_map, colormap=colormap)
+
+        for label, indices in self.label_map.items():
+            if labels is not None and label not in labels:
+                continue
+            for i, index in enumerate(indices):
+                ax.plot(x, y[:, index], c=colors[index], ls='--')
+            ax.plot(x, np.sum(y[:, indices], axis=1), label=label,
+                    c=colors[indices[0]], ls='-')
+
+        # ax.set_ylim(-0.03, 1.03)
+        ax.set_xlabel(r'Detuning (MHz)')
+        ax.set_ylabel(r'State population')
+        plt.legend()
+        if show:
+            plt.show()
+        return fig
 
 
 def _define_colors(n: int, label_map: dict, colormap: str = None):

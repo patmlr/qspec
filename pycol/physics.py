@@ -568,6 +568,17 @@ def hyper_zeeman(i: float, s: float, ll: float, j: float, f: float, m: float, g_
     return shift
 
 
+def saturation_intensity(f: array_like, a: array_like, a_dipole: array_like):
+    """
+    :param f: The frequency of the transition.
+    :param a: The Einstein A coefficient (MHz).
+    :param a_dipole: The reduced dipole coefficient of the transition (see algebra.a_dipole).
+    :returns: The saturation intensity.
+    """
+    f, a, a_dipole = np.asarray(f), np.asarray(a), np.asarray(a_dipole)
+    return np.pi * f ** 3 * sc.h * a / (3 * sc.c ** 2 * a_dipole) * 1e24
+
+
 def saturation(i: array_like, f: array_like, a: array_like, a_dipole: array_like):
     """
     :param i: The intensity of the laser.
@@ -589,6 +600,18 @@ def rabi(a: array_like, s: array_like):
     """
     a, s = np.asarray(a), np.asarray(s)
     return a * np.sqrt(s / 2.)
+
+
+def scattering_rate(df: array_like, a: array_like, s: array_like):
+    """
+    :param df: The detuning of to be scattered light from the transition.
+     This must be differences of real frequencies, such that w = 2 pi * df (MHz).
+    :param a: The Einstein A coefficient (MHz).
+    :param s: The saturation parameter.
+    :returns: The 2-state-equilibrium scattering-rate of an electronic transition.
+    """
+    df, a, s = np.asarray(df), np.asarray(a), np.asarray(s)
+    return 0.125 * s * a ** 3 / (0.25 * (1 + s) * a ** 2 + (2 * np.pi * df) ** 2)
 
 
 def mass_factor(m: array_like, m_ref: array_like, m_d: array_like = 0, m_ref_d: array_like = 0, k_inf: bool = True) \

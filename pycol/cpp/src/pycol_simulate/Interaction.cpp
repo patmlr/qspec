@@ -393,7 +393,7 @@ void Interaction::gen_deltamap()
 	tmap.resize(0);
 	for (size_t m = 0; m < lasers.size(); ++m)
 	{
-		tmap.push_back(ArrayXi::Zero(atom->get_size(), atom->get_size()));
+		tmap.push_back(MatrixXi::Zero(atom->get_size(), atom->get_size()));
 	}
 
 	std::set<size_t> visited;
@@ -416,6 +416,19 @@ void Interaction::gen_deltamap()
 		printf("\033[93mWARNING: The situations where two or more lasers form loops are "
 			"not supported for time-independent coherent dynamics. Activating time dependence.\033[0m\n");
 		time_dependent = true;
+		/*for (size_t m = 0; m < lasers.size(); ++m)
+		{
+			printf("%zi:\n", m);
+			for (size_t i = 0; i < atom->get_size(); ++i)
+			{
+				printf("[");
+				for (size_t j = 0; j < atom->get_size(); ++j)
+				{
+					printf("%d, ", tmap.at(m)(i, j));
+				}
+				printf("]\n");
+			}
+		}*/
 	};
 }
 
@@ -469,6 +482,7 @@ void Interaction::propagate(size_t i, size_t i0, std::set<size_t>& visited, cons
 				loop = loop || _loop;
 				if (_loop)  // If a loop is completed with the current path, ...
 				{
+					// printf("%zi, %zi\n", i, j);
 					tmap.at(m)(i, j) = pm;  // ... set tmap entry to true.
 					tmap.at(m)(j, i) = -pm;
 				};
@@ -645,7 +659,8 @@ void Interaction::update_hamiltonian_off(MatrixXcd& H, VectorXd& w, double t)
 					H(j, i) = std::conj(H(i, j));
 					continue;
 				}
-				H(i, j) += rabimap.at(m)(i, j) * std::exp(sc::i * (delta(i) + tmap.at(m)(i, j) * w(m)) * t);
+				// printf("(m = %zi, %zi, %zi) = %3.3f\n", m, i, j, delta(j) - tmap.at(m)(i, j) * w(m));  // if (delta(i) != 0) 
+				H(i, j) += rabimap.at(m)(i, j) * std::exp(sc::i * (delta(j) - tmap.at(m)(i, j) * w(m)) * t);
 				H(j, i) = std::conj(H(i, j));
 			}
 		}

@@ -61,7 +61,7 @@ protected:
 	std::vector<std::vector<size_t>> con_list;
 	MatrixXd deltamap;
 	MatrixXd atommap;
-	std::vector<ArrayXi> tmap;
+	std::vector<MatrixXi> tmap;
 
 public:
 	int n_history;
