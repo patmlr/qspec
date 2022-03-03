@@ -410,6 +410,17 @@ def alpha_atom(alpha: array_like, v: array_like) -> array_like:
     return np.arccos(arg)
 
 
+def v_rec(f, m) -> array_like:
+    """
+    :param f: The frequency of light in the atoms rest frame (MHz).
+    :param m: The mass of a body (amu).
+    :returns: The change of velocity of an atom at rest
+     due to the absorption of a photon with frequency f (m/s).
+    """
+    f, m = np.asarray(f), np.asarray(m)
+    return sc.h * f / (m * sc.atomic_mass * sc.c) * 1e6
+
+
 def photon_recoil(f: array_like, m: array_like) -> array_like:
     """
     :param f: The frequency of light in the atoms rest frame (MHz).

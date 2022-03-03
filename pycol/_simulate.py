@@ -1280,6 +1280,8 @@ class Interaction:
         if self.controlled:
             raise ValueError('Controlled steppers are not supported with \'master_mc\' yet.'
                   ' Decrease the step size if necessary.')
+        if dynamics and self.atom.mass <= 0:
+            raise ValueError('To simulate mechanical dynamics, the mass of the atom must be specified.')
         _y0, ctype = _cast_y0(y0, 3, self.atom)
         if v is None:
             instance = dll.interaction_master_mc_y0(self.instance, c_double(float(t)), c_size_t(ntraj),
@@ -1421,7 +1423,7 @@ class Result:
     @property
     def v(self):
         """
-        :returns: The entries of the image space (y-axes) as an array. This has shape (n, m).
+        :returns: The entries of the image space (y-axes) as an array. This has shape (n, 3).
         """
         if self._v_size() == 0:
             return None
@@ -1458,6 +1460,23 @@ class Result:
         if show:
             plt.show()
         return fig
+
+    def hist(self, v_rec=None):
+        v = self.v.copy()
+        if v is None:
+            return
+        if v_rec is not None:
+            v /= v_rec
+            plt.xlabel('number of recoils')
+        else:
+            plt.xlabel('velocity change (m/s)')
+        plt.ylabel('abundance')
+        bins = min([int(v.shape[0] / 100), 100])
+        plt.hist(v[:, 0], bins=bins, density=True, alpha=0.7, label='x')
+        plt.hist(v[:, 1], bins=bins, density=True, alpha=0.7, label='y')
+        plt.hist(v[:, 2], bins=bins, density=True, alpha=0.7, label='z')
+        plt.legend(loc=1)
+        plt.show()
 
 
 class Spectrum:
