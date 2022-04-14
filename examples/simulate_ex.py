@@ -116,10 +116,35 @@ def example(n: Union[set, int] = None):
         # (Here the s-states are the first in the list and they all have the same label.)
 
     if 2 in n:
+        f_sp = 761905012.599  # The 4s -> 4p 2P1/3 transition frequency.
+        a_sp = 147
+
+        s_hyper = [-806.4, ]
+        p3_hyper = [-31., -6.9]
+
+        s = sim.construct_electronic_state(freq_0=0, s=0.5, l=0, j=0.5, i=3.5, hyper_const=s_hyper, label='s')
+        p = sim.construct_electronic_state(freq_0=f_sp, s=0.5, l=1, j=1.5, i=3.5, hyper_const=p3_hyper, label='p')
+
+        decay = sim.DecayMap(labels=[('s', 'p'), ], a=[a_sp, ])
+
+        states = s + p
+        ca43 = sim.Atom(states=states, decay_map=decay)
+
+        pol_sp = sim.Polarization([1, 1, 1], q_axis=2)
+        laser_sp = sim.Laser(freq=f_sp - 1700, polarization=pol_sp, intensity=10)
+
+        inter = sim.Interaction(atom=ca43, lasers=[laser_sp, ], delta_max=400.)
+
+        delta = np.linspace(-150, 150, 301)
+        # delta = np.concatenate((np.linspace(-1900, -1500, 401), np.linspace(1100, 1600, 401)), axis=0)
+        spec = inter.spectrum(0.5, delta=delta, solver='master')
+        spec.plot([0.4, 0.5])
+
+    if 3 in n:
         """
-        Example 2: Interaction between a singly-charged lithium ion and two lasers.
+        Example 3: Interaction between a singly-charged lithium ion and two lasers.
         
-        In example 2 Fig. 5 from [Noertershaeuser et al. Phys. Rev. Accel. Beams 24, 024701 (2021),
+        In example 3 Fig. 5 from [Noertershaeuser et al. Phys. Rev. Accel. Beams 24, 024701 (2021),
         https://doi.org/10.1103/PhysRevAccelBeams.24.024701] is calculated.
         """
 
@@ -163,4 +188,4 @@ def example(n: Union[set, int] = None):
 
 
 if __name__ == '__main__':
-    example({0, 1, 2})
+    example({2})

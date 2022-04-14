@@ -1549,7 +1549,7 @@ class Spectrum:
     def plot(self, t: Union[tuple, list], labels: Iterable[str] = None, show: bool = True, colormap: str = None):
         """
 
-        :param t: A time interval which is summed over to display the spectrum. TODO
+        :param t: A time interval which is summed over to display the spectrum.
         :param labels: An Iterable of state labels to include in the plot if a system is known.
          Default is None which plots all states.
         :param show: Whether to show the plot.
@@ -1557,7 +1557,7 @@ class Spectrum:
         :returns: The newly created figure.
         """
         fig, ax = plt.subplots()
-        x, _t = self.x[:, 1], self.t
+        x, _t = self.x[:, 0], self.t
         in_t = np.nonzero(~((_t < t[0]) + (_t > t[1])))[0]
         y = np.sum(self.y[:, in_t, :], axis=1) * (_t[1] - _t[0])
         colors = _define_colors(y.shape[1], self.label_map, colormap=colormap)
