@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-PyCLS.algebra
+pycol.algebra
 
 Created on 30.04.2020
 

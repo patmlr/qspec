@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-PyCLS._simulate
+pycol._simulate
 
 Created on 09.01.2022
 

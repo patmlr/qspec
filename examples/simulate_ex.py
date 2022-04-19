@@ -116,6 +116,11 @@ def example(n: Union[set, int] = None):
         # (Here the s-states are the first in the list and they all have the same label.)
 
     if 2 in n:
+        """
+        Example 2: Interaction between a singly-charged calcium ion and a single laser.
+        
+        In example 2, the master equation is solved for different detunings in 43Ca+.
+        """
         f_sp = 761905012.599  # The 4s -> 4p 2P1/3 transition frequency.
         a_sp = 147
 

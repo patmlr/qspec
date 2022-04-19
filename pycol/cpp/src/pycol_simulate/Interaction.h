@@ -187,9 +187,9 @@ public:
 	void set_result(Result* _result);
 	Result* get_result();
 
-	bool get_loop();
 	bool get_time_dependent();
 	void set_time_dependent(bool _time_dependent);
+	bool get_loop();
 	MatrixXi* get_summap();
 	std::vector<MatrixXcd>* get_rabimap();
 	MatrixXd* get_atommap();

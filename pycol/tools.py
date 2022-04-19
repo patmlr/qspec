@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-PyCLS.Tools
+pycol.tools
 
 Created on 05.05.2020
 
@@ -178,7 +178,7 @@ def check_half_integer(*args: scalar):
     """
     :param args: Scalar arguments.
     :returns: None. Checks whether the given arguments are multiples of 1/2.
-    :raises ValueError: If the any argument is not a multiple of 1/2.
+    :raises ValueError: If any argument is not a multiple of 1/2.
     """
     if sum([abs(arg % 0.5) for arg in args]) > 0:
         raise ValueError('The numbers must be multiples of 1/2.')
@@ -318,7 +318,8 @@ def round_to_n(x: array_like, n: int) -> (scalar, int):
     """
     :param x: The input data.
     :param n: The number of significant decimal places to round to.
-    :returns: x rounded to 'n' significant decimal places and the corresponding number of decimal places.
+    :returns: x rounded to 'n' significant decimal places and
+     the corresponding number of decimal places after the decimal point.
     """
     if isinstance(x, ndarray):
         x = x.squeeze().tolist()
@@ -334,7 +335,7 @@ def round_to_n(x: array_like, n: int) -> (scalar, int):
 def factorial(n: array_like):
     """
     :param n: The integer number.
-    :returns: n!.
+    :returns: n! (array compatible).
     """
     n = np.asarray(n, dtype=int)
     mask = n > 1

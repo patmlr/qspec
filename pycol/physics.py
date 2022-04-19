@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-PyCLS.Physics
+pycol.Physics
 
 Created on 01.04.2020
 
@@ -1105,3 +1105,32 @@ def convolved_thermal_norm_f_lin_pdf(f: array_like, xi: array_like, sigma: array
     if scalar_true:
         return main[0] * norm
     return main * norm
+
+
+def source_energy_pdf(f, f0, sigma, xi, collinear=True):
+    """
+    :param f: Frequency quantiles (arb. units).
+    :param f0: Frequency offset (arb. units).
+    :param sigma: The standard deviation of the underlying normal distribution in frequency units ([f]).
+    :param xi: The proportionality constant between kinetic energy differences and frequency differences ([f]).
+    :param collinear:
+    :returns: PDF of rest frame frequencies after acceleration of thermally and normally distributed kinetic energies.
+    """
+    pm = 1. if collinear else -1.
+    f = np.asarray(f)
+    sig = (sigma / (2. * xi)) ** 2
+    _norm = np.exp(-0.5 * sig) / (sigma * np.sqrt(2. * np.pi))
+    mu = -pm * (f - f0) / (2. * xi) - sig
+    nonzero = mu.astype(bool)
+    mu = mu[nonzero]
+    b_arg = mu ** 2 / (4. * sig)
+    main = np.full(f.shape, np.sqrt(LEMNISCATE * np.sqrt(sig / np.pi)))
+    main_nonzero = np.empty_like(f[nonzero], dtype=float)
+    mask = mu < 0.
+
+    main_nonzero[mask] = np.sqrt(-0.5 * mu[mask] / np.pi) * np.exp(-mu[mask]) \
+        * np.exp(-b_arg[mask]) * sp.kv(0.25, b_arg[mask])
+    main_nonzero[~mask] = 0.5 * np.sqrt(mu[~mask] * np.pi) * np.exp(-mu[~mask]) \
+        * (sp.ive(0.25, b_arg[~mask]) + sp.ive(-0.25, b_arg[~mask]))
+    main[nonzero] = main_nonzero
+    return main * _norm

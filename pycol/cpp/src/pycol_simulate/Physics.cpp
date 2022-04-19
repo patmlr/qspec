@@ -1,7 +1,7 @@
 /*
 * PyCLS.Physics.cpp
 * 
-* Factorial, GCcoeff, ThreeJSymbol, SixJSymbol and NineJSymbol taken from
+* Factorial, GCcoeff, ThreeJSymbol, SixJSymbol and NineJSymbol taken and modified from
 * https://nukephysik101.wordpress.com/2019/01/30/3j-6j-9j-symbol-fro-c/
 * by Tsz Leung Tang (Also known as Ryan Tang)
 * Orcid: 0000-0001-5527-076X
@@ -190,16 +190,19 @@ double hyperfine(double i, double j, double f, double* hyper_const)
 {
     if (i == 0 || j == 0) return 0.;
     double k_0 = f * (f + 1) - i * (i + 1) - j * (j + 1);
-    double shift = hyper_const[0] * k_0 / 2;
+    double shift = 0.5 * hyper_const[0] * k_0;
     if (i > 0.5 && j > 0.5)
     {
         double k_1 = 3 * k_0 * (k_0 + 1) / 2 - 2 * i * (i + 1) * j * (j + 1);
         k_1 /= i * (2 * i - 1) * j * (2 * j - 1);
-        shift += hyper_const[1] * k_1 / 4;
+        shift += 0.25 * hyper_const[1] * k_1;
     }
     if (i > 1 && j > 1)
     {
-        shift += 0;  // 3. order
+        double k_2 = std::pow(k_0, 3) + 4 * std::pow(k_0, 2) + 0.8 * k_0 * (-3 * i * (i + 1) * j * (j + 1) + i * (i + 1) + j * (j + 1) + 3)
+            - 4 * i * (i + 1) * j * (j + 1);
+            k_2 /= i * (i - 1) * (2 * i - 1) * j * (j - 1) * (2 * j - 1);
+        shift += 1.25 * hyper_const[2] * k_2;
     }
     return shift;
 }

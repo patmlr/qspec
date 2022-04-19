@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-PyCLS.Types
+pycol.types
 
 Created on 16.06.2020
 

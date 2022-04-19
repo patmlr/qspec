@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-PyCLS.simulate
+pycol.simulate
 
 Created on 05.05.2020
 
@@ -21,9 +21,12 @@ from . import algebra as al
 from ._simulate import *
 
 
-config = tools.get_config_dict()
-matplotlib.use('Qt5Agg')
-plt.rcParams['animation.ffmpeg_path'] = config['ffmpeg']
+try:
+    matplotlib.use('Qt5Agg')
+except ImportError:
+    pass
+# config = tools.get_config_dict()
+# plt.rcParams['animation.ffmpeg_path'] = config['ffmpeg']
 
 LINESTYLES = ['-', ':', '--', '-.']
 

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-PyCLS.Analytics
+pycol.analyze
 
 Created on 07.05.2020
 
@@ -18,8 +18,8 @@ curve fitting methods:
     - odr_fit(); Encapsulates the scipy.odr.odr method to accept inputs similarly to curve_fit().
 
 classes:
-    - Element; Holds spectroscopic information about a chemical element.
-    - Radii; Holds information about nuclear charge radii of an chemical element.
+    (- Element; Holds spectroscopic information about a chemical element.)
+    (- Radii; Holds information about nuclear charge radii of an chemical element.)
     - King; Creates a King plot with isotope shifts or nuclear charge radii.
 
 """

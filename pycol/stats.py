@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-PyCLS.Statistics
+pycol.stats
 
 Created on 22.04.2020
 
