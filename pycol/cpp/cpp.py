@@ -75,7 +75,6 @@ SpectrumHandler = ctypes.POINTER(ctypes.c_char)
 
 dll_path = os.path.abspath(os.path.dirname(__file__))
 x64 = r'\x64' if ctypes.sizeof(ctypes.c_void_p) == 8 else ''
-print(x64)
 dll_path = os.path.join(dll_path, r'src\pycol_simulate{}\Release'.format(x64))
 dll_name = 'pycol_simulate.dll'
 dll = ctypes.CDLL(os.path.join(dll_path, dll_name))
