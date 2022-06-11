@@ -6,7 +6,7 @@ Created on 24.06.2021
 
 @author: Patrick Mueller
 
-Example script / Guide for the PyCLS.simulate module.
+Example script / Guide for the pycol.simulate module.
 """
 
 import numpy as np

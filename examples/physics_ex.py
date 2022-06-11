@@ -6,7 +6,7 @@ Created on 12.05.2021
 
 @author: Patrick Mueller
 
-Example script / Guide for the PyCLS.physics module.
+Example script / Guide for the pycol.physics module.
 """
 
 import numpy as np

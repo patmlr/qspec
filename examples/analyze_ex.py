@@ -6,7 +6,7 @@ Created on 15.08.2021
 
 @author: Patrick Mueller
 
-Example script / Guide for the PyCLS.analyze module.
+Example script / Guide for the pycol.analyze module.
 """
 
 import numpy as np

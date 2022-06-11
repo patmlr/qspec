@@ -6,7 +6,7 @@ Created on 25.01.2022
 
 @author: Patrick Mueller
 
-Example script / Guide for the PyCLS.stats module.
+Example script / Guide for the pycol.stats module.
 """
 import numpy as np
 import matplotlib.pyplot as plt
