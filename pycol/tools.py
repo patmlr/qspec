@@ -37,6 +37,36 @@ class COLORS:
     PYPLOT = ['C{}'.format(i) for i in range(10)]
 
 
+def get_rgb_print_command(r, g, b):
+    """
+    :param r: The fraction of red (0-255).
+    :param g: The fraction of green (0-255).
+    :param b: The fraction of blue (0-255).
+    :returns: The command str to print rgb colors in the console.
+    """
+    return '\033[38;2;{};{};{}m'.format(r, g, b)
+
+
+def print_colored(specifier, *values, returned=False, **kwargs):
+    """
+    Print with the specified color.
+
+    :param specifier: str of the color name defined in the COLORS class or an RGB-value (0-255, 0-255, 0-255).
+    :param values: The values to print.
+    :param returned: Return the str instead of printing it.
+    :param kwargs: See print().
+    :returns: None.
+    """
+    if isinstance(specifier, str):
+        _c = eval('COLORS.{}'.format(specifier.upper()))
+    else:
+        _c = get_rgb_print_command(*specifier)
+    _values = (_c, ) + values + (COLORS.ENDC, )
+    if returned:
+        return '{}{}{}'.format(*_values)
+    print('{}{}{}'.format(*_values), **kwargs)
+
+
 def printh(*values, **kwargs):
     """
     Print with the HEADER color (pink).
@@ -51,7 +81,7 @@ def printh(*values, **kwargs):
 
 def printw(*values, **kwargs):
     """
-    Print with the HEADER color (pink).
+    Print with the WARNING color (yellow).
 
     :param values: The values to print.
     :param kwargs: See print().
@@ -63,7 +93,7 @@ def printw(*values, **kwargs):
 
 def printf(*values, **kwargs):
     """
-    Print with the HEADER color (pink).
+    Print with the FAIL color (red).
 
     :param values: The values to print.
     :param kwargs: See print().
@@ -71,6 +101,40 @@ def printf(*values, **kwargs):
     """
     _values = (COLORS.FAIL, ) + values + (COLORS.ENDC, )
     print('{}{}{}'.format(*_values), **kwargs)
+
+
+def map_corr_coeff_to_color(val):
+    """
+
+    :param val: A value between -1 and 1.
+    :returns: The RGB values in the range 0-255.
+    """
+    if val < -1 or val > 1:
+        raise ValueError('The correlation coefficient must be in [-1, 1].')
+    g = int(round(val * 127 + 127, 0))
+    return 255 - g, g, 0
+
+
+def print_cov(cov, normalize=False, decimals=2):
+    """
+    Print a covariance "as is" or as color-coded Pearson correlation coefficients.
+
+    :param cov: A covariance matrix.
+    :param normalize: Whether to normalize the covariance to be the Pearson correlation coefficient.
+    :param decimals: The number of decimal places to be printed.
+    :returns: None.
+    """
+    cov = np.array(cov, dtype=float)
+    if normalize:
+        norm = np.sqrt(np.diag(cov)[:, None] * np.diag(cov))
+        nonzero = norm != 0
+        cov[nonzero] /= norm[nonzero]
+    cov = np.around(cov + 0., decimals=decimals)
+    digits = int(np.floor(np.log10(np.abs(cov.shape[0])))) + 1
+    for i, row in enumerate(cov):
+        print('{}:   {}'.format(str(i).zfill(digits), '   '.join(
+            '{}{}{}'.format(get_rgb_print_command(*map_corr_coeff_to_color(val)),
+                            '{:1.2f}'.format(val).rjust(decimals + 3), COLORS.ENDC) for val in row)))
 
 
 """ System operations """

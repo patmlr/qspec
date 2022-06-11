@@ -198,6 +198,7 @@ void Interaction::set_env(Environment* _env)
 {
 	env = _env;
 	for (State* state : *atom->get_states()) state->update(env);
+	atom->gen_w0();
 	update();
 }
 
@@ -983,6 +984,7 @@ Result* Interaction::master(size_t n, MatrixXcd& x0, const VectorXd& delta)
 	VectorXd* w0 = gen_w0();
 	VectorXd* w = gen_w(delta);
 	MatrixXcd* H = gen_hamiltonian(*w0, *w);
+
 
 	Result* _result = nullptr;
 	if (time_dependent) _result = master(n, x0, *w0, *w, *H);

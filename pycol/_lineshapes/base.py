@@ -445,8 +445,11 @@ class Linked(Listed):
 
         for i, (name, val, fix, link) in enumerate(self.get_pars()):
             if isinstance(fix, str):
-                self.set_fix(i, '{}__{}'.format(fix, self.model_map[i]))
-            if link and not fix:
+                _fix = fix
+                for _i, _name in enumerate(self.models[self.model_map[i]].names):
+                    _fix = _fix.replace(_name, '{}__{}'.format(_name, self.model_map[i]))
+                self.set_fix(i, _fix)
+            if link and (fix is False or isinstance(fix, list)):
                 _name = name[:name.rfind('__')]
                 for j, model in enumerate(self.models):
                     if j < self.model_map[i] and _name in model.names:

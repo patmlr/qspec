@@ -348,12 +348,12 @@ def propagate(f: Callable, x: Union[array_like, Observable], x_d: array_like = N
 
 def propagate_fit(f: Callable, x: array_like, popt: array_like, pcov: array_like, sample_size: int = 1000000):
     """
-    :param f: The function to compute. 'f' needs to be vectorized.
+    :param f: The function to compute. :math:`f` needs to be vectorized.
     :param x: The input values.
     :param popt: An array of the fitted parameters (compare curve_fit).
     :param pcov: A 2d-array of the estimated covariances (compare curve_fit).
     :param sample_size: The number of random variates used for the calculation. The default is 1,000,000.
-    :returns: f(x, *popt), (f - 1sigma)(x, *), (f + 1sigma)(x, *).
+    :returns: The median and the :math:`1\\sigma` percentiles of the sampled function :math:`f`.
     """
     x = np.asarray(x)
     _x = np.expand_dims(x, axis=-1)

@@ -1015,7 +1015,7 @@ class Interaction:
 
         :returns: None.
         """
-        print('Resonance info:\n<label>(S, L, J, I, F, m) -> <label\'>(S\', L\', J\', I\', F\', m\')')
+        print('Resonance info:')  # \n<label>(S, L, J, I, F, m) -> <label\'>(S\', L\', J\', I\', F\', m\')')
         for k, (laser, laser_m) in enumerate(zip(self.lasers, self.get_rabi())):
             n = 0
             print('Laser {} @ {} MHz:'.format(k, laser.freq))
@@ -1322,7 +1322,7 @@ class Interaction:
         """
         :param t: The final time of the solution. The number of time steps is determined
          by the step size Interaction.dt.
-        :param delta: An array of frequency shifts for the laser(s). 'delta' must be a scalar or an 1d- or 2d-array
+        :param delta: An array of frequency shifts for the laser(s). 'delta' must be a scalar or a 1d- or 2d-array
          with shapes (., ) or (., #lasers), respectively.
         :param m: The index of the shifted laser. If delta is a 2d-array, 'm' ist omitted.
         :param v: Atom velocities. Must be a scalar or have shape (n, ) or (n, 3). In the first two cases,

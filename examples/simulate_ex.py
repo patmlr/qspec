@@ -63,13 +63,15 @@ def example(n: Union[set, int] = None):
         laser_sp = sim.Laser(freq=f_sp, polarization=pol, intensity=500)  # Linear polarized laser for the two
         laser_dp = sim.Laser(freq=f_dp, polarization=pol, intensity=500)  # transitions, with 500 uW / mm**2.
 
-        inter = sim.Interaction(atom=ca40, lasers=[laser_sp, laser_dp])  # The interaction.
-        # inter.resonance_info()  # Print the detuning of the lasers from the considered transitions.
-        inter.environment = sim.Environment(B=[0, 0, 0.01])
+        inter = sim.Interaction(atom=ca40, lasers=[laser_sp, ])  # The interaction.
+        inter.resonance_info()  # Print the detuning of the lasers from the considered transitions.
+        inter.environment = sim.Environment(B=[0, 0, 0.005])
+        inter.resonance_info()  # Print the detuning of the lasers from the considered transitions.
 
-        inter.master(t=0.5)  # Solve the master equation for 0.5 us, assuming equal population in all s-states.
-        # (Here the s-states are the first in the list and they all have the same label.)
+        # inter.master(t=0.5)  # Solve the master equation for 0.5 us, assuming equal population in all s-states.
+        # (Here the s-states are the first in the list, and they all have the same label.)
         # inter.master(t=0.5, dissipation=False)  # Without spontaneous emission.
+        inter.spectrum(0.5, np.linspace(-100, 100, 401), solver='rates')
 
     if 1 in n:
         """
@@ -193,4 +195,4 @@ def example(n: Union[set, int] = None):
 
 
 if __name__ == '__main__':
-    example({2})
+    example({0})

@@ -31,7 +31,8 @@ def gen_splitter_model(qi: bool = False, hf_mixing: bool = False):
 
 def hf_coeff(i, j, f):
     """ Return the tuple of hyperfine coefficients for A and B-factor for a given quantum state """
-    # First three orders are taken from https://journals.aps.org/pra/abstract/10.1103/PhysRevA.103.032826.
+    # First and third order are taken from https://journals.aps.org/pra/abstract/10.1103/PhysRevA.103.032826.
+    # Second order from https://link.springer.com/referencework/10.1007/978-0-387-26308-3.
     if i < 0.5 or j < 0.5:
         return tuple()
 

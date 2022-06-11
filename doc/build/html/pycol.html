@@ -43,6 +43,7 @@
 <li class="toctree-l2 current"><a class="current reference internal" href="#">pycol package</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#subpackages">Subpackages</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="pycol.cpp.html">pycol.cpp package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pycol._lineshapes.html">pycol._lineshapes package</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="#submodules">Submodules</a></li>
@@ -98,6 +99,15 @@
 <li class="toctree-l2"><a class="reference internal" href="pycol.cpp.html#module-pycol.cpp">Module contents</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="pycol._lineshapes.html">pycol._lineshapes package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="pycol._lineshapes.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pycol._lineshapes.html#module-pycol._lineshapes.base">pycol._lineshapes.base module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pycol._lineshapes.html#module-pycol._lineshapes.convolved">pycol._lineshapes.convolved module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pycol._lineshapes.html#module-pycol._lineshapes.spectrum">pycol._lineshapes.spectrum module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pycol._lineshapes.html#module-pycol._lineshapes.splitter">pycol._lineshapes.splitter module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pycol._lineshapes.html#module-pycol._lineshapes">Module contents</a></li>
+</ul>
+</li>
 </ul>
 </div>
 </div>
@@ -106,7 +116,7 @@
 </div>
 <div class="section" id="module-pycol.algebra">
 <span id="pycol-algebra-module"></span><h2>pycol.algebra module<a class="headerlink" href="#module-pycol.algebra" title="Permalink to this headline">¶</a></h2>
-<p>PyCLS.algebra</p>
+<p>pycol.algebra</p>
 <p>Created on 30.04.2020</p>
 <p>&#64;author: Patrick Mueller</p>
 <p>Module including methods for calculating dipole coefficients.</p>
@@ -541,7 +551,7 @@ J_4 &amp; J_5 &amp; J_6
 </div>
 <div class="section" id="module-pycol.analyze">
 <span id="pycol-analyze-module"></span><h2>pycol.analyze module<a class="headerlink" href="#module-pycol.analyze" title="Permalink to this headline">¶</a></h2>
-<p>PyCLS.Analytics</p>
+<p>pycol.analyze</p>
 <p>Created on 07.05.2020</p>
 <p>&#64;author: Patrick Mueller</p>
 <p>Module for analysing/evaluating/fitting data.</p>
@@ -557,284 +567,18 @@ J_4 &amp; J_5 &amp; J_6
 <li><p>odr_fit(); Encapsulates the scipy.odr.odr method to accept inputs similarly to curve_fit().</p></li>
 </ul>
 </dd>
-<dt>classes:</dt><dd><ul class="simple">
-<li><p>Element; Holds spectroscopic information about a chemical element.</p></li>
-<li><p>Radii; Holds information about nuclear charge radii of an chemical element.</p></li>
-<li><p>King; Creates a King plot with isotope shifts or nuclear charge radii.</p></li>
-</ul>
+<dt>classes:</dt><dd><p>(- Element; Holds spectroscopic information about a chemical element.)
+(- Radii; Holds information about nuclear charge radii of an chemical element.)
+- King; Creates a King plot with isotope shifts or nuclear charge radii.</p>
 </dd>
 </dl>
-<dl class="py class">
-<dt id="pycol.analyze.Element">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">pycol.analyze.</span></code><code class="sig-name descname"><span class="pre">Element</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">label</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">decimals</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pycol/analyze.html#Element"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycol.analyze.Element" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<dl class="simple">
-<dt>Class representing a single chemical element. The user can define an electronic transition</dt><dd><p>to extract all spectroscopy data for that transition available in the users ‘AtomicDatabase.db’ database.
-The transition frequencies and isotope shifts are stored inside a nested dictionary
-with isotopes and the user-defined line labels as keys.</p>
-</dd>
-</dl>
-<dl class="py method">
-<dt id="pycol.analyze.Element.calc_df">
-<code class="sig-name descname"><span class="pre">calc_df</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="pre">a</span></em>, <em class="sig-param"><span class="pre">a_ref</span></em>, <em class="sig-param"><span class="pre">line</span></em>, <em class="sig-param"><span class="pre">rtype=&lt;class</span> <span class="pre">'numpy.ndarray'&gt;</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pycol/analyze.html#Element.calc_df"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycol.analyze.Element.calc_df" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>a</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Iterable</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>]) – An Iterable of the mass numbers of the isotopes.</p></li>
-<li><p><strong>a_ref</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Iterable</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>]) – An Iterable of the mass numbers of the reference isotopes</p></li>
-<li><p><strong>line</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Iterable</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]]) – A line or an Iterable of previously defined lines.</p></li>
-<li><p><strong>rtype</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">type</span></code>) – The type in which the results will be returned. Currently supported special types are [dict, ].
-The standard ‘rtype’ is a numpy array.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ValueError</span></code>]</p>
-</dd>
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p>Differences of transition frequencies and their uncertainties calculated from the ‘self.f’ dictionary
-according to the lists ‘a’ and ‘a_ref’. The output has shape (len(a), 2)
-or shape (len(a), len(line), 2) if line is a list.</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt id="pycol.analyze.Element.check_ref_args">
-<code class="sig-name descname"><span class="pre">check_ref_args</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">references</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pycol/analyze.html#Element.check_ref_args"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycol.analyze.Element.check_ref_args" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>references</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Iterable</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – A reference str, iterable of reference str’s
-or a dictionary of these with isotopes or lines as keys.</p>
-</dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code>]</p>
-</dd>
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p>A dictionary of the specified references which has the structure {a: {line: [references, ]}}.</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt id="pycol.analyze.Element.choose_df">
-<code class="sig-name descname"><span class="pre">choose_df</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">a_ref</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">references</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exclude</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pycol/analyze.html#Element.choose_df"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycol.analyze.Element.choose_df" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>a_ref</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – The mass number of the reference isotope.</p></li>
-<li><p><strong>references</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Iterable</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code>]) – A reference str, iterable of reference str’s,
-or a dictionary of these with isotopes or lines as keys.
-The most accurate frequency values will be determined from the specified references.</p></li>
-<li><p><strong>exclude</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Iterable</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code>]) – A reference str, iterable of reference str’s,
-or a dictionary of these with isotopes or lines as keys.
-The specified references will be excluded when choosing frequency values.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></p>
-</dd>
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p>None. Fills the dictionary self.df and self.refs_df with the chosen isotope shifts and references.</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt id="pycol.analyze.Element.choose_f">
-<code class="sig-name descname"><span class="pre">choose_f</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">references</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exclude</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pycol/analyze.html#Element.choose_f"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycol.analyze.Element.choose_f" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>references</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Iterable</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code>]) – A reference str, iterable of reference str’s,
-or a dictionary of these with isotopes or lines as keys.
-The most accurate frequency values will be determined from the specified references.</p></li>
-<li><p><strong>exclude</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Iterable</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code>]) – A reference str, iterable of reference str’s,
-or a dictionary of these with isotopes or lines as keys.
-The specified references will be excluded when choosing frequency values.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></p>
-</dd>
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p>None. Fills the dictionary self.f and self.refs_f
-with the chosen transition frequencies and references.</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt id="pycol.analyze.Element.define_line">
-<code class="sig-name descname"><span class="pre">define_line</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">label</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">q</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config_l</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">multiplet_l</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">l_l</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">j_l</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config_u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">multiplet_u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">l_u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">j_u</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pycol/analyze.html#Element.define_line"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycol.analyze.Element.define_line" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>label</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – The user-defined name of the line.</p></li>
-<li><p><strong>q</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – The charge state of the isotope (e).</p></li>
-<li><p><strong>config_l</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – The electronic configuration of the lower state.</p></li>
-<li><p><strong>multiplet_l</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – The spin multiplet of the lower state.</p></li>
-<li><p><strong>l_l</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – The angular momentum quantum number L of the lower state.</p></li>
-<li><p><strong>j_l</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>) – The total angular momentum quantum number J of the lower state.</p></li>
-<li><p><strong>config_u</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – The electronic configuration of the upper state.</p></li>
-<li><p><strong>multiplet_u</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – The spin multiplet of the upper state.</p></li>
-<li><p><strong>l_u</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – The angular momentum quantum number L of the upper state.</p></li>
-<li><p><strong>j_u</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>) – The total angular momentum quantum number J of the upper state.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>None. Extracts the available electronic transition/isotope shift entries for the specified line
-and stores them in ‘self.f’ and ‘self.df’, respectively. The definition of the line is stored in ‘self.lines’.</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt id="pycol.analyze.Element.get_df">
-<code class="sig-name descname"><span class="pre">get_df</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="pre">a</span></em>, <em class="sig-param"><span class="pre">line</span></em>, <em class="sig-param"><span class="pre">rtype=&lt;class</span> <span class="pre">'numpy.ndarray'&gt;</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pycol/analyze.html#Element.get_df"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycol.analyze.Element.get_df" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>a</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Iterable</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>]]) – The mass number or an Iterable of mass numbers.</p></li>
-<li><p><strong>line</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Iterable</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]]) – A line or an Iterable of previously defined lines.</p></li>
-<li><p><strong>rtype</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">type</span></code>) – The type in which the results will be returned. Currently supported special types are [dict, ].
-The standard ‘rtype’ is a numpy array.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ValueError</span></code>]</p>
-</dd>
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p>A subset of the dictionary ‘self.df’ as a dictionary or a numpy array.</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt id="pycol.analyze.Element.get_f">
-<code class="sig-name descname"><span class="pre">get_f</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="pre">a</span></em>, <em class="sig-param"><span class="pre">line</span></em>, <em class="sig-param"><span class="pre">rtype=&lt;class</span> <span class="pre">'numpy.ndarray'&gt;</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pycol/analyze.html#Element.get_f"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycol.analyze.Element.get_f" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>a</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Iterable</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>]]) – The mass number or an Iterable of mass numbers.</p></li>
-<li><p><strong>line</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Iterable</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]]) – A line or an Iterable of previously defined lines.</p></li>
-<li><p><strong>rtype</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">type</span></code>) – The type in which the results will be returned. Currently supported special types are [dict, ].
-The standard ‘rtype’ is a numpy array.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ValueError</span></code>]</p>
-</dd>
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p>A subset of the dictionary ‘self.f’ as a dictionary or a numpy array.</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt id="pycol.analyze.Element.get_gamma">
-<code class="sig-name descname"><span class="pre">get_gamma</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">line</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pycol/analyze.html#Element.get_gamma"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycol.analyze.Element.get_gamma" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>line</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – The label of the user-defined electronic transition.</p>
-</dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></p>
-</dd>
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p>The natural linewidth of the electronic transition and its uncertainty (MHz).</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt id="pycol.analyze.Element.get_hyperfine_constants">
-<code class="sig-name descname"><span class="pre">get_hyperfine_constants</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">a</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">line</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pycol/analyze.html#Element.get_hyperfine_constants"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycol.analyze.Element.get_hyperfine_constants" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>a</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – The mass number of the isotope.</p></li>
-<li><p><strong>line</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – The label of the user-defined electronic transition.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></p>
-</dd>
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p>The natural linewidth of the electronic transition and its uncertainty (MHz).</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt id="pycol.analyze.Element.get_king">
-<code class="sig-name descname"><span class="pre">get_king</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pycol/analyze.html#Element.get_king"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycol.analyze.Element.get_king" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p>A ‘King’ object including all isotopes available in ‘AtomicDatabase.db’.
-The number of subtracted electrons in the ‘King’ object is equal to the charge number Z of the element.</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt id="pycol.analyze.Element.get_masses">
-<code class="sig-name descname"><span class="pre">get_masses</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="pre">a=None</span></em>, <em class="sig-param"><span class="pre">rtype=&lt;class</span> <span class="pre">'numpy.ndarray'&gt;</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pycol/analyze.html#Element.get_masses"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycol.analyze.Element.get_masses" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>a</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Iterable</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>], <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code>]) – An Iterable of the mass numbers of the isotopes to be returned.</p></li>
-<li><p><strong>rtype</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">type</span></code>) – The type in which the results will be returned. Currently supported special types are [dict, ].
-The standard ‘rtype’ is a numpy array.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ValueError</span></code>]</p>
-</dd>
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p>The masses and their uncertainties of the specified mass numbers.
-The output has shape (2, ) if a is an int value and shape (len(a), 2) if a is an Iterable.</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt id="pycol.analyze.Element.get_radii">
-<code class="sig-name descname"><span class="pre">get_radii</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pycol/analyze.html#Element.get_radii"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycol.analyze.Element.get_radii" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p>The default ‘Radii’ object for this element.</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt id="pycol.analyze.Element.spectroscopy_info">
-<code class="sig-name descname"><span class="pre">spectroscopy_info</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">e_kin</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pycol/analyze.html#Element.spectroscopy_info"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycol.analyze.Element.spectroscopy_info" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>e_kin</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>) – Kinetic energy of the isotopes (eV).</p>
-</dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></p>
-</dd>
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p>A dictionary of information for collinear laser spectroscopy with keys ‘E’, ‘U’, ‘v’, ‘col’ and ‘acol’
-for the kinetic energy (eV), the required voltage (V), the velocity of isotopes
-with an initial velocity of 0 m/s (m/s), as well as the resonant laser frequencies
-in collinear and anticollinear geometry (MHz).</p>
-</dd>
-</dl>
-</dd></dl>
-
-</dd></dl>
-
 <dl class="py class">
 <dt id="pycol.analyze.King">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">pycol.analyze.</span></code><code class="sig-name descname"><span class="pre">King</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">a</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">m</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_abs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_abs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subtract_electrons</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">element_label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pycol/analyze.html#King"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycol.analyze.King" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">pycol.analyze.</span></code><code class="sig-name descname"><span class="pre">King</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">a</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">m</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_abs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subtract_electrons</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">element_label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pycol/analyze.html#King"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycol.analyze.King" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <dl class="py method">
 <dt id="pycol.analyze.King.fit">
-<code class="sig-name descname"><span class="pre">fit</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="pre">a</span></em>, <em class="sig-param"><span class="pre">a_ref</span></em>, <em class="sig-param"><span class="pre">x=None</span></em>, <em class="sig-param"><span class="pre">y=None</span></em>, <em class="sig-param"><span class="pre">func=&lt;function</span> <span class="pre">york&gt;</span></em>, <em class="sig-param"><span class="pre">alpha=0</span></em>, <em class="sig-param"><span class="pre">find_alpha=False</span></em>, <em class="sig-param"><span class="pre">axis=0</span></em>, <em class="sig-param"><span class="pre">show=True</span></em>, <em class="sig-param"><span class="pre">**kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pycol/analyze.html#King.fit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycol.analyze.King.fit" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">fit</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="pre">a</span></em>, <em class="sig-param"><span class="pre">a_ref</span></em>, <em class="sig-param"><span class="pre">x=None</span></em>, <em class="sig-param"><span class="pre">y=None</span></em>, <em class="sig-param"><span class="pre">xy=None</span></em>, <em class="sig-param"><span class="pre">func=&lt;function</span> <span class="pre">york&gt;</span></em>, <em class="sig-param"><span class="pre">alpha=0</span></em>, <em class="sig-param"><span class="pre">find_alpha=False</span></em>, <em class="sig-param"><span class="pre">show=True</span></em>, <em class="sig-param"><span class="pre">**kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pycol/analyze.html#King.fit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycol.analyze.King.fit" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -842,15 +586,16 @@ in collinear and anticollinear geometry (MHz).</p>
 <li><p><strong>a_ref</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Iterable</span></code>]) – An Iterable of the mass numbers of the used reference isotopes.</p></li>
 <li><p><strong>x</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Iterable</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code>]) – The x-values and their uncertainties of the King-fit to be performed. If ‘mode’ is “radii”,
 this must contain the differences of mean square nuclear charge radii or the Lambda-factor.
-‘x’ must have shape (len(a), 2). Units: (fm^2) or (MHz).</p></li>
+‘x’ must have shape (len(a), 2). Units: (fm ** 2) or (MHz).</p></li>
 <li><p><strong>y</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Iterable</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code>]) – The isotope shifts and their uncertainties of the King-fit to be performed.
 ‘y’ must have shape (len(a), 2). If None, ‘y’ is tried to be inherited from ‘self.f’. Units: (MHz).</p></li>
+<li><p><strong>xy</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Iterable</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>]]) – A 2-tuple of indices (ix, iy) which select the axes to use for the King-fit from ‘King.x_abs’
+if x or y is not specified. The default value is (0, 1), fitting the second against the first axis.</p></li>
 <li><p><strong>func</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Callable</span></code>) – The fitting routine.</p></li>
 <li><p><strong>alpha</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>]) – An x-axis offset to reduce the correlation coefficient between the y-intercept and the slope.
 Unit: (u fm ** 2) or (u MHz).</p></li>
 <li><p><strong>find_alpha</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – Whether to search for the best ‘alpha’. Uses the given ‘alpha’ as a starting point.
 May not give the desired result if ‘alpha’ was initialized to far from its optimal value.</p></li>
-<li><p><strong>axis</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – The axis to use if ‘x_abs’ was specified and is multidimensional.</p></li>
 <li><p><strong>show</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – Whether to plot the fit result.</p></li>
 <li><p><strong>kwargs</strong> – Additional keyword arguments are passed to ‘self.plot’.</p></li>
 </ul>
@@ -880,41 +625,43 @@ of two transitions [‘D1’, ‘D2’], yields the slope F_D2 / F_D1 if ‘axis
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>A list of results as defined by the routine ‘linear_alpha’:
-a, b, sigma_a, sigma_b, corr_ab, (alpha). The best y-intercept and slope,
-their respective 1-sigma uncertainties, their correlation coefficient( and the used alpha).</p>
+<dd class="field-even"><p>A list of results as defined by the routine ‘linear_monte_carlo_nd’:
+A tuple (a, b, sigma_a, sigma_b, corr_ab) of arrays. The best y-intercepts and slopes,
+their respective 1-sigma uncertainties and their correlation matrix.
+Additionally, a second tuple with the accepted points, offsets, slopes and a mask
+for the accepted points is returned if full_output == True.</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py method">
-<dt id="pycol.analyze.King.get_fk">
-<code class="sig-name descname"><span class="pre">get_fk</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pycol/analyze.html#King.get_fk"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycol.analyze.King.get_fk" title="Permalink to this definition">¶</a></dt>
+<dt id="pycol.analyze.King.get_popt">
+<code class="sig-name descname"><span class="pre">get_popt</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pycol/analyze.html#King.get_popt"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycol.analyze.King.get_popt" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p>(&lt;class ‘numpy.ndarray’&gt;, &lt;class ‘numpy.ndarray’&gt;)</p>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>The slope, y-intercept of the performed fit and their correlation,
+<dd class="field-even"><p>The y-intercept and slope of the performed fit and their correlation,
 if alpha was zero (Only changes the y-intercept).
-This returns the field-shift and mass-shift factors F and K if the x-axis are radii
-and the field-shift ratio Fy/Fx and the y-intercept Ky - Fy/Fx * Kx if the x-axis are isotope shifts.</p>
+This returns the mass- and field-shift factors K and F if the x-axis are radii
+and the y-intercept Ky - Fy/Fx * Kx and field-shift ratio Fy/Fx if the x-axis are isotope shifts.</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py method">
-<dt id="pycol.analyze.King.get_fk_nd">
-<code class="sig-name descname"><span class="pre">get_fk_nd</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pycol/analyze.html#King.get_fk_nd"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycol.analyze.King.get_fk_nd" title="Permalink to this definition">¶</a></dt>
+<dt id="pycol.analyze.King.get_popt_nd">
+<code class="sig-name descname"><span class="pre">get_popt_nd</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pycol/analyze.html#King.get_popt_nd"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycol.analyze.King.get_popt_nd" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p>(&lt;class ‘numpy.ndarray’&gt;, &lt;class ‘numpy.ndarray’&gt;)</p>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>The slopes and y-intercepts of the performed fit.
-This returns the field-shift and mass-shift factors F and K if the x-axis are radii
-and the field-shift ratio Fy/Fx and the y-intercept Ky - Fy/Fx * Kx if the x-axis are isotope shifts.
-The returned arrays f and k have shape (n, 2) were n is number of dimensions of the King-fit.</p>
+This returns the mass- and field-shift factors K and F if the x-axis are radii
+and the y-intercept Ky - Fy/Fx * Kx and field-shift ratio Fy/Fx if the x-axis are isotope shifts.
+The returned arrays k and f have shape (n, 2) were n is number of dimensions of the King-fit.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1048,95 +795,6 @@ as well as the fit results ‘self.results_nd’.</p>
 
 </dd></dl>
 
-<dl class="py class">
-<dt id="pycol.analyze.Radii">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">pycol.analyze.</span></code><code class="sig-name descname"><span class="pre">Radii</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">element</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">a</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">barrett</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vn</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seltzer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">decimals</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pycol/analyze.html#Radii"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycol.analyze.Radii" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<dl class="simple">
-<dt>A class which holds the information about nuclear charge radii from muonic atom spectroscopy</dt><dd><p>and elastic electron scattering. Differences of the even moments of nuclear charge radii
-as well as the Lambda parameter can be returned in a dict or an array format
-in the specified combination of mass numbers and reference mass numbers.</p>
-</dd>
-</dl>
-<dl class="py method">
-<dt id="pycol.analyze.Radii.choose_barrett">
-<code class="sig-name descname"><span class="pre">choose_barrett</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">references</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'mean'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pycol/analyze.html#Radii.choose_barrett"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycol.analyze.Radii.choose_barrett" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>references</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Iterable</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]]) – An Iterable of references to consider.</p></li>
-<li><p><strong>mode</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – The mode how to choose the Barret radii from multiple references.
-The Currently supported modes are {‘minErr’, mean}.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>None. Sets the instance variables ‘barrett’ and ‘used_references’.</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt id="pycol.analyze.Radii.get_lambda">
-<code class="sig-name descname"><span class="pre">get_lambda</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="pre">a</span></em>, <em class="sig-param"><span class="pre">a_ref</span></em>, <em class="sig-param"><span class="pre">delta_barrett=None</span></em>, <em class="sig-param"><span class="pre">decimals=4</span></em>, <em class="sig-param"><span class="pre">rtype=&lt;class</span> <span class="pre">'numpy.ndarray'&gt;</span></em>, <em class="sig-param"><span class="pre">key_format=None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pycol/analyze.html#Radii.get_lambda"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycol.analyze.Radii.get_lambda" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>a</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Iterable</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>]) – The mass numbers of the moments to return.</p></li>
-<li><p><strong>a_ref</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Iterable</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>]) – The reference mass numbers of the moments to return.</p></li>
-<li><p><strong>delta_barrett</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Iterable</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code>]) – The differences of Barrett radii with uncertainties.
-If specified, it must have shape (len(a), 2) and include the values in the first
-and the uncertainties in the second column.</p></li>
-<li><p><strong>decimals</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – The number of decimal places to return.</p></li>
-<li><p><strong>rtype</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">type</span></code>) – The type in which the results will be returned. Currently supported special types are [dict, ].
-The standard ‘rtype’ is a numpy array.</p></li>
-<li><p><strong>key_format</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – If ‘rtype’ is dict, The key format is used to build the dictionary keys in str format.
-The mass number is inserted into the first, the reference mass number into the second ‘{}’ bracket.
-Use numbers {1}(…){0} to change the order of the mass numbers.
-If None, the mass numbers are used as integer keys.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ValueError</span></code>]</p>
-</dd>
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p>The Lambda parameter for different mass and reference mass numbers.</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt id="pycol.analyze.Radii.get_rn">
-<code class="sig-name descname"><span class="pre">get_rn</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="pre">n</span></em>, <em class="sig-param"><span class="pre">a</span></em>, <em class="sig-param"><span class="pre">a_ref</span></em>, <em class="sig-param"><span class="pre">delta_barrett=None</span></em>, <em class="sig-param"><span class="pre">decimals=4</span></em>, <em class="sig-param"><span class="pre">rtype=&lt;class</span> <span class="pre">'numpy.ndarray'&gt;</span></em>, <em class="sig-param"><span class="pre">key_format=None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pycol/analyze.html#Radii.get_rn"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycol.analyze.Radii.get_rn" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>n</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – The moment to return. Currently supported moments are [2, 4, 6].</p></li>
-<li><p><strong>a</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Iterable</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>]) – The mass numbers of the moments to return.</p></li>
-<li><p><strong>a_ref</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Iterable</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>]) – The reference mass numbers of the moments to return.</p></li>
-<li><p><strong>delta_barrett</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Iterable</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code>]) – The differences of Barrett radii with uncertainties.
-If specified, it must have shape (len(a), 2) and include the values in the first
-and the uncertainties in the second column.</p></li>
-<li><p><strong>decimals</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – The number of decimal places to return.</p></li>
-<li><p><strong>rtype</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">type</span></code>) – The type in which the results will be returned. Currently supported special types are [dict, ].
-The standard ‘rtype’ is a numpy array.</p></li>
-<li><p><strong>key_format</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – If ‘rtype’ is dict, The key format is used to build the dictionary keys in str format.
-The mass number is inserted into the first, the reference mass number into the second ‘{}’ bracket.
-Use numbers {1}(…){0} to change the order of the mass numbers.
-If None, the mass numbers are used as integer keys.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ValueError</span></code>]</p>
-</dd>
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p>Differences of the specified moment of nuclear charge radii for different mass
-and reference mass numbers.</p>
-</dd>
-</dl>
-</dd></dl>
-
-</dd></dl>
-
 <dl class="py function">
 <dt id="pycol.analyze.cubic">
 <code class="sig-prename descclassname"><span class="pre">pycol.analyze.</span></code><code class="sig-name descname"><span class="pre">cubic</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">a</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">c</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">d</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pycol/analyze.html#cubic"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycol.analyze.cubic" title="Permalink to this definition">¶</a></dt>
@@ -1144,7 +802,7 @@ and reference mass numbers.</p>
 
 <dl class="py function">
 <dt id="pycol.analyze.curve_fit">
-<code class="sig-prename descclassname"><span class="pre">pycol.analyze.</span></code><code class="sig-name descname"><span class="pre">curve_fit</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p0_fixed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sigma</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">absolute_sigma</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">check_finite</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bounds</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(-</span> <span class="pre">inf,</span> <span class="pre">inf)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">jac</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pycol/analyze.html#curve_fit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycol.analyze.curve_fit" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">pycol.analyze.</span></code><code class="sig-name descname"><span class="pre">curve_fit</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p0_fixed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sigma</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">absolute_sigma</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">check_finite</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bounds</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(-</span> <span class="pre">inf,</span> <span class="pre">inf)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">jac</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">report</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pycol/analyze.html#curve_fit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycol.analyze.curve_fit" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -1162,6 +820,7 @@ Must have the same length as p0.</p></li>
 <li><p><strong>bounds</strong> (<em>(</em><em>&lt;class 'numpy.ndarray'&gt;</em><em>, </em><em>&lt;class 'numpy.ndarray'&gt;</em><em>)</em>) – See scipy.optimize.curve_fit.</p></li>
 <li><p><strong>method</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – See scipy.optimize.curve_fit.</p></li>
 <li><p><strong>jac</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Callable</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code>]) – See scipy.optimize.curve_fit.</p></li>
+<li><p><strong>report</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – Whether to print the result of the fit.</p></li>
 <li><p><strong>kwargs</strong> – See scipy.optimize.curve_fit.</p></li>
 </ul>
 </dd>
@@ -1291,14 +950,14 @@ their respective 1-sigma uncertainties and their correlation coefficient.</p>
 
 <dl class="py function">
 <dt id="pycol.analyze.linear_monte_carlo_nd">
-<code class="sig-prename descclassname"><span class="pre">pycol.analyze.</span></code><code class="sig-name descname"><span class="pre">linear_monte_carlo_nd</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cov</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p_axis</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1000000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">full_output</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">report</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pycol/analyze.html#linear_monte_carlo_nd"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycol.analyze.linear_monte_carlo_nd" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">pycol.analyze.</span></code><code class="sig-name descname"><span class="pre">linear_monte_carlo_nd</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cov</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">axis</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1000000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">full_output</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">report</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pycol/analyze.html#linear_monte_carlo_nd"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycol.analyze.linear_monte_carlo_nd" title="Permalink to this definition">¶</a></dt>
 <dd><p>A Monte-Carlo fitter that finds a straight line in n-dimensional space.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>x</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Iterable</span></code>]) – The x data. ‘x’ is an iterable of vectors with arbitrary but fixed dimension.</p></li>
 <li><p><strong>cov</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Iterable</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code>]) – The covariance matrices of the x data vectors. Must have shape (x.shape[0], x.shape[1], x.shape[1]).</p></li>
-<li><p><strong>p_axis</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>]) – The axis to use for the parametrization. If None, the directional vector is normalized.</p></li>
+<li><p><strong>axis</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>]) – The axis to use for the parametrization. If None, the directional vector is normalized.</p></li>
 <li><p><strong>n</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – The number of samples generated for each data point.</p></li>
 <li><p><strong>full_output</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – Whether to also return the generated points ‘p’ and a mask for the ‘accepted’ points.
 The accepted points are p[accepted]. p has shape (n, x.shape).</p></li>
@@ -1307,17 +966,20 @@ The accepted points are p[accepted]. p has shape (n, x.shape).</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>A list of (a, b, sigma_a, sigma_b, corr_ab). The best y-intercepts and slopes,
+<dd class="field-even"><p>A list of results as defined by the routine ‘linear_monte_carlo_nd’:
+A tuple (a, b, sigma_a, sigma_b, corr_ab) of arrays. The best y-intercepts and slopes,
 their respective 1-sigma uncertainties and their correlation matrix.
-The y-intercepts and slopes are defined through ‘p_axis’ by a(x[p_axis] == 0)
-and b(dx[i != p_axis] / dx[p_axis]), respectively.</p>
+The y-intercepts and slopes are defined through ‘axis’ by a(x[axis] == 0)
+and b(dx[i != axis] / dx[axis]), respectively.
+Additionally, a second tuple with the accepted points, offsets, slopes and a mask
+for the accepted points is returned if full_output == True.</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py function">
 <dt id="pycol.analyze.odr_fit">
-<code class="sig-prename descclassname"><span class="pre">pycol.analyze.</span></code><code class="sig-name descname"><span class="pre">odr_fit</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sigma_x</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sigma_y</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p0_d</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p0_fixed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pycol/analyze.html#odr_fit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycol.analyze.odr_fit" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">pycol.analyze.</span></code><code class="sig-name descname"><span class="pre">odr_fit</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sigma_x</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sigma_y</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p0_d</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p0_fixed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">report</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pycol/analyze.html#odr_fit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycol.analyze.odr_fit" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -1333,6 +995,7 @@ If ‘p0’ is None, 1 is taken as an initial guess for all non-keyword paramete
 Must have the same length as p0.</p></li>
 <li><p><strong>p0_fixed</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Iterable</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code>]) – A numpy array or an Iterable of bool values specifying, whether to fix a parameter.
 Must have the same length as p0.</p></li>
+<li><p><strong>report</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – Whether to print the result of the fit.</p></li>
 <li><p><strong>kwargs</strong> – Keyword arguments passed to odr.ODR.</p></li>
 </ul>
 </dd>
@@ -1444,7 +1107,7 @@ Must have the same length as p0.</p></li>
 
 <dl class="py function">
 <dt id="pycol.analyze.york">
-<code class="sig-prename descclassname"><span class="pre">pycol.analyze.</span></code><code class="sig-name descname"><span class="pre">york</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sigma_x</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sigma_y</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">corr</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">iter_max</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">200</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">report</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pycol/analyze.html#york"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycol.analyze.york" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">pycol.analyze.</span></code><code class="sig-name descname"><span class="pre">york</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sigma_x</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sigma_y</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">corr</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">iter_max</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">200</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">report</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pycol/analyze.html#york"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycol.analyze.york" title="Permalink to this definition">¶</a></dt>
 <dd><p>A linear regression algorithm to find the best straight line, given normally distributed errors for x and y
 and correlation coefficients between errors in x and y. The algorithm is described in
 [‘Unified equations for the slope, intercept, and standard errors of the best straight line’,
@@ -1472,365 +1135,34 @@ their respective 1-sigma uncertainties and their correlation coefficient.</p>
 </div>
 <div class="section" id="module-pycol.lineshapes">
 <span id="pycol-lineshapes-module"></span><h2>pycol.lineshapes module<a class="headerlink" href="#module-pycol.lineshapes" title="Permalink to this headline">¶</a></h2>
-<p>PyCLS.lineshapes</p>
+<p>pycol.lineshapes</p>
 <p>Created on 29.04.2020</p>
 <p>&#64;author: Patrick Mueller</p>
 <p>Module for spectral lineshape functions.</p>
-<dl class="py class">
-<dt id="pycol.lineshapes.HyperfineShape">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">pycol.lineshapes.</span></code><code class="sig-name descname"><span class="pre">HyperfineShape</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">func</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'lorentz'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">func_args</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">i</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">j_l</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">j_u</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pycol/lineshapes.html#HyperfineShape"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycol.lineshapes.HyperfineShape" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#pycol.lineshapes.Shape" title="pycol.lineshapes.Shape"><code class="xref py py-class docutils literal notranslate"><span class="pre">pycol.lineshapes.Shape</span></code></a></p>
-<p>Class representing a hyperfine structure lineshape without any model-specific parameters such as offsets or scales.
-Instances of this class are Callables. A list of their parameters can be viewed by printing
-‘&lt;HyperfineShape&gt;.arg_list’. The initialization parameters can only be set at creation time of the shape.</p>
-<dl class="py method">
-<dt id="pycol.lineshapes.HyperfineShape.define">
-<code class="sig-name descname"><span class="pre">define</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f_f</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qi</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fixed_ratios</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pycol/lineshapes.html#HyperfineShape.define"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycol.lineshapes.HyperfineShape.define" title="Permalink to this definition">¶</a></dt>
-<dd><p>Define whether to use all peaks, quantum interference and fixed intensity ratios.</p>
+<dl class="py function">
+<dt id="pycol.lineshapes.gen_model">
+<code class="sig-prename descclassname"><span class="pre">pycol.lineshapes.</span></code><code class="sig-name descname"><span class="pre">gen_model</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ijj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shape</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qi</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hf_mixing</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_peaks</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">offsets</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_cuts</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">convolve</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pycol/lineshapes.html#gen_model"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycol.lineshapes.gen_model" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a lineshape model to fit arbitrary atomic fluorescence spectra.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>f_f</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Iterable</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>]]]) – Hyperfine transitions which are not used. TODO: Not implemented yet.</p></li>
-<li><p><strong>qi</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – Whether to use quantum interference. This adds a single parameter if fixed_ratios is True
-and cross-intensities if fixed_ratios is False. Default is False.</p></li>
-<li><p><strong>fixed_ratios</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – Whether the relative intensity ratios should be fixed to the Racah coefficients.</p></li>
-<li><p><strong>kwargs</strong> – Additional definitions. Do not have any effect currently.</p></li>
+<li><p><strong>ijj</strong> – The three or an Iterable of three quantum numbers I, J_l and J_u.
+Must have the format [I, J_l, J_u] or [[I0, J0_l, J0_u], [I1, J1_l, J1_u], …].</p></li>
+<li><p><strong>shape</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">type</span></code>, <a class="reference internal" href="pycol._lineshapes.html#pycol._lineshapes.spectrum.Spectrum" title="pycol._lineshapes.spectrum.Spectrum"><code class="xref py py-class docutils literal notranslate"><span class="pre">Spectrum</span></code></a>]) – A str representation of or a Spectrum type.</p></li>
+<li><p><strong>qi</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – Whether to use a quantum interference model. NOT IMPLEMENTED.</p></li>
+<li><p><strong>hf_mixing</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – Whether to use a hyperfine mixing model. NOT IMPLEMENTED.</p></li>
+<li><p><strong>n_peaks</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – The number of “peaks per resonance”.</p></li>
+<li><p><strong>offsets</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code>]) – The orders of the offset polynomials of the separate x-axis intervals.
+Must be a list or a single value. In the former case len(offsets) == len(x_cuts) + 1 must hold.
+If offsets is None, a single constant offset is assumed.</p></li>
+<li><p><strong>x_cuts</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code>]) – The x values where to cut the x-axis. Must be a list or a single value.
+In the former case len(offsets) == len(x_cuts) + 1 must hold.
+If x_cuts is None, the x-axis will not be cut.</p></li>
+<li><p><strong>convolve</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">type</span></code>, <a class="reference internal" href="pycol._lineshapes.html#pycol._lineshapes.spectrum.Spectrum" title="pycol._lineshapes.spectrum.Spectrum"><code class="xref py py-class docutils literal notranslate"><span class="pre">Spectrum</span></code></a>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code>]) – A str representation of or a Convolved type.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>None. Defines the parameter space of the shape.</p>
-</dd>
-</dl>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="py class">
-<dt id="pycol.lineshapes.Model">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">pycol.lineshapes.</span></code><code class="sig-name descname"><span class="pre">Model</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">shape</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'lorentz'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">offset_order</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_shape</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_cuts</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">arg_map</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pycol/lineshapes.html#Model"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycol.lineshapes.Model" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>Class representing a lineshape model. Instances of this class are Callables.
-A list of their parameters can be viewed by printing ‘&lt;Model&gt;.arg_list’.</p>
-<dl class="py method">
-<dt id="pycol.lineshapes.Model.define">
-<code class="sig-name descname"><span class="pre">define</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">offset_order</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_shape</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_cuts</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">arg_map</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pycol/lineshapes.html#Model.define"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycol.lineshapes.Model.define" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>offset_order</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – The polynomial order of the offset. For example, an order of 2 yields the model definition
-model(…, y0, y1, y2) which has a parabola y0 + y1 * x + y2 * x ** 2 as an offset.</p></li>
-<li><p><strong>n_shape</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – The multiplicity of the shape (i.e. the number of peaks for single-peak shapes).</p></li>
-<li><p><strong>x_cuts</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Iterable</span></code>]) – An Iterable of x-values where tu cut the x-axis to use multiple offset parameters.
-The offset parameters are appended to the arguments of the model,
-such that for example model(…, norm_n, y0_0, y0_1) if the x-axis is cut once and offset_order=0.
-If the model is computed at the exact value of a cut, the offset corresponding to the larger x-values is used.</p></li>
-<li><p><strong>arg_map</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code>]) – A dictionary of the parameters as keys and lists of int values as values.
-Each list entry represents one of the ‘n_shape’ shape calls of the specific parameter.
-Note for the offset parameters, there are len(x_cuts) + 1 list entries.
-All shape calls which have the same number for a parameter use a common argument for that specific parameter.
-For example, if ‘n_shape’ = 3 and ‘arg_map’ = {‘scale’: [0, 2, 2]},
-only two arguments for the parameter ‘scale’, named ‘scale_0’ and ‘scale_2’ are created. If ‘arg_map’ is None,
-individual arguments are created for the two general parameters ‘x0’ and ‘scale’ and common arguments for the
-remaining parameters of the specified ‘shape’. For example, if ‘shape’ is ‘lorentz’ and n = 3,
-arg_map = {‘x0’: [0, 1, 2], ‘scale’: [0, 1, 2], ‘gamma’: [0, 0, 0]} and the model is defined as
-model(gamma, x0_0, x0_1, x0_2, scale_0, scale_1, scale_2, y0).</p></li>
-<li><p><strong>kwargs</strong> – Additional definitions. Do not have any effect currently.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>None. Defines the parameter space of the model.</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt id="pycol.lineshapes.Model.define_shape">
-<code class="sig-name descname"><span class="pre">define_shape</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f_f</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qi</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fixed_ratios</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pycol/lineshapes.html#Model.define_shape"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycol.lineshapes.Model.define_shape" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>f_f</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Iterable</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>]]]) – </p></li>
-<li><p><strong>qi</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – </p></li>
-<li><p><strong>fixed_ratios</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – </p></li>
-<li><p><strong>kwargs</strong> – </p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>None. Redefines the ‘shape’ of the model.</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt id="pycol.lineshapes.Model.get_arg_index">
-<code class="sig-name descname"><span class="pre">get_arg_index</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">arg</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sub_dict</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pycol/lineshapes.html#Model.get_arg_index"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycol.lineshapes.Model.get_arg_index" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>arg</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – The argument whose index is returned. Must be in ‘arg_map’.</p></li>
-<li><p><strong>n</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – The number of the specified argument whose index is returned.</p></li>
-<li><p><strong>sub_dict</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – The specific argument list to get the index from. Can be None, ‘signal’ or ‘offset’.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>The index of the nth parameter corresponding to the specified argument.</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt id="pycol.lineshapes.Model.get_arg_label">
-<code class="sig-name descname"><span class="pre">get_arg_label</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">arg</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pycol/lineshapes.html#Model.get_arg_label"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycol.lineshapes.Model.get_arg_label" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>arg</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – The argument whose name is returned. Must be in ‘arg_map’.</p></li>
-<li><p><strong>n</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – The number of the specified argument whose name is returned.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>The name of the nth parameter corresponding to the specified argument.</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt id="pycol.lineshapes.Model.get_arg_map_keys">
-<code class="sig-name descname"><span class="pre">get_arg_map_keys</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pycol/lineshapes.html#Model.get_arg_map_keys"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycol.lineshapes.Model.get_arg_map_keys" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p>The keys of arg_map.</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt id="pycol.lineshapes.Model.get_default_arg_map">
-<code class="sig-name descname"><span class="pre">get_default_arg_map</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pycol/lineshapes.html#Model.get_default_arg_map"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycol.lineshapes.Model.get_default_arg_map" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p>The default arg_map.</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt id="pycol.lineshapes.Model.offset">
-<code class="sig-name descname"><span class="pre">offset</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pycol/lineshapes.html#Model.offset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycol.lineshapes.Model.offset" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>x</strong> – The x quantiles.</p></li>
-<li><p><strong>args</strong> – The offset parameters.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>The offset at the specified x values.</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt id="pycol.lineshapes.Model.signal">
-<code class="sig-name descname"><span class="pre">signal</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pycol/lineshapes.html#Model.signal"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycol.lineshapes.Model.signal" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>x</strong> – The x quantiles.</p></li>
-<li><p><strong>args</strong> – The signal parameters.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>The signal at the specified x values.</p>
-</dd>
-</dl>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="py class">
-<dt id="pycol.lineshapes.Shape">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">pycol.lineshapes.</span></code><code class="sig-name descname"><span class="pre">Shape</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">func</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'lorentz'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">func_args</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pycol/lineshapes.html#Shape"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycol.lineshapes.Shape" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>Class representing a lineshape without any model-specific parameters such as offsets or scales.
-Instances of this class are Callables. A list of their parameters can be viewed by printing ‘&lt;Shape&gt;.arg_list’.
-The initialization parameters can only be set at creation time of the shape.</p>
-<dl class="py method">
-<dt id="pycol.lineshapes.Shape.define">
-<code class="sig-name descname"><span class="pre">define</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pycol/lineshapes.html#Shape.define"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycol.lineshapes.Shape.define" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
-<dl class="py class">
-<dt id="pycol.lineshapes.SumModel">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">pycol.lineshapes.</span></code><code class="sig-name descname"><span class="pre">SumModel</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">models</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">offset_order</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_shape</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_cuts</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">arg_map</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pycol/lineshapes.html#SumModel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycol.lineshapes.SumModel" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#pycol.lineshapes.Model" title="pycol.lineshapes.Model"><code class="xref py py-class docutils literal notranslate"><span class="pre">pycol.lineshapes.Model</span></code></a></p>
-<p>Class representing a sum of lineshape models. Instances of this class are Callables.
-A list of their parameters can be viewed by printing ‘&lt;SumModel&gt;.arg_list’.</p>
-</dd></dl>
-
-<dl class="py function">
-<dt id="pycol.lineshapes.define_shape">
-<code class="sig-prename descclassname"><span class="pre">pycol.lineshapes.</span></code><code class="sig-name descname"><span class="pre">define_shape</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">shape</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'lorentz'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shape_args</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pycol/lineshapes.html#define_shape"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycol.lineshapes.define_shape" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>shape</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Callable</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – A Callable or a str representing a Callable which is used as the lineshape for each individual peak.</p></li>
-<li><p><strong>shape_args</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Iterable</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]]) – The parameter names of ‘shape’.
-If it is None, the parameters are tried to be inherited from shape.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>The specified shape and parameter names.</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt id="pycol.lineshapes.fwhm_to_sigma">
-<code class="sig-prename descclassname"><span class="pre">pycol.lineshapes.</span></code><code class="sig-name descname"><span class="pre">fwhm_to_sigma</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fwhm</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pycol/lineshapes.html#fwhm_to_sigma"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycol.lineshapes.fwhm_to_sigma" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>fwhm</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Iterable</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>]) – The full width at half maximum of a Gauss distribution.</p>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>The standard deviation of a Gauss distribution with full width at half maximum ‘fwhm’.</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt id="pycol.lineshapes.gauss">
-<code class="sig-prename descclassname"><span class="pre">pycol.lineshapes.</span></code><code class="sig-name descname"><span class="pre">gauss</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sigma</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pycol/lineshapes.html#gauss"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycol.lineshapes.gauss" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>x</strong> – The x quantile.</p></li>
-<li><p><strong>sigma</strong> – The standard deviation of the Gauss distribution.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>The value of the normalized gauss distribution with standard deviation ‘sigma’ at the value ‘x’.</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt id="pycol.lineshapes.lorentz">
-<code class="sig-prename descclassname"><span class="pre">pycol.lineshapes.</span></code><code class="sig-name descname"><span class="pre">lorentz</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gamma</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pycol/lineshapes.html#lorentz"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycol.lineshapes.lorentz" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>x</strong> – The x quantile.</p></li>
-<li><p><strong>gamma</strong> – The full width at half maximum of the Lorentz profile.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>The value of a Voigt profile at the value ‘x’.</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt id="pycol.lineshapes.lorentz_convolved">
-<code class="sig-prename descclassname"><span class="pre">pycol.lineshapes.</span></code><code class="sig-name descname"><span class="pre">lorentz_convolved</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dist</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k_max</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">15</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pycol/lineshapes.html#lorentz_convolved"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycol.lineshapes.lorentz_convolved" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>dist</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Callable</span></code>) – A one-dimensional probability density function. Its integral over all real numbers must equate to one.</p></li>
-<li><p><strong>k_max</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – Defines the maximum number of samples to calculate the convolution integral.
-The number of samples n is n &lt;= 2 ** k_max + 1. The number of samples which are used for the calculation
-are determined dynamically based on the width of ‘dist’ and the width of the Lorentz profile ‘gamma’.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>The lineshape resulting from the convolution of the Lorentz profile
-with a user-specified probability density function ‘dist’. The parameters of ‘dist’ are appended
-to the ‘gamma’ parameter of the Lorentz profile.</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt id="pycol.lineshapes.lorentz_qi">
-<code class="sig-prename descclassname"><span class="pre">pycol.lineshapes.</span></code><code class="sig-name descname"><span class="pre">lorentz_qi</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gamma_0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gamma_1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pycol/lineshapes.html#lorentz_qi"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycol.lineshapes.lorentz_qi" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>x</strong> – The x quantile.</p></li>
-<li><p><strong>x_0</strong> – The x-axis (energy, frequency, …) position of the first transition.</p></li>
-<li><p><strong>x_1</strong> – The x-axis (energy, frequency, …) position of the second transition.</p></li>
-<li><p><strong>gamma_0</strong> – The full width at half maximum of the first level.</p></li>
-<li><p><strong>gamma_1</strong> – The full width at half maximum of the second level.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>The value of the interference terms of a Lorentz profile at the value ‘x’.</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt id="pycol.lineshapes.pseudo_voigt">
-<code class="sig-prename descclassname"><span class="pre">pycol.lineshapes.</span></code><code class="sig-name descname"><span class="pre">pseudo_voigt</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gamma</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">a</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pycol/lineshapes.html#pseudo_voigt"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycol.lineshapes.pseudo_voigt" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>x</strong> – The x quantile.</p></li>
-<li><p><strong>gamma</strong> – The full width at half maximum of the Lorentzian part.</p></li>
-<li><p><strong>a</strong> – The linear coefficient between Lorentz and Gauss profile,
-where a=1 is a pure Lorentzian and a=0 is a pure Gaussian.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>The value of a Pseudo-Voigt profile at the value ‘x’.</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt id="pycol.lineshapes.sigma_to_fwhm">
-<code class="sig-prename descclassname"><span class="pre">pycol.lineshapes.</span></code><code class="sig-name descname"><span class="pre">sigma_to_fwhm</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sigma</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pycol/lineshapes.html#sigma_to_fwhm"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycol.lineshapes.sigma_to_fwhm" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>sigma</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Iterable</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>]) – The standard deviation of a Gauss distribution.</p>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>The full width at half maximum of a Gauss distribution with standard deviation ‘sigma’.</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt id="pycol.lineshapes.voigt">
-<code class="sig-prename descclassname"><span class="pre">pycol.lineshapes.</span></code><code class="sig-name descname"><span class="pre">voigt</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gamma</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sigma</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pycol/lineshapes.html#voigt"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycol.lineshapes.voigt" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>x</strong> – The x quantile.</p></li>
-<li><p><strong>gamma</strong> – The full width at half maximum of the Lorentzian part.</p></li>
-<li><p><strong>sigma</strong> – The standard deviation of the underlying Gauss distribution.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>The value of a Voigt profile at the value ‘x’.</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt id="pycol.lineshapes.voigt_fwhm">
-<code class="sig-prename descclassname"><span class="pre">pycol.lineshapes.</span></code><code class="sig-name descname"><span class="pre">voigt_fwhm</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gamma</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sigma</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pycol/lineshapes.html#voigt_fwhm"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycol.lineshapes.voigt_fwhm" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>gamma</strong> – The full width at half maximum of the lorentzian part of the Voigt profile.</p></li>
-<li><p><strong>sigma</strong> – The standard deviation of the gaussian part of the Voigt profile.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>The total full width at half maximum of a Voigt profile.</p>
+<dd class="field-even"><p>The defined lineshape model.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1838,7 +1170,7 @@ where a=1 is a pure Lorentzian and a=0 is a pure Gaussian.</p></li>
 </div>
 <div class="section" id="module-pycol.physics">
 <span id="pycol-physics-module"></span><h2>pycol.physics module<a class="headerlink" href="#module-pycol.physics" title="Permalink to this headline">¶</a></h2>
-<p>PyCLS.Physics</p>
+<p>pycol.Physics</p>
 <p>Created on 01.04.2020</p>
 <p>&#64;author: Patrick Mueller</p>
 <p>Module including physical functions useful for CLS.</p>
@@ -2003,15 +1335,15 @@ to a convolution of the boltzmann and a normal distribution (s/m).</p>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>r</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>) – The Barrett radius of an isotope.</p></li>
-<li><p><strong>r_d</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>) – The uncertainty of the Barrett radius.</p></li>
-<li><p><strong>r_ref</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>) – The Barrett radius of a reference isotope.</p></li>
-<li><p><strong>r_ref_d</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>) – The uncertainty of the Barrett radius of the reference isotope.</p></li>
-<li><p><strong>delta_r</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>) – The difference between the Barrett radius of the isotope and the reference isotope.</p></li>
-<li><p><strong>delta_r_d</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>) – The uncertainty of the difference between
+<li><p><strong>r</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Iterable</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>]) – The Barrett radius of an isotope.</p></li>
+<li><p><strong>r_d</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Iterable</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>]) – The uncertainty of the Barrett radius.</p></li>
+<li><p><strong>r_ref</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Iterable</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>]) – The Barrett radius of a reference isotope.</p></li>
+<li><p><strong>r_ref_d</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Iterable</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>]) – The uncertainty of the Barrett radius of the reference isotope.</p></li>
+<li><p><strong>delta_r</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Iterable</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>]) – The difference between the Barrett radius of the isotope and the reference isotope.</p></li>
+<li><p><strong>delta_r_d</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Iterable</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>]) – The uncertainty of the difference between
 the Barrett radius of the isotope and the reference isotope.</p></li>
-<li><p><strong>v2</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>) – The V2 factor of the isotope.</p></li>
-<li><p><strong>v2_ref</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>) – The V2 factor of the reference isotope.</p></li>
+<li><p><strong>v2</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Iterable</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>]) – The V2 factor of the isotope.</p></li>
+<li><p><strong>v2_ref</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Iterable</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>]) – The V2 factor of the reference isotope.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -2026,15 +1358,15 @@ the Barrett radius of the isotope and the reference isotope.</p></li>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>r</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>) – The Barrett radius of an isotope.</p></li>
-<li><p><strong>r_d</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>) – The uncertainty of the Barrett radius.</p></li>
-<li><p><strong>r_ref</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>) – The Barrett radius of a reference isotope.</p></li>
-<li><p><strong>r_ref_d</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>) – The uncertainty of the Barrett radius of the reference isotope.</p></li>
-<li><p><strong>delta_r</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>) – The difference between the Barrett radius of the isotope and the reference isotope.</p></li>
-<li><p><strong>delta_r_d</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>) – The uncertainty of the difference between
+<li><p><strong>r</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Iterable</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>]) – The Barrett radius of an isotope.</p></li>
+<li><p><strong>r_d</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Iterable</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>]) – The uncertainty of the Barrett radius.</p></li>
+<li><p><strong>r_ref</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Iterable</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>]) – The Barrett radius of a reference isotope.</p></li>
+<li><p><strong>r_ref_d</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Iterable</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>]) – The uncertainty of the Barrett radius of the reference isotope.</p></li>
+<li><p><strong>delta_r</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Iterable</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>]) – The difference between the Barrett radius of the isotope and the reference isotope.</p></li>
+<li><p><strong>delta_r_d</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Iterable</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>]) – The uncertainty of the difference between
 the Barrett radius of the isotope and the reference isotope.</p></li>
-<li><p><strong>v4</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>) – The V4 factor of the isotope.</p></li>
-<li><p><strong>v4_ref</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>) – The V4 factor of the reference isotope.</p></li>
+<li><p><strong>v4</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Iterable</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>]) – The V4 factor of the isotope.</p></li>
+<li><p><strong>v4_ref</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Iterable</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>]) – The V4 factor of the reference isotope.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -2049,15 +1381,15 @@ the Barrett radius of the isotope and the reference isotope.</p></li>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>r</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>) – The Barrett radius of an isotope.</p></li>
-<li><p><strong>r_d</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>) – The uncertainty of the Barrett radius.</p></li>
-<li><p><strong>r_ref</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>) – The Barrett radius of a reference isotope.</p></li>
-<li><p><strong>r_ref_d</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>) – The uncertainty of the Barrett radius of the reference isotope.</p></li>
-<li><p><strong>delta_r</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>) – The difference between the Barrett radius of the isotope and the reference isotope.</p></li>
-<li><p><strong>delta_r_d</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>) – The uncertainty of the difference between
+<li><p><strong>r</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Iterable</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>]) – The Barrett radius of an isotope.</p></li>
+<li><p><strong>r_d</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Iterable</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>]) – The uncertainty of the Barrett radius.</p></li>
+<li><p><strong>r_ref</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Iterable</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>]) – The Barrett radius of a reference isotope.</p></li>
+<li><p><strong>r_ref_d</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Iterable</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>]) – The uncertainty of the Barrett radius of the reference isotope.</p></li>
+<li><p><strong>delta_r</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Iterable</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>]) – The difference between the Barrett radius of the isotope and the reference isotope.</p></li>
+<li><p><strong>delta_r_d</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Iterable</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>]) – The uncertainty of the difference between
 the Barrett radius of the isotope and the reference isotope.</p></li>
-<li><p><strong>v6</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>) – The V6 factor of the isotope.</p></li>
-<li><p><strong>v6_ref</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>) – The V6 factor of the reference isotope.</p></li>
+<li><p><strong>v6</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Iterable</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>]) – The V6 factor of the isotope.</p></li>
+<li><p><strong>v6_ref</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Iterable</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>]) – The V6 factor of the reference isotope.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -2677,7 +2009,7 @@ and its uncertainty.</p>
 <li><p><strong>m_ref_d</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Iterable</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>]) – The uncertainty of the mass of the reference isotope (amu).
 Must be a scalar or have the same shape as ‘m’.</p></li>
 <li><p><strong>k_inf</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – Whether the normal mass-shift factor K(NMS) is defined mass independently
-as m_e * T(inf) or as m_e * T(A_ref). Compare (6.4) with (3.17)
+as m_e * T(inf) (= True) or as m_e * T(A_ref) (= False). Compare (6.4) with (3.17)
 in [W. H. King, Isotope shifts in atomic spectra (1984)].</p></li>
 </ul>
 </dd>
@@ -2832,6 +2164,41 @@ due to the absorption of a laser photon with frequency f (MHz).</p>
 </dd></dl>
 
 <dl class="py function">
+<dt id="pycol.physics.saturation_intensity">
+<code class="sig-prename descclassname"><span class="pre">pycol.physics.</span></code><code class="sig-name descname"><span class="pre">saturation_intensity</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">a</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">a_dipole</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pycol/physics.html#saturation_intensity"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycol.physics.saturation_intensity" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>f</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Iterable</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>]) – The frequency of the transition.</p></li>
+<li><p><strong>a</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Iterable</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>]) – The Einstein A coefficient (MHz).</p></li>
+<li><p><strong>a_dipole</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Iterable</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>]) – The reduced dipole coefficient of the transition (see algebra.a_dipole).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The saturation intensity.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="pycol.physics.scattering_rate">
+<code class="sig-prename descclassname"><span class="pre">pycol.physics.</span></code><code class="sig-name descname"><span class="pre">scattering_rate</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">a</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">s</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pycol/physics.html#scattering_rate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycol.physics.scattering_rate" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>df</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Iterable</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>]) – The detuning of to be scattered light from the transition.
+This must be differences of real frequencies, such that w = 2 pi * df (MHz).</p></li>
+<li><p><strong>a</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Iterable</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>]) – The Einstein A coefficient (MHz).</p></li>
+<li><p><strong>s</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Iterable</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>]) – The saturation parameter.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The 2-state-equilibrium scattering-rate of an electronic transition.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
 <dt id="pycol.physics.sellmeier">
 <code class="sig-prename descclassname"><span class="pre">pycol.physics.</span></code><code class="sig-name descname"><span class="pre">sellmeier</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">w</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">a</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pycol/physics.html#sellmeier"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycol.physics.sellmeier" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
@@ -2844,6 +2211,25 @@ due to the absorption of a laser photon with frequency f (MHz).</p>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>The index of refraction for the wavelength w and the given material.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="pycol.physics.source_energy_pdf">
+<code class="sig-prename descclassname"><span class="pre">pycol.physics.</span></code><code class="sig-name descname"><span class="pre">source_energy_pdf</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">f0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sigma</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xi</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">collinear</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pycol/physics.html#source_energy_pdf"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycol.physics.source_energy_pdf" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>f</strong> – Frequency quantiles (arb. units).</p></li>
+<li><p><strong>f0</strong> – Frequency offset (arb. units).</p></li>
+<li><p><strong>sigma</strong> – The standard deviation of the underlying normal distribution in frequency units ([f]).</p></li>
+<li><p><strong>xi</strong> – The proportionality constant between kinetic energy differences and frequency differences ([f]).</p></li>
+<li><p><strong>collinear</strong> – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>PDF of rest frame frequencies after acceleration of thermally and normally distributed kinetic energies.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -3016,6 +2402,26 @@ after electrostatic acceleration with voltage u (m/s).</p>
 </dd></dl>
 
 <dl class="py function">
+<dt id="pycol.physics.v_rec">
+<code class="sig-prename descclassname"><span class="pre">pycol.physics.</span></code><code class="sig-name descname"><span class="pre">v_rec</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">m</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pycol/physics.html#v_rec"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycol.physics.v_rec" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>f</strong> – The frequency of light in the atoms rest frame (MHz).</p></li>
+<li><p><strong>m</strong> – The mass of a body (amu).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Iterable</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>]</p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>The change of velocity of an atom at rest
+due to the absorption of a photon with frequency f (m/s).</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
 <dt id="pycol.physics.zeeman">
 <code class="sig-prename descclassname"><span class="pre">pycol.physics.</span></code><code class="sig-name descname"><span class="pre">zeeman</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">m</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">g</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">as_freq</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pycol/physics.html#zeeman"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycol.physics.zeeman" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
@@ -3039,7 +2445,7 @@ after electrostatic acceleration with voltage u (m/s).</p>
 </div>
 <div class="section" id="module-pycol.simulate">
 <span id="pycol-simulate-module"></span><h2>pycol.simulate module<a class="headerlink" href="#module-pycol.simulate" title="Permalink to this headline">¶</a></h2>
-<p>PyCLS.simulate</p>
+<p>pycol.simulate</p>
 <p>Created on 05.05.2020</p>
 <p>&#64;author: Patrick Mueller</p>
 <p>Module including classes and methods to simulate fluorescence spectra.</p>
@@ -3540,7 +2946,7 @@ time will be an array of equally spaced times, such that numerical integrations 
 </div>
 <div class="section" id="module-pycol.stats">
 <span id="pycol-stats-module"></span><h2>pycol.stats module<a class="headerlink" href="#module-pycol.stats" title="Permalink to this headline">¶</a></h2>
-<p>PyCLS.Statistics</p>
+<p>pycol.stats</p>
 <p>Created on 22.04.2020</p>
 <p>&#64;author: Patrick Mueller</p>
 <p>Module including classes and methods for doing statistical evaluations.</p>
@@ -3722,7 +3128,7 @@ The plot shows that the ratio between the two 1-sigma percentiles cannot exceed 
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>a</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Iterable</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>]) – The uncorrelated sample data.</p></li>
+<li><p><strong>a</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Iterable</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>]) – The sample data.</p></li>
 <li><p><strong>axis</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>]) – The axis along which the three percentiles are computed.</p></li>
 </ul>
 </dd>
@@ -3731,7 +3137,7 @@ The plot shows that the ratio between the two 1-sigma percentiles cannot exceed 
 </dd>
 <dt class="field-odd">Returns</dt>
 <dd class="field-odd"><p>The median (0.5-percentile) as well as the left- (~0.1587) and right-sided (~0.8413) 1-sigma percentile
-relative to the median of a given sample ‘a’ along the specified ‘axis’.</p>
+of a given sample ‘a’ along the specified ‘axis’.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -3766,7 +3172,7 @@ which considers asymmetric uncertainties. If an element is not an ‘Observable�
 a multivariate normal distribution with covariance ‘cov’.</p></li>
 <li><p><strong>unc_places</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>]) – The number of significant decimal places the result will be rounded to.
 If None, the result is not rounded.</p></li>
-<li><p><strong>sample_size</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – The number of random variates (default is 1,000,000) used for the calculation.</p></li>
+<li><p><strong>sample_size</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – The number of random variates used for the calculation. The default is 1,000,000.</p></li>
 <li><p><strong>rtol</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>) – The relative tolerance, with respect to the median of the resulting sample,
 with which the left- and right-sided uncertainties can deviate before asymmetric uncertainties are used.</p></li>
 <li><p><strong>atol</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>]) – The absolute tolerance with which the left- and right-sided uncertainties can deviate,
@@ -3794,9 +3200,41 @@ as well as the output sample are returned along with the observable.</p>
 </dd></dl>
 
 <dl class="py function">
+<dt id="pycol.stats.propagate_fit">
+<code class="sig-prename descclassname"><span class="pre">pycol.stats.</span></code><code class="sig-name descname"><span class="pre">propagate_fit</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">popt</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pcov</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sample_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1000000</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pycol/stats.html#propagate_fit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycol.stats.propagate_fit" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>f</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Callable</span></code>) – The function to compute. <span class="math notranslate nohighlight">\(f\)</span> needs to be vectorized.</p></li>
+<li><p><strong>x</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Iterable</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>]) – The input values.</p></li>
+<li><p><strong>popt</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Iterable</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>]) – An array of the fitted parameters (compare curve_fit).</p></li>
+<li><p><strong>pcov</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Iterable</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>]) – A 2d-array of the estimated covariances (compare curve_fit).</p></li>
+<li><p><strong>sample_size</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – The number of random variates used for the calculation. The default is 1,000,000.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The median and the <span class="math notranslate nohighlight">\(1\sigma\)</span> percentiles of the sampled function <span class="math notranslate nohighlight">\(f\)</span>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
 <dt id="pycol.stats.relevant_interval">
 <code class="sig-prename descclassname"><span class="pre">pycol.stats.</span></code><code class="sig-name descname"><span class="pre">relevant_interval</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dist</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pycol/stats.html#relevant_interval"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycol.stats.relevant_interval" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dist</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Callable</span></code>) – The probability distribution function (pdf).</p></li>
+<li><p><strong>args</strong> – Additional arguments for the pdf.</p></li>
+<li><p><strong>show</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – Whether to show the pdf in the determined interval.</p></li>
+<li><p><strong>kwargs</strong> – Additional keyword arguments for the pdf.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>An estimation of the interval where most of the probability lies in.</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
 <dt id="pycol.stats.uniform">
@@ -3841,7 +3279,7 @@ as well as the output sample are returned along with the observable.</p>
 </div>
 <div class="section" id="module-pycol.tools">
 <span id="pycol-tools-module"></span><h2>pycol.tools module<a class="headerlink" href="#module-pycol.tools" title="Permalink to this headline">¶</a></h2>
-<p>PyCLS.Tools</p>
+<p>pycol.tools</p>
 <p>Created on 05.05.2020</p>
 <p>&#64;author: Patrick Mueller</p>
 <p>Module including algebraic and technical methods.</p>
@@ -4040,7 +3478,7 @@ Additional instance attributes are the angle in degree ‘alpha_deg’ and the r
 <dd class="field-even"><p>None. Checks whether the given arguments are multiples of 1/2.</p>
 </dd>
 <dt class="field-odd">Raises</dt>
-<dd class="field-odd"><p><strong>ValueError</strong> – If the any argument is not a multiple of 1/2.</p>
+<dd class="field-odd"><p><strong>ValueError</strong> – If any argument is not a multiple of 1/2.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -4300,7 +3738,7 @@ e_z = e_r(0, 0)</p>
 <dd class="field-odd"><p><strong>n</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Iterable</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>]) – The integer number.</p>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>n!.</p>
+<dd class="field-even"><p>n! (array compatible).</p>
 </dd>
 </dl>
 </dd></dl>
@@ -4388,6 +3826,23 @@ e_z = e_r(0, 0)</p>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
 <dd class="field-odd"><p>The absolute path to the “PyCLS user folder.”</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="pycol.tools.get_rgb_print_command">
+<code class="sig-prename descclassname"><span class="pre">pycol.tools.</span></code><code class="sig-name descname"><span class="pre">get_rgb_print_command</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">r</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">g</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pycol/tools.html#get_rgb_print_command"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycol.tools.get_rgb_print_command" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>r</strong> – The fraction of red (0-255).</p></li>
+<li><p><strong>g</strong> – The fraction of green (0-255).</p></li>
+<li><p><strong>b</strong> – The fraction of blue (0-255).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The command str to print rgb colors in the console.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -4536,6 +3991,19 @@ For example: [‘a’, ‘b’, ‘c’, ‘b’, ‘d’] -&gt; [‘a’, ‘b_
 </dd></dl>
 
 <dl class="py function">
+<dt id="pycol.tools.map_corr_coeff_to_color">
+<code class="sig-prename descclassname"><span class="pre">pycol.tools.</span></code><code class="sig-name descname"><span class="pre">map_corr_coeff_to_color</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">val</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pycol/tools.html#map_corr_coeff_to_color"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycol.tools.map_corr_coeff_to_color" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>val</strong> – A value between -1 and 1.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The RGB values in the range 0-255.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
 <dt id="pycol.tools.merge_dicts">
 <code class="sig-prename descclassname"><span class="pre">pycol.tools.</span></code><code class="sig-name descname"><span class="pre">merge_dicts</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">a</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pycol/tools.html#merge_dicts"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycol.tools.merge_dicts" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
@@ -4645,6 +4113,94 @@ given the vector ‘r’ pointing in the ‘e_r’ direction.</p>
 </dd></dl>
 
 <dl class="py function">
+<dt id="pycol.tools.print_colored">
+<code class="sig-prename descclassname"><span class="pre">pycol.tools.</span></code><code class="sig-name descname"><span class="pre">print_colored</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">specifier</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">values</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">returned</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pycol/tools.html#print_colored"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycol.tools.print_colored" title="Permalink to this definition">¶</a></dt>
+<dd><p>Print with the specified color.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>specifier</strong> – str of the color name defined in the COLORS class or an RGB-value (0-255, 0-255, 0-255).</p></li>
+<li><p><strong>values</strong> – The values to print.</p></li>
+<li><p><strong>returned</strong> – Return the str instead of printing it.</p></li>
+<li><p><strong>kwargs</strong> – See print().</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>None.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="pycol.tools.print_cov">
+<code class="sig-prename descclassname"><span class="pre">pycol.tools.</span></code><code class="sig-name descname"><span class="pre">print_cov</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cov</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">normalize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">decimals</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pycol/tools.html#print_cov"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycol.tools.print_cov" title="Permalink to this definition">¶</a></dt>
+<dd><p>Print a covariance “as is” or as color-coded Pearson correlation coefficients.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>cov</strong> – A covariance matrix.</p></li>
+<li><p><strong>normalize</strong> – Whether to normalize the covariance to be the Pearson correlation coefficient.</p></li>
+<li><p><strong>decimals</strong> – The number of decimal places to be printed.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>None.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="pycol.tools.printf">
+<code class="sig-prename descclassname"><span class="pre">pycol.tools.</span></code><code class="sig-name descname"><span class="pre">printf</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">values</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pycol/tools.html#printf"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycol.tools.printf" title="Permalink to this definition">¶</a></dt>
+<dd><p>Print with the FAIL color (red).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>values</strong> – The values to print.</p></li>
+<li><p><strong>kwargs</strong> – See print().</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>None.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="pycol.tools.printh">
+<code class="sig-prename descclassname"><span class="pre">pycol.tools.</span></code><code class="sig-name descname"><span class="pre">printh</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">values</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pycol/tools.html#printh"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycol.tools.printh" title="Permalink to this definition">¶</a></dt>
+<dd><p>Print with the HEADER color (pink).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>values</strong> – The values to print.</p></li>
+<li><p><strong>kwargs</strong> – See print().</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>None.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="pycol.tools.printw">
+<code class="sig-prename descclassname"><span class="pre">pycol.tools.</span></code><code class="sig-name descname"><span class="pre">printw</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">values</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pycol/tools.html#printw"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycol.tools.printw" title="Permalink to this definition">¶</a></dt>
+<dd><p>Print with the WARNING color (yellow).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>values</strong> – The values to print.</p></li>
+<li><p><strong>kwargs</strong> – See print().</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>None.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
 <dt id="pycol.tools.roman_to_int">
 <code class="sig-prename descclassname"><span class="pre">pycol.tools.</span></code><code class="sig-name descname"><span class="pre">roman_to_int</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">roman</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pycol/tools.html#roman_to_int"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycol.tools.roman_to_int" title="Permalink to this definition">¶</a></dt>
 <dd><p>Convert from Roman numerals to an integer
@@ -4705,7 +4261,8 @@ given the vector ‘r’ pointing in the ‘e_r’ direction.</p>
 <dd class="field-even"><p>(typing.Union[int, float], &lt;class ‘int’&gt;)</p>
 </dd>
 <dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p>x rounded to ‘n’ significant decimal places and the corresponding number of decimal places.</p>
+<dd class="field-odd"><p>x rounded to ‘n’ significant decimal places and
+the corresponding number of decimal places after the decimal point.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -4738,7 +4295,7 @@ given the vector ‘r’ pointing in the ‘e_r’ direction.</p>
 </div>
 <div class="section" id="module-pycol.types">
 <span id="pycol-types-module"></span><h2>pycol.types module<a class="headerlink" href="#module-pycol.types" title="Permalink to this headline">¶</a></h2>
-<p>PyCLS.Types</p>
+<p>pycol.types</p>
 <p>Created on 16.06.2020</p>
 <p>&#64;author: Patrick Mueller</p>
 <p>Module including types for the docstrings.</p>
@@ -4759,7 +4316,7 @@ given the vector ‘r’ pointing in the ‘e_r’ direction.</p>
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2022, Patrick Mueller.</p>
+    <p>&#169; Copyright 2022, Patrick Matthias Mueller.</p>
   </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a

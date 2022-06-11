@@ -8,6 +8,7 @@ Subpackages
    :maxdepth: 4
 
    pycol.cpp
+   pycol._lineshapes
 
 Submodules
 ----------
