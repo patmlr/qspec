@@ -20,7 +20,7 @@ import pycol.tools as tools
 
 def example(n: Union[set, int] = None):
     """
-    Run one or several of the available examples. Scroll down for the function call.
+    Run one or several of the available examples. Scroll to the end for the function call.
 
     :param n: The number of the example or a list of numbers.
 
@@ -29,6 +29,8 @@ def example(n: Union[set, int] = None):
     Example 1: Calculation of Doppler shifts for an ensemble of ion-velocity vectors.
 
     Example 2: Calculation of optical parameters.
+
+    Example 3: Calculation of mean square nuclear charge radii.
 
     :returns: None.
     """
@@ -57,20 +59,20 @@ def example(n: Union[set, int] = None):
         gamma = ph.gamma(v)  # The Lorentzian time-dilation factor.
 
         f_col = ph.doppler(f0, v, alpha=0, return_frame='lab')
-        # The resonant laser frequency in collinear direction (MHz).
-        f_acol = ph.doppler(f0, v, alpha=np.pi, return_frame='lab')  # " in anticollinear direction (MHz).
+        # The resonant laser frequency in collinear direction (MHz) and ...
+        f_acol = ph.doppler(f0, v, alpha=np.pi, return_frame='lab')  # ... in anticollinear direction (MHz).
 
         f_div_col = ph.doppler_el_d1(f_col, 0, U, q, m, 0, return_frame='atom')
-        # The differential Doppler factor in the atoms rest frame (MHz / V).
-        # == The change of the laser frequency in the atoms rest frame with the voltage.
+        # The differential Doppler factors in the atoms rest frame (MHz / V).
+        # == The changes of the laser frequencies in the atoms rest frame with the voltage.
         f_div_acol = ph.doppler_el_d1(f_acol, np.pi, U, q, m, 0, return_frame='atom')
 
-        # b) Typical CRYRING calculation.
+        # b) Inverse calculation.
         v = ph.inverse_doppler(f0, f_col, alpha=0)  # The velocity of the carbon ions (m/s).
         beta = ph.beta(v)  # The relative velocity of the carbon ions.
         e_kin = ph.e_kin(v, m, relativistic=True)  # The kinetic energy of the carbon ions (eV).
 
-        for k, v in locals().items():
+        for k, v in locals().items():  # Print all local variables.
             print('{} = {}'.format(k, v))
 
     if 1 in n:
@@ -108,7 +110,9 @@ def example(n: Union[set, int] = None):
         f_atom = tools.absolute(f_vec_atom[:, 1:], axis=-1)
         # The length of the cartesian components of the boosted 4-vectors.
 
-        num_test = f_atom - f_vec_atom[:, 0]  # That length must be equal to the zeroth component of the 4-vectors.
+        num_test = f_atom - f_vec_atom[:, 0]  # The length of this vector must be equal
+        # to the 0th component of the 4-vectors.
+
         # plt.plot(num_test / f_vec_atom[:, 0])  # Plot relative numeric variation.
         # plt.show()
 
@@ -163,15 +167,16 @@ def example(n: Union[set, int] = None):
 
     if 3 in n:
         """
-        Example 3: Calculation of mean square charge radii from Fricke et al for barium.
+        Example 3: Calculation of mean square charge radii from Fricke et al. for barium.
         """
-        a = [134, 135, 136, 137, 138]
-        barrett = [6.1782, 6.1747, 6.1825, 6.1818, 6.1906]
-        barrett_d = [0.0015, 0.0014, 0.0015, 0.0014, 0.0015]
-        delta_barret = [-0.0124, -0.0142, -0.008, -0.0084, 0.]
-        delta_barret_d = [0.0005, ] * 4 + [0., ]
-        v2, v4, v6 = 1.27976, 1.1974, 1.1370
-        c2c1, c3c1 = -7.03e-3, 2.04e-6
+        a = [134, 135, 136, 137, 138]  # The mass numbers
+        barrett = [6.1782, 6.1747, 6.1825, 6.1818, 6.1906]  # The barret radii
+        barrett_d = [0.0015, 0.0014, 0.0015, 0.0014, 0.0015]  # The uncertainties of the barret radii.
+        delta_barret = [-0.0124, -0.0142, -0.008, -0.0084, 0.]   # Differences between barret radii as specified
+        # Fricke et al., ...
+        delta_barret_d = [0.0005, ] * 4 + [0., ]  # ... these have smaller uncertainties.
+        v2, v4, v6 = 1.27976, 1.1974, 1.1370  # The shape factors.
+        c2c1, c3c1 = -7.03e-3, 2.04e-6  # The Seltzer coefficients.
 
         dr2, dr2_d = ph.delta_r2(barrett, barrett_d, barrett[-1], barrett_d[-1], delta_barret, delta_barret_d, v2, v2)
         dr4, dr4_d = ph.delta_r2(barrett, barrett_d, barrett[-1], barrett_d[-1], delta_barret, delta_barret_d, v4, v4)
@@ -183,4 +188,4 @@ def example(n: Union[set, int] = None):
 
 
 if __name__ == '__main__':
-    example({2, })
+    example({0, 1, 2, 3})

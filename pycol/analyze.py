@@ -442,9 +442,10 @@ def linear_monte_carlo_nd(x: array_iter, cov: array_iter = None, axis: int = Non
     # plt.show()
     if report:
         tools.printh('Linear Monte-Carlo-fit result:')
-        print('Accepted samples: {} / {} ({}%)\na: {} +- {}\nb: {} +- {}\ncorr_ab:\n{}'
+        print('Accepted samples: {} / {} ({}%)\na: {} +- {}\nb: {} +- {}\ncorr_ab:'
               .format(n_accepted, n, np.around(n_accepted / n * 100, decimals=2),
-                      a, sigma_a, b, sigma_b, corr_ab))
+                      a, sigma_a, b, sigma_b))
+        tools.print_cov(corr_ab, normalize=True)
     if full_output:
         return (a, b, sigma_a, sigma_b, corr_ab), (p[accepted], p_0, dr, accepted)
     return a, b, sigma_a, sigma_b, corr_ab

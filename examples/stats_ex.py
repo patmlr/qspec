@@ -8,6 +8,7 @@ Created on 25.01.2022
 
 Example script / Guide for the pycol.stats module.
 """
+
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -18,11 +19,13 @@ import pycol.analyze as an
 
 def example(n: Union[set, int] = None):
     """
-    Run one or several of the available examples. Scroll down for the function call.
+    Run one or several of the available examples. Scroll to the end for the function call.
 
     :param n: The number of the example or a list of numbers.
 
     Example 0: Create an observable with uncertainties and do statistics.
+
+    Example 1: Fit a function and plot its median and 1-sigma percentiles.
 
     :returns: None.
     """
@@ -45,7 +48,7 @@ def example(n: Union[set, int] = None):
         # The statistic of the observable is estimated using a skew normal distribution.
         print('5 * f = {}'.format(5 * f))
         print('f ** 2 = {}'.format(f ** 2))
-        print('f + 2 * f = {}'.format(f + 2 * f))  # If formulae are getting to long or contains non-standard operators
+        print('f + 2 * f = {}'.format(f + 2 * f))  # If formulae are getting to long or contain non-standard operators,
         # it is more efficient/necessary to use propagate and define the function (see 'sin' above):
 
         x, a, b, c = 0.2, 3, 10, 5
@@ -68,7 +71,7 @@ def example(n: Union[set, int] = None):
 
     if 1 in n:
         """
-        Example 1: Fit a function and plot its median and 1sigma percentiles.
+        Example 1: Fit a function and plot its median and 1-sigma percentiles.
         """
         f = st.Observable(60, 0.5, 0.7)
         a = st.Observable(3, 0.1, 0.13)

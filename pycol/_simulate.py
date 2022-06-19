@@ -1327,7 +1327,7 @@ class Interaction:
         :param m: The index of the shifted laser. If delta is a 2d-array, 'm' ist omitted.
         :param v: Atom velocities. Must be a scalar or have shape (n, ) or (n, 3). In the first two cases,
          the velocity vector(s) is assumed to be aligned with the x-axis.
-        :param y0: The initial state of an ensemble of atoms. This must be None, an 1d-array of size
+        :param y0: The initial state of an ensemble of atoms. This must be None, a 1d-array of size
          Interaction.atom.size or a 2d-array (i.e. a list of coherent state vectors)
          with shape (n, Interaction.atom.size). 'y0' can be complex valued.
          If None, the ground states are populated according to the chosen solver.
@@ -1366,7 +1366,7 @@ class Interaction:
                     self.instance, delta.ctypes.data_as(c_double_p), c_size_t(delta.shape[0]),
                     v.ctypes.data_as(c_double_p), c_size_t(v.shape[0]), c_double(t), _y0.ctypes.data_as(ctype))
 
-        return self._spectrum(instance=instance, t=(0, t), **kwargs)
+        return self._spectrum(instance=instance, t=(0, t), **{**{'m': m}, **kwargs})
 
 
 class Result:
@@ -1546,10 +1546,12 @@ class Spectrum:
         set_restype(dll.spectrum_get_y, tensor_d_p)
         return dll.spectrum_get_y(self.instance)
 
-    def plot(self, t: Union[tuple, list], labels: Iterable[str] = None, show: bool = True, colormap: str = None):
+    def plot(self, t: Union[tuple, list], m: Optional[int] = 0, labels: Iterable[str] = None,
+             show: bool = True, colormap: str = None):
         """
 
         :param t: A time interval which is summed over to display the spectrum.
+        :param m: The index of the shown laser. If delta is a 1d-array, 'm' ist omitted.
         :param labels: An Iterable of state labels to include in the plot if a system is known.
          Default is None which plots all states.
         :param show: Whether to show the plot.
@@ -1557,7 +1559,10 @@ class Spectrum:
         :returns: The newly created figure.
         """
         fig, ax = plt.subplots()
-        x, _t = self.x[:, 0], self.t
+        if m is None:
+            m = 0
+        m = int(m)
+        x, _t = self.x[:, m], self.t
         in_t = np.nonzero(~((_t < t[0]) + (_t > t[1])))[0]
         y = np.sum(self.y[:, in_t, :], axis=1) * (_t[1] - _t[0])
         colors = _define_colors(y.shape[1], self.label_map, colormap=colormap)

@@ -19,7 +19,7 @@ import pycol.analyze as an
 
 def example(n: Union[set, int] = None):
     """
-    Run one or several of the available examples. Scroll down for the function call.
+    Run one or several of the available examples. Scroll to the end for the function call.
 
     :param n: The number of the example or a list of numbers.
 
@@ -70,7 +70,7 @@ def example(n: Union[set, int] = None):
         # with x- and y-axis uncertainties as well as correlations between the two axes.
 
         plt.plot(x, y, 'k.')
-        an.draw_sigma2d(x, y, sx, sy, c, n=1)
+        an.draw_sigma2d(x, y, sx, sy, c, n=1)  # Draw 2d-uncertainties with correlations.
 
         x_cont = np.linspace(-0.1, 1.1, 1001)
 
@@ -82,6 +82,7 @@ def example(n: Union[set, int] = None):
 
         plt.plot(x_cont, an.straight(x_cont, *popt_of), label='odr_fit')
         plt.plot(x_cont, an.straight(x_cont, a, b), label='york')
+        plt.legend(loc=2)
         plt.show()
 
     if 1 in n:
@@ -91,6 +92,7 @@ def example(n: Union[set, int] = None):
 
         # The mass numbers of the stable Ca isotopes.
         a = np.array([40, 42, 43, 44, 46, 48])
+
         # The masses of the isotopes.
         m = np.array([(39.962590865, 22e-9), (41.958617828, 159e-9), (42.958766430, 244e-9),
                       (43.955481543, 348e-9), (45.953687988, 2399e-9), (47.952522904, 103e-9)])
@@ -128,7 +130,7 @@ def example(n: Union[set, int] = None):
         results = king.fit(a_fit, a_ref, xy=xy, mode='shifts')  # Do a simple 1d-King fit.
         results = king.fit_nd(a_fit, a_ref, axis=0, mode='shifts')  # Do a 4d-King fit.
 
-        # Put in values for isotopes known only for one observable and ...
+        # Put in values for isotopes known only for one observable, ...
         a_unknown = [43, 46]
         a_unknown_ref = [40, 40]
         y = np.array([(679.443, 0.568), (1299.071, 0.583)])
@@ -141,10 +143,10 @@ def example(n: Union[set, int] = None):
         printh('\n(D1, D2, D3P1, D3P3, D5P3) isotope shifts (43, 46):')
         print(x)
 
-        # ... the parameters for the straight fit.
+        # ... return the parameters for the straight fit.
         k, f, corr = king.get_popt()
         k, f, corr = king.get_popt_nd()
 
 
 if __name__ == '__main__':
-    example({1, })
+    example({0, 1, })
