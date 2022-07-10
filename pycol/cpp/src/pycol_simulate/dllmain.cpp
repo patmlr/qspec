@@ -603,6 +603,23 @@ extern "C"
         return interaction->rate_equations(n, _y0);
     }
 
+    __declspec(dllexport) void interaction_rate_equations_new(Interaction* interaction, double t, double* delta, double* v, double* y0, size_t vec_size)
+    {
+        size_t n = interaction->arange_t(t);
+        size_t size = interaction->get_atom()->get_size();
+        const std::vector<VectorXd> _delta = cast_delta(delta, vec_size, interaction->get_lasers()->size());
+        const std::vector<Vector3d> _v = cast_v(v, vec_size);
+        std::vector<VectorXd> _y0 = cast_delta(y0, vec_size, size);
+        interaction->rate_equations(n, _delta, _v, _y0);
+        for (size_t i = 0; i < vec_size; ++i)
+        {
+            for (size_t j = 0; j < size; ++j)
+            {
+                y0[i * size + j] = _y0.at(i)(j);
+            }
+        }
+    }
+
     __declspec(dllexport) Result* interaction_schroedinger(Interaction* interaction, double t)
     {
         return interaction->schroedinger(t);

@@ -61,7 +61,7 @@ def example(n: Union[set, int] = None):
 
         ca40 = sim.Atom(states=s + p + d, decay_map=decay)  # The Atom with all states and the decay information.
 
-        pol = sim.Polarization([0, 1, 0], q_axis=2)
+        pol = sim.Polarization([0, 1, 0], q_axis=2, vec_as_q=True)
         laser_sp = sim.Laser(freq=f_sp, polarization=pol, intensity=500)  # Linear polarized laser for the ground-state
         # transition with 500 uW / mm**2.
 

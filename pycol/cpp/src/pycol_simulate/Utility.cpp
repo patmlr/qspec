@@ -3,7 +3,7 @@
 #include "Utility.h"
 
 
-std::vector<VectorXd> cast_delta(double* delta, size_t delta_size, size_t lasers_size)
+std::vector<VectorXd> cast_delta(double delta[], size_t delta_size, size_t lasers_size)
 {
     std::vector<VectorXd> _delta = std::vector<VectorXd>(delta_size, VectorXd::Zero(lasers_size));
     for (size_t i = 0; i < delta_size; ++i)
@@ -14,7 +14,7 @@ std::vector<VectorXd> cast_delta(double* delta, size_t delta_size, size_t lasers
 }
 
 
-std::vector<Vector3d> cast_v(double* delta, size_t v_size)
+std::vector<Vector3d> cast_v(double delta[], size_t v_size)
 {
     std::vector<Vector3d> _v = std::vector<Vector3d>(v_size, Vector3d::Zero());
     for (size_t i = 0; i < v_size; ++i)
@@ -25,7 +25,7 @@ std::vector<Vector3d> cast_v(double* delta, size_t v_size)
 }
 
 
-VectorXd cast_y0_vectord(double* y0, size_t size)
+VectorXd cast_y0_vectord(double y0[], size_t size)
 {
     VectorXd _y0(size);
     _y0 = VectorXd::Zero(size);
@@ -33,7 +33,7 @@ VectorXd cast_y0_vectord(double* y0, size_t size)
     return _y0;
 }
 
-VectorXcd cast_y0_vectorcd(std::complex<double>* y0, size_t size)
+VectorXcd cast_y0_vectorcd(std::complex<double> y0[], size_t size)
 {
     VectorXcd _y0(size);
     _y0 = VectorXcd::Zero(size);
@@ -41,7 +41,7 @@ VectorXcd cast_y0_vectorcd(std::complex<double>* y0, size_t size)
     return _y0;
 }
 
-MatrixXcd cast_y0_matrixcd(std::complex<double>* y0, size_t size)
+MatrixXcd cast_y0_matrixcd(std::complex<double> y0[], size_t size)
 {
     MatrixXcd _y0(size, size);
     _y0 = MatrixXcd::Zero(size, size);
@@ -52,7 +52,7 @@ MatrixXcd cast_y0_matrixcd(std::complex<double>* y0, size_t size)
     return _y0;
 }
 
-std::vector<VectorXcd> cast_y0_vector_vectorcd(std::complex<double>* y0, size_t y0_size, size_t size)
+std::vector<VectorXcd> cast_y0_vector_vectorcd(std::complex<double> y0[], size_t y0_size, size_t size)
 {
     std::vector<VectorXcd> _y0 = std::vector<VectorXcd>(y0_size, VectorXcd::Zero(size));
     for (size_t i = 0; i < y0_size; ++i)

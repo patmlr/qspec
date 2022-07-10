@@ -780,7 +780,9 @@ def _cast_delta(delta: array_like, m: Optional[int], size: int) -> ndarray:
     :param size: The number of available lasers.
     :returns: An array of vectors with size 'size' containing frequency shifts for the lasers.
     """
-    delta = np.asarray(delta, dtype=float)
+    if delta is None:
+        return np.zeros((1, size))
+    delta = np.array(delta, dtype=float, order='C')
     if len(delta.shape) != 2 and not -size <= m < size:
         raise IndexError('Laser index \'m\' is out of bounds. Must be {} <= m < {} or None but is {}.'
                          .format(-size, size, m))
@@ -840,10 +842,10 @@ def _cast_y0(y0: Optional[array_like], i_solver: int, atom: Atom):
             y0 = np.zeros(size, dtype=float)
             y0[gs] = 1 / gs.size
             return y0, c_double_p
-        y0 = np.asarray(y0, dtype=float)
-        if y0.shape != (size, ):
-            raise ValueError('\'y0\' must have shape {} but has shape {}.'.format((size, ), y0.shape))
-        y0 /= np.sum(y0)
+        y0 = np.array(y0, dtype=float, order='C')
+        if y0.shape[-1] != size:
+            raise ValueError('\'y0\' must have size {} in the last axis but has shape {}.'.format(size, y0.shape))
+        y0 /= np.expand_dims(np.sum(y0, axis=-1), axis=-1)
         return y0, c_double_p
 
     elif i_solver == 1:  # Schroedinger equation.
@@ -851,7 +853,7 @@ def _cast_y0(y0: Optional[array_like], i_solver: int, atom: Atom):
             y0 = np.zeros(size, dtype=complex)
             y0[gs[0]] = 1
             return y0, c_complex_p
-        y0 = np.asarray(y0, dtype=complex)
+        y0 = np.array(y0, dtype=complex, order='C')
         if y0.shape != (size, ):
             raise ValueError('\'y0\' must have shape {} but has shape {}.'.format((size, ), y0.shape))
         y0 /= tools.absolute_complex(y0)
@@ -863,7 +865,7 @@ def _cast_y0(y0: Optional[array_like], i_solver: int, atom: Atom):
             y0[gs] = 1 / gs.size
             y0 = np.diag(y0)
             return y0, c_complex_p
-        y0 = np.asarray(y0, dtype=complex)
+        y0 = np.array(y0, dtype=complex, order='C')
         if y0.shape != (size, size) and y0.shape != (size, ):
             raise ValueError('\'y0\' must have shape {} or {} but has shape {}.'
                              .format((size, size), (size, ), y0.shape))
@@ -880,7 +882,7 @@ def _cast_y0(y0: Optional[array_like], i_solver: int, atom: Atom):
             y0[gs, gs] = 1
             y0 = np.diag(y0)
             return y0, c_complex_p
-        y0 = np.asarray(y0, dtype=complex)
+        y0 = np.array(y0, dtype=complex, order='C')
         if (len(y0.shape) < 2 and y0.shape != (size, )) or len(y0.shape) > 2:
             raise ValueError('\'y0\' must have shape (., {}) or {} but has shape {}.'
                              .format(size, (size, ), y0.shape))
@@ -905,7 +907,7 @@ def _cast_v(v: Optional[array_like]):
     """
     if v is None:
         return np.array([[0, 0, 0]], dtype=float)
-    v = np.asarray(v, dtype=float)
+    v = np.array(v, dtype=float, order='C')
     if len(v.shape) == 0:
         return np.array([[v, 0, 0]], dtype=float)
     elif len(v.shape) == 1:
@@ -1232,6 +1234,46 @@ class Interaction:
         _y0, ctype = _cast_y0(y0, 0, self.atom)
         return self._result(dll.interaction_rate_equations_y0(
             self.instance, c_double(float(t)), _y0.ctypes.data_as(ctype)), **kwargs)
+
+    def rates_new(self, t: scalar, delta: array_like = None, m: Optional[int] = 0, v: array_like = None,
+                  y0: array_like = None):
+        """
+        :param t: The final time of the solution. The number of time steps is determined
+         by the step size Interaction.dt.
+        :param delta: An array of frequency shifts for the laser(s). 'delta' must be a scalar or a 1d- or 2d-array
+         with shapes (., ) or (., #lasers), respectively.
+        :param m: The index of the shifted laser. If delta is a 2d-array, 'm' ist omitted.
+        :param v: Atom velocities. Must be a scalar or have shape (n, ) or (n, 3). In the first two cases,
+         the velocity vector(s) is assumed to be aligned with the x-axis.
+        :param y0: The initial state of an ensemble of atoms. This must be None or a 1d-array of size
+         Interaction.atom.size. If None, the ground states are populated equally.
+        :param kwargs: Keyword arguments to be passed to the chosen solver or plot function.
+        :returns: The integrated rate equations as a 'Result' object.
+        """
+        if isinstance(delta, np.ndarray) and isinstance(v, np.ndarray) and isinstance(y0, np.ndarray):
+            if delta.shape == v.shape == y0.shape:
+                if delta.flags.f_contiguous:
+                    delta = np.ascontiguousarray(delta)
+                if v.flags.f_contiguous:
+                    v = np.ascontiguousarray(v)
+                if y0.flags.f_contiguous:
+                    y0 = np.ascontiguousarray(y0)
+            vec_size = delta.shape[0]
+        else:
+            delta = _cast_delta(delta, m, len(self.lasers))
+            v = _cast_v(v)
+            y0, ctype = _cast_y0(y0, 0, self.atom)
+
+            vec_size = max([delta.shape[0], v.shape[0], 1])
+
+            delta = np.array(np.broadcast_to(delta, (vec_size, len(self.lasers))), dtype=float, order='C')
+            v = np.array(np.broadcast_to(v, (vec_size, 3)), dtype=float, order='C')
+            y0 = np.array(np.broadcast_to(y0, (vec_size, self.atom.size)), dtype=float, order='C')
+
+        dll.interaction_rate_equations_new(self.instance, c_double(float(t)), delta.ctypes.data_as(c_double_p),
+                                           v.ctypes.data_as(c_double_p), y0.ctypes.data_as(c_double_p),
+                                           c_size_t(vec_size))
+        return y0
 
     def schroedinger(self, t: scalar, y0: array_like = None, **kwargs):
         """

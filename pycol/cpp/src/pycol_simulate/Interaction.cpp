@@ -287,6 +287,8 @@ void Interaction::gen_coordinates()
 void Interaction::gen_rabi()
 {
 	summap = MatrixXi::Zero(atom->get_size(), atom->get_size());
+	printf_s("%1.3f, %1.3f, %1.3f \n", (*lasers.at(0)->get_polarization()->get_q())(0).real(), (*lasers.at(0)->get_polarization()->get_q())(1).real(), (*lasers.at(0)->get_polarization()->get_q())(2).real());
+	printf_s("%1.3f, %1.3f, %1.3f \n", (*lasers.at(0)->get_polarization()->get_q())(0).imag(), (*lasers.at(0)->get_polarization()->get_q())(1).imag(), (*lasers.at(0)->get_polarization()->get_q())(2).imag());
 	for (size_t q = 0; q < 3; ++q)
 	{
 		double q_val = static_cast<double>(q) - 1;
@@ -585,6 +587,20 @@ MatrixXd* Interaction::gen_rates(VectorXd& w0, VectorXd& w)
 {
 	MatrixXd* R = new MatrixXd(atom->get_size(), atom->get_size());
 	*R = MatrixXd::Zero(atom->get_size(), atom->get_size());
+	update_rates(*R, w0, w);
+	return R;
+}
+
+VectorXd* Interaction::gen_rates_sum(MatrixXd& R)
+{
+	VectorXd* R_sum = new VectorXd(atom->get_size());
+	update_rates_sum(*R_sum, R);
+	return R_sum;
+}
+
+void Interaction::update_rates(MatrixXd& R, VectorXd& w0, VectorXd& w)
+{
+	R.setZero();
 	double _w0;
 	double a;
 	double r;
@@ -599,26 +615,17 @@ MatrixXd* Interaction::gen_rates(VectorXd& w0, VectorXd& w)
 				r = 4 * std::pow(std::abs(rabimap.at(m)(i, j)), 2);
 				if (r == 0) continue;
 				_w0 = abs(w0(i) - w0(j));
-				(*R)(i, j) += lorentz(w(m), _w0, a, r);
-				(*R)(j, i) = (*R)(i, j);
+				R(i, j) += lorentz(w(m), _w0, a, r);
+				R(j, i) = R(i, j);
 			}
 		}
 	}
-	return R;
 }
 
-VectorXd* Interaction::gen_rates_sum(MatrixXd& R)
+void Interaction::update_rates_sum(VectorXd& R_sum, MatrixXd& R)
 {
-	VectorXd* R_sum = new VectorXd(atom->get_size());
-	*R_sum = R.colwise().sum();
-	return R_sum;
+	R_sum = R.colwise().sum();
 }
-
-//void Interaction::update_rates()
-//{
-//	gen_delta();
-//	gen_rates();
-//}
 
 MatrixXcd* Interaction::gen_hamiltonian(VectorXd& w0, VectorXd& w)
 {
@@ -709,7 +716,8 @@ Result* Interaction::rate_equations(size_t n, VectorXd& x0, MatrixXd& R, VectorX
 	double t = 0;
 	if (controlled)
 	{
-		t = integrate_n_steps(rk4_vd_type(), f_rate_equations(R, R_sum, *atom->get_L0(), *atom->get_Lsum()),
+		d_dopri5_vd_type dopri5 = make_dense_output(1e-5, 1e-5, dt_var, dopri5_vd_type());
+		t = integrate_n_steps(dopri5, f_rate_equations(R, R_sum, *atom->get_L0(), *atom->get_Lsum()),
 			x0, 0.0, dt_var, n, push_back_state_and_time(*_result->get_y(), *_result->get_x()));
 	}
 	else
@@ -768,6 +776,43 @@ Result* Interaction::rate_equations(size_t n, VectorXd& x0, const Vector3d& v)
 	delete R;
 	delete R_sum;
 	return _result;
+}
+
+void Interaction::rate_equations(size_t n, const std::vector<VectorXd>& delta, const std::vector<Vector3d>& v, std::vector<VectorXd>& x0)
+{
+	VectorXd* w0 = gen_w0();
+	VectorXd* w = gen_w(delta.at(0), v.at(0));
+	MatrixXd* R = gen_rates(*w0, *w);
+	VectorXd* R_sum = gen_rates_sum(*R);
+
+	std::vector<size_t> n_vec(x0.size());
+	for (size_t i = 0; i < x0.size(); ++i) n_vec.at(i) = i;
+
+	std::for_each(std::execution::par_unseq, n_vec.begin(), n_vec.end(),
+		[this, n, &x0, &delta, &v, &w0, &w, &R, &R_sum](size_t i)
+		{
+			update_w(*w, delta.at(i), v.at(i));
+			update_rates(*R, *w0, *w);
+			update_rates_sum(*R_sum, *R);
+			double t = 0;
+			if (controlled)
+			{
+				d_dopri5_vd_type dopri5 = make_dense_output(1e-5, 1e-5, dt_var, dopri5_vd_type());
+				t = integrate_n_steps(dopri5, f_rate_equations(*R, *R_sum, *atom->get_L0(), *atom->get_Lsum()),
+					x0.at(i), 0.0, dt_var, n);
+			}
+			else
+			{
+				t = integrate_n_steps(rk4_vd_type(), f_rate_equations(*R, *R_sum, *atom->get_L0(), *atom->get_Lsum()),
+					x0.at(i), 0.0, dt_var, n);
+			}
+			// printf("\r\033[92mProgress: %3.2f \033[0m", 100 * i / x0.size());
+		}
+	);
+	// printf("\n");
+	delete w;
+	delete R;
+	delete R_sum;
 }
 
 Result* Interaction::rate_equations(size_t n, VectorXd& x0)

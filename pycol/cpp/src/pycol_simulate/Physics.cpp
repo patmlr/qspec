@@ -228,7 +228,7 @@ double hyper_zeeman(double i, double s, double l, double j,
 double lorentz(double w, double w0, double a, double rabi_square)
 {
     // if (a == 0) return 0;
-    return rabi_square * a / (std::pow(w - w0, 2) + std::pow(a, 2) / 4) / 12;
+    return rabi_square * a / (std::pow(w - w0, 2) + std::pow(a, 2) / 4) / 4;
 }
 
 double gamma(double v)

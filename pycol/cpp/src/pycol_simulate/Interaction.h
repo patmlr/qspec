@@ -24,7 +24,7 @@ typedef runge_kutta4<VectorXcd, double, VectorXcd, double, vector_space_algebra>
 typedef runge_kutta4<MatrixXcd, double, MatrixXcd, double, vector_space_algebra> rk4_mcd_type;
 
 
-typedef runge_kutta_dopri5< MatrixXcd, double, MatrixXcd, double, vector_space_algebra > dopri5_vd_type;
+typedef runge_kutta_dopri5< VectorXd, double, VectorXd, double, vector_space_algebra > dopri5_vd_type;
 typedef controlled_runge_kutta< dopri5_vd_type > c_dopri5_vd_type;
 typedef dense_output_runge_kutta< c_dopri5_vd_type > d_dopri5_vd_type;
 
@@ -110,7 +110,8 @@ public:
 
 	MatrixXd* gen_rates(VectorXd& w0, VectorXd& w);
 	VectorXd* gen_rates_sum(MatrixXd& R);
-	void update_rates();
+	void update_rates(MatrixXd& R, VectorXd& w0, VectorXd& w);
+	void update_rates_sum(VectorXd& R_sum, MatrixXd& R);
 
 	MatrixXcd* gen_hamiltonian(VectorXd& w0, VectorXd& w);
 	void update_hamiltonian_off(MatrixXcd& H);
@@ -130,6 +131,7 @@ public:
 	Result* rate_equations(size_t n, VectorXd& x0, const VectorXd& delta, const Vector3d& v);
 	Result* rate_equations(size_t n, VectorXd& x0, const VectorXd& delta);
 	Result* rate_equations(size_t n, VectorXd& x0, const Vector3d& v);
+	void rate_equations(size_t n, const std::vector<VectorXd>& delta, const std::vector<Vector3d>& v, std::vector<VectorXd>& x0);
 	Result* rate_equations(size_t n, VectorXd& x0);
 	Result* rate_equations(size_t n);
 	Result* rate_equations(double t);

@@ -18,8 +18,8 @@ Polarization::Polarization()
 
 void Polarization::init(Vector3cd vec, Vector3d _q_axis, bool vec_as_q)
 {
-	if (vec_as_q) q = vec;
-	else x = vec;
+	if (vec_as_q) q = vec / vec.norm();
+	else x = vec / vec.norm();
 	def_q_axis(_q_axis, vec_as_q);
 }
 
@@ -44,11 +44,21 @@ void Polarization::def_q_axis(Vector3d _q_axis, bool q_fixed)
 void Polarization::infer_x()
 {
 	x = T.adjoint() * (R.matrix().transpose() * q);
+	for (size_t i = 0; i < 3; ++i)
+	{
+		if (abs(x.array()[i]) < 1e-9) x(i) = 0;
+	}
+	x /= x.norm();
 }
 
 void Polarization::infer_q()
 {
 	q = T * (R.matrix() * x);
+	for (size_t i = 0; i < 3; ++i)
+	{
+		if (abs(q.array()[i]) < 1e-9) q(i) = 0;
+	}
+	q /= q.norm();
 }
 
 Vector3cd* Polarization::get_x()
