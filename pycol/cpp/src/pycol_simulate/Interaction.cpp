@@ -287,8 +287,8 @@ void Interaction::gen_coordinates()
 void Interaction::gen_rabi()
 {
 	summap = MatrixXi::Zero(atom->get_size(), atom->get_size());
-	printf_s("%1.3f, %1.3f, %1.3f \n", (*lasers.at(0)->get_polarization()->get_q())(0).real(), (*lasers.at(0)->get_polarization()->get_q())(1).real(), (*lasers.at(0)->get_polarization()->get_q())(2).real());
-	printf_s("%1.3f, %1.3f, %1.3f \n", (*lasers.at(0)->get_polarization()->get_q())(0).imag(), (*lasers.at(0)->get_polarization()->get_q())(1).imag(), (*lasers.at(0)->get_polarization()->get_q())(2).imag());
+	// printf_s("%1.3f, %1.3f, %1.3f \n", (*lasers.at(0)->get_polarization()->get_q())(0).real(), (*lasers.at(0)->get_polarization()->get_q())(1).real(), (*lasers.at(0)->get_polarization()->get_q())(2).real());
+	// printf_s("%1.3f, %1.3f, %1.3f \n", (*lasers.at(0)->get_polarization()->get_q())(0).imag(), (*lasers.at(0)->get_polarization()->get_q())(1).imag(), (*lasers.at(0)->get_polarization()->get_q())(2).imag());
 	for (size_t q = 0; q < 3; ++q)
 	{
 		double q_val = static_cast<double>(q) - 1;
@@ -781,19 +781,19 @@ Result* Interaction::rate_equations(size_t n, VectorXd& x0, const Vector3d& v)
 void Interaction::rate_equations(size_t n, const std::vector<VectorXd>& delta, const std::vector<Vector3d>& v, std::vector<VectorXd>& x0)
 {
 	VectorXd* w0 = gen_w0();
-	VectorXd* w = gen_w(delta.at(0), v.at(0));
-	MatrixXd* R = gen_rates(*w0, *w);
-	VectorXd* R_sum = gen_rates_sum(*R);
 
 	std::vector<size_t> n_vec(x0.size());
 	for (size_t i = 0; i < x0.size(); ++i) n_vec.at(i) = i;
 
 	std::for_each(std::execution::par_unseq, n_vec.begin(), n_vec.end(),
-		[this, n, &x0, &delta, &v, &w0, &w, &R, &R_sum](size_t i)
+		[this, n, &x0, &delta, &v, &w0](size_t i)
 		{
-			update_w(*w, delta.at(i), v.at(i));
+			VectorXd* w = gen_w(delta.at(i), v.at(i));
+			MatrixXd* R = gen_rates(*w0, *w);
+			VectorXd* R_sum = gen_rates_sum(*R);
+			/*update_w(*w, delta.at(i), v.at(i));
 			update_rates(*R, *w0, *w);
-			update_rates_sum(*R_sum, *R);
+			update_rates_sum(*R_sum, *R);*/
 			double t = 0;
 			if (controlled)
 			{
@@ -806,13 +806,13 @@ void Interaction::rate_equations(size_t n, const std::vector<VectorXd>& delta, c
 				t = integrate_n_steps(rk4_vd_type(), f_rate_equations(*R, *R_sum, *atom->get_L0(), *atom->get_Lsum()),
 					x0.at(i), 0.0, dt_var, n);
 			}
+			delete w;
+			delete R;
+			delete R_sum;
 			// printf("\r\033[92mProgress: %3.2f \033[0m", 100 * i / x0.size());
 		}
 	);
 	// printf("\n");
-	delete w;
-	delete R;
-	delete R_sum;
 }
 
 Result* Interaction::rate_equations(size_t n, VectorXd& x0)
