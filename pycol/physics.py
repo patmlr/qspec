@@ -579,6 +579,20 @@ def hyper_zeeman(i: float, s: float, ll: float, j: float, f: float, m: float, g_
     return shift
 
 
+def a_hyper_mu(i: scalar, j: scalar, mu: array_like, b: array_like):
+    """
+    :param i: The nuclear spin quantum number I.
+    :param j: The electronic total angular momentum quantum number J.
+    :param mu: The magnetic moment of the nucleus in units of the nuclear magneton (mu_N).
+    :param b: The B-field of the atomic electrons at the nucleus (T).
+    :returns: The hyperfine structure constant A (MHz).
+    """
+    mu, b = np.asarray(mu), np.asarray(b)
+    if i == 0 or j == 0:
+        return np.zeros_like(mu * b)
+    return mu * b / np.sqrt(i * (i + 1) * j * (j + 1)) / sc.h
+
+
 def saturation_intensity(f: array_like, a: array_like, a_dipole: array_like):
     """
     :param f: The frequency of the transition.
