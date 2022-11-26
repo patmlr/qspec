@@ -27,6 +27,8 @@ mu_B = sc.physical_constants['Bohr magneton'][0]
 g_s = sc.physical_constants['electron g factor'][0]
 m_e_u = sc.physical_constants['electron mass in u'][0]
 m_e_u_d = sc.physical_constants['electron mass in u'][2]
+gp_s = sc.physical_constants['proton g factor'][0]
+gn_s = sc.physical_constants['neutron g factor'][0]
 
 
 """ Units """
@@ -38,6 +40,30 @@ def inv_cm_to_freq(k: array_like):
     :returns: The frequency corresponding to the wavenumber k (MHz).
     """
     return k * sc.c * 1e-4
+
+
+def freq_to_inv_cm(freq: array_like):
+    """
+    :param freq: The frequency f of a transition (MHz)
+    :returns: The wavenumber k corresponding to the frequency freq (MHz).
+    """
+    return freq / sc.c * 1e4
+
+
+def wavelength_to_freq(lam: array_like):
+    """
+    :param lam: The wavelength lambda of a transition (um)
+    :returns: The frequency corresponding to the wavelength lam (MHz).
+    """
+    return sc.c / lam
+
+
+def freq_to_wavelength(freq: array_like):
+    """
+    :param freq: The frequency f of a transition (MHz)
+    :returns: The wavelength corresponding to the frequency freq (MHz).
+    """
+    return sc.c / freq
 
 
 """ 1-D kinematics """
@@ -175,7 +201,7 @@ def v_el_d1(u: array_like, q: array_like, m: array_like, v0: array_like = 0, rel
     return v_e_d1(e_el(u, q), m, v0=v0, relativistic=relativistic) * q
 
 
-def p(v: array_like, m: array_like, relativistic=True) -> array_like:
+def p_v(v: array_like, m: array_like, relativistic=True) -> array_like:
     """
     :param v: The velocity of a body (m/s).
     :param m: The mass of the body (amu).
@@ -805,6 +831,14 @@ def lambda_rn(r_2: float, r_2_d: float, r_4: float, r_4_d: float, r_6: float, r_
     err += (c2c1 * r_4_d) ** 2
     err += (c3c1 * r_6_d) ** 2
     return val, np.sqrt(err)
+
+
+def schmidt_line(ll, j, is_proton):
+    _g_s = gp_s if is_proton else gn_s
+    _g_l = 1 if is_proton else 0
+    if j < ll:
+        return j / (j + 1) * ((ll + 1) * _g_l - 0.5 * _g_s)
+    return ll * _g_l + 0.5 * _g_s
 
 
 """ Optics """
