@@ -333,20 +333,21 @@ void Atom::update()
 				_j = i;
 			}
 
-			double a = decays->get_item(states[i]->get_label(), states[j]->get_label());
-			L0(_i, _j) = a * pow(a_dipole(states[_i]->get_i(), states[_i]->get_j(), states[_i]->get_f(), states[_i]->get_m(),
-				states[_j]->get_j(), states[_j]->get_f(), states[_j]->get_m(), states[_j]->get_m() - states[_i]->get_m()), 2);
-			L0(_j, _i) = 0.;
-			if (states[i]->get_freq() == states[j]->get_freq()) continue;
+			size_t q = 1;
+			if (states[_j]->get_m() - states[_i]->get_m() < 0) q = 0;
+			else if (states[_j]->get_m() - states[_i]->get_m() > 0) q = 2;
 
+			double a = decays->get_item(states[i]->get_label(), states[j]->get_label());
+			double a_dip = a_dipole(states[_i]->get_i(), states[_i]->get_j(), states[_i]->get_f(), states[_i]->get_m(),
+				states[_j]->get_j(), states[_j]->get_f(), states[_j]->get_m(), states[_j]->get_m() - states[_i]->get_m());  // This takes the time.
+
+			L0(_i, _j) = a * a_dip * a_dip;
+			L0(_j, _i) = 0.;
+
+			if (states[i]->get_freq() == states[j]->get_freq()) continue;
 			double norm = j_dipole(a, states[i]->get_freq(), states[j]->get_freq());
-			for (size_t q = 0; q < 3; ++q)
-			{
-				double q_val = static_cast<double>(q) - 1;
-				m_dipole.at(q)(i, j) = norm * a_dipole(states[_i]->get_i(), states[_i]->get_j(), states[_i]->get_f(), states[_i]->get_m(),
-					states[_j]->get_j(), states[_j]->get_f(), states[_j]->get_m(), q_val);
-				m_dipole.at(q)(j, i) = m_dipole.at(q)(i, j);
-			}
+			m_dipole.at(q)(i, j) = norm * a_dip;
+			m_dipole.at(q)(j, i) = m_dipole.at(q)(i, j);
 		}
 	}
 	Lsum = L0.colwise().sum();

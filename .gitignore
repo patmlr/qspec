@@ -1,2 +1,6 @@
 /build/
 /pycol.egg-info/
+/pycol/cpp/src/pycol_simulate/x64/Release/*
+/pycol/cpp/src/pycol_simulate/Release/*
+!pycol/cpp/src/pycol_simulate/x64/Release/pycol_simulate.dll
+!pycol/cpp/src/pycol_simulate/Release/pycol_simulate.dll
