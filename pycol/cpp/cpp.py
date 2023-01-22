@@ -319,6 +319,9 @@ dll.interaction_rate_equations.argtypes = (InteractionHandler, c_double)
 dll.interaction_rate_equations.restype = ResultHandler
 dll.interaction_rate_equations_y0.argtypes = (InteractionHandler, c_double, c_double_p)
 dll.interaction_rate_equations_y0.restype = ResultHandler
+dll.interaction_rate_equations_new_t.argtypes = \
+    (InteractionHandler, c_double_p, c_double_p, c_double_p, c_double_p, c_double_p, c_size_t, c_size_t)
+dll.interaction_rate_equations_new_t.restype = ctypes.c_void_p
 dll.interaction_rate_equations_new.argtypes = \
     (InteractionHandler, c_double, c_double_p, c_double_p, c_double_p, c_size_t)
 dll.interaction_rate_equations_new.restype = ctypes.c_void_p

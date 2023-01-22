@@ -1235,6 +1235,49 @@ class Interaction:
         return self._result(dll.interaction_rate_equations_y0(
             self.instance, c_double(float(t)), _y0.ctypes.data_as(ctype)), **kwargs)
 
+    def rates_new_t(self, t: array_like, delta: array_like = None, m: Optional[int] = 0, v: array_like = None,
+                    y0: array_like = None):
+        """
+        :param t: The times when to compute the solution.
+        :param delta: An array of frequency shifts for the laser(s). 'delta' must be a scalar or a 1d- or 2d-array
+         with shapes (., ) or (., #lasers), respectively.
+        :param m: The index of the shifted laser. If delta is a 2d-array, 'm' ist omitted.
+        :param v: Atom velocities. Must be a scalar or have shape (n, ) or (n, 3). In the first two cases,
+         the velocity vector(s) is assumed to be aligned with the x-axis.
+        :param y0: The initial state of an ensemble of atoms. This must be None or a 1d-array of size
+         Interaction.atom.size. If None, the ground states are populated equally.
+        :returns: The integrated rate equations as a 'Result' object.
+        """
+        t = np.asarray(t, dtype=float).flatten()
+        t.sort()
+        t_size = t.size
+        if isinstance(delta, np.ndarray) and isinstance(v, np.ndarray) and isinstance(y0, np.ndarray):
+            if delta.shape == v.shape == y0.shape:
+                if delta.flags.f_contiguous:
+                    delta = np.ascontiguousarray(delta)
+                if v.flags.f_contiguous:
+                    v = np.ascontiguousarray(v)
+                if y0.flags.f_contiguous:
+                    y0 = np.ascontiguousarray(y0)
+            vec_size = delta.shape[0]
+        else:
+            delta = _cast_delta(delta, m, len(self.lasers))
+            v = _cast_v(v)
+            y0, ctype = _cast_y0(y0, 0, self.atom)
+
+            vec_size = max([delta.shape[0], v.shape[0], 1])
+
+            delta = np.array(np.broadcast_to(delta, (vec_size, len(self.lasers))), dtype=float, order='C')
+            v = np.array(np.broadcast_to(v, (vec_size, 3)), dtype=float, order='C')
+            y0 = np.array(np.broadcast_to(y0, (vec_size, self.atom.size)), dtype=float, order='C')
+
+        results = np.zeros((vec_size, self.atom.size, t_size), dtype=float)
+        dll.interaction_rate_equations_new_t(self.instance, t.ctypes.data_as(c_double_p),
+                                             delta.ctypes.data_as(c_double_p), v.ctypes.data_as(c_double_p),
+                                             y0.ctypes.data_as(c_double_p), results.ctypes.data_as(c_double_p),
+                                             c_size_t(t_size), c_size_t(vec_size))
+        return results
+
     def rates_new(self, t: scalar, delta: array_like = None, m: Optional[int] = 0, v: array_like = None,
                   y0: array_like = None):
         """
@@ -1247,7 +1290,6 @@ class Interaction:
          the velocity vector(s) is assumed to be aligned with the x-axis.
         :param y0: The initial state of an ensemble of atoms. This must be None or a 1d-array of size
          Interaction.atom.size. If None, the ground states are populated equally.
-        :param kwargs: Keyword arguments to be passed to the chosen solver or plot function.
         :returns: The integrated rate equations as a 'Result' object.
         """
         if isinstance(delta, np.ndarray) and isinstance(v, np.ndarray) and isinstance(y0, np.ndarray):

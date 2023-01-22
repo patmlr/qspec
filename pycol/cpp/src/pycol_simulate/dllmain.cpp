@@ -559,7 +559,7 @@ extern "C"
     __declspec(dllexport) double* interaction_get_delta(Interaction* interaction)
     {
         VectorXd* delta = new VectorXd(interaction->get_atom()->get_size());
-        *delta = interaction->gen_delta(*interaction->gen_w0(), *interaction->gen_w());
+        *delta = interaction->gen_delta(*interaction->get_atom()->get_w0(), *interaction->gen_w());
         return delta->data();
     }
 
@@ -588,300 +588,87 @@ extern "C"
         return interaction->n_history;
     }
 
-    __declspec(dllexport) Result* interaction_rate_equations(Interaction* interaction, double t)
+    __declspec(dllexport) void interaction_rates(
+        Interaction* interaction, double* t, double* delta, double* v, double* x0, double* results, size_t t_size, size_t sample_size)
     {
-        return interaction->rate_equations(t);
-    }
-
-    __declspec(dllexport) Result* interaction_rate_equations_y0(Interaction* interaction, double t, double* y0)
-    {
-        size_t n = interaction->arange_t(t);
+        const std::vector<double> _t = cast_samples_double(t, t_size);
+        const std::vector<VectorXd> _delta = cast_samples_VectorXd(delta, sample_size, interaction->get_lasers()->size());
+        const std::vector<Vector3d> _v = cast_samples_Vector3d(v, sample_size);
         size_t size = interaction->get_atom()->get_size();
-        VectorXd _y0(size);
-        _y0 = VectorXd::Zero(size);
-        for (size_t i = 0; i < size; ++i) _y0(i) = y0[i];
-        return interaction->rate_equations(n, _y0);
-    }
-
-    __declspec(dllexport) void interaction_rate_equations_new(Interaction* interaction, double t, double* delta, double* v, double* y0, size_t vec_size)
-    {
-        size_t n = interaction->arange_t(t);
-        size_t size = interaction->get_atom()->get_size();
-        const std::vector<VectorXd> _delta = cast_delta(delta, vec_size, interaction->get_lasers()->size());
-        const std::vector<Vector3d> _v = cast_v(v, vec_size);
-        std::vector<VectorXd> _y0 = cast_delta(y0, vec_size, size);
-        interaction->rate_equations(n, _delta, _v, _y0);
-        for (size_t i = 0; i < vec_size; ++i)
+        std::vector<VectorXd> _x0 = cast_samples_VectorXd(x0, sample_size, size);
+        std::vector<std::vector<VectorXd>> _results = interaction->rates(_t, _delta, _v, _x0);
+        for (size_t i = 0; i < sample_size; ++i)
         {
             for (size_t j = 0; j < size; ++j)
             {
-                y0[i * size + j] = _y0.at(i)(j);
+                for (size_t k = 0; k < t_size; ++k)
+                results[i * size * t_size + j * t_size + k] = _results.at(i).at(k)(j);
             }
         }
     }
 
-    __declspec(dllexport) Result* interaction_schroedinger(Interaction* interaction, double t)
+    __declspec(dllexport) void interaction_schroedinger(
+        Interaction* interaction, double* t, double* delta, double* v, std::complex<double>* x0, std::complex<double>* results, size_t t_size, size_t sample_size)
     {
-        return interaction->schroedinger(t);
-    }
-
-    __declspec(dllexport) Result* interaction_schroedinger_y0(Interaction* interaction, double t, std::complex<double>* y0)
-    {
-        size_t n = interaction->arange_t(t);
+        const std::vector<double> _t = cast_samples_double(t, t_size);
+        const std::vector<VectorXd> _delta = cast_samples_VectorXd(delta, sample_size, interaction->get_lasers()->size());
+        const std::vector<Vector3d> _v = cast_samples_Vector3d(v, sample_size);
         size_t size = interaction->get_atom()->get_size();
-        VectorXcd _y0(size);
-        _y0 = VectorXcd::Zero(size);
-        for (size_t i = 0; i < size; ++i) _y0(i) = y0[i];
-        return interaction->schroedinger(n, _y0);
-    }
-
-    __declspec(dllexport) Result* interaction_master(Interaction* interaction, double t)
-    {
-        return interaction->master(t);
-    }
-
-    __declspec(dllexport) Result* interaction_master_y0(Interaction* interaction, double t, std::complex<double>* y0, bool dynamics)
-    {
-        size_t n = interaction->arange_t(t);
-        size_t size = interaction->get_atom()->get_size();
-        MatrixXcd _y0(size, size);
-        _y0 = MatrixXcd::Zero(size, size);
-        for (size_t j = 0; j < size; ++j)
+        std::vector<VectorXcd> _x0 = cast_samples_VectorXcd(x0, sample_size, size);
+        std::vector<std::vector<VectorXcd>> _results = interaction->schroedinger(_t, _delta, _v, _x0);
+        for (size_t i = 0; i < sample_size; ++i)
         {
-            for (size_t i = 0; i < size; ++i) _y0(i, j) = y0[size * j + i];
+            for (size_t j = 0; j < size; ++j)
+            {
+                for (size_t k = 0; k < t_size; ++k)
+                    results[i * size * t_size + j * t_size + k] = _results.at(i).at(k)(j);
+            }
         }
-        return interaction->master(n, _y0);
     }
 
-    __declspec(dllexport) Result* interaction_master_mc(Interaction* interaction, double t, size_t num, bool dynamics)
+    __declspec(dllexport) void interaction_master(
+        Interaction* interaction, double* t, double* delta, double* v, std::complex<double>* x0, std::complex<double>* results, size_t t_size, size_t sample_size)
     {
-        return interaction->master_mc(t, num, dynamics);
-    }
-
-    __declspec(dllexport) Result* interaction_master_mc_v(Interaction* interaction, double* v, size_t v_size, double t, bool dynamics)
-    {
-        size_t n = interaction->arange_t(t);
-        VectorXd delta = VectorXd::Zero(interaction->get_lasers()->size());
-        std::vector<Vector3d> _v = cast_v(v, v_size);
-        return interaction->master_mc(n, delta, _v, dynamics);
-    }
-
-    __declspec(dllexport) Result* interaction_master_mc_y0(Interaction* interaction, double t, size_t num,
-        std::complex<double>* y0, size_t y0_size, bool dynamics)
-    {
-        size_t n = interaction->arange_t(t);
+        const std::vector<double> _t = cast_samples_double(t, t_size);
+        const std::vector<VectorXd> _delta = cast_samples_VectorXd(delta, sample_size, interaction->get_lasers()->size());
+        const std::vector<Vector3d> _v = cast_samples_Vector3d(v, sample_size);
         size_t size = interaction->get_atom()->get_size();
-        std::vector<VectorXcd> _y0 = cast_y0_vector_vectorcd(y0, y0_size, size);
-        return interaction->master_mc(n, _y0, num, dynamics);
+        std::vector<MatrixXcd> _x0 = cast_samples_MatrixXcd(x0, sample_size, size);
+        std::vector<std::vector<MatrixXcd>> _results = interaction->master(_t, _delta, _v, _x0);
+        for (size_t i = 0; i < sample_size; ++i)
+        {
+            for (size_t m = 0; m < size; ++m)
+            {
+                for (size_t n = 0; n < size; ++n)
+                {
+                    for (size_t k = 0; k < t_size; ++k)
+                        results[i * size * size * t_size + m * size * t_size + n * t_size + k] = _results.at(i).at(k)(m, n);
+                }
+            }
+        }
     }
 
-    __declspec(dllexport) Result* interaction_master_mc_v_y0(Interaction* interaction, double* v, size_t v_size, double t,
-        std::complex<double>* y0, size_t y0_size, bool dynamics)
+    __declspec(dllexport) void interaction_mc_schroedinger(
+        Interaction* interaction, double* t, double* delta, double* v, std::complex<double>* x0, bool dynamics, std::complex<double>* results, size_t t_size, size_t sample_size)
     {
-        size_t n = interaction->arange_t(t);
+        const std::vector<double> _t = cast_samples_double(t, t_size);
+        const std::vector<VectorXd> _delta = cast_samples_VectorXd(delta, sample_size, interaction->get_lasers()->size());
+        std::vector<Vector3d> _v = cast_samples_Vector3d(v, sample_size);
         size_t size = interaction->get_atom()->get_size();
-        std::vector<VectorXcd> _y0 = cast_y0_vector_vectorcd(y0, y0_size, size);
-        VectorXd delta = VectorXd::Zero(interaction->get_lasers()->size());
-        std::vector<Vector3d> _v = cast_v(v, v_size);
-        return interaction->master_mc(n, _y0, delta, _v, dynamics);
+        std::vector<VectorXcd> _x0 = cast_samples_VectorXcd(x0, sample_size, size);
+        std::vector<std::vector<VectorXcd>> _results = interaction->mc_schroedinger(_t, _delta, _v, _x0, dynamics);
+        for (size_t i = 0; i < sample_size; ++i)
+        {
+            for (size_t m = 0; m < size; ++m)
+            {
+                for (size_t n = 0; n < size; ++n)
+                {
+                    for (size_t k = 0; k < t_size; ++k)
+                        results[i * size * size * t_size + m * size * t_size + n * t_size + k] = _results.at(i).at(k)(m, n);
+                }
+            }
+        }
     }
-
-    __declspec(dllexport) Result* interaction_mean_v(Interaction* interaction, double* v, size_t v_size,
-        double t, int solver)
-    {
-        return interaction->mean_v(cast_v(v, v_size), t, solver);
-    }
-
-    __declspec(dllexport) Result* interaction_mean_v_y0_vectord(Interaction* interaction, double* v, size_t v_size,
-        double t, double* y0)
-    {
-        size_t n = interaction->arange_t(t);
-        VectorXd _y0 = cast_y0_vectord(y0, interaction->get_atom()->get_size());
-        return interaction->mean_v(cast_v(v, v_size), n, _y0, 0);
-    }
-
-    __declspec(dllexport) Result* interaction_mean_v_y0_vectorcd(Interaction* interaction, double* v, size_t v_size,
-        double t, std::complex<double>* y0)
-    {
-        size_t n = interaction->arange_t(t);
-        VectorXcd _y0 = cast_y0_vectorcd(y0, interaction->get_atom()->get_size());
-        return interaction->mean_v(cast_v(v, v_size), n, _y0, 1);
-    }
-
-    __declspec(dllexport) Result* interaction_mean_v_y0_matrixcd(Interaction* interaction, double* v, size_t v_size,
-        double t, std::complex<double>* y0)
-    {
-        size_t n = interaction->arange_t(t);
-        MatrixXcd _y0 = cast_y0_matrixcd(y0, interaction->get_atom()->get_size());
-        return interaction->mean_v(cast_v(v, v_size), n, _y0, 2);
-    }
-
-    __declspec(dllexport) Spectrum* interaction_spectrum(Interaction* interaction, double* delta, size_t delta_size,
-        double t, int solver)
-    {
-        // Map<MatrixXd> _delta(delta, interaction->get_lasers()->size(), delta_size);
-        return interaction->spectrum(cast_delta(delta, delta_size, interaction->get_lasers()->size()), t, solver);
-    }
-
-    __declspec(dllexport) Spectrum* interaction_spectrum_y0_vectord(Interaction* interaction, double* delta, size_t delta_size,
-        double t, double* y0)
-    {
-        size_t n = interaction->arange_t(t);
-        VectorXd _y0 = cast_y0_vectord(y0, interaction->get_atom()->get_size());
-        const std::vector<VectorXd> _delta = cast_delta(delta, delta_size, interaction->get_lasers()->size());
-        return interaction->spectrum(_delta, n, _y0, 0);
-    }
-
-    __declspec(dllexport) Spectrum* interaction_spectrum_y0_vectorcd(Interaction* interaction, double* delta, size_t delta_size,
-        double t, std::complex<double>* y0)
-    {
-        size_t n = interaction->arange_t(t);
-        VectorXcd _y0 = cast_y0_vectorcd(y0, interaction->get_atom()->get_size());
-        const std::vector<VectorXd> _delta = cast_delta(delta, delta_size, interaction->get_lasers()->size());
-        return interaction->spectrum(_delta, n, _y0, 1);
-    }
-
-    __declspec(dllexport) Spectrum* interaction_spectrum_y0_matrixcd(Interaction* interaction, double* delta, size_t delta_size,
-        double t, std::complex<double>* y0)
-    {
-        size_t n = interaction->arange_t(t);
-        MatrixXcd _y0 = cast_y0_matrixcd(y0, interaction->get_atom()->get_size());
-        const std::vector<VectorXd> _delta = cast_delta(delta, delta_size, interaction->get_lasers()->size());
-        return interaction->spectrum(_delta, n, _y0, 2);
-    }
-
-    __declspec(dllexport) Spectrum* interaction_spectrum_mean_v(Interaction* interaction, double* delta, size_t delta_size,
-        double* v, size_t v_size, double t, int solver)
-    {
-        return interaction->spectrum(cast_delta(delta, delta_size, interaction->get_lasers()->size()), cast_v(v, v_size), t, solver);
-    }
-
-    __declspec(dllexport) Spectrum* interaction_spectrum_mean_v_y0_vectord(Interaction* interaction, double* delta, size_t delta_size,
-        double* v, size_t v_size, double t, double* y0)
-    {
-        size_t n = interaction->arange_t(t);
-        VectorXd _y0 = cast_y0_vectord(y0, interaction->get_atom()->get_size());
-        const std::vector<VectorXd> _delta = cast_delta(delta, delta_size, interaction->get_lasers()->size());
-        return interaction->spectrum(_delta, cast_v(v, v_size), n, _y0, 0);
-    }
-
-    __declspec(dllexport) Spectrum* interaction_spectrum_mean_v_y0_vectorcd(Interaction* interaction, double* delta, size_t delta_size,
-        double* v, size_t v_size, double t, std::complex<double>* y0)
-    {
-        size_t n = interaction->arange_t(t);
-        VectorXcd _y0 = cast_y0_vectorcd(y0, interaction->get_atom()->get_size());
-        const std::vector<VectorXd> _delta = cast_delta(delta, delta_size, interaction->get_lasers()->size());
-        return interaction->spectrum(_delta, cast_v(v, v_size), n, _y0, 1);
-    }
-
-    __declspec(dllexport) Spectrum* interaction_spectrum_mean_v_y0_matrixcd(Interaction* interaction, double* delta, size_t delta_size,
-        double* v, size_t v_size, double t, std::complex<double>* y0)
-    {
-        size_t n = interaction->arange_t(t);
-        MatrixXcd _y0 = cast_y0_matrixcd(y0, interaction->get_atom()->get_size());
-        const std::vector<VectorXd> _delta = cast_delta(delta, delta_size, interaction->get_lasers()->size());
-        return interaction->spectrum(_delta, cast_v(v, v_size), n, _y0, 2);
-    }
-
-    __declspec(dllexport) Spectrum* interaction_spectrum_mean_v_y0_vector_vectorcd(Interaction* interaction, double* delta, size_t delta_size,
-        double* v, size_t v_size, double t, std::complex<double>* y0, size_t y0_size, bool dynamics)
-    {
-        size_t n = interaction->arange_t(t);
-        std::vector<VectorXcd> _y0 = cast_y0_vector_vectorcd(y0, y0_size, interaction->get_atom()->get_size());
-        const std::vector<VectorXd> _delta = cast_delta(delta, delta_size, interaction->get_lasers()->size());
-        return interaction->spectrum_mc(_delta, cast_v(v, v_size), n, _y0, 2, dynamics);
-    }
-
-
-    // Result
-    __declspec(dllexport) Result* result_construct()
-    {
-        return new Result();
-    }
-
-    __declspec(dllexport) void result_destruct(Result* result)
-    {
-        result->~Result();
-    }
-
-    __declspec(dllexport) double* result_get_x(Result* result)
-    {
-        return result->get_x()->data();
-    }
-
-    __declspec(dllexport) double* result_get_y(Result* result)
-    {
-        return result->get_y_numpy()->data();
-    }
-
-    __declspec(dllexport) double* result_get_v(Result* result)
-    {
-        return result->get_v_numpy()->data();
-    }
-
-    __declspec(dllexport) size_t result_get_x_size(Result* result)
-    {
-
-        return result->get_x_size();
-    }
-
-    __declspec(dllexport) size_t result_get_y_size(Result* result)
-    {
-        return result->get_y_size();
-    }
-
-    __declspec(dllexport) size_t result_get_v_size(Result* result)
-    {
-        return result->get_v_size();
-    }
-
-
-    // Spectrum
-    __declspec(dllexport) Spectrum* spectrum_construct()
-    {
-        return new Spectrum();
-    }
-
-    __declspec(dllexport) void spectrum_destruct(Spectrum* spectrum)
-    {
-        spectrum->~Spectrum();
-    }
-
-    __declspec(dllexport) double* spectrum_get_x(Spectrum* spectrum)
-    {
-        return spectrum->get_x()->data();
-    }
-
-    __declspec(dllexport) double* spectrum_get_t(Spectrum* spectrum)
-    {
-        return spectrum->get_t()->data();
-    }
-
-    __declspec(dllexport) double* spectrum_get_y(Spectrum* spectrum)
-    {
-        return spectrum->get_y()->data();
-    }
-
-    __declspec(dllexport) size_t spectrum_get_m_size(Spectrum* spectrum)
-    {
-        return spectrum->get_m_size();
-    }
-
-    __declspec(dllexport) size_t spectrum_get_x_size(Spectrum* spectrum)
-    {
-        return spectrum->get_x_size();
-    }
-
-    __declspec(dllexport) size_t spectrum_get_t_size(Spectrum* spectrum)
-    {
-        return spectrum->get_t_size();
-    }
-
-    __declspec(dllexport) size_t spectrum_get_y_size(Spectrum* spectrum)
-    {
-        return spectrum->get_y_size();
-    }
-
 
     // @ScatteringRate
     __declspec(dllexport) void sr_generate_y(std::complex<double>* denominator, std::complex<double>* f_theta,

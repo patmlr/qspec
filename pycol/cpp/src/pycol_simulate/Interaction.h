@@ -3,7 +3,6 @@
 #include "Physics.h"
 #include "Matter.h"
 #include "Light.h"
-#include "Results.h"
 #include "Utility.h"
 #include <set>
 #include <queue>
@@ -84,10 +83,21 @@ public:
 
 	double get_delta_max();
 	void set_delta_max(double _delta_max);
+
 	bool get_controlled();
 	void set_controlled(bool _controlled);
+
+	bool get_time_dependent();
+	void set_time_dependent(bool _time_dependent);
+
 	double get_dt();
 	void set_dt(double _dt);
+
+	bool get_loop();
+	MatrixXi* get_summap();
+	std::vector<MatrixXcd>* get_rabimap();
+	MatrixXd* get_atommap();
+	MatrixXd* get_deltamap();
 
 	void update();
 	void gen_coordinates();
@@ -98,8 +108,6 @@ public:
 	void propagate(size_t i, size_t i0, std::set<size_t>& visited, const std::vector<size_t>& tree,
 		std::array<std::vector<size_t>, 2>& path, std::vector<MatrixXd>& shifts);
 
-	VectorXd* gen_w0();
-	VectorXd* gen_w0(Environment& env);
 	VectorXd* gen_w(const bool dynamics = false);
 	VectorXd* gen_w(const VectorXd& delta, const bool dynamics = false);
 	VectorXd* gen_w(const Vector3d& v, const bool dynamics = false);
@@ -127,73 +135,12 @@ public:
 
 	size_t arange_t(double t);
 
-	Result* rate_equations(size_t n, VectorXd& x0, MatrixXd& R, VectorXd& R_sum);
-	Result* rate_equations(size_t n, VectorXd& x0, const VectorXd& delta, const Vector3d& v);
-	Result* rate_equations(size_t n, VectorXd& x0, const VectorXd& delta);
-	Result* rate_equations(size_t n, VectorXd& x0, const Vector3d& v);
-	void rate_equations(size_t n, const std::vector<VectorXd>& delta, const std::vector<Vector3d>& v, std::vector<VectorXd>& x0);
-	Result* rate_equations(size_t n, VectorXd& x0);
-	Result* rate_equations(size_t n);
-	Result* rate_equations(double t);
-
-	Result* schroedinger(size_t n, VectorXcd& x0, VectorXd& w0, VectorXd& w, MatrixXcd& H);
-	Result* schroedinger(size_t n, VectorXcd& x0, MatrixXcd& H);
-	Result* schroedinger(size_t n, VectorXcd& x0, const VectorXd& delta, const Vector3d& v);
-	Result* schroedinger(size_t n, VectorXcd& x0, const VectorXd& delta);
-	Result* schroedinger(size_t n, VectorXcd& x0, const Vector3d& v);
-	Result* schroedinger(size_t n, VectorXcd& x0);
-	Result* schroedinger(size_t n);
-	Result* schroedinger(double t);
-
-	Result* master(size_t n, MatrixXcd& x0, VectorXd& w0, VectorXd& w, MatrixXcd& H);
-	Result* master(size_t n, MatrixXcd& x0, MatrixXcd& H);
-	Result* master(size_t n, MatrixXcd& x0, const VectorXd& delta, const Vector3d& v);
-	Result* master(size_t n, MatrixXcd& x0, const VectorXd& delta);
-	Result* master(size_t n, MatrixXcd& x0, const Vector3d& v);
-	Result* master(size_t n, MatrixXcd& x0);
-	Result* master(size_t n);
-	Result* master(double t);
-
-	Result* master_mc(size_t n, std::vector<VectorXcd>& x0, const VectorXd& delta, const std::vector<Vector3d>& v, const bool dynamics = false);
-	Result* master_mc(size_t n, std::vector<VectorXcd>& x0, const VectorXd& delta, const Vector3d& v, size_t num);
-	Result* master_mc(size_t n, const VectorXd& delta, std::vector<Vector3d>& v, bool dynamics = false);
-	Result* master_mc(size_t n, std::vector<VectorXcd>& x0, size_t num, bool dynamics = false);
-	Result* master_mc(size_t n, size_t num, bool dynamics = false);
-	Result* master_mc(double t, size_t num, bool dynamics = false);
-
-	Result* call_solver_v(size_t n, VectorXd& x0, const VectorXd& delta, const Vector3d& v, int solver);
-	Result* call_solver_v(size_t n, VectorXcd& x0, const VectorXd& delta, const Vector3d& v, int solver);
-	Result* call_solver_v(size_t n, MatrixXcd& x0, const VectorXd& delta, const Vector3d& v, int solver);
-
-	template<typename T>
-	Result* mean_v(const VectorXd& delta, const std::vector<Vector3d>& v, size_t n, T& y0, int solver);
-	template<typename T>
-	Result* mean_v(const std::vector<Vector3d>& v, size_t n, T& y0, int solver);
-	Result* mean_v(const std::vector<Vector3d>& v, size_t n, int solver);
-	Result* mean_v(const std::vector<Vector3d>& v, double t, int solver);
-
-	Result* call_solver_d(size_t n, VectorXd& x0, const VectorXd& delta, int solver);
-	Result* call_solver_d(size_t n, VectorXcd& x0, const VectorXd& delta, int solver);
-	Result* call_solver_d(size_t n, MatrixXcd& x0, const VectorXd& delta, int solver);
-
-	template<typename T>
-	Spectrum* spectrum(const std::vector<VectorXd>& delta, size_t n, T& y0, int solver);
-	Spectrum* spectrum(const std::vector<VectorXd>& delta, size_t n, int solver);
-	Spectrum* spectrum(const std::vector<VectorXd>& delta, double t, int solver);
-	template<typename T>
-	Spectrum* spectrum(const std::vector<VectorXd>& delta, const std::vector<Vector3d>& v, size_t n, T& y0, int solver);
-	Spectrum* spectrum(const std::vector<VectorXd>& delta, const std::vector<Vector3d>& v, size_t n, int solver);
-	Spectrum* spectrum(const std::vector<VectorXd>& delta, const std::vector<Vector3d>& v, double t, int solver);
-	Spectrum* spectrum_mc(const std::vector<VectorXd>& delta, const std::vector<Vector3d>& v, size_t n, std::vector<VectorXcd>& y0, int solver, bool dynamics = false);
-
-	void set_result(Result* _result);
-	Result* get_result();
-
-	bool get_time_dependent();
-	void set_time_dependent(bool _time_dependent);
-	bool get_loop();
-	MatrixXi* get_summap();
-	std::vector<MatrixXcd>* get_rabimap();
-	MatrixXd* get_atommap();
-	MatrixXd* get_deltamap();
+	std::vector<std::vector<VectorXd>> rates(
+		const std::vector<double>& t, const std::vector<VectorXd>& delta, const std::vector<Vector3d>& v, std::vector<VectorXd>& x0);
+	std::vector<std::vector<VectorXcd>> schroedinger(
+		const std::vector<double>& t, const std::vector<VectorXd>& delta, const std::vector<Vector3d>& v, std::vector<VectorXcd>& x0);
+	std::vector<std::vector<MatrixXcd>> master(
+		const std::vector<double>& t, const std::vector<VectorXd>& delta, const std::vector<Vector3d>& v, std::vector<MatrixXcd>& x0);
+	std::vector<std::vector<VectorXcd>> mc_schroedinger(
+		const std::vector<double>& t, const std::vector<VectorXd>& delta, std::vector<Vector3d>& v, std::vector<VectorXcd>& x0, const bool dynamics = false);
 };

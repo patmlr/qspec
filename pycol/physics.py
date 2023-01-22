@@ -372,11 +372,11 @@ def inverse_doppler(f_atom: array_like, f_lab: array_like, alpha: array_like,
     if np.any(nan):
         if mode[:5] == 'raise':
             raise ValueError('Situation is physically impossible for at least one argument.')
-        print('WARNING: Situation is physically impossible for at least one argument.')
+        # print('WARNING: Situation is physically impossible for at least one argument.')
     if np.any(ambiguous):
         if mode[6:] == 'raise':
             raise ValueError('Situation allows two different velocities.')
-        print('WARNING: Situation allows two different velocities. Taking the {} velocity.'.format(mode[6:]))
+        # print('WARNING: Situation allows two different velocities. Taking the {} velocity.'.format(mode[6:]))
     if return_mask:
         if scalar_true:
             return (bet * sc.c)[0], ambiguous

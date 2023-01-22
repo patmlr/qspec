@@ -3,63 +3,81 @@
 #include "Utility.h"
 
 
-std::vector<VectorXd> cast_delta(double delta[], size_t delta_size, size_t lasers_size)
-{
-    std::vector<VectorXd> _delta = std::vector<VectorXd>(delta_size, VectorXd::Zero(lasers_size));
-    for (size_t i = 0; i < delta_size; ++i)
-    {
-        for (size_t m = 0; m < lasers_size; ++m) _delta.at(i)(m) = delta[lasers_size * i + m];
-    }
-    return _delta;
-}
 
 
-std::vector<Vector3d> cast_v(double delta[], size_t v_size)
-{
-    std::vector<Vector3d> _v = std::vector<Vector3d>(v_size, Vector3d::Zero());
-    for (size_t i = 0; i < v_size; ++i)
-    {
-        for (size_t r = 0; r < 3; ++r) _v.at(i)(r) = delta[3 * i + r];
-    }
-    return _v;
-}
-
-
-VectorXd cast_y0_vectord(double y0[], size_t size)
+VectorXd cast_VectorXd(double* x, size_t size)
 {
     VectorXd _y0(size);
     _y0 = VectorXd::Zero(size);
-    for (size_t i = 0; i < size; ++i) _y0(i) = y0[i];
+    for (size_t i = 0; i < size; ++i) _y0(i) = x[i];
     return _y0;
 }
 
-VectorXcd cast_y0_vectorcd(std::complex<double> y0[], size_t size)
+VectorXcd cast_VectorXcd(std::complex<double>* x, size_t size)
 {
     VectorXcd _y0(size);
     _y0 = VectorXcd::Zero(size);
-    for (size_t i = 0; i < size; ++i) _y0(i) = y0[i];
+    for (size_t i = 0; i < size; ++i) _y0(i) = x[i];
     return _y0;
 }
 
-MatrixXcd cast_y0_matrixcd(std::complex<double> y0[], size_t size)
+MatrixXcd cast_MatrixXcd(std::complex<double>* x, size_t size)
 {
     MatrixXcd _y0(size, size);
     _y0 = MatrixXcd::Zero(size, size);
     for (size_t j = 0; j < size; ++j)
     {
-        for (size_t i = 0; i < size; ++i) _y0(i, j) = y0[size * j + i];
+        for (size_t i = 0; i < size; ++i) _y0(i, j) = x[size * j + i];
     }
     return _y0;
 }
 
-std::vector<VectorXcd> cast_y0_vector_vectorcd(std::complex<double> y0[], size_t y0_size, size_t size)
+std::vector<double> cast_samples_double(double* x, size_t sample_size)
 {
-    std::vector<VectorXcd> _y0 = std::vector<VectorXcd>(y0_size, VectorXcd::Zero(size));
-    for (size_t i = 0; i < y0_size; ++i)
+    std::vector<double> _x = std::vector<double>(sample_size);
+    for (size_t i = 0; i < sample_size; ++i) _x.at(i) = x[i];
+    return _x;
+}
+
+
+std::vector<Vector3d> cast_samples_Vector3d(double* x, size_t sample_size)
+{
+    std::vector<Vector3d> _x = std::vector<Vector3d>(sample_size, Vector3d::Zero());
+    for (size_t i = 0; i < sample_size; ++i)
     {
-        for (size_t j = 0; j < size; ++j) _y0.at(i)(j) = y0[size * i + j];
+        for (size_t r = 0; r < 3; ++r) _x.at(i)(r) = x[3 * i + r];
     }
-    return _y0;
+    return _x;
+}
+
+std::vector<VectorXd> cast_samples_VectorXd(double* x, size_t sample_size, size_t size)
+{
+    std::vector<VectorXd> _x = std::vector<VectorXd>(sample_size, VectorXd::Zero(size));
+    for (size_t i = 0; i < sample_size; ++i)
+    {
+        for (size_t m = 0; m < size; ++m) _x.at(i)(m) = x[size * i + m];
+    }
+    return _x;
+}
+
+std::vector<VectorXcd> cast_samples_VectorXcd(std::complex<double>* x, size_t sample_size, size_t size)
+{
+    std::vector<VectorXcd> _x = std::vector<VectorXcd>(sample_size, VectorXcd::Zero(size));
+    for (size_t i = 0; i < sample_size; ++i)
+    {
+        for (size_t m = 0; m < size; ++m) _x.at(i)(m) = x[size * i + m];
+    }
+    return _x;
+}
+
+std::vector<MatrixXcd> cast_samples_MatrixXcd(std::complex<double>* x, size_t sample_size, size_t size)
+{
+    std::vector<MatrixXcd> _x = std::vector<MatrixXcd>(sample_size, MatrixXcd::Zero(size, size));
+    for (size_t i = 0; i < sample_size; ++i)
+    {
+        for (size_t m = 0; m < size; ++m) _x.at(i)(m) = x[size * i + m];
+    }
+    return _x;
 }
 
 size_t gen_index(VectorXd p, std::uniform_real_distribution<double>& d, std::mt19937& gen)
