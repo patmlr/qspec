@@ -237,36 +237,6 @@ dll.atom_get_L1.argtypes = (AtomHandler, )
 dll.atom_get_L1.restype = c_double_p
 
 
-# Result
-dll.result_construct.restype = ResultHandler
-dll.result_destruct.argtypes = (ResultHandler, )
-
-dll.result_get_x.argtypes = (ResultHandler, )
-dll.result_get_x_size.argtypes = (ResultHandler, )
-dll.result_get_x_size.restype = c_size_t
-
-dll.result_get_y.argtypes = (ResultHandler, )
-dll.result_get_y_size.argtypes = (ResultHandler, )
-dll.result_get_y_size.restype = c_size_t
-
-dll.result_get_v.argtypes = (ResultHandler, )
-dll.result_get_v_size.argtypes = (ResultHandler, )
-dll.result_get_v_size.restype = c_size_t
-
-
-# Spectrum
-dll.spectrum_get_m_size.argtypes = (SpectrumHandler, )
-dll.spectrum_get_m_size.restype = c_size_t
-dll.spectrum_get_x_size.argtypes = (SpectrumHandler, )
-dll.spectrum_get_x_size.restype = c_size_t
-dll.spectrum_get_t_size.argtypes = (SpectrumHandler, )
-dll.spectrum_get_t_size.restype = c_size_t
-dll.spectrum_get_y_size.argtypes = (SpectrumHandler, )
-dll.spectrum_get_y_size.restype = c_size_t
-dll.spectrum_get_x.argtypes = (SpectrumHandler, )
-dll.spectrum_get_t.argtypes = (SpectrumHandler, )
-dll.spectrum_get_y.argtypes = (SpectrumHandler, )
-
 # Interaction
 dll.interaction_construct.restype = InteractionHandler
 dll.interaction_destruct.argtypes = (InteractionHandler, )
@@ -315,80 +285,21 @@ dll.interaction_get_atommap.argtypes = (InteractionHandler, )
 dll.interaction_get_deltamap.argtypes = (InteractionHandler, )
 dll.interaction_get_delta.argtypes = (InteractionHandler, )
 
-dll.interaction_rate_equations.argtypes = (InteractionHandler, c_double)
-dll.interaction_rate_equations.restype = ResultHandler
-dll.interaction_rate_equations_y0.argtypes = (InteractionHandler, c_double, c_double_p)
-dll.interaction_rate_equations_y0.restype = ResultHandler
-dll.interaction_rate_equations_new_t.argtypes = \
+dll.interaction_rates.argtypes = \
     (InteractionHandler, c_double_p, c_double_p, c_double_p, c_double_p, c_double_p, c_size_t, c_size_t)
-dll.interaction_rate_equations_new_t.restype = ctypes.c_void_p
-dll.interaction_rate_equations_new.argtypes = \
-    (InteractionHandler, c_double, c_double_p, c_double_p, c_double_p, c_size_t)
-dll.interaction_rate_equations_new.restype = ctypes.c_void_p
+dll.interaction_rates.restype = ctypes.c_void_p
 
-dll.interaction_schroedinger.argtypes = (InteractionHandler, c_double)
-dll.interaction_schroedinger.restype = ResultHandler
-dll.interaction_schroedinger_y0.argtypes = (InteractionHandler, c_double, c_complex_p)
-dll.interaction_schroedinger_y0.restype = ResultHandler
+dll.interaction_schroedinger.argtypes = \
+    (InteractionHandler, c_double_p, c_double_p, c_double_p, c_complex_p, c_complex_p, c_size_t, c_size_t)
+dll.interaction_schroedinger.restype = ctypes.c_void_p
 
-dll.interaction_master.argtypes = (InteractionHandler, c_double)
-dll.interaction_master.restype = ResultHandler
-dll.interaction_master_y0.argtypes = (InteractionHandler, c_double, c_complex_p)
-dll.interaction_master_y0.restype = ResultHandler
+dll.interaction_master.argtypes = \
+    (InteractionHandler, c_double_p, c_double_p, c_double_p, c_complex_p, c_complex_p, c_size_t, c_size_t)
+dll.interaction_master.restype = ctypes.c_void_p
 
-dll.interaction_master_mc.argtypes = (InteractionHandler, c_double, c_size_t, c_bool)
-dll.interaction_master_mc.restype = ResultHandler
-dll.interaction_master_mc_v.argtypes = (InteractionHandler, c_double_p, c_size_t, c_double, c_bool)
-dll.interaction_master_mc_v.restype = ResultHandler
-dll.interaction_master_mc_y0.argtypes = (InteractionHandler, c_double, c_size_t, c_complex_p, c_size_t, c_bool)
-dll.interaction_master_mc_y0.restype = ResultHandler
-dll.interaction_master_mc_v_y0.argtypes = \
-    (InteractionHandler, c_double_p, c_size_t, c_double, c_complex_p, c_size_t, c_bool)
-dll.interaction_master_mc_v_y0.restype = ResultHandler
-
-dll.interaction_mean_v.argtypes = (InteractionHandler, c_double_p, c_size_t, c_double, c_int)
-dll.interaction_mean_v.restype = ResultHandler
-
-dll.interaction_mean_v_y0_vectord.argtypes = (InteractionHandler, c_double_p, c_size_t, c_double, c_double_p)
-dll.interaction_mean_v_y0_vectord.restype = SpectrumHandler
-
-dll.interaction_mean_v_y0_vectorcd.argtypes = (InteractionHandler, c_double_p, c_size_t, c_double, c_complex_p)
-dll.interaction_mean_v_y0_vectorcd.restype = SpectrumHandler
-
-dll.interaction_mean_v_y0_matrixcd.argtypes = (InteractionHandler, c_double_p, c_size_t, c_double, c_complex_p)
-dll.interaction_mean_v_y0_matrixcd.restype = SpectrumHandler
-
-dll.interaction_spectrum.argtypes = (InteractionHandler, c_double_p, c_size_t, c_double, c_int)
-dll.interaction_spectrum.restype = SpectrumHandler
-
-dll.interaction_spectrum_y0_vectord.argtypes = (InteractionHandler, c_double_p, c_size_t, c_double, c_double_p)
-dll.interaction_spectrum_y0_vectord.restype = SpectrumHandler
-
-dll.interaction_spectrum_y0_vectorcd.argtypes = (InteractionHandler, c_double_p, c_size_t, c_double, c_complex_p)
-dll.interaction_spectrum_y0_vectorcd.restype = SpectrumHandler
-
-dll.interaction_spectrum_y0_matrixcd.argtypes = (InteractionHandler, c_double_p, c_size_t, c_double, c_complex_p)
-dll.interaction_spectrum_y0_matrixcd.restype = SpectrumHandler
-
-dll.interaction_spectrum_mean_v.argtypes = \
-    (InteractionHandler, c_double_p, c_size_t, c_double_p, c_size_t, c_double, c_int)
-dll.interaction_spectrum_mean_v.restype = SpectrumHandler
-
-dll.interaction_spectrum_mean_v_y0_vectord.argtypes = \
-    (InteractionHandler, c_double_p, c_size_t, c_double_p, c_size_t, c_double, c_double_p)
-dll.interaction_spectrum_mean_v_y0_vectord.restype = SpectrumHandler
-
-dll.interaction_spectrum_mean_v_y0_vectorcd.argtypes = \
-    (InteractionHandler, c_double_p, c_size_t, c_double_p, c_size_t, c_double, c_complex_p)
-dll.interaction_spectrum_mean_v_y0_vectorcd.restype = SpectrumHandler
-
-dll.interaction_spectrum_mean_v_y0_matrixcd.argtypes = \
-    (InteractionHandler, c_double_p, c_size_t, c_double_p, c_size_t, c_double, c_complex_p)
-dll.interaction_spectrum_mean_v_y0_matrixcd.restype = SpectrumHandler
-
-dll.interaction_spectrum_mean_v_y0_vector_vectorcd.argtypes = \
-    (InteractionHandler, c_double_p, c_size_t, c_double_p, c_size_t, c_double, c_complex_p, c_size_t, c_bool)
-dll.interaction_spectrum_mean_v_y0_vector_vectorcd.restype = SpectrumHandler
+dll.interaction_mc_schroedinger.argtypes = \
+    (InteractionHandler, c_double_p, c_double_p, c_double_p, c_complex_p, c_bool, c_complex_p, c_size_t, c_size_t)
+dll.interaction_mc_schroedinger.restype = ctypes.c_void_p
 
 
 # @ScatteringRate
