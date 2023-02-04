@@ -133,8 +133,6 @@ public:
 	void update_hamiltonian_diag(MatrixXcd& H, VectorXd& w0, VectorXd& w);
 	void update_hamiltonian_leaky_diag(MatrixXcd& H, VectorXd& w0, VectorXd& w);
 
-	size_t arange_t(double t);
-
 	std::vector<std::vector<VectorXd>> rates(
 		const std::vector<double>& t, const std::vector<VectorXd>& delta, const std::vector<Vector3d>& v, std::vector<VectorXd>& x0);
 	std::vector<std::vector<VectorXcd>> schroedinger(

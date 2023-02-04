@@ -11,6 +11,7 @@ Example script / Guide for the pycol.simulate module.
 
 import numpy as np
 import scipy.constants as sc
+import matplotlib.pyplot as plt
 
 from pycol.types import *
 import pycol.physics as ph
@@ -52,30 +53,38 @@ def example(n: Union[set, int] = None):
         a_sp = 140  # The Einstein coefficients of the two transitions
         a_dp = 10.7
 
-        s = sim.construct_electronic_state(freq_0=0, s=0.5, l=0, j=0.5, label='s')  # A list of all 4s sub-states.
-        p = sim.construct_electronic_state(f_sp, 0.5, 1, 0.5, label='p')  # A list of all 4p 2P1/2 sub-states.
-        d = sim.construct_electronic_state(f_sp - f_dp, 0.5, 2, 1.5, label='d')  # A list of all 3d 2D3/2 sub-states.
+        s = sim.construct_electronic_state(freq_0=0, s=0.5, l=0, j=0.5, label='s')  # A list of all 4s substates.
+        p = sim.construct_electronic_state(f_sp, 0.5, 1, 0.5, label='p')  # A list of all 4p 2P1/2 substates.
+        d = sim.construct_electronic_state(f_sp - f_dp, 0.5, 2, 1.5, label='d')  # A list of all 3d 2D3/2 substates.
 
         decay = sim.DecayMap(labels=[('s', 'p'), ('p', 'd')], a=[a_sp, a_dp])
+        decay = sim.DecayMap(labels=[('s', 'p'), ], a=[a_sp])
         # The states are linked by Einstein-A coefficients via the specified labels.
 
-        ca40 = sim.Atom(states=s + p + d, decay_map=decay)  # The Atom with all states and the decay information.
+        ca40 = sim.Atom(states=s + p, decay_map=decay)  # The Atom with all states and the decay information.
 
-        pol = sim.Polarization([0, 1, 0], q_axis=2, vec_as_q=True)
+        pol = sim.Polarization([0, 1, 1], q_axis=[0, 1, 1], vec_as_q=True)
         laser_sp = sim.Laser(freq=f_sp, polarization=pol, intensity=500)  # Linear polarized laser for the ground-state
         # transition with 500 uW / mm**2.
 
         inter = sim.Interaction(atom=ca40, lasers=[laser_sp, ])  # The interaction.
         inter.resonance_info()  # Print the detuning of the lasers from the considered transitions.
+        inter.controlled = False
 
         t = 0.5  # Integration time in us.
 
-        inter.rates(t=t)  # Solve the rate equations for t, assuming equal population in all s-states.
-        inter.master(t=t)  # Solve the master equation for t, assuming equal population in all s-states.
+        times = np.linspace(0.1, 0.5, 1001, dtype=float)
+        results = inter.rates(times, delta=np.linspace(-50, 50, 101))
+        for res in results:
+            plt.plot(times, res[-1])
+        plt.show()
+
+        # inter.rates(t=t)  # Solve the rate equations for t, assuming equal population in all s-states.
+        # inter.master(t=t)  # Solve the master equation for t, assuming equal population in all s-states.
         # inter.master(t=t, dissipation=False)  # Without spontaneous emission.
 
         # Calculate the integrated population for each state after t.
-        inter.spectrum(t, np.linspace(-100, 100, 401), solver='rates')
+        # inter.spectrum(t, np.linspace(-100, 100, 401), solver='rates')
         # inter.spectrum(t, np.linspace(-100, 100, 401), solver='master')  # Use the master equation solver.
 
     if 1 in n:
@@ -92,9 +101,9 @@ def example(n: Union[set, int] = None):
         a_sp = 140  # The Einstein coefficients of the two transitions
         a_dp = 10.7
 
-        s = sim.construct_electronic_state(freq_0=0, s=0.5, l=0, j=0.5, label='s')  # A list of all 4s sub-states.
-        p = sim.construct_electronic_state(f_sp, 0.5, 1, 0.5, label='p')  # A list of all 4p 2P1/2 sub-states.
-        d = sim.construct_electronic_state(f_sp - f_dp, 0.5, 2, 1.5, label='d')  # A list of all 3d 2D3/2 sub-states.
+        s = sim.construct_electronic_state(freq_0=0, s=0.5, l=0, j=0.5, label='s')  # A list of all 4s substates.
+        p = sim.construct_electronic_state(f_sp, 0.5, 1, 0.5, label='p')  # A list of all 4p 2P1/2 substates.
+        d = sim.construct_electronic_state(f_sp - f_dp, 0.5, 2, 1.5, label='d')  # A list of all 3d 2D3/2 substates.
 
         decay = sim.DecayMap(labels=[('s', 'p'), ('p', 'd')], a=[a_sp, a_dp])
         # The states are linked by Einstein-A coefficients via the specified labels.
@@ -111,14 +120,15 @@ def example(n: Union[set, int] = None):
         inter.controlled = True  # Use the controlled solver.
         # inter.dt = 4e-5  # or small step sizes.
 
-        t = 4.  # Integration time in us.
+        t = np.linspace(0, 2, 2)  # Integration time in us.
         delta = np.linspace(-1.5, 1.5, 101)
 
-        # inter.rates(t=t)  # Solve the rate equations for t, assuming equal population in all s-states.
-        inter.master(t=t)  # Solve the master equation for t, assuming equal population in all s-states.
-
-        spec = inter.spectrum(4., delta=delta, solver='master', show=False)  # Suppress the plot here ...
-        spec.plot([2.5, 4])  # ... to plot only the integrated population of the desired interval.
+        results = inter.master(t, delta)  # Solve the master equation for t, assuming equal population in all s-states.
+        print(results.shape)
+        y = np.diagonal(results[:, :, :, -1], axis1=1, axis2=2).real
+        print(y.shape)
+        plt.plot(delta, y[:, 4:])
+        plt.show()
 
     if 2 in n:
         """
@@ -171,17 +181,20 @@ def example(n: Union[set, int] = None):
 
         inter.resonance_info()  # Print the detunings of the lasers from the considered transitions.
 
-        inter.controlled = True  # Use an error controlled solver to deal with fast dynamics.
+        # inter.controlled = True  # Use an error controlled solver to deal with fast dynamics.
         # inter.dt = 1e-4  # Alternatively, decrease the step size.
 
-        t = 0.2  # Integration time in us.
+        t = [0., 0.2]  # Integration time in us.
         delta = np.linspace(-180, 150, 331)
 
-        inter.rates(t=t)  # Solve the rate equations for t, assuming equal population in all s-states.
-        # inter.master(t=t)  # Solve the master equation for t, assuming equal population in all s-states.
+        results = inter.rates(t, delta)  # Solve the rate equations for t, assuming equal population in all s-states.
+        plt.plot(delta, results[:, ca43.get_state_indexes('d5'), -1])
+        plt.show()
 
-        # inter.spectrum(t, delta=delta, solver='rates')
-        inter.spectrum(t, delta=delta, solver='master')
+        # results = inter.master(t, delta)  # Solve the master equation for t, assuming equal population in all s-states
+        # y = np.diagonal(results[:, :, :, -1], axis1=1, axis2=2).real
+        # plt.plot(delta, y[:, ca43.get_state_indexes('d5')])
+        # plt.show()
 
     if 3 in n:
         """
@@ -221,16 +234,20 @@ def example(n: Union[set, int] = None):
         inter = sim.Interaction(atom=li7, lasers=[laser_b, laser_r])
         inter.resonance_info()  # Print the resonance info.
 
-        t = 10.  # Integration time in us.
+        t = np.concatenate([np.zeros(1), np.logspace(-4, 1, 5000)], axis=0)  # Integration time in us.
         delta = np.linspace(-50., 50., 201)
         y0 = li7.get_y0(['s3', 's5'])
 
-        inter.rates(t=t, y0=y0, x_scale='log')  # Solve the master equation for t and plot with logarithmic scaling.
-        # inter.master(t=t, y0=y0, x_scale='log')  # Solve the master equation for t and plot with logarithmic scaling.
+        y = inter.rates(t, m=0, y0=y0)  # Solve the master equation for t and plot with logarithmic scaling.
+        plt.xscale('log')
+        plt.plot(t, np.sum(y, axis=0).T)
+        plt.show()
 
-        # Solve for the first 10 us (these are 10 000 time steps times 201 detunings)
-        inter.spectrum(t, delta, m=0, y0=y0, solver='rates')  # with the rate equations ...
-        # inter.spectrum(t, delta, m=0, y0=y0, solver='master')  # ... and the master equation.
+        y = inter.master(t, m=0, y0=y0)  # Solve the master equation for t and plot with logarithmic scaling.
+        y = np.diagonal(y, axis1=1, axis2=2).real
+        plt.xscale('log')
+        plt.plot(t, np.sum(y, axis=0))
+        plt.show()
 
 
 if __name__ == '__main__':

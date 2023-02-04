@@ -338,8 +338,14 @@ void Atom::update()
 			else if (states[_j]->get_m() - states[_i]->get_m() > 0) q = 2;
 
 			double a = decays->get_item(states[i]->get_label(), states[j]->get_label());
-			double a_dip = a_dipole(states[_i]->get_i(), states[_i]->get_j(), states[_i]->get_f(), states[_i]->get_m(),
-				states[_j]->get_j(), states[_j]->get_f(), states[_j]->get_m(), states[_j]->get_m() - states[_i]->get_m());  // This takes the time.
+			double a_dip = 0.;
+			if (abs(states[_i]->get_j() - states[_j]->get_j()) < 1.5 
+				&& abs(states[_i]->get_f() - states[_j]->get_f()) < 1.5
+				&& abs(states[_i]->get_m() - states[_j]->get_m()) < 1.5)  // Check dipole condition before calling a_dipole.
+			{
+				a_dip = a_dipole(states[_i]->get_i(), states[_i]->get_j(), states[_i]->get_f(), states[_i]->get_m(),
+					states[_j]->get_j(), states[_j]->get_f(), states[_j]->get_m(), states[_j]->get_m() - states[_i]->get_m());  // This takes the time.
+			}
 
 			L0(_i, _j) = a * a_dip * a_dip;
 			L0(_j, _i) = 0.;

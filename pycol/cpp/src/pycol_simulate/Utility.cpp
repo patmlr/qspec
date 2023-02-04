@@ -75,7 +75,10 @@ std::vector<MatrixXcd> cast_samples_MatrixXcd(std::complex<double>* x, size_t sa
     std::vector<MatrixXcd> _x = std::vector<MatrixXcd>(sample_size, MatrixXcd::Zero(size, size));
     for (size_t i = 0; i < sample_size; ++i)
     {
-        for (size_t m = 0; m < size; ++m) _x.at(i)(m) = x[size * i + m];
+        for (size_t m = 0; m < size; ++m)
+        {
+            for (size_t n = 0; n < size; ++n) _x.at(i)(n, m) = x[size * size * i + size * m + n];
+        }
     }
     return _x;
 }

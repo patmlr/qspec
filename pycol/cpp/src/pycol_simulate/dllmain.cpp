@@ -642,7 +642,7 @@ extern "C"
                 for (size_t n = 0; n < size; ++n)
                 {
                     for (size_t k = 0; k < t_size; ++k)
-                        results[i * size * size * t_size + m * size * t_size + n * t_size + k] = _results.at(i).at(k)(m, n);
+                        results[i * size * size * t_size + m * size * t_size + n * t_size + k] = _results.at(i).at(k)(n, m);
                 }
             }
         }

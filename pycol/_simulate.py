@@ -724,6 +724,9 @@ class Atom:
         y0[indices] = 1 / indices.size
         return y0
 
+    def get_state_indexes(self, labels: Union[Iterable[str], str] = None) -> np.ndarray:
+        return np.array([i for i, s in enumerate(self.states) if s.label in labels], dtype=int)
+
     def plot(self, indices: array_like = None, draw_bounds: bool = False, show: bool = True):
         """
         Plot a term scheme of the atom.
@@ -1277,7 +1280,7 @@ class Interaction:
             v = np.array(np.broadcast_to(v, (sample_size, 3)), dtype=float, order='C')
             y0 = np.array(np.broadcast_to(y0, (sample_size, self.atom.size, self.atom.size)), dtype=complex, order='C')
 
-        results = np.zeros((sample_size, self.atom.size, self.atom.size, t_size), dtype=float)
+        results = np.zeros((sample_size, self.atom.size, self.atom.size, t_size), dtype=complex)
         dll.interaction_master(self.instance, t.ctypes.data_as(c_double_p), delta.ctypes.data_as(c_double_p),
                                v.ctypes.data_as(c_double_p), y0.ctypes.data_as(c_complex_p),
                                results.ctypes.data_as(c_complex_p), c_size_t(t_size), c_size_t(sample_size))

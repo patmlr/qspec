@@ -599,13 +599,6 @@ void Interaction::update_w(VectorXd& w, const VectorXd& delta, const Vector3d& v
 	for (size_t m = 0; m < lasers.size(); ++m) w(m) = 2 * sc::pi * lasers.at(m)->get_detuned(delta(m), v);
 }
 
-//VectorXd Interaction::gen_delta(VectorXd& w0, VectorXd& w)
-//{
-//	VectorXd delta_diag(atom->get_size());
-//	delta_diag = (atommap * w0) + (deltamap * w);
-//	return delta_diag;
-//}
-
 VectorXd Interaction::gen_delta(const VectorXd& w0, const VectorXd& w)
 {
 	VectorXd delta_diag(atom->get_size());
@@ -728,15 +721,7 @@ void Interaction::update_hamiltonian_leaky(MatrixXcd& H, VectorXd& w0, VectorXd&
 
 void Interaction::update_hamiltonian_leaky_diag(MatrixXcd& H, VectorXd& w0, VectorXd& w)
 {
-
 	H.diagonal() = gen_delta(w0, w) - 0.5 * sc::i * (*atom->get_Lsum());
-}
-
-size_t Interaction::arange_t(double t)
-{
-	double n = t / dt;
-	dt_var = dt;
-	return static_cast<size_t>(n);
 }
 
 std::vector<std::vector<VectorXd>> Interaction::rates(
@@ -764,22 +749,23 @@ std::vector<std::vector<VectorXd>> Interaction::rates(
 
 			if (controlled)
 			{
-				d_dopri5_vd_type dopri5 = make_dense_output(1e-5, 1e-5, dt_var, dopri5_vd_type());
+				d_dopri5_vd_type dopri5 = make_dense_output(1e-5, 1e-5, dt, dopri5_vd_type());
 				n = integrate_times(dopri5, f_rate_equations(*R, *R_sum, *atom->get_L0(), *atom->get_Lsum()),
-					x0.at(i), t.begin(), t.end(), dt_var, push_back_VectorXd(results.at(i)));
+					x0.at(i), t.begin(), t.end(), dt, push_back_VectorXd(results.at(i)));
 			}
 			else
 			{
 				n = integrate_times(rk4_vd_type(), f_rate_equations(*R, *R_sum, *atom->get_L0(), *atom->get_Lsum()),
-					x0.at(i), t.begin(), t.end(), dt_var, push_back_VectorXd(results.at(i)));
+					x0.at(i), t.begin(), t.end(), dt, push_back_VectorXd(results.at(i)));
 			}
 			delete w;
 			delete R;
 			delete R_sum;
 			progress.at(i) = 1;
-			printf("\r\033[92mProgress: %3.2f %\033[0m", 100 * std::reduce(progress.begin(), progress.end()) / x0.size());
+			printf("\r\033[92mSolving rate equations ... %3.2f %%\033[0m", 100 * std::reduce(progress.begin(), progress.end()) / x0.size());
 		}
 	);
+	printf("\r\033[92mSolving rate equations ... 100.00 %%\033[0m");
 	printf("\n");
 	return results;
 }
@@ -818,9 +804,10 @@ std::vector<std::vector<VectorXcd>> Interaction::schroedinger(
 					x0.at(i), t.begin(), t.end(), dt_var, push_back_VectorXcd(results.at(i)));
 			}
 			progress.at(i) = 1;
-			printf("\r\033[92mProgress: %3.2f %\033[0m", 100 * std::reduce(progress.begin(), progress.end()) / x0.size());
+			printf("\r\033[92mSolving schroedinger equation ... %3.2f %%\033[0m", 100 * std::reduce(progress.begin(), progress.end()) / x0.size());
 		}
 	);
+	printf("\r\033[92mSolving schroedinger equation ... 100.00 %%\033[0m");
 	printf("\n");
 	return results;
 }
@@ -851,19 +838,20 @@ std::vector<std::vector<MatrixXcd>> Interaction::master(
 
 			if (controlled)
 			{
-				d_dopri5_mcd_type dopri5 = make_dense_output(1e-5, 1e-5, dt_var, dopri5_mcd_type());
+				d_dopri5_mcd_type dopri5 = make_dense_output(1e-5, 1e-5, dt, dopri5_mcd_type());
 				n = integrate_times(dopri5, f_master(*H, L0, L1),
-					x0.at(i), t.begin(), t.end(), dt_var, push_back_MatrixXcd(results.at(i)));
+					x0.at(i), t.begin(), t.end(), dt, push_back_MatrixXcd(results.at(i)));
 			}
 			else
 			{
 				n = integrate_times(rk4_mcd_type(), f_master(*H, L0, L1),
-					x0.at(i), t.begin(), t.end(), dt_var, push_back_MatrixXcd(results.at(i)));
+					x0.at(i), t.begin(), t.end(), dt, push_back_MatrixXcd(results.at(i)));
 			}
 			progress.at(i) = 1;
-			printf("\r\033[92mProgress: %3.2f %\033[0m", 100 * std::reduce(progress.begin(), progress.end()) / x0.size());
+			printf("\r\033[92mSolving master equation ... %3.2f %%\033[0m", 100 * std::reduce(progress.begin(), progress.end()) / x0.size());
 		}
 	);
+	printf("\r\033[92mSolving master equation ... 100.00 %%\033[0m");
 	printf("\n");
 	return results;
 }
