@@ -279,9 +279,23 @@ double DecayMap::get_item(std::string state_0, std::string state_1)
 	for (size_t i = 0; i < size; ++i)
 	{
 		if ((state_0 == states_0[i] && state_1 == states_1[i]) 
-			|| (state_0 == states_1[i] && state_1 == states_0[i])) return a[i];
+			|| (state_0 == states_1[i] && state_1 == states_0[i])) return a.at(i);
 	}
 	return 0.;
+}
+
+double DecayMap::get_gamma(std::string state_0, std::string state_1)
+{
+	double gamma = 0;
+	for (size_t i = 0; i < size; ++i)
+	{
+		if (states_0.at(i) == state_0 || states_0.at(i) == state_1 || states_1.at(i) == state_0 || states_1.at(i) == state_1)
+		{
+			gamma += a.at(i);
+			continue;
+		}
+	}
+	return gamma;
 }
 
 

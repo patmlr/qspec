@@ -626,19 +626,25 @@ void Interaction::update_rates(MatrixXd& R, VectorXd& w0, VectorXd& w)
 	R.setZero();
 	double _w0;
 	double a;
+	double gamma;
 	double r;
-	for (int m = 0; m < lasers.size(); ++m)
+	std::set<std::string> labels_i;
+	std::set<std::string> labels_j;
+	for (size_t m = 0; m < lasers.size(); ++m)
 	{
-		for (int j = 1; j < atom->get_size(); ++j)
+		for (size_t j = 1; j < atom->get_size(); ++j)
 		{
-			for (int i = 0; i < j; ++i)
+			for (size_t i = 0; i < j; ++i)
 			{
+				labels_i.clear();
+				labels_j.clear();
 				a = atom->get_decay_map()->get_item(atom->get(i)->get_label(), atom->get(j)->get_label());  // (*atom->get_L0())(i, j) + (*atom->get_L0())(j, i);
 				if (a == 0) continue;
+				gamma = atom->get_decay_map()->get_gamma(atom->get(i)->get_label(), atom->get(j)->get_label());
 				r = 4 * std::pow(std::abs(rabimap.at(m)(i, j)), 2);
 				if (r == 0) continue;
 				_w0 = abs(w0(i) - w0(j));
-				R(i, j) += lorentz(w(m), _w0, a, r);
+				R(i, j) += lorentz(w(m), _w0, gamma, r);
 				R(j, i) = R(i, j);
 			}
 		}

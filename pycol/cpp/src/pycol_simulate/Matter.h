@@ -108,6 +108,7 @@ public:
 	std::vector<std::string>* get_states_1();
 	std::vector<double>* get_a();
 	double get_item(std::string state_0, std::string state_1);
+	double get_gamma(std::string state_0, std::string state_1);
 };
 
 
