@@ -1,6 +1,12 @@
 /build/
 /pycol.egg-info/
+/.idea/
 /pycol/cpp/src/pycol_simulate/x64/Release/*
 /pycol/cpp/src/pycol_simulate/Release/*
 !pycol/cpp/src/pycol_simulate/x64/Release/pycol_simulate.dll
 !pycol/cpp/src/pycol_simulate/Release/pycol_simulate.dll
+/pycol/cpp/src/pycol_simulate/.vs/
+/pycol/cpp/src/pycol_simulate/pycol_simulate.sln
+/pycol/cpp/src/pycol_simulate/pycol_simulate.vcxproj
+/pycol/cpp/src/pycol_simulate/pycol_simulate.vcxproj.filters
+/pycol/cpp/src/pycol_simulate/pycol_simulate.vcxproj.user
