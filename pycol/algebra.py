@@ -114,8 +114,9 @@ def a(i: sympy_qn, j_l: sympy_qn, f_l: sympy_qn, j_u: sympy_qn, f_u: sympy_qn, a
     """
     ret = spw.wigner_6j(j_u, j_l, 1, f_l, f_u, i) ** 2
     i, j_l, f_l, j_u, f_u, ret = cast_sympy(as_sympy, i, j_l, f_l, j_u, f_u, ret)
-    # return f_0(i, j_l, j_u, f_l, f_u, 0, as_sympy=as_sympy) - b(i, j_l, j_u, f_l, f_u, as_sympy=as_sympy)  # (slower)
     return ret * (2 * f_l + 1) * (2 * f_u + 1) * (2 * j_u + 1) / (3 * (2 * j_l + 1) * (2 * i + 1))
+    # i, j_l, f_l, j_u, f_u = cast_sympy(as_sympy, i, j_l, f_l, j_u, f_u)
+    # return f_0(i, j_l, f_l, j_u, f_u, 0, as_sympy=as_sympy) - b(i, j_l, f_l, j_u, f_u, as_sympy=as_sympy)  # (slower)
 
 
 def b(i: sympy_qn, j_l: sympy_qn, f_l: sympy_qn, j_u: sympy_qn, f_u: sympy_qn, as_sympy: bool = False) \

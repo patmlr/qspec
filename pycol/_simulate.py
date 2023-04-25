@@ -849,10 +849,12 @@ def _cast_y0(y0: Optional[array_like], i_solver: int, atom: Atom):
             y0[gs] = 1 / gs.size
             return np.diag(y0), c_complex_p
         y0 = np.array(y0, dtype=complex, order='C')
-        if not y0.shape or y0.shape[-1] != size:
-            raise ValueError('\'y0\' must have size {} in the last axis but has shape {}.'.format(size, y0.shape))
+        if not y0.shape or (len(y0.shape) == 1 and y0.shape[-1] != size) \
+                or (len(y0.shape) > 1 and y0.shape[-2:] != (size, size)):
+            raise ValueError('\'y0\' must have a total shape of {}, or shape {} in the last two axes but has shape {}.'
+                             .format((size, ), (size, size), y0.shape))
         if len(y0.shape) > 1:
-            y0 /= np.expand_dims(np.sum(np.diagonal(y0, axis1=-2, axis2=-1)), axis=(-1, -1))
+            y0 /= np.sum(np.diagonal(y0, axis1=-2, axis2=-1), axis=-1)[:, None, None]
         else:
             y0 = np.diag(y0 / np.sum(y0))
         return y0, c_complex_p
@@ -1018,6 +1020,8 @@ class Interaction:
         :param value: The new lasers of the interaction.
         :returns: None.
         """
+        if value is None:
+            value = []
         self._lasers = list(value)
         dll.interaction_clear_lasers(self.instance)
         for laser in self.lasers:
@@ -1254,7 +1258,8 @@ class Interaction:
         :param v: Atom velocities. Must be a scalar or have shape (n, ) or (n, 3). In the first two cases,
          the velocity vector(s) are assumed to be aligned with the x-axis.
         :param y0: The initial state / density matrix of the atom.
-         This must be None or have shape (n, [#states], #states). If None, the ground states are populated equally.
+         This must be None or have shape (#states, ) or (n, #states, #states).
+         If None, the ground states are populated equally.
         :returns: The integrated master equation as a complex-valued array of shape (n, #states, #states, #times).
         """
         t = np.asarray(t, dtype=float).flatten()

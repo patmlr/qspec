@@ -63,7 +63,7 @@ def example(n: Union[set, int] = None):
 
         ca40 = sim.Atom(states=s + p, decay_map=decay)  # The Atom with all states and the decay information.
 
-        pol = sim.Polarization([0, 1, 1], q_axis=[0, 1, 1], vec_as_q=True)
+        pol = sim.Polarization([0, 1, 0], q_axis=2, vec_as_q=True)
         laser_sp = sim.Laser(freq=f_sp, polarization=pol, intensity=500)  # Linear polarized laser for the ground-state
         # transition with 500 uW / mm**2.
 
@@ -75,8 +75,10 @@ def example(n: Union[set, int] = None):
 
         times = np.linspace(0.1, 0.5, 1001, dtype=float)
         results = inter.rates(times, delta=np.linspace(-50, 50, 101))
+        i = ca40.get_state_indexes('p')
         for res in results:
-            plt.plot(times, res[-1])
+            plt.plot(times, res[-2])
+            # plt.plot(times, np.sum(res[i], axis=0))
         plt.show()
 
         # inter.rates(t=t)  # Solve the rate equations for t, assuming equal population in all s-states.
