@@ -18,11 +18,11 @@
 # -- Project information -----------------------------------------------------
 
 project = 'pycol'
-copyright = '2022, Patrick Matthias Mueller'
-author = 'Patrick Matthias Mueller'
+copyright = '2023, Patrick Mueller'
+author = 'Patrick Mueller'
 
 # The full version, including alpha/beta/rc tags
-release = '09.01.2022'
+release = '01.05.2023'
 
 
 # -- General configuration ---------------------------------------------------

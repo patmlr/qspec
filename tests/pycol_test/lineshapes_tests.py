@@ -10,7 +10,6 @@ Module including unittests for the lineshapes module.
 """
 
 import unittest as ut
-# import pycol.databases as db
 import pycol.lineshapes as ls
 
 

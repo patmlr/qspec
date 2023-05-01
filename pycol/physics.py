@@ -15,8 +15,8 @@ import scipy.constants as sc
 import scipy.stats as st
 import scipy.special as sp
 
-from .types import *
-from . import tools
+from pycol.types import *
+from pycol import tools
 
 
 L_LABEL = ['S', 'P', 'D', ] + list(string.ascii_uppercase[5:])

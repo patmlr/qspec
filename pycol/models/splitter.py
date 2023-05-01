@@ -14,7 +14,7 @@ import numpy as np
 
 from pycol.tools import merge_intervals
 from pycol.algebra import wigner_6j, a
-from .base import Model, Summed
+from pycol.models.base import Model, Summed
 
 
 def gen_splitter_model(qi: bool = False, hf_mixing: bool = False):

@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>pycol.algebra &mdash; pycol 09.01.2022 documentation</title><link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <title>pycol.algebra &mdash; pycol 01.05.2023 documentation</title><link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/css/borders.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/css/wy-nav-content.css" type="text/css" />
@@ -80,7 +80,7 @@
 <span class="kn">from</span> <span class="nn">sympy.vector</span> <span class="kn">import</span> <span class="n">CoordSys3D</span>
 <span class="kn">import</span> <span class="nn">sympy.physics.wigner</span> <span class="k">as</span> <span class="nn">spw</span>
 
-<span class="kn">from</span> <span class="nn">.types</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">pycol.types</span> <span class="kn">import</span> <span class="o">*</span>
 
 
 <div class="viewcode-block" id="cast_sympy"><a class="viewcode-back" href="../../pycol.html#pycol.algebra.cast_sympy">[docs]</a><span class="k">def</span> <span class="nf">cast_sympy</span><span class="p">(</span><span class="n">as_sympy</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">sympy_like</span><span class="p">,</span> <span class="n">dtype</span><span class="p">:</span> <span class="nb">type</span> <span class="o">=</span> <span class="nb">float</span><span class="p">):</span>
@@ -180,8 +180,9 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">ret</span> <span class="o">=</span> <span class="n">spw</span><span class="o">.</span><span class="n">wigner_6j</span><span class="p">(</span><span class="n">j_u</span><span class="p">,</span> <span class="n">j_l</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">f_l</span><span class="p">,</span> <span class="n">f_u</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span>
     <span class="n">i</span><span class="p">,</span> <span class="n">j_l</span><span class="p">,</span> <span class="n">f_l</span><span class="p">,</span> <span class="n">j_u</span><span class="p">,</span> <span class="n">f_u</span><span class="p">,</span> <span class="n">ret</span> <span class="o">=</span> <span class="n">cast_sympy</span><span class="p">(</span><span class="n">as_sympy</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">j_l</span><span class="p">,</span> <span class="n">f_l</span><span class="p">,</span> <span class="n">j_u</span><span class="p">,</span> <span class="n">f_u</span><span class="p">,</span> <span class="n">ret</span><span class="p">)</span>
-    <span class="c1"># return f_0(i, j_l, j_u, f_l, f_u, 0, as_sympy=as_sympy) - b(i, j_l, j_u, f_l, f_u, as_sympy=as_sympy)  # (slower)</span>
     <span class="k">return</span> <span class="n">ret</span> <span class="o">*</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">f_l</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">f_u</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">j_u</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="mi">3</span> <span class="o">*</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">j_l</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))</span></div>
+    <span class="c1"># i, j_l, f_l, j_u, f_u = cast_sympy(as_sympy, i, j_l, f_l, j_u, f_u)</span>
+    <span class="c1"># return f_0(i, j_l, f_l, j_u, f_u, 0, as_sympy=as_sympy) - b(i, j_l, f_l, j_u, f_u, as_sympy=as_sympy)  # (slower)</span>
 
 
 <div class="viewcode-block" id="b"><a class="viewcode-back" href="../../pycol.html#pycol.algebra.b">[docs]</a><span class="k">def</span> <span class="nf">b</span><span class="p">(</span><span class="n">i</span><span class="p">:</span> <span class="n">sympy_qn</span><span class="p">,</span> <span class="n">j_l</span><span class="p">:</span> <span class="n">sympy_qn</span><span class="p">,</span> <span class="n">f_l</span><span class="p">:</span> <span class="n">sympy_qn</span><span class="p">,</span> <span class="n">j_u</span><span class="p">:</span> <span class="n">sympy_qn</span><span class="p">,</span> <span class="n">f_u</span><span class="p">:</span> <span class="n">sympy_qn</span><span class="p">,</span> <span class="n">as_sympy</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> \
@@ -481,7 +482,7 @@
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2022, Patrick Mueller.</p>
+    <p>&#169; Copyright 2023, Patrick Mueller.</p>
   </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a

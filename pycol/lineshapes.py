@@ -8,10 +8,11 @@ Created on 29.04.2020
 
 Module for spectral lineshape functions.
 """
+
 import numpy as np
 
-from .types import *
-from ._lineshapes import base, spectrum, splitter, convolved
+from pycol.types import *
+from pycol.models import base, spectrum, splitter, convolved
 
 
 def gen_model(ijj, shape: Union[str, type, spectrum.Spectrum], qi: bool = False, hf_mixing: bool = False,

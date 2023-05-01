@@ -16,6 +16,7 @@ from sympy.core.numbers import Integer, Float, Rational
 from sympy.core.add import Add
 from sympy.core.mul import Mul
 
+
 scalar = Union[int, float]
 scalar_c = Union[int, float, complex]
 array_iter = Union[ndarray, Iterable]

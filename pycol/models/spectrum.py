@@ -14,7 +14,7 @@ from scipy.stats import norm, cauchy
 from scipy.special import voigt_profile
 
 from pycol.physics import source_energy_pdf
-from .base import Model
+from pycol.models.base import Model
 
 
 # The names of the spectra. Includes all spectra that appear in the GUI.

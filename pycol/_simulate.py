@@ -13,21 +13,21 @@ import numpy as np
 from matplotlib import cm
 import matplotlib.pyplot as plt
 
-from .types import *
-from . import tools
-from . import physics as ph
-from .cpp.cpp import *
+from pycol.types import *
+from pycol import tools
+import pycol.physics as ph
+from pycol.cpp.cpp import *
 
 
 def sr_generate_y(denominator: np.ndarray, f_theta: np.ndarray, f_phi: np.ndarray,
                   counts: np.ndarray, shape: np.ndarray):
     """
-    :param denominator:
-    :param f_theta:
-    :param f_phi:
-    :param counts:
-    :param shape:
-    :return:
+    :param denominator: The denominator of the scattering rate.
+    :param f_theta: The numerator with the 'theta-polarization'.
+    :param f_phi: The numerator with the 'phi-polarization'.
+    :param counts: The number of summands.
+    :param shape: The shape of y.
+    :returns: The scattering rate.
     """
     y = np.zeros((shape[0] * shape[1], ), dtype=float)  # Allocate memory.
     denominator_p = denominator.ctypes.data_as(c_complex_p)  # Get all pointers to the first elements of the arrays.
@@ -724,8 +724,22 @@ class Atom:
         y0[indices] = 1 / indices.size
         return y0
 
-    def get_state_indexes(self, labels: Union[Iterable[str], str] = None) -> np.ndarray:
-        return np.array([i for i, s in enumerate(self.states) if s.label in labels], dtype=int)
+    def get_state_indexes(self, labels: Union[Iterable[str], str] = None,
+                          f: Union[Iterable[scalar], scalar] = None) -> np.ndarray:
+        """
+        :param labels: The labels of the states whose indexes are to be returned.
+        :param f: The F quantum numbers whose indexes are to be returned.
+        :returns: The indexes corresponding to the specified labels and F quantum numbers.
+        """
+        if labels is None:
+            labels = set(s.label for s in self.states)
+        if f is None:
+            f = set(s.f for s in self.states)
+        try:
+            f = set(f)
+        except TypeError:
+            f = {f}
+        return np.array([i for i, s in enumerate(self.states) if s.label in labels and s.f in f], dtype=int)
 
     def plot(self, indices: array_like = None, draw_bounds: bool = False, show: bool = True):
         """

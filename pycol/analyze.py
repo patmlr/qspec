@@ -19,9 +19,8 @@ curve fitting methods:
 
 classes:
     (- Element; Holds spectroscopic information about a chemical element.)
-    (- Radii; Holds information about nuclear charge radii of an chemical element.)
+    (- Radii; Holds information about nuclear charge radii of a chemical element.)
     - King; Creates a King plot with isotope shifts or nuclear charge radii.
-
 """
 
 import inspect
@@ -31,11 +30,11 @@ import scipy.odr as odr
 import scipy.optimize as so
 import matplotlib.pyplot as plt
 
-from .types import *
-from . import tools
-from . import physics as ph
-# from .stats import average
-# from . import databases as dat
+from pycol.types import *
+from pycol import tools
+import pycol.physics as ph
+# from pycol.stats import average
+# import pycol.databases as dat
 
 
 def _get_rtype2(ab_dict: dict, a: Union[Iterable, any], b: Union[Iterable, any], rtype: type = ndarray):
@@ -179,7 +178,7 @@ def draw_sigma2d(x: array_iter, y: array_iter, sigma_x: array_iter, sigma_y: arr
     phi = np.arange(0., 2 * np.pi, 0.001)
     for x_i, y_i, s_x, s_y, r in zip(x, y, sigma_x, sigma_y, corr):
         for i in range(1, n + 1, 1):
-            plt.plot(*ellipse2d(x_i, y_i, i * s_x, i * s_y, phi, r), 'k-', **kwargs)
+            plt.plot(*ellipse2d(x_i, y_i, i * s_x, i * s_y, phi, r), '-k', **kwargs)
 
 
 def weight(sigma):

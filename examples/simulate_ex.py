@@ -7,6 +7,13 @@ Created on 24.06.2021
 @author: Patrick Mueller
 
 Example script / Guide for the pycol.simulate module.
+
+
+- Einstein coefficients taken from [NIST Atomic Spectra Database, https://doi.org/10.18434/T4W30F].
+- Frequencies of 40Ca+ taken from [P. Mueller et al., Phys. Rev. Research 2, 043351 (2020),
+                                  https://doi.org/10.1103/PhysRevResearch.2.043351].
+- Hyperfine-structure constants [A, B] of 40Ca+ taken from [Noertershaeuser et al., Eur. Phys. J. D 2, 33–39 (1998),
+                                                            https://doi.org/10.1007/s100530050107]
 """
 
 import numpy as np
@@ -31,7 +38,7 @@ def example(n: Union[set, int] = None):
 
     Example 2: Interaction between 43Ca+ with hyperfine structure and a laser.
 
-    Example 3: Interaction between a singly-charged lithium ion and two lasers.
+    Example 3: Interaction between a singly-charged lithium-ion and two lasers.
 
     :returns: None.
     """
@@ -45,7 +52,7 @@ def example(n: Union[set, int] = None):
         Example 0: Interaction between 40Ca+ and a laser.
         
         The simulate module provides functions to simulate the interaction between lasers and atoms.
-        In example 0, the master equation is solved for 40Ca+.
+        In example 0, the rate (master) equation is solved for different laser detunings in 40Ca+.
         """
         f_sp = 755222766  # The 4s -> 4p 2P1/2 transition frequency.
         f_dp = 346000235  # The 3d 2D3/2 -> 4p 2P1/2 transition frequency.
@@ -58,10 +65,9 @@ def example(n: Union[set, int] = None):
         d = sim.construct_electronic_state(f_sp - f_dp, 0.5, 2, 1.5, label='d')  # A list of all 3d 2D3/2 substates.
 
         decay = sim.DecayMap(labels=[('s', 'p'), ('p', 'd')], a=[a_sp, a_dp])
-        decay = sim.DecayMap(labels=[('s', 'p'), ], a=[a_sp])
         # The states are linked by Einstein-A coefficients via the specified labels.
 
-        ca40 = sim.Atom(states=s + p, decay_map=decay)  # The Atom with all states and the decay information.
+        ca40 = sim.Atom(states=s + p + d, decay_map=decay)  # The Atom with all states and the decay information.
 
         pol = sim.Polarization([0, 1, 0], q_axis=2, vec_as_q=True)
         laser_sp = sim.Laser(freq=f_sp, polarization=pol, intensity=500)  # Linear polarized laser for the ground-state
@@ -69,25 +75,31 @@ def example(n: Union[set, int] = None):
 
         inter = sim.Interaction(atom=ca40, lasers=[laser_sp, ])  # The interaction.
         inter.resonance_info()  # Print the detuning of the lasers from the considered transitions.
-        inter.controlled = False
 
-        t = 0.5  # Integration time in us.
+        times = np.linspace(0., 0.5, 1001)  # Integration times.
+        delta = np.linspace(-50, 50, 101)  # Laser detunings from the given laser frequency.
 
-        times = np.linspace(0.1, 0.5, 1001, dtype=float)
-        results = inter.rates(times, delta=np.linspace(-50, 50, 101))
-        i = ca40.get_state_indexes('p')
+        results = inter.rates(times, delta=delta)  # rate equation
+
+        # results = inter.master(times, delta=delta)  # master equation
+        # results = np.transpose(np.diagonal(results, axis1=1, axis2=2).real, axes=[0, 2, 1])
+
         for res in results:
-            plt.plot(times, res[-2])
-            # plt.plot(times, np.sum(res[i], axis=0))
+            i = ca40.get_state_indexes('p')
+            plt.plot(times, np.sum(res[i], axis=0))
+        plt.xlabel('time (us)')
+        plt.ylabel('p-state populations')
         plt.show()
 
-        # inter.rates(t=t)  # Solve the rate equations for t, assuming equal population in all s-states.
-        # inter.master(t=t)  # Solve the master equation for t, assuming equal population in all s-states.
-        # inter.master(t=t, dissipation=False)  # Without spontaneous emission.
-
-        # Calculate the integrated population for each state after t.
-        # inter.spectrum(t, np.linspace(-100, 100, 401), solver='rates')
-        # inter.spectrum(t, np.linspace(-100, 100, 401), solver='master')  # Use the master equation solver.
+        i_t = -1
+        for s in ['s', 'p', 'd']:  # Plot all fine-structure states.
+            i = ca40.get_state_indexes(s)
+            plt.plot(delta, np.sum(results[:, i, i_t], axis=1), label=s)
+        plt.ylim(0, 1)
+        plt.xlabel('f - {} (MHz)'.format(laser_sp.freq))
+        plt.ylabel('state population after {} us'.format(times[i_t]))
+        plt.legend()
+        plt.show()
 
     if 1 in n:
         """
@@ -122,87 +134,107 @@ def example(n: Union[set, int] = None):
         inter.controlled = True  # Use the controlled solver.
         # inter.dt = 4e-5  # or small step sizes.
 
-        t = np.linspace(0, 2, 2)  # Integration time in us.
+        times = [0, 2]  # Integration time in us.
         delta = np.linspace(-1.5, 1.5, 101)
 
-        results = inter.master(t, delta)  # Solve the master equation for t, assuming equal population in all s-states.
-        print(results.shape)
+        results = inter.master(times, delta, m=0)  # m=0 for delta in first laser.
+        # Solve the master equation for t, assuming equal population in all s-states.
+
+        print('Shape of the resulting density-matrices object: ', results.shape)
         y = np.diagonal(results[:, :, :, -1], axis1=1, axis2=2).real
-        print(y.shape)
-        plt.plot(delta, y[:, 4:])
+        print('Reshaped to (#delta, #states): ', y.shape)
+
+        for s in ['s', 'p', 'd']:  # Plot all fine-structure states.
+            i = ca40.get_state_indexes(s)
+            plt.plot(delta, np.sum(y[:, i], axis=1), label=s)
+        plt.xlabel('f - {} (MHz)'.format(laser_sp.freq))
+        plt.ylabel('state population after {} us'.format(times[-1]))
+        plt.legend()
         plt.show()
 
     if 2 in n:
         """
         Example 2: Interaction between 43Ca+ with hyperfine structure and a laser.
         
-        In example 2, the master equation is solved for 43Ca+.
+        In example 2, the rate (master) equation is solved for 43Ca+.
         """
-        # Frequencies (40Ca+) taken from [P. Mueller et al., Phys. Rev. Research 2, 043351 (2020),
-        # https://doi.org/10.1103/PhysRevResearch.2.043351].
         # f_sp1 = 755222766  # The 4s -> 4p 2P1/2 transition frequency.
         f_sp3 = 761905013  # The 4s -> 4p 2P3/2 transition frequency.
         # f_d3p1 = 346000235  # The 3d 2D3/2 -> 4p 2P1/2 transition frequency.
         f_d3p3 = 352682482  # The 3d 2D3/2 -> 4p 2P3/2 transition frequency.
         f_d5p3 = 350862883  # The 3d 2D5/2 -> 4p 2P3/2 transition frequency.
 
-        # Einstein coefficients taken from [NIST Atomic Spectra Database, https://doi.org/10.18434/T4W30F].
-        # a_sp1 = 140  # The Einstein coefficients of the two transitions
-        a_sp3 = 147  # The Einstein coefficients of the two transitions
+        # The Einstein coefficients of the transitions.
+        # a_sp1 = 140
+        a_sp3 = 147
         # a_d3p1 = 10.7
         a_d3p3 = 1.11
         a_d5p3 = 9.9
 
-        # Hyperfine-structure constants [A, B], taken from [Noertershaeuser et al., Eur. Phys. J. D 2, 33–39 (1998),
-        # https://doi.org/10.1007/s100530050107]
+        # The hyperfine-structure constants of the states.
         s_hyper = [-806.4, ]
         # p1_hyper = [-145.6, ]
         p3_hyper = [-31., -6.9]
         d3_hyper = [-47.3, -3.7]
         d5_hyper = [-3.8, -3.9]
 
+        i = 3.5
+
         # Create only the states for the D2 transition.
-        s = sim.construct_electronic_state(freq_0=0, s=0.5, l=0, j=0.5, i=3.5, hyper_const=s_hyper, label='s')
-        p3 = sim.construct_electronic_state(f_sp3, 0.5, 1, 1.5, i=3.5, hyper_const=p3_hyper, label='p3')
-        d3 = sim.construct_electronic_state(f_sp3 - f_d3p3, 0.5, 2, 1.5, i=3.5, hyper_const=d3_hyper, label='d3')
-        d5 = sim.construct_electronic_state(f_sp3 - f_d5p3, 0.5, 2, 2.5, i=3.5, hyper_const=d5_hyper, label='d5')
+        s = sim.construct_electronic_state(freq_0=0, s=0.5, l=0, j=0.5, i=i, hyper_const=s_hyper, label='s')
+        p3 = sim.construct_electronic_state(f_sp3, 0.5, 1, 1.5, i=i, hyper_const=p3_hyper, label='p3')
+        d3 = sim.construct_electronic_state(f_sp3 - f_d3p3, 0.5, 2, 1.5, i=i, hyper_const=d3_hyper, label='d3')
+        d5 = sim.construct_electronic_state(f_sp3 - f_d5p3, 0.5, 2, 2.5, i=i, hyper_const=d5_hyper, label='d5')
 
         decay = sim.DecayMap(labels=[('s', 'p3'), ('p3', 'd3'), ('p3', 'd5')], a=[a_sp3, a_d3p3, a_d5p3])
         # The states are linked by Einstein-A coefficients via the specified labels.
 
         states = s + p3 + d3 + d5
         ca43 = sim.Atom(states=states, decay_map=decay)
-        ca43.plot()  # Plot the involved states.
-        # The Atom with all states and the decay information from above.
+
+        ca43.plot()  # Plot the atom with all states.
 
         pol_sp = sim.Polarization([0, 1, 0], q_axis=2)
         laser_sp = sim.Laser(freq=f_sp3 - 1697, polarization=pol_sp, intensity=500)
+        # Put the laser on a specific hyperfine transition.
 
         inter = sim.Interaction(atom=ca43, lasers=[laser_sp, ], delta_max=400.)
         # Set delta_max (MHz) to do a RWA in the off-resonance transitions.
 
-        inter.resonance_info()  # Print the detunings of the lasers from the considered transitions.
-
+        # inter.resonance_info()  # Print the detunings of the lasers from the considered transitions.
         # inter.controlled = True  # Use an error controlled solver to deal with fast dynamics.
         # inter.dt = 1e-4  # Alternatively, decrease the step size.
 
-        t = [0., 0.2]  # Integration time in us.
+        times = [0., 0.2]  # Integration time in us.
         delta = np.linspace(-180, 150, 331)
 
-        results = inter.rates(t, delta)  # Solve the rate equations for t, assuming equal population in all s-states.
-        plt.plot(delta, results[:, ca43.get_state_indexes('d5'), -1])
+        results = inter.rates(times, delta)
+        # Solve the rate equation for all times, assuming equal population in all s-states.
+
+        # Plot the population of all d5-states.
+        for f in ph.get_f(i, 2.5):
+            plt.plot(delta, np.sum(results[:, ca43.get_state_indexes('d5', f), -1], axis=1), label='F={}'.format(f))
+        plt.xlabel('f - {} (MHz)'.format(laser_sp.freq))
+        plt.ylabel('d5-state population after {} us'.format(times[-1]))
+        plt.legend()
         plt.show()
 
-        # results = inter.master(t, delta)  # Solve the master equation for t, assuming equal population in all s-states
+        ''' Master equation here already takes ~ 5 - 10 min '''
+        # # Plot the population of all d5-states.
+        # results = inter.master(times, delta)
+        # # Solve the master equation for all times, assuming equal population in all s-states
         # y = np.diagonal(results[:, :, :, -1], axis1=1, axis2=2).real
-        # plt.plot(delta, y[:, ca43.get_state_indexes('d5')])
+        # for f in ph.get_f(I, 2.5):
+        #     plt.plot(delta, np.sum(y[:, ca43.get_state_indexes('d5', f)], axis=1), label='F={}'.format(f))
+        # plt.xlabel('f - {} (MHz)'.format(laser_sp.freq))
+        # plt.ylabel('d5-state population after {} us'.format(times[-1]))
         # plt.show()
 
     if 3 in n:
         """
         Example 3: Interaction between a singly-charged lithium ion and two lasers.
         
-        In example 3 Fig. 5 from [Noertershaeuser et al. Phys. Rev. Accel. Beams 24, 024701 (2021),
+        In example 3, Fig. 5 from [Noertershaeuser et al. Phys. Rev. Accel. Beams 24, 024701 (2021),
         https://doi.org/10.1103/PhysRevAccelBeams.24.024701] is calculated.
         """
 
@@ -224,8 +256,8 @@ def example(n: Union[set, int] = None):
         i_b = 200  # Intensity of the blue laser (uW / mm ** 2)
         i_r = 2000  # Intensity of the red laser (uW / mm ** 2)
 
-        pol_b = sim.Polarization([0, 1, 0], q_axis=2)  # sigma+ polarization
-        pol_r = sim.Polarization([0, 1, 0], q_axis=2)  # sigma+ polarization
+        pol_b = sim.Polarization([0, 0, 1], q_axis=2)  # sigma+ polarization
+        pol_r = sim.Polarization([0, 0, 1], q_axis=2)  # sigma+ polarization
         laser_b = sim.Laser(freq=f + 6234.29, polarization=pol_b, intensity=i_b)  # blue laser
         laser_r = sim.Laser(freq=f - 13566., polarization=pol_r, intensity=i_r)  # red laser
 
@@ -234,23 +266,32 @@ def example(n: Union[set, int] = None):
         # The saturation intensity can be compared easily to the specified values in the paper.
 
         inter = sim.Interaction(atom=li7, lasers=[laser_b, laser_r])
+        inter.controlled = True
         inter.resonance_info()  # Print the resonance info.
 
         t = np.concatenate([np.zeros(1), np.logspace(-4, 1, 5000)], axis=0)  # Integration time in us.
-        delta = np.linspace(-50., 50., 201)
         y0 = li7.get_y0(['s3', 's5'])
 
-        y = inter.rates(t, m=0, y0=y0)  # Solve the master equation for t and plot with logarithmic scaling.
+        y = inter.rates(t, y0=y0)  # Solve the rate equation for t and plot with logarithmic scaling.
         plt.xscale('log')
-        plt.plot(t, np.sum(y, axis=0).T)
+        for s in ['s3', 's5', 'p']:
+            plt.plot(t, np.sum(y[0, li7.get_state_indexes(s)], axis=0), label=s)
+        plt.xlabel('time (us)')
+        plt.ylabel('state population')
+        plt.legend()
         plt.show()
 
-        y = inter.master(t, m=0, y0=y0)  # Solve the master equation for t and plot with logarithmic scaling.
-        y = np.diagonal(y, axis1=1, axis2=2).real
+        ''' The result is quiet different with fully coherent dynamics. '''
+        y = inter.master(t, y0=y0)  # Solve the master equation for t and plot with logarithmic scaling.
+        y = np.diagonal(y[0], axis1=0, axis2=1).real
         plt.xscale('log')
-        plt.plot(t, np.sum(y, axis=0))
+        for s in ['s3', 's5', 'p']:
+            plt.plot(t, np.sum(y[:, li7.get_state_indexes(s)], axis=1), label=s)
+        plt.xlabel('time (us)')
+        plt.ylabel('state population')
+        plt.legend()
         plt.show()
 
 
 if __name__ == '__main__':
-    example({0})
+    example({3})

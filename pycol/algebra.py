@@ -14,7 +14,7 @@ from sympy import nsimplify, sqrt, sin, cos, pi
 from sympy.vector import CoordSys3D
 import sympy.physics.wigner as spw
 
-from .types import *
+from pycol.types import *
 
 
 def cast_sympy(as_sympy: bool, *args: sympy_like, dtype: type = float):

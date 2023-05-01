@@ -16,9 +16,8 @@ from mpl_toolkits.axes_grid1 import make_axes_locatable
 # noinspection PyUnresolvedReferences
 from mpl_toolkits.mplot3d.axes3d import Axes3D
 
-
-from . import algebra as al
-from ._simulate import *
+import pycol.algebra as al
+from pycol._simulate import *
 
 
 try:

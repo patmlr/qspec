@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>pycol package &mdash; pycol 09.01.2022 documentation</title><link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <title>pycol package &mdash; pycol 01.05.2023 documentation</title><link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/borders.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/wy-nav-content.css" type="text/css" />
@@ -43,7 +43,7 @@
 <li class="toctree-l2 current"><a class="current reference internal" href="#">pycol package</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#subpackages">Subpackages</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="pycol.cpp.html">pycol.cpp package</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pycol._lineshapes.html">pycol._lineshapes package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pycol.models.html">pycol.models package</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="#submodules">Submodules</a></li>
@@ -99,13 +99,13 @@
 <li class="toctree-l2"><a class="reference internal" href="pycol.cpp.html#module-pycol.cpp">Module contents</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="pycol._lineshapes.html">pycol._lineshapes package</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="pycol._lineshapes.html#submodules">Submodules</a></li>
-<li class="toctree-l2"><a class="reference internal" href="pycol._lineshapes.html#module-pycol._lineshapes.base">pycol._lineshapes.base module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="pycol._lineshapes.html#module-pycol._lineshapes.convolved">pycol._lineshapes.convolved module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="pycol._lineshapes.html#module-pycol._lineshapes.spectrum">pycol._lineshapes.spectrum module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="pycol._lineshapes.html#module-pycol._lineshapes.splitter">pycol._lineshapes.splitter module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="pycol._lineshapes.html#module-pycol._lineshapes">Module contents</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pycol.models.html">pycol.models package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="pycol.models.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pycol.models.html#module-pycol.models.base">pycol.models.base module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pycol.models.html#module-pycol.models.convolved">pycol.models.convolved module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pycol.models.html#module-pycol.models.spectrum">pycol.models.spectrum module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pycol.models.html#module-pycol.models.splitter">pycol.models.splitter module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pycol.models.html#module-pycol.models">Module contents</a></li>
 </ul>
 </li>
 </ul>
@@ -568,7 +568,7 @@ J_4 &amp; J_5 &amp; J_6
 </ul>
 </dd>
 <dt>classes:</dt><dd><p>(- Element; Holds spectroscopic information about a chemical element.)
-(- Radii; Holds information about nuclear charge radii of an chemical element.)
+(- Radii; Holds information about nuclear charge radii of a chemical element.)
 - King; Creates a King plot with isotope shifts or nuclear charge radii.</p>
 </dd>
 </dl>
@@ -1148,7 +1148,7 @@ their respective 1-sigma uncertainties and their correlation coefficient.</p>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>ijj</strong> – The three or an Iterable of three quantum numbers I, J_l and J_u.
 Must have the format [I, J_l, J_u] or [[I0, J0_l, J0_u], [I1, J1_l, J1_u], …].</p></li>
-<li><p><strong>shape</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">type</span></code>, <a class="reference internal" href="pycol._lineshapes.html#pycol._lineshapes.spectrum.Spectrum" title="pycol._lineshapes.spectrum.Spectrum"><code class="xref py py-class docutils literal notranslate"><span class="pre">Spectrum</span></code></a>]) – A str representation of or a Spectrum type.</p></li>
+<li><p><strong>shape</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">type</span></code>, <a class="reference internal" href="pycol.models.html#pycol.models.spectrum.Spectrum" title="pycol.models.spectrum.Spectrum"><code class="xref py py-class docutils literal notranslate"><span class="pre">Spectrum</span></code></a>]) – A str representation of or a Spectrum type.</p></li>
 <li><p><strong>qi</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – Whether to use a quantum interference model. NOT IMPLEMENTED.</p></li>
 <li><p><strong>hf_mixing</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – Whether to use a hyperfine mixing model. NOT IMPLEMENTED.</p></li>
 <li><p><strong>n_peaks</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – The number of “peaks per resonance”.</p></li>
@@ -1158,7 +1158,7 @@ If offsets is None, a single constant offset is assumed.</p></li>
 <li><p><strong>x_cuts</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code>]) – The x values where to cut the x-axis. Must be a list or a single value.
 In the former case len(offsets) == len(x_cuts) + 1 must hold.
 If x_cuts is None, the x-axis will not be cut.</p></li>
-<li><p><strong>convolve</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">type</span></code>, <a class="reference internal" href="pycol._lineshapes.html#pycol._lineshapes.spectrum.Spectrum" title="pycol._lineshapes.spectrum.Spectrum"><code class="xref py py-class docutils literal notranslate"><span class="pre">Spectrum</span></code></a>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code>]) – A str representation of or a Convolved type.</p></li>
+<li><p><strong>convolve</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">type</span></code>, <a class="reference internal" href="pycol.models.html#pycol.models.spectrum.Spectrum" title="pycol.models.spectrum.Spectrum"><code class="xref py py-class docutils literal notranslate"><span class="pre">Spectrum</span></code></a>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code>]) – A str representation of or a Convolved type.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -1174,6 +1174,24 @@ If x_cuts is None, the x-axis will not be cut.</p></li>
 <p>Created on 01.04.2020</p>
 <p>&#64;author: Patrick Mueller</p>
 <p>Module including physical functions useful for CLS.</p>
+<dl class="py function">
+<dt id="pycol.physics.a_hyper_mu">
+<code class="sig-prename descclassname"><span class="pre">pycol.physics.</span></code><code class="sig-name descname"><span class="pre">a_hyper_mu</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">i</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">j</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mu</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pycol/physics.html#a_hyper_mu"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycol.physics.a_hyper_mu" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>i</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>]) – The nuclear spin quantum number I.</p></li>
+<li><p><strong>j</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>]) – The electronic total angular momentum quantum number J.</p></li>
+<li><p><strong>mu</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Iterable</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>]) – The magnetic moment of the nucleus in units of the nuclear magneton (mu_N).</p></li>
+<li><p><strong>b</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Iterable</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>]) – The B-field of the atomic electrons at the nucleus (T).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The hyperfine structure constant A (MHz).</p>
+</dd>
+</dl>
+</dd></dl>
+
 <dl class="py function">
 <dt id="pycol.physics.alpha_atom">
 <code class="sig-prename descclassname"><span class="pre">pycol.physics.</span></code><code class="sig-name descname"><span class="pre">alpha_atom</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">alpha</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pycol/physics.html#alpha_atom"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycol.physics.alpha_atom" title="Permalink to this definition">¶</a></dt>
@@ -1600,6 +1618,32 @@ the Barrett radius of the isotope and the reference isotope.</p></li>
 </dd></dl>
 
 <dl class="py function">
+<dt id="pycol.physics.freq_to_inv_cm">
+<code class="sig-prename descclassname"><span class="pre">pycol.physics.</span></code><code class="sig-name descname"><span class="pre">freq_to_inv_cm</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">freq</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pycol/physics.html#freq_to_inv_cm"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycol.physics.freq_to_inv_cm" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>freq</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Iterable</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>]) – The frequency f of a transition (MHz)</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The wavenumber k corresponding to the frequency freq (MHz).</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="pycol.physics.freq_to_wavelength">
+<code class="sig-prename descclassname"><span class="pre">pycol.physics.</span></code><code class="sig-name descname"><span class="pre">freq_to_wavelength</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">freq</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pycol/physics.html#freq_to_wavelength"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycol.physics.freq_to_wavelength" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>freq</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Iterable</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>]) – The frequency f of a transition (MHz)</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The wavelength corresponding to the frequency freq (MHz).</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
 <dt id="pycol.physics.gamma">
 <code class="sig-prename descclassname"><span class="pre">pycol.physics.</span></code><code class="sig-name descname"><span class="pre">gamma</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">v</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pycol/physics.html#gamma"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycol.physics.gamma" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
@@ -1756,6 +1800,12 @@ The shapes of r, k, w0, v and r0 must be compatible.</p>
 <dd class="field-even"><p>All possible zeeman substates of the specified quantum number.</p>
 </dd>
 </dl>
+</dd></dl>
+
+<dl class="py data">
+<dt id="pycol.physics.gn_s">
+<code class="sig-prename descclassname"><span class="pre">pycol.physics.</span></code><code class="sig-name descname"><span class="pre">gn_s</span></code><em class="property"> <span class="pre">=</span> <span class="pre">-3.82608545</span></em><a class="headerlink" href="#pycol.physics.gn_s" title="Permalink to this definition">¶</a></dt>
+<dd><p>Units</p>
 </dd></dl>
 
 <dl class="py function">
@@ -1991,12 +2041,6 @@ and its uncertainty.</p>
 </dl>
 </dd></dl>
 
-<dl class="py data">
-<dt id="pycol.physics.m_e_u_d">
-<code class="sig-prename descclassname"><span class="pre">pycol.physics.</span></code><code class="sig-name descname"><span class="pre">m_e_u_d</span></code><em class="property"> <span class="pre">=</span> <span class="pre">1.6e-14</span></em><a class="headerlink" href="#pycol.physics.m_e_u_d" title="Permalink to this definition">¶</a></dt>
-<dd><p>Units</p>
-</dd></dl>
-
 <dl class="py function">
 <dt id="pycol.physics.mass_factor">
 <code class="sig-prename descclassname"><span class="pre">pycol.physics.</span></code><code class="sig-name descname"><span class="pre">mass_factor</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">m</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">m_ref</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">m_d</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">m_ref_d</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k_inf</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pycol/physics.html#mass_factor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycol.physics.mass_factor" title="Permalink to this definition">¶</a></dt>
@@ -2018,26 +2062,6 @@ in [W. H. King, Isotope shifts in atomic spectra (1984)].</p></li>
 </dd>
 <dt class="field-odd">Returns</dt>
 <dd class="field-odd"><p>the mass factor and its uncertainty needed to calculate modified isotope shifts or charge radii.</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt id="pycol.physics.p">
-<code class="sig-prename descclassname"><span class="pre">pycol.physics.</span></code><code class="sig-name descname"><span class="pre">p</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">v</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">m</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">relativistic</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pycol/physics.html#p"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycol.physics.p" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>v</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Iterable</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>]) – The velocity of a body (m/s).</p></li>
-<li><p><strong>m</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Iterable</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>]) – The mass of the body (amu).</p></li>
-<li><p><strong>relativistic</strong> – The calculation is performed either relativistically or classically.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Iterable</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>]</p>
-</dd>
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p>The momentum of a body with velocity v and mass m.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -2083,6 +2107,26 @@ after the addition of the kinetic energy e (amu m/s).</p>
 <dt class="field-odd">Returns</dt>
 <dd class="field-odd"><p>The momentum of a body with starting momentum p0, charge q and mass m
 after electrostatic acceleration with voltage u.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="pycol.physics.p_v">
+<code class="sig-prename descclassname"><span class="pre">pycol.physics.</span></code><code class="sig-name descname"><span class="pre">p_v</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">v</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">m</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">relativistic</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pycol/physics.html#p_v"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycol.physics.p_v" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>v</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Iterable</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>]) – The velocity of a body (m/s).</p></li>
+<li><p><strong>m</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Iterable</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>]) – The mass of the body (amu).</p></li>
+<li><p><strong>relativistic</strong> – The calculation is performed either relativistically or classically.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Iterable</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>]</p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>The momentum of a body with velocity v and mass m.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -2197,6 +2241,11 @@ This must be differences of real frequencies, such that w = 2 pi * df (MHz).</p>
 </dd>
 </dl>
 </dd></dl>
+
+<dl class="py function">
+<dt id="pycol.physics.schmidt_line">
+<code class="sig-prename descclassname"><span class="pre">pycol.physics.</span></code><code class="sig-name descname"><span class="pre">schmidt_line</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ll</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">j</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_proton</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pycol/physics.html#schmidt_line"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycol.physics.schmidt_line" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 <dl class="py function">
 <dt id="pycol.physics.sellmeier">
@@ -2417,6 +2466,19 @@ after electrostatic acceleration with voltage u (m/s).</p>
 <dt class="field-odd">Returns</dt>
 <dd class="field-odd"><p>The change of velocity of an atom at rest
 due to the absorption of a photon with frequency f (m/s).</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="pycol.physics.wavelength_to_freq">
+<code class="sig-prename descclassname"><span class="pre">pycol.physics.</span></code><code class="sig-name descname"><span class="pre">wavelength_to_freq</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lam</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pycol/physics.html#wavelength_to_freq"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycol.physics.wavelength_to_freq" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>lam</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Iterable</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>]) – The wavelength lambda of a transition (um)</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The frequency corresponding to the wavelength lam (MHz).</p>
 </dd>
 </dl>
 </dd></dl>
@@ -4316,7 +4378,7 @@ the corresponding number of decimal places after the decimal point.</p>
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2022, Patrick Matthias Mueller.</p>
+    <p>&#169; Copyright 2023, Patrick Mueller.</p>
   </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a

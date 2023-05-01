@@ -12,8 +12,8 @@ Convolution classes for lineshape models.
 import numpy as np
 
 from pycol.tools import merge_intervals
-from .base import Model
-from .spectrum import Gauss, Lorentz, GaussChi2, source_energy_pdf
+from pycol.models.base import Model
+from pycol.models.spectrum import Gauss, Lorentz, GaussChi2, source_energy_pdf
 
 
 CONVOLVE = ['None', 'Gauss', 'Lorentz', 'GaussChi2']

@@ -15,8 +15,8 @@ import scipy.integrate as si
 from scipy.optimize import curve_fit, root, minimize
 import matplotlib.pyplot as plt
 
-from .types import *
-from . import tools
+from pycol.types import *
+from pycol import tools
 
 
 class Observable(float):
