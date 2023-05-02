@@ -157,7 +157,7 @@ double j_dipole(double a, double freq_0, double freq_1)
 
 double a_dipole(double i, double j_l, double f_l, double m_l, double j_u, double f_u, double m_u, double q)
 {
-    if (m_u - m_l != q) return 0.;
+    if (abs(m_u - m_l - q) > 0.1) return 0.;
     double sqrt_f = sqrt(2 * f_l + 1);
     double sqrt_j = sqrt(2 * j_u + 1);
     double exp = f_l + i + 1 + j_u;

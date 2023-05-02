@@ -1,6 +1,40 @@
 [build-system]
 build-backend = 'setuptools.build_meta'
 requires = [
-    'setuptools >= 42',
+    'setuptools >= 61.2',
     'wheel',
 ]
+
+[project]
+name = 'pycol'
+version = '0.0.1'
+description = 'A python package for calculations surrounding Collinear Laser Spectroscopy.'
+readme = 'README.md'
+requires-python = '>=3.8'
+license = {file = 'LICENSE'}
+keywords = ['physics', 'laser spectroscopy', 'simulation', 'quantum mechanics', 'data analysis']
+authors = [
+    {name = 'Patrick Mueller', email = 'pamueller@ikp.tu-darmstadt.de'},
+]
+maintainers = [
+  {name = 'Patrick Mueller', email = 'pamueller@ikp.tu-darmstadt.de'}
+]
+classifiers = [
+    'Programming Language :: Python :: 3',
+    'License :: OSI Approved :: MIT License',
+    'Operating System :: Microsoft :: Windows'
+]
+dependencies = [
+    'numpy >= 1.20.0',
+    'scipy',
+    'sympy',
+    'matplotlib'
+]
+
+[project.urls]
+homepage = 'https://www.ikp.tu-darmstadt.de/forschung_kernphysik/gruppen_kernphysik/experiment/ag_w_noertershaeuser/index.en.jsp'
+repository = 'http://gitlab.ikp.physik.tu-darmstadt.de/Lasersphere/pycol'
+bug-tracker = 'http://gitlab.ikp.physik.tu-darmstadt.de/Lasersphere/pycol/issues'
+
+[tool.setuptools.package-data]
+'*' = ['*.dll']
