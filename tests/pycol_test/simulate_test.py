@@ -33,12 +33,23 @@ class TestPhysics(ut.TestCase):
         inter.resonance_info()
 
         t = np.linspace(0, 4, 1001)
+
         # y = inter.rates(t)[0]
+
         y = inter.master(t)
         y = np.diagonal(y[0], axis1=0, axis2=1).real.T
+
         for s in states:
             plt.plot(t, np.sum(y[atom.get_state_indexes(s.label)], axis=0), label=s.label)
         plt.xlabel('time (us)')
         plt.ylabel('state populations')
+        plt.legend()
+        plt.show()
+
+        for s in ['s-', 'd+']:
+            sr = atom.scattering_rate(y, j=atom.get_state_indexes(s), axis=0)
+            plt.plot(t, sr, label=f'into {s}')
+        plt.xlabel('time (us)')
+        plt.ylabel('scattering rate (MHz)')
         plt.legend()
         plt.show()

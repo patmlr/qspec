@@ -225,7 +225,8 @@ def _process_hyper_const(hyper_const: array_like) -> ndarray:
     Preprocess the hyperfine-structure constants.
 
     :param hyper_const: The hyperfine-structure constants. Currently, constants up to the electric quadrupole order are
-     supported (A, B). If 'hyper_const' is a scalar, it is assumed to be the constant A and the other orders are 0.
+     supported (A, B). If 'hyper_const' is a scalar,
+     it is assumed to be the constant A and the other orders are 0 (MHz).
     :returns: The hyperfine-structure constants as a 3d-vector.
     """
     if hyper_const is None or not hyper_const:
@@ -468,7 +469,8 @@ def construct_electronic_state(freq_0: scalar, s: scalar, l: scalar, j: scalar, 
     :param j: The electronic total angular momentum quantum number J.
     :param i: The nuclear spin quantum number I.
     :param hyper_const: The hyperfine-structure constants. Currently, constants up to the electric quadrupole order are
-     supported (A, B). If 'hyper_const' is a scalar, it is assumed to be the constant A and the other orders are 0.
+     supported (A, B). If 'hyper_const' is a scalar,
+     it is assumed to be the constant A and the other orders are 0 (MHz).
     :param g: The nuclear g-factor.
     :param label: The label of the states. The labels are used to link states via decay maps.
     :returns: A list of the created states.
@@ -491,7 +493,8 @@ def construct_hyperfine_state(freq_0: scalar, s: scalar, l: scalar, j: scalar, i
     :param i: The nuclear spin quantum number I.
     :param f: The hyperfine structure total angular momentum quantum number F.
     :param hyper_const: The hyperfine-structure constants. Currently, constants up to the electric quadrupole order are
-     supported (A, B). If 'hyper_const' is a scalar, it is assumed to be the constant A and the other orders are 0.
+     supported (A, B). If 'hyper_const' is a scalar,
+     it is assumed to be the constant A and the other orders are 0 (MHz).
     :param g: The nuclear g-factor.
     :param label: The label of the states. The labels are used to link states via decay maps.
     :returns: A list of the created states.
@@ -507,7 +510,7 @@ class DecayMap:
     def __init__(self, labels: Iterable[tuple] = None, a: Iterable[scalar] = None, instance=None):
         """
         :param labels: An iterable of label pairs, corresponding to atomic states which get connected.
-        :param a: An Iterable of Einstein-A coefficients.
+        :param a: An Iterable of Einstein-A coefficients (MHz).
         :param instance: A pointer to an existing DecayMap instance.
          If this is specified, the other parameters are omitted.
         """
@@ -585,7 +588,7 @@ class Atom:
         """
         :param states: The states of the atom.
         :param decay_map: The decay map which connects the atomic states.
-        :param mass: The mass of the atom.
+        :param mass: The mass of the atom (u).
         :param instance: A pointer to an existing Atom instance.
          If this is specified, the other parameters are omitted.
         """
@@ -663,14 +666,14 @@ class Atom:
     @property
     def mass(self):
         """
-        :returns: The mass of the atom.
+        :returns: The mass of the atom (u).
         """
         return dll.atom_get_mass(self.instance)
 
     @mass.setter
     def mass(self, value: scalar):
         """
-        :param value: The new mass of the atom.
+        :param value: The new mass of the atom (u).
         :returns: None.
         """
         dll.atom_set_mass(self.instance, c_double(value))
@@ -740,6 +743,44 @@ class Atom:
         except TypeError:
             f = {f}
         return np.array([i for i, s in enumerate(self.states) if s.label in labels and s.f in f], dtype=int)
+
+    def scattering_rate(self, rho: array_like, i: array_like = None, j: array_like = None, axis: int = 1):
+        """
+        :param rho: The population of the atom. Must have the same size as the atom along the specified 'axis'.
+        :param i: The initial state indexes to consider for spontaneous decay. If None, all states are considered.
+        :param j: The final state indexes to consider for spontaneous decay. If None, all states are considered.
+        :param axis: The axis along which the population is aligned in 'rho'.
+        :returns: The scattering rate of the atom given the population 'rho' (MHz or Events / s).
+        :raises ValueError: 'rho' must have the same size as the atom along the specified 'axis'.
+        """
+        rho = np.asarray(rho).real
+        if rho.shape[axis] != self.size:
+            raise ValueError('\'rho\' must have the same size as the atom along the specified \'axis\'.')
+
+        if i is None:
+            i = np.arange(self.size, dtype=int)
+        else:
+            i = np.array(i).flatten()
+        if j is None:
+            j = np.arange(self.size, dtype=int)
+        else:
+            j = np.array(j).flatten()
+
+        if axis < 0:
+            axis += len(rho.shape)
+
+        l0 = np.array([[1. if _i in i and _j in j else 0. for _i in range(self.size)] for _j in range(self.size)])
+        l0 *= self.l0
+
+        axes = [ax for ax in range(axis)]
+        if axes:
+            l0 = np.expand_dims(self.l0, axis=axes)
+        axes = [axis + ax + 2 for ax in range(len(rho.shape) - axis - 1)]
+        if axes:
+            l0 = np.expand_dims(l0, axis=axes)
+
+        sr = tools.transform(l0, rho, axis=axis)
+        return np.sum(sr, axis=axis)
 
     def plot(self, indices: array_like = None, draw_bounds: bool = False, show: bool = True):
         """
