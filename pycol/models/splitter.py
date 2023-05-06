@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-pycol._lineshapes.splitter
+pycol.models#.splitter
 
 Created on 14.03.2022
 
@@ -139,6 +139,10 @@ class Hyperfine(Splitter):
             self._add_arg('{}l'.format(ascii_uppercase[i]), 0., False, False)
         for i in range(self.n_u):
             self._add_arg('{}u'.format(ascii_uppercase[i]), 0., False, False)
+
+        for i in range(min([self.n_l, self.n_u])):
+            fix = '{} / {}'.format('{}u'.format(ascii_uppercase[i]), '{}l'.format(ascii_uppercase[i]))
+            self._add_arg('{}_ratio'.format(ascii_uppercase[i]), 0., fix, False)
 
         for i, (t, intensity) in enumerate(zip(self.transitions, self.racah_intensities)):
             self.racah_indices.append(self._index)

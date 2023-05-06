@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-pycol._lineshapes.convolved
+pycol.models.convolved
 
 Created on 14.03.2022
 

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-pycol._lineshapes.base
+pycol.models.base
 
 Created on 14.03.2022
 
@@ -12,7 +12,6 @@ Base classes for lineshape models.
 import numpy as np
 
 from pycol.tools import merge_intervals
-
 
 np_version = np.version.version.split('.')
 
@@ -32,8 +31,8 @@ class Model:
 
     def __call__(self, x, *args, **kwargs):
         return self.evaluate(x, *self.update_args(args), **kwargs)
-    
-    def evaluate(self, x, *args, **kwargs):  # Reimplement this function in subclasses (not evaluate).
+
+    def evaluate(self, x, *args, **kwargs):  # Reimplement this function in subclasses.
         pass
 
     def _add_arg(self, name, val, fix, link):
@@ -47,6 +46,19 @@ class Model:
 
         self._index += 1
         self._size += 1
+
+    @property
+    def description(self):
+        label = ''
+        super_model = self
+        while super_model is not None:
+            if isinstance(super_model, Listed):
+                label += super_model.type + '[0].'
+                super_model = super_model.models[0]
+            else:
+                label += super_model.type + '.'
+                super_model = super_model.model
+        return label[:-1]
 
     @property
     def size(self):
@@ -110,7 +122,7 @@ class Model:
     def set_links(self, links, force=False):
         for i, link in enumerate(links):
             self.set_link(i, link, force=force)
-    
+
     def set_val(self, i, val, force=False):
         if force or isinstance(val, int) or isinstance(val, float):
             if self.model is None:
@@ -120,13 +132,16 @@ class Model:
                 # to ensure set_val is called for a ListedModel if one is part of the sub-models.
                 # This is only needed for the vals since these may be predicted by the specific model.
                 # Everything else is handled by the top-model.
-    
+
     def set_fix(self, i, fix, force=False):
         if force:
             self.fixes[i] = fix
             return
         if isinstance(fix, int) or isinstance(fix, float):
-            fix = bool(fix)
+            if isinstance(fix, bool) or fix <= 0 or np.isinf(fix):
+                fix = bool(fix)
+            else:
+                fix = float(fix)
             expr = 'args[{}]'.format(i)
         elif isinstance(fix, str):
             _fix = fix
@@ -134,7 +149,7 @@ class Model:
                 _fix = _fix.replace(name, 'eval(self.expressions[{}])'.format(j))
             expr = _fix
             try:
-                eval(expr, {}, {'self': self, 'args': self.vals})
+                self._eval_zero_division(self.vals, expr)
             except (ValueError, TypeError, SyntaxError, NameError) as e:
                 print('Invalid expression for parameter \'{}\': {}. Got a {}.'.format(self.names[i], fix, repr(e)))
                 return
@@ -158,7 +173,7 @@ class Model:
             print('Expressions form a loop. Got a {}.'.format(repr(e)))
             self.expressions[i] = temp_expr
             self.fixes[i] = temp_fix
-    
+
     def set_link(self, i, link, force=False):
         if force:
             self.links[i] = link
@@ -166,8 +181,14 @@ class Model:
         if isinstance(link, int) or isinstance(link, float):
             self.links[i] = bool(link)
 
+    def _eval_zero_division(self, args, expr):
+        try:
+            return eval(expr, {}, {'self': self, 'args': args})
+        except ZeroDivisionError:
+            return 0.
+
     def update_args(self, args):
-        return tuple(eval(expr, {}, {'self': self, 'args': args}) for expr in self.expressions)
+        return tuple(self._eval_zero_division(args, expr) for expr in self.expressions)
 
     def update(self):
         self.set_vals(self.update_args(self.vals), force=True)
@@ -194,6 +215,10 @@ class Model:
             if isinstance(fix, bool):
                 b_lower.append(-np.inf)
                 b_upper.append(np.inf)
+            elif isinstance(fix, float):
+                b_lower.append(-np.inf)
+                b_upper.append(np.inf)
+                fixed[i] = False
             elif isinstance(fix, list):
                 _bounds = True
                 b_lower.append(fix[0])
@@ -211,9 +236,6 @@ class Model:
             bounds = (b_lower, b_upper)
         return fixed, bounds
 
-    def racah(self):
-        self.model.racah()
-
 
 class Empty(Model):
     def __init__(self):
@@ -230,8 +252,8 @@ class NPeak(Model):
         self.type = 'NPeak'
         self.n_peaks = int(n_peaks)
         for n in range(self.n_peaks):
-            self._add_arg('x{}'.format(n), 0., False, False)
-            self._add_arg('p{}'.format(n), 1., False, False)
+            self._add_arg('x{}'.format(n), 0., n == 0, False)
+            self._add_arg('p{}'.format(n), 1., n == 0, False)
 
     def evaluate(self, x, *args, **kwargs):
         return np.sum([args[self.model.size + 2 * n + 1]
@@ -253,27 +275,21 @@ class NPeak(Model):
 
 
 class Offset(Model):
-    def __init__(self, model=None, offsets=None, x_cuts=None):
+    def __init__(self, model=None, x_cuts=None, offsets=None):
         """
         :param model: The model the offset will be added to. If None, the offset will be added to zero.
-        :param offsets: A list of maximally considered polynomial orders for each slice.
         :param x_cuts: x values where to cut the x-axis.
+        :param offsets: A list of maximally considered polynomial orders for each slice.
          The list must have length len(x_cuts) + 1.
         """
         super().__init__(model=model)
         self.type = 'Offset'
-        self.offsets = offsets
-        if self.offsets is None:
-            self.offsets = [0, ]
-        elif isinstance(self.offsets, int):
-            self.offsets = [self.offsets, ]
         if x_cuts is None:
             x_cuts = []
-        elif isinstance(self.x_cuts, int) or isinstance(self.x_cuts, float):
-            self.x_cuts = [float(self.x_cuts), ]
-        if not x_cuts:
-            self.offsets = [self.offsets[0], ]
         self.x_cuts = sorted(list(x_cuts))
+        self.offsets = offsets
+        if self.offsets is None:
+            self.offsets = [0]
         if len(self.offsets) != len(self.x_cuts) + 1:
             raise ValueError('The parameter offset must be a list of size \'len(x_cuts) + 1\''
                              ' and contain the maximally considered polynomial order for each slice.')
@@ -377,6 +393,9 @@ class Listed(Model):
             for j, (name, val, fix, link) in enumerate(model.get_pars()):
                 self.model_map.append(i)
                 self.index_map.append(j)
+                if isinstance(fix, str):
+                    for _name in model.names:
+                        fix = fix.replace(_name, '{}{}'.format(_name, label))
                 self._add_arg('{}{}'.format(name, label), val, fix, link)
 
     def set_val(self, i, val, force=False):
@@ -403,10 +422,6 @@ class Listed(Model):
     def inherit_links(self):
         self.set_links([link for model in self.models for link in model.links], force=True)
 
-    def racah(self):
-        for model in self.models:
-            model.racah()
-
 
 class Summed(Listed):
     def __init__(self, models, labels=None):
@@ -416,8 +431,8 @@ class Summed(Listed):
         self.indices_add = []
         for n, (model, label) in enumerate(zip(self.models, self.labels)):
             self.indices_add.append([self._index, self._index + 1])
-            self._add_arg('center{}'.format(label), 0., n == 0, False)
-            self._add_arg('int{}'.format(label), 1., True, False)
+            self._add_arg('center{}'.format(label), 0., False, False)
+            self._add_arg('int{}'.format(label), 1., False, False)
 
     def evaluate(self, x, *args, **kwargs):
         return np.sum([args[i[1]] * model.evaluate(x - args[i[0]], *args[_slice], **kwargs)
