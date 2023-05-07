@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-pycol.models#.splitter
+pycol.models.splitter
 
 Created on 14.03.2022
 
