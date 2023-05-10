@@ -9,6 +9,7 @@ Created on 14.03.2022
 Classes for lineshape models.
 """
 
+from pycol.models.helper import *
 from pycol.models.base import *
 from pycol.models.convolved import *
 from pycol.models.spectrum import *
