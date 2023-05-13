@@ -83,6 +83,12 @@ def fit(model: base.Model, x: array_iter, y: array_iter, sigma_x: array_iter = N
     if model.error:
         raise ValueError(model.error)
 
+    sigma = kwargs.get('sigma', None)
+    if sigma_y is None:
+        sigma_y = sigma
+    elif sigma is not None:
+        print_colored('WARNING', 'Parameter \'sigma\' is redundant. \'sigma_y\' will be used.')
+
     if isinstance(model, base.Linked):
         if mc_sigma != 0:
             raise TypeError('Linked models are currently not supported with Monte-Carlo sampling.')
@@ -111,6 +117,12 @@ def fit(model: base.Model, x: array_iter, y: array_iter, sigma_x: array_iter = N
                 models_offset[0].gen_offset_masks(x)
                 if guess_offset:
                     models_offset[0].guess_offset(x, y)
+
+    model = base.YPars(model)
+    vals = [base.val_fix_to_val(model.vals[p_y], model.fixes[p_y]) for p_y in model.p_y]
+    uncs = [base.fix_to_unc(model.fixes[p_y]) for p_y in model.p_y]
+    y = np.concatenate([y, np.array(vals, dtype=float)], axis=0)
+    sigma_y = np.concatenate([sigma_y, np.array(uncs, dtype=float)], axis=0)
 
     p0_fixed, bounds = model.fit_prepare()
 
@@ -162,7 +174,6 @@ def fit(model: base.Model, x: array_iter, y: array_iter, sigma_x: array_iter = N
         popt = np.array(model.vals, dtype=float)
         pcov = np.zeros((popt.size, popt.size))
         e = _e
-
     if report:
         digits = int(np.floor(np.log10(np.abs(model.size)))) + 1
         print('Optimized parameters:')
@@ -180,6 +191,7 @@ def fit(model: base.Model, x: array_iter, y: array_iter, sigma_x: array_iter = N
         else:
             print_colored('OKGREEN', 'Fit successful.\n')
 
+    model = model.model  # Discard the YPars model.
     if isinstance(model, base.Linked):
         for model_offset in models_offset:
             model_offset.update_on_call = True  # Reset the offset model to be updated on call.

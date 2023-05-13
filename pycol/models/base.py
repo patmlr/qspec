@@ -16,6 +16,36 @@ from pycol.tools import merge_intervals
 np_version = np.version.version.split('.')
 
 
+def is_unc(fix):
+    if isinstance(fix, float):
+        return True
+    if not isinstance(fix, str):
+        return False
+
+    j, k = fix.find('('), fix.find(')')
+    try:
+        if j == -1 or k == -1:
+            raise ValueError('Not a value with uncertainty.')
+        _ = '{}({})'.format(float(fix[:j]), float(fix[j+1:k]))
+    except ValueError:
+        return False
+    return True
+
+
+def val_fix_to_val(val, fix):
+    if isinstance(fix, float):
+        return val
+    j = fix.find('(')
+    return float(fix[:j])
+
+
+def fix_to_unc(fix):
+    if isinstance(fix, float):
+        return fix
+    j, k = fix.find('('), fix.find(')')
+    return float(fix[j+1:k])
+
+
 def args_ordered(args, order):
     return [args[i] for i in order]
 
@@ -36,6 +66,8 @@ class Model:
         pass
 
     def _add_arg(self, name, val, fix, link):
+        if name in self.names:
+            raise ValueError('Parameter {} already exists.'.format(name))
         self.names.append(name)
         self.vals.append(val)
         self.fixes.append(fix)
@@ -138,21 +170,30 @@ class Model:
             self.fixes[i] = fix
             return
         if isinstance(fix, int) or isinstance(fix, float):
-            if isinstance(fix, bool) or fix <= 0 or np.isinf(fix):
+            if isinstance(fix, bool):
                 fix = bool(fix)
+            elif fix <= 0 or np.isinf(fix):
+                fix = fix <= 0
             else:
                 fix = float(fix)
             expr = 'args[{}]'.format(i)
         elif isinstance(fix, str):
-            _fix = fix
-            for j, name in enumerate(self.names):
-                _fix = _fix.replace(name, 'eval(self.expressions[{}])'.format(j))
-            expr = _fix
+            j, k = fix.find('('), fix.find(')')
             try:
-                self._eval_zero_division(self.vals, expr)
-            except (ValueError, TypeError, SyntaxError, NameError) as e:
-                print('Invalid expression for parameter \'{}\': {}. Got a {}.'.format(self.names[i], fix, repr(e)))
-                return
+                if j == -1 or k == -1:
+                    raise ValueError('Not a value with uncertainty.')
+                fix = '{}({})'.format(float(fix[:j]), float(fix[j+1:k]))
+                expr = 'args[{}]'.format(i)
+            except ValueError:
+                _fix = fix
+                for j, name in enumerate(self.names):
+                    _fix = _fix.replace(name, 'eval(self.expressions[{}])'.format(j))
+                expr = _fix
+                try:
+                    self._eval_zero_division(self.vals, expr)
+                except (ValueError, TypeError, SyntaxError, NameError) as e:
+                    print('Invalid expression for parameter \'{}\': {}. Got a {}.'.format(self.names[i], fix, repr(e)))
+                    return
         elif isinstance(fix, list):
             if len(fix) == 0:
                 fix = [0, 1]
@@ -215,7 +256,7 @@ class Model:
             if isinstance(fix, bool):
                 b_lower.append(-np.inf)
                 b_upper.append(np.inf)
-            elif isinstance(fix, float):
+            elif is_unc(fix):
                 b_lower.append(-np.inf)
                 b_upper.append(np.inf)
                 fixed[i] = False
@@ -372,6 +413,35 @@ class Amplifier(Model):
         return self._max
 
 
+class Custom(Model):
+    def __init__(self, model=None, parameters=None):
+        super().__init__(model=model)
+        self.type = 'Custom'
+        if parameters is None:
+            parameters = []
+        self.parameters = parameters
+
+        for p in self.parameters:
+            self._add_arg(p, 0., False, False)
+
+    def evaluate(self, x, *args, **kwargs):
+        if self.model is None:
+            return np.array(args, dtype=float)
+        return self.model.evaluate(x, *args[:self.model.size], **kwargs)
+
+
+class YPars(Model):
+    def __init__(self, model):
+        super().__init__(model=model)
+        self.type = 'YPars'
+
+        self.p_y = [i for i, fix in enumerate(self.model.fixes) if is_unc(fix)]
+
+    def evaluate(self, x, *args, **kwargs):
+        return np.concatenate([self.model.evaluate(x, *args, **kwargs),
+                               np.array([args[p_y] for p_y in self.p_y], dtype=float)], axis=0)
+
+
 class Listed(Model):
     def __init__(self, models, labels=None):
         super().__init__(model=None)
@@ -393,7 +463,7 @@ class Listed(Model):
             for j, (name, val, fix, link) in enumerate(model.get_pars()):
                 self.model_map.append(i)
                 self.index_map.append(j)
-                if isinstance(fix, str):
+                if isinstance(fix, str) and not is_unc(fix):
                     for _name in model.names:
                         fix = fix.replace(_name, '{}{}'.format(_name, label))
                 self._add_arg('{}{}'.format(name, label), val, fix, link)
@@ -459,12 +529,7 @@ class Linked(Listed):
         self.type = 'Linked'
 
         for i, (name, val, fix, link) in enumerate(self.get_pars()):
-            if isinstance(fix, str):
-                _fix = fix
-                for _i, _name in enumerate(self.models[self.model_map[i]].names):
-                    _fix = _fix.replace(_name, '{}__{}'.format(_name, self.model_map[i]))
-                self.set_fix(i, _fix)
-            if link and (fix is False or isinstance(fix, list)):
+            if link and (not fix or isinstance(fix, list) or is_unc(fix)):
                 _name = name[:name.rfind('__')]
                 for j, model in enumerate(self.models):
                     if j < self.model_map[i] and _name in model.names:
