@@ -23,7 +23,7 @@ ROUTINES = {'curve_fit', 'odr_fit'}
 
 class Xlist:  # Custom list to trick 'curve_fit' for linked fitting of files with different x-axis sizes.
     def __init__(self, x):
-        self.x = x
+        self.x = [np.asarray(_x, dtype=float) for _x in x]
 
     def __iter__(self):
         for _x in self.x:
@@ -36,6 +36,12 @@ class Xlist:  # Custom list to trick 'curve_fit' for linked fitting of files wit
         self.x[key] = value
 
 
+def sqrt_zero_free(x: array_like):
+    y = np.ones_like(x, dtype=float)
+    y[x > 1] = np.sqrt(x)
+    return y
+
+
 def residuals(model, x, y):
     return y - model(x, *model.vals)
 
@@ -46,9 +52,16 @@ def reduced_chi2(model, x, y, sigma_y):
     return np.sum(residuals(model, x, y) ** 2 / sigma_y ** 2) / (y.size - n_free)
 
 
-def fit(model: base.Model, x: array_iter, y: array_iter, sigma_x: array_iter = None, sigma_y: array_iter = None,
-        report: bool = False, routine: Union[Callable, str] = None, guess_offset: bool = False,
-        mc_sigma: int = 0, **kwargs):
+def _wrap_sigma_y(sigma_y, uncs):
+    i = -uncs.size if uncs.size > 0 else None
+    def func(x, y, y_fit, *params):
+        return np.concatenate([sigma_y(x, y, y_fit, *params)[:i], uncs], axis=0)
+    return func
+
+
+def fit(model: base.Model, x: array_iter, y: array_iter, sigma_x: array_iter = None,
+        sigma_y: Union[array_iter, Callable] = None, report: bool = False, routine: Union[Callable, str] = None,
+        guess_offset: bool = False, mc_sigma: int = 0, **kwargs):
     """
     :param model: The model to fit.
     :param x: The x data. Can be any object accepted by the model.
@@ -59,6 +72,8 @@ def fit(model: base.Model, x: array_iter, y: array_iter, sigma_x: array_iter = N
      set to odr_fit.
     :param sigma_y: The uncertainties of the y-values.
      This has to be a 1-d array or a list of 1-d arrays if model is a Linked model and have the same shape as 'y'.
+     If routine is 'curve_fit', sigma may be a function g such that 'g(x, y, model(x, *params), *params) -> sigma'.
+     g should accept the same x as the model and y and model(x, *params) as 1-d arrays.
     :param report: Whether to print the fit results.
     :param routine: The routine to use for fitting. Currently supported are {curve_fit, odr_fit}.
      If None, curve_fit is used. See 'sigma_x' for one exception.
@@ -89,6 +104,9 @@ def fit(model: base.Model, x: array_iter, y: array_iter, sigma_x: array_iter = N
     elif sigma is not None:
         print_colored('WARNING', 'Parameter \'sigma\' is redundant. \'sigma_y\' will be used.')
 
+    if callable(sigma_y) and mc_sigma:
+        raise ValueError("'sigma(_y)' must not be callable if 'mc_sigma' > 0.")
+
     if isinstance(model, base.Linked):
         if mc_sigma != 0:
             raise TypeError('Linked models are currently not supported with Monte-Carlo sampling.')
@@ -104,11 +122,13 @@ def fit(model: base.Model, x: array_iter, y: array_iter, sigma_x: array_iter = N
         y = np.concatenate(y, axis=0)
         if sigma_x is not None:
             sigma_x = np.concatenate(sigma_x, axis=0)
-        if sigma_y is not None:
+        if sigma_y is not None and not callable(sigma_y):
             sigma_y = np.concatenate(sigma_y, axis=0)
     else:
         y = np.asarray(y, dtype=float)
-        sigma_x, sigma_y = asarray_optional(sigma_x, dtype=float), asarray_optional(sigma_y, dtype=float)
+        sigma_x = asarray_optional(sigma_x, dtype=float)
+        if not callable(sigma_y):
+            sigma_y = asarray_optional(sigma_y, dtype=float)
 
         models_offset = [helper.find_model(model, base.Offset)]
         if models_offset[0] is not None:
@@ -118,11 +138,17 @@ def fit(model: base.Model, x: array_iter, y: array_iter, sigma_x: array_iter = N
                 if guess_offset:
                     models_offset[0].guess_offset(x, y)
 
-    model = base.YPars(model)
-    vals = [base.val_fix_to_val(model.vals[p_y], model.fixes[p_y]) for p_y in model.p_y]
-    uncs = [base.fix_to_unc(model.fixes[p_y]) for p_y in model.p_y]
-    y = np.concatenate([y, np.array(vals, dtype=float)], axis=0)
-    sigma_y = np.concatenate([sigma_y, np.array(uncs, dtype=float)], axis=0)
+    discard_y_pars = False
+    if not isinstance(model, base.YPars):
+        discard_y_pars = True
+        model = base.YPars(model)
+        vals = np.array([base.val_fix_to_val(model.vals[p_y], model.fixes[p_y]) for p_y in model.p_y], dtype=float)
+        uncs = np.array([base.fix_to_unc(model.fixes[p_y]) for p_y in model.p_y], dtype=float)
+        y = np.concatenate([y, vals], axis=0)
+        if callable(sigma_y):
+            sigma_y = _wrap_sigma_y(sigma_y, uncs)
+        else:
+            sigma_y = np.concatenate([sigma_y, uncs], axis=0)
 
     p0_fixed, bounds = model.fit_prepare()
 
@@ -166,7 +192,12 @@ def fit(model: base.Model, x: array_iter, y: array_iter, sigma_x: array_iter = N
             popt, pcov = routine(model, x, y, p0=model.vals, p0_fixed=p0_fixed, **kwargs)
         popt = np.array(model.update_args(popt))
         model.set_vals(popt, force=True)
-        chi2 = 0. if sigma_y is None else reduced_chi2(model, x, y, sigma_y)
+        if sigma_y is None:
+            chi2 = 0.
+        elif callable(sigma_y):
+            chi2 = reduced_chi2(model, x, y, sigma_y(x, y, model(x, *popt), *popt))
+        else:
+            chi2 = reduced_chi2(model, x, y, sigma_y)
     except (ValueError, RuntimeError) as _e:
         warn = True
         err = True
@@ -191,7 +222,8 @@ def fit(model: base.Model, x: array_iter, y: array_iter, sigma_x: array_iter = N
         else:
             print_colored('OKGREEN', 'Fit successful.\n')
 
-    model = model.model  # Discard the YPars model.
+    if discard_y_pars:
+        model = model.model  # Discard the YPars model.
     if isinstance(model, base.Linked):
         for model_offset in models_offset:
             model_offset.update_on_call = True  # Reset the offset model to be updated on call.

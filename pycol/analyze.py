@@ -14,20 +14,29 @@ linear regression algorithms:
     - linear_monte_carlo_nd(); based on [Gebert et al., Phys. Rev. Lett. 115, 053003 (2015), Suppl.]
 
 curve fitting methods:
-    - curve_fit(); Encapsulates the scipy.optimize.curve_fit method to allow fixing parameters.
+    - curve_fit(); Encapsulates the scipy.optimize.curve_fit method to allow fixing parameters
+     and having parameter-dependent y-uncertainties.
     - odr_fit(); Encapsulates the scipy.odr.odr method to accept inputs similarly to curve_fit().
 
 classes:
     (- Element; Holds spectroscopic information about a chemical element.)
     (- Radii; Holds information about nuclear charge radii of a chemical element.)
     - King; Creates a King plot with isotope shifts or nuclear charge radii.
+
+LICENSE NOTES: The method curve_fit is a modified version of scipy.optimize.curve_fit.
+ Therefore, it is licensed under the 'BSD 3-Clause "New" or "Revised" License' provided with scipy.
 """
 
 import inspect
+import warnings
 import numpy as np
+
+from scipy.optimize._minpack_py import Bounds, LinAlgError, OptimizeWarning, _getfullargspec, _initialize_feasible, \
+    _wrap_jac, cholesky, least_squares, leastsq, prepare_bounds, solve_triangular, svd
+from scipy.optimize import minimize
 import scipy.stats as st
 import scipy.odr as odr
-import scipy.optimize as so
+# import scipy.optimize as so
 import matplotlib.pyplot as plt
 
 from pycol.types import *
@@ -72,6 +81,40 @@ def _get_rtype2(ab_dict: dict, a: Union[Iterable, any], b: Union[Iterable, any],
             return np.array([[ab_dict[a_i][b_i] for b_i in b] for a_i in a])
     else:
         raise ValueError('\'a\' and \'b\' must be Non-Iterables or an Iterable of the corresponding types.')
+
+
+def _wrap_func_pars(func, p0, p0_fixed):
+    def func_wrapped(x, *params):
+        _params = p0
+        _params[~p0_fixed] = np.asarray(params)
+        return func(x, *_params)
+    return func_wrapped
+
+
+def _wrap_func_sigma(sigma, p0, p0_fixed):
+    def transform(xdata, ydata, yfunc, *params):
+        _params = p0
+        _params[~p0_fixed] = np.asarray(params)
+        return 1 / sigma(xdata, ydata, yfunc, *_params)
+    return transform
+
+
+def _wrap_func(func, xdata, ydata, transform):
+    # Copied from scipy, extended for callables.
+    if transform is None:
+        def func_wrapped(params):
+            return func(xdata, *params) - ydata
+    elif callable(transform):
+        def func_wrapped(params):
+            yfunc = func(xdata, *params)
+            return transform(xdata, ydata, yfunc, *params) * (yfunc - ydata)
+    elif transform.ndim == 1:
+        def func_wrapped(params):
+            return transform * (func(xdata, *params) - ydata)
+    else:
+        def func_wrapped(params):
+            return solve_triangular(transform, func(xdata, *params) - ydata, lower=True)
+    return func_wrapped
 
 
 def straight(x: array_like, a: array_like, b: array_like) -> ndarray:
@@ -189,6 +232,14 @@ def weight(sigma):
     return 1. / sigma ** 2
 
 
+def cost_chi2(y, y_fit, y_err):
+    return np.sum(((y - y_fit) / y_err) ** 2)
+
+
+def cost_chi2_poisson(y, y_fit):
+    return np.sum(((y - y_fit) / tools.sqrt_zero_free(y_fit)) ** 2)
+
+
 def york(x: array_iter, y: array_iter, sigma_x: array_iter = None, sigma_y: array_iter = None,
          corr: array_iter = None, iter_max: int = 200, report: bool = False, show: bool = False):
     """
@@ -224,7 +275,7 @@ def york(x: array_iter, y: array_iter, sigma_x: array_iter = None, sigma_y: arra
 
     sigma_x, sigma_y, corr = np.asarray(sigma_x), np.asarray(sigma_y), np.asarray(corr)
 
-    p_opt, _ = so.curve_fit(straight, x, y, p0=[0., 1.], sigma=sigma_y)  # (1)
+    p_opt, _ = curve_fit(straight, x, y, p0=[0., 1.], sigma=sigma_y)  # (1)
     b_init = p_opt[1]
     b = b_init
 
@@ -478,8 +529,8 @@ def linear_alpha(x: array_iter, y: array_iter, sigma_x: array_like = None, sigma
         return c ** 2 * 10. ** (n + 1)
 
     if find_alpha:
-        alpha = so.minimize(cost, np.array([alpha]), method='Nelder-Mead',
-                            options={'xatol': 1., 'fatol': 0.01 ** 2 * 10. ** (n + 1)}).x[0]
+        alpha = minimize(cost, np.array([alpha]), method='Nelder-Mead',
+                         options={'xatol': 1., 'fatol': 0.01 ** 2 * 10. ** (n + 1)}).x[0]
 
     a, b, sigma_a, sigma_b, corr_ab =\
         func(x - alpha, y, sigma_x=sigma_x, sigma_y=sigma_y, corr=corr,
@@ -487,65 +538,6 @@ def linear_alpha(x: array_iter, y: array_iter, sigma_x: array_like = None, sigma
     if report:
         print('alpha: {}'.format(alpha))
     return a, b, sigma_a, sigma_b, corr_ab, alpha
-
-
-def curve_fit(f: Callable, x: Union[array_like, object], y: array_like, p0: array_iter = None,
-              p0_fixed: array_iter = None, sigma: array_iter = None, absolute_sigma: bool = False,
-              check_finite: bool = True, bounds: (ndarray, ndarray) = (-np.inf, np.inf), method: str = None,
-              jac: Union[Callable, str] = None, report: bool = False, **kwargs) -> (ndarray, ndarray):
-    """
-    :param f: The model function to fit to the data.
-    :param x: The x data.
-    :param y: The y data.
-    :param p0: A numpy array or an Iterable of the initial guesses for the parameters.
-     Must have at least the same length as the minimum number of parameters required by the function 'f'.
-     If 'p0' is None, 1 is taken as an initial guess for all non-keyword parameters.
-    :param p0_fixed: A numpy array or an Iterable of bool values specifying, whether to fix a parameter.
-     Must have the same length as p0.
-    :param sigma: The 1-sigma uncertainty of the y data.
-    :param absolute_sigma: See scipy.optimize.curve_fit.
-    :param check_finite: See scipy.optimize.curve_fit.
-    :param bounds: See scipy.optimize.curve_fit.
-    :param method: See scipy.optimize.curve_fit.
-    :param jac: See scipy.optimize.curve_fit.
-    :param report: Whether to print the result of the fit.
-    :param kwargs: See scipy.optimize.curve_fit.
-    :returns: popt, pcov. The optimal parameters and their covariance matrix.
-    """
-    if p0_fixed is None or all(not p for p in p0_fixed):
-        popt, pcov = so.curve_fit(f, x, y, p0=p0, sigma=sigma, absolute_sigma=absolute_sigma,
-                                  check_finite=check_finite, bounds=bounds, method=method, jac=jac, **kwargs)
-    elif p0 is None:
-        raise ValueError('Please specify the initial parameters when any of the parameters shall be fixed.')
-    else:
-        # noinspection PyTypeChecker
-        p0, p0_fixed = np.asarray(p0), np.asarray(p0_fixed).astype(bool)
-        if p0_fixed.shape != p0.shape:
-            raise ValueError('\'p0_fixed\' must have the same shape as \'p0\'.')
-        _p0 = p0[~p0_fixed]
-        _bounds = (np.asarray(bounds[0]), np.asarray(bounds[1]))
-        if len(_bounds[0].shape) > 0 and _bounds[0].size == p0.size:
-            _bounds = (_bounds[0][~p0_fixed], _bounds[1][~p0_fixed])
-
-        def _f(_x, *args):
-            _args = p0
-            _args[~p0_fixed] = np.asarray(args)
-            return f(_x, *_args)
-
-        popt, pcov = np.ones_like(p0, dtype=float), np.zeros((p0.size, p0.size), dtype=float)
-        pcov_mask = ~(np.expand_dims(p0_fixed, axis=1) + np.expand_dims(p0_fixed, axis=0))
-        popt[p0_fixed] = p0[p0_fixed]
-        _popt, _pcov = so.curve_fit(_f, x, y, p0=_p0, sigma=sigma, absolute_sigma=absolute_sigma,
-                                    check_finite=check_finite, bounds=_bounds, method=method, jac=jac, **kwargs)
-        popt[~p0_fixed] = _popt
-        # noinspection PyUnresolvedReferences
-        pcov[pcov_mask] = _pcov.flatten()
-
-    if report:
-        tools.printh('curve_fit result:')
-        for i, (val, err) in enumerate(zip(popt, np.sqrt(np.diag(pcov)))):
-            print('{}: {} +/- {}'.format(i, val, err))
-    return popt, pcov
 
 
 def odr_fit(f: Callable, x: array_iter, y: array_iter, sigma_x: array_iter = None, sigma_y: array_iter = None,
@@ -609,527 +601,196 @@ def odr_fit(f: Callable, x: array_iter, y: array_iter, sigma_x: array_iter = Non
     return out.beta, out.cov_beta
 
 
-# class Element:
-#     """
-#     Class representing a single chemical element. The user can define an electronic transition
-#      to extract all spectroscopy data for that transition available in the users 'AtomicDatabase.db' database.
-#      The transition frequencies and isotope shifts are stored inside a nested dictionary
-#      with isotopes and the user-defined line labels as keys.
-#     """
-#
-#     def __init__(self, label, decimals=3):
-#         """
-#         :param label: The label of a chemical element.
-#         :param decimals: The number of decimal places (sub-MHz places) to use for frequency values.
-#         """
-#         self.label = label
-#         self.decimals = decimals
-#         self.isotopes = {iso['A']: iso for iso in dat.get_table_entries('Isotopes', {'element': self.label})}
-#         self.lines = {}
-#         self.a_ref = None
-#         self.f_ref = {}
-#         self.df_ref = {}
-#         self.f = {}
-#         self.refs_f = {}
-#         self.df = {}
-#         self.refs_df = {}
-#
-#     def check_ref_args(self, references: Union[array_iter, dict, str]) -> Union[dict, None]:
-#         """
-#         :param references: A reference str, iterable of reference str's
-#          or a dictionary of these with isotopes or lines as keys.
-#         :returns: A dictionary of the specified references which has the structure {a: {line: [references, ]}}.
-#         """
-#         if references is None:
-#             return None
-#         if isinstance(references, dict):
-#             if any(a not in self.isotopes.keys() for a in references.keys()):
-#                 if any(line not in self.lines.keys() for line in references.keys()):
-#                     return None
-#                 else:
-#                     if not all(isinstance(iso_dict, dict) for iso_dict in references.values()):
-#                         refs = {a: {line: tools.check_iterable(references[line]) if line in references.keys() else []
-#                                     for line in self.lines.keys()}
-#                                 for a in self.isotopes.keys()}
-#                     else:
-#                         refs = {a: {line: tools.check_iterable(references[line][a])
-#                                     if line in references.keys() and a in references[line].keys() else []
-#                                     for line in self.lines.keys()}
-#                                 for a in self.isotopes.keys()}
-#             else:
-#                 if not all(isinstance(line_dict, dict) for line_dict in references.values()):
-#                     refs = {a: {line: tools.check_iterable(references[a]) if a in references.keys() else []
-#                                 for line in self.lines.keys()}
-#                             for a in self.isotopes.keys()}
-#                 else:
-#                     refs = {a: {line: tools.check_iterable(references[a][line])
-#                                 if a in references.keys() and line in references[a].keys() else []
-#                                 for line in self.lines.keys()}
-#                             for a in self.isotopes.keys()}
-#         else:
-#             refs = {a: {line: tools.check_iterable(references) for line in self.lines.keys()}
-#                     for a in self.isotopes.keys()}
-#         return refs
-#
-#     def define_line(self, label: str, q: int,
-#                     config_l: str, multiplet_l: int, l_l: int, j_l: float,
-#                     config_u: str, multiplet_u: int, l_u: int, j_u: float):
-#         """
-#         :param label: The user-defined name of the line.
-#         :param q: The charge state of the isotope (e).
-#         :param config_l: The electronic configuration of the lower state.
-#         :param multiplet_l: The spin multiplet of the lower state.
-#         :param l_l: The angular momentum quantum number L of the lower state.
-#         :param j_l: The total angular momentum quantum number J of the lower state.
-#         :param config_u: The electronic configuration of the upper state.
-#         :param multiplet_u: The spin multiplet of the upper state.
-#         :param l_u: The angular momentum quantum number L of the upper state.
-#         :param j_u: The total angular momentum quantum number J of the upper state.
-#         :returns: None. Extracts the available electronic transition/isotope shift entries for the specified line
-#          and stores them in 'self.f' and 'self.df', respectively. The definition of the line is stored in 'self.lines'.
-#         """
-#         conditions = {'q': q, 'config_l': config_l, 'multiplet_l': multiplet_l, 'L_l': l_l, 'J_l': j_l,
-#                       'config_u': config_u, 'multiplet_u': multiplet_u, 'L_u': l_u, 'J_u': j_u}
-#         self.lines[label] = conditions
-#
-#         transitions = dat.get_table_entries('Lines', conditions)
-#         shifts = dat.get_table_entries('IsotopeShifts', conditions)
-#
-#         for tr in transitions:
-#             tools.add_nested_key(self.f_ref, [tr['A'], label, tr['reference']], [tr['f'], tr['f_d']])
-#         # self.choose_f()
-#
-#         if shifts:
-#             for shift in shifts:
-#                 tools.add_nested_key(self.df_ref, ['{0}-{1}'.format(shift['A'], shift['ARef']), label,
-#                                                    shift['reference']], [shift['df'], shift['df_d']])
-#             # self.choose_df(min([shift['ARef'] for shift in shifts]))
-#
-#     def choose_f(self, references: Union[array_iter, dict, str] = None,
-#                  exclude: Union[array_iter, dict, str] = None) -> None:
-#         """
-#         :param references: A reference str, iterable of reference str's,
-#          or a dictionary of these with isotopes or lines as keys.
-#          The most accurate frequency values will be determined from the specified references.
-#         :param exclude: A reference str, iterable of reference str's,
-#          or a dictionary of these with isotopes or lines as keys.
-#          The specified references will be excluded when choosing frequency values.
-#         :returns: None. Fills the dictionary self.f and self.refs_f
-#          with the chosen transition frequencies and references.
-#         """
-#         f, refs_f = {}, {}
-#         if exclude is None:
-#             exclude = []
-#         refs, exc = self.check_ref_args(references), self.check_ref_args(exclude)
-#         if refs is None:
-#             refs = {a: {line: [ref for ref in self.f_ref[a][line].keys()]
-#                         for line in self.lines.keys()}
-#                     for a in self.isotopes.keys() if a in self.f_ref.keys()}
-#         for a, line_dict in refs.items():
-#             f[a], refs_f[a] = {}, {}
-#             for line, ref_list in line_dict.items():
-#                 uncertainties = [[ref, self.f_ref[a][line][ref][1]] for ref in ref_list
-#                                  if a in self.f_ref.keys() and line in self.f_ref[a].keys()
-#                                  and ref in self.f_ref[a][line].keys() and ref not in exc[a][line]]
-#                 if not uncertainties:
-#                     continue
-#                 i_min = int(np.argmin([unc[1] for unc in uncertainties]))
-#                 ref_min = uncertainties[i_min][0]
-#                 f[a][line] = self.f_ref[a][line][ref_min]
-#                 refs_f[a][line] = ref_min
-#         for a in refs.keys():
-#             if f[a] == {}:
-#                 del f[a]
-#                 del refs_f[a]
-#         self.f, self.refs_f = f, refs_f
-#
-#     def choose_df(self, a_ref: int, references: Union[array_iter, dict, str] = None,
-#                   exclude: Union[array_iter, dict, str] = None) -> None:
-#         """
-#         :param a_ref: The mass number of the reference isotope.
-#         :param references: A reference str, iterable of reference str's,
-#          or a dictionary of these with isotopes or lines as keys.
-#          The most accurate frequency values will be determined from the specified references.
-#         :param exclude: A reference str, iterable of reference str's,
-#          or a dictionary of these with isotopes or lines as keys.
-#          The specified references will be excluded when choosing frequency values.
-#         :returns: None. Fills the dictionary self.df and self.refs_df with the chosen isotope shifts and references.
-#         """
-#         self.a_ref = a_ref
-#         df, refs_df = {}, {}
-#         if exclude is None:
-#             exclude = []
-#         refs, exc = self.check_ref_args(references), self.check_ref_args(exclude)
-#         if refs is None:
-#             refs = {a: {line: [ref for ref in self.df_ref['{0}-{1}'.format(a, a_ref)][line].keys()]
-#                         for line in self.lines.keys()}
-#                     for a in self.isotopes.keys() if '{0}-{1}'.format(a, a_ref) in self.df_ref.keys()}
-#         for a, line_dict in refs.items():
-#             if a == a_ref:
-#                 continue
-#             df[a], refs_df[a] = {}, {}
-#             for line, ref_list in line_dict.items():
-#                 uncertainties = [[ref, self.df_ref['{0}-{1}'.format(a, a_ref)][line][ref][1]]
-#                                  for ref in ref_list if '{0}-{1}'.format(a, a_ref) in self.df_ref.keys()
-#                                  and line in self.df_ref['{0}-{1}'.format(a, a_ref)].keys()
-#                                  and ref in self.df_ref['{0}-{1}'.format(a, a_ref)][line].keys()
-#                                  and ref not in exc[a][line]]
-#                 if not uncertainties:
-#                     continue
-#                 i_min = int(np.argmin([unc[1] for unc in uncertainties]))
-#                 ref_min = uncertainties[i_min][0]
-#                 df[a][line] = self.df_ref['{0}-{1}'.format(a, a_ref)][line][ref_min]
-#                 refs_df[a][line] = ref_min
-#         for a in refs.keys():
-#             if a == a_ref:
-#                 continue
-#             if df[a] == {}:
-#                 del df[a]
-#                 del refs_df[a]
-#         self.df, self.refs_df = df, refs_df
-#
-#     def get_gamma(self, line: str) -> tuple:
-#         """
-#         :param line: The label of the user-defined electronic transition.
-#         :returns: The natural linewidth of the electronic transition and its uncertainty (MHz).
-#         """
-#         try:
-#             conditions = self.lines[line]
-#         except KeyError:
-#             print('WARNING: The specified line was not defined.')
-#             return np.nan, np.nan
-#         entries = dat.get_table_entries('Lines', conditions)
-#         gamma = np.array([[entry['Gamma'], entry['Gamma_d']] for entry in entries])
-#         gamma = gamma[np.argmin(gamma[:, 1]), :]
-#         return tuple(gamma)
-#
-#     def get_hyperfine_constants(self, a: int, line: str) -> tuple:
-#         """
-#         :param a: The mass number of the isotope.
-#         :param line: The label of the user-defined electronic transition.
-#         :returns: The natural linewidth of the electronic transition and its uncertainty (MHz).
-#         """
-#         try:
-#             conditions = self.lines[line]
-#         except KeyError:
-#             print('WARNING: The specified line was not defined.')
-#             return [np.nan, ] * 4, [np.nan, ] * 4
-#         tools.merge_dicts(conditions, {'A': a})
-#         entries = dat.get_table_entries('Lines', conditions)
-#         if not entries:
-#             print('WARNING: There are no entries for the specified mass number ({}) and line ({}).'.format(a, line))
-#             return [np.nan, ] * 4, [np.nan, ] * 4
-#         ret1, ret2 = [], []
-#         for const in ['A_l', 'B_l', 'A_u', 'B_u']:
-#             val = np.array([[entry[const], entry[const + '_d']] for entry in entries])
-#             val = val[np.argmin(val[:, 1]), :]
-#             ret1.append(np.nan if val[0] is None else val[0])
-#             ret2.append(np.nan if val[1] is None else val[1])
-#         return ret1, ret2
-#
-#     def spectroscopy_info(self, e_kin: float) -> dict:
-#         """
-#         :param e_kin: Kinetic energy of the isotopes (eV).
-#         :returns: A dictionary of information for collinear laser spectroscopy with keys 'E', 'U', 'v', 'col' and 'acol'
-#          for the kinetic energy (eV), the required voltage (V), the velocity of isotopes
-#          with an initial velocity of 0 m/s (m/s), as well as the resonant laser frequencies
-#          in collinear and anticollinear geometry (MHz).
-#         """
-#         info = {}
-#         for a, line_dict in self.f.items():
-#             info[a] = {}
-#             for line, f in line_dict.items():
-#                 v = ph.v_e(e_kin, self.isotopes[a]['mass'], 0.)
-#                 col = np.around(ph.doppler(f[0], v, 0., return_frame='lab'), decimals=self.decimals)
-#                 acol = np.around(ph.doppler(f[0], v, np.pi, return_frame='lab'), decimals=self.decimals)
-#                 info[a][line] = \
-#                     {'E': e_kin, 'U': np.nan if self.lines[line]['q'] == 0 else e_kin / self.lines[line]['q'],
-#                      'v': v, 'col': col, 'acol': acol}
-#         return info
-#
-#     def get_f(self, a: Union[int, Iterable[int]], line: Union[str, Iterable[str]],
-#               rtype: type = ndarray) -> Union[ndarray, dict, ValueError]:
-#         """
-#         :param a: The mass number or an Iterable of mass numbers.
-#         :param line: A line or an Iterable of previously defined lines.
-#         :param rtype: The type in which the results will be returned. Currently supported special types are [dict, ].
-#          The standard 'rtype' is a numpy array.
-#         :returns: A subset of the dictionary 'self.f' as a dictionary or a numpy array.
-#         """
-#         return _get_rtype2(self.f, a, line, rtype=rtype)
-#
-#     def get_df(self, a: Union[int, Iterable[int]], line: Union[str, Iterable[str]], rtype: type = ndarray) \
-#             -> Union[ndarray, dict, ValueError]:
-#         """
-#         :param a: The mass number or an Iterable of mass numbers.
-#         :param line: A line or an Iterable of previously defined lines.
-#         :param rtype: The type in which the results will be returned. Currently supported special types are [dict, ].
-#          The standard 'rtype' is a numpy array.
-#         :returns: A subset of the dictionary 'self.df' as a dictionary or a numpy array.
-#         """
-#         return _get_rtype2(self.df, a, line, rtype=rtype)
-#
-#     def calc_df(self, a: Iterable[int], a_ref: Iterable[int], line: Union[str, Iterable[str]],
-#                 rtype: type = ndarray) -> Union[ndarray, dict, ValueError]:
-#         """
-#         :param a: An Iterable of the mass numbers of the isotopes.
-#         :param a_ref: An Iterable of the mass numbers of the reference isotopes
-#         :param line: A line or an Iterable of previously defined lines.
-#         :param rtype: The type in which the results will be returned. Currently supported special types are [dict, ].
-#          The standard 'rtype' is a numpy array.
-#         :returns: Differences of transition frequencies and their uncertainties calculated from the 'self.f' dictionary
-#          according to the lists 'a' and 'a_ref'. The output has shape (len(a), 2)
-#          or shape (len(a), len(line), 2) if line is a list.
-#         """
-#         if isinstance(line, str):
-#             a_dict = {k: v[line][0] for k, v in self.f.items()}
-#             a_d_dict = {k:  v[line][1] for k, v in self.f.items()}
-#             v_dict = tools.convolve_dict(a_dict, a, a_ref, operator='-')
-#             v_d_dict = tools.convolve_dict(a_d_dict, a, a_ref, operator='gauss')
-#             if rtype == dict:
-#                 return {a_i: [round(v_dict[a_i], self.decimals), round(v_d_dict[a_i], self.decimals)] for a_i in a}
-#             else:
-#                 return np.array([[round(v_dict[a_i], self.decimals), round(v_d_dict[a_i], self.decimals)] for a_i in a])
-#         else:
-#             a_dict = {k: np.array([v[ll][0] for ll in line]) for k, v in self.f.items()}
-#             a_d_dict = {k: np.array([v[ll][1] for ll in line]) for k, v in self.f.items()}
-#             v_dict = tools.convolve_dict(a_dict, a, a_ref, operator='-')
-#             v_d_dict = tools.convolve_dict(a_d_dict, a, a_ref, operator='gauss')
-#             if rtype == dict:
-#                 ValueError('rtype=dict not implemented for list of lines yet.')
-#                 pass
-#             else:
-#                 return np.array([np.array([np.around(v_dict[a_i], self.decimals),
-#                                            np.around(v_d_dict[a_i], self.decimals)]).T for a_i in a])
-#
-#     def _calc_f(self, a: Iterable[int], a_ref: Iterable[int], line: str,
-#                 rtype: type = ndarray) -> Union[ndarray, dict, ValueError]:
-#         # TODO?: Calculation of lines.
-#         pass
-#
-#     def get_masses(self, a: Union[int, Iterable[int]] = None, rtype: type = ndarray) \
-#             -> Union[ndarray, dict, ValueError]:
-#         """
-#         :param a: An Iterable of the mass numbers of the isotopes to be returned.
-#         :param rtype: The type in which the results will be returned. Currently supported special types are [dict, ].
-#          The standard 'rtype' is a numpy array.
-#         :returns: The masses and their uncertainties of the specified mass numbers.
-#          The output has shape (2, ) if a is an int value and shape (len(a), 2) if a is an Iterable.
-#         """
-#         if a is None:
-#             a = list(self.isotopes.keys())
-#         a_arr = np.asarray(a)
-#         a_dim = len(a_arr.shape)
-#         if a_dim == 0:
-#             if rtype == dict:
-#                 return {a: [self.isotopes[a]['mass'], self.isotopes[a]['mass_d']]}
-#             else:
-#                 return np.array([self.isotopes[a]['mass'], self.isotopes[a]['mass_d']])
-#         else:
-#             if rtype == dict:
-#                 return {a_i: [self.isotopes[a_i]['mass'], self.isotopes[a_i]['mass_d']] for a_i in a}
-#             else:
-#                 return np.array([[self.isotopes[a_i]['mass'], self.isotopes[a_i]['mass_d']] for a_i in a])
-#
-#     def get_radii(self):
-#         """
-#         :returns: The default 'Radii' object for this element.
-#         """
-#         return Radii(self.label)
-#
-#     def get_king(self):
-#         """
-#         :returns: A 'King' object including all isotopes available in 'AtomicDatabase.db'.
-#          The number of subtracted electrons in the 'King' object is equal to the charge number Z of the element.
-#         """
-#         a = list(self.isotopes.keys())
-#         return King(a, self.get_masses(a), subtract_electrons=self.isotopes[a[0]]['Z'], element_label=self.label)
-#
-#
-# class Radii:
-#     """
-#     A class which holds the information about nuclear charge radii from muonic atom spectroscopy
-#      and elastic electron scattering. Differences of the even moments of nuclear charge radii
-#      as well as the Lambda parameter can be returned in a dict or an array format
-#      in the specified combination of mass numbers and reference mass numbers.
-#     """
-#     def __init__(self, element: str, a: array_iter = None, barrett: array_iter = None,
-#                  vn: array_like = None, seltzer: array_iter = None, decimals: int = 4):
-#         """
-#         :param a: An iterable of mass numbers.
-#         :param barrett: An iterable of Barrett radii. Must have shape (len(a), 2) and include the values in the first
-#          and the uncertainties in the second column.
-#         :param vn: An iterable of Vn factors. Must have either shape (3, ) or (1, 3)
-#          in which case the same Vn factors are used for all specified mass numbers or shape (len(a), 3)
-#          in which case individual Vn factors are used for every mass number.
-#         :param seltzer: An iterable of the two Seltzer coefficients [C2/C1, C3/C1].
-#         :param decimals: The number of decimal places (sub-square-fm places) to use for radial values.
-#         Any of the parameters which is None is exported from the database 'NuclearChargeRadii.db'.
-#         """
-#         self.element = element
-#         self.conditions = {'element': self.element}
-#         self.decimals = decimals
-#
-#         self.a = None
-#         if a is not None:
-#             self.a: Union[object, list] = np.asarray(a, dtype=int).tolist()
-#
-#         if barrett is None:
-#             barrett_ref = dat.get_table_entries('BarrettRadii', self.conditions)
-#             self.a = list({entry['A'] for entry in barrett_ref})
-#             references = {entry['reference'] for entry in barrett_ref}
-#             self.barrett_ref = {ref: {entry['A']: [entry['val'], entry['StatErr'] + entry['SysErr']]
-#                                       for entry in barrett_ref if entry['reference'] == ref
-#                                       and (a is None or entry['A'] in a)} for ref in references}
-#             self.ref_barrett = None
-#             self.choose_barrett()
-#         else:
-#             if a is None:
-#                 raise ValueError('\'a\' is not specified and therefore \'barrett\' cannot be '
-#                                  'related to mass numbers unambiguously.')
-#             self.barrett = np.asarray(barrett)
-#
-#         if vn is None:
-#             self.vn = {entry['A']: entry for entry in dat.get_table_entries('Vn', self.conditions)}
-#             self.vn = np.array([[self.vn[a_i]['V2'], self.vn[a_i]['V4'], self.vn[a_i]['V6']] if a_i in self.vn.keys()
-#                                 else [self.vn[-1]['V2'], self.vn[-1]['V4'], self.vn[-1]['V6']]
-#                                 for a_i in self.a])
-#         else:
-#             self.vn = np.asarray(vn)
-#             if a is None and self.vn.shape not in [(3, ), (1, 3)]:
-#                 raise ValueError('\'a\' is not specified and therefore \'vn\' cannot be '
-#                                  'related to mass numbers unambiguously.')
-#         if self.vn.shape == (3, ):
-#             self.vn = np.expand_dims(self.vn, axis=0)
-#         if self.vn.shape == (1, 3):
-#             self.vn = np.array([self.vn[0], ] * len(self.a))
-#
-#         self.seltzer = seltzer
-#         if self.seltzer is None:
-#             self.seltzer = dat.get_table_entries('SeltzerCoefficients', self.conditions)
-#             self.seltzer = [self.seltzer[0]['C2C1'], self.seltzer[0]['C3C1']]
-#
-#     def choose_barrett(self, references: Iterable[str] = None, mode: str = 'mean'):
-#         """
-#         :param references: An Iterable of references to consider.
-#         :param mode: The mode how to choose the Barret radii from multiple references.
-#          The Currently supported modes are {'minErr', mean}.
-#         :returns: None. Sets the instance variables 'barrett' and 'used_references'.
-#         """
-#         modes = ['minUnc', 'mean']
-#         barrett = []
-#         ref_barrett = []
-#         if mode == 'minUnc':
-#             for a in self.a:
-#                 uncertainties = [[ref, r[a][1]]
-#                                  for ref, r in self.barrett_ref.items()
-#                                  if ref in references and a in self.barrett_ref[ref].keys()]
-#                 i_min = int(np.argmin([unc[1] for unc in uncertainties]))
-#                 ref_min = uncertainties[i_min][0]
-#                 barrett.append(self.barrett_ref[ref_min][a])
-#                 ref_barrett.append(ref_min)
-#         elif mode == 'mean':
-#             for a in self.a:
-#                 r = np.array([[r[a][0], r[a][1]] for ref, r in self.barrett_ref.items()
-#                               if a in self.barrett_ref[ref].keys()])
-#                 cov = np.expand_dims(r[:, 1], axis=1) * np.expand_dims(r[:, 1], axis=0)
-#                 barrett.append(list(average(r[:, 0], cov=cov)))
-#             ref_barrett = 'mean'
-#         else:
-#             raise ValueError('Mode \'{}\' is not supported. Choose from {}'.format(mode, modes))
-#         self.barrett, self.ref_barrett = np.around(barrett, decimals=self.decimals), ref_barrett
-#
-#     def get_rn(self, n: int, a: array_like, a_ref: array_like, delta_barrett: array_iter = None,
-#                decimals: int = 4, rtype: type = ndarray, key_format: str = None) -> Union[ndarray, dict, ValueError]:
-#         """
-#         :param n: The moment to return. Currently supported moments are [2, 4, 6].
-#         :param a: The mass numbers of the moments to return.
-#         :param a_ref: The reference mass numbers of the moments to return.
-#         :param delta_barrett: The differences of Barrett radii with uncertainties.
-#          If specified, it must have shape (len(a), 2) and include the values in the first
-#          and the uncertainties in the second column.
-#         :param decimals: The number of decimal places to return.
-#         :param rtype: The type in which the results will be returned. Currently supported special types are [dict, ].
-#          The standard 'rtype' is a numpy array.
-#         :param key_format: If 'rtype' is dict, The key format is used to build the dictionary keys in str format.
-#          The mass number is inserted into the first, the reference mass number into the second '{}' bracket.
-#          Use numbers {1}(...){0} to change the order of the mass numbers.
-#          If None, the mass numbers are used as integer keys.
-#         :returns: Differences of the specified moment of nuclear charge radii for different mass
-#          and reference mass numbers.
-#         """
-#         n = int(n)
-#         if n not in [2, 4, 6]:
-#             raise ValueError('n must be in [2, 4, 6] but is {}'.format(n))
-#         a: Union[object, list, int] = np.asarray(a, dtype=int).tolist()
-#         if isinstance(a, int):
-#             a = [a, ]
-#         a_ref: Union[object, list, int] = np.asarray(a_ref, dtype=int).tolist()
-#         if isinstance(a_ref, int):
-#             a_ref = [a_ref, ] * len(a)
-#         i = np.array([self.a.index(a_i) for a_i in a])
-#         i_ref = np.array([self.a.index(a_i) for a_i in a_ref])
-#         if delta_barrett is None:
-#             delta_barrett = np.array([self.barrett[i, 0] - self.barrett[i_ref, 0],
-#                                       np.sqrt(self.barrett[i, 1] ** 2 + self.barrett[i_ref, 1] ** 2)]).T
-#         delta_barrett = np.asarray(delta_barrett)
-#         rn = eval('ph.delta_r{}'.format(n))(self.barrett[i, 0], self.barrett[i, 1],
-#                                             self.barrett[i_ref, 0], self.barrett[i_ref, 1],
-#                                             delta_barrett[:, 0], delta_barrett[:, 1],
-#                                             self.vn[i, int(n / 2 - 1)], self.vn[i_ref, int(n / 2 - 1)])
-#         rn = [[np.around(rn[0][j], decimals=decimals), np.around(rn[1][j], decimals=decimals)]
-#               for j in range(rn[0].size)]
-#         if rtype == dict:
-#             if key_format is None:
-#                 return {a_i: r for a_i, r in zip(a, rn)}
-#             elif key_format.count('{}') == 1 and key_format.count('{') == 1 and key_format.count('}') == 1:
-#                 return {key_format.format(a_i): r for a_i, r in zip(a, rn)}
-#             elif key_format.count('{}') == 2 or ('{0}' in key_format and '{1}' in key_format) \
-#                     and key_format.count('{') == 2 and key_format.count('}') == 2:
-#                 return {key_format.format(a_i, a_ref_i): r for a_i, a_ref_i, r in zip(a, a_ref, rn)}
-#             raise ValueError('Specified key_format ({}) not supported.'.format(key_format))
-#         else:
-#             return np.array(rn)
-#
-#     def get_lambda(self, a: array_like, a_ref: array_like, delta_barrett: array_iter = None,
-#                    decimals: int = 4, rtype: type = ndarray, key_format: str = None) \
-#             -> Union[ndarray, dict, ValueError]:
-#         """
-#         :param a: The mass numbers of the moments to return.
-#         :param a_ref: The reference mass numbers of the moments to return.
-#         :param delta_barrett: The differences of Barrett radii with uncertainties.
-#          If specified, it must have shape (len(a), 2) and include the values in the first
-#          and the uncertainties in the second column.
-#         :param decimals: The number of decimal places to return.
-#         :param rtype: The type in which the results will be returned. Currently supported special types are [dict, ].
-#          The standard 'rtype' is a numpy array.
-#         :param key_format: If 'rtype' is dict, The key format is used to build the dictionary keys in str format.
-#          The mass number is inserted into the first, the reference mass number into the second '{}' bracket.
-#          Use numbers {1}(...){0} to change the order of the mass numbers.
-#          If None, the mass numbers are used as integer keys.
-#         :returns: The Lambda parameter for different mass and reference mass numbers.
-#         """
-#         if self.seltzer is None:
-#             return ValueError('Seltzer coefficients were not specified. '
-#                               'Please assign the local variable\nself.seltzer = [C2/C1, C3/C1]')
-#         r2 = self.get_rn(2, a, a_ref, delta_barrett=delta_barrett, decimals=decimals + 2, rtype=list)
-#         r4 = self.get_rn(4, a, a_ref, delta_barrett=delta_barrett, decimals=decimals + 2, rtype=list)
-#         r6 = self.get_rn(6, a, a_ref, delta_barrett=delta_barrett, decimals=decimals + 2, rtype=list)
-#         ll = ph.lambda_rn(r2[:, 0], r2[:, 1], r4[:, 0], r4[:, 1], r6[:, 0], r6[:, 1], self.seltzer[0], self.seltzer[1])
-#         ll = [[np.around(ll[0][j], decimals=decimals), np.around(ll[1][j], decimals=decimals)]
-#               for j in range(ll[0].size)]
-#         if rtype == dict:
-#             print(key_format.count('{}'))
-#             if key_format is None:
-#                 return {a_i: r for a_i, r in zip(a, ll)}
-#             elif key_format.count('{}') == 1 and key_format.count('{') == 1 and key_format.count('}') == 1:
-#                 return {key_format.format(a_i): r for a_i, r in zip(a, ll)}
-#             elif key_format.count('{}') == 2 or ('{0}' in key_format and '{1}' in key_format) \
-#                     and key_format.count('{') == 2 and key_format.count('}') == 2:
-#                 return {key_format.format(a_i, a_ref_i): r for a_i, a_ref_i, r in zip(a, a_ref, ll)}
-#             raise ValueError('Specified key_format ({}) not supported.'.format(key_format))
-#         else:
-#             return np.array(ll)
+def curve_fit(f: Callable, x: Union[array_like, object], y: array_like, p0: array_iter = None,
+               p0_fixed: array_iter = None, sigma: Union[array_iter, Callable] = None, absolute_sigma: bool = False,
+               check_finite: bool = True, bounds: (ndarray, ndarray) = (-np.inf, np.inf), method: str = None,
+               jac: Union[Callable, str] = None, full_output: bool = False, report: bool = False, **kwargs):
+    """
+    :param f: The model function to fit to the data.
+    :param x: The x data.
+    :param y: The y data.
+    :param p0: A numpy array or an Iterable of the initial guesses for the parameters.
+     Must have at least the same length as the minimum number of parameters required by the function 'f'.
+     If 'p0' is None, 1 is taken as an initial guess for all non-keyword parameters.
+    :param p0_fixed: A numpy array or an Iterable of bool values specifying, whether to fix a parameter.
+     Must have the same length as p0.
+    :param sigma: The 1-sigma uncertainty of the y data.
+     This can also be a function g such that 'g(x, y, f(x, *params), *params) -> sigma'.
+    :param absolute_sigma: See scipy.optimize.curve_fit.
+    :param check_finite: See scipy.optimize.curve_fit.
+    :param bounds: See scipy.optimize.curve_fit.
+    :param method: See scipy.optimize.curve_fit.
+    :param jac: See scipy.optimize.curve_fit. Must not be callable if 'sigma' is callable.
+    :param full_output: See scipy.optimize.curve_fit.
+    :param report: Whether to print the result of the fit.
+    :param kwargs: See scipy.optimize.curve_fit.
+    :returns: popt, pcov. The optimal parameters and their covariance matrix. Additional output if full_output is True.
+     See scipy.optimize.curve_fit.
+    """
+
+    if p0 is None:
+        # determine number of parameters by inspecting the function
+        sig = _getfullargspec(f)
+        args = sig.args
+        if len(args) < 2:
+            raise ValueError("Unable to determine number of fit parameters.")
+        n = len(args) - 1
+    else:
+        p0 = np.atleast_1d(p0)
+        n = p0.size
+
+    if p0_fixed is None:
+        p0_fixed = np.zeros(n, dtype=bool)
+    else:
+        p0_fixed = np.atleast_1d(p0_fixed)
+
+    if isinstance(bounds, Bounds):
+        lb, ub = bounds.lb, bounds.ub
+    else:
+        lb, ub = prepare_bounds(bounds, n)
+    if p0 is None:
+        p0 = _initialize_feasible(lb, ub)
+
+    # Truncate p0, bounds and func to use free parameters only.
+    p0_free = p0[~p0_fixed]
+    lb, ub = lb[~p0_fixed], ub[~p0_fixed]
+    func = _wrap_func_pars(f, p0, p0_fixed)
+
+    bounded_problem = np.any((lb > -np.inf) | (ub < np.inf))
+    if method is None:
+        if bounded_problem:
+            method = 'trf'
+        else:
+            method = 'lm'
+
+    if method == 'lm' and bounded_problem:
+        raise ValueError("Method 'lm' only works for unconstrained problems. "
+                         "Use 'trf' or 'dogbox' instead.")
+
+    # optimization may produce garbage for float32 inputs, cast them to float64
+
+    # NaNs cannot be handled
+    if check_finite:
+        y = np.asarray_chkfinite(y, float)
+    else:
+        y = np.asarray(y, float)
+
+    if isinstance(x, (list, tuple, np.ndarray)):
+        # 'x' is passed straight to the user-defined 'f', so allow
+        # non-array_like 'x'.
+        if check_finite:
+            x = np.asarray_chkfinite(x, float)
+        else:
+            x = np.asarray(x, float)
+
+    if y.size == 0:
+        raise ValueError("'y' must not be empty!")
+
+    # Determine type of sigma
+    if sigma is not None:
+        if callable(sigma):
+            transform = _wrap_func_sigma(sigma, p0, p0_fixed)
+        else:
+            sigma = np.asarray(sigma)
+
+            # if 1-D, sigma are errors, define transform = 1/sigma
+            if sigma.shape == (y.size,):
+                transform = 1.0 / sigma
+            # if 2-D, sigma is the covariance matrix,
+            # define transform = L such that L L^T = C
+            elif sigma.shape == (y.size, y.size):
+                try:
+                    # scipy.linalg.cholesky requires lower=True to return L L^T = A
+                    transform = cholesky(sigma, lower=True)
+                except LinAlgError as e:
+                    raise ValueError("'sigma' must be positive definite.") from e
+            else:
+                raise ValueError("'sigma' has incorrect shape.")
+    else:
+        transform = None
+
+    func = _wrap_func(func, x, y, transform)
+    if callable(jac):
+        if callable(sigma):
+            raise ValueError("'jac' must not be callable if 'sigma' is callable.")
+        jac = _wrap_jac(jac, x, transform)
+    elif jac is None and method != 'lm':
+        jac = '2-point'
+
+    if 'args' in kwargs:
+        # The specification for the model function 'f' does not support
+        # additional arguments. Refer to the 'curve_fit' docstring for
+        # acceptable call signatures of 'f'.
+        raise ValueError("'args' is not a supported keyword argument.")
+
+    if method == 'lm':
+        # if y.size == 1, this might be used for broadcast.
+        if y.size != 1 and n > y.size:
+            raise TypeError(f"The number of func parameters={n} must not exceed the number of data points={y.size}")
+        res = leastsq(func, p0_free, Dfun=jac, full_output=True, **kwargs)
+        popt, pcov, infodict, errmsg, ier = res
+        ysize = len(infodict['fvec'])
+        cost = np.sum(infodict['fvec'] ** 2)
+        if ier not in [1, 2, 3, 4]:
+            raise RuntimeError("Optimal parameters not found: " + errmsg)
+    else:
+        # Rename maxfev (leastsq) to max_nfev (least_squares), if specified.
+        if 'max_nfev' not in kwargs:
+            kwargs['max_nfev'] = kwargs.pop('maxfev', None)
+
+        res = least_squares(func, p0_free, jac=jac, bounds=bounds, method=method, **kwargs)
+
+        if not res.success:
+            raise RuntimeError("Optimal parameters not found: " + res.message)
+
+        infodict = dict(nfev=res.nfev, fvec=res.fun)
+        ier = res.status
+        errmsg = res.message
+
+        ysize = len(res.fun)
+        cost = 2 * res.cost  # res.cost is half sum of squares!
+        popt = res.x
+
+        # Do Moore-Penrose inverse discarding zero singular values.
+        # noinspection PyTupleAssignmentBalance
+        _, s, vt = svd(res.jac, full_matrices=False)
+        threshold = np.finfo(float).eps * max(res.jac.shape) * s[0]
+        s = s[s > threshold]
+        vt = vt[:s.size]
+        pcov = np.dot(vt.T / s ** 2, vt)
+
+    warn_cov = False
+    if pcov is None:
+        # indeterminate covariance
+        pcov = np.zeros((len(popt), len(popt)), dtype=float)
+        pcov.fill(np.inf)
+        warn_cov = True
+    elif not absolute_sigma:
+        if ysize > p0.size:
+            s_sq = cost / (ysize - p0.size)
+            pcov = pcov * s_sq
+        else:
+            pcov.fill(np.inf)
+            warn_cov = True
+
+    popt_ret, pcov_ret = p0.copy(), np.zeros((p0.size, p0.size), dtype=float)
+    popt_ret[~p0_fixed] = popt
+    pcov_mask = ~(p0_fixed[np.newaxis, :] + p0_fixed[:, np.newaxis])
+    pcov_ret[pcov_mask] = pcov.flatten()
+
+    if report:
+        digits = int(np.floor(np.log10(np.abs(p0.size)))) + 1
+        tools.printh("curve_fit result:")
+        for i, (val, err, fix) in enumerate(zip(popt_ret, np.sqrt(np.diag(pcov_ret)), p0_fixed)):
+            print(f"{str(i).zfill(digits)}: {val} +/- {err} ({'fixed' if fix else 'free'})")
+
+    if warn_cov:
+        warnings.warn("Covariance of the parameters could not be estimated", category=OptimizeWarning)
+
+    if full_output:
+        return popt_ret, pcov_ret, infodict, errmsg, ier
+    else:
+        return popt_ret, pcov_ret
 
 
 class King:
@@ -1450,13 +1111,13 @@ class King:
     def plot(self, mode: str = '', sigma2d: bool = True, show: bool = True, add_xy: array_like = None,
              add_a: array_like = None):
         """
-        :param mode: The mode of the King-fit. If mode='radii', the :math:`x`-axis must contain the differences of
+        :param mode: The mode of the King-fit. If mode='radii', the :math:'x'-axis must contain the differences of
          mean square nuclear charge radii or the Lambda-factor. For every other value,
-         the :math:`x`-axis is assumed to be an isotope shift such that the slope corresponds to
-         a field-shift ratio :math:`F(y_i) / F(x)`.
+         the :math:'x'-axis is assumed to be an isotope shift such that the slope corresponds to
+         a field-shift ratio :math:'F(y_i) / F(x)'.
         :param sigma2d: Whether to draw the actual two-dimensional uncertainty bounds or the classical errorbars.
         :param show: Whether to show the plot.
-        :param add_xy: Additional :math:`x` and :math:`y` data to plot. Must have shape (:, 4).
+        :param add_xy: Additional :math:'x' and :math:'y' data to plot. Must have shape (:, 4).
         :param add_a: Additional mass numbers for the additional data- Must have shape (:, 2).
          The reference is the second column.
         :returns: None. Generates a King-Plot based on the modified axes 'self.x_mod' and 'self.y_mod'
@@ -1535,10 +1196,10 @@ class King:
     def plot_nd(self, axis: int = 0, mode: str = '', sigma2d: bool = True):
         """
         :param axis: The axis which is used as the x-axis throughout the plots.
-        :param mode: The mode of the King-plot. If mode='radii', the :math:`x`-axis must contain the differences of
+        :param mode: The mode of the King-plot. If mode='radii', the :math:'x'-axis must contain the differences of
          mean square nuclear charge radii or the Lambda-factor. For every other value,
-         the :math:`x`-axis is assumed to be an isotope shift such that the slope corresponds to
-         a field-shift ratio :math:`F(y_i) / F(x)`.
+         the :math:'x'-axis is assumed to be an isotope shift such that the slope corresponds to
+         a field-shift ratio :math:'F(y_i) / F(x)'.
         :param sigma2d: Whether to draw the actual two-dimensional uncertainty bounds or the classical errorbars.
         :returns: None. Generates a King-Plot based on the modified axes 'self.x_mod_nd' and 'self.y_mod_nd'
          as well as the fit results 'self.results_nd'.

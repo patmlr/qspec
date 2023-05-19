@@ -103,13 +103,21 @@ def printf(*values, **kwargs):
     print('{}{}{}'.format(*_values), **kwargs)
 
 
-def map_corr_coeff_to_color(val):
+def map_corr_coeff_to_color(val, clip=True):
     """
 
     :param val: A value between -1 and 1.
+    :param clip: Whether to clip vals outside -1 and 1. If False, raise ValueError.
     :returns: The RGB values in the range 0-255.
     """
-    if val < -1 or val > 1:
+    if clip:
+        if np.isnan(val):
+            val = 0.
+        elif val < -1:
+            val = -1
+        elif val > 1:
+            val = 1
+    if np.isnan(val) or val < -1 or val > 1:
         raise ValueError('The correlation coefficient must be in [-1, 1].')
     g = int(round(val * 127 + 127, 0))
     return 255 - g, g, 0
