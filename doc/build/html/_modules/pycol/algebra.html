@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>pycol.algebra &mdash; pycol 01.05.2023 documentation</title><link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <title>pycol.algebra &mdash; pycol 20.05.2023 documentation</title><link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/css/borders.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/css/wy-nav-content.css" type="text/css" />
@@ -67,6 +67,7 @@
 <span></span><span class="c1"># -*- coding: utf-8 -*-</span>
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">pycol.algebra</span>
+<span class="sd">=============</span>
 
 <span class="sd">Created on 30.04.2020</span>
 
@@ -80,7 +81,10 @@
 <span class="kn">from</span> <span class="nn">sympy.vector</span> <span class="kn">import</span> <span class="n">CoordSys3D</span>
 <span class="kn">import</span> <span class="nn">sympy.physics.wigner</span> <span class="k">as</span> <span class="nn">spw</span>
 
-<span class="kn">from</span> <span class="nn">pycol.types</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">pycol._types</span> <span class="kn">import</span> <span class="o">*</span>
+
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;cast_sympy&#39;</span><span class="p">,</span> <span class="s1">&#39;clebsch_gordan&#39;</span><span class="p">,</span> <span class="s1">&#39;wigner_3j&#39;</span><span class="p">,</span> <span class="s1">&#39;wigner_6j&#39;</span><span class="p">,</span> <span class="s1">&#39;a&#39;</span><span class="p">,</span> <span class="s1">&#39;b&#39;</span><span class="p">,</span> <span class="s1">&#39;ab&#39;</span><span class="p">,</span> <span class="s1">&#39;c&#39;</span><span class="p">,</span> <span class="s1">&#39;abc&#39;</span><span class="p">,</span> <span class="s1">&#39;f_0&#39;</span><span class="p">,</span> <span class="s1">&#39;g_0&#39;</span><span class="p">,</span>
+           <span class="s1">&#39;c_dipole&#39;</span><span class="p">,</span> <span class="s1">&#39;a_dipole&#39;</span><span class="p">,</span> <span class="s1">&#39;a_dipole_cart&#39;</span><span class="p">,</span> <span class="s1">&#39;reduced_f_root&#39;</span><span class="p">,</span> <span class="s1">&#39;reduced_f&#39;</span><span class="p">,</span> <span class="s1">&#39;a_tilda&#39;</span><span class="p">,</span> <span class="s1">&#39;a_m_tilda&#39;</span><span class="p">]</span>
 
 
 <div class="viewcode-block" id="cast_sympy"><a class="viewcode-back" href="../../pycol.html#pycol.algebra.cast_sympy">[docs]</a><span class="k">def</span> <span class="nf">cast_sympy</span><span class="p">(</span><span class="n">as_sympy</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">sympy_like</span><span class="p">,</span> <span class="n">dtype</span><span class="p">:</span> <span class="nb">type</span> <span class="o">=</span> <span class="nb">float</span><span class="p">):</span>
@@ -456,7 +460,7 @@
 <span class="sd">    :returns: The relative transition strengths normed as in tilda.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">i</span><span class="p">,</span> <span class="n">j_l</span><span class="p">,</span> <span class="n">f_l</span><span class="p">,</span> <span class="n">j_u</span><span class="p">,</span> <span class="n">f_u</span> <span class="o">=</span> <span class="n">cast_sympy</span><span class="p">(</span><span class="n">as_sympy</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">j_l</span><span class="p">,</span> <span class="n">f_l</span><span class="p">,</span> <span class="n">j_u</span><span class="p">,</span> <span class="n">f_u</span><span class="p">)</span>
-    <span class="k">return</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">f_l</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">j_u</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">wigner_6j</span><span class="p">(</span><span class="n">j_u</span><span class="p">,</span> <span class="n">j_l</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">f_l</span><span class="p">,</span> <span class="n">f_u</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">as_sympy</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span></div>
+    <span class="k">return</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">f_l</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">f_u</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">wigner_6j</span><span class="p">(</span><span class="n">j_u</span><span class="p">,</span> <span class="n">j_l</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">f_l</span><span class="p">,</span> <span class="n">f_u</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">as_sympy</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span></div>
 
 
 <div class="viewcode-block" id="a_m_tilda"><a class="viewcode-back" href="../../pycol.html#pycol.algebra.a_m_tilda">[docs]</a><span class="k">def</span> <span class="nf">a_m_tilda</span><span class="p">(</span><span class="n">i</span><span class="p">:</span> <span class="n">sympy_qn</span><span class="p">,</span> <span class="n">j_l</span><span class="p">:</span> <span class="n">sympy_qn</span><span class="p">,</span> <span class="n">f_l</span><span class="p">:</span> <span class="n">sympy_qn</span><span class="p">,</span> <span class="n">m_l</span><span class="p">:</span> <span class="n">sympy_qn</span><span class="p">,</span>

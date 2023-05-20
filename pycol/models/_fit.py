@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-pycol.models.fit
+pycol.models._fit
 
 Created on 06.05.2023
 
@@ -11,11 +11,13 @@ Module to fit the models to data.
 
 import numpy as np
 
-from pycol.types import *
+from pycol._types import *
 from pycol.tools import asarray_optional, print_colored, print_cov
-# noinspection PyUnresolvedReferences
 from pycol.analyze import curve_fit, odr_fit
-from pycol.models import base, helper
+from pycol.models import _base, _helper
+from pycol.models._base import _val_fix_to_val, _fix_to_unc
+
+__all__ = ['ROUTINES', 'sigma_poisson', 'residuals', 'reduced_chi2', 'fit']
 
 
 ROUTINES = {'curve_fit', 'odr_fit'}
@@ -36,10 +38,23 @@ class Xlist:  # Custom list to trick 'curve_fit' for linked fitting of files wit
         self.x[key] = value
 
 
-def sqrt_zero_free(x: array_like):
+def _wrap_sigma_y(sigma_y, uncs):
+    i = -uncs.size if uncs.size > 0 else None
+
+    def func(x, y, y_fit, *params):
+        return np.concatenate([sigma_y(x, y, y_fit, *params)[:i], uncs], axis=0)
+    return func
+
+
+def _sqrt_zero_free(x: array_like):
     y = np.ones_like(x, dtype=float)
     y[x > 1] = np.sqrt(x)
     return y
+
+
+# noinspection PyUnusedLocal
+def sigma_poisson(x: array_like, y: array_like, y_model: array_like, *params):
+    return _sqrt_zero_free(y_model)
 
 
 def residuals(model, x, y):
@@ -52,14 +67,7 @@ def reduced_chi2(model, x, y, sigma_y):
     return np.sum(residuals(model, x, y) ** 2 / sigma_y ** 2) / (y.size - n_free)
 
 
-def _wrap_sigma_y(sigma_y, uncs):
-    i = -uncs.size if uncs.size > 0 else None
-    def func(x, y, y_fit, *params):
-        return np.concatenate([sigma_y(x, y, y_fit, *params)[:i], uncs], axis=0)
-    return func
-
-
-def fit(model: base.Model, x: array_iter, y: array_iter, sigma_x: array_iter = None,
+def fit(model: _base.Model, x: array_iter, y: array_iter, sigma_x: array_iter = None,
         sigma_y: Union[array_iter, Callable] = None, report: bool = False, routine: Union[Callable, str] = None,
         guess_offset: bool = False, mc_sigma: int = 0, **kwargs):
     """
@@ -72,8 +80,8 @@ def fit(model: base.Model, x: array_iter, y: array_iter, sigma_x: array_iter = N
      set to odr_fit.
     :param sigma_y: The uncertainties of the y-values.
      This has to be a 1-d array or a list of 1-d arrays if model is a Linked model and have the same shape as 'y'.
-     If routine is 'curve_fit', sigma may be a function g such that 'g(x, y, model(x, *params), *params) -> sigma'.
-     g should accept the same x as the model and y and model(x, *params) as 1-d arrays.
+     If routine is 'curve_fit', sigma may be a function g such that 'g(x, y, model(x, \*params), \*params) -> sigma'.
+     g should accept the same x as the model and y and model(x, \*params) as 1-d arrays.
     :param report: Whether to print the fit results.
     :param routine: The routine to use for fitting. Currently supported are {curve_fit, odr_fit}.
      If None, curve_fit is used. See 'sigma_x' for one exception.
@@ -93,7 +101,7 @@ def fit(model: base.Model, x: array_iter, y: array_iter, sigma_x: array_iter = N
     if routine.__name__ not in ROUTINES:
         raise ValueError('Specified routine \'{}\' is not supported.'.format(routine.__name__))
 
-    if not isinstance(model, base.Model):
+    if not isinstance(model, _base.Model):
         raise TypeError('\'model\' must have or inherit type pycol.models.Model but has type {}.'.format(type(model)))
     if model.error:
         raise ValueError(model.error)
@@ -107,10 +115,10 @@ def fit(model: base.Model, x: array_iter, y: array_iter, sigma_x: array_iter = N
     if callable(sigma_y) and mc_sigma:
         raise ValueError("'sigma(_y)' must not be callable if 'mc_sigma' > 0.")
 
-    if isinstance(model, base.Linked):
+    if isinstance(model, _base.Linked):
         if mc_sigma != 0:
             raise TypeError('Linked models are currently not supported with Monte-Carlo sampling.')
-        models_offset = helper.find_models(model, base.Offset)
+        models_offset = _helper.find_models(model, _base.Offset)
         for _offset, _x, _y in zip(models_offset, x, y):
             if _offset is not None:
                 _offset.update_on_call = False
@@ -130,7 +138,7 @@ def fit(model: base.Model, x: array_iter, y: array_iter, sigma_x: array_iter = N
         if not callable(sigma_y):
             sigma_y = asarray_optional(sigma_y, dtype=float)
 
-        models_offset = [helper.find_model(model, base.Offset)]
+        models_offset = [_helper.find_model(model, _base.Offset)]
         if models_offset[0] is not None:
             if models_offset[0] is not None:
                 models_offset[0].update_on_call = False
@@ -139,11 +147,11 @@ def fit(model: base.Model, x: array_iter, y: array_iter, sigma_x: array_iter = N
                     models_offset[0].guess_offset(x, y)
 
     discard_y_pars = False
-    if not isinstance(model, base.YPars):
+    if not isinstance(model, _base.YPars):
         discard_y_pars = True
-        model = base.YPars(model)
-        vals = np.array([base.val_fix_to_val(model.vals[p_y], model.fixes[p_y]) for p_y in model.p_y], dtype=float)
-        uncs = np.array([base.fix_to_unc(model.fixes[p_y]) for p_y in model.p_y], dtype=float)
+        model = _base.YPars(model)
+        vals = np.array([_val_fix_to_val(model.vals[p_y], model.fixes[p_y]) for p_y in model.p_y], dtype=float)
+        uncs = np.array([_fix_to_unc(model.fixes[p_y]) for p_y in model.p_y], dtype=float)
         y = np.concatenate([y, vals], axis=0)
         if callable(sigma_y):
             sigma_y = _wrap_sigma_y(sigma_y, uncs)
@@ -224,7 +232,7 @@ def fit(model: base.Model, x: array_iter, y: array_iter, sigma_x: array_iter = N
 
     if discard_y_pars:
         model = model.model  # Discard the YPars model.
-    if isinstance(model, base.Linked):
+    if isinstance(model, _base.Linked):
         for model_offset in models_offset:
             model_offset.update_on_call = True  # Reset the offset model to be updated on call.
     else:

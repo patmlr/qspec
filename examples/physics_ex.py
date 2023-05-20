@@ -13,12 +13,10 @@ import numpy as np
 import scipy.constants as sc
 import matplotlib.pyplot as plt
 
-from pycol.types import *
-import pycol.physics as ph
-import pycol.tools as tools
+import pycol as pc
 
 
-def example(n: Union[set, int] = None):
+def example(n=None):
     """
     Run one or several of the available examples. Scroll to the end for the function call.
 
@@ -53,24 +51,24 @@ def example(n: Union[set, int] = None):
 
         # a) Typical COALA calculation.
         U = 20e3  # The acceleration voltage (V).
-        e_el = ph.e_el(U, q)  # The potential energy difference corresponding to the voltage (eV)
+        e_el = pc.e_el(U, q)  # The potential energy difference corresponding to the voltage (eV)
 
-        v = ph.v_el(U, q, m, v0=0, relativistic=True)  # The velocity of the accelerated carbon ions (m/s).
-        gamma = ph.gamma(v)  # The Lorentzian time-dilation factor.
+        v = pc.v_el(U, q, m, v0=0, relativistic=True)  # The velocity of the accelerated carbon ions (m/s).
+        gamma = pc.gamma(v)  # The Lorentzian time-dilation factor.
 
-        f_col = ph.doppler(f0, v, alpha=0, return_frame='lab')
+        f_col = pc.doppler(f0, v, alpha=0, return_frame='lab')
         # The resonant laser frequency in collinear direction (MHz) and ...
-        f_acol = ph.doppler(f0, v, alpha=np.pi, return_frame='lab')  # ... in anticollinear direction (MHz).
+        f_acol = pc.doppler(f0, v, alpha=np.pi, return_frame='lab')  # ... in anticollinear direction (MHz).
 
-        f_div_col = ph.doppler_el_d1(f_col, 0, U, q, m, 0, return_frame='atom')
+        f_div_col = pc.doppler_el_d1(f_col, 0, U, q, m, 0, return_frame='atom')
         # The differential Doppler factors in the atoms rest frame (MHz / V).
         # == The changes of the laser frequencies in the atoms rest frame with the voltage.
-        f_div_acol = ph.doppler_el_d1(f_acol, np.pi, U, q, m, 0, return_frame='atom')
+        f_div_acol = pc.doppler_el_d1(f_acol, np.pi, U, q, m, 0, return_frame='atom')
 
         # b) Inverse calculation.
-        v = ph.inverse_doppler(f0, f_col, alpha=0)  # The velocity of the carbon ions (m/s).
-        beta = ph.beta(v)  # The relative velocity of the carbon ions.
-        e_kin = ph.e_kin(v, m, relativistic=True)  # The kinetic energy of the carbon ions (eV).
+        v = pc.inverse_doppler(f0, f_col, alpha=0)  # The velocity of the carbon ions (m/s).
+        beta = pc.beta(v)  # The relative velocity of the carbon ions.
+        e_kin = pc.e_kin(v, m, relativistic=True)  # The kinetic energy of the carbon ions (eV).
 
         for k, v in locals().items():  # Print all local variables.
             print('{} = {}'.format(k, v))
@@ -92,22 +90,22 @@ def example(n: Union[set, int] = None):
         U = 20e3  # The acceleration voltage (V).
         f_col = 1321038455  # Resonant collinear laser frequency at 20kV.
 
-        v_vec = ph.thermal_v_rvs(m, 2500, (num, 3))
+        v_vec = pc.thermal_v_rvs(m, 2500, (num, 3))
         # Generate 100,000 thermally distributed velocity values for each direction.
 
-        v_vec[:, 0] = ph.v_el(U, q, m, v_vec[:, 0], relativistic=True)
+        v_vec[:, 0] = pc.v_el(U, q, m, v_vec[:, 0], relativistic=True)
         # Offset the kinetic energy by 20 kV =1a)= 80 keV in the x direction.
 
-        gamma3d = np.mean(ph.gamma_3d(v_vec, axis=-1), axis=0)
+        gamma3d = np.mean(pc.gamma_3d(v_vec, axis=-1), axis=0)
         # The mean Lorentzian time-dilation factor for the 3d vectors.
 
         f_vec = np.array([[f_col, f_col, 0, 0], ])  # The collinear frequency 4-vector.
         # Note that it was expanded along axis 0 to match the shape of v_vec.
 
-        f_vec_atom = ph.boost(f_vec, v_vec, axis=-1)  # The Lorentz boosts of the frequency 4-vector.
+        f_vec_atom = pc.boost(f_vec, v_vec, axis=-1)  # The Lorentz boosts of the frequency 4-vector.
         # Note that the vector components are aligned with the last axis.
 
-        f_atom = tools.absolute(f_vec_atom[:, 1:], axis=-1)
+        f_atom = pc.absolute(f_vec_atom[:, 1:], axis=-1)
         # The length of the cartesian components of the boosted 4-vectors.
 
         num_test = f_atom - f_vec_atom[:, 0]  # The length of this vector must be equal
@@ -139,22 +137,22 @@ def example(n: Union[set, int] = None):
         # Thorlabs UV fused silica
         mat0 = [[0.6961663, 0.4079426, 0.8974794],
                 [4.67914826e-3, 1.35120631e-2, 97.9340025]]
-        n0 = ph.sellmeier(w, mat0[0], mat0[1])
+        n0 = pc.sellmeier(w, mat0[0], mat0[1])
 
         # EdmundOptics UV fused silica
         mat1 = [[0.683740494, 0.420323613, 0.58502748],
                 [0.00460352869, 0.01339688560, 64.49327320000]]
-        n1 = ph.sellmeier(w, mat1[0], mat1[1])
+        n1 = pc.sellmeier(w, mat1[0], mat1[1])
 
         # Suprasil-family, Spectrosil
         mat2 = [[0.473115591, 0.631038719, 0.906404498],
                 [0.0129957170, 4.12809220e-3, 98.7685322]]
-        n2 = ph.sellmeier(w, mat2[0], mat2[1])
+        n2 = pc.sellmeier(w, mat2[0], mat2[1])
 
         # HPFS Grade 8655 Corning Fused Silica @ 22°C
         mat3 = [[3.550277875e-2, 7.353314507e-1, 3.334560303e-1, 9.269506614e-1],
                 [-4.826183477e-3, 5.808687673e-3, 1.399572492e-2, 1.012182926e2]]
-        n3 = ph.sellmeier(w, mat3[0], mat3[1])
+        n3 = pc.sellmeier(w, mat3[0], mat3[1])
 
         plt.plot(w, n0, 'r-', label='Thorlabs')
         plt.plot(w, n1, 'y-', label='EdmundOptics')
@@ -178,10 +176,10 @@ def example(n: Union[set, int] = None):
         v2, v4, v6 = 1.27976, 1.1974, 1.1370  # The shape factors.
         c2c1, c3c1 = -7.03e-3, 2.04e-6  # The Seltzer coefficients.
 
-        dr2, dr2_d = ph.delta_r2(barrett, barrett_d, barrett[-1], barrett_d[-1], delta_barret, delta_barret_d, v2, v2)
-        dr4, dr4_d = ph.delta_r2(barrett, barrett_d, barrett[-1], barrett_d[-1], delta_barret, delta_barret_d, v4, v4)
-        dr6, dr6_d = ph.delta_r2(barrett, barrett_d, barrett[-1], barrett_d[-1], delta_barret, delta_barret_d, v6, v6)
-        lambda_rn, lambda_rn_d = ph.lambda_rn(dr2, dr2_d, dr4, dr4_d, dr6, dr6_d, c2c1, c3c1)
+        dr2, dr2_d = pc.delta_r2(barrett, barrett_d, barrett[-1], barrett_d[-1], delta_barret, delta_barret_d, v2, v2)
+        dr4, dr4_d = pc.delta_r2(barrett, barrett_d, barrett[-1], barrett_d[-1], delta_barret, delta_barret_d, v4, v4)
+        dr6, dr6_d = pc.delta_r2(barrett, barrett_d, barrett[-1], barrett_d[-1], delta_barret, delta_barret_d, v6, v6)
+        lambda_rn, lambda_rn_d = pc.lambda_rn(dr2, dr2_d, dr4, dr4_d, dr6, dr6_d, c2c1, c3c1)
 
         for k, v in locals().items():
             print('{} = {}'.format(k, v))

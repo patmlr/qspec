@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 """
-pycol._simulate
+pycol._simulate_cpp
+===================
 
 Created on 09.01.2022
 
@@ -13,10 +14,14 @@ import numpy as np
 from matplotlib import cm
 import matplotlib.pyplot as plt
 
-from pycol.types import *
+from pycol._types import *
+from pycol._cpp import *
 from pycol import tools
-import pycol.physics as ph
-from pycol.cpp.cpp import *
+from pycol import get_f, get_m
+
+
+__all__ = ['Polarization', 'Laser', 'Environment', 'construct_electronic_state', 'construct_hyperfine_state', 'State',
+           'DecayMap', 'Atom', 'Interaction']
 
 
 def sr_generate_y(denominator: np.ndarray, f_theta: np.ndarray, f_phi: np.ndarray,
@@ -475,8 +480,8 @@ def construct_electronic_state(freq_0: scalar, s: scalar, l: scalar, j: scalar, 
     :param label: The label of the states. The labels are used to link states via decay maps.
     :returns: A list of the created states.
     """
-    f = ph.get_f(i, j)
-    m = [ph.get_m(_f) for _f in f]
+    f = get_f(i, j)
+    m = [get_m(_f) for _f in f]
     fm = [(_f, _m) for _f, m_f in zip(f, m) for _m in m_f]
     return [State(freq_0, s, l, j, i, _f, _m, hyper_const=hyper_const, g=g, label=label) for (_f, _m) in fm]
 
@@ -499,8 +504,7 @@ def construct_hyperfine_state(freq_0: scalar, s: scalar, l: scalar, j: scalar, i
     :param label: The label of the states. The labels are used to link states via decay maps.
     :returns: A list of the created states.
     """
-    m = ph.get_m(f)
-    return [State(freq_0, s, l, j, i, f, _m, hyper_const=hyper_const, g=g, label=label) for _m in m]
+    return [State(freq_0, s, l, j, i, f, _m, hyper_const=hyper_const, g=g, label=label) for _m in get_m(f)]
 
 
 class DecayMap:

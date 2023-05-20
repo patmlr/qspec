@@ -10,9 +10,9 @@ Example script / Guide for the pycol.simulate module.
 
 
 - Einstein coefficients taken from [NIST Atomic Spectra Database, https://doi.org/10.18434/T4W30F].
-- Frequencies of 40Ca+ taken from [P. Mueller et al., Phys. Rev. Research 2, 043351 (2020),
+- Frequencies of 40Ca+ taken from [P. Mueller et pc., Phys. Rev. Research 2, 043351 (2020),
                                   https://doi.org/10.1103/PhysRevResearch.2.043351].
-- Hyperfine-structure constants [A, B] of 40Ca+ taken from [Noertershaeuser et al., Eur. Phys. J. D 2, 33–39 (1998),
+- Hyperfine-structure constants [A, B] of 40Ca+ taken from [Noertershaeuser et pc., Eur. Phys. J. D 2, 33–39 (1998),
                                                             https://doi.org/10.1007/s100530050107]
 """
 
@@ -20,13 +20,11 @@ import numpy as np
 import scipy.constants as sc
 import matplotlib.pyplot as plt
 
-from pycol.types import *
-import pycol.physics as ph
-import pycol.algebra as al
+import pycol as pc
 import pycol.simulate as sim
 
 
-def example(n: Union[set, int] = None):
+def example(n=None):
     """
     Run one or several of the available examples. Scroll to the end for the function call.
 
@@ -212,7 +210,7 @@ def example(n: Union[set, int] = None):
         # Solve the rate equation for all times, assuming equal population in all s-states.
 
         # Plot the population of all d5-states.
-        for f in ph.get_f(i, 2.5):
+        for f in pc.get_f(i, 2.5):
             plt.plot(delta, np.sum(results[:, ca43.get_state_indexes('d5', f), -1], axis=1), label='F={}'.format(f))
         plt.xlabel('f - {} (MHz)'.format(laser_sp.freq))
         plt.ylabel('d5-state population after {} us'.format(times[-1]))
@@ -224,7 +222,7 @@ def example(n: Union[set, int] = None):
         # results = inter.master(times, delta)
         # # Solve the master equation for all times, assuming equal population in all s-states
         # y = np.diagonal(results[:, :, :, -1], axis1=1, axis2=2).real
-        # for f in ph.get_f(I, 2.5):
+        # for f in pc.get_f(I, 2.5):
         #     plt.plot(delta, np.sum(y[:, ca43.get_state_indexes('d5', f)], axis=1), label='F={}'.format(f))
         # plt.xlabel('f - {} (MHz)'.format(laser_sp.freq))
         # plt.ylabel('d5-state population after {} us'.format(times[-1]))
@@ -234,7 +232,7 @@ def example(n: Union[set, int] = None):
         """
         Example 3: Interaction between a singly-charged lithium ion and two lasers.
         
-        In example 3, Fig. 5 from [Noertershaeuser et al. Phys. Rev. Accel. Beams 24, 024701 (2021),
+        In example 3, Fig. 5 from [Noertershaeuser et pc. Phys. Rev. Accel. Beams 24, 024701 (2021),
         https://doi.org/10.1103/PhysRevAccelBeams.24.024701] is calculated.
         """
 
@@ -261,8 +259,8 @@ def example(n: Union[set, int] = None):
         laser_b = sim.Laser(freq=f + 6234.29, polarization=pol_b, intensity=i_b)  # blue laser
         laser_r = sim.Laser(freq=f - 13566., polarization=pol_r, intensity=i_r)  # red laser
 
-        print('Saturation s(blue): {}'.format(ph.saturation(i_b, f, a, al.a(1.5, 1, 1.5, 2, 2.5))))
-        print('Saturation s(red): {}'.format(ph.saturation(i_r, f, a, al.a(1.5, 1, 2.5, 2, 2.5))))
+        print('Saturation s(blue): {}'.format(pc.saturation(i_b, f, a, pc.a(1.5, 1, 1.5, 2, 2.5))))
+        print('Saturation s(red): {}'.format(pc.saturation(i_r, f, a, pc.a(1.5, 1, 2.5, 2, 2.5))))
         # The saturation intensity can be compared easily to the specified values in the paper.
 
         inter = sim.Interaction(atom=li7, lasers=[laser_b, laser_r])

@@ -12,12 +12,10 @@ Example script / Guide for the pycol.stats module.
 import numpy as np
 import matplotlib.pyplot as plt
 
-from pycol.types import *
-import pycol.stats as st
-import pycol.analyze as an
+import pycol as pc
 
 
-def example(n: Union[set, int] = None):
+def example(n=None):
     """
     Run one or several of the available examples. Scroll to the end for the function call.
 
@@ -41,7 +39,7 @@ def example(n: Union[set, int] = None):
         """
         Example 0: Create an observable with uncertainties and do statistics.
         """
-        f = st.Observable(60, 1, 1.4)  # Create an observable with possibly asymmetric uncertainties.
+        f = pc.Observable(60, 1, 1.4)  # Create an observable with possibly asymmetric uncertainties.
         # f.hist()  # show the statistics of f.
 
         # Currently the ratio between the uncertainties must not exceed 1.5.
@@ -52,19 +50,19 @@ def example(n: Union[set, int] = None):
         # it is more efficient/necessary to use propagate and define the function (see 'sin' above):
 
         x, a, b, c = 0.2, 3, 10, 5
-        print('\n1. sin = {}'.format(st.propagate(sin, [x, f, a, b, c])))
+        print('\n1. sin = {}'.format(pc.propagate(sin, [x, f, a, b, c])))
 
-        x = st.Observable(x, 0.01)  # All values with uncertainties.
-        a = st.Observable(a, 0.2, 0.18)
-        b = st.Observable(b, 0.8)
-        c = st.Observable(c, 1, 1.1)
-        print('2. sin = {}'.format(st.propagate(sin, [x, f, a, b, c])))
+        x = pc.Observable(x, 0.01)  # All values with uncertainties.
+        a = pc.Observable(a, 0.2, 0.18)
+        b = pc.Observable(b, 0.8)
+        c = pc.Observable(c, 1, 1.1)
+        print('2. sin = {}'.format(pc.propagate(sin, [x, f, a, b, c])))
 
         num = 101
         x = np.linspace(-0.2, 0.2, num)
         p0 = f.rvs(num), a.rvs(num), b.rvs(num), c.rvs(num)
         y = sin(x, *p0)  # generate samples with .rvs()
-        popt, pcov = an.curve_fit(sin, x, y, p0=np.array(p0)[:, 0])
+        popt, pcov = pc.curve_fit(sin, x, y, p0=np.array(p0)[:, 0])
         plt.plot(x, y, 'C0.')
         plt.plot(x, sin(x, *popt), 'C1-')
         plt.show()
@@ -73,10 +71,10 @@ def example(n: Union[set, int] = None):
         """
         Example 1: Fit a function and plot its median and 1-sigma percentiles.
         """
-        f = st.Observable(60, 0.5, 0.7)
-        a = st.Observable(3, 0.1, 0.13)
-        b = st.Observable(10, 0.8)
-        c = st.Observable(5, 1, 1.1)
+        f = pc.Observable(60, 0.5, 0.7)
+        a = pc.Observable(3, 0.1, 0.13)
+        b = pc.Observable(10, 0.8)
+        c = pc.Observable(5, 1, 1.1)
 
         num = 101
         x = np.linspace(-0.2, 0.2, num)
@@ -86,7 +84,7 @@ def example(n: Union[set, int] = None):
         # until here its just generating data. The use case starts below.
 
         # fit the sin-function, use the first sample for initialization.
-        popt, pcov = an.curve_fit(sin, x, y, sigma=sigma, absolute_sigma=True, p0=np.array(p0)[:, 0])
+        popt, pcov = pc.curve_fit(sin, x, y, sigma=sigma, absolute_sigma=True, p0=np.array(p0)[:, 0])
         y_fit = sin(x, *popt)
 
         # plot the data and fitted function
@@ -94,7 +92,7 @@ def example(n: Union[set, int] = None):
         plt.plot(x, y_fit, 'C2-', label='Fit')
 
         # get proper error bands including correlations.
-        y_med, y_min, y_max = st.propagate_fit(sin, x, popt, pcov, sample_size=100000)
+        y_med, y_min, y_max = pc.propagate_fit(sin, x, popt, pcov, sample_size=100000)
         plt.plot(x, y_med, 'C1-', label='Median')
         plt.fill_between(x, y_min, y_max, color='C1', alpha=0.7)
 

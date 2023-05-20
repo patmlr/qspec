@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-pycol.models.convolved
+pycol.models._convolved
 
 Created on 14.03.2022
 
@@ -12,8 +12,11 @@ Convolution classes for lineshape models.
 import numpy as np
 
 from pycol.tools import merge_intervals
-from pycol.models.base import Model
-from pycol.models.spectrum import Gauss, Lorentz, GaussChi2, source_energy_pdf
+from pycol.physics import source_energy_pdf
+from pycol.models._base import Model
+from pycol.models._spectrum import Gauss, Lorentz, GaussChi2
+
+__all__ = ['CONVOLVE', 'Convolved', 'GaussConvolved', 'LorentzConvolved', 'GaussChi2Convolved']
 
 
 CONVOLVE = ['None', 'Gauss', 'Lorentz', 'GaussChi2']

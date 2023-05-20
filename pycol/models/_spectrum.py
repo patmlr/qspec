@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-pycol.models.spectrum
+pycol.models._spectrum
 
 Created on 14.03.2022
 
@@ -15,7 +15,10 @@ from scipy.special import voigt_profile
 from scipy.special import wofz
 
 from pycol.physics import source_energy_pdf
-from pycol.models.base import Model
+from pycol.models._base import Model
+
+__all__ = ['SPECTRA', 'fwhm_voigt', 'fwhm_voigt_d', 'Spectrum', 'Gauss', 'Lorentz', 'Voigt', 'VoigtDerivative',
+           'VoigtAsy', 'VoigtCEC', 'GaussChi2']
 
 
 # The names of the spectra. Includes all spectra that appear in the GUI.

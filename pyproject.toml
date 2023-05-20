@@ -7,7 +7,7 @@ requires = [
 
 [project]
 name = 'pycol'
-version = '0.0.1'
+version = '0.1.0'
 description = 'A python package for calculations surrounding Collinear Laser Spectroscopy.'
 readme = 'README.md'
 requires-python = '>=3.8'
@@ -25,8 +25,8 @@ classifiers = [
     'Operating System :: Microsoft :: Windows'
 ]
 dependencies = [
-    'numpy >= 1.20.0',
-    'scipy',
+    'numpy >= 1.20.3',
+    'scipy >= 1.10.1',
     'sympy',
     'matplotlib'
 ]

@@ -1,18 +1,6 @@
 pycol package
 =============
 
-Subpackages
------------
-
-.. toctree::
-   :maxdepth: 4
-
-   pycol.cpp
-   pycol.models
-
-Submodules
-----------
-
 pycol.algebra module
 --------------------
 
@@ -29,10 +17,10 @@ pycol.analyze module
    :undoc-members:
    :show-inheritance:
 
-pycol.lineshapes module
------------------------
+pycol.models module
+-------------------
 
-.. automodule:: pycol.lineshapes
+.. automodule:: pycol.models
    :members:
    :undoc-members:
    :show-inheritance:
@@ -65,22 +53,6 @@ pycol.tools module
 ------------------
 
 .. automodule:: pycol.tools
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-pycol.types module
-------------------
-
-.. automodule:: pycol.types
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-Module contents
----------------
-
-.. automodule:: pycol
    :members:
    :undoc-members:
    :show-inheritance:

@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>pycol.tools &mdash; pycol 01.05.2023 documentation</title><link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <title>pycol.tools &mdash; pycol 20.05.2023 documentation</title><link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/css/borders.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/css/wy-nav-content.css" type="text/css" />
@@ -67,12 +67,13 @@
 <span></span><span class="c1"># -*- coding: utf-8 -*-</span>
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">pycol.tools</span>
+<span class="sd">===========</span>
 
 <span class="sd">Created on 05.05.2020</span>
 
 <span class="sd">@author: Patrick Mueller</span>
 
-<span class="sd">Module including algebraic and technical methods.</span>
+<span class="sd">Module including mathematical and technical methods.</span>
 <span class="sd">&quot;&quot;&quot;</span>
 
 <span class="kn">import</span> <span class="nn">os</span>
@@ -84,7 +85,18 @@
 <span class="kn">import</span> <span class="nn">sqlite3</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 
-<span class="kn">from</span> <span class="nn">pycol.types</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">pycol._types</span> <span class="kn">import</span> <span class="o">*</span>
+
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;ROMAN_NUMERALS&#39;</span><span class="p">,</span> <span class="s1">&#39;COLORS&#39;</span><span class="p">,</span> <span class="s1">&#39;get_rgb_print_command&#39;</span><span class="p">,</span> <span class="s1">&#39;print_colored&#39;</span><span class="p">,</span> <span class="s1">&#39;printh&#39;</span><span class="p">,</span> <span class="s1">&#39;printw&#39;</span><span class="p">,</span> <span class="s1">&#39;printf&#39;</span><span class="p">,</span>
+           <span class="s1">&#39;map_corr_coeff_to_color&#39;</span><span class="p">,</span> <span class="s1">&#39;print_cov&#39;</span><span class="p">,</span> <span class="s1">&#39;get_default_path&#39;</span><span class="p">,</span> <span class="s1">&#39;create_doc_link&#39;</span><span class="p">,</span> <span class="s1">&#39;create_data_dir&#39;</span><span class="p">,</span>
+           <span class="s1">&#39;get_config_dict&#39;</span><span class="p">,</span> <span class="s1">&#39;fraction&#39;</span><span class="p">,</span> <span class="s1">&#39;check_half_integer&#39;</span><span class="p">,</span> <span class="s1">&#39;half_integer_to_fraction&#39;</span><span class="p">,</span> <span class="s1">&#39;half_integer_to_str&#39;</span><span class="p">,</span>
+           <span class="s1">&#39;get_val_with_unc&#39;</span><span class="p">,</span> <span class="s1">&#39;roman_to_int&#39;</span><span class="p">,</span> <span class="s1">&#39;odd&#39;</span><span class="p">,</span> <span class="s1">&#39;even&#39;</span><span class="p">,</span> <span class="s1">&#39;get_decimals&#39;</span><span class="p">,</span> <span class="s1">&#39;floor_log2&#39;</span><span class="p">,</span> <span class="s1">&#39;floor_log10&#39;</span><span class="p">,</span> <span class="s1">&#39;round_to_n&#39;</span><span class="p">,</span>
+           <span class="s1">&#39;factorial&#39;</span><span class="p">,</span> <span class="s1">&#39;asarray_optional&#39;</span><span class="p">,</span> <span class="s1">&#39;in_nested&#39;</span><span class="p">,</span> <span class="s1">&#39;check_iterable&#39;</span><span class="p">,</span> <span class="s1">&#39;make_str_iterable_unique&#39;</span><span class="p">,</span>
+           <span class="s1">&#39;check_dimension&#39;</span><span class="p">,</span> <span class="s1">&#39;check_shape_like&#39;</span><span class="p">,</span> <span class="s1">&#39;check_shape&#39;</span><span class="p">,</span> <span class="s1">&#39;nan_helper&#39;</span><span class="p">,</span> <span class="s1">&#39;dict_to_list&#39;</span><span class="p">,</span> <span class="s1">&#39;list_to_dict&#39;</span><span class="p">,</span>
+           <span class="s1">&#39;list_to_excel&#39;</span><span class="p">,</span> <span class="s1">&#39;add_nested_key&#39;</span><span class="p">,</span> <span class="s1">&#39;merge_dicts&#39;</span><span class="p">,</span> <span class="s1">&#39;convolve_dict&#39;</span><span class="p">,</span> <span class="s1">&#39;combine_dicts&#39;</span><span class="p">,</span> <span class="s1">&#39;merge_intervals&#39;</span><span class="p">,</span>
+           <span class="s1">&#39;absolute&#39;</span><span class="p">,</span> <span class="s1">&#39;absolute_complex&#39;</span><span class="p">,</span> <span class="s1">&#39;angle&#39;</span><span class="p">,</span> <span class="s1">&#39;transform&#39;</span><span class="p">,</span> <span class="s1">&#39;unit_vector&#39;</span><span class="p">,</span> <span class="s1">&#39;e_r&#39;</span><span class="p">,</span> <span class="s1">&#39;e_theta&#39;</span><span class="p">,</span> <span class="s1">&#39;e_phi&#39;</span><span class="p">,</span>
+           <span class="s1">&#39;orthonormal_rtp&#39;</span><span class="p">,</span> <span class="s1">&#39;orthonormal&#39;</span><span class="p">,</span> <span class="s1">&#39;rotation_matrix&#39;</span><span class="p">,</span> <span class="s1">&#39;Rotation&#39;</span><span class="p">,</span> <span class="s1">&#39;rotation_to_vector&#39;</span><span class="p">,</span>
+           <span class="s1">&#39;import_iso_shifts_tilda&#39;</span><span class="p">]</span>
 
 
 <span class="n">ROMAN_NUMERALS</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;M&#39;</span><span class="p">:</span> <span class="mi">1000</span><span class="p">,</span> <span class="s1">&#39;D&#39;</span><span class="p">:</span> <span class="mi">500</span><span class="p">,</span> <span class="s1">&#39;C&#39;</span><span class="p">:</span> <span class="mi">100</span><span class="p">,</span> <span class="s1">&#39;L&#39;</span><span class="p">:</span> <span class="mi">50</span><span class="p">,</span> <span class="s1">&#39;X&#39;</span><span class="p">:</span> <span class="mi">10</span><span class="p">,</span> <span class="s1">&#39;V&#39;</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span> <span class="s1">&#39;I&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">}</span>
@@ -169,13 +181,21 @@
     <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{}{}{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="o">*</span><span class="n">_values</span><span class="p">),</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="map_corr_coeff_to_color"><a class="viewcode-back" href="../../pycol.html#pycol.tools.map_corr_coeff_to_color">[docs]</a><span class="k">def</span> <span class="nf">map_corr_coeff_to_color</span><span class="p">(</span><span class="n">val</span><span class="p">):</span>
+<div class="viewcode-block" id="map_corr_coeff_to_color"><a class="viewcode-back" href="../../pycol.html#pycol.tools.map_corr_coeff_to_color">[docs]</a><span class="k">def</span> <span class="nf">map_corr_coeff_to_color</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="n">clip</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 
 <span class="sd">    :param val: A value between -1 and 1.</span>
+<span class="sd">    :param clip: Whether to clip vals outside -1 and 1. If False, raise ValueError.</span>
 <span class="sd">    :returns: The RGB values in the range 0-255.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="n">val</span> <span class="o">&lt;</span> <span class="o">-</span><span class="mi">1</span> <span class="ow">or</span> <span class="n">val</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">clip</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">val</span><span class="p">):</span>
+            <span class="n">val</span> <span class="o">=</span> <span class="mf">0.</span>
+        <span class="k">elif</span> <span class="n">val</span> <span class="o">&lt;</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+            <span class="n">val</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="k">elif</span> <span class="n">val</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">val</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">val</span><span class="p">)</span> <span class="ow">or</span> <span class="n">val</span> <span class="o">&lt;</span> <span class="o">-</span><span class="mi">1</span> <span class="ow">or</span> <span class="n">val</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;The correlation coefficient must be in [-1, 1].&#39;</span><span class="p">)</span>
     <span class="n">g</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">val</span> <span class="o">*</span> <span class="mi">127</span> <span class="o">+</span> <span class="mi">127</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
     <span class="k">return</span> <span class="mi">255</span> <span class="o">-</span> <span class="n">g</span><span class="p">,</span> <span class="n">g</span><span class="p">,</span> <span class="mi">0</span></div>

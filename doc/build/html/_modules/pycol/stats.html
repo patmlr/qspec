@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>pycol.stats &mdash; pycol 01.05.2023 documentation</title><link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <title>pycol.stats &mdash; pycol 20.05.2023 documentation</title><link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/css/borders.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/css/wy-nav-content.css" type="text/css" />
@@ -67,22 +67,27 @@
 <span></span><span class="c1"># -*- coding: utf-8 -*-</span>
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">pycol.stats</span>
+<span class="sd">===========</span>
 
 <span class="sd">Created on 22.04.2020</span>
 
 <span class="sd">@author: Patrick Mueller</span>
 
-<span class="sd">Module including classes and methods for doing statistical evaluations.</span>
+<span class="sd">Module for doing statistical analysis.</span>
 <span class="sd">&quot;&quot;&quot;</span>
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">scipy.stats</span> <span class="k">as</span> <span class="nn">st</span>
 <span class="kn">import</span> <span class="nn">scipy.integrate</span> <span class="k">as</span> <span class="nn">si</span>
-<span class="kn">from</span> <span class="nn">scipy.optimize</span> <span class="kn">import</span> <span class="n">curve_fit</span><span class="p">,</span> <span class="n">root</span><span class="p">,</span> <span class="n">minimize</span>
+<span class="kn">from</span> <span class="nn">scipy.optimize</span> <span class="kn">import</span> <span class="n">root</span><span class="p">,</span> <span class="n">minimize</span>
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 
-<span class="kn">from</span> <span class="nn">pycol.types</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">pycol._types</span> <span class="kn">import</span> <span class="o">*</span>
 <span class="kn">from</span> <span class="nn">pycol</span> <span class="kn">import</span> <span class="n">tools</span>
+<span class="kn">from</span> <span class="nn">pycol.analyze</span> <span class="kn">import</span> <span class="n">curve_fit</span>
+
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Observable&#39;</span><span class="p">,</span> <span class="s1">&#39;add&#39;</span><span class="p">,</span> <span class="s1">&#39;mul&#39;</span><span class="p">,</span> <span class="s1">&#39;average&#39;</span><span class="p">,</span> <span class="s1">&#39;median&#39;</span><span class="p">,</span> <span class="s1">&#39;estimate_skewnorm&#39;</span><span class="p">,</span> <span class="s1">&#39;propagate&#39;</span><span class="p">,</span> <span class="s1">&#39;propagate_fit&#39;</span><span class="p">,</span>
+           <span class="s1">&#39;combined_pdf&#39;</span><span class="p">,</span> <span class="s1">&#39;relevant_interval&#39;</span><span class="p">,</span> <span class="s1">&#39;uniform&#39;</span><span class="p">,</span> <span class="s1">&#39;uniform_pumped&#39;</span><span class="p">,</span> <span class="s1">&#39;info&#39;</span><span class="p">]</span>
 
 
 <div class="viewcode-block" id="Observable"><a class="viewcode-back" href="../../pycol.html#pycol.stats.Observable">[docs]</a><span class="k">class</span> <span class="nc">Observable</span><span class="p">(</span><span class="nb">float</span><span class="p">):</span>

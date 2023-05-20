@@ -22,7 +22,7 @@ copyright = '2023, Patrick Mueller'
 author = 'Patrick Mueller'
 
 # The full version, including alpha/beta/rc tags
-release = '01.05.2023'
+release = '20.05.2023'
 
 
 # -- General configuration ---------------------------------------------------

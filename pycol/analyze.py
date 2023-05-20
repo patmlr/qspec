@@ -1,49 +1,49 @@
 # -*- coding: utf-8 -*-
 """
 pycol.analyze
+=============
 
 Created on 07.05.2020
 
 @author: Patrick Mueller
 
-Module for analysing/evaluating/fitting data.
+Module for analyzing/evaluating/fitting data.
 
-linear regression algorithms:
+Linear regression algorithms:
     - york(); [York et al., Am. J. Phys. 72, 367 (2004)]
     - linear_monte_carlo(); based on [Gebert et al., Phys. Rev. Lett. 115, 053003 (2015), Suppl.]
     - linear_monte_carlo_nd(); based on [Gebert et al., Phys. Rev. Lett. 115, 053003 (2015), Suppl.]
 
-curve fitting methods:
-    - curve_fit(); Encapsulates the scipy.optimize.curve_fit method to allow fixing parameters
-     and having parameter-dependent y-uncertainties.
+Curve fitting methods:
+    - curve_fit(); Reimplements the scipy.optimize.curve_fit method to allow fixing parameters
+      and having parameter-dependent y-uncertainties.
     - odr_fit(); Encapsulates the scipy.odr.odr method to accept inputs similarly to curve_fit().
 
-classes:
-    (- Element; Holds spectroscopic information about a chemical element.)
-    (- Radii; Holds information about nuclear charge radii of a chemical element.)
+Classes:
     - King; Creates a King plot with isotope shifts or nuclear charge radii.
 
-LICENSE NOTES: The method curve_fit is a modified version of scipy.optimize.curve_fit.
- Therefore, it is licensed under the 'BSD 3-Clause "New" or "Revised" License' provided with scipy.
+LICENSE NOTES:
+    The method curve_fit is a modified version of scipy.optimize.curve_fit.
+    Therefore, it is licensed under the 'BSD 3-Clause "New" or "Revised" License' provided with scipy.
 """
 
 import inspect
 import warnings
 import numpy as np
-
 from scipy.optimize._minpack_py import Bounds, LinAlgError, OptimizeWarning, _getfullargspec, _initialize_feasible, \
     _wrap_jac, cholesky, least_squares, leastsq, prepare_bounds, solve_triangular, svd
 from scipy.optimize import minimize
-import scipy.stats as st
-import scipy.odr as odr
-# import scipy.optimize as so
+from scipy.stats import norm, multivariate_normal
+from scipy import odr
 import matplotlib.pyplot as plt
 
-from pycol.types import *
+from pycol._types import *
 from pycol import tools
-import pycol.physics as ph
-# from pycol.stats import average
-# import pycol.databases as dat
+from pycol.physics import me_u, me_u_d, mass_factor
+
+__all__ = ['straight', 'straight_slope', 'straight_std', 'straight_x_std', 'draw_straight_unc_area', 'cubic',
+           'ellipse2d', 'draw_sigma2d', 'weight', 'york', 'linear_monte_carlo', 'linear_monte_carlo_nd', 'linear_alpha',
+           'odr_fit', 'curve_fit', 'King']
 
 
 def _get_rtype2(ab_dict: dict, a: Union[Iterable, any], b: Union[Iterable, any], rtype: type = ndarray):
@@ -232,14 +232,6 @@ def weight(sigma):
     return 1. / sigma ** 2
 
 
-def cost_chi2(y, y_fit, y_err):
-    return np.sum(((y - y_fit) / y_err) ** 2)
-
-
-def cost_chi2_poisson(y, y_fit):
-    return np.sum(((y - y_fit) / tools.sqrt_zero_free(y_fit)) ** 2)
-
-
 def york(x: array_iter, y: array_iter, sigma_x: array_iter = None, sigma_y: array_iter = None,
          corr: array_iter = None, iter_max: int = 200, report: bool = False, show: bool = False):
     """
@@ -396,18 +388,18 @@ def _generate_collinear_points(x: ndarray, cov: ndarray, n: int):
      the unit vectors dr [shape=(n, x.shape[1])] in the directions of the straight lines
      and a mask of the accepted samples. The accepted samples are p[accepted] and dr[accepted].
     """
-    p_0 = st.multivariate_normal.rvs(mean=x[0], cov=cov[0], size=n)
-    p_1 = st.multivariate_normal.rvs(mean=x[-1], cov=cov[-1], size=n)
+    p_0 = multivariate_normal.rvs(mean=x[0], cov=cov[0], size=n)
+    p_1 = multivariate_normal.rvs(mean=x[-1], cov=cov[-1], size=n)
     dr = straight_slope(p_0, p_1, axis=-1)
 
     t_0 = [np.einsum('ij,ij->i', np.expand_dims(x_i, axis=0) - p_0, dr) for x_i in x[1:-1]]
-    t = [st.norm.rvs(loc=t_0_i, scale=np.sqrt(np.min(np.diag(cov_i)))) for t_0_i, cov_i in zip(t_0, cov[1:-1])]
+    t = [norm.rvs(loc=t_0_i, scale=np.sqrt(np.min(np.diag(cov_i)))) for t_0_i, cov_i in zip(t_0, cov[1:-1])]
 
     p_new = [p_0 + np.expand_dims(t_i, axis=-1) * dr for t_i in t]
-    f = np.prod([st.multivariate_normal.pdf(p_i, mean=x_i, cov=cov_i)
+    f = np.prod([multivariate_normal.pdf(p_i, mean=x_i, cov=cov_i)
                  for p_i, x_i, cov_i in zip(p_new, x[1:-1], cov[1:-1])], axis=0)
 
-    g = np.prod([st.norm.pdf(t_i, loc=t_0_i, scale=np.sqrt(np.max(np.diag(cov_i))))
+    g = np.prod([norm.pdf(t_i, loc=t_0_i, scale=np.sqrt(np.max(np.diag(cov_i))))
                  for t_i, t_0_i, cov_i in zip(t, t_0, cov[1:-1])], axis=0)
     if p_new:
         u = f / g
@@ -602,9 +594,9 @@ def odr_fit(f: Callable, x: array_iter, y: array_iter, sigma_x: array_iter = Non
 
 
 def curve_fit(f: Callable, x: Union[array_like, object], y: array_like, p0: array_iter = None,
-               p0_fixed: array_iter = None, sigma: Union[array_iter, Callable] = None, absolute_sigma: bool = False,
-               check_finite: bool = True, bounds: (ndarray, ndarray) = (-np.inf, np.inf), method: str = None,
-               jac: Union[Callable, str] = None, full_output: bool = False, report: bool = False, **kwargs):
+              p0_fixed: array_iter = None, sigma: Union[array_iter, Callable] = None, absolute_sigma: bool = False,
+              check_finite: bool = True, bounds: (ndarray, ndarray) = (-np.inf, np.inf), method: str = None,
+              jac: Union[Callable, str] = None, full_output: bool = False, report: bool = False, **kwargs):
     """
     :param f: The model function to fit to the data.
     :param x: The x data.
@@ -615,7 +607,7 @@ def curve_fit(f: Callable, x: Union[array_like, object], y: array_like, p0: arra
     :param p0_fixed: A numpy array or an Iterable of bool values specifying, whether to fix a parameter.
      Must have the same length as p0.
     :param sigma: The 1-sigma uncertainty of the y data.
-     This can also be a function g such that 'g(x, y, f(x, *params), *params) -> sigma'.
+     This can also be a function g such that 'g(x, y, f(x, \*params), \*params) -> sigma'.
     :param absolute_sigma: See scipy.optimize.curve_fit.
     :param check_finite: See scipy.optimize.curve_fit.
     :param bounds: See scipy.optimize.curve_fit.
@@ -822,10 +814,10 @@ class King:
             if len(self.x_abs.shape) < 3:
                 self.x_abs = np.expand_dims(self.x_abs, axis=1)
         self.m: Union[object, list, ndarray] = np.asarray(m, dtype=float).tolist()
-        self.m = np.array([[m_i[0] - self.subtract_electrons * ph.m_e_u,
-                            np.sqrt(m_i[1] ** 2 + (self.subtract_electrons * ph.m_e_u_d) ** 2)] for m_i in self.m])
+        self.m = np.array([[m_i[0] - self.subtract_electrons * me_u,
+                            np.sqrt(m_i[1] ** 2 + (self.subtract_electrons * me_u_d) ** 2)] for m_i in self.m])
         tools.check_shape((len(a), 2), self.m, allow_scalar=False)
-        self.m_mod = np.array([[list(ph.mass_factor(_m[0], _m_ref[0], m_d=_m[1], m_ref_d=_m_ref[1], k_inf=True))
+        self.m_mod = np.array([[list(mass_factor(_m[0], _m_ref[0], m_d=_m[1], m_ref_d=_m_ref[1], k_inf=True))
                                 if _i != _j else [0., 0.]
                                 for _j, _m in enumerate(self.m)] for _i, _m_ref in enumerate(self.m)])
         self.m_sample = None
@@ -849,10 +841,10 @@ class King:
         """
         i = np.array([self.a.index(a_i) for a_i in self.a_fit])
         i_ref = np.array([self.a.index(a_i) for a_i in self.a_ref])
-        self.m_sample = st.norm.rvs(loc=self.m[:, 0], scale=self.m[:, 1], size=(self.n, self.m.shape[0])).T
-        x = st.norm.rvs(loc=self.x[:, 0], scale=self.x[:, 1], size=(self.n, self.x.shape[0])).T
-        y = st.norm.rvs(loc=self.y[:, 0], scale=self.y[:, 1], size=(self.n, self.y.shape[0])).T
-        m_mod_sample = ph.mass_factor(self.m_sample[i], self.m_sample[i_ref], k_inf=True)[0]
+        self.m_sample = norm.rvs(loc=self.m[:, 0], scale=self.m[:, 1], size=(self.n, self.m.shape[0])).T
+        x = norm.rvs(loc=self.x[:, 0], scale=self.x[:, 1], size=(self.n, self.x.shape[0])).T
+        y = norm.rvs(loc=self.y[:, 0], scale=self.y[:, 1], size=(self.n, self.y.shape[0])).T
+        m_mod_sample = mass_factor(self.m_sample[i], self.m_sample[i_ref], k_inf=True)[0]
         x_mod = m_mod_sample * x
         y_mod = m_mod_sample * y
         self.corr = np.diag(np.corrcoef(x_mod, y_mod)[:x_mod.shape[0], x_mod.shape[0]:])
@@ -863,11 +855,11 @@ class King:
         """
         i = np.array([self.a.index(a_i) for a_i in self.a_fit])
         i_ref = np.array([self.a.index(a_i) for a_i in self.a_ref])
-        self.m_sample = st.norm.rvs(loc=self.m[:, 0], scale=self.m[:, 1], size=(self.n, self.m.shape[0])).T
-        x_nd = st.norm.rvs(loc=self.x_nd[:, :, 0], scale=self.x_nd[:, :, 1],
-                           size=(self.n, self.x_nd.shape[0], self.x_nd.shape[1]))
+        self.m_sample = norm.rvs(loc=self.m[:, 0], scale=self.m[:, 1], size=(self.n, self.m.shape[0])).T
+        x_nd = norm.rvs(loc=self.x_nd[:, :, 0], scale=self.x_nd[:, :, 1],
+                        size=(self.n, self.x_nd.shape[0], self.x_nd.shape[1]))
         x_nd = np.transpose(x_nd, axes=[1, 2, 0])
-        m_mod_sample = ph.mass_factor(self.m_sample[i], self.m_sample[i_ref], k_inf=True)[0]
+        m_mod_sample = mass_factor(self.m_sample[i], self.m_sample[i_ref], k_inf=True)[0]
         x_mod = np.expand_dims(m_mod_sample, axis=1) * x_nd
         self.cov = np.array([np.cov(x_mod_i) for x_mod_i in x_mod])
 
@@ -1076,7 +1068,7 @@ class King:
             return None
         i = np.array([self.a.index(a_i) for a_i in self.a_fit])
         i_ref = np.array([self.a.index(a_i) for a_i in self.a_ref])
-        m_mod_sample = ph.mass_factor(self.m_sample[i], self.m_sample[i_ref], k_inf=True)[0]
+        m_mod_sample = mass_factor(self.m_sample[i], self.m_sample[i_ref], k_inf=True)[0]
         x = self.x_results[0] / np.expand_dims(m_mod_sample.T[self.x_results[-1]], axis=-1)
         return np.transpose(np.array([np.mean(x, axis=0), np.std(x, ddof=1, axis=0)]), axes=[1, 2, 0])
 
@@ -1100,8 +1092,8 @@ class King:
         m = m[:, self.x_results[-1]]
         m_ref = self.m_sample[i_ref, :]
         m_ref = m_ref[:, self.x_results[-1]]
-        m_mod_sample = ph.mass_factor(m, m_ref, k_inf=True)[0].T
-        y_sample = st.norm.rvs(loc=y[:, 0], scale=y[:, 1], size=(m_mod_sample.shape[0], len(a)))
+        m_mod_sample = mass_factor(m, m_ref, k_inf=True)[0].T
+        y_sample = norm.rvs(loc=y[:, 0], scale=y[:, 1], size=(m_mod_sample.shape[0], len(a)))
         y_sample = m_mod_sample * y_sample
         x_sample = straight(y_sample, -_a[:, :, axis] / b[:, :, axis], 1. / b[:, :, axis])
         x_sample = straight(np.expand_dims(x_sample, axis=-1), _a, b)

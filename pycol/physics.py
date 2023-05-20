@@ -1,12 +1,13 @@
 # -*- coding: utf-8 -*-
 """
-pycol.Physics
+pycol.physics
+=============
 
 Created on 01.04.2020
 
 @author: Patrick Mueller
 
-Module including physical functions useful for CLS.
+Module for physical functions useful for CLS.
 """
 
 import string
@@ -15,8 +16,20 @@ import scipy.constants as sc
 import scipy.stats as st
 import scipy.special as sp
 
-from pycol.types import *
+from pycol._types import *
 from pycol import tools
+
+__all__ = ['L_LABEL', 'E_NORM', 'LEMNISCATE', 'mu_N', 'mu_B', 'g_s', 'me_u', 'me_u_d', 'gp_s', 'gn_s',
+           'inv_cm_to_freq', 'freq_to_inv_cm', 'wavelength_to_freq', 'freq_to_wavelength', 'inv_cm_to_wavelength',
+           'wavelength_to_inv_cm', 'beta', 'gamma', 'gamma_e', 'gamma_e_kin', 'e_rest', 'e_kin', 'e_total', 'e_el',
+           'v_e', 'v_e_d1', 'v_el', 'v_el_d1', 'p_v', 'p_e', 'p_el', 'doppler', 'doppler_d1', 'doppler_e_d1',
+           'doppler_el_d1', 'inverse_doppler', 'inverse_doppler_d1', 'alpha_atom', 'v_rec', 'photon_recoil',
+           'photon_recoil_v', 'get_f', 'get_m', 'hyperfine', 'lande_n', 'lande_j', 'lande_f', 'zeeman', 'hyper_zeeman',
+           'a_hyper_mu', 'saturation_intensity', 'saturation', 'rabi', 'scattering_rate', 'mass_factor', 'delta_r2',
+           'delta_r4', 'delta_r6', 'lambda_r', 'lambda_rn', 'schmidt_line', 'sellmeier', 'gamma_3d', 'boost',
+           'doppler_3d', 'gaussian_beam_3d', 'gaussian_doppler_3d', 'thermal_v_pdf', 'thermal_v_rvs', 'thermal_e_pdf',
+           'thermal_e_rvs', 'convolved_boltzmann_norm_pdf', 'convolved_thermal_norm_v_pdf',
+           'convolved_thermal_norm_f_pdf', 'convolved_thermal_norm_f_lin_pdf', 'source_energy_pdf']
 
 
 L_LABEL = ['S', 'P', 'D', ] + list(string.ascii_uppercase[5:])
@@ -25,8 +38,8 @@ LEMNISCATE = 2.6220575543
 mu_N = sc.physical_constants['nuclear magneton'][0]
 mu_B = sc.physical_constants['Bohr magneton'][0]
 g_s = sc.physical_constants['electron g factor'][0]
-m_e_u = sc.physical_constants['electron mass in u'][0]
-m_e_u_d = sc.physical_constants['electron mass in u'][2]
+me_u = sc.physical_constants['electron mass in u'][0]
+me_u_d = sc.physical_constants['electron mass in u'][2]
 gp_s = sc.physical_constants['proton g factor'][0]
 gn_s = sc.physical_constants['neutron g factor'][0]
 
@@ -45,7 +58,7 @@ def inv_cm_to_freq(k: array_like):
 def freq_to_inv_cm(freq: array_like):
     """
     :param freq: The frequency f of a transition (MHz)
-    :returns: The wavenumber k corresponding to the frequency freq (MHz).
+    :returns: The wavenumber k corresponding to the frequency freq (cm ** -1).
     """
     return freq / sc.c * 1e4
 
@@ -61,9 +74,25 @@ def wavelength_to_freq(lam: array_like):
 def freq_to_wavelength(freq: array_like):
     """
     :param freq: The frequency f of a transition (MHz)
-    :returns: The wavelength corresponding to the frequency freq (MHz).
+    :returns: The wavelength corresponding to the frequency freq (um).
     """
     return sc.c / freq
+
+
+def inv_cm_to_wavelength(k: array_like):
+    """
+    :param k: The wavenumber k of a transition (cm ** -1)
+    :returns: The wavelength corresponding to the wavenumber k (um).
+    """
+    return 1e4 / k
+
+
+def wavelength_to_inv_cm(lam: array_like):
+    """
+    :param lam: The wavelength lambda of a transition (um)
+    :returns: The wavenumber k corresponding to the wavelength lam (cm ** -1).
+    """
+    return 1e4 / lam
 
 
 """ 1-D kinematics """
@@ -680,19 +709,19 @@ def mass_factor(m: array_like, m_ref: array_like, m_d: array_like = 0, m_ref_d: 
     """
     m, m_d, m_ref, m_ref_d = np.asarray(m), np.asarray(m_d), np.asarray(m_ref), np.asarray(m_ref_d)
     if k_inf:
-        mu = (m + m_e_u) * (m_ref + m_e_u) / (m - m_ref)
+        mu = (m + me_u) * (m_ref + me_u) / (m - m_ref)
         if np.all(m_d) == 0 and np.all(m_ref_d) == 0:
             return mu, np.zeros_like(mu)
-        mu_d = ((mu / (m + m_e_u) - mu / (m - m_ref)) * m_d) ** 2
-        mu_d += ((mu / (m_ref + m_e_u) + mu / (m - m_ref)) * m_ref_d) ** 2
-        mu_d += ((mu / (m + m_e_u) + mu / (m_ref + m_e_u)) * m_e_u_d) ** 2
+        mu_d = ((mu / (m + me_u) - mu / (m - m_ref)) * m_d) ** 2
+        mu_d += ((mu / (m_ref + me_u) + mu / (m - m_ref)) * m_ref_d) ** 2
+        mu_d += ((mu / (m + me_u) + mu / (m_ref + me_u)) * me_u_d) ** 2
     else:
-        mu = (m + m_e_u) * m_ref / (m - m_ref)
+        mu = (m + me_u) * m_ref / (m - m_ref)
         if np.all(m_d) == 0 and np.all(m_ref_d) == 0:
             return mu, np.zeros_like(mu)
-        mu_d = (-m_ref * (m_ref + m_e_u) / ((m - m_ref) ** 2) * m_d) ** 2
-        mu_d += (m * (m + m_e_u) / ((m - m_ref) ** 2) * m_ref_d) ** 2
-        mu_d += (m_ref / (m - m_ref) * m_e_u_d) ** 2
+        mu_d = (-m_ref * (m_ref + me_u) / ((m - m_ref) ** 2) * m_d) ** 2
+        mu_d += (m * (m + me_u) / ((m - m_ref) ** 2) * m_ref_d) ** 2
+        mu_d += (m_ref / (m - m_ref) * me_u_d) ** 2
     return mu, np.sqrt(mu_d)
 
 

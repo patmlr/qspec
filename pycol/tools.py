@@ -1,12 +1,13 @@
 # -*- coding: utf-8 -*-
 """
 pycol.tools
+===========
 
 Created on 05.05.2020
 
 @author: Patrick Mueller
 
-Module including algebraic and technical methods.
+Module including mathematical and technical methods.
 """
 
 import os
@@ -18,7 +19,18 @@ import shutil
 import sqlite3
 import numpy as np
 
-from pycol.types import *
+from pycol._types import *
+
+__all__ = ['ROMAN_NUMERALS', 'COLORS', 'get_rgb_print_command', 'print_colored', 'printh', 'printw', 'printf',
+           'map_corr_coeff_to_color', 'print_cov', 'get_default_path', 'create_doc_link', 'create_data_dir',
+           'get_config_dict', 'fraction', 'check_half_integer', 'half_integer_to_fraction', 'half_integer_to_str',
+           'get_val_with_unc', 'roman_to_int', 'odd', 'even', 'get_decimals', 'floor_log2', 'floor_log10', 'round_to_n',
+           'factorial', 'asarray_optional', 'in_nested', 'check_iterable', 'make_str_iterable_unique',
+           'check_dimension', 'check_shape_like', 'check_shape', 'nan_helper', 'dict_to_list', 'list_to_dict',
+           'list_to_excel', 'add_nested_key', 'merge_dicts', 'convolve_dict', 'combine_dicts', 'merge_intervals',
+           'absolute', 'absolute_complex', 'angle', 'transform', 'unit_vector', 'e_r', 'e_theta', 'e_phi',
+           'orthonormal_rtp', 'orthonormal', 'rotation_matrix', 'Rotation', 'rotation_to_vector',
+           'import_iso_shifts_tilda']
 
 
 ROMAN_NUMERALS = {'M': 1000, 'D': 500, 'C': 100, 'L': 50, 'X': 10, 'V': 5, 'I': 1}

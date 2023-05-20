@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>pycol.analyze &mdash; pycol 01.05.2023 documentation</title><link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <title>pycol.analyze &mdash; pycol 20.05.2023 documentation</title><link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/css/borders.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/css/wy-nav-content.css" type="text/css" />
@@ -67,40 +67,49 @@
 <span></span><span class="c1"># -*- coding: utf-8 -*-</span>
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">pycol.analyze</span>
+<span class="sd">=============</span>
 
 <span class="sd">Created on 07.05.2020</span>
 
 <span class="sd">@author: Patrick Mueller</span>
 
-<span class="sd">Module for analysing/evaluating/fitting data.</span>
+<span class="sd">Module for analyzing/evaluating/fitting data.</span>
 
-<span class="sd">linear regression algorithms:</span>
+<span class="sd">Linear regression algorithms:</span>
 <span class="sd">    - york(); [York et al., Am. J. Phys. 72, 367 (2004)]</span>
 <span class="sd">    - linear_monte_carlo(); based on [Gebert et al., Phys. Rev. Lett. 115, 053003 (2015), Suppl.]</span>
 <span class="sd">    - linear_monte_carlo_nd(); based on [Gebert et al., Phys. Rev. Lett. 115, 053003 (2015), Suppl.]</span>
 
-<span class="sd">curve fitting methods:</span>
-<span class="sd">    - curve_fit(); Encapsulates the scipy.optimize.curve_fit method to allow fixing parameters.</span>
+<span class="sd">Curve fitting methods:</span>
+<span class="sd">    - curve_fit(); Reimplements the scipy.optimize.curve_fit method to allow fixing parameters</span>
+<span class="sd">      and having parameter-dependent y-uncertainties.</span>
 <span class="sd">    - odr_fit(); Encapsulates the scipy.odr.odr method to accept inputs similarly to curve_fit().</span>
 
-<span class="sd">classes:</span>
-<span class="sd">    (- Element; Holds spectroscopic information about a chemical element.)</span>
-<span class="sd">    (- Radii; Holds information about nuclear charge radii of a chemical element.)</span>
+<span class="sd">Classes:</span>
 <span class="sd">    - King; Creates a King plot with isotope shifts or nuclear charge radii.</span>
+
+<span class="sd">LICENSE NOTES:</span>
+<span class="sd">    The method curve_fit is a modified version of scipy.optimize.curve_fit.</span>
+<span class="sd">    Therefore, it is licensed under the &#39;BSD 3-Clause &quot;New&quot; or &quot;Revised&quot; License&#39; provided with scipy.</span>
 <span class="sd">&quot;&quot;&quot;</span>
 
 <span class="kn">import</span> <span class="nn">inspect</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">scipy.stats</span> <span class="k">as</span> <span class="nn">st</span>
-<span class="kn">import</span> <span class="nn">scipy.odr</span> <span class="k">as</span> <span class="nn">odr</span>
-<span class="kn">import</span> <span class="nn">scipy.optimize</span> <span class="k">as</span> <span class="nn">so</span>
+<span class="kn">from</span> <span class="nn">scipy.optimize._minpack_py</span> <span class="kn">import</span> <span class="n">Bounds</span><span class="p">,</span> <span class="n">LinAlgError</span><span class="p">,</span> <span class="n">OptimizeWarning</span><span class="p">,</span> <span class="n">_getfullargspec</span><span class="p">,</span> <span class="n">_initialize_feasible</span><span class="p">,</span> \
+    <span class="n">_wrap_jac</span><span class="p">,</span> <span class="n">cholesky</span><span class="p">,</span> <span class="n">least_squares</span><span class="p">,</span> <span class="n">leastsq</span><span class="p">,</span> <span class="n">prepare_bounds</span><span class="p">,</span> <span class="n">solve_triangular</span><span class="p">,</span> <span class="n">svd</span>
+<span class="kn">from</span> <span class="nn">scipy.optimize</span> <span class="kn">import</span> <span class="n">minimize</span>
+<span class="kn">from</span> <span class="nn">scipy.stats</span> <span class="kn">import</span> <span class="n">norm</span><span class="p">,</span> <span class="n">multivariate_normal</span>
+<span class="kn">from</span> <span class="nn">scipy</span> <span class="kn">import</span> <span class="n">odr</span>
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 
-<span class="kn">from</span> <span class="nn">pycol.types</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">pycol._types</span> <span class="kn">import</span> <span class="o">*</span>
 <span class="kn">from</span> <span class="nn">pycol</span> <span class="kn">import</span> <span class="n">tools</span>
-<span class="kn">import</span> <span class="nn">pycol.physics</span> <span class="k">as</span> <span class="nn">ph</span>
-<span class="c1"># from pycol.stats import average</span>
-<span class="c1"># import pycol.databases as dat</span>
+<span class="kn">from</span> <span class="nn">pycol.physics</span> <span class="kn">import</span> <span class="n">me_u</span><span class="p">,</span> <span class="n">me_u_d</span><span class="p">,</span> <span class="n">mass_factor</span>
+
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;straight&#39;</span><span class="p">,</span> <span class="s1">&#39;straight_slope&#39;</span><span class="p">,</span> <span class="s1">&#39;straight_std&#39;</span><span class="p">,</span> <span class="s1">&#39;straight_x_std&#39;</span><span class="p">,</span> <span class="s1">&#39;draw_straight_unc_area&#39;</span><span class="p">,</span> <span class="s1">&#39;cubic&#39;</span><span class="p">,</span>
+           <span class="s1">&#39;ellipse2d&#39;</span><span class="p">,</span> <span class="s1">&#39;draw_sigma2d&#39;</span><span class="p">,</span> <span class="s1">&#39;weight&#39;</span><span class="p">,</span> <span class="s1">&#39;york&#39;</span><span class="p">,</span> <span class="s1">&#39;linear_monte_carlo&#39;</span><span class="p">,</span> <span class="s1">&#39;linear_monte_carlo_nd&#39;</span><span class="p">,</span> <span class="s1">&#39;linear_alpha&#39;</span><span class="p">,</span>
+           <span class="s1">&#39;odr_fit&#39;</span><span class="p">,</span> <span class="s1">&#39;curve_fit&#39;</span><span class="p">,</span> <span class="s1">&#39;King&#39;</span><span class="p">]</span>
 
 
 <span class="k">def</span> <span class="nf">_get_rtype2</span><span class="p">(</span><span class="n">ab_dict</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">a</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Iterable</span><span class="p">,</span> <span class="nb">any</span><span class="p">],</span> <span class="n">b</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Iterable</span><span class="p">,</span> <span class="nb">any</span><span class="p">],</span> <span class="n">rtype</span><span class="p">:</span> <span class="nb">type</span> <span class="o">=</span> <span class="n">ndarray</span><span class="p">):</span>
@@ -138,6 +147,40 @@
             <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="n">ab_dict</span><span class="p">[</span><span class="n">a_i</span><span class="p">][</span><span class="n">b_i</span><span class="p">]</span> <span class="k">for</span> <span class="n">b_i</span> <span class="ow">in</span> <span class="n">b</span><span class="p">]</span> <span class="k">for</span> <span class="n">a_i</span> <span class="ow">in</span> <span class="n">a</span><span class="p">])</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\&#39;</span><span class="s1">a</span><span class="se">\&#39;</span><span class="s1"> and </span><span class="se">\&#39;</span><span class="s1">b</span><span class="se">\&#39;</span><span class="s1"> must be Non-Iterables or an Iterable of the corresponding types.&#39;</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_wrap_func_pars</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="n">p0</span><span class="p">,</span> <span class="n">p0_fixed</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">func_wrapped</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="o">*</span><span class="n">params</span><span class="p">):</span>
+        <span class="n">_params</span> <span class="o">=</span> <span class="n">p0</span>
+        <span class="n">_params</span><span class="p">[</span><span class="o">~</span><span class="n">p0_fixed</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">func</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="o">*</span><span class="n">_params</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">func_wrapped</span>
+
+
+<span class="k">def</span> <span class="nf">_wrap_func_sigma</span><span class="p">(</span><span class="n">sigma</span><span class="p">,</span> <span class="n">p0</span><span class="p">,</span> <span class="n">p0_fixed</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">transform</span><span class="p">(</span><span class="n">xdata</span><span class="p">,</span> <span class="n">ydata</span><span class="p">,</span> <span class="n">yfunc</span><span class="p">,</span> <span class="o">*</span><span class="n">params</span><span class="p">):</span>
+        <span class="n">_params</span> <span class="o">=</span> <span class="n">p0</span>
+        <span class="n">_params</span><span class="p">[</span><span class="o">~</span><span class="n">p0_fixed</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+        <span class="k">return</span> <span class="mi">1</span> <span class="o">/</span> <span class="n">sigma</span><span class="p">(</span><span class="n">xdata</span><span class="p">,</span> <span class="n">ydata</span><span class="p">,</span> <span class="n">yfunc</span><span class="p">,</span> <span class="o">*</span><span class="n">_params</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">transform</span>
+
+
+<span class="k">def</span> <span class="nf">_wrap_func</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="n">xdata</span><span class="p">,</span> <span class="n">ydata</span><span class="p">,</span> <span class="n">transform</span><span class="p">):</span>
+    <span class="c1"># Copied from scipy, extended for callables.</span>
+    <span class="k">if</span> <span class="n">transform</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">def</span> <span class="nf">func_wrapped</span><span class="p">(</span><span class="n">params</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">func</span><span class="p">(</span><span class="n">xdata</span><span class="p">,</span> <span class="o">*</span><span class="n">params</span><span class="p">)</span> <span class="o">-</span> <span class="n">ydata</span>
+    <span class="k">elif</span> <span class="n">callable</span><span class="p">(</span><span class="n">transform</span><span class="p">):</span>
+        <span class="k">def</span> <span class="nf">func_wrapped</span><span class="p">(</span><span class="n">params</span><span class="p">):</span>
+            <span class="n">yfunc</span> <span class="o">=</span> <span class="n">func</span><span class="p">(</span><span class="n">xdata</span><span class="p">,</span> <span class="o">*</span><span class="n">params</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">transform</span><span class="p">(</span><span class="n">xdata</span><span class="p">,</span> <span class="n">ydata</span><span class="p">,</span> <span class="n">yfunc</span><span class="p">,</span> <span class="o">*</span><span class="n">params</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">yfunc</span> <span class="o">-</span> <span class="n">ydata</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">transform</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">def</span> <span class="nf">func_wrapped</span><span class="p">(</span><span class="n">params</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">transform</span> <span class="o">*</span> <span class="p">(</span><span class="n">func</span><span class="p">(</span><span class="n">xdata</span><span class="p">,</span> <span class="o">*</span><span class="n">params</span><span class="p">)</span> <span class="o">-</span> <span class="n">ydata</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">def</span> <span class="nf">func_wrapped</span><span class="p">(</span><span class="n">params</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">solve_triangular</span><span class="p">(</span><span class="n">transform</span><span class="p">,</span> <span class="n">func</span><span class="p">(</span><span class="n">xdata</span><span class="p">,</span> <span class="o">*</span><span class="n">params</span><span class="p">)</span> <span class="o">-</span> <span class="n">ydata</span><span class="p">,</span> <span class="n">lower</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">func_wrapped</span>
 
 
 <div class="viewcode-block" id="straight"><a class="viewcode-back" href="../../pycol.html#pycol.analyze.straight">[docs]</a><span class="k">def</span> <span class="nf">straight</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">a</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">b</span><span class="p">:</span> <span class="n">array_like</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ndarray</span><span class="p">:</span>
@@ -290,7 +333,7 @@
 
     <span class="n">sigma_x</span><span class="p">,</span> <span class="n">sigma_y</span><span class="p">,</span> <span class="n">corr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">sigma_x</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">sigma_y</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">corr</span><span class="p">)</span>
 
-    <span class="n">p_opt</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">so</span><span class="o">.</span><span class="n">curve_fit</span><span class="p">(</span><span class="n">straight</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">p0</span><span class="o">=</span><span class="p">[</span><span class="mf">0.</span><span class="p">,</span> <span class="mf">1.</span><span class="p">],</span> <span class="n">sigma</span><span class="o">=</span><span class="n">sigma_y</span><span class="p">)</span>  <span class="c1"># (1)</span>
+    <span class="n">p_opt</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">curve_fit</span><span class="p">(</span><span class="n">straight</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">p0</span><span class="o">=</span><span class="p">[</span><span class="mf">0.</span><span class="p">,</span> <span class="mf">1.</span><span class="p">],</span> <span class="n">sigma</span><span class="o">=</span><span class="n">sigma_y</span><span class="p">)</span>  <span class="c1"># (1)</span>
     <span class="n">b_init</span> <span class="o">=</span> <span class="n">p_opt</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
     <span class="n">b</span> <span class="o">=</span> <span class="n">b_init</span>
 
@@ -411,18 +454,18 @@
 <span class="sd">     the unit vectors dr [shape=(n, x.shape[1])] in the directions of the straight lines</span>
 <span class="sd">     and a mask of the accepted samples. The accepted samples are p[accepted] and dr[accepted].</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">p_0</span> <span class="o">=</span> <span class="n">st</span><span class="o">.</span><span class="n">multivariate_normal</span><span class="o">.</span><span class="n">rvs</span><span class="p">(</span><span class="n">mean</span><span class="o">=</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">cov</span><span class="o">=</span><span class="n">cov</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">size</span><span class="o">=</span><span class="n">n</span><span class="p">)</span>
-    <span class="n">p_1</span> <span class="o">=</span> <span class="n">st</span><span class="o">.</span><span class="n">multivariate_normal</span><span class="o">.</span><span class="n">rvs</span><span class="p">(</span><span class="n">mean</span><span class="o">=</span><span class="n">x</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">cov</span><span class="o">=</span><span class="n">cov</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">size</span><span class="o">=</span><span class="n">n</span><span class="p">)</span>
+    <span class="n">p_0</span> <span class="o">=</span> <span class="n">multivariate_normal</span><span class="o">.</span><span class="n">rvs</span><span class="p">(</span><span class="n">mean</span><span class="o">=</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">cov</span><span class="o">=</span><span class="n">cov</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">size</span><span class="o">=</span><span class="n">n</span><span class="p">)</span>
+    <span class="n">p_1</span> <span class="o">=</span> <span class="n">multivariate_normal</span><span class="o">.</span><span class="n">rvs</span><span class="p">(</span><span class="n">mean</span><span class="o">=</span><span class="n">x</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">cov</span><span class="o">=</span><span class="n">cov</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">size</span><span class="o">=</span><span class="n">n</span><span class="p">)</span>
     <span class="n">dr</span> <span class="o">=</span> <span class="n">straight_slope</span><span class="p">(</span><span class="n">p_0</span><span class="p">,</span> <span class="n">p_1</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
 
     <span class="n">t_0</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">einsum</span><span class="p">(</span><span class="s1">&#39;ij,ij-&gt;i&#39;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">x_i</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span> <span class="o">-</span> <span class="n">p_0</span><span class="p">,</span> <span class="n">dr</span><span class="p">)</span> <span class="k">for</span> <span class="n">x_i</span> <span class="ow">in</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]]</span>
-    <span class="n">t</span> <span class="o">=</span> <span class="p">[</span><span class="n">st</span><span class="o">.</span><span class="n">norm</span><span class="o">.</span><span class="n">rvs</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="n">t_0_i</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">cov_i</span><span class="p">))))</span> <span class="k">for</span> <span class="n">t_0_i</span><span class="p">,</span> <span class="n">cov_i</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">t_0</span><span class="p">,</span> <span class="n">cov</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">])]</span>
+    <span class="n">t</span> <span class="o">=</span> <span class="p">[</span><span class="n">norm</span><span class="o">.</span><span class="n">rvs</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="n">t_0_i</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">cov_i</span><span class="p">))))</span> <span class="k">for</span> <span class="n">t_0_i</span><span class="p">,</span> <span class="n">cov_i</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">t_0</span><span class="p">,</span> <span class="n">cov</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">])]</span>
 
     <span class="n">p_new</span> <span class="o">=</span> <span class="p">[</span><span class="n">p_0</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">t_i</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">dr</span> <span class="k">for</span> <span class="n">t_i</span> <span class="ow">in</span> <span class="n">t</span><span class="p">]</span>
-    <span class="n">f</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">prod</span><span class="p">([</span><span class="n">st</span><span class="o">.</span><span class="n">multivariate_normal</span><span class="o">.</span><span class="n">pdf</span><span class="p">(</span><span class="n">p_i</span><span class="p">,</span> <span class="n">mean</span><span class="o">=</span><span class="n">x_i</span><span class="p">,</span> <span class="n">cov</span><span class="o">=</span><span class="n">cov_i</span><span class="p">)</span>
+    <span class="n">f</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">prod</span><span class="p">([</span><span class="n">multivariate_normal</span><span class="o">.</span><span class="n">pdf</span><span class="p">(</span><span class="n">p_i</span><span class="p">,</span> <span class="n">mean</span><span class="o">=</span><span class="n">x_i</span><span class="p">,</span> <span class="n">cov</span><span class="o">=</span><span class="n">cov_i</span><span class="p">)</span>
                  <span class="k">for</span> <span class="n">p_i</span><span class="p">,</span> <span class="n">x_i</span><span class="p">,</span> <span class="n">cov_i</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">p_new</span><span class="p">,</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">cov</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">])],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
 
-    <span class="n">g</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">prod</span><span class="p">([</span><span class="n">st</span><span class="o">.</span><span class="n">norm</span><span class="o">.</span><span class="n">pdf</span><span class="p">(</span><span class="n">t_i</span><span class="p">,</span> <span class="n">loc</span><span class="o">=</span><span class="n">t_0_i</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">cov_i</span><span class="p">))))</span>
+    <span class="n">g</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">prod</span><span class="p">([</span><span class="n">norm</span><span class="o">.</span><span class="n">pdf</span><span class="p">(</span><span class="n">t_i</span><span class="p">,</span> <span class="n">loc</span><span class="o">=</span><span class="n">t_0_i</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">cov_i</span><span class="p">))))</span>
                  <span class="k">for</span> <span class="n">t_i</span><span class="p">,</span> <span class="n">t_0_i</span><span class="p">,</span> <span class="n">cov_i</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">t_0</span><span class="p">,</span> <span class="n">cov</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">])],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">p_new</span><span class="p">:</span>
         <span class="n">u</span> <span class="o">=</span> <span class="n">f</span> <span class="o">/</span> <span class="n">g</span>
@@ -544,8 +587,8 @@
         <span class="k">return</span> <span class="n">c</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">*</span> <span class="mf">10.</span> <span class="o">**</span> <span class="p">(</span><span class="n">n</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">find_alpha</span><span class="p">:</span>
-        <span class="n">alpha</span> <span class="o">=</span> <span class="n">so</span><span class="o">.</span><span class="n">minimize</span><span class="p">(</span><span class="n">cost</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">alpha</span><span class="p">]),</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;Nelder-Mead&#39;</span><span class="p">,</span>
-                            <span class="n">options</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;xatol&#39;</span><span class="p">:</span> <span class="mf">1.</span><span class="p">,</span> <span class="s1">&#39;fatol&#39;</span><span class="p">:</span> <span class="mf">0.01</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">*</span> <span class="mf">10.</span> <span class="o">**</span> <span class="p">(</span><span class="n">n</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)})</span><span class="o">.</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">alpha</span> <span class="o">=</span> <span class="n">minimize</span><span class="p">(</span><span class="n">cost</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">alpha</span><span class="p">]),</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;Nelder-Mead&#39;</span><span class="p">,</span>
+                         <span class="n">options</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;xatol&#39;</span><span class="p">:</span> <span class="mf">1.</span><span class="p">,</span> <span class="s1">&#39;fatol&#39;</span><span class="p">:</span> <span class="mf">0.01</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">*</span> <span class="mf">10.</span> <span class="o">**</span> <span class="p">(</span><span class="n">n</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)})</span><span class="o">.</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 
     <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">sigma_a</span><span class="p">,</span> <span class="n">sigma_b</span><span class="p">,</span> <span class="n">corr_ab</span> <span class="o">=</span>\
         <span class="n">func</span><span class="p">(</span><span class="n">x</span> <span class="o">-</span> <span class="n">alpha</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">sigma_x</span><span class="o">=</span><span class="n">sigma_x</span><span class="p">,</span> <span class="n">sigma_y</span><span class="o">=</span><span class="n">sigma_y</span><span class="p">,</span> <span class="n">corr</span><span class="o">=</span><span class="n">corr</span><span class="p">,</span>
@@ -553,65 +596,6 @@
     <span class="k">if</span> <span class="n">report</span><span class="p">:</span>
         <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;alpha: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">alpha</span><span class="p">))</span>
     <span class="k">return</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">sigma_a</span><span class="p">,</span> <span class="n">sigma_b</span><span class="p">,</span> <span class="n">corr_ab</span><span class="p">,</span> <span class="n">alpha</span></div>
-
-
-<div class="viewcode-block" id="curve_fit"><a class="viewcode-back" href="../../pycol.html#pycol.analyze.curve_fit">[docs]</a><span class="k">def</span> <span class="nf">curve_fit</span><span class="p">(</span><span class="n">f</span><span class="p">:</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">array_like</span><span class="p">,</span> <span class="nb">object</span><span class="p">],</span> <span class="n">y</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">p0</span><span class="p">:</span> <span class="n">array_iter</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-              <span class="n">p0_fixed</span><span class="p">:</span> <span class="n">array_iter</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">sigma</span><span class="p">:</span> <span class="n">array_iter</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">absolute_sigma</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-              <span class="n">check_finite</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">bounds</span><span class="p">:</span> <span class="p">(</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">ndarray</span><span class="p">)</span> <span class="o">=</span> <span class="p">(</span><span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">),</span> <span class="n">method</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-              <span class="n">jac</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Callable</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">report</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="p">(</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">ndarray</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    :param f: The model function to fit to the data.</span>
-<span class="sd">    :param x: The x data.</span>
-<span class="sd">    :param y: The y data.</span>
-<span class="sd">    :param p0: A numpy array or an Iterable of the initial guesses for the parameters.</span>
-<span class="sd">     Must have at least the same length as the minimum number of parameters required by the function &#39;f&#39;.</span>
-<span class="sd">     If &#39;p0&#39; is None, 1 is taken as an initial guess for all non-keyword parameters.</span>
-<span class="sd">    :param p0_fixed: A numpy array or an Iterable of bool values specifying, whether to fix a parameter.</span>
-<span class="sd">     Must have the same length as p0.</span>
-<span class="sd">    :param sigma: The 1-sigma uncertainty of the y data.</span>
-<span class="sd">    :param absolute_sigma: See scipy.optimize.curve_fit.</span>
-<span class="sd">    :param check_finite: See scipy.optimize.curve_fit.</span>
-<span class="sd">    :param bounds: See scipy.optimize.curve_fit.</span>
-<span class="sd">    :param method: See scipy.optimize.curve_fit.</span>
-<span class="sd">    :param jac: See scipy.optimize.curve_fit.</span>
-<span class="sd">    :param report: Whether to print the result of the fit.</span>
-<span class="sd">    :param kwargs: See scipy.optimize.curve_fit.</span>
-<span class="sd">    :returns: popt, pcov. The optimal parameters and their covariance matrix.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="n">p0_fixed</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="nb">all</span><span class="p">(</span><span class="ow">not</span> <span class="n">p</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">p0_fixed</span><span class="p">):</span>
-        <span class="n">popt</span><span class="p">,</span> <span class="n">pcov</span> <span class="o">=</span> <span class="n">so</span><span class="o">.</span><span class="n">curve_fit</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">p0</span><span class="o">=</span><span class="n">p0</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="n">sigma</span><span class="p">,</span> <span class="n">absolute_sigma</span><span class="o">=</span><span class="n">absolute_sigma</span><span class="p">,</span>
-                                  <span class="n">check_finite</span><span class="o">=</span><span class="n">check_finite</span><span class="p">,</span> <span class="n">bounds</span><span class="o">=</span><span class="n">bounds</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="n">method</span><span class="p">,</span> <span class="n">jac</span><span class="o">=</span><span class="n">jac</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-    <span class="k">elif</span> <span class="n">p0</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Please specify the initial parameters when any of the parameters shall be fixed.&#39;</span><span class="p">)</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="c1"># noinspection PyTypeChecker</span>
-        <span class="n">p0</span><span class="p">,</span> <span class="n">p0_fixed</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">p0</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">p0_fixed</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">bool</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">p0_fixed</span><span class="o">.</span><span class="n">shape</span> <span class="o">!=</span> <span class="n">p0</span><span class="o">.</span><span class="n">shape</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\&#39;</span><span class="s1">p0_fixed</span><span class="se">\&#39;</span><span class="s1"> must have the same shape as </span><span class="se">\&#39;</span><span class="s1">p0</span><span class="se">\&#39;</span><span class="s1">.&#39;</span><span class="p">)</span>
-        <span class="n">_p0</span> <span class="o">=</span> <span class="n">p0</span><span class="p">[</span><span class="o">~</span><span class="n">p0_fixed</span><span class="p">]</span>
-        <span class="n">_bounds</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">bounds</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">bounds</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">_bounds</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">_bounds</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">size</span> <span class="o">==</span> <span class="n">p0</span><span class="o">.</span><span class="n">size</span><span class="p">:</span>
-            <span class="n">_bounds</span> <span class="o">=</span> <span class="p">(</span><span class="n">_bounds</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="o">~</span><span class="n">p0_fixed</span><span class="p">],</span> <span class="n">_bounds</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="o">~</span><span class="n">p0_fixed</span><span class="p">])</span>
-
-        <span class="k">def</span> <span class="nf">_f</span><span class="p">(</span><span class="n">_x</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
-            <span class="n">_args</span> <span class="o">=</span> <span class="n">p0</span>
-            <span class="n">_args</span><span class="p">[</span><span class="o">~</span><span class="n">p0_fixed</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
-            <span class="k">return</span> <span class="n">f</span><span class="p">(</span><span class="n">_x</span><span class="p">,</span> <span class="o">*</span><span class="n">_args</span><span class="p">)</span>
-
-        <span class="n">popt</span><span class="p">,</span> <span class="n">pcov</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones_like</span><span class="p">(</span><span class="n">p0</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">p0</span><span class="o">.</span><span class="n">size</span><span class="p">,</span> <span class="n">p0</span><span class="o">.</span><span class="n">size</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
-        <span class="n">pcov_mask</span> <span class="o">=</span> <span class="o">~</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">p0_fixed</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">p0_fixed</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">))</span>
-        <span class="n">popt</span><span class="p">[</span><span class="n">p0_fixed</span><span class="p">]</span> <span class="o">=</span> <span class="n">p0</span><span class="p">[</span><span class="n">p0_fixed</span><span class="p">]</span>
-        <span class="n">_popt</span><span class="p">,</span> <span class="n">_pcov</span> <span class="o">=</span> <span class="n">so</span><span class="o">.</span><span class="n">curve_fit</span><span class="p">(</span><span class="n">_f</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">p0</span><span class="o">=</span><span class="n">_p0</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="n">sigma</span><span class="p">,</span> <span class="n">absolute_sigma</span><span class="o">=</span><span class="n">absolute_sigma</span><span class="p">,</span>
-                                    <span class="n">check_finite</span><span class="o">=</span><span class="n">check_finite</span><span class="p">,</span> <span class="n">bounds</span><span class="o">=</span><span class="n">_bounds</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="n">method</span><span class="p">,</span> <span class="n">jac</span><span class="o">=</span><span class="n">jac</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-        <span class="n">popt</span><span class="p">[</span><span class="o">~</span><span class="n">p0_fixed</span><span class="p">]</span> <span class="o">=</span> <span class="n">_popt</span>
-        <span class="c1"># noinspection PyUnresolvedReferences</span>
-        <span class="n">pcov</span><span class="p">[</span><span class="n">pcov_mask</span><span class="p">]</span> <span class="o">=</span> <span class="n">_pcov</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
-
-    <span class="k">if</span> <span class="n">report</span><span class="p">:</span>
-        <span class="n">tools</span><span class="o">.</span><span class="n">printh</span><span class="p">(</span><span class="s1">&#39;curve_fit result:&#39;</span><span class="p">)</span>
-        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="n">err</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">popt</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">pcov</span><span class="p">)))):</span>
-            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{}</span><span class="s1">: </span><span class="si">{}</span><span class="s1"> +/- </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">val</span><span class="p">,</span> <span class="n">err</span><span class="p">))</span>
-    <span class="k">return</span> <span class="n">popt</span><span class="p">,</span> <span class="n">pcov</span></div>
 
 
 <div class="viewcode-block" id="odr_fit"><a class="viewcode-back" href="../../pycol.html#pycol.analyze.odr_fit">[docs]</a><span class="k">def</span> <span class="nf">odr_fit</span><span class="p">(</span><span class="n">f</span><span class="p">:</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">array_iter</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">array_iter</span><span class="p">,</span> <span class="n">sigma_x</span><span class="p">:</span> <span class="n">array_iter</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">sigma_y</span><span class="p">:</span> <span class="n">array_iter</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -675,527 +659,196 @@
     <span class="k">return</span> <span class="n">out</span><span class="o">.</span><span class="n">beta</span><span class="p">,</span> <span class="n">out</span><span class="o">.</span><span class="n">cov_beta</span></div>
 
 
-<span class="c1"># class Element:</span>
-<span class="c1">#     &quot;&quot;&quot;</span>
-<span class="c1">#     Class representing a single chemical element. The user can define an electronic transition</span>
-<span class="c1">#      to extract all spectroscopy data for that transition available in the users &#39;AtomicDatabase.db&#39; database.</span>
-<span class="c1">#      The transition frequencies and isotope shifts are stored inside a nested dictionary</span>
-<span class="c1">#      with isotopes and the user-defined line labels as keys.</span>
-<span class="c1">#     &quot;&quot;&quot;</span>
-<span class="c1">#</span>
-<span class="c1">#     def __init__(self, label, decimals=3):</span>
-<span class="c1">#         &quot;&quot;&quot;</span>
-<span class="c1">#         :param label: The label of a chemical element.</span>
-<span class="c1">#         :param decimals: The number of decimal places (sub-MHz places) to use for frequency values.</span>
-<span class="c1">#         &quot;&quot;&quot;</span>
-<span class="c1">#         self.label = label</span>
-<span class="c1">#         self.decimals = decimals</span>
-<span class="c1">#         self.isotopes = {iso[&#39;A&#39;]: iso for iso in dat.get_table_entries(&#39;Isotopes&#39;, {&#39;element&#39;: self.label})}</span>
-<span class="c1">#         self.lines = {}</span>
-<span class="c1">#         self.a_ref = None</span>
-<span class="c1">#         self.f_ref = {}</span>
-<span class="c1">#         self.df_ref = {}</span>
-<span class="c1">#         self.f = {}</span>
-<span class="c1">#         self.refs_f = {}</span>
-<span class="c1">#         self.df = {}</span>
-<span class="c1">#         self.refs_df = {}</span>
-<span class="c1">#</span>
-<span class="c1">#     def check_ref_args(self, references: Union[array_iter, dict, str]) -&gt; Union[dict, None]:</span>
-<span class="c1">#         &quot;&quot;&quot;</span>
-<span class="c1">#         :param references: A reference str, iterable of reference str&#39;s</span>
-<span class="c1">#          or a dictionary of these with isotopes or lines as keys.</span>
-<span class="c1">#         :returns: A dictionary of the specified references which has the structure {a: {line: [references, ]}}.</span>
-<span class="c1">#         &quot;&quot;&quot;</span>
-<span class="c1">#         if references is None:</span>
-<span class="c1">#             return None</span>
-<span class="c1">#         if isinstance(references, dict):</span>
-<span class="c1">#             if any(a not in self.isotopes.keys() for a in references.keys()):</span>
-<span class="c1">#                 if any(line not in self.lines.keys() for line in references.keys()):</span>
-<span class="c1">#                     return None</span>
-<span class="c1">#                 else:</span>
-<span class="c1">#                     if not all(isinstance(iso_dict, dict) for iso_dict in references.values()):</span>
-<span class="c1">#                         refs = {a: {line: tools.check_iterable(references[line]) if line in references.keys() else []</span>
-<span class="c1">#                                     for line in self.lines.keys()}</span>
-<span class="c1">#                                 for a in self.isotopes.keys()}</span>
-<span class="c1">#                     else:</span>
-<span class="c1">#                         refs = {a: {line: tools.check_iterable(references[line][a])</span>
-<span class="c1">#                                     if line in references.keys() and a in references[line].keys() else []</span>
-<span class="c1">#                                     for line in self.lines.keys()}</span>
-<span class="c1">#                                 for a in self.isotopes.keys()}</span>
-<span class="c1">#             else:</span>
-<span class="c1">#                 if not all(isinstance(line_dict, dict) for line_dict in references.values()):</span>
-<span class="c1">#                     refs = {a: {line: tools.check_iterable(references[a]) if a in references.keys() else []</span>
-<span class="c1">#                                 for line in self.lines.keys()}</span>
-<span class="c1">#                             for a in self.isotopes.keys()}</span>
-<span class="c1">#                 else:</span>
-<span class="c1">#                     refs = {a: {line: tools.check_iterable(references[a][line])</span>
-<span class="c1">#                                 if a in references.keys() and line in references[a].keys() else []</span>
-<span class="c1">#                                 for line in self.lines.keys()}</span>
-<span class="c1">#                             for a in self.isotopes.keys()}</span>
-<span class="c1">#         else:</span>
-<span class="c1">#             refs = {a: {line: tools.check_iterable(references) for line in self.lines.keys()}</span>
-<span class="c1">#                     for a in self.isotopes.keys()}</span>
-<span class="c1">#         return refs</span>
-<span class="c1">#</span>
-<span class="c1">#     def define_line(self, label: str, q: int,</span>
-<span class="c1">#                     config_l: str, multiplet_l: int, l_l: int, j_l: float,</span>
-<span class="c1">#                     config_u: str, multiplet_u: int, l_u: int, j_u: float):</span>
-<span class="c1">#         &quot;&quot;&quot;</span>
-<span class="c1">#         :param label: The user-defined name of the line.</span>
-<span class="c1">#         :param q: The charge state of the isotope (e).</span>
-<span class="c1">#         :param config_l: The electronic configuration of the lower state.</span>
-<span class="c1">#         :param multiplet_l: The spin multiplet of the lower state.</span>
-<span class="c1">#         :param l_l: The angular momentum quantum number L of the lower state.</span>
-<span class="c1">#         :param j_l: The total angular momentum quantum number J of the lower state.</span>
-<span class="c1">#         :param config_u: The electronic configuration of the upper state.</span>
-<span class="c1">#         :param multiplet_u: The spin multiplet of the upper state.</span>
-<span class="c1">#         :param l_u: The angular momentum quantum number L of the upper state.</span>
-<span class="c1">#         :param j_u: The total angular momentum quantum number J of the upper state.</span>
-<span class="c1">#         :returns: None. Extracts the available electronic transition/isotope shift entries for the specified line</span>
-<span class="c1">#          and stores them in &#39;self.f&#39; and &#39;self.df&#39;, respectively. The definition of the line is stored in &#39;self.lines&#39;.</span>
-<span class="c1">#         &quot;&quot;&quot;</span>
-<span class="c1">#         conditions = {&#39;q&#39;: q, &#39;config_l&#39;: config_l, &#39;multiplet_l&#39;: multiplet_l, &#39;L_l&#39;: l_l, &#39;J_l&#39;: j_l,</span>
-<span class="c1">#                       &#39;config_u&#39;: config_u, &#39;multiplet_u&#39;: multiplet_u, &#39;L_u&#39;: l_u, &#39;J_u&#39;: j_u}</span>
-<span class="c1">#         self.lines[label] = conditions</span>
-<span class="c1">#</span>
-<span class="c1">#         transitions = dat.get_table_entries(&#39;Lines&#39;, conditions)</span>
-<span class="c1">#         shifts = dat.get_table_entries(&#39;IsotopeShifts&#39;, conditions)</span>
-<span class="c1">#</span>
-<span class="c1">#         for tr in transitions:</span>
-<span class="c1">#             tools.add_nested_key(self.f_ref, [tr[&#39;A&#39;], label, tr[&#39;reference&#39;]], [tr[&#39;f&#39;], tr[&#39;f_d&#39;]])</span>
-<span class="c1">#         # self.choose_f()</span>
-<span class="c1">#</span>
-<span class="c1">#         if shifts:</span>
-<span class="c1">#             for shift in shifts:</span>
-<span class="c1">#                 tools.add_nested_key(self.df_ref, [&#39;{0}-{1}&#39;.format(shift[&#39;A&#39;], shift[&#39;ARef&#39;]), label,</span>
-<span class="c1">#                                                    shift[&#39;reference&#39;]], [shift[&#39;df&#39;], shift[&#39;df_d&#39;]])</span>
-<span class="c1">#             # self.choose_df(min([shift[&#39;ARef&#39;] for shift in shifts]))</span>
-<span class="c1">#</span>
-<span class="c1">#     def choose_f(self, references: Union[array_iter, dict, str] = None,</span>
-<span class="c1">#                  exclude: Union[array_iter, dict, str] = None) -&gt; None:</span>
-<span class="c1">#         &quot;&quot;&quot;</span>
-<span class="c1">#         :param references: A reference str, iterable of reference str&#39;s,</span>
-<span class="c1">#          or a dictionary of these with isotopes or lines as keys.</span>
-<span class="c1">#          The most accurate frequency values will be determined from the specified references.</span>
-<span class="c1">#         :param exclude: A reference str, iterable of reference str&#39;s,</span>
-<span class="c1">#          or a dictionary of these with isotopes or lines as keys.</span>
-<span class="c1">#          The specified references will be excluded when choosing frequency values.</span>
-<span class="c1">#         :returns: None. Fills the dictionary self.f and self.refs_f</span>
-<span class="c1">#          with the chosen transition frequencies and references.</span>
-<span class="c1">#         &quot;&quot;&quot;</span>
-<span class="c1">#         f, refs_f = {}, {}</span>
-<span class="c1">#         if exclude is None:</span>
-<span class="c1">#             exclude = []</span>
-<span class="c1">#         refs, exc = self.check_ref_args(references), self.check_ref_args(exclude)</span>
-<span class="c1">#         if refs is None:</span>
-<span class="c1">#             refs = {a: {line: [ref for ref in self.f_ref[a][line].keys()]</span>
-<span class="c1">#                         for line in self.lines.keys()}</span>
-<span class="c1">#                     for a in self.isotopes.keys() if a in self.f_ref.keys()}</span>
-<span class="c1">#         for a, line_dict in refs.items():</span>
-<span class="c1">#             f[a], refs_f[a] = {}, {}</span>
-<span class="c1">#             for line, ref_list in line_dict.items():</span>
-<span class="c1">#                 uncertainties = [[ref, self.f_ref[a][line][ref][1]] for ref in ref_list</span>
-<span class="c1">#                                  if a in self.f_ref.keys() and line in self.f_ref[a].keys()</span>
-<span class="c1">#                                  and ref in self.f_ref[a][line].keys() and ref not in exc[a][line]]</span>
-<span class="c1">#                 if not uncertainties:</span>
-<span class="c1">#                     continue</span>
-<span class="c1">#                 i_min = int(np.argmin([unc[1] for unc in uncertainties]))</span>
-<span class="c1">#                 ref_min = uncertainties[i_min][0]</span>
-<span class="c1">#                 f[a][line] = self.f_ref[a][line][ref_min]</span>
-<span class="c1">#                 refs_f[a][line] = ref_min</span>
-<span class="c1">#         for a in refs.keys():</span>
-<span class="c1">#             if f[a] == {}:</span>
-<span class="c1">#                 del f[a]</span>
-<span class="c1">#                 del refs_f[a]</span>
-<span class="c1">#         self.f, self.refs_f = f, refs_f</span>
-<span class="c1">#</span>
-<span class="c1">#     def choose_df(self, a_ref: int, references: Union[array_iter, dict, str] = None,</span>
-<span class="c1">#                   exclude: Union[array_iter, dict, str] = None) -&gt; None:</span>
-<span class="c1">#         &quot;&quot;&quot;</span>
-<span class="c1">#         :param a_ref: The mass number of the reference isotope.</span>
-<span class="c1">#         :param references: A reference str, iterable of reference str&#39;s,</span>
-<span class="c1">#          or a dictionary of these with isotopes or lines as keys.</span>
-<span class="c1">#          The most accurate frequency values will be determined from the specified references.</span>
-<span class="c1">#         :param exclude: A reference str, iterable of reference str&#39;s,</span>
-<span class="c1">#          or a dictionary of these with isotopes or lines as keys.</span>
-<span class="c1">#          The specified references will be excluded when choosing frequency values.</span>
-<span class="c1">#         :returns: None. Fills the dictionary self.df and self.refs_df with the chosen isotope shifts and references.</span>
-<span class="c1">#         &quot;&quot;&quot;</span>
-<span class="c1">#         self.a_ref = a_ref</span>
-<span class="c1">#         df, refs_df = {}, {}</span>
-<span class="c1">#         if exclude is None:</span>
-<span class="c1">#             exclude = []</span>
-<span class="c1">#         refs, exc = self.check_ref_args(references), self.check_ref_args(exclude)</span>
-<span class="c1">#         if refs is None:</span>
-<span class="c1">#             refs = {a: {line: [ref for ref in self.df_ref[&#39;{0}-{1}&#39;.format(a, a_ref)][line].keys()]</span>
-<span class="c1">#                         for line in self.lines.keys()}</span>
-<span class="c1">#                     for a in self.isotopes.keys() if &#39;{0}-{1}&#39;.format(a, a_ref) in self.df_ref.keys()}</span>
-<span class="c1">#         for a, line_dict in refs.items():</span>
-<span class="c1">#             if a == a_ref:</span>
-<span class="c1">#                 continue</span>
-<span class="c1">#             df[a], refs_df[a] = {}, {}</span>
-<span class="c1">#             for line, ref_list in line_dict.items():</span>
-<span class="c1">#                 uncertainties = [[ref, self.df_ref[&#39;{0}-{1}&#39;.format(a, a_ref)][line][ref][1]]</span>
-<span class="c1">#                                  for ref in ref_list if &#39;{0}-{1}&#39;.format(a, a_ref) in self.df_ref.keys()</span>
-<span class="c1">#                                  and line in self.df_ref[&#39;{0}-{1}&#39;.format(a, a_ref)].keys()</span>
-<span class="c1">#                                  and ref in self.df_ref[&#39;{0}-{1}&#39;.format(a, a_ref)][line].keys()</span>
-<span class="c1">#                                  and ref not in exc[a][line]]</span>
-<span class="c1">#                 if not uncertainties:</span>
-<span class="c1">#                     continue</span>
-<span class="c1">#                 i_min = int(np.argmin([unc[1] for unc in uncertainties]))</span>
-<span class="c1">#                 ref_min = uncertainties[i_min][0]</span>
-<span class="c1">#                 df[a][line] = self.df_ref[&#39;{0}-{1}&#39;.format(a, a_ref)][line][ref_min]</span>
-<span class="c1">#                 refs_df[a][line] = ref_min</span>
-<span class="c1">#         for a in refs.keys():</span>
-<span class="c1">#             if a == a_ref:</span>
-<span class="c1">#                 continue</span>
-<span class="c1">#             if df[a] == {}:</span>
-<span class="c1">#                 del df[a]</span>
-<span class="c1">#                 del refs_df[a]</span>
-<span class="c1">#         self.df, self.refs_df = df, refs_df</span>
-<span class="c1">#</span>
-<span class="c1">#     def get_gamma(self, line: str) -&gt; tuple:</span>
-<span class="c1">#         &quot;&quot;&quot;</span>
-<span class="c1">#         :param line: The label of the user-defined electronic transition.</span>
-<span class="c1">#         :returns: The natural linewidth of the electronic transition and its uncertainty (MHz).</span>
-<span class="c1">#         &quot;&quot;&quot;</span>
-<span class="c1">#         try:</span>
-<span class="c1">#             conditions = self.lines[line]</span>
-<span class="c1">#         except KeyError:</span>
-<span class="c1">#             print(&#39;WARNING: The specified line was not defined.&#39;)</span>
-<span class="c1">#             return np.nan, np.nan</span>
-<span class="c1">#         entries = dat.get_table_entries(&#39;Lines&#39;, conditions)</span>
-<span class="c1">#         gamma = np.array([[entry[&#39;Gamma&#39;], entry[&#39;Gamma_d&#39;]] for entry in entries])</span>
-<span class="c1">#         gamma = gamma[np.argmin(gamma[:, 1]), :]</span>
-<span class="c1">#         return tuple(gamma)</span>
-<span class="c1">#</span>
-<span class="c1">#     def get_hyperfine_constants(self, a: int, line: str) -&gt; tuple:</span>
-<span class="c1">#         &quot;&quot;&quot;</span>
-<span class="c1">#         :param a: The mass number of the isotope.</span>
-<span class="c1">#         :param line: The label of the user-defined electronic transition.</span>
-<span class="c1">#         :returns: The natural linewidth of the electronic transition and its uncertainty (MHz).</span>
-<span class="c1">#         &quot;&quot;&quot;</span>
-<span class="c1">#         try:</span>
-<span class="c1">#             conditions = self.lines[line]</span>
-<span class="c1">#         except KeyError:</span>
-<span class="c1">#             print(&#39;WARNING: The specified line was not defined.&#39;)</span>
-<span class="c1">#             return [np.nan, ] * 4, [np.nan, ] * 4</span>
-<span class="c1">#         tools.merge_dicts(conditions, {&#39;A&#39;: a})</span>
-<span class="c1">#         entries = dat.get_table_entries(&#39;Lines&#39;, conditions)</span>
-<span class="c1">#         if not entries:</span>
-<span class="c1">#             print(&#39;WARNING: There are no entries for the specified mass number ({}) and line ({}).&#39;.format(a, line))</span>
-<span class="c1">#             return [np.nan, ] * 4, [np.nan, ] * 4</span>
-<span class="c1">#         ret1, ret2 = [], []</span>
-<span class="c1">#         for const in [&#39;A_l&#39;, &#39;B_l&#39;, &#39;A_u&#39;, &#39;B_u&#39;]:</span>
-<span class="c1">#             val = np.array([[entry[const], entry[const + &#39;_d&#39;]] for entry in entries])</span>
-<span class="c1">#             val = val[np.argmin(val[:, 1]), :]</span>
-<span class="c1">#             ret1.append(np.nan if val[0] is None else val[0])</span>
-<span class="c1">#             ret2.append(np.nan if val[1] is None else val[1])</span>
-<span class="c1">#         return ret1, ret2</span>
-<span class="c1">#</span>
-<span class="c1">#     def spectroscopy_info(self, e_kin: float) -&gt; dict:</span>
-<span class="c1">#         &quot;&quot;&quot;</span>
-<span class="c1">#         :param e_kin: Kinetic energy of the isotopes (eV).</span>
-<span class="c1">#         :returns: A dictionary of information for collinear laser spectroscopy with keys &#39;E&#39;, &#39;U&#39;, &#39;v&#39;, &#39;col&#39; and &#39;acol&#39;</span>
-<span class="c1">#          for the kinetic energy (eV), the required voltage (V), the velocity of isotopes</span>
-<span class="c1">#          with an initial velocity of 0 m/s (m/s), as well as the resonant laser frequencies</span>
-<span class="c1">#          in collinear and anticollinear geometry (MHz).</span>
-<span class="c1">#         &quot;&quot;&quot;</span>
-<span class="c1">#         info = {}</span>
-<span class="c1">#         for a, line_dict in self.f.items():</span>
-<span class="c1">#             info[a] = {}</span>
-<span class="c1">#             for line, f in line_dict.items():</span>
-<span class="c1">#                 v = ph.v_e(e_kin, self.isotopes[a][&#39;mass&#39;], 0.)</span>
-<span class="c1">#                 col = np.around(ph.doppler(f[0], v, 0., return_frame=&#39;lab&#39;), decimals=self.decimals)</span>
-<span class="c1">#                 acol = np.around(ph.doppler(f[0], v, np.pi, return_frame=&#39;lab&#39;), decimals=self.decimals)</span>
-<span class="c1">#                 info[a][line] = \</span>
-<span class="c1">#                     {&#39;E&#39;: e_kin, &#39;U&#39;: np.nan if self.lines[line][&#39;q&#39;] == 0 else e_kin / self.lines[line][&#39;q&#39;],</span>
-<span class="c1">#                      &#39;v&#39;: v, &#39;col&#39;: col, &#39;acol&#39;: acol}</span>
-<span class="c1">#         return info</span>
-<span class="c1">#</span>
-<span class="c1">#     def get_f(self, a: Union[int, Iterable[int]], line: Union[str, Iterable[str]],</span>
-<span class="c1">#               rtype: type = ndarray) -&gt; Union[ndarray, dict, ValueError]:</span>
-<span class="c1">#         &quot;&quot;&quot;</span>
-<span class="c1">#         :param a: The mass number or an Iterable of mass numbers.</span>
-<span class="c1">#         :param line: A line or an Iterable of previously defined lines.</span>
-<span class="c1">#         :param rtype: The type in which the results will be returned. Currently supported special types are [dict, ].</span>
-<span class="c1">#          The standard &#39;rtype&#39; is a numpy array.</span>
-<span class="c1">#         :returns: A subset of the dictionary &#39;self.f&#39; as a dictionary or a numpy array.</span>
-<span class="c1">#         &quot;&quot;&quot;</span>
-<span class="c1">#         return _get_rtype2(self.f, a, line, rtype=rtype)</span>
-<span class="c1">#</span>
-<span class="c1">#     def get_df(self, a: Union[int, Iterable[int]], line: Union[str, Iterable[str]], rtype: type = ndarray) \</span>
-<span class="c1">#             -&gt; Union[ndarray, dict, ValueError]:</span>
-<span class="c1">#         &quot;&quot;&quot;</span>
-<span class="c1">#         :param a: The mass number or an Iterable of mass numbers.</span>
-<span class="c1">#         :param line: A line or an Iterable of previously defined lines.</span>
-<span class="c1">#         :param rtype: The type in which the results will be returned. Currently supported special types are [dict, ].</span>
-<span class="c1">#          The standard &#39;rtype&#39; is a numpy array.</span>
-<span class="c1">#         :returns: A subset of the dictionary &#39;self.df&#39; as a dictionary or a numpy array.</span>
-<span class="c1">#         &quot;&quot;&quot;</span>
-<span class="c1">#         return _get_rtype2(self.df, a, line, rtype=rtype)</span>
-<span class="c1">#</span>
-<span class="c1">#     def calc_df(self, a: Iterable[int], a_ref: Iterable[int], line: Union[str, Iterable[str]],</span>
-<span class="c1">#                 rtype: type = ndarray) -&gt; Union[ndarray, dict, ValueError]:</span>
-<span class="c1">#         &quot;&quot;&quot;</span>
-<span class="c1">#         :param a: An Iterable of the mass numbers of the isotopes.</span>
-<span class="c1">#         :param a_ref: An Iterable of the mass numbers of the reference isotopes</span>
-<span class="c1">#         :param line: A line or an Iterable of previously defined lines.</span>
-<span class="c1">#         :param rtype: The type in which the results will be returned. Currently supported special types are [dict, ].</span>
-<span class="c1">#          The standard &#39;rtype&#39; is a numpy array.</span>
-<span class="c1">#         :returns: Differences of transition frequencies and their uncertainties calculated from the &#39;self.f&#39; dictionary</span>
-<span class="c1">#          according to the lists &#39;a&#39; and &#39;a_ref&#39;. The output has shape (len(a), 2)</span>
-<span class="c1">#          or shape (len(a), len(line), 2) if line is a list.</span>
-<span class="c1">#         &quot;&quot;&quot;</span>
-<span class="c1">#         if isinstance(line, str):</span>
-<span class="c1">#             a_dict = {k: v[line][0] for k, v in self.f.items()}</span>
-<span class="c1">#             a_d_dict = {k:  v[line][1] for k, v in self.f.items()}</span>
-<span class="c1">#             v_dict = tools.convolve_dict(a_dict, a, a_ref, operator=&#39;-&#39;)</span>
-<span class="c1">#             v_d_dict = tools.convolve_dict(a_d_dict, a, a_ref, operator=&#39;gauss&#39;)</span>
-<span class="c1">#             if rtype == dict:</span>
-<span class="c1">#                 return {a_i: [round(v_dict[a_i], self.decimals), round(v_d_dict[a_i], self.decimals)] for a_i in a}</span>
-<span class="c1">#             else:</span>
-<span class="c1">#                 return np.array([[round(v_dict[a_i], self.decimals), round(v_d_dict[a_i], self.decimals)] for a_i in a])</span>
-<span class="c1">#         else:</span>
-<span class="c1">#             a_dict = {k: np.array([v[ll][0] for ll in line]) for k, v in self.f.items()}</span>
-<span class="c1">#             a_d_dict = {k: np.array([v[ll][1] for ll in line]) for k, v in self.f.items()}</span>
-<span class="c1">#             v_dict = tools.convolve_dict(a_dict, a, a_ref, operator=&#39;-&#39;)</span>
-<span class="c1">#             v_d_dict = tools.convolve_dict(a_d_dict, a, a_ref, operator=&#39;gauss&#39;)</span>
-<span class="c1">#             if rtype == dict:</span>
-<span class="c1">#                 ValueError(&#39;rtype=dict not implemented for list of lines yet.&#39;)</span>
-<span class="c1">#                 pass</span>
-<span class="c1">#             else:</span>
-<span class="c1">#                 return np.array([np.array([np.around(v_dict[a_i], self.decimals),</span>
-<span class="c1">#                                            np.around(v_d_dict[a_i], self.decimals)]).T for a_i in a])</span>
-<span class="c1">#</span>
-<span class="c1">#     def _calc_f(self, a: Iterable[int], a_ref: Iterable[int], line: str,</span>
-<span class="c1">#                 rtype: type = ndarray) -&gt; Union[ndarray, dict, ValueError]:</span>
-<span class="c1">#         # TODO?: Calculation of lines.</span>
-<span class="c1">#         pass</span>
-<span class="c1">#</span>
-<span class="c1">#     def get_masses(self, a: Union[int, Iterable[int]] = None, rtype: type = ndarray) \</span>
-<span class="c1">#             -&gt; Union[ndarray, dict, ValueError]:</span>
-<span class="c1">#         &quot;&quot;&quot;</span>
-<span class="c1">#         :param a: An Iterable of the mass numbers of the isotopes to be returned.</span>
-<span class="c1">#         :param rtype: The type in which the results will be returned. Currently supported special types are [dict, ].</span>
-<span class="c1">#          The standard &#39;rtype&#39; is a numpy array.</span>
-<span class="c1">#         :returns: The masses and their uncertainties of the specified mass numbers.</span>
-<span class="c1">#          The output has shape (2, ) if a is an int value and shape (len(a), 2) if a is an Iterable.</span>
-<span class="c1">#         &quot;&quot;&quot;</span>
-<span class="c1">#         if a is None:</span>
-<span class="c1">#             a = list(self.isotopes.keys())</span>
-<span class="c1">#         a_arr = np.asarray(a)</span>
-<span class="c1">#         a_dim = len(a_arr.shape)</span>
-<span class="c1">#         if a_dim == 0:</span>
-<span class="c1">#             if rtype == dict:</span>
-<span class="c1">#                 return {a: [self.isotopes[a][&#39;mass&#39;], self.isotopes[a][&#39;mass_d&#39;]]}</span>
-<span class="c1">#             else:</span>
-<span class="c1">#                 return np.array([self.isotopes[a][&#39;mass&#39;], self.isotopes[a][&#39;mass_d&#39;]])</span>
-<span class="c1">#         else:</span>
-<span class="c1">#             if rtype == dict:</span>
-<span class="c1">#                 return {a_i: [self.isotopes[a_i][&#39;mass&#39;], self.isotopes[a_i][&#39;mass_d&#39;]] for a_i in a}</span>
-<span class="c1">#             else:</span>
-<span class="c1">#                 return np.array([[self.isotopes[a_i][&#39;mass&#39;], self.isotopes[a_i][&#39;mass_d&#39;]] for a_i in a])</span>
-<span class="c1">#</span>
-<span class="c1">#     def get_radii(self):</span>
-<span class="c1">#         &quot;&quot;&quot;</span>
-<span class="c1">#         :returns: The default &#39;Radii&#39; object for this element.</span>
-<span class="c1">#         &quot;&quot;&quot;</span>
-<span class="c1">#         return Radii(self.label)</span>
-<span class="c1">#</span>
-<span class="c1">#     def get_king(self):</span>
-<span class="c1">#         &quot;&quot;&quot;</span>
-<span class="c1">#         :returns: A &#39;King&#39; object including all isotopes available in &#39;AtomicDatabase.db&#39;.</span>
-<span class="c1">#          The number of subtracted electrons in the &#39;King&#39; object is equal to the charge number Z of the element.</span>
-<span class="c1">#         &quot;&quot;&quot;</span>
-<span class="c1">#         a = list(self.isotopes.keys())</span>
-<span class="c1">#         return King(a, self.get_masses(a), subtract_electrons=self.isotopes[a[0]][&#39;Z&#39;], element_label=self.label)</span>
-<span class="c1">#</span>
-<span class="c1">#</span>
-<span class="c1"># class Radii:</span>
-<span class="c1">#     &quot;&quot;&quot;</span>
-<span class="c1">#     A class which holds the information about nuclear charge radii from muonic atom spectroscopy</span>
-<span class="c1">#      and elastic electron scattering. Differences of the even moments of nuclear charge radii</span>
-<span class="c1">#      as well as the Lambda parameter can be returned in a dict or an array format</span>
-<span class="c1">#      in the specified combination of mass numbers and reference mass numbers.</span>
-<span class="c1">#     &quot;&quot;&quot;</span>
-<span class="c1">#     def __init__(self, element: str, a: array_iter = None, barrett: array_iter = None,</span>
-<span class="c1">#                  vn: array_like = None, seltzer: array_iter = None, decimals: int = 4):</span>
-<span class="c1">#         &quot;&quot;&quot;</span>
-<span class="c1">#         :param a: An iterable of mass numbers.</span>
-<span class="c1">#         :param barrett: An iterable of Barrett radii. Must have shape (len(a), 2) and include the values in the first</span>
-<span class="c1">#          and the uncertainties in the second column.</span>
-<span class="c1">#         :param vn: An iterable of Vn factors. Must have either shape (3, ) or (1, 3)</span>
-<span class="c1">#          in which case the same Vn factors are used for all specified mass numbers or shape (len(a), 3)</span>
-<span class="c1">#          in which case individual Vn factors are used for every mass number.</span>
-<span class="c1">#         :param seltzer: An iterable of the two Seltzer coefficients [C2/C1, C3/C1].</span>
-<span class="c1">#         :param decimals: The number of decimal places (sub-square-fm places) to use for radial values.</span>
-<span class="c1">#         Any of the parameters which is None is exported from the database &#39;NuclearChargeRadii.db&#39;.</span>
-<span class="c1">#         &quot;&quot;&quot;</span>
-<span class="c1">#         self.element = element</span>
-<span class="c1">#         self.conditions = {&#39;element&#39;: self.element}</span>
-<span class="c1">#         self.decimals = decimals</span>
-<span class="c1">#</span>
-<span class="c1">#         self.a = None</span>
-<span class="c1">#         if a is not None:</span>
-<span class="c1">#             self.a: Union[object, list] = np.asarray(a, dtype=int).tolist()</span>
-<span class="c1">#</span>
-<span class="c1">#         if barrett is None:</span>
-<span class="c1">#             barrett_ref = dat.get_table_entries(&#39;BarrettRadii&#39;, self.conditions)</span>
-<span class="c1">#             self.a = list({entry[&#39;A&#39;] for entry in barrett_ref})</span>
-<span class="c1">#             references = {entry[&#39;reference&#39;] for entry in barrett_ref}</span>
-<span class="c1">#             self.barrett_ref = {ref: {entry[&#39;A&#39;]: [entry[&#39;val&#39;], entry[&#39;StatErr&#39;] + entry[&#39;SysErr&#39;]]</span>
-<span class="c1">#                                       for entry in barrett_ref if entry[&#39;reference&#39;] == ref</span>
-<span class="c1">#                                       and (a is None or entry[&#39;A&#39;] in a)} for ref in references}</span>
-<span class="c1">#             self.ref_barrett = None</span>
-<span class="c1">#             self.choose_barrett()</span>
-<span class="c1">#         else:</span>
-<span class="c1">#             if a is None:</span>
-<span class="c1">#                 raise ValueError(&#39;\&#39;a\&#39; is not specified and therefore \&#39;barrett\&#39; cannot be &#39;</span>
-<span class="c1">#                                  &#39;related to mass numbers unambiguously.&#39;)</span>
-<span class="c1">#             self.barrett = np.asarray(barrett)</span>
-<span class="c1">#</span>
-<span class="c1">#         if vn is None:</span>
-<span class="c1">#             self.vn = {entry[&#39;A&#39;]: entry for entry in dat.get_table_entries(&#39;Vn&#39;, self.conditions)}</span>
-<span class="c1">#             self.vn = np.array([[self.vn[a_i][&#39;V2&#39;], self.vn[a_i][&#39;V4&#39;], self.vn[a_i][&#39;V6&#39;]] if a_i in self.vn.keys()</span>
-<span class="c1">#                                 else [self.vn[-1][&#39;V2&#39;], self.vn[-1][&#39;V4&#39;], self.vn[-1][&#39;V6&#39;]]</span>
-<span class="c1">#                                 for a_i in self.a])</span>
-<span class="c1">#         else:</span>
-<span class="c1">#             self.vn = np.asarray(vn)</span>
-<span class="c1">#             if a is None and self.vn.shape not in [(3, ), (1, 3)]:</span>
-<span class="c1">#                 raise ValueError(&#39;\&#39;a\&#39; is not specified and therefore \&#39;vn\&#39; cannot be &#39;</span>
-<span class="c1">#                                  &#39;related to mass numbers unambiguously.&#39;)</span>
-<span class="c1">#         if self.vn.shape == (3, ):</span>
-<span class="c1">#             self.vn = np.expand_dims(self.vn, axis=0)</span>
-<span class="c1">#         if self.vn.shape == (1, 3):</span>
-<span class="c1">#             self.vn = np.array([self.vn[0], ] * len(self.a))</span>
-<span class="c1">#</span>
-<span class="c1">#         self.seltzer = seltzer</span>
-<span class="c1">#         if self.seltzer is None:</span>
-<span class="c1">#             self.seltzer = dat.get_table_entries(&#39;SeltzerCoefficients&#39;, self.conditions)</span>
-<span class="c1">#             self.seltzer = [self.seltzer[0][&#39;C2C1&#39;], self.seltzer[0][&#39;C3C1&#39;]]</span>
-<span class="c1">#</span>
-<span class="c1">#     def choose_barrett(self, references: Iterable[str] = None, mode: str = &#39;mean&#39;):</span>
-<span class="c1">#         &quot;&quot;&quot;</span>
-<span class="c1">#         :param references: An Iterable of references to consider.</span>
-<span class="c1">#         :param mode: The mode how to choose the Barret radii from multiple references.</span>
-<span class="c1">#          The Currently supported modes are {&#39;minErr&#39;, mean}.</span>
-<span class="c1">#         :returns: None. Sets the instance variables &#39;barrett&#39; and &#39;used_references&#39;.</span>
-<span class="c1">#         &quot;&quot;&quot;</span>
-<span class="c1">#         modes = [&#39;minUnc&#39;, &#39;mean&#39;]</span>
-<span class="c1">#         barrett = []</span>
-<span class="c1">#         ref_barrett = []</span>
-<span class="c1">#         if mode == &#39;minUnc&#39;:</span>
-<span class="c1">#             for a in self.a:</span>
-<span class="c1">#                 uncertainties = [[ref, r[a][1]]</span>
-<span class="c1">#                                  for ref, r in self.barrett_ref.items()</span>
-<span class="c1">#                                  if ref in references and a in self.barrett_ref[ref].keys()]</span>
-<span class="c1">#                 i_min = int(np.argmin([unc[1] for unc in uncertainties]))</span>
-<span class="c1">#                 ref_min = uncertainties[i_min][0]</span>
-<span class="c1">#                 barrett.append(self.barrett_ref[ref_min][a])</span>
-<span class="c1">#                 ref_barrett.append(ref_min)</span>
-<span class="c1">#         elif mode == &#39;mean&#39;:</span>
-<span class="c1">#             for a in self.a:</span>
-<span class="c1">#                 r = np.array([[r[a][0], r[a][1]] for ref, r in self.barrett_ref.items()</span>
-<span class="c1">#                               if a in self.barrett_ref[ref].keys()])</span>
-<span class="c1">#                 cov = np.expand_dims(r[:, 1], axis=1) * np.expand_dims(r[:, 1], axis=0)</span>
-<span class="c1">#                 barrett.append(list(average(r[:, 0], cov=cov)))</span>
-<span class="c1">#             ref_barrett = &#39;mean&#39;</span>
-<span class="c1">#         else:</span>
-<span class="c1">#             raise ValueError(&#39;Mode \&#39;{}\&#39; is not supported. Choose from {}&#39;.format(mode, modes))</span>
-<span class="c1">#         self.barrett, self.ref_barrett = np.around(barrett, decimals=self.decimals), ref_barrett</span>
-<span class="c1">#</span>
-<span class="c1">#     def get_rn(self, n: int, a: array_like, a_ref: array_like, delta_barrett: array_iter = None,</span>
-<span class="c1">#                decimals: int = 4, rtype: type = ndarray, key_format: str = None) -&gt; Union[ndarray, dict, ValueError]:</span>
-<span class="c1">#         &quot;&quot;&quot;</span>
-<span class="c1">#         :param n: The moment to return. Currently supported moments are [2, 4, 6].</span>
-<span class="c1">#         :param a: The mass numbers of the moments to return.</span>
-<span class="c1">#         :param a_ref: The reference mass numbers of the moments to return.</span>
-<span class="c1">#         :param delta_barrett: The differences of Barrett radii with uncertainties.</span>
-<span class="c1">#          If specified, it must have shape (len(a), 2) and include the values in the first</span>
-<span class="c1">#          and the uncertainties in the second column.</span>
-<span class="c1">#         :param decimals: The number of decimal places to return.</span>
-<span class="c1">#         :param rtype: The type in which the results will be returned. Currently supported special types are [dict, ].</span>
-<span class="c1">#          The standard &#39;rtype&#39; is a numpy array.</span>
-<span class="c1">#         :param key_format: If &#39;rtype&#39; is dict, The key format is used to build the dictionary keys in str format.</span>
-<span class="c1">#          The mass number is inserted into the first, the reference mass number into the second &#39;{}&#39; bracket.</span>
-<span class="c1">#          Use numbers {1}(...){0} to change the order of the mass numbers.</span>
-<span class="c1">#          If None, the mass numbers are used as integer keys.</span>
-<span class="c1">#         :returns: Differences of the specified moment of nuclear charge radii for different mass</span>
-<span class="c1">#          and reference mass numbers.</span>
-<span class="c1">#         &quot;&quot;&quot;</span>
-<span class="c1">#         n = int(n)</span>
-<span class="c1">#         if n not in [2, 4, 6]:</span>
-<span class="c1">#             raise ValueError(&#39;n must be in [2, 4, 6] but is {}&#39;.format(n))</span>
-<span class="c1">#         a: Union[object, list, int] = np.asarray(a, dtype=int).tolist()</span>
-<span class="c1">#         if isinstance(a, int):</span>
-<span class="c1">#             a = [a, ]</span>
-<span class="c1">#         a_ref: Union[object, list, int] = np.asarray(a_ref, dtype=int).tolist()</span>
-<span class="c1">#         if isinstance(a_ref, int):</span>
-<span class="c1">#             a_ref = [a_ref, ] * len(a)</span>
-<span class="c1">#         i = np.array([self.a.index(a_i) for a_i in a])</span>
-<span class="c1">#         i_ref = np.array([self.a.index(a_i) for a_i in a_ref])</span>
-<span class="c1">#         if delta_barrett is None:</span>
-<span class="c1">#             delta_barrett = np.array([self.barrett[i, 0] - self.barrett[i_ref, 0],</span>
-<span class="c1">#                                       np.sqrt(self.barrett[i, 1] ** 2 + self.barrett[i_ref, 1] ** 2)]).T</span>
-<span class="c1">#         delta_barrett = np.asarray(delta_barrett)</span>
-<span class="c1">#         rn = eval(&#39;ph.delta_r{}&#39;.format(n))(self.barrett[i, 0], self.barrett[i, 1],</span>
-<span class="c1">#                                             self.barrett[i_ref, 0], self.barrett[i_ref, 1],</span>
-<span class="c1">#                                             delta_barrett[:, 0], delta_barrett[:, 1],</span>
-<span class="c1">#                                             self.vn[i, int(n / 2 - 1)], self.vn[i_ref, int(n / 2 - 1)])</span>
-<span class="c1">#         rn = [[np.around(rn[0][j], decimals=decimals), np.around(rn[1][j], decimals=decimals)]</span>
-<span class="c1">#               for j in range(rn[0].size)]</span>
-<span class="c1">#         if rtype == dict:</span>
-<span class="c1">#             if key_format is None:</span>
-<span class="c1">#                 return {a_i: r for a_i, r in zip(a, rn)}</span>
-<span class="c1">#             elif key_format.count(&#39;{}&#39;) == 1 and key_format.count(&#39;{&#39;) == 1 and key_format.count(&#39;}&#39;) == 1:</span>
-<span class="c1">#                 return {key_format.format(a_i): r for a_i, r in zip(a, rn)}</span>
-<span class="c1">#             elif key_format.count(&#39;{}&#39;) == 2 or (&#39;{0}&#39; in key_format and &#39;{1}&#39; in key_format) \</span>
-<span class="c1">#                     and key_format.count(&#39;{&#39;) == 2 and key_format.count(&#39;}&#39;) == 2:</span>
-<span class="c1">#                 return {key_format.format(a_i, a_ref_i): r for a_i, a_ref_i, r in zip(a, a_ref, rn)}</span>
-<span class="c1">#             raise ValueError(&#39;Specified key_format ({}) not supported.&#39;.format(key_format))</span>
-<span class="c1">#         else:</span>
-<span class="c1">#             return np.array(rn)</span>
-<span class="c1">#</span>
-<span class="c1">#     def get_lambda(self, a: array_like, a_ref: array_like, delta_barrett: array_iter = None,</span>
-<span class="c1">#                    decimals: int = 4, rtype: type = ndarray, key_format: str = None) \</span>
-<span class="c1">#             -&gt; Union[ndarray, dict, ValueError]:</span>
-<span class="c1">#         &quot;&quot;&quot;</span>
-<span class="c1">#         :param a: The mass numbers of the moments to return.</span>
-<span class="c1">#         :param a_ref: The reference mass numbers of the moments to return.</span>
-<span class="c1">#         :param delta_barrett: The differences of Barrett radii with uncertainties.</span>
-<span class="c1">#          If specified, it must have shape (len(a), 2) and include the values in the first</span>
-<span class="c1">#          and the uncertainties in the second column.</span>
-<span class="c1">#         :param decimals: The number of decimal places to return.</span>
-<span class="c1">#         :param rtype: The type in which the results will be returned. Currently supported special types are [dict, ].</span>
-<span class="c1">#          The standard &#39;rtype&#39; is a numpy array.</span>
-<span class="c1">#         :param key_format: If &#39;rtype&#39; is dict, The key format is used to build the dictionary keys in str format.</span>
-<span class="c1">#          The mass number is inserted into the first, the reference mass number into the second &#39;{}&#39; bracket.</span>
-<span class="c1">#          Use numbers {1}(...){0} to change the order of the mass numbers.</span>
-<span class="c1">#          If None, the mass numbers are used as integer keys.</span>
-<span class="c1">#         :returns: The Lambda parameter for different mass and reference mass numbers.</span>
-<span class="c1">#         &quot;&quot;&quot;</span>
-<span class="c1">#         if self.seltzer is None:</span>
-<span class="c1">#             return ValueError(&#39;Seltzer coefficients were not specified. &#39;</span>
-<span class="c1">#                               &#39;Please assign the local variable\nself.seltzer = [C2/C1, C3/C1]&#39;)</span>
-<span class="c1">#         r2 = self.get_rn(2, a, a_ref, delta_barrett=delta_barrett, decimals=decimals + 2, rtype=list)</span>
-<span class="c1">#         r4 = self.get_rn(4, a, a_ref, delta_barrett=delta_barrett, decimals=decimals + 2, rtype=list)</span>
-<span class="c1">#         r6 = self.get_rn(6, a, a_ref, delta_barrett=delta_barrett, decimals=decimals + 2, rtype=list)</span>
-<span class="c1">#         ll = ph.lambda_rn(r2[:, 0], r2[:, 1], r4[:, 0], r4[:, 1], r6[:, 0], r6[:, 1], self.seltzer[0], self.seltzer[1])</span>
-<span class="c1">#         ll = [[np.around(ll[0][j], decimals=decimals), np.around(ll[1][j], decimals=decimals)]</span>
-<span class="c1">#               for j in range(ll[0].size)]</span>
-<span class="c1">#         if rtype == dict:</span>
-<span class="c1">#             print(key_format.count(&#39;{}&#39;))</span>
-<span class="c1">#             if key_format is None:</span>
-<span class="c1">#                 return {a_i: r for a_i, r in zip(a, ll)}</span>
-<span class="c1">#             elif key_format.count(&#39;{}&#39;) == 1 and key_format.count(&#39;{&#39;) == 1 and key_format.count(&#39;}&#39;) == 1:</span>
-<span class="c1">#                 return {key_format.format(a_i): r for a_i, r in zip(a, ll)}</span>
-<span class="c1">#             elif key_format.count(&#39;{}&#39;) == 2 or (&#39;{0}&#39; in key_format and &#39;{1}&#39; in key_format) \</span>
-<span class="c1">#                     and key_format.count(&#39;{&#39;) == 2 and key_format.count(&#39;}&#39;) == 2:</span>
-<span class="c1">#                 return {key_format.format(a_i, a_ref_i): r for a_i, a_ref_i, r in zip(a, a_ref, ll)}</span>
-<span class="c1">#             raise ValueError(&#39;Specified key_format ({}) not supported.&#39;.format(key_format))</span>
-<span class="c1">#         else:</span>
-<span class="c1">#             return np.array(ll)</span>
+<div class="viewcode-block" id="curve_fit"><a class="viewcode-back" href="../../pycol.html#pycol.analyze.curve_fit">[docs]</a><span class="k">def</span> <span class="nf">curve_fit</span><span class="p">(</span><span class="n">f</span><span class="p">:</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">array_like</span><span class="p">,</span> <span class="nb">object</span><span class="p">],</span> <span class="n">y</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">p0</span><span class="p">:</span> <span class="n">array_iter</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+              <span class="n">p0_fixed</span><span class="p">:</span> <span class="n">array_iter</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">sigma</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">array_iter</span><span class="p">,</span> <span class="n">Callable</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">absolute_sigma</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+              <span class="n">check_finite</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">bounds</span><span class="p">:</span> <span class="p">(</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">ndarray</span><span class="p">)</span> <span class="o">=</span> <span class="p">(</span><span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">),</span> <span class="n">method</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+              <span class="n">jac</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Callable</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">full_output</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">report</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    :param f: The model function to fit to the data.</span>
+<span class="sd">    :param x: The x data.</span>
+<span class="sd">    :param y: The y data.</span>
+<span class="sd">    :param p0: A numpy array or an Iterable of the initial guesses for the parameters.</span>
+<span class="sd">     Must have at least the same length as the minimum number of parameters required by the function &#39;f&#39;.</span>
+<span class="sd">     If &#39;p0&#39; is None, 1 is taken as an initial guess for all non-keyword parameters.</span>
+<span class="sd">    :param p0_fixed: A numpy array or an Iterable of bool values specifying, whether to fix a parameter.</span>
+<span class="sd">     Must have the same length as p0.</span>
+<span class="sd">    :param sigma: The 1-sigma uncertainty of the y data.</span>
+<span class="sd">     This can also be a function g such that &#39;g(x, y, f(x, \*params), \*params) -&gt; sigma&#39;.</span>
+<span class="sd">    :param absolute_sigma: See scipy.optimize.curve_fit.</span>
+<span class="sd">    :param check_finite: See scipy.optimize.curve_fit.</span>
+<span class="sd">    :param bounds: See scipy.optimize.curve_fit.</span>
+<span class="sd">    :param method: See scipy.optimize.curve_fit.</span>
+<span class="sd">    :param jac: See scipy.optimize.curve_fit. Must not be callable if &#39;sigma&#39; is callable.</span>
+<span class="sd">    :param full_output: See scipy.optimize.curve_fit.</span>
+<span class="sd">    :param report: Whether to print the result of the fit.</span>
+<span class="sd">    :param kwargs: See scipy.optimize.curve_fit.</span>
+<span class="sd">    :returns: popt, pcov. The optimal parameters and their covariance matrix. Additional output if full_output is True.</span>
+<span class="sd">     See scipy.optimize.curve_fit.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="n">p0</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="c1"># determine number of parameters by inspecting the function</span>
+        <span class="n">sig</span> <span class="o">=</span> <span class="n">_getfullargspec</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+        <span class="n">args</span> <span class="o">=</span> <span class="n">sig</span><span class="o">.</span><span class="n">args</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Unable to determine number of fit parameters.&quot;</span><span class="p">)</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">p0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">atleast_1d</span><span class="p">(</span><span class="n">p0</span><span class="p">)</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="n">p0</span><span class="o">.</span><span class="n">size</span>
+
+    <span class="k">if</span> <span class="n">p0_fixed</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">p0_fixed</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">p0_fixed</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">atleast_1d</span><span class="p">(</span><span class="n">p0_fixed</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">bounds</span><span class="p">,</span> <span class="n">Bounds</span><span class="p">):</span>
+        <span class="n">lb</span><span class="p">,</span> <span class="n">ub</span> <span class="o">=</span> <span class="n">bounds</span><span class="o">.</span><span class="n">lb</span><span class="p">,</span> <span class="n">bounds</span><span class="o">.</span><span class="n">ub</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">lb</span><span class="p">,</span> <span class="n">ub</span> <span class="o">=</span> <span class="n">prepare_bounds</span><span class="p">(</span><span class="n">bounds</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">p0</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">p0</span> <span class="o">=</span> <span class="n">_initialize_feasible</span><span class="p">(</span><span class="n">lb</span><span class="p">,</span> <span class="n">ub</span><span class="p">)</span>
+
+    <span class="c1"># Truncate p0, bounds and func to use free parameters only.</span>
+    <span class="n">p0_free</span> <span class="o">=</span> <span class="n">p0</span><span class="p">[</span><span class="o">~</span><span class="n">p0_fixed</span><span class="p">]</span>
+    <span class="n">lb</span><span class="p">,</span> <span class="n">ub</span> <span class="o">=</span> <span class="n">lb</span><span class="p">[</span><span class="o">~</span><span class="n">p0_fixed</span><span class="p">],</span> <span class="n">ub</span><span class="p">[</span><span class="o">~</span><span class="n">p0_fixed</span><span class="p">]</span>
+    <span class="n">func</span> <span class="o">=</span> <span class="n">_wrap_func_pars</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">p0</span><span class="p">,</span> <span class="n">p0_fixed</span><span class="p">)</span>
+
+    <span class="n">bounded_problem</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">((</span><span class="n">lb</span> <span class="o">&gt;</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">)</span> <span class="o">|</span> <span class="p">(</span><span class="n">ub</span> <span class="o">&lt;</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">))</span>
+    <span class="k">if</span> <span class="n">method</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">bounded_problem</span><span class="p">:</span>
+            <span class="n">method</span> <span class="o">=</span> <span class="s1">&#39;trf&#39;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">method</span> <span class="o">=</span> <span class="s1">&#39;lm&#39;</span>
+
+    <span class="k">if</span> <span class="n">method</span> <span class="o">==</span> <span class="s1">&#39;lm&#39;</span> <span class="ow">and</span> <span class="n">bounded_problem</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Method &#39;lm&#39; only works for unconstrained problems. &quot;</span>
+                         <span class="s2">&quot;Use &#39;trf&#39; or &#39;dogbox&#39; instead.&quot;</span><span class="p">)</span>
+
+    <span class="c1"># optimization may produce garbage for float32 inputs, cast them to float64</span>
+
+    <span class="c1"># NaNs cannot be handled</span>
+    <span class="k">if</span> <span class="n">check_finite</span><span class="p">:</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray_chkfinite</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="nb">float</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="nb">float</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)):</span>
+        <span class="c1"># &#39;x&#39; is passed straight to the user-defined &#39;f&#39;, so allow</span>
+        <span class="c1"># non-array_like &#39;x&#39;.</span>
+        <span class="k">if</span> <span class="n">check_finite</span><span class="p">:</span>
+            <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray_chkfinite</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="nb">float</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="nb">float</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">y</span><span class="o">.</span><span class="n">size</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;&#39;y&#39; must not be empty!&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Determine type of sigma</span>
+    <span class="k">if</span> <span class="n">sigma</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">callable</span><span class="p">(</span><span class="n">sigma</span><span class="p">):</span>
+            <span class="n">transform</span> <span class="o">=</span> <span class="n">_wrap_func_sigma</span><span class="p">(</span><span class="n">sigma</span><span class="p">,</span> <span class="n">p0</span><span class="p">,</span> <span class="n">p0_fixed</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">sigma</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">sigma</span><span class="p">)</span>
+
+            <span class="c1"># if 1-D, sigma are errors, define transform = 1/sigma</span>
+            <span class="k">if</span> <span class="n">sigma</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="p">(</span><span class="n">y</span><span class="o">.</span><span class="n">size</span><span class="p">,):</span>
+                <span class="n">transform</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="n">sigma</span>
+            <span class="c1"># if 2-D, sigma is the covariance matrix,</span>
+            <span class="c1"># define transform = L such that L L^T = C</span>
+            <span class="k">elif</span> <span class="n">sigma</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="p">(</span><span class="n">y</span><span class="o">.</span><span class="n">size</span><span class="p">,</span> <span class="n">y</span><span class="o">.</span><span class="n">size</span><span class="p">):</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="c1"># scipy.linalg.cholesky requires lower=True to return L L^T = A</span>
+                    <span class="n">transform</span> <span class="o">=</span> <span class="n">cholesky</span><span class="p">(</span><span class="n">sigma</span><span class="p">,</span> <span class="n">lower</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                <span class="k">except</span> <span class="n">LinAlgError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;&#39;sigma&#39; must be positive definite.&quot;</span><span class="p">)</span> <span class="kn">from</span> <span class="nn">e</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;&#39;sigma&#39; has incorrect shape.&quot;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">transform</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="n">func</span> <span class="o">=</span> <span class="n">_wrap_func</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">transform</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">callable</span><span class="p">(</span><span class="n">jac</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">callable</span><span class="p">(</span><span class="n">sigma</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;&#39;jac&#39; must not be callable if &#39;sigma&#39; is callable.&quot;</span><span class="p">)</span>
+        <span class="n">jac</span> <span class="o">=</span> <span class="n">_wrap_jac</span><span class="p">(</span><span class="n">jac</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">transform</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">jac</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">method</span> <span class="o">!=</span> <span class="s1">&#39;lm&#39;</span><span class="p">:</span>
+        <span class="n">jac</span> <span class="o">=</span> <span class="s1">&#39;2-point&#39;</span>
+
+    <span class="k">if</span> <span class="s1">&#39;args&#39;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
+        <span class="c1"># The specification for the model function &#39;f&#39; does not support</span>
+        <span class="c1"># additional arguments. Refer to the &#39;curve_fit&#39; docstring for</span>
+        <span class="c1"># acceptable call signatures of &#39;f&#39;.</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;&#39;args&#39; is not a supported keyword argument.&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">method</span> <span class="o">==</span> <span class="s1">&#39;lm&#39;</span><span class="p">:</span>
+        <span class="c1"># if y.size == 1, this might be used for broadcast.</span>
+        <span class="k">if</span> <span class="n">y</span><span class="o">.</span><span class="n">size</span> <span class="o">!=</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">n</span> <span class="o">&gt;</span> <span class="n">y</span><span class="o">.</span><span class="n">size</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;The number of func parameters=</span><span class="si">{</span><span class="n">n</span><span class="si">}</span><span class="s2"> must not exceed the number of data points=</span><span class="si">{</span><span class="n">y</span><span class="o">.</span><span class="n">size</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="n">leastsq</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="n">p0_free</span><span class="p">,</span> <span class="n">Dfun</span><span class="o">=</span><span class="n">jac</span><span class="p">,</span> <span class="n">full_output</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">popt</span><span class="p">,</span> <span class="n">pcov</span><span class="p">,</span> <span class="n">infodict</span><span class="p">,</span> <span class="n">errmsg</span><span class="p">,</span> <span class="n">ier</span> <span class="o">=</span> <span class="n">res</span>
+        <span class="n">ysize</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">infodict</span><span class="p">[</span><span class="s1">&#39;fvec&#39;</span><span class="p">])</span>
+        <span class="n">cost</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">infodict</span><span class="p">[</span><span class="s1">&#39;fvec&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">ier</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">]:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Optimal parameters not found: &quot;</span> <span class="o">+</span> <span class="n">errmsg</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c1"># Rename maxfev (leastsq) to max_nfev (least_squares), if specified.</span>
+        <span class="k">if</span> <span class="s1">&#39;max_nfev&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
+            <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;max_nfev&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;maxfev&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+
+        <span class="n">res</span> <span class="o">=</span> <span class="n">least_squares</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="n">p0_free</span><span class="p">,</span> <span class="n">jac</span><span class="o">=</span><span class="n">jac</span><span class="p">,</span> <span class="n">bounds</span><span class="o">=</span><span class="n">bounds</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="n">method</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">res</span><span class="o">.</span><span class="n">success</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Optimal parameters not found: &quot;</span> <span class="o">+</span> <span class="n">res</span><span class="o">.</span><span class="n">message</span><span class="p">)</span>
+
+        <span class="n">infodict</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">nfev</span><span class="o">=</span><span class="n">res</span><span class="o">.</span><span class="n">nfev</span><span class="p">,</span> <span class="n">fvec</span><span class="o">=</span><span class="n">res</span><span class="o">.</span><span class="n">fun</span><span class="p">)</span>
+        <span class="n">ier</span> <span class="o">=</span> <span class="n">res</span><span class="o">.</span><span class="n">status</span>
+        <span class="n">errmsg</span> <span class="o">=</span> <span class="n">res</span><span class="o">.</span><span class="n">message</span>
+
+        <span class="n">ysize</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">res</span><span class="o">.</span><span class="n">fun</span><span class="p">)</span>
+        <span class="n">cost</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">res</span><span class="o">.</span><span class="n">cost</span>  <span class="c1"># res.cost is half sum of squares!</span>
+        <span class="n">popt</span> <span class="o">=</span> <span class="n">res</span><span class="o">.</span><span class="n">x</span>
+
+        <span class="c1"># Do Moore-Penrose inverse discarding zero singular values.</span>
+        <span class="c1"># noinspection PyTupleAssignmentBalance</span>
+        <span class="n">_</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">vt</span> <span class="o">=</span> <span class="n">svd</span><span class="p">(</span><span class="n">res</span><span class="o">.</span><span class="n">jac</span><span class="p">,</span> <span class="n">full_matrices</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="n">threshold</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">finfo</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span><span class="o">.</span><span class="n">eps</span> <span class="o">*</span> <span class="nb">max</span><span class="p">(</span><span class="n">res</span><span class="o">.</span><span class="n">jac</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">*</span> <span class="n">s</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="n">s</span><span class="p">[</span><span class="n">s</span> <span class="o">&gt;</span> <span class="n">threshold</span><span class="p">]</span>
+        <span class="n">vt</span> <span class="o">=</span> <span class="n">vt</span><span class="p">[:</span><span class="n">s</span><span class="o">.</span><span class="n">size</span><span class="p">]</span>
+        <span class="n">pcov</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">vt</span><span class="o">.</span><span class="n">T</span> <span class="o">/</span> <span class="n">s</span> <span class="o">**</span> <span class="mi">2</span><span class="p">,</span> <span class="n">vt</span><span class="p">)</span>
+
+    <span class="n">warn_cov</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="k">if</span> <span class="n">pcov</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="c1"># indeterminate covariance</span>
+        <span class="n">pcov</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">popt</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">popt</span><span class="p">)),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+        <span class="n">pcov</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">)</span>
+        <span class="n">warn_cov</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="k">elif</span> <span class="ow">not</span> <span class="n">absolute_sigma</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">ysize</span> <span class="o">&gt;</span> <span class="n">p0</span><span class="o">.</span><span class="n">size</span><span class="p">:</span>
+            <span class="n">s_sq</span> <span class="o">=</span> <span class="n">cost</span> <span class="o">/</span> <span class="p">(</span><span class="n">ysize</span> <span class="o">-</span> <span class="n">p0</span><span class="o">.</span><span class="n">size</span><span class="p">)</span>
+            <span class="n">pcov</span> <span class="o">=</span> <span class="n">pcov</span> <span class="o">*</span> <span class="n">s_sq</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">pcov</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">)</span>
+            <span class="n">warn_cov</span> <span class="o">=</span> <span class="kc">True</span>
+
+    <span class="n">popt_ret</span><span class="p">,</span> <span class="n">pcov_ret</span> <span class="o">=</span> <span class="n">p0</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">p0</span><span class="o">.</span><span class="n">size</span><span class="p">,</span> <span class="n">p0</span><span class="o">.</span><span class="n">size</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+    <span class="n">popt_ret</span><span class="p">[</span><span class="o">~</span><span class="n">p0_fixed</span><span class="p">]</span> <span class="o">=</span> <span class="n">popt</span>
+    <span class="n">pcov_mask</span> <span class="o">=</span> <span class="o">~</span><span class="p">(</span><span class="n">p0_fixed</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">,</span> <span class="p">:]</span> <span class="o">+</span> <span class="n">p0_fixed</span><span class="p">[:,</span> <span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">])</span>
+    <span class="n">pcov_ret</span><span class="p">[</span><span class="n">pcov_mask</span><span class="p">]</span> <span class="o">=</span> <span class="n">pcov</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="n">report</span><span class="p">:</span>
+        <span class="n">digits</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">p0</span><span class="o">.</span><span class="n">size</span><span class="p">))))</span> <span class="o">+</span> <span class="mi">1</span>
+        <span class="n">tools</span><span class="o">.</span><span class="n">printh</span><span class="p">(</span><span class="s2">&quot;curve_fit result:&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="n">err</span><span class="p">,</span> <span class="n">fix</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">popt_ret</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">pcov_ret</span><span class="p">)),</span> <span class="n">p0_fixed</span><span class="p">)):</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="o">.</span><span class="n">zfill</span><span class="p">(</span><span class="n">digits</span><span class="p">)</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">val</span><span class="si">}</span><span class="s2"> +/- </span><span class="si">{</span><span class="n">err</span><span class="si">}</span><span class="s2"> (</span><span class="si">{</span><span class="s1">&#39;fixed&#39;</span> <span class="k">if</span> <span class="n">fix</span> <span class="k">else</span> <span class="s1">&#39;free&#39;</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">warn_cov</span><span class="p">:</span>
+        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;Covariance of the parameters could not be estimated&quot;</span><span class="p">,</span> <span class="n">category</span><span class="o">=</span><span class="n">OptimizeWarning</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">full_output</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">popt_ret</span><span class="p">,</span> <span class="n">pcov_ret</span><span class="p">,</span> <span class="n">infodict</span><span class="p">,</span> <span class="n">errmsg</span><span class="p">,</span> <span class="n">ier</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">popt_ret</span><span class="p">,</span> <span class="n">pcov_ret</span></div>
 
 
 <div class="viewcode-block" id="King"><a class="viewcode-back" href="../../pycol.html#pycol.analyze.King">[docs]</a><span class="k">class</span> <span class="nc">King</span><span class="p">:</span>
@@ -1227,10 +880,10 @@
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x_abs</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">3</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">x_abs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x_abs</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">m</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">object</span><span class="p">,</span> <span class="nb">list</span><span class="p">,</span> <span class="n">ndarray</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">m</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="n">m_i</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">subtract_electrons</span> <span class="o">*</span> <span class="n">ph</span><span class="o">.</span><span class="n">m_e_u</span><span class="p">,</span>
-                            <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">m_i</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">subtract_electrons</span> <span class="o">*</span> <span class="n">ph</span><span class="o">.</span><span class="n">m_e_u_d</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)]</span> <span class="k">for</span> <span class="n">m_i</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">m</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">m</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="n">m_i</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">subtract_electrons</span> <span class="o">*</span> <span class="n">me_u</span><span class="p">,</span>
+                            <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">m_i</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">subtract_electrons</span> <span class="o">*</span> <span class="n">me_u_d</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)]</span> <span class="k">for</span> <span class="n">m_i</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">m</span><span class="p">])</span>
         <span class="n">tools</span><span class="o">.</span><span class="n">check_shape</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">a</span><span class="p">),</span> <span class="mi">2</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">m</span><span class="p">,</span> <span class="n">allow_scalar</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">m_mod</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="nb">list</span><span class="p">(</span><span class="n">ph</span><span class="o">.</span><span class="n">mass_factor</span><span class="p">(</span><span class="n">_m</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">_m_ref</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">m_d</span><span class="o">=</span><span class="n">_m</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">m_ref_d</span><span class="o">=</span><span class="n">_m_ref</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">k_inf</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">m_mod</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="nb">list</span><span class="p">(</span><span class="n">mass_factor</span><span class="p">(</span><span class="n">_m</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">_m_ref</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">m_d</span><span class="o">=</span><span class="n">_m</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">m_ref_d</span><span class="o">=</span><span class="n">_m_ref</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">k_inf</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
                                 <span class="k">if</span> <span class="n">_i</span> <span class="o">!=</span> <span class="n">_j</span> <span class="k">else</span> <span class="p">[</span><span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">]</span>
                                 <span class="k">for</span> <span class="n">_j</span><span class="p">,</span> <span class="n">_m</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">m</span><span class="p">)]</span> <span class="k">for</span> <span class="n">_i</span><span class="p">,</span> <span class="n">_m_ref</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">m</span><span class="p">)])</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">m_sample</span> <span class="o">=</span> <span class="kc">None</span>
@@ -1254,10 +907,10 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">i</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">a</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">a_i</span><span class="p">)</span> <span class="k">for</span> <span class="n">a_i</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">a_fit</span><span class="p">])</span>
         <span class="n">i_ref</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">a</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">a_i</span><span class="p">)</span> <span class="k">for</span> <span class="n">a_i</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">a_ref</span><span class="p">])</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">m_sample</span> <span class="o">=</span> <span class="n">st</span><span class="o">.</span><span class="n">norm</span><span class="o">.</span><span class="n">rvs</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">m</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">scale</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">m</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">m</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span><span class="o">.</span><span class="n">T</span>
-        <span class="n">x</span> <span class="o">=</span> <span class="n">st</span><span class="o">.</span><span class="n">norm</span><span class="o">.</span><span class="n">rvs</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">scale</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span><span class="o">.</span><span class="n">T</span>
-        <span class="n">y</span> <span class="o">=</span> <span class="n">st</span><span class="o">.</span><span class="n">norm</span><span class="o">.</span><span class="n">rvs</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">y</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">scale</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">y</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">y</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span><span class="o">.</span><span class="n">T</span>
-        <span class="n">m_mod_sample</span> <span class="o">=</span> <span class="n">ph</span><span class="o">.</span><span class="n">mass_factor</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">m_sample</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">m_sample</span><span class="p">[</span><span class="n">i_ref</span><span class="p">],</span> <span class="n">k_inf</span><span class="o">=</span><span class="kc">True</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">m_sample</span> <span class="o">=</span> <span class="n">norm</span><span class="o">.</span><span class="n">rvs</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">m</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">scale</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">m</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">m</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span><span class="o">.</span><span class="n">T</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">norm</span><span class="o">.</span><span class="n">rvs</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">scale</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span><span class="o">.</span><span class="n">T</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="n">norm</span><span class="o">.</span><span class="n">rvs</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">y</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">scale</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">y</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">y</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span><span class="o">.</span><span class="n">T</span>
+        <span class="n">m_mod_sample</span> <span class="o">=</span> <span class="n">mass_factor</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">m_sample</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">m_sample</span><span class="p">[</span><span class="n">i_ref</span><span class="p">],</span> <span class="n">k_inf</span><span class="o">=</span><span class="kc">True</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">x_mod</span> <span class="o">=</span> <span class="n">m_mod_sample</span> <span class="o">*</span> <span class="n">x</span>
         <span class="n">y_mod</span> <span class="o">=</span> <span class="n">m_mod_sample</span> <span class="o">*</span> <span class="n">y</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">corr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">corrcoef</span><span class="p">(</span><span class="n">x_mod</span><span class="p">,</span> <span class="n">y_mod</span><span class="p">)[:</span><span class="n">x_mod</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">x_mod</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]:])</span>
@@ -1268,11 +921,11 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">i</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">a</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">a_i</span><span class="p">)</span> <span class="k">for</span> <span class="n">a_i</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">a_fit</span><span class="p">])</span>
         <span class="n">i_ref</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">a</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">a_i</span><span class="p">)</span> <span class="k">for</span> <span class="n">a_i</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">a_ref</span><span class="p">])</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">m_sample</span> <span class="o">=</span> <span class="n">st</span><span class="o">.</span><span class="n">norm</span><span class="o">.</span><span class="n">rvs</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">m</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">scale</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">m</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">m</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span><span class="o">.</span><span class="n">T</span>
-        <span class="n">x_nd</span> <span class="o">=</span> <span class="n">st</span><span class="o">.</span><span class="n">norm</span><span class="o">.</span><span class="n">rvs</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">x_nd</span><span class="p">[:,</span> <span class="p">:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">scale</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">x_nd</span><span class="p">[:,</span> <span class="p">:,</span> <span class="mi">1</span><span class="p">],</span>
-                           <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">x_nd</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">x_nd</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">m_sample</span> <span class="o">=</span> <span class="n">norm</span><span class="o">.</span><span class="n">rvs</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">m</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">scale</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">m</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">m</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span><span class="o">.</span><span class="n">T</span>
+        <span class="n">x_nd</span> <span class="o">=</span> <span class="n">norm</span><span class="o">.</span><span class="n">rvs</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">x_nd</span><span class="p">[:,</span> <span class="p">:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">scale</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">x_nd</span><span class="p">[:,</span> <span class="p">:,</span> <span class="mi">1</span><span class="p">],</span>
+                        <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">x_nd</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">x_nd</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
         <span class="n">x_nd</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">x_nd</span><span class="p">,</span> <span class="n">axes</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
-        <span class="n">m_mod_sample</span> <span class="o">=</span> <span class="n">ph</span><span class="o">.</span><span class="n">mass_factor</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">m_sample</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">m_sample</span><span class="p">[</span><span class="n">i_ref</span><span class="p">],</span> <span class="n">k_inf</span><span class="o">=</span><span class="kc">True</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">m_mod_sample</span> <span class="o">=</span> <span class="n">mass_factor</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">m_sample</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">m_sample</span><span class="p">[</span><span class="n">i_ref</span><span class="p">],</span> <span class="n">k_inf</span><span class="o">=</span><span class="kc">True</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">x_mod</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">m_mod_sample</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">x_nd</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">cov</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">cov</span><span class="p">(</span><span class="n">x_mod_i</span><span class="p">)</span> <span class="k">for</span> <span class="n">x_mod_i</span> <span class="ow">in</span> <span class="n">x_mod</span><span class="p">])</span>
 
@@ -1481,7 +1134,7 @@
             <span class="k">return</span> <span class="kc">None</span>
         <span class="n">i</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">a</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">a_i</span><span class="p">)</span> <span class="k">for</span> <span class="n">a_i</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">a_fit</span><span class="p">])</span>
         <span class="n">i_ref</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">a</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">a_i</span><span class="p">)</span> <span class="k">for</span> <span class="n">a_i</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">a_ref</span><span class="p">])</span>
-        <span class="n">m_mod_sample</span> <span class="o">=</span> <span class="n">ph</span><span class="o">.</span><span class="n">mass_factor</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">m_sample</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">m_sample</span><span class="p">[</span><span class="n">i_ref</span><span class="p">],</span> <span class="n">k_inf</span><span class="o">=</span><span class="kc">True</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">m_mod_sample</span> <span class="o">=</span> <span class="n">mass_factor</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">m_sample</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">m_sample</span><span class="p">[</span><span class="n">i_ref</span><span class="p">],</span> <span class="n">k_inf</span><span class="o">=</span><span class="kc">True</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">x_results</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">m_mod_sample</span><span class="o">.</span><span class="n">T</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">x_results</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]],</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">ddof</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)]),</span> <span class="n">axes</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span></div>
 
@@ -1505,8 +1158,8 @@
         <span class="n">m</span> <span class="o">=</span> <span class="n">m</span><span class="p">[:,</span> <span class="bp">self</span><span class="o">.</span><span class="n">x_results</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]]</span>
         <span class="n">m_ref</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">m_sample</span><span class="p">[</span><span class="n">i_ref</span><span class="p">,</span> <span class="p">:]</span>
         <span class="n">m_ref</span> <span class="o">=</span> <span class="n">m_ref</span><span class="p">[:,</span> <span class="bp">self</span><span class="o">.</span><span class="n">x_results</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]]</span>
-        <span class="n">m_mod_sample</span> <span class="o">=</span> <span class="n">ph</span><span class="o">.</span><span class="n">mass_factor</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">m_ref</span><span class="p">,</span> <span class="n">k_inf</span><span class="o">=</span><span class="kc">True</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">T</span>
-        <span class="n">y_sample</span> <span class="o">=</span> <span class="n">st</span><span class="o">.</span><span class="n">norm</span><span class="o">.</span><span class="n">rvs</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="n">y</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">scale</span><span class="o">=</span><span class="n">y</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="n">m_mod_sample</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="nb">len</span><span class="p">(</span><span class="n">a</span><span class="p">)))</span>
+        <span class="n">m_mod_sample</span> <span class="o">=</span> <span class="n">mass_factor</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">m_ref</span><span class="p">,</span> <span class="n">k_inf</span><span class="o">=</span><span class="kc">True</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">T</span>
+        <span class="n">y_sample</span> <span class="o">=</span> <span class="n">norm</span><span class="o">.</span><span class="n">rvs</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="n">y</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">scale</span><span class="o">=</span><span class="n">y</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="n">m_mod_sample</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="nb">len</span><span class="p">(</span><span class="n">a</span><span class="p">)))</span>
         <span class="n">y_sample</span> <span class="o">=</span> <span class="n">m_mod_sample</span> <span class="o">*</span> <span class="n">y_sample</span>
         <span class="n">x_sample</span> <span class="o">=</span> <span class="n">straight</span><span class="p">(</span><span class="n">y_sample</span><span class="p">,</span> <span class="o">-</span><span class="n">_a</span><span class="p">[:,</span> <span class="p">:,</span> <span class="n">axis</span><span class="p">]</span> <span class="o">/</span> <span class="n">b</span><span class="p">[:,</span> <span class="p">:,</span> <span class="n">axis</span><span class="p">],</span> <span class="mf">1.</span> <span class="o">/</span> <span class="n">b</span><span class="p">[:,</span> <span class="p">:,</span> <span class="n">axis</span><span class="p">])</span>
         <span class="n">x_sample</span> <span class="o">=</span> <span class="n">straight</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">x_sample</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">),</span> <span class="n">_a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span>
@@ -1516,13 +1169,13 @@
 <div class="viewcode-block" id="King.plot"><a class="viewcode-back" href="../../pycol.html#pycol.analyze.King.plot">[docs]</a>    <span class="k">def</span> <span class="nf">plot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mode</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">sigma2d</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">show</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">add_xy</span><span class="p">:</span> <span class="n">array_like</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
              <span class="n">add_a</span><span class="p">:</span> <span class="n">array_like</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        :param mode: The mode of the King-fit. If mode=&#39;radii&#39;, the :math:`x`-axis must contain the differences of</span>
+<span class="sd">        :param mode: The mode of the King-fit. If mode=&#39;radii&#39;, the :math:&#39;x&#39;-axis must contain the differences of</span>
 <span class="sd">         mean square nuclear charge radii or the Lambda-factor. For every other value,</span>
-<span class="sd">         the :math:`x`-axis is assumed to be an isotope shift such that the slope corresponds to</span>
-<span class="sd">         a field-shift ratio :math:`F(y_i) / F(x)`.</span>
+<span class="sd">         the :math:&#39;x&#39;-axis is assumed to be an isotope shift such that the slope corresponds to</span>
+<span class="sd">         a field-shift ratio :math:&#39;F(y_i) / F(x)&#39;.</span>
 <span class="sd">        :param sigma2d: Whether to draw the actual two-dimensional uncertainty bounds or the classical errorbars.</span>
 <span class="sd">        :param show: Whether to show the plot.</span>
-<span class="sd">        :param add_xy: Additional :math:`x` and :math:`y` data to plot. Must have shape (:, 4).</span>
+<span class="sd">        :param add_xy: Additional :math:&#39;x&#39; and :math:&#39;y&#39; data to plot. Must have shape (:, 4).</span>
 <span class="sd">        :param add_a: Additional mass numbers for the additional data- Must have shape (:, 2).</span>
 <span class="sd">         The reference is the second column.</span>
 <span class="sd">        :returns: None. Generates a King-Plot based on the modified axes &#39;self.x_mod&#39; and &#39;self.y_mod&#39;</span>
@@ -1601,10 +1254,10 @@
 <div class="viewcode-block" id="King.plot_nd"><a class="viewcode-back" href="../../pycol.html#pycol.analyze.King.plot_nd">[docs]</a>    <span class="k">def</span> <span class="nf">plot_nd</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">axis</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">mode</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">sigma2d</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param axis: The axis which is used as the x-axis throughout the plots.</span>
-<span class="sd">        :param mode: The mode of the King-plot. If mode=&#39;radii&#39;, the :math:`x`-axis must contain the differences of</span>
+<span class="sd">        :param mode: The mode of the King-plot. If mode=&#39;radii&#39;, the :math:&#39;x&#39;-axis must contain the differences of</span>
 <span class="sd">         mean square nuclear charge radii or the Lambda-factor. For every other value,</span>
-<span class="sd">         the :math:`x`-axis is assumed to be an isotope shift such that the slope corresponds to</span>
-<span class="sd">         a field-shift ratio :math:`F(y_i) / F(x)`.</span>
+<span class="sd">         the :math:&#39;x&#39;-axis is assumed to be an isotope shift such that the slope corresponds to</span>
+<span class="sd">         a field-shift ratio :math:&#39;F(y_i) / F(x)&#39;.</span>
 <span class="sd">        :param sigma2d: Whether to draw the actual two-dimensional uncertainty bounds or the classical errorbars.</span>
 <span class="sd">        :returns: None. Generates a King-Plot based on the modified axes &#39;self.x_mod_nd&#39; and &#39;self.y_mod_nd&#39;</span>
 <span class="sd">         as well as the fit results &#39;self.results_nd&#39;.</span>

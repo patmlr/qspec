@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-pycol.models.base
+pycol.models._base
 
 Created on 14.03.2022
 
@@ -13,10 +13,13 @@ import numpy as np
 
 from pycol.tools import merge_intervals
 
+__all__ = ['Model', 'Empty', 'NPeak', 'Offset', 'Amplifier', 'Custom', 'YPars', 'Listed', 'Summed', 'Linked']
+
+
 np_version = np.version.version.split('.')
 
 
-def is_unc(fix):
+def _is_unc(fix):
     if isinstance(fix, float):
         return True
     if not isinstance(fix, str):
@@ -32,25 +35,25 @@ def is_unc(fix):
     return True
 
 
-def val_fix_to_val(val, fix):
+def _val_fix_to_val(val, fix):
     if isinstance(fix, float):
         return val
     j = fix.find('(')
     return float(fix[:j])
 
 
-def fix_to_unc(fix):
+def _fix_to_unc(fix):
     if isinstance(fix, float):
         return fix
     j, k = fix.find('('), fix.find(')')
     return float(fix[j+1:k])
 
 
-def args_ordered(args, order):
+def _args_ordered(args, order):
     return [args[i] for i in order]
 
 
-def poly(x, *args):
+def _poly(x, *args):
     return np.sum([args[n] * x ** n for n in range(len(args))], axis=0)
 
 
@@ -256,7 +259,7 @@ class Model:
             if isinstance(fix, bool):
                 b_lower.append(-np.inf)
                 b_upper.append(np.inf)
-            elif is_unc(fix):
+            elif _is_unc(fix):
                 b_lower.append(-np.inf)
                 b_upper.append(np.inf)
                 fixed[i] = False
@@ -357,7 +360,7 @@ class Offset(Model):
             self.gen_offset_masks(x)
         ret = np.zeros_like(x)
         for i, mask in enumerate(self.offset_masks):
-            ret[mask] = poly(x[mask], *args_ordered(args, self.offset_map[i]))
+            ret[mask] = _poly(x[mask], *_args_ordered(args, self.offset_map[i]))
         return ret
 
     def gen_offset_map(self):
@@ -400,7 +403,7 @@ class Amplifier(Model):
     def evaluate(self, x, *args, **kwargs):
         self._min = np.min(x)
         self._max = np.max(x)
-        return poly(x, *args)
+        return _poly(x, *args)
 
     @property
     def dx(self):
@@ -435,7 +438,7 @@ class YPars(Model):
         super().__init__(model=model)
         self.type = 'YPars'
 
-        self.p_y = [i for i, fix in enumerate(self.model.fixes) if is_unc(fix)]
+        self.p_y = [i for i, fix in enumerate(self.model.fixes) if _is_unc(fix)]
 
     def evaluate(self, x, *args, **kwargs):
         return np.concatenate([self.model.evaluate(x, *args, **kwargs),
@@ -463,7 +466,7 @@ class Listed(Model):
             for j, (name, val, fix, link) in enumerate(model.get_pars()):
                 self.model_map.append(i)
                 self.index_map.append(j)
-                if isinstance(fix, str) and not is_unc(fix):
+                if isinstance(fix, str) and not _is_unc(fix):
                     for _name in model.names:
                         fix = fix.replace(_name, '{}{}'.format(_name, label))
                 self._add_arg('{}{}'.format(name, label), val, fix, link)
@@ -529,7 +532,7 @@ class Linked(Listed):
         self.type = 'Linked'
 
         for i, (name, val, fix, link) in enumerate(self.get_pars()):
-            if link and (not fix or isinstance(fix, list) or is_unc(fix)):
+            if link and (not fix or isinstance(fix, list) or _is_unc(fix)):
                 _name = name[:name.rfind('__')]
                 for j, model in enumerate(self.models):
                     if j < self.model_map[i] and _name in model.names:

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-pycol.models.splitter
+pycol.models._splitter
 
 Created on 14.03.2022
 
@@ -14,7 +14,10 @@ import numpy as np
 
 from pycol.tools import merge_intervals
 from pycol.algebra import wigner_6j, a
-from pycol.models.base import Model, Summed
+from pycol.models._base import Model, Summed
+
+__all__ = ['gen_splitter_model', 'get_all_f', 'hf_coeff', 'hf_trans', 'hf_shift', 'hf_int', 'Splitter',
+           'SplitterSummed', 'Hyperfine', 'HyperfineMixed']
 
 
 def gen_splitter_model(qi: bool = False, hf_mixing: bool = False):

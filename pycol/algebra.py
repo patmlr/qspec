@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 pycol.algebra
+=============
 
 Created on 30.04.2020
 
@@ -14,7 +15,10 @@ from sympy import nsimplify, sqrt, sin, cos, pi
 from sympy.vector import CoordSys3D
 import sympy.physics.wigner as spw
 
-from pycol.types import *
+from pycol._types import *
+
+__all__ = ['cast_sympy', 'clebsch_gordan', 'wigner_3j', 'wigner_6j', 'a', 'b', 'ab', 'c', 'abc', 'f_0', 'g_0',
+           'c_dipole', 'a_dipole', 'a_dipole_cart', 'reduced_f_root', 'reduced_f', 'a_tilda', 'a_m_tilda']
 
 
 def cast_sympy(as_sympy: bool, *args: sympy_like, dtype: type = float):
@@ -390,7 +394,7 @@ def a_tilda(i: sympy_qn, j_l: sympy_qn, f_l: sympy_qn, j_u: sympy_qn, f_u: sympy
     :returns: The relative transition strengths normed as in tilda.
     """
     i, j_l, f_l, j_u, f_u = cast_sympy(as_sympy, i, j_l, f_l, j_u, f_u)
-    return (2 * f_l + 1) * (2 * j_u + 1) * wigner_6j(j_u, j_l, 1, f_l, f_u, i, as_sympy) ** 2
+    return (2 * f_l + 1) * (2 * f_u + 1) * wigner_6j(j_u, j_l, 1, f_l, f_u, i, as_sympy) ** 2
 
 
 def a_m_tilda(i: sympy_qn, j_l: sympy_qn, f_l: sympy_qn, m_l: sympy_qn,

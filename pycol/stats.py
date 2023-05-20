@@ -1,22 +1,27 @@
 # -*- coding: utf-8 -*-
 """
 pycol.stats
+===========
 
 Created on 22.04.2020
 
 @author: Patrick Mueller
 
-Module including classes and methods for doing statistical evaluations.
+Module for doing statistical analysis.
 """
 
 import numpy as np
 import scipy.stats as st
 import scipy.integrate as si
-from scipy.optimize import curve_fit, root, minimize
+from scipy.optimize import root, minimize
 import matplotlib.pyplot as plt
 
-from pycol.types import *
+from pycol._types import *
 from pycol import tools
+from pycol.analyze import curve_fit
+
+__all__ = ['Observable', 'add', 'mul', 'average', 'median', 'estimate_skewnorm', 'propagate', 'propagate_fit',
+           'combined_pdf', 'relevant_interval', 'uniform', 'uniform_pumped', 'info']
 
 
 class Observable(float):
