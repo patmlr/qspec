@@ -643,6 +643,7 @@ def curve_fit(f: Callable, x: Union[array_like, object], y: array_like, p0: arra
     p0_free = p0[~p0_fixed]
     lb, ub = lb[~p0_fixed], ub[~p0_fixed]
     func = _wrap_func_pars(f, p0, p0_fixed)
+    bounds = (lb, ub)
 
     bounded_problem = np.any((lb > -np.inf) | (ub < np.inf))
     if method is None:
