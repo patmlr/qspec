@@ -58,6 +58,10 @@ def _poly(x, *args):
 
 
 class Model:
+    """
+    Base class for all models.
+    """
+
     def __init__(self, model=None):
         self.model = model
         self.type = 'Model'
@@ -282,6 +286,9 @@ class Model:
 
 
 class Empty(Model):
+    """
+    An empty model, returning zeros with the same shape as x.
+    """
     def __init__(self):
         super().__init__(model=None)
         self.type = 'Empty'
@@ -291,6 +298,9 @@ class Empty(Model):
 
 
 class NPeak(Model):
+    """
+    Evaluates the given 'model' at the positions x\ :sub:`i` with scalings p\ :sub:`i` where i < 'n_peaks'.
+    """
     def __init__(self, model, n_peaks=1):
         super().__init__(model=model)
         self.type = 'NPeak'
@@ -319,6 +329,9 @@ class NPeak(Model):
 
 
 class Offset(Model):
+    """
+    Cuts the x-axis and adds y-axis offsets to every segment.
+    """
     def __init__(self, model=None, x_cuts=None, offsets=None):
         """
         :param model: The model the offset will be added to. If None, the offset will be added to zero.
@@ -389,6 +402,9 @@ class Offset(Model):
 
 
 class Amplifier(Model):
+    """
+    A polynomial of order 'order'.
+    """
     def __init__(self, order=None):
         super().__init__(model=None)
         self.type = 'Amplifier'

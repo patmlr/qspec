@@ -41,7 +41,7 @@ from pycol._types import *
 from pycol import tools
 from pycol.physics import me_u, me_u_d, mass_factor
 
-__all__ = ['straight', 'straight_slope', 'straight_std', 'straight_x_std', 'draw_straight_unc_area', 'cubic',
+__all__ = ['straight', 'straight_slope', 'straight_std', 'straight_x_std', 'draw_straight_unc_area',
            'ellipse2d', 'draw_sigma2d', 'weight', 'york', 'linear_monte_carlo', 'linear_monte_carlo_nd', 'linear_alpha',
            'odr_fit', 'curve_fit', 'King']
 
@@ -183,10 +183,6 @@ def draw_straight_unc_area(x: array_like, y: array_like, sigma_a: array_like, si
     """
     unc = straight_std(x, sigma_a, sigma_b, corr_ab)
     plt.fill_between(x, y - unc, y + unc, **kwargs)
-
-
-def cubic(x, a, b, c, d):
-    return a + b * x + 0.5 * c * x ** 2 + 1. / 6. * d * x ** 3
 
 
 def ellipse2d(x: array_like, y: array_like, scale_x: array_like, scale_y: array_like,
