@@ -218,7 +218,7 @@ class Model:
         try:
             self.update_args(self.vals)
         except RecursionError as e:
-            print('Expressions form a loop. Got a {}.'.format(repr(e)))
+            print('Expression for {} with fix {} form a loop. Got a {}.'.format(self.names[i], fix, repr(e)))
             self.expressions[i] = temp_expr
             self.fixes[i] = temp_fix
 
@@ -239,7 +239,7 @@ class Model:
         return tuple(self._eval_zero_division(args, expr) for expr in self.expressions)
 
     def update(self):
-        self.set_vals(self.update_args(self.vals), force=True)
+        self.set_vals(self.update_args(self.vals), force=False)
 
     def min(self):
         return -1. if self.model is None else self.model.min()
@@ -486,6 +486,7 @@ class Listed(Model):
                     for _name in model.names:
                         fix = fix.replace(_name, '{}{}'.format(_name, label))
                 self._add_arg('{}{}'.format(name, label), val, fix, link)
+        self.set_fixes(list(self.fixes))
 
     def set_val(self, i, val, force=False):
         super().set_val(i, val, force=force)
@@ -502,14 +503,14 @@ class Listed(Model):
         if i < len(self.model_map):
             self.models[self.model_map[i]].set_link(self.index_map[i], self.links[i], force=True)
 
-    def inherit_vals(self):
-        self.set_vals([val for model in self.models for val in model.vals], force=True)
+    def inherit_vals(self, force=False):
+        self.set_vals([val for model in self.models for val in model.vals], force=force)
 
-    def inherit_fixes(self):
-        self.set_fixes([fix for model in self.models for fix in model.fixes], force=True)
+    def inherit_fixes(self, force=False):
+        self.set_fixes([fix for model in self.models for fix in model.fixes], force=force)
 
-    def inherit_links(self):
-        self.set_links([link for model in self.models for link in model.links], force=True)
+    def inherit_links(self, force=False):
+        self.set_links([link for model in self.models for link in model.links], force=force)
 
 
 class Summed(Listed):
