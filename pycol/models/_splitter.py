@@ -9,22 +9,25 @@ Created on 14.03.2022
 Splitter classes for lineshape models.
 """
 
+import os
 from string import ascii_uppercase
 import numpy as np
 
 from pycol.tools import merge_intervals
-from pycol.algebra import wigner_6j, a
+from pycol.physics import get_f
+from pycol.algebra import wigner_6j, a, b, c
 from pycol.models._base import Model, Summed
+from pycol.models._spectrum import LorentzQI
 
 __all__ = ['gen_splitter_model', 'get_all_f', 'hf_coeff', 'hf_trans', 'hf_shift', 'hf_int', 'Splitter',
-           'SplitterSummed', 'Hyperfine', 'HyperfineMixed']
+           'SplitterSummed', 'Hyperfine', 'HyperfineQI', 'HyperfineMixed']
 
 
 def gen_splitter_model(qi: bool = False, hf_mixing: bool = False):
     if qi and hf_mixing:
         pass
     elif qi:
-        pass
+        return HyperfineQI
     elif hf_mixing:
         return HyperfineMixed
     else:
@@ -71,9 +74,8 @@ def hf_trans(i, j_l, j_u):
     Returns (f_l, f_u, coAl, coBl, coAu, coBu)
     """
     return [[(f_l, f_u), hf_coeff(i, j_l, f_l), hf_coeff(i, j_u, f_u)]
-            for f_l in np.arange(abs(i - j_l), (i + j_l + 0.5))
-            for f_u in np.arange(abs(i - j_u), (i + j_u + 0.5))
-            if abs(f_l - f_u) == 1 or (f_l - f_u == 0 and f_l != 0 and f_u != 0)]
+            for f_l in get_f(i, j_l) for f_u in get_f(i, j_u)
+            if abs(f_u - f_l) < 1.1 and not f_u == f_l == 0]
 
 
 def hf_shift(hyper_l, hyper_u, coeff_l, coeff_u):
@@ -176,6 +178,102 @@ class Hyperfine(Splitter):
     def racah(self):
         for i, intensity in zip(self.racah_indices, self.racah_intensities):
             self.vals[i] = intensity
+
+
+def load_qi(filepath):
+    if not os.path.isfile(filepath):
+        return None
+    with open(os.path.join(filepath), 'r') as file:
+        ret = eval(file.read())
+    return ret['a'], ret['b'], ret['c']
+
+
+class HyperfineQI(Splitter):
+    def __init__(self, model, i, j_l, j_u, name, qi_path=None):
+        super().__init__(LorentzQI(), i, j_l, j_u, name)
+        self.type = 'HyperfineQI'
+        self.qi_path = qi_path
+        self.file = f'qi_{name}.txt'
+
+        self.transitions = hf_trans(self.i, self.j_l, self.j_u)
+        self.racah_intensities = [0., ]
+
+        save = False
+        if self.qi_path is None or not os.path.isfile(os.path.join(self.qi_path, self.file)):
+            print(f'Calculating QI A-matrix of isotope {name} ... ')
+            self.a_qi = [a(self.i, self.j_l, f_l, self.j_u, f_u, as_sympy=False)
+                         for f_l in get_f(self.i, self.j_l) for f_u in get_f(self.i, self.j_u)
+                         if abs(f_u - f_l) < 1.1 and not f_u == f_l == 0]
+            print(f'Calculating QI B-matrix of isotope {name} ... ')
+            self.b_qi = [b(self.i, self.j_l, f_l, self.j_u, f_u, as_sympy=False)
+                         for f_l in get_f(self.i, self.j_l) for f_u in get_f(self.i, self.j_u)
+                         if abs(f_u - f_l) < 1.1 and not f_u == f_l == 0]
+            print(f'Calculating QI C-matrix of isotope {name} ... ')
+            self.c_qi = [[c(self.i, self.j_l, f_l, self.j_u, f1_u, f2_u, as_sympy=False)
+                          for i2, f2_u in enumerate(get_f(self.i, self.j_u)) if i2 > i1
+                          if abs(f1_u - f_l) < 1.1 and abs(f2_u - f_l) < 1.1
+                          and not f1_u == f_l == 0 and not f2_u == f_l == 0]
+                         for f_l in get_f(self.i, self.j_l) for i1, f1_u in enumerate(get_f(self.i, self.j_u))]
+            if qi_path is not None:
+                save = True
+        else:
+            self.a_qi, self.b_qi, self.c_qi = load_qi(os.path.join(self.qi_path, self.file))
+        if save:
+            qi_dict = {'a': self.a_qi, 'b': self.b_qi, 'c': self.c_qi}
+            with open(os.path.join(self.qi_path, self.file), 'w') as file:
+                file.write(str(qi_dict))
+
+        self.transitions_qi = [[[(f_l, f2_u), hf_coeff(self.i, self.j_l, f_l), hf_coeff(self.i, self.j_u, f2_u)]
+                                for i2, f2_u in enumerate(get_f(self.i, self.j_u)) if i2 > i1
+                                if abs(f1_u - f_l) < 1.1 and abs(f2_u - f_l) < 1.1
+                                and not f1_u == f_l == 0 and not f2_u == f_l == 0]
+                               for f_l in get_f(self.i, self.j_l) for i1, f1_u in enumerate(get_f(self.i, self.j_u))]
+
+        self.n_l = len(self.transitions[0][1])
+        self.n_u = len(self.transitions[0][2])
+        for i in range(self.n_l):
+            self._add_arg('{}l'.format(ascii_uppercase[i]), 0., False, False)
+        for i in range(self.n_u):
+            self._add_arg('{}u'.format(ascii_uppercase[i]), 0., False, False)
+
+        for i in range(min([self.n_l, self.n_u])):
+            fix = '{} / {}'.format('{}u'.format(ascii_uppercase[i]), '{}l'.format(ascii_uppercase[i]))
+            self._add_arg('{}_ratio'.format(ascii_uppercase[i]), 0., fix, False)
+
+        self.racah_indices.append(self._index)
+        self._add_arg('geo', 0., False, False)
+
+    def evaluate(self, x, *args, **kwargs):
+        const_l = tuple(args[self.model.size + i] for i in range(self.n_l))
+        const_u = tuple(args[self.model.size + self.n_l + i] for i in range(self.n_u))
+        return np.sum([(_a + _b * args[self.racah_indices[0]])
+                       * self.model.evaluate(x - hf_shift(const_l, const_u, t[1], t[2]), *args, **kwargs)
+                       + np.sum([_c * args[self.racah_indices[0]]
+                                 * self.model.evaluate_qi(x - hf_shift(const_l, const_u, t[1], t[2]),
+                                                          hf_shift(const_l, const_u, _t[1], _t[2])
+                                                          - hf_shift(const_l, const_u, t[1], t[2]), *args, **kwargs)
+                                 for _t, _c in zip(t_list, c_list)], axis=0)
+                       for t, _a, _b, t_list, c_list in zip(
+                self.transitions, self.a_qi, self.b_qi, self.transitions_qi, self.c_qi)], axis=0) / np.max(self.a_qi)
+
+    def min(self):
+        const_l = tuple(self.vals[self.model.size + i] for i in range(self.n_l))
+        const_u = tuple(self.vals[self.model.size + self.n_l + i] for i in range(self.n_u))
+        return self.model.min() + min(hf_shift(const_l, const_u, t[1], t[2]) for t in self.transitions)
+
+    def max(self):
+        const_l = tuple(self.vals[self.model.size + i] for i in range(self.n_l))
+        const_u = tuple(self.vals[self.model.size + self.n_l + i] for i in range(self.n_u))
+        return self.model.max() + max(hf_shift(const_l, const_u, t[1], t[2]) for t in self.transitions)
+
+    def intervals(self):
+        const_l = tuple(self.vals[self.model.size + i] for i in range(self.n_l))
+        const_u = tuple(self.vals[self.model.size + self.n_l + i] for i in range(self.n_u))
+        shifts = [hf_shift(const_l, const_u, t[1], t[2]) for t in self.transitions]
+        return merge_intervals([[self.model.min() + shift, self.model.max() + shift] for shift in shifts])
+
+    def racah(self):
+        self.vals[self.racah_indices[0]] = 0.
 
 
 class HyperfineMixed(Splitter):

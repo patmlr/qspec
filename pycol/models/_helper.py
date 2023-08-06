@@ -39,8 +39,8 @@ def gen_model(ijj, shape: Union[str, type, _spectrum.Spectrum], qi: bool = False
     :param convolve: A str representation of or a Convolved type.
     :returns: The defined lineshape model.
     """
-    if qi or hf_mixing:
-        raise NotImplementedError('QI and HF-mixing models are not fully implemented yet.')
+    if qi and hf_mixing:
+        raise NotImplementedError('QI with HF-mixing is not implemented yet.')
     ijj = np.asarray(ijj, float)
     if len(ijj.shape) == 1:
         ijj = np.expand_dims(ijj, axis=0)

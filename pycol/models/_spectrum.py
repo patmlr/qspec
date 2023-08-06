@@ -17,8 +17,8 @@ from scipy.special import wofz
 from pycol.physics import source_energy_pdf
 from pycol.models._base import Model
 
-__all__ = ['SPECTRA', 'fwhm_voigt', 'fwhm_voigt_d', 'Spectrum', 'Gauss', 'Lorentz', 'Voigt', 'VoigtDerivative',
-           'VoigtAsy', 'VoigtCEC', 'GaussChi2']
+__all__ = ['SPECTRA', 'fwhm_voigt', 'fwhm_voigt_d', 'Spectrum', 'Gauss', 'Lorentz', 'LorentzQI',
+           'Voigt', 'VoigtDerivative', 'VoigtAsy', 'VoigtCEC', 'GaussChi2']
 
 
 # The names of the spectra. Includes all spectra that appear in the GUI.
@@ -84,6 +84,31 @@ class Lorentz(Spectrum):
         return 10 * self.fwhm()
 
 
+class LorentzQI(Spectrum):
+    def __init__(self):
+        super().__init__()
+        self.type = 'LorentzQI'
+
+        self._add_arg('Gamma', 1., False, False)
+
+    def evaluate_qi(self, x, x_qi, *args, **kwargs):
+        scale = 0.5 * args[0]
+        return 2 * scale ** 2 * np.real(1 / ((x + 1j * scale) * (x - x_qi - 1j * scale)))
+
+    def evaluate(self, x, *args, **kwargs):  # Normalize to the maximum.
+        scale = 0.5 * args[0]
+        return scale * np.pi * cauchy.pdf(x, loc=0, scale=scale)
+
+    def fwhm(self):
+        return abs(self.vals[self.p['Gamma']])
+
+    def min(self):
+        return -10 * self.fwhm()
+
+    def max(self):
+        return 10 * self.fwhm()
+
+
 class Gauss(Spectrum):
     def __init__(self):
         super().__init__()
@@ -122,7 +147,7 @@ class Voigt(Spectrum):
 class VoigtDerivative(Spectrum):
     def __init__(self):
         super().__init__()
-        self.type = 'Voigt'
+        self.type = 'VoigtDerivative'
 
         self._add_arg('Gamma', 1., False, False)
         self._add_arg('sigma', 1., False, False)
@@ -139,7 +164,7 @@ class VoigtDerivative(Spectrum):
 class VoigtAsy(Spectrum):
     def __init__(self):
         super().__init__()
-        self.type = 'AsyVoigt'
+        self.type = 'VoigtAsy'
 
         self._add_arg('Gamma', 1., False, False)
         self._add_arg('sigma', 1., False, False)

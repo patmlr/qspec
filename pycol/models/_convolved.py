@@ -66,19 +66,22 @@ class Convolved(Model):
 
     @property
     def dx(self):
-        return max([min([self.model.dx, self.model_1.dx]), (self.max() - self.min()) / 1000])
+        return max([self.model.dx, self.model_1.dx])
 
     """ Preprocessing """
 
     def gen_x_int(self, *args):
+        temp_vals = [v for v in self.vals[:self.j_1]]
         self.set_vals(args[:self.j_1], force=True)
         dx = min([self.model.dx, self.model_1.dx])
         self.x_int = np.expand_dims(np.arange(self.model_1.min(), self.model_1.max() + 0.5 * dx, dx), axis=0)
+        self.set_vals(temp_vals, force=True)
 
 
 class GaussConvolved(Convolved):
     def __init__(self, model):
         super().__init__(model_0=model, model_1=Gauss())
+        self.type = 'GaussConvolved'
 
     def evaluate(self, x, *args, **kwargs):  # Normalize the kernel function of the convolution to its integral.
         return super().evaluate(x, *args, **kwargs) / (np.sqrt(2 * np.pi) * args[self.i_1])
@@ -87,6 +90,7 @@ class GaussConvolved(Convolved):
 class LorentzConvolved(Convolved):
     def __init__(self, model):
         super().__init__(model_0=model, model_1=Lorentz())
+        self.type = 'LorentzConvolved'
 
     def evaluate(self, x, *args, **kwargs):  # Normalize the kernel function of the convolution to its integral.
         return super().evaluate(x, *args, **kwargs) / (0.5 * np.pi * args[self.i_1])
@@ -95,6 +99,7 @@ class LorentzConvolved(Convolved):
 class GaussChi2Convolved(Convolved):
     def __init__(self, model):
         super().__init__(model_0=model, model_1=GaussChi2())
+        self.type = 'GaussChi2Convolved'
 
     def evaluate(self, x, *args, **kwargs):  # Normalize the kernel function of the convolution to its integral.
         return super().evaluate(x, *args, **kwargs) \
