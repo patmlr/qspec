@@ -6,14 +6,14 @@ Created on 12.05.2021
 
 @author: Patrick Mueller
 
-Example script / Guide for the pycol.physics module.
+Example script / Guide for the qspec.physics module.
 """
 
 import numpy as np
 import scipy.constants as sc
 import matplotlib.pyplot as plt
 
-import pycol as pc
+import qspec as pc
 
 
 def example(n=None):

@@ -6,7 +6,7 @@ requires = [
 ]
 
 [project]
-name = 'pycol'
+name = 'qspec'
 version = '0.1.1'
 description = 'A python package for calculations surrounding Collinear Laser Spectroscopy.'
 readme = 'README.md'
@@ -33,8 +33,8 @@ dependencies = [
 
 [project.urls]
 homepage = 'https://www.ikp.tu-darmstadt.de/forschung_kernphysik/gruppen_kernphysik/experiment/ag_w_noertershaeuser/index.en.jsp'
-repository = 'http://gitlab.ikp.physik.tu-darmstadt.de/Lasersphere/pycol'
-bug-tracker = 'http://gitlab.ikp.physik.tu-darmstadt.de/Lasersphere/pycol/issues'
+repository = 'http://gitlab.ikp.physik.tu-darmstadt.de/Lasersphere/qspec'
+bug-tracker = 'http://gitlab.ikp.physik.tu-darmstadt.de/Lasersphere/qspec/issues'
 
 [tool.setuptools.package-data]
 '*' = ['*.dll']

@@ -6,13 +6,13 @@ Created on 15.08.2021
 
 @author: Patrick Mueller
 
-Example script / Guide for the pycol.analyze module.
+Example script / Guide for the qspec.analyze module.
 """
 
 import numpy as np
 import matplotlib.pyplot as plt
 
-import pycol as pc
+import qspec as pc
 
 
 def example(n=None):

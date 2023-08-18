@@ -1,7 +1,7 @@
-pycol
+qspec
 =====
 
 .. toctree::
    :maxdepth: 4
 
-   pycol
+   qspec

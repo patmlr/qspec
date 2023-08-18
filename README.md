@@ -1,9 +1,9 @@
-pycol
+qspec
 =====
 
 A python package for calculations surrounding Collinear Laser Spectroscopy.
 
-The [_pycol_](https://github.com/lasersphere/pycol) Python package provides mathematical and physical functions
+The [_qspec_](https://github.com/lasersphere/qspec) Python package provides mathematical and physical functions
 frequently used in laser spectroscopy but also more general methods for data processing. 
 Most functions are compatible with numpy arrays and are able to process n-dimensional arrays,
 even in the case of arrays of vector- or matrix-objects. This enables fast calculations with large samples of data,

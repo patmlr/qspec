@@ -6,7 +6,7 @@ Created on 24.06.2021
 
 @author: Patrick Mueller
 
-Example script / Guide for the pycol.simulate module.
+Example script / Guide for the qspec.simulate module.
 
 
 - Einstein coefficients taken from [NIST Atomic Spectra Database, https://doi.org/10.18434/T4W30F].
@@ -20,8 +20,8 @@ import numpy as np
 import scipy.constants as sc
 import matplotlib.pyplot as plt
 
-import pycol as pc
-import pycol.simulate as sim
+import qspec as pc
+import qspec.simulate as sim
 
 
 def example(n=None):
