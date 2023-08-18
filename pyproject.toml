@@ -7,7 +7,7 @@ requires = [
 
 [project]
 name = 'qspec'
-version = '0.1.1'
+version = '0.1.2'
 description = 'A python package for calculations surrounding Collinear Laser Spectroscopy.'
 readme = 'README.md'
 requires-python = '>=3.8'
@@ -33,8 +33,9 @@ dependencies = [
 
 [project.urls]
 homepage = 'https://www.ikp.tu-darmstadt.de/forschung_kernphysik/gruppen_kernphysik/experiment/ag_w_noertershaeuser/index.en.jsp'
-repository = 'http://gitlab.ikp.physik.tu-darmstadt.de/Lasersphere/qspec'
-bug-tracker = 'http://gitlab.ikp.physik.tu-darmstadt.de/Lasersphere/qspec/issues'
+source = 'https://github.com/lasersphere/qspec'
+download = 'https://pypi.org/project/qspec/#files'
+tracker = 'https://github.com/lasersphere/qspec/issues'
 
 [tool.setuptools.package-data]
 '*' = ['*.dll']
