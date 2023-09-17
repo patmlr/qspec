@@ -41,7 +41,7 @@ def example(n=None):
     :returns: None.
     """
     if n is None:
-        n = {0, 1, 2}
+        n = {0, 1, 2, 3, 4}
     if isinstance(n, int):
         n = {n, }
 
@@ -290,6 +290,56 @@ def example(n=None):
         plt.legend()
         plt.show()
 
+    if 4 in n:
+        f_sp3 = 761905013  # The 4s -> 4p 2P3/2 transition frequency.
+        a_sp3 = 147
+
+        # s_hyper = [-806.4, ]
+        # p3_hyper = [-31., -6.9]
+
+        s_hyper = [-806.4, ]
+        p3_hyper = [-31., -6.9]
+
+        i = 3.5
+
+        s = sim.construct_electronic_state(freq_0=0, s=0.5, l=0, j=0.5, i=i, hyper_const=s_hyper, label='s')
+        p3 = sim.construct_electronic_state(f_sp3, 0.5, 1, 1.5, i=i, hyper_const=p3_hyper, label='p3')
+
+        decay = sim.DecayMap(labels=[('s', 'p3')], a=[a_sp3])
+        # The states are linked by Einstein-A coefficients via the specified labels.
+
+        states = s + p3
+        ca43 = sim.Atom(states=states, decay_map=decay)
+        # ca43.plot()
+
+        pol_sp = sim.Polarization([0, 1, 0], q_axis=2)
+        laser_sp = sim.Laser(freq=f_sp3 - 1700, polarization=pol_sp, intensity=1)
+
+        inter = sim.Interaction(atom=ca43, lasers=[laser_sp, ], delta_max=1000.)
+        inter.resonance_info()  # Print the detunings of the lasers from the considered transitions.
+        # inter.controlled = True  # Use an error controlled solver to deal with fast dynamics.
+        # inter.dt = 1e-4  # Alternatively, decrease the step size.
+
+        times = [0., 0.2]  # Integration time in us.
+        delta = np.linspace(-200, 200, 201)
+
+        results = inter.rates(times, delta)
+        plt.plot(delta, a_sp3 * np.sum(results[:, ca43.get_state_indexes('p3'), -1], axis=1), label='p-state')
+        plt.xlabel('f - {} (MHz)'.format(laser_sp.freq))
+        plt.ylabel('scattering rate after {} us'.format(times[-1]))
+
+        rho = inter.master(times, delta)
+        y = ca43.scattering_rate(rho, np.pi / 2, 0).real
+        plt.plot(delta, 8 * np.pi * a_sp3 * y[:, -1], label='QI')
+
+        sr = sim.ScatteringRate(ca43, polarization=pol_sp)
+        y = sr.generate_y(delta - 1700, np.pi / 2, 0)
+        s = pc.saturation(1, f_sp3, a_sp3, pc.a_dipole(0, 0.5, 0.5, 0.5, 1.5, 1.5, 1.5, 1))
+        plt.plot(delta, 4 * np.pi * s * y[:, 0, 0], '-C2', label='QI pert.')
+
+        plt.legend()
+        plt.show()
+
 
 if __name__ == '__main__':
-    example({3})
+    example({4})

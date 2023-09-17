@@ -650,26 +650,25 @@ def a_hyper_mu(i: scalar, j: scalar, mu: array_like, b: array_like):
 
 def saturation_intensity(f: array_like, a: array_like, a_dipole: array_like):
     """
-    :param f: The frequency of the transition.
+    :param f: The frequency of the transition (MHz).
     :param a: The Einstein A coefficient (MHz).
     :param a_dipole: The reduced dipole coefficient of the transition (see algebra.a_dipole).
     :returns: The saturation intensity.
     """
     f, a, a_dipole = np.asarray(f), np.asarray(a), np.asarray(a_dipole)
-    return np.pi * f ** 3 * sc.h * a / (3 * sc.c ** 2 * a_dipole) * 1e24
+    return np.pi * (f * 1e6) ** 3 * sc.h * a * 1e6 / (3 * sc.c ** 2 * a_dipole)
 
 
 def saturation(i: array_like, f: array_like, a: array_like, a_dipole: array_like):
     """
-    :param i: The intensity of the laser.
-    :param f: The frequency of the transition.
+    :param i: The intensity of the laser (MHz).
+    :param f: The frequency of the transition (MHz).
     :param a: The Einstein A coefficient (MHz).
     :param a_dipole: The reduced dipole coefficient of the transition (see algebra.a_dipole).
     :returns: The saturation parameter.
     """
-    i, f, a, a_dipole = np.asarray(i), np.asarray(f), np.asarray(a), np.asarray(a_dipole)
-    i0 = np.pi * f ** 3 * sc.h * a / (3 * sc.c ** 2 * a_dipole) * 1e24
-    return i / i0
+    i = np.asarray(i)
+    return i / saturation_intensity(f, a, a_dipole)
 
 
 def rabi(a: array_like, s: array_like):

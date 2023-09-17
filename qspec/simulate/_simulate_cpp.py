@@ -18,6 +18,7 @@ from qspec._types import *
 from qspec._cpp import *
 from qspec import tools
 from qspec import get_f, get_m
+import qspec.algebra as al
 
 
 __all__ = ['Polarization', 'Laser', 'Environment', 'construct_electronic_state', 'construct_hyperfine_state', 'State',
@@ -748,11 +749,88 @@ class Atom:
             f = {f}
         return np.array([i for i, s in enumerate(self.states) if s.label in labels and s.f in f], dtype=int)
 
-    def scattering_rate(self, rho: array_like, i: array_like = None, j: array_like = None, axis: int = 1):
+    def scattering_rate(self, rho: array_like, theta: array_like = None, phi: array_like = None,
+                        i: array_like = None, j: array_like = None, axis: int = 1):
+        """
+        :param rho: The density matrix of the atom. Must have the same size as the atom
+         along the specified 'axis' and 'axis' + 1.
+        :param i: The initially excited state indexes to consider for spontaneous decay.
+         If None, all states are considered.
+        :param j: The final decayed state indexes to consider for spontaneous decay. If None, all states are considered.
+        :param theta: The elevation angle of detection.
+        :param phi: The azimuthal angle of detection.
+        :param axis: The axis along which the population is aligned in 'rho'.
+        :returns: The scattering rate of the atom given the population 'rho' (MHz or Events / s).
+        :raises ValueError: 'rho' must have the same size as the atom along the specified 'axis'.
+        """
+        rho = np.asarray(rho)
+
+        if i is None:
+            i = np.arange(self.size, dtype=int)
+        else:
+            i = np.array(i).flatten()
+        if j is None:
+            j = np.arange(self.size, dtype=int)
+        else:
+            j = np.array(j).flatten()
+
+        if axis < 0:
+            axis += len(rho.shape)
+
+        l0 = np.array([[1. if _i in i and _j in j else 0. for _i in range(self.size)] for _j in range(self.size)])
+        l0 *= self.l0
+
+        a_cart = [[al.a_dipole_cart(self.states[_j].i, self.states[_j].j, self.states[_j].f, self.states[_j].m,
+                                    self.states[_i].j, self.states[_i].f, self.states[_i].m)
+                   if l0[_j][_i] else np.zeros(3, dtype=complex)
+                   if _i in i and _j in j else 0. for _i in range(self.size)] for _j in range(self.size)]
+        e_theta = tools.e_theta(theta, phi)
+        e_phi = tools.e_phi(theta, phi)
+
+        c_theta = np.array([[np.sum(e_theta * _a_cart) for _a_cart in a_cart_list]
+                            for a_cart_list in a_cart])
+        c_phi = np.array([[np.sum(e_phi * _a_cart) for _a_cart in a_cart_list]
+                          for a_cart_list in a_cart])
+
+        ct_theta = np.array([[np.sum(e_theta * np.conj(_a_cart))
+                              for _a_cart in a_cart_list] for a_cart_list in a_cart])
+        ct_phi = np.array([[np.sum(e_phi * np.conj(_a_cart))
+                            for _a_cart in a_cart_list] for a_cart_list in a_cart])
+
+        axes = [ax for ax in range(axis)]
+        if axes:
+            c_theta = np.expand_dims(c_theta, axis=axes)
+            c_phi = np.expand_dims(c_phi, axis=axes)
+            ct_theta = np.expand_dims(ct_theta, axis=axes)
+            ct_phi = np.expand_dims(ct_phi, axis=axes)
+        axes = [axis + ax + 2 for ax in range(len(rho.shape) - axis - 2)]
+        if axes:
+            c_theta = np.expand_dims(c_theta, axis=axes)
+            c_phi = np.expand_dims(c_phi, axis=axes)
+            ct_theta = np.expand_dims(ct_theta, axis=axes)
+            ct_phi = np.expand_dims(ct_phi, axis=axes)
+
+        sr = (np.sum([np.expand_dims(tools.get_subarray(c_theta, k, axis), axis=axis + 1)
+                      * np.expand_dims(tools.get_subarray(rho, k, axis + 1), axis=axis)
+                      for k in range(self.size)], axis=0)
+              * np.sum([np.expand_dims(tools.get_subarray(ct_theta, k, axis + 1), axis=axis)
+                        * np.expand_dims(tools.get_subarray(rho, k, axis), axis=axis + 1)
+                        for k in range(self.size)], axis=0))
+        
+        sr += (np.sum([np.expand_dims(tools.get_subarray(c_phi, k, axis), axis=axis + 1)
+                       * np.expand_dims(tools.get_subarray(rho, k, axis + 1), axis=axis)
+                       for k in range(self.size)], axis=0)
+               * np.sum([np.expand_dims(tools.get_subarray(ct_phi, k, axis + 1), axis=axis)
+                         * np.expand_dims(tools.get_subarray(rho, k, axis), axis=axis + 1)
+                         for k in range(self.size)], axis=0))
+        return np.sum(np.sum(sr, axis=axis), axis=axis)
+
+    def scattering_rate_old(self, rho: array_like, i: array_like = None, j: array_like = None, axis: int = 1):
         """
         :param rho: The population of the atom. Must have the same size as the atom along the specified 'axis'.
-        :param i: The initial state indexes to consider for spontaneous decay. If None, all states are considered.
-        :param j: The final state indexes to consider for spontaneous decay. If None, all states are considered.
+        :param i: The initially excited state indexes to consider for spontaneous decay.
+         If None, all states are considered.
+        :param j: The final decayed state indexes to consider for spontaneous decay. If None, all states are considered.
         :param axis: The axis along which the population is aligned in 'rho'.
         :returns: The scattering rate of the atom given the population 'rho' (MHz or Events / s).
         :raises ValueError: 'rho' must have the same size as the atom along the specified 'axis'.

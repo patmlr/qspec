@@ -771,6 +771,19 @@ def merge_intervals(intervals: array_iter) -> ndarray:
     return new_inter
 
 
+def get_subarray(a, i, axis):
+    """
+    :param a: The array.
+    :param i: The indexes to select along the 'axis'
+    :param axis: The axis along which the indexes 'i' are selected.
+    :returns: The subarray selected with the indexes 'i' along the 'axis'.
+    """
+
+    axis += a.ndim if axis < 0 else 0
+    index = ((slice(None),) * axis + (i,) + (slice(None),) * (a.ndim - axis - 1))
+    return a[index]
+
+
 """ Vector math """
 
 
