@@ -799,12 +799,14 @@ class Atom:
 
         axes = [ax for ax in range(axis)]
         if axes:
+            l0 = np.expand_dims(l0, axis=axes)
             c_theta = np.expand_dims(c_theta, axis=axes)
             c_phi = np.expand_dims(c_phi, axis=axes)
             ct_theta = np.expand_dims(ct_theta, axis=axes)
             ct_phi = np.expand_dims(ct_phi, axis=axes)
         axes = [axis + ax + 2 for ax in range(len(rho.shape) - axis - 2)]
         if axes:
+            l0 = np.expand_dims(l0, axis=axes)
             c_theta = np.expand_dims(c_theta, axis=axes)
             c_phi = np.expand_dims(c_phi, axis=axes)
             ct_theta = np.expand_dims(ct_theta, axis=axes)
@@ -823,7 +825,7 @@ class Atom:
                * np.sum([np.expand_dims(tools.get_subarray(ct_phi, k, axis + 1), axis=axis)
                          * np.expand_dims(tools.get_subarray(rho, k, axis), axis=axis + 1)
                          for k in range(self.size)], axis=0))
-        return np.sum(np.sum(sr, axis=axis), axis=axis)
+        return np.sum(np.sum(sr, axis=axis), axis=axis).real
 
     def scattering_rate_old(self, rho: array_like, i: array_like = None, j: array_like = None, axis: int = 1):
         """

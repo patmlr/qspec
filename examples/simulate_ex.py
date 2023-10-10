@@ -17,8 +17,10 @@ Example script / Guide for the qspec.simulate module.
 """
 
 import numpy as np
+import qspec
 import scipy.constants as sc
 import matplotlib.pyplot as plt
+import scipy.integrate as si
 
 import qspec as pc
 import qspec.simulate as sim
@@ -312,8 +314,9 @@ def example(n=None):
         ca43 = sim.Atom(states=states, decay_map=decay)
         # ca43.plot()
 
+        intensity = 0.1
         pol_sp = sim.Polarization([0, 1, 0], q_axis=2)
-        laser_sp = sim.Laser(freq=f_sp3 - 1700, polarization=pol_sp, intensity=1)
+        laser_sp = sim.Laser(freq=f_sp3 - 1700, polarization=pol_sp, intensity=intensity)
 
         inter = sim.Interaction(atom=ca43, lasers=[laser_sp, ], delta_max=1000.)
         inter.resonance_info()  # Print the detunings of the lasers from the considered transitions.
@@ -322,24 +325,84 @@ def example(n=None):
 
         times = [0., 0.2]  # Integration time in us.
         delta = np.linspace(-200, 200, 201)
+        theta, phi = np.pi / 2, 0.
+        theta, phi = 0., 0.
 
         results = inter.rates(times, delta)
-        plt.plot(delta, a_sp3 * np.sum(results[:, ca43.get_state_indexes('p3'), -1], axis=1), label='p-state')
-        plt.xlabel('f - {} (MHz)'.format(laser_sp.freq))
-        plt.ylabel('scattering rate after {} us'.format(times[-1]))
+        y = a_sp3 * np.sum(results[:, ca43.get_state_indexes('p3'), -1], axis=1) / (4 * np.pi)
+        plt.plot(delta, y, label='p-state')
 
         rho = inter.master(times, delta)
-        y = ca43.scattering_rate(rho, np.pi / 2, 0).real
-        plt.plot(delta, 8 * np.pi * a_sp3 * y[:, -1], label='QI')
+        y = a_sp3 * 3 / (8 * np.pi) * (2 * i + 1) * ca43.scattering_rate(rho, theta, phi)[:, -1]
+        # th, ph = np.linspace(-np.pi / 2, np.pi / 2, 9), np.linspace(0, 2 * np.pi, 17)
+        # y = np.array([[ca43.scattering_rate(rho, _t, _p).real * np.cos(_t) for _t in th] for _p in ph])
+        # y = si.simps(y, x=th, axis=1)
+        # y = si.simps(y, x=ph, axis=0)
+        plt.plot(delta, y, label='QI')
 
         sr = sim.ScatteringRate(ca43, polarization=pol_sp)
-        y = sr.generate_y(delta - 1700, np.pi / 2, 0)
-        s = pc.saturation(1, f_sp3, a_sp3, pc.a_dipole(0, 0.5, 0.5, 0.5, 1.5, 1.5, 1.5, 1))
-        plt.plot(delta, 4 * np.pi * s * y[:, 0, 0], '-C2', label='QI pert.')
+        y = sr.generate_y(delta - 1700, theta, phi)[:, 0, 0]
+        s = pc.saturation(intensity, f_sp3, a_sp3, 1)  # pc.a_dipole(0, 0.5, 0.5, 0.5, 1.5, 1.5, 1.5, 1))  # pc.a(0, 0.5, 0.5, 1.5, 1.5)
+        plt.plot(delta, s * y, '-C2', label='QI pert.')
 
+        plt.xlabel('f - {} (MHz)'.format(laser_sp.freq))
+        plt.ylabel('scattering rate after {} us'.format(times[-1]))
+        plt.legend()
+        plt.show()
+
+    if 5 in n:
+        f_p = 7e8
+        a_p = 100.
+
+        i = 1.5
+        s_hyper = [0.]
+        p_hyper = [0.]
+
+        s = sim.construct_electronic_state(freq_0=0, s=0, l=0, j=0, i=i, hyper_const=s_hyper, label='s')
+        p = sim.construct_electronic_state(freq_0=f_p, s=0, l=1, j=1, i=i, hyper_const=p_hyper, label='p')
+
+        decay = sim.DecayMap(labels=[('s', 'p')], a=[a_p])
+
+        states = s + p
+        he = sim.Atom(states=states, decay_map=decay)
+        # he.plot()
+
+        intensity = 0.1
+        pol_sp = sim.Polarization([0, 1, 0], q_axis=2)
+        laser_sp = sim.Laser(freq=f_p, polarization=pol_sp, intensity=intensity)
+
+        inter = sim.Interaction(atom=he, lasers=[laser_sp, ], delta_max=500.)
+        inter.resonance_info()
+
+        times = [0., 0.2]
+        delta = np.linspace(-100, 100, 201)
+        theta, phi = np.pi / 2, 0.
+        # theta, phi = 0., 0.
+
+        results = inter.rates(times, delta)
+        y = a_p * np.sum(results[:, he.get_state_indexes('p'), :], axis=1) / (4 * np.pi)
+        # y = he.scattering_rate_old(results, i=he.get_state_indexes('p')) / (4 * np.pi)
+        plt.plot(delta, y[:, -1], label='p-state')
+
+        rho = inter.master(times, delta)
+        y = a_p * 3 / (8 * np.pi) * (2 * i + 1) * he.scattering_rate(rho, theta, phi)[:, -1]
+        # th, ph = np.linspace(-np.pi / 2, np.pi / 2, 9), np.linspace(0, 2 * np.pi, 17)
+        # y = np.array([[he.scattering_rate(rho, _t, _p).real * np.cos(_t) for _t in th] for _p in ph])
+        # y = si.simps(y, x=th, axis=1)
+        # y = si.simps(y, x=ph, axis=0)
+        plt.plot(delta, y, label='QI')
+
+        sr = sim.ScatteringRate(he, polarization=pol_sp)
+        y = sr.generate_y(delta, theta, phi)[:, 0, 0]
+        # y = sr.integrate_y(delta) / (4 * np.pi)
+        s = pc.saturation(intensity, f_p, a_p, 1)  # pc.a_dipole(0, 0, 0, 0, 1, 1, 1, 1))  # pc.a(0, 0, 0, 1, 1)
+        plt.plot(delta, s * y, '-C2', label='QI pert.')
+
+        plt.xlabel('f - {} (MHz)'.format(laser_sp.freq))
+        plt.ylabel('scattering rate after {} us'.format(times[-1]))
         plt.legend()
         plt.show()
 
 
 if __name__ == '__main__':
-    example({4})
+    example({4, 5})
