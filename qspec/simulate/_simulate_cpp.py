@@ -1476,11 +1476,11 @@ class Interaction:
             v = np.array(np.broadcast_to(v, (sample_size, 3)), dtype=float, order='C')
             y0 = np.array(np.broadcast_to(y0, (sample_size, self.atom.size)), dtype=complex, order='C')
 
-        results = np.zeros((sample_size, self.atom.size, t_size), dtype=float)
-        dll.interaction_schroedinger(self.instance, t.ctypes.data_as(c_double_p), delta.ctypes.data_as(c_double_p),
-                                     v.ctypes.data_as(c_double_p), y0.ctypes.data_as(c_complex_p), c_bool(dynamics),
-                                     results.ctypes.data_as(c_complex_p), c_size_t(t_size), c_size_t(sample_size))
-        return results
+        results = np.zeros((sample_size, self.atom.size, t_size), dtype=complex)
+        dll.interaction_mc_schroedinger(self.instance, t.ctypes.data_as(c_double_p), delta.ctypes.data_as(c_double_p),
+                                        v.ctypes.data_as(c_double_p), y0.ctypes.data_as(c_complex_p), c_bool(dynamics),
+                                        results.ctypes.data_as(c_complex_p), c_size_t(t_size), c_size_t(sample_size))
+        return results, v
 
 
 def _define_colors(n: int, label_map: dict, colormap: str = None):

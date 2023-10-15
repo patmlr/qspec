@@ -43,7 +43,7 @@ def example(n=None):
     :returns: None.
     """
     if n is None:
-        n = {0, 1, 2, 3, 4}
+        n = {0, 1, 2, 3, 4, 5, 6}
     if isinstance(n, int):
         n = {n, }
 
@@ -356,7 +356,7 @@ def example(n=None):
 
         i = 1.5
         s_hyper = [0.]
-        p_hyper = [0.]
+        p_hyper = [10.]
 
         s = sim.construct_electronic_state(freq_0=0, s=0, l=0, j=0, i=i, hyper_const=s_hyper, label='s')
         p = sim.construct_electronic_state(freq_0=f_p, s=0, l=1, j=1, i=i, hyper_const=p_hyper, label='p')
@@ -403,6 +403,75 @@ def example(n=None):
         plt.legend()
         plt.show()
 
+    if 6 in n:
+        f_p = 1_319_800_372.2
+        a_p = 56.69
+
+        i = 0.5
+        s_hyper = [42_234.7]
+        p_hyper = [19_425.6]
+
+        s = sim.construct_electronic_state(freq_0=0, s=1, l=0, j=1, i=i, hyper_const=s_hyper, label='s')
+        p = sim.construct_electronic_state(freq_0=f_p, s=1, l=1, j=2, i=i, hyper_const=p_hyper, label='p')
+
+        decay = sim.DecayMap(labels=[('s', 'p')], a=[a_p])
+
+        states = s + p
+        c = sim.Atom(states=states, decay_map=decay, mass=13.00335483534)
+        # c.plot()
+
+        f_laser = 1_319_798_680.45
+        # f_laser = 1_319_750_116.45
+        pol_sp = sim.Polarization([0, 1, 0], q_axis=2)
+        power = 0.9e-3
+        r = 0.7e-3
+        intensity = 2 * power / (np.pi * r ** 2)
+        laser_sp = sim.Laser(freq=f_laser, polarization=pol_sp, intensity=intensity)
+
+        inter = sim.Interaction(atom=c, lasers=[laser_sp, ], delta_max=1000.)
+        inter.resonance_info()
+
+        times = [0., 0.1]
+        # times = np.linspace(0, 1, 101)
+        d_size = 81
+        delta = np.linspace(-200, 200, d_size)
+
+        # y = inter.rates(times)[0]
+        # s_05 = np.sum(y[c.get_state_indexes('s', 0.5)], axis=0)
+        # s_15 = np.sum(y[c.get_state_indexes('s', 1.5)], axis=0)
+        # plt.plot(times, s_05)
+        # plt.plot(times, s_15)
+        # plt.show()
+
+        size = 50000
+        # v = np.zeros(size, dtype=float)
+        v0 = np.random.normal(loc=0, scale=15, size=size)
+        delta, v = np.meshgrid(delta, v0, indexing='ij')
+        delta, v = delta.flatten(), v.flatten()
+        indexes = np.random.randint(2, 6, size)
+        y0 = np.zeros((size, c.size), dtype=complex)
+        for _i in range(y0.shape[0]):
+            y0[_i, indexes[_i]] = 1
+        y0 = np.concatenate([y0, ] * d_size, axis=0)
+        v = np.array([[_v, _v, _v] for _v in v])
+        y, v = inter.mc_schroedinger(times, delta=delta, v=v, y0=y0, dynamics=True)
+        y = y.reshape((d_size, size, c.size, 2))
+        y = np.mean((y * y.conj()).real / np.expand_dims(np.sum((y * y.conj()).real, axis=2), axis=2), axis=1)
+        s_05 = np.sum(y[:, c.get_state_indexes('s', 0.5), -1], axis=1)
+        s_15 = np.sum(y[:, c.get_state_indexes('s', 1.5), -1], axis=1)
+        p_15 = np.sum(y[:, c.get_state_indexes('p', 1.5), -1], axis=1)
+        p_25 = np.sum(y[:, c.get_state_indexes('p', 2.5), -1], axis=1)
+        delta = np.linspace(-250, 250, d_size)
+        # plt.plot(delta, s_05, label='s_05')
+        # plt.plot(delta, s_15, label='s_15')
+        # plt.plot(delta, p_15, label='p_15')
+        plt.plot(delta, p_25, label='p_25')
+        plt.legend()
+        plt.show()
+        # v -= v
+        plt.hist(v[:, 0] / qspec.v_rec(f_p, c.mass))
+        plt.show()
+
 
 if __name__ == '__main__':
-    example({4, 5})
+    example({6})

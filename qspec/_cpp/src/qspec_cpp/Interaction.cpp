@@ -979,7 +979,7 @@ std::vector<std::vector<VectorXcd>> Interaction::mc_schroedinger(
 					r = d(gen);
 				}
 			}
-			if (dynamics) v.at(n) = v_temp;
+			if (dynamics) v.at(n) += v_temp;
 			delete w;
 		});
 	return results;

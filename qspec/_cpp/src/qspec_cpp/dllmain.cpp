@@ -658,15 +658,17 @@ extern "C"
         std::vector<VectorXcd> _x0 = cast_samples_VectorXcd(x0, sample_size, size);
         std::vector<std::vector<VectorXcd>> _results = interaction->mc_schroedinger(_t, _delta, _v, _x0, dynamics);
         for (size_t i = 0; i < sample_size; ++i)
-        {
-            for (size_t m = 0; m < size; ++m)
+        {   
+            if (dynamics)
             {
-                for (size_t n = 0; n < size; ++n)
-                {
-                    for (size_t k = 0; k < t_size; ++k)
-                        results[i * size * size * t_size + m * size * t_size + n * t_size + k] = _results.at(i).at(k)(m, n);
-                }
+                for (size_t j = 0; j < 3; ++j) v[i * 3 + j] = _v.at(i)(j);
             }
+            for (size_t n = 0; n < size; ++n)
+            {
+                for (size_t k = 0; k < t_size; ++k)
+                    results[i * size * t_size + n * t_size + k] = _results.at(i).at(k)(n);
+            }
+        
         }
     }
 
