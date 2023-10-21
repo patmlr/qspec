@@ -546,9 +546,7 @@ class Geometry:
         Shows a 3d plot of the angular range covered by the geometry object.
         :returns: The axes object.
         """
-        theta, phi = self.integration_sample(step=0.02)
-        r = np.array([[tools.e_r(t, p) for p in phi[0]] for t in theta[0]])
-        r = tools.transform(np.expand_dims(self.rotation.R, axis=(0, 1)), r)
+
         fig = plt.figure(num=1, figsize=[8, 8], clear=True)
         ax = fig.add_subplot(111, projection='3d')
         plt.xlabel(r'$x$ / arb. units')
@@ -564,17 +562,23 @@ class Geometry:
         ax.set_yticks(ticks)
         ax.set_zticks(ticks)
         ax.pbaspect = [1., 1., 1.]
-        radius = 0.8
-        r *= radius
-        surf = ax.plot_surface(r[:, :, 0], r[:, :, 1], r[:, :, 2], zorder=2, rcount=40, ccount=40,
-                               cmap=plt.get_cmap('cividis'), antialiased=False, alpha=0.3)
-        surf.set_clim([-1, 1])
+
+        radius = 0.9
+        theta, phi = self.integration_sample(step=0.02)
+        for t_arr in theta:
+            for p_arr in phi:
+                r = np.array([[tools.e_r(t, p) for p in p_arr] for t in t_arr])
+                r = tools.transform(np.expand_dims(self.rotation.R, axis=(0, 1)), r)
+                r *= radius
+                surf = ax.plot_surface(r[:, :, 0], r[:, :, 1], r[:, :, 2], zorder=2, rcount=40, ccount=40,
+                                       cmap=plt.get_cmap('cividis'), antialiased=False, alpha=0.5)
+                surf.set_clim([-radius, radius])
         # cb = plt.colorbar(surf, ax=ax, shrink=0.5)
         # cb.set_label('z / arb. units')
         # cb.set_ticks([-1, 0, 1])
 
-        plt.style.use('seaborn')
-        plt.tight_layout()
+        # plt.style.use('seaborn')
+        # plt.tight_layout()
         if show:
             plt.show()
             plt.style.use('default')

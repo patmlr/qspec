@@ -201,6 +201,9 @@ dll.decaymap_get_a.argtypes = (DecayMapHandler, )
 dll.decaymap_get_size.argtypes = (DecayMapHandler, )
 dll.decaymap_get_size.restype = c_size_t
 
+dll.decaymap_get_item.argtypes = (DecayMapHandler, c_char_p, c_char_p)
+dll.decaymap_get_item.restype = c_double
+
 
 # Atom
 dll.atom_construct.restype = AtomHandler

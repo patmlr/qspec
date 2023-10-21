@@ -40,7 +40,14 @@ void Environment::set_E(double _E)
 void Environment::set_E(Vector3d _E)
 {
 	E = _E.norm();
-	e_E = _E / E;
+	if (E == 0)
+	{
+		e_E << 1, 0, 0;
+	}
+	else
+	{
+		e_E = _E / E;
+	}
 }
 
 void Environment::set_B(double _B)
@@ -51,7 +58,14 @@ void Environment::set_B(double _B)
 void Environment::set_B(Vector3d _B)
 {
 	B = _B.norm();
-	e_B = _B / B;
+	if (B == 0)
+	{
+		e_B << 0, 0, 1;
+	}
+	else
+	{
+		e_B = _B / B;
+	}
 }
 
 

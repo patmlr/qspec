@@ -246,5 +246,5 @@ double doppler(double x, double v, double angle)
 
 double recoil(double freq, double mass)
 {
-    return sc::h * std::pow(freq, 2) / (2 * mass * sc::amu * std::pow(sc::c, 2)) * 1e12;
+    return sc::h * std::pow(freq, 2) / (2 * mass * sc::amu * std::pow(sc::c, 2)) * 1e6;
 }

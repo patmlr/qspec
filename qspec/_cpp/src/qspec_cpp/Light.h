@@ -13,6 +13,7 @@ class Polarization
 protected:
 	Matrix3cd T;
 	Quaterniond R;
+	Quaterniond Rq;
 
 	Vector3d q_axis;
 	Vector3cd x;
@@ -22,7 +23,7 @@ public:
 	Polarization();
 	void init(Vector3cd vec, Vector3d _q_axis, bool vec_as_q);
 
-	void calc_R();
+	void calc_R(Vector3d _q_axis);
 	void infer_x();
 	void infer_q();
 	void def_q_axis(Vector3d _q_axis, bool q_fixed);

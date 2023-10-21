@@ -207,6 +207,8 @@ Atom* Interaction::get_atom()
 void Interaction::set_atom(Atom* _atom)
 {
 	atom = _atom;
+	summap = MatrixXi::Zero(atom->get_size(), atom->get_size());
+	set_env(env);
 }
 
 void Interaction::clear_lasers()
@@ -225,8 +227,8 @@ void Interaction::add_laser(Laser* _laser)
 	for (size_t q_i = 0; q_i < 3; ++q_i)
 	{
 		lasermap.at(q_i).push_back(MatrixXi::Zero(atom->get_size(), atom->get_size()));
-		rabimap.push_back(MatrixXcd::Zero(atom->get_size(), atom->get_size()));
 	}
+	rabimap.push_back(MatrixXcd::Zero(atom->get_size(), atom->get_size()));
 }
 
 Environment* Interaction::get_env()
@@ -326,14 +328,17 @@ void Interaction::gen_coordinates()
 
 void Interaction::gen_rabi()
 {
-	summap = MatrixXi::Zero(atom->get_size(), atom->get_size());
-	// printf_s("%1.3f, %1.3f, %1.3f \n", (*lasers.at(0)->get_polarization()->get_q())(0).real(), (*lasers.at(0)->get_polarization()->get_q())(1).real(), (*lasers.at(0)->get_polarization()->get_q())(2).real());
-	// printf_s("%1.3f, %1.3f, %1.3f \n", (*lasers.at(0)->get_polarization()->get_q())(0).imag(), (*lasers.at(0)->get_polarization()->get_q())(1).imag(), (*lasers.at(0)->get_polarization()->get_q())(2).imag());
+	summap.setZero();
+	for (size_t m = 0; m < lasers.size(); ++m)
+	{
+		rabimap.at(m).setZero();
+	}
 	for (size_t q = 0; q < 3; ++q)
 	{
 		double q_val = static_cast<double>(q) - 1;
 		for (size_t m = 0; m < lasers.size(); ++m)
 		{
+			lasermap.at(q).at(m).setZero();
 			// Which transitions are laser-driven?
 			for (size_t col = 1; col < atom->get_size(); ++col)
 			{
@@ -353,7 +358,6 @@ void Interaction::gen_rabi()
 					std::complex<double> q_i = lasers.at(m)->get_polarization()->get_q()->array()[q];
 					if (atom->get_m_dipole()->at(q)(row, col) * abs(q_i)  // q_i.real() * q_i.imag()  // (pow(q_i.real(), 2) + pow(q_i.imag(), 2))
 						* lasers.at(m)->get_intensity() == 0) continue;  // Transition allowed/active?
-
 					lasermap.at(q).at(m)(row, col) = 1;
 					lasermap.at(q).at(m)(col, row) = 1;
 					summap(row, col) = 1;
@@ -596,7 +600,12 @@ VectorXd* Interaction::gen_w(const VectorXd& delta, const Vector3d& v, const boo
 
 void Interaction::update_w(VectorXd& w, const VectorXd& delta, const Vector3d& v, const bool dynamics)
 {
-	for (size_t m = 0; m < lasers.size(); ++m) w(m) = 2 * sc::pi * lasers.at(m)->get_detuned(delta(m), v);
+	for (size_t m = 0; m < lasers.size(); ++m)
+	{
+		w(m) = lasers.at(m)->get_detuned(delta(m), v);
+		if (dynamics) w(m) -= recoil(w(m), atom->get_mass());
+		w(m) *= 2 * sc::pi;
+	}
 }
 
 VectorXd Interaction::gen_delta(const VectorXd& w0, const VectorXd& w)
@@ -713,7 +722,7 @@ MatrixXcd* Interaction::gen_hamiltonian_leaky(VectorXd& w0, VectorXd& w)
 {
 	MatrixXcd* H = new MatrixXcd(atom->get_size(), atom->get_size());
 	*H = MatrixXcd::Zero(atom->get_size(), atom->get_size());
-	H->diagonal() = gen_delta(w0, w) - 0.5 * sc::i * (*atom->get_Lsum());
+	H->diagonal() = gen_delta(w0, w) - sc::i * 0.5 * (*atom->get_Lsum());
 	update_hamiltonian_off(*H);
 	return H;
 }
@@ -721,13 +730,13 @@ MatrixXcd* Interaction::gen_hamiltonian_leaky(VectorXd& w0, VectorXd& w)
 void Interaction::update_hamiltonian_leaky(MatrixXcd& H, VectorXd& w0, VectorXd& w, double t)
 {
 	H.fill(0);
-	H.diagonal() = gen_delta(w0, w) - 0.5 * sc::i * (*atom->get_Lsum());
+	H.diagonal() = gen_delta(w0, w) - sc::i * 0.5 * (*atom->get_Lsum());
 	update_hamiltonian_off(H, w, t);
 }
 
 void Interaction::update_hamiltonian_leaky_diag(MatrixXcd& H, VectorXd& w0, VectorXd& w)
 {
-	H.diagonal() = gen_delta(w0, w) - 0.5 * sc::i * (*atom->get_Lsum());
+	H.diagonal() = gen_delta(w0, w) - sc::i * 0.5 * (*atom->get_Lsum());
 }
 
 std::vector<std::vector<VectorXd>> Interaction::rates(
@@ -892,7 +901,7 @@ std::vector<std::vector<VectorXcd>> Interaction::mc_schroedinger(
 	}
 
 	std::for_each(std::execution::par_unseq, n_vec.begin(), n_vec.end(),
-		[this, &x0, &delta, &v, dynamics, &c_i, &c_j, &c_a, &t, &results](size_t n)
+		[this, &x0, &delta, &v, dynamics, &c_i, &c_j, &c_a, &t, &results, &progress](size_t n)
 		{
 			// d_dopri5_vcd_type dopri5 = make_dense_output(1e-5, 1e-5, dt_var, dopri5_vcd_type());
 			VectorXd w0 = *atom->get_w0();
@@ -981,6 +990,10 @@ std::vector<std::vector<VectorXcd>> Interaction::mc_schroedinger(
 			}
 			if (dynamics) v.at(n) += v_temp;
 			delete w;
+			progress.at(n) = 1;
+			printf("\r\033[92mSolving mc-schroedinger equation ... %3.2f %%\033[0m", 100 * std::reduce(progress.begin(), progress.end()) / x0.size());
 		});
+	printf("\r\033[92mSolving mc-schroedinger equation ... 100.00 %%\033[0m");
+	printf("\n");
 	return results;
 }

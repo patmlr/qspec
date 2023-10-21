@@ -370,6 +370,12 @@ extern "C"
         return decays->get_size();
     }
 
+
+    __declspec(dllexport) double decaymap_get_item(DecayMap* decays, char* state_0, char* state_1)
+    {
+        return decays->get_item(std::string(state_0), std::string(state_1));
+    }
+
     // Atom
     __declspec(dllexport) Atom* atom_construct()
     {

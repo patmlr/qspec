@@ -6,9 +6,10 @@
 
 Polarization::Polarization()
 {
-	T = Matrix3cd{ {1, -sc::i, 0}, {0, 0, sqrt(2)}, {1, sc::i, 0} };
+	T = Matrix3cd{ {1, sc::i, 0}, {0, 0, sqrt(2)}, {1, -sc::i, 0} };
 	T /= sqrt(2);
 	R = AngleAxisd(0, Vector3d(0, 0, 1));
+	Rq = AngleAxisd(0, Vector3d(0, 0, 1));
 
 	q_axis << 0, 0, 1;
 
@@ -23,27 +24,27 @@ void Polarization::init(Vector3cd vec, Vector3d _q_axis, bool vec_as_q)
 	def_q_axis(_q_axis, vec_as_q);
 }
 
-void Polarization::calc_R()
+void Polarization::calc_R(Vector3d _q_axis)
 {
-	Vector3d z = Vector3d(0, 0, 1);
-	double angle = acos(z.dot(q_axis) / sqrt(z.dot(z) * q_axis.dot(q_axis)));
-	Vector3d rot_axis = z.cross(q_axis);
+	double angle = acos(q_axis.dot(_q_axis) / sqrt(q_axis.dot(q_axis) * _q_axis.dot(_q_axis)));
+	Vector3d rot_axis = q_axis.cross(_q_axis);
 	if (rot_axis.sum() == 0) rot_axis(2) = 1;
 	rot_axis /= rot_axis.norm();
-	R = AngleAxisd(angle, rot_axis);
+	Rq = AngleAxisd(angle, rot_axis);
+	R = R * Rq;
 }
 
 void Polarization::def_q_axis(Vector3d _q_axis, bool q_fixed)
-{
+{	
+	calc_R(_q_axis);
 	q_axis = _q_axis / _q_axis.norm();
-	calc_R();
 	if (q_fixed) infer_x();
 	else infer_q();
 }
 
 void Polarization::infer_x()
 {
-	x = T.adjoint() * (R.matrix().transpose() * q);
+	x = Rq.matrix() * (T.adjoint() * q);
 	for (size_t i = 0; i < 3; ++i)
 	{
 		if (abs(x.array()[i]) < 1e-9) x(i) = 0;
@@ -53,7 +54,7 @@ void Polarization::infer_x()
 
 void Polarization::infer_q()
 {
-	q = T * (R.matrix() * x);
+	q = T * (Rq.matrix().transpose() * x);
 	for (size_t i = 0; i < 3; ++i)
 	{
 		if (abs(q.array()[i]) < 1e-9) q(i) = 0;

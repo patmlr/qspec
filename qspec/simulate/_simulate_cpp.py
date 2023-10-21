@@ -567,6 +567,13 @@ class DecayMap:
         """
         return dll.decaymap_get_size(self.instance)
 
+    def get(self, label_0: str, label_1: str):
+        """
+        :returns: The number of linked sets of atomic states.
+        """
+        return dll.decaymap_get_item(
+            self.instance, c_char_p(bytes(label_0, 'utf-8')), c_char_p(bytes(label_1, 'utf-8')))
+
 
 def _gen_label_map(atom):
     """
@@ -782,7 +789,8 @@ class Atom:
 
         a_cart = [[al.a_dipole_cart(self.states[_j].i, self.states[_j].j, self.states[_j].f, self.states[_j].m,
                                     self.states[_i].j, self.states[_i].f, self.states[_i].m)
-                   if l0[_j][_i] else np.zeros(3, dtype=complex)
+                   * np.sqrt(2 * self.states[_j].i + 1) * np.sqrt(2 * self.states[_j].j + 1) * np.sqrt(self.decay_map.a)
+                   if l0[_j, _i] else np.zeros(3, dtype=complex)
                    if _i in i and _j in j else 0. for _i in range(self.size)] for _j in range(self.size)]
         e_theta = tools.e_theta(theta, phi)
         e_phi = tools.e_phi(theta, phi)
@@ -799,14 +807,12 @@ class Atom:
 
         axes = [ax for ax in range(axis)]
         if axes:
-            l0 = np.expand_dims(l0, axis=axes)
             c_theta = np.expand_dims(c_theta, axis=axes)
             c_phi = np.expand_dims(c_phi, axis=axes)
             ct_theta = np.expand_dims(ct_theta, axis=axes)
             ct_phi = np.expand_dims(ct_phi, axis=axes)
         axes = [axis + ax + 2 for ax in range(len(rho.shape) - axis - 2)]
         if axes:
-            l0 = np.expand_dims(l0, axis=axes)
             c_theta = np.expand_dims(c_theta, axis=axes)
             c_phi = np.expand_dims(c_phi, axis=axes)
             ct_theta = np.expand_dims(ct_theta, axis=axes)
@@ -825,7 +831,7 @@ class Atom:
                * np.sum([np.expand_dims(tools.get_subarray(ct_phi, k, axis + 1), axis=axis)
                          * np.expand_dims(tools.get_subarray(rho, k, axis), axis=axis + 1)
                          for k in range(self.size)], axis=0))
-        return np.sum(np.sum(sr, axis=axis), axis=axis).real
+        return 3 / (8 * np.pi) * np.sum(np.sum(sr, axis=axis), axis=axis).real
 
     def scattering_rate_old(self, rho: array_like, i: array_like = None, j: array_like = None, axis: int = 1):
         """
@@ -1375,13 +1381,13 @@ class Interaction:
             v = _cast_v(v)
             y0, ctype = _cast_y0(y0, 1, self.atom)
 
-            sample_size = max([delta.shape[0], v.shape[0], 1])
+            sample_size = max([delta.shape[0], v.shape[0], y0.shape[0], 1])
 
             delta = np.array(np.broadcast_to(delta, (sample_size, len(self.lasers))), dtype=float, order='C')
             v = np.array(np.broadcast_to(v, (sample_size, 3)), dtype=float, order='C')
-            y0 = np.array(np.broadcast_to(y0, (sample_size, self.atom.size)), dtype=float, order='C')
+            y0 = np.array(np.broadcast_to(y0, (sample_size, self.atom.size)), dtype=complex, order='C')
 
-        results = np.zeros((sample_size, self.atom.size, t_size), dtype=float)
+        results = np.zeros((sample_size, self.atom.size, t_size), dtype=complex)
         dll.interaction_schroedinger(self.instance, t.ctypes.data_as(c_double_p), delta.ctypes.data_as(c_double_p),
                                      v.ctypes.data_as(c_double_p), y0.ctypes.data_as(c_complex_p),
                                      results.ctypes.data_as(c_complex_p), c_size_t(t_size), c_size_t(sample_size))
