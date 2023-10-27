@@ -789,11 +789,20 @@ class Atom:
 
         a_cart = [[al.a_dipole_cart(self.states[_j].i, self.states[_j].j, self.states[_j].f, self.states[_j].m,
                                     self.states[_i].j, self.states[_i].f, self.states[_i].m)
-                   * np.sqrt(2 * self.states[_j].i + 1) * np.sqrt(2 * self.states[_j].j + 1) * np.sqrt(self.decay_map.a)
+                   * np.sqrt(2 * self.states[_j].i + 1) * np.sqrt(2 * self.states[_j].j + 1)
+                   * np.sqrt(self.decay_map.get(self.states[_j].label, self.states[_i].label))
                    if l0[_j, _i] else np.zeros(3, dtype=complex)
                    if _i in i and _j in j else 0. for _i in range(self.size)] for _j in range(self.size)]
+        # a_cart = [[a_cart[_i][_j].conj() if self.states[_j].f > self.states[_i].f else a_cart[_j][_i]
+        #            if l0[_j, _i] else np.zeros(3, dtype=complex)
+        #            if _i in i and _j in j else 0. for _i in range(self.size)] for _j in range(self.size)]
+        # a_cart = [[a_cart[_j][_i].conj() if _j > _i  else a_cart[_j][_i]
+        #            if l0[_j, _i] else np.zeros(3, dtype=complex)
+        #            if _i in i and _j in j else 0. for _i in range(self.size)] for _j in range(self.size)]
         e_theta = tools.e_theta(theta, phi)
         e_phi = tools.e_phi(theta, phi)
+        print(f'({theta}, {phi})')
+        print(f'({e_theta}, {e_phi})')
 
         c_theta = np.array([[np.sum(e_theta * _a_cart) for _a_cart in a_cart_list]
                             for a_cart_list in a_cart])

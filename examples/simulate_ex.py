@@ -368,7 +368,9 @@ def example(n=None):
         # he.plot()
 
         intensity = 0.1
-        pol_sp = sim.Polarization([0, 1, 0], q_axis=2)
+        pol_sp = sim.Polarization([1, 0, 0], vec_as_q=False, q_axis=2)
+        print(pol_sp.x)
+        print(pol_sp.q)
         laser_sp = sim.Laser(freq=f_p, polarization=pol_sp, intensity=intensity)
 
         inter = sim.Interaction(atom=he, lasers=[laser_sp, ], delta_max=500.)
