@@ -356,7 +356,7 @@ def example(n=None):
 
         i = 1.5
         s_hyper = [0.]
-        p_hyper = [10.]
+        p_hyper = [30.]
 
         s = sim.construct_electronic_state(freq_0=0, s=0, l=0, j=0, i=i, hyper_const=s_hyper, label='s')
         p = sim.construct_electronic_state(freq_0=f_p, s=0, l=1, j=1, i=i, hyper_const=p_hyper, label='p')
@@ -368,7 +368,7 @@ def example(n=None):
         # he.plot()
 
         intensity = 0.1
-        pol_sp = sim.Polarization([1, 0, 0], vec_as_q=False, q_axis=2)
+        pol_sp = sim.Polarization([0, 1, 0], vec_as_q=False, q_axis=2)
         print(pol_sp.x)
         print(pol_sp.q)
         laser_sp = sim.Laser(freq=f_p, polarization=pol_sp, intensity=intensity)
@@ -386,6 +386,8 @@ def example(n=None):
         # y = he.scattering_rate_old(results, i=he.get_state_indexes('p')) / (4 * np.pi)
         plt.plot(delta, y[:, -1], label='p-state')
 
+        # rho = np.array([np.diag(results[_i, :, -1]) for _i in range(delta.size)])
+        # y = he.scattering_rate(rho, theta, phi)
         rho = inter.master(times, delta)
         y = he.scattering_rate(rho, theta, phi)[:, -1]
         # th, ph = np.linspace(-np.pi / 2, np.pi / 2, 9), np.linspace(0, 2 * np.pi, 17)
@@ -399,6 +401,66 @@ def example(n=None):
         # y = sr.integrate_y(delta) / (4 * np.pi)
         s = pc.saturation(intensity, f_p, a_p, 1)  # pc.a_dipole(0, 0, 0, 0, 1, 1, 1, 1))  # pc.a(0, 0, 0, 1, 1)
         plt.plot(delta, s * y, '-C2', label='QI pert.')
+
+        plt.xlabel('f - {} (MHz)'.format(laser_sp.freq))
+        plt.ylabel('scattering rate after {} us'.format(times[-1]))
+        plt.legend()
+        plt.show()
+
+    if 6 in n:
+        f_p = 7e8
+        a_p = 100.
+
+        i = 0.
+        s_hyper = [0.]
+        p_hyper = [10.]
+
+        s = sim.construct_electronic_state(freq_0=0, s=0, l=0, j=0, i=i, hyper_const=s_hyper, label='s')
+        p = sim.construct_electronic_state(freq_0=f_p, s=0, l=1, j=1, i=i, hyper_const=p_hyper, label='p')
+
+        decay = sim.DecayMap(labels=[('s', 'p')], a=[a_p])
+
+        states = s + p
+        he = sim.Atom(states=states, decay_map=decay)
+        # he.plot()
+
+        intensity = 0.1
+        pol_sp = sim.Polarization([1, 1, 0], vec_as_q=False, q_axis=2)
+        print('x:', pol_sp.x)
+        print('q:', pol_sp.q)
+        laser_sp = sim.Laser(freq=f_p, polarization=pol_sp, intensity=intensity)
+
+        inter = sim.Interaction(atom=he, lasers=[laser_sp, ], delta_max=500.)
+        # inter.resonance_info()
+
+        times = np.linspace(0, 0.2, 101)
+        theta, phi = 0, 0.
+        # theta, phi = 0., 0.
+
+        # results = inter.rates(times)
+        rho = inter.master(times)
+        results = np.diagonal(rho, axis1=1, axis2=2).real
+        results = np.transpose(results, axes=[0, 2, 1])
+        for i in range(1, 4, 1):
+            y = a_p * results[:, i, :] / (4 * np.pi)
+            # y = he.scattering_rate_old(results, i=he.get_state_indexes('p')) / (4 * np.pi)
+            plt.plot(times, y[0], 'C0', ls=[':', '-.', '--'][i - 1], label=f'{i - 2}')
+        plt.plot(times, np.sum(a_p * results[0, he.get_state_indexes('p'), :] / (4 * np.pi), axis=0),
+                 '-C0', label='$p$-state')
+
+        rho = inter.master(times)
+        y = he.scattering_rate(rho, theta, phi)
+        # th, ph = np.linspace(-np.pi / 2, np.pi / 2, 9), np.linspace(0, 2 * np.pi, 17)
+        # y = np.array([[he.scattering_rate(rho, _t, _p).real * np.cos(_t) for _t in th] for _p in ph])
+        # y = si.simps(y, x=th, axis=1)
+        # y = si.simps(y, x=ph, axis=0)
+        plt.plot(times, y[0], '-C1', label='QI')
+
+        sr = sim.ScatteringRate(he, polarization=pol_sp)
+        y = sr.generate_y(0, theta, phi)[:, 0, 0]
+        # y = sr.integrate_y(delta) / (4 * np.pi)
+        s = pc.saturation(intensity, f_p, a_p, 1)  # pc.a_dipole(0, 0, 0, 0, 1, 1, 1, 1))  # pc.a(0, 0, 0, 1, 1)
+        plt.hlines(s * y, times[0], times[-1], ls='--', colors='C2', label='QI pert.')
 
         plt.xlabel('f - {} (MHz)'.format(laser_sp.freq))
         plt.ylabel('scattering rate after {} us'.format(times[-1]))

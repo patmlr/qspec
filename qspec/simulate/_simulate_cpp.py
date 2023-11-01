@@ -761,11 +761,11 @@ class Atom:
         """
         :param rho: The density matrix of the atom. Must have the same size as the atom
          along the specified 'axis' and 'axis' + 1.
+        :param theta: The elevation angle of detection.
+        :param phi: The azimuthal angle of detection.
         :param i: The initially excited state indexes to consider for spontaneous decay.
          If None, all states are considered.
         :param j: The final decayed state indexes to consider for spontaneous decay. If None, all states are considered.
-        :param theta: The elevation angle of detection.
-        :param phi: The azimuthal angle of detection.
         :param axis: The axis along which the population is aligned in 'rho'.
         :returns: The scattering rate of the atom given the population 'rho' (MHz or Events / s).
         :raises ValueError: 'rho' must have the same size as the atom along the specified 'axis'.
@@ -793,16 +793,8 @@ class Atom:
                    * np.sqrt(self.decay_map.get(self.states[_j].label, self.states[_i].label))
                    if l0[_j, _i] else np.zeros(3, dtype=complex)
                    if _i in i and _j in j else 0. for _i in range(self.size)] for _j in range(self.size)]
-        # a_cart = [[a_cart[_i][_j].conj() if self.states[_j].f > self.states[_i].f else a_cart[_j][_i]
-        #            if l0[_j, _i] else np.zeros(3, dtype=complex)
-        #            if _i in i and _j in j else 0. for _i in range(self.size)] for _j in range(self.size)]
-        # a_cart = [[a_cart[_j][_i].conj() if _j > _i  else a_cart[_j][_i]
-        #            if l0[_j, _i] else np.zeros(3, dtype=complex)
-        #            if _i in i and _j in j else 0. for _i in range(self.size)] for _j in range(self.size)]
         e_theta = tools.e_theta(theta, phi)
         e_phi = tools.e_phi(theta, phi)
-        print(f'({theta}, {phi})')
-        print(f'({e_theta}, {e_phi})')
 
         c_theta = np.array([[np.sum(e_theta * _a_cart) for _a_cart in a_cart_list]
                             for a_cart_list in a_cart])
