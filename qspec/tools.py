@@ -28,7 +28,7 @@ __all__ = ['ROMAN_NUMERALS', 'COLORS', 'get_rgb_print_command', 'print_colored',
            'factorial', 'asarray_optional', 'in_nested', 'check_iterable', 'make_str_iterable_unique',
            'check_dimension', 'check_shape_like', 'check_shape', 'nan_helper', 'dict_to_list', 'list_to_dict',
            'list_to_excel', 'add_nested_key', 'merge_dicts', 'convolve_dict', 'combine_dicts', 'merge_intervals',
-           'absolute', 'absolute_complex', 'angle', 'transform', 'unit_vector', 'e_r', 'e_theta', 'e_phi',
+           'absolute', 'absolute_complex', 'angle', 'angle_d', 'transform', 'unit_vector', 'e_r', 'e_theta', 'e_phi',
            'orthonormal_rtp', 'orthonormal', 'rotation_matrix', 'Rotation', 'rotation_to_vector',
            'import_iso_shifts_tilda']
 
@@ -818,6 +818,24 @@ def angle(x: array_like, y: array_like, axis=-1) -> array_like:
     x, y = np.asarray(x), np.asarray(y)
     check_shape_like(x, y)
     return np.arccos(np.sum(x * y, axis=axis) / np.sqrt(np.sum(x ** 2, axis=axis) * np.sum(y ** 2, axis=axis)))
+
+
+def angle_d(x: array_like, x_d: array_like, y: array_like, y_d: array_like, axis=-1):
+    """
+    :param x: The first vectors (arb. units).
+    :param x_d: The uncertainties of the first vectors ([x]).
+    :param y: The second vectors ([x]).
+    :param y_d: The uncertainties of the second vectors ([x]).
+    :param axis: The axis along which the vector components are aligned.
+    :returns: The angle between two vectors x and y (rad).
+    :raises ValueError: The shapes of x and y must be compatible.
+    """
+    z = np.sum(x * y, axis=axis)
+    n = np.sum(x ** 2, axis=axis) * np.sum(y ** 2, axis=axis)
+    arg = z / np.sqrt(n)
+    dx = np.sum(((n * y - z * x * np.sum(y ** 2, axis=axis)) / n ** 1.5 * x_d) ** 2, axis=axis)
+    dy = np.sum(((n * x - z * y * np.sum(x ** 2, axis=axis)) / n ** 1.5 * y_d) ** 2, axis=axis)
+    return np.sqrt((dx + dy) / (1 - arg ** 2))
 
 
 def transform(t: array_like, vec: array_like, axis=-1) -> array_like:
