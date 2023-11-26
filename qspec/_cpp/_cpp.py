@@ -300,9 +300,9 @@ dll.interaction_master.argtypes = \
     (InteractionHandler, c_double_p, c_double_p, c_double_p, c_complex_p, c_complex_p, c_size_t, c_size_t)
 dll.interaction_master.restype = ctypes.c_void_p
 
-dll.interaction_mc_schroedinger.argtypes = \
+dll.interaction_mc_master.argtypes = \
     (InteractionHandler, c_double_p, c_double_p, c_double_p, c_complex_p, c_bool, c_complex_p, c_size_t, c_size_t)
-dll.interaction_mc_schroedinger.restype = ctypes.c_void_p
+dll.interaction_mc_master.restype = ctypes.c_void_p
 
 
 # @ScatteringRate

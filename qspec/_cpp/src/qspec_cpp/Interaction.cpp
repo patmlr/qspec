@@ -809,15 +809,34 @@ std::vector<std::vector<VectorXcd>> Interaction::schroedinger(
 
 			if (controlled)
 			{
-				d_dopri5_vcd_type dopri5 = make_dense_output(1e-5, 1e-5, dt_var, dopri5_vcd_type());
-				n = integrate_times(dopri5, f_schroedinger(*H),
-					x0.at(i), t.begin(), t.end(), dt_var, push_back_VectorXcd(results.at(i)));
+				if (time_dependent)
+				{
+					d_dopri5_vcd_type dopri5 = make_dense_output(1e-5, 1e-5, dt_var, dopri5_vcd_type());
+					n = integrate_times(dopri5, f_schroedinger_t(*H, w0, *w, *this),
+						x0.at(i), t.begin(), t.end(), dt_var, push_back_VectorXcd(results.at(i)));
+				}
+				else
+				{
+					d_dopri5_vcd_type dopri5 = make_dense_output(1e-5, 1e-5, dt_var, dopri5_vcd_type());
+					n = integrate_times(dopri5, f_schroedinger(*H),
+						x0.at(i), t.begin(), t.end(), dt_var, push_back_VectorXcd(results.at(i)));
+				}
 			}
 			else
 			{
-				n = integrate_times(rk4_vcd_type(), f_schroedinger(*H),
-					x0.at(i), t.begin(), t.end(), dt_var, push_back_VectorXcd(results.at(i)));
+				if (time_dependent)
+				{
+					n = integrate_times(rk4_vcd_type(), f_schroedinger_t(*H, w0, *w, *this),
+						x0.at(i), t.begin(), t.end(), dt_var, push_back_VectorXcd(results.at(i)));
+				}
+				else
+				{
+					n = integrate_times(rk4_vcd_type(), f_schroedinger(*H),
+						x0.at(i), t.begin(), t.end(), dt_var, push_back_VectorXcd(results.at(i)));
+				}
 			}
+			delete w;
+			delete H;
 			progress.at(i) = 1;
 			printf("\r\033[92mSolving schroedinger equation ... %3.2f %%\033[0m", 100 * std::reduce(progress.begin(), progress.end()) / x0.size());
 		}
@@ -853,15 +872,34 @@ std::vector<std::vector<MatrixXcd>> Interaction::master(
 
 			if (controlled)
 			{
-				d_dopri5_mcd_type dopri5 = make_dense_output(1e-5, 1e-5, dt, dopri5_mcd_type());
-				n = integrate_times(dopri5, f_master(*H, L0, L1),
-					x0.at(i), t.begin(), t.end(), dt, push_back_MatrixXcd(results.at(i)));
+				if (time_dependent)
+				{
+					d_dopri5_mcd_type dopri5 = make_dense_output(1e-5, 1e-5, dt, dopri5_mcd_type());
+					n = integrate_times(dopri5, f_master_t(*H, L0, L1, w0, *w, *this),
+						x0.at(i), t.begin(), t.end(), dt, push_back_MatrixXcd(results.at(i)));
+				}
+				else
+				{
+					d_dopri5_mcd_type dopri5 = make_dense_output(1e-5, 1e-5, dt, dopri5_mcd_type());
+					n = integrate_times(dopri5, f_master(*H, L0, L1),
+						x0.at(i), t.begin(), t.end(), dt, push_back_MatrixXcd(results.at(i)));
+				}
 			}
 			else
 			{
-				n = integrate_times(rk4_mcd_type(), f_master(*H, L0, L1),
-					x0.at(i), t.begin(), t.end(), dt, push_back_MatrixXcd(results.at(i)));
+				if (time_dependent)
+				{
+					n = integrate_times(rk4_mcd_type(), f_master_t(*H, L0, L1, w0, *w, *this),
+						x0.at(i), t.begin(), t.end(), dt, push_back_MatrixXcd(results.at(i)));
+				}
+				else
+				{
+					n = integrate_times(rk4_mcd_type(), f_master(*H, L0, L1),
+						x0.at(i), t.begin(), t.end(), dt, push_back_MatrixXcd(results.at(i)));
+				}
 			}
+			delete w;
+			delete H;
 			progress.at(i) = 1;
 			printf("\r\033[92mSolving master equation ... %3.2f %%\033[0m", 100 * std::reduce(progress.begin(), progress.end()) / x0.size());
 		}
@@ -871,7 +909,7 @@ std::vector<std::vector<MatrixXcd>> Interaction::master(
 	return results;
 }
 
-std::vector<std::vector<VectorXcd>> Interaction::mc_schroedinger(
+std::vector<std::vector<VectorXcd>> Interaction::mc_master(
 	const std::vector<double>& t, const std::vector<VectorXd>& delta, std::vector<Vector3d>& v, std::vector<VectorXcd>& x0, const bool dynamics)
 {
 	std::vector<std::vector<VectorXcd>> results = std::vector<std::vector<VectorXcd>>(x0.size());

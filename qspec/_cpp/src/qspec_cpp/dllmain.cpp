@@ -654,7 +654,7 @@ extern "C"
         }
     }
 
-    __declspec(dllexport) void interaction_mc_schroedinger(
+    __declspec(dllexport) void interaction_mc_master(
         Interaction* interaction, double* t, double* delta, double* v, std::complex<double>* x0, bool dynamics, std::complex<double>* results, size_t t_size, size_t sample_size)
     {
         const std::vector<double> _t = cast_samples_double(t, t_size);
@@ -662,7 +662,7 @@ extern "C"
         std::vector<Vector3d> _v = cast_samples_Vector3d(v, sample_size);
         size_t size = interaction->get_atom()->get_size();
         std::vector<VectorXcd> _x0 = cast_samples_VectorXcd(x0, sample_size, size);
-        std::vector<std::vector<VectorXcd>> _results = interaction->mc_schroedinger(_t, _delta, _v, _x0, dynamics);
+        std::vector<std::vector<VectorXcd>> _results = interaction->mc_master(_t, _delta, _v, _x0, dynamics);
         for (size_t i = 0; i < sample_size; ++i)
         {   
             if (dynamics)

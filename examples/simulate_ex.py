@@ -467,6 +467,52 @@ def example(n=None):
         plt.legend()
         plt.show()
 
+    if 7 in n:
+        f_p = 7e8
+        a_p = 10.
+
+        i = 0.
+        s_hyper = [0.]
+        p_hyper = [10.]
+
+        s = sim.construct_electronic_state(freq_0=0, s=0, l=0, j=0, i=i, hyper_const=s_hyper, label='s')
+        p = sim.construct_electronic_state(freq_0=f_p, s=0, l=1, j=1, i=i, hyper_const=p_hyper, label='p')
+
+        decay = sim.DecayMap(labels=[('s', 'p')], a=[a_p])
+
+        states = s + p
+        he = sim.Atom(states=states, decay_map=decay)
+        # he.plot()
+
+        intensity = 1000.
+        pol_0 = sim.Polarization([0, 0, 1], vec_as_q=False, q_axis=2)
+        pol_1 = sim.Polarization([0, 0, -1], vec_as_q=False, q_axis=2)
+        print('x:', pol_0.x)
+        print('q:', pol_0.q)
+        laser_0 = sim.Laser(freq=f_p - 0.1, polarization=pol_0, intensity=intensity)
+        laser_1 = sim.Laser(freq=f_p + 0.1, polarization=pol_1, intensity=intensity)
+
+        inter = sim.Interaction(atom=he, lasers=[laser_0, laser_1], delta_max=500.)
+        inter.time_dependent = True
+        # inter.resonance_info()
+
+        times = np.linspace(0, 10., 10001)
+        theta, phi = 0, 0.
+        # theta, phi = 0., 0.
+
+        # results = inter.rates(times)
+        # y = inter.schroedinger(times)
+        # y = np.abs(y) ** 2
+        rho = inter.master(times)
+        y = np.diagonal(rho, axis1=1, axis2=2).real
+        y = np.transpose(y, axes=[0, 2, 1])
+        ys = np.sum(y[0, he.get_state_indexes('s')], axis=0)
+        yp = np.sum(y[0, he.get_state_indexes('p')], axis=0)
+
+        plt.plot(times, ys)
+        plt.plot(times, yp)
+        plt.show()
+
 
 if __name__ == '__main__':
-    example({5})
+    example({7})

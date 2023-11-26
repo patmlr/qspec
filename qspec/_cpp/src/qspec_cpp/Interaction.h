@@ -139,6 +139,6 @@ public:
 		const std::vector<double>& t, const std::vector<VectorXd>& delta, const std::vector<Vector3d>& v, std::vector<VectorXcd>& x0);
 	std::vector<std::vector<MatrixXcd>> master(
 		const std::vector<double>& t, const std::vector<VectorXd>& delta, const std::vector<Vector3d>& v, std::vector<MatrixXcd>& x0);
-	std::vector<std::vector<VectorXcd>> mc_schroedinger(
+	std::vector<std::vector<VectorXcd>> mc_master(
 		const std::vector<double>& t, const std::vector<VectorXd>& delta, std::vector<Vector3d>& v, std::vector<VectorXcd>& x0, const bool dynamics = false);
 };
