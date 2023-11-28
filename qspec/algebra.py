@@ -325,7 +325,7 @@ def a_dipole(i: sympy_qn, j_l: sympy_qn, f_l: sympy_qn, m_l: sympy_qn,
         * clebsch_gordan(f_l, 1, f_u, m_l, q, m_u, as_sympy)
 
 
-def a_dipole_cart_(i: sympy_qn, j_l: sympy_qn, f_l: sympy_qn, m_l: sympy_qn,
+def a_dipole_cart(i: sympy_qn, j_l: sympy_qn, f_l: sympy_qn, m_l: sympy_qn,
                   j_u: sympy_qn, f_u: sympy_qn, m_u: sympy_qn, as_sympy: bool = False) -> ndarray:
     """
     :param i: The nuclear spin quantum number I.
@@ -342,8 +342,8 @@ def a_dipole_cart_(i: sympy_qn, j_l: sympy_qn, f_l: sympy_qn, m_l: sympy_qn,
     sqrt_2 = nsimplify(1 / sqrt(2)) if as_sympy else 1 / np.sqrt(2)
     x = sqrt_2 * (a_dipole(i, j_l, f_l, m_l, j_u, f_u, m_u, -1, as_sympy)
                   - a_dipole(i, j_l, f_l, m_l, j_u, f_u, m_u, 1, as_sympy))
-    y = 1j * sqrt_2 * (a_dipole(i, j_l, f_l, m_l, j_u, f_u, m_u, -1, as_sympy)
-                       + a_dipole(i, j_l, f_l, m_l, j_u, f_u, m_u, 1, as_sympy))
+    y = -1j * sqrt_2 * (a_dipole(i, j_l, f_l, m_l, j_u, f_u, m_u, -1, as_sympy)
+                        + a_dipole(i, j_l, f_l, m_l, j_u, f_u, m_u, 1, as_sympy))
     z = a_dipole(i, j_l, f_l, m_l, j_u, f_u, m_u, 0, as_sympy)
     if as_sympy:
         a3 = CoordSys3D('a3')
@@ -351,7 +351,7 @@ def a_dipole_cart_(i: sympy_qn, j_l: sympy_qn, f_l: sympy_qn, m_l: sympy_qn,
     return np.array([x, y, z], dtype=complex)
 
 
-def a_dipole_cart(i: sympy_qn, j_l: sympy_qn, f_l: sympy_qn, m_l: sympy_qn,
+def a_dipole_cart_(i: sympy_qn, j_l: sympy_qn, f_l: sympy_qn, m_l: sympy_qn,
                  j_u: sympy_qn, f_u: sympy_qn, m_u: sympy_qn, as_sympy: bool = False) -> ndarray:
     """
     :param i: The nuclear spin quantum number I.

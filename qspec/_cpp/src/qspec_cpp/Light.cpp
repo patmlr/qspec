@@ -6,7 +6,8 @@
 
 Polarization::Polarization()
 {
-	T = Matrix3cd{ {1, sc::i, 0}, {0, 0, sqrt(2)}, {1, -sc::i, 0} };
+	//T = Matrix3cd{ {1, sc::i, 0}, {0, 0, sqrt(2)}, {1, -sc::i, 0} };
+	T = Matrix3cd{ {1, -sc::i, 0}, {0, 0, sqrt(2)}, {-1, -sc::i, 0} };
 	T /= sqrt(2);
 	R = AngleAxisd(0, Vector3d(0, 0, 1));
 	Rq = AngleAxisd(0, Vector3d(0, 0, 1));
