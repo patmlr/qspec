@@ -1,22 +1,24 @@
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" >
+<html class="writer-html5" lang="en">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>qspec.simulate._simulate_cpp &mdash; qspec 20.05.2023 documentation</title>
-      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
-      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <title>qspec.simulate._simulate_cpp &mdash; qspec 13.12.2023 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
       <link rel="stylesheet" href="../../../_static/css/borders.css" type="text/css" />
       <link rel="stylesheet" href="../../../_static/css/wy-nav-content.css" type="text/css" />
+
+  
   <!--[if lt IE 9]>
     <script src="../../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
         <script src="../../../_static/jquery.js?v=5d32c60e"></script>
         <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="../../../_static/documentation_options.js?v=52e4f5b1"></script>
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js?v=7f3357fe"></script>
         <script src="../../../_static/doctools.js?v=888ff710"></script>
-        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=4825356b"></script>
     <script src="../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" /> 
@@ -91,6 +93,7 @@
 <span class="kn">from</span> <span class="nn">qspec._cpp</span> <span class="kn">import</span> <span class="o">*</span>
 <span class="kn">from</span> <span class="nn">qspec</span> <span class="kn">import</span> <span class="n">tools</span>
 <span class="kn">from</span> <span class="nn">qspec</span> <span class="kn">import</span> <span class="n">get_f</span><span class="p">,</span> <span class="n">get_m</span>
+<span class="kn">import</span> <span class="nn">qspec.algebra</span> <span class="k">as</span> <span class="nn">al</span>
 
 
 <span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Polarization&#39;</span><span class="p">,</span> <span class="s1">&#39;Laser&#39;</span><span class="p">,</span> <span class="s1">&#39;Environment&#39;</span><span class="p">,</span> <span class="s1">&#39;construct_electronic_state&#39;</span><span class="p">,</span> <span class="s1">&#39;construct_hyperfine_state&#39;</span><span class="p">,</span> <span class="s1">&#39;State&#39;</span><span class="p">,</span>
@@ -138,9 +141,7 @@
     <span class="k">return</span> <span class="n">q_axis</span>
 
 
-<div class="viewcode-block" id="Polarization">
-<a class="viewcode-back" href="../../../qspec.html#qspec.simulate.Polarization">[docs]</a>
-<span class="k">class</span> <span class="nc">Polarization</span><span class="p">:</span>
+<div class="viewcode-block" id="Polarization"><a class="viewcode-back" href="../../../qspec.html#qspec.simulate.Polarization">[docs]</a><span class="k">class</span> <span class="nc">Polarization</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Class representing a polarization state of light. The property &#39;x&#39; holds the polarization in cartesian coordinates.</span>
 <span class="sd">    The property &#39;q&#39; holds the polarization in spherical coordinates ( sigma-, pi, sigma+ )</span>
@@ -173,9 +174,7 @@
     <span class="k">def</span> <span class="fm">__del__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">dll</span><span class="o">.</span><span class="n">polarization_destruct</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="p">)</span>
 
-<div class="viewcode-block" id="Polarization.def_q_axis">
-<a class="viewcode-back" href="../../../qspec.html#qspec.simulate.Polarization.def_q_axis">[docs]</a>
-    <span class="k">def</span> <span class="nf">def_q_axis</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">q_axis</span><span class="p">:</span> <span class="n">array_like</span> <span class="o">=</span> <span class="mi">2</span><span class="p">,</span> <span class="n">q_fixed</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+<div class="viewcode-block" id="Polarization.def_q_axis"><a class="viewcode-back" href="../../../qspec.html#qspec.simulate.Polarization.def_q_axis">[docs]</a>    <span class="k">def</span> <span class="nf">def_q_axis</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">q_axis</span><span class="p">:</span> <span class="n">array_like</span> <span class="o">=</span> <span class="mi">2</span><span class="p">,</span> <span class="n">q_fixed</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Defines the quantization axis. This changes either &#39;x&#39; or &#39;q&#39;, depending on &#39;q_fixed&#39;.</span>
 
@@ -184,7 +183,6 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">q_axis</span> <span class="o">=</span> <span class="n">_process_q_axis</span><span class="p">(</span><span class="n">q_axis</span><span class="p">)</span>
         <span class="n">dll</span><span class="o">.</span><span class="n">polarization_def_q_axis</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="p">,</span> <span class="n">q_axis</span><span class="p">,</span> <span class="n">q_fixed</span><span class="p">)</span></div>
-
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">q_axis</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ndarray</span><span class="p">:</span>
@@ -208,10 +206,7 @@
         <span class="k">return</span> <span class="n">dll</span><span class="o">.</span><span class="n">polarization_get_q</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="p">)</span></div>
 
 
-
-<div class="viewcode-block" id="Laser">
-<a class="viewcode-back" href="../../../qspec.html#qspec.simulate.Laser">[docs]</a>
-<span class="k">class</span> <span class="nc">Laser</span><span class="p">:</span>
+<div class="viewcode-block" id="Laser"><a class="viewcode-back" href="../../../qspec.html#qspec.simulate.Laser">[docs]</a><span class="k">class</span> <span class="nc">Laser</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Class representing a laser.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -222,6 +217,7 @@
 <span class="sd">        :param freq: The frequency of the laser (MHz).</span>
 <span class="sd">        :param intensity: The intensity of the laser (uW / mm**2 = W / m**2).</span>
 <span class="sd">        :param polarization: The polarization of the laser.</span>
+<span class="sd">        :param k: The direction of the laser.</span>
 <span class="sd">        :param instance: A pointer to an existing Laser instance.</span>
 <span class="sd">         If this is specified, the other parameters are omitted.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -306,7 +302,6 @@
         <span class="n">dll</span><span class="o">.</span><span class="n">laser_set_k</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="p">,</span> <span class="n">_value</span><span class="o">.</span><span class="n">flatten</span><span class="p">())</span></div>
 
 
-
 <span class="k">def</span> <span class="nf">_process_hyper_const</span><span class="p">(</span><span class="n">hyper_const</span><span class="p">:</span> <span class="n">array_like</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ndarray</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Preprocess the hyperfine-structure constants.</span>
@@ -327,9 +322,7 @@
 
 
 <span class="c1"># noinspection PyPep8Naming</span>
-<div class="viewcode-block" id="Environment">
-<a class="viewcode-back" href="../../../qspec.html#qspec.simulate.Environment">[docs]</a>
-<span class="k">class</span> <span class="nc">Environment</span><span class="p">:</span>
+<div class="viewcode-block" id="Environment"><a class="viewcode-back" href="../../../qspec.html#qspec.simulate.Environment">[docs]</a><span class="k">class</span> <span class="nc">Environment</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Class representing an electromagnetic environment.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -381,10 +374,7 @@
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;B must be a scalar, 3d-vector or None, but has shape </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">value</span><span class="o">.</span><span class="n">shape</span><span class="p">))</span></div>
 
 
-
-<div class="viewcode-block" id="State">
-<a class="viewcode-back" href="../../../qspec.html#qspec.simulate.State">[docs]</a>
-<span class="k">class</span> <span class="nc">State</span><span class="p">:</span>
+<div class="viewcode-block" id="State"><a class="viewcode-back" href="../../../qspec.html#qspec.simulate.State">[docs]</a><span class="k">class</span> <span class="nc">State</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Class representing an atomic quantum state :math:`|(\\mathrm{label})SLJIFm\\rangle`.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -423,9 +413,7 @@
         <span class="k">return</span> <span class="s1">&#39;</span><span class="si">{}</span><span class="s1">(</span><span class="si">{}</span><span class="s1">)&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="p">,</span> <span class="p">(</span><span class="s1">&#39;</span><span class="si">{}</span><span class="s1">, &#39;</span> <span class="o">*</span> <span class="mi">6</span><span class="p">)[:</span><span class="o">-</span><span class="mi">2</span><span class="p">])</span> \
             <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="o">*</span><span class="p">[</span><span class="n">tools</span><span class="o">.</span><span class="n">half_integer_to_str</span><span class="p">(</span><span class="n">qn</span><span class="p">,</span> <span class="s1">&#39;/&#39;</span><span class="p">)</span> <span class="k">for</span> <span class="n">qn</span> <span class="ow">in</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">s</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">l</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">j</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">i</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">f</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">m</span><span class="p">]])</span>
 
-<div class="viewcode-block" id="State.update">
-<a class="viewcode-back" href="../../../qspec.html#qspec.simulate.State.update">[docs]</a>
-    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">environment</span><span class="p">:</span> <span class="n">Environment</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="State.update"><a class="viewcode-back" href="../../../qspec.html#qspec.simulate.State.update">[docs]</a>    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">environment</span><span class="p">:</span> <span class="n">Environment</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Update the shifted frequency of the state.</span>
 
@@ -436,16 +424,12 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="n">dll</span><span class="o">.</span><span class="n">state_update_env</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="p">,</span> <span class="n">environment</span><span class="o">.</span><span class="n">instance</span><span class="p">)</span></div>
 
-
-<div class="viewcode-block" id="State.get_shift">
-<a class="viewcode-back" href="../../../qspec.html#qspec.simulate.State.get_shift">[docs]</a>
-    <span class="k">def</span> <span class="nf">get_shift</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="State.get_shift"><a class="viewcode-back" href="../../../qspec.html#qspec.simulate.State.get_shift">[docs]</a>    <span class="k">def</span> <span class="nf">get_shift</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :returns: The difference between the shifted frequency of the hyperfine-structure</span>
 <span class="sd">         and the frequency of the fine-structure state.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">dll</span><span class="o">.</span><span class="n">state_get_shift</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="p">)</span></div>
-
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">freq_j</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -556,10 +540,7 @@
         <span class="n">dll</span><span class="o">.</span><span class="n">state_set_label</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="p">,</span> <span class="n">c_char_p</span><span class="p">(</span><span class="nb">bytes</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="s1">&#39;utf-8&#39;</span><span class="p">)))</span></div>
 
 
-
-<div class="viewcode-block" id="construct_electronic_state">
-<a class="viewcode-back" href="../../../qspec.html#qspec.simulate.construct_electronic_state">[docs]</a>
-<span class="k">def</span> <span class="nf">construct_electronic_state</span><span class="p">(</span><span class="n">freq_0</span><span class="p">:</span> <span class="n">scalar</span><span class="p">,</span> <span class="n">s</span><span class="p">:</span> <span class="n">scalar</span><span class="p">,</span> <span class="n">l</span><span class="p">:</span> <span class="n">scalar</span><span class="p">,</span> <span class="n">j</span><span class="p">:</span> <span class="n">scalar</span><span class="p">,</span> <span class="n">i</span><span class="p">:</span> <span class="n">scalar</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+<div class="viewcode-block" id="construct_electronic_state"><a class="viewcode-back" href="../../../qspec.html#qspec.simulate.construct_electronic_state">[docs]</a><span class="k">def</span> <span class="nf">construct_electronic_state</span><span class="p">(</span><span class="n">freq_0</span><span class="p">:</span> <span class="n">scalar</span><span class="p">,</span> <span class="n">s</span><span class="p">:</span> <span class="n">scalar</span><span class="p">,</span> <span class="n">l</span><span class="p">:</span> <span class="n">scalar</span><span class="p">,</span> <span class="n">j</span><span class="p">:</span> <span class="n">scalar</span><span class="p">,</span> <span class="n">i</span><span class="p">:</span> <span class="n">scalar</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
                                <span class="n">hyper_const</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">scalar</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">g</span><span class="p">:</span> <span class="n">scalar</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">label</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Creates all substates of a fine-structure state using a common label.</span>
@@ -582,10 +563,7 @@
     <span class="k">return</span> <span class="p">[</span><span class="n">State</span><span class="p">(</span><span class="n">freq_0</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">l</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">_f</span><span class="p">,</span> <span class="n">_m</span><span class="p">,</span> <span class="n">hyper_const</span><span class="o">=</span><span class="n">hyper_const</span><span class="p">,</span> <span class="n">g</span><span class="o">=</span><span class="n">g</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">label</span><span class="p">)</span> <span class="k">for</span> <span class="p">(</span><span class="n">_f</span><span class="p">,</span> <span class="n">_m</span><span class="p">)</span> <span class="ow">in</span> <span class="n">fm</span><span class="p">]</span></div>
 
 
-
-<div class="viewcode-block" id="construct_hyperfine_state">
-<a class="viewcode-back" href="../../../qspec.html#qspec.simulate.construct_hyperfine_state">[docs]</a>
-<span class="k">def</span> <span class="nf">construct_hyperfine_state</span><span class="p">(</span><span class="n">freq_0</span><span class="p">:</span> <span class="n">scalar</span><span class="p">,</span> <span class="n">s</span><span class="p">:</span> <span class="n">scalar</span><span class="p">,</span> <span class="n">l</span><span class="p">:</span> <span class="n">scalar</span><span class="p">,</span> <span class="n">j</span><span class="p">:</span> <span class="n">scalar</span><span class="p">,</span> <span class="n">i</span><span class="p">:</span> <span class="n">scalar</span><span class="p">,</span> <span class="n">f</span><span class="p">:</span> <span class="n">scalar</span><span class="p">,</span>
+<div class="viewcode-block" id="construct_hyperfine_state"><a class="viewcode-back" href="../../../qspec.html#qspec.simulate.construct_hyperfine_state">[docs]</a><span class="k">def</span> <span class="nf">construct_hyperfine_state</span><span class="p">(</span><span class="n">freq_0</span><span class="p">:</span> <span class="n">scalar</span><span class="p">,</span> <span class="n">s</span><span class="p">:</span> <span class="n">scalar</span><span class="p">,</span> <span class="n">l</span><span class="p">:</span> <span class="n">scalar</span><span class="p">,</span> <span class="n">j</span><span class="p">:</span> <span class="n">scalar</span><span class="p">,</span> <span class="n">i</span><span class="p">:</span> <span class="n">scalar</span><span class="p">,</span> <span class="n">f</span><span class="p">:</span> <span class="n">scalar</span><span class="p">,</span>
                               <span class="n">hyper_const</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">scalar</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">g</span><span class="p">:</span> <span class="n">scalar</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">label</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Creates all substates of a fine-structure state using a common label.</span>
@@ -606,10 +584,7 @@
     <span class="k">return</span> <span class="p">[</span><span class="n">State</span><span class="p">(</span><span class="n">freq_0</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">l</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">_m</span><span class="p">,</span> <span class="n">hyper_const</span><span class="o">=</span><span class="n">hyper_const</span><span class="p">,</span> <span class="n">g</span><span class="o">=</span><span class="n">g</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">label</span><span class="p">)</span> <span class="k">for</span> <span class="n">_m</span> <span class="ow">in</span> <span class="n">get_m</span><span class="p">(</span><span class="n">f</span><span class="p">)]</span></div>
 
 
-
-<div class="viewcode-block" id="DecayMap">
-<a class="viewcode-back" href="../../../qspec.html#qspec.simulate.DecayMap">[docs]</a>
-<span class="k">class</span> <span class="nc">DecayMap</span><span class="p">:</span>
+<div class="viewcode-block" id="DecayMap"><a class="viewcode-back" href="../../../qspec.html#qspec.simulate.DecayMap">[docs]</a><span class="k">class</span> <span class="nc">DecayMap</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Class linking sets of atomic states via Einstein-A coefficients.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -666,8 +641,14 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :returns: The number of linked sets of atomic states.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">dll</span><span class="o">.</span><span class="n">decaymap_get_size</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="n">dll</span><span class="o">.</span><span class="n">decaymap_get_size</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="p">)</span>
 
+<div class="viewcode-block" id="DecayMap.get"><a class="viewcode-back" href="../../../qspec.html#qspec.simulate.DecayMap.get">[docs]</a>    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">label_0</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">label_1</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :returns: The number of linked sets of atomic states.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">dll</span><span class="o">.</span><span class="n">decaymap_get_item</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="p">,</span> <span class="n">c_char_p</span><span class="p">(</span><span class="nb">bytes</span><span class="p">(</span><span class="n">label_0</span><span class="p">,</span> <span class="s1">&#39;utf-8&#39;</span><span class="p">)),</span> <span class="n">c_char_p</span><span class="p">(</span><span class="nb">bytes</span><span class="p">(</span><span class="n">label_1</span><span class="p">,</span> <span class="s1">&#39;utf-8&#39;</span><span class="p">)))</span></div></div>
 
 
 <span class="k">def</span> <span class="nf">_gen_label_map</span><span class="p">(</span><span class="n">atom</span><span class="p">):</span>
@@ -687,9 +668,7 @@
     <span class="k">return</span> <span class="n">label_map</span>
 
 
-<div class="viewcode-block" id="Atom">
-<a class="viewcode-back" href="../../../qspec.html#qspec.simulate.Atom">[docs]</a>
-<span class="k">class</span> <span class="nc">Atom</span><span class="p">:</span>
+<div class="viewcode-block" id="Atom"><a class="viewcode-back" href="../../../qspec.html#qspec.simulate.Atom">[docs]</a><span class="k">class</span> <span class="nc">Atom</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Class representing an Atom and its inner structure.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -727,9 +706,7 @@
     <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">states</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
 
-<div class="viewcode-block" id="Atom.update">
-<a class="viewcode-back" href="../../../qspec.html#qspec.simulate.Atom.update">[docs]</a>
-    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="Atom.update"><a class="viewcode-back" href="../../../qspec.html#qspec.simulate.Atom.update">[docs]</a>    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Update the atom.</span>
 
@@ -737,7 +714,6 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">dll</span><span class="o">.</span><span class="n">atom_update</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">label_map</span> <span class="o">=</span> <span class="n">_gen_label_map</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
-
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">states</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -827,9 +803,7 @@
         <span class="n">a</span> <span class="o">=</span> <span class="n">dll</span><span class="o">.</span><span class="n">atom_get_L1</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">ctypeslib</span><span class="o">.</span><span class="n">as_array</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">size</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">size</span><span class="p">))</span><span class="o">.</span><span class="n">T</span>
 
-<div class="viewcode-block" id="Atom.get_y0">
-<a class="viewcode-back" href="../../../qspec.html#qspec.simulate.Atom.get_y0">[docs]</a>
-    <span class="k">def</span> <span class="nf">get_y0</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ground_state_labels</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<div class="viewcode-block" id="Atom.get_y0"><a class="viewcode-back" href="../../../qspec.html#qspec.simulate.Atom.get_y0">[docs]</a>    <span class="k">def</span> <span class="nf">get_y0</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ground_state_labels</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param ground_state_labels: An Iterable of labels belonging to ground states.</span>
 <span class="sd">        :returns: The initial population of the atom.</span>
@@ -841,10 +815,7 @@
         <span class="n">y0</span><span class="p">[</span><span class="n">indices</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">/</span> <span class="n">indices</span><span class="o">.</span><span class="n">size</span>
         <span class="k">return</span> <span class="n">y0</span></div>
 
-
-<div class="viewcode-block" id="Atom.get_state_indexes">
-<a class="viewcode-back" href="../../../qspec.html#qspec.simulate.Atom.get_state_indexes">[docs]</a>
-    <span class="k">def</span> <span class="nf">get_state_indexes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">labels</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<div class="viewcode-block" id="Atom.get_state_indexes"><a class="viewcode-back" href="../../../qspec.html#qspec.simulate.Atom.get_state_indexes">[docs]</a>    <span class="k">def</span> <span class="nf">get_state_indexes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">labels</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
                           <span class="n">f</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Iterable</span><span class="p">[</span><span class="n">scalar</span><span class="p">],</span> <span class="n">scalar</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param labels: The labels of the states whose indexes are to be returned.</span>
@@ -861,14 +832,90 @@
             <span class="n">f</span> <span class="o">=</span> <span class="p">{</span><span class="n">f</span><span class="p">}</span>
         <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">s</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">states</span><span class="p">)</span> <span class="k">if</span> <span class="n">s</span><span class="o">.</span><span class="n">label</span> <span class="ow">in</span> <span class="n">labels</span> <span class="ow">and</span> <span class="n">s</span><span class="o">.</span><span class="n">f</span> <span class="ow">in</span> <span class="n">f</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span></div>
 
+<div class="viewcode-block" id="Atom.scattering_rate"><a class="viewcode-back" href="../../../qspec.html#qspec.simulate.Atom.scattering_rate">[docs]</a>    <span class="k">def</span> <span class="nf">scattering_rate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rho</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">theta</span><span class="p">:</span> <span class="n">array_like</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">phi</span><span class="p">:</span> <span class="n">array_like</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                        <span class="n">i</span><span class="p">:</span> <span class="n">array_like</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">j</span><span class="p">:</span> <span class="n">array_like</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">axis</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param rho: The density matrix of the atom. Must have the same size as the atom</span>
+<span class="sd">         along the specified &#39;axis&#39; and &#39;axis&#39; + 1.</span>
+<span class="sd">        :param theta: The elevation angle of detection.</span>
+<span class="sd">        :param phi: The azimuthal angle of detection.</span>
+<span class="sd">        :param i: The initially excited state indexes to consider for spontaneous decay.</span>
+<span class="sd">         If None, all states are considered.</span>
+<span class="sd">        :param j: The final decayed state indexes to consider for spontaneous decay. If None, all states are considered.</span>
+<span class="sd">        :param axis: The axis along which the population is aligned in &#39;rho&#39;.</span>
+<span class="sd">        :returns: The scattering rate of the atom given the population &#39;rho&#39; (MHz or Events / s).</span>
+<span class="sd">        :raises ValueError: &#39;rho&#39; must have the same size as the atom along the specified &#39;axis&#39;.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">rho</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">rho</span><span class="p">)</span>
 
-<div class="viewcode-block" id="Atom.scattering_rate">
-<a class="viewcode-back" href="../../../qspec.html#qspec.simulate.Atom.scattering_rate">[docs]</a>
-    <span class="k">def</span> <span class="nf">scattering_rate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rho</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">i</span><span class="p">:</span> <span class="n">array_like</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">j</span><span class="p">:</span> <span class="n">array_like</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">axis</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">i</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">i</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">size</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">i</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">j</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">j</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">size</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">j</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">j</span><span class="p">)</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">axis</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">axis</span> <span class="o">+=</span> <span class="nb">len</span><span class="p">(</span><span class="n">rho</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+
+        <span class="n">l0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">1.</span> <span class="k">if</span> <span class="n">_i</span> <span class="ow">in</span> <span class="n">i</span> <span class="ow">and</span> <span class="n">_j</span> <span class="ow">in</span> <span class="n">j</span> <span class="k">else</span> <span class="mf">0.</span> <span class="k">for</span> <span class="n">_i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">size</span><span class="p">)]</span> <span class="k">for</span> <span class="n">_j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">size</span><span class="p">)])</span>
+        <span class="n">l0</span> <span class="o">*=</span> <span class="bp">self</span><span class="o">.</span><span class="n">l0</span>
+
+        <span class="n">a_cart</span> <span class="o">=</span> <span class="p">[[</span><span class="n">al</span><span class="o">.</span><span class="n">a_dipole_cart</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">states</span><span class="p">[</span><span class="n">_j</span><span class="p">]</span><span class="o">.</span><span class="n">i</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">states</span><span class="p">[</span><span class="n">_j</span><span class="p">]</span><span class="o">.</span><span class="n">j</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">states</span><span class="p">[</span><span class="n">_j</span><span class="p">]</span><span class="o">.</span><span class="n">f</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">states</span><span class="p">[</span><span class="n">_j</span><span class="p">]</span><span class="o">.</span><span class="n">m</span><span class="p">,</span>
+                                    <span class="bp">self</span><span class="o">.</span><span class="n">states</span><span class="p">[</span><span class="n">_i</span><span class="p">]</span><span class="o">.</span><span class="n">j</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">states</span><span class="p">[</span><span class="n">_i</span><span class="p">]</span><span class="o">.</span><span class="n">f</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">states</span><span class="p">[</span><span class="n">_i</span><span class="p">]</span><span class="o">.</span><span class="n">m</span><span class="p">)</span>
+                   <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">states</span><span class="p">[</span><span class="n">_j</span><span class="p">]</span><span class="o">.</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">states</span><span class="p">[</span><span class="n">_j</span><span class="p">]</span><span class="o">.</span><span class="n">j</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+                   <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">decay_map</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">states</span><span class="p">[</span><span class="n">_j</span><span class="p">]</span><span class="o">.</span><span class="n">label</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">states</span><span class="p">[</span><span class="n">_i</span><span class="p">]</span><span class="o">.</span><span class="n">label</span><span class="p">))</span>
+                   <span class="k">if</span> <span class="n">l0</span><span class="p">[</span><span class="n">_j</span><span class="p">,</span> <span class="n">_i</span><span class="p">]</span> <span class="k">else</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">complex</span><span class="p">)</span>
+                   <span class="k">if</span> <span class="n">_i</span> <span class="ow">in</span> <span class="n">i</span> <span class="ow">and</span> <span class="n">_j</span> <span class="ow">in</span> <span class="n">j</span> <span class="k">else</span> <span class="mf">0.</span> <span class="k">for</span> <span class="n">_i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">size</span><span class="p">)]</span> <span class="k">for</span> <span class="n">_j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">size</span><span class="p">)]</span>
+        <span class="n">e_theta</span> <span class="o">=</span> <span class="n">tools</span><span class="o">.</span><span class="n">e_theta</span><span class="p">(</span><span class="n">theta</span><span class="p">,</span> <span class="n">phi</span><span class="p">)</span>
+        <span class="n">e_phi</span> <span class="o">=</span> <span class="n">tools</span><span class="o">.</span><span class="n">e_phi</span><span class="p">(</span><span class="n">theta</span><span class="p">,</span> <span class="n">phi</span><span class="p">)</span>
+
+        <span class="n">c_theta</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">e_theta</span> <span class="o">*</span> <span class="n">_a_cart</span><span class="p">)</span> <span class="k">for</span> <span class="n">_a_cart</span> <span class="ow">in</span> <span class="n">a_cart_list</span><span class="p">]</span>
+                            <span class="k">for</span> <span class="n">a_cart_list</span> <span class="ow">in</span> <span class="n">a_cart</span><span class="p">])</span>
+        <span class="n">c_phi</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">e_phi</span> <span class="o">*</span> <span class="n">_a_cart</span><span class="p">)</span> <span class="k">for</span> <span class="n">_a_cart</span> <span class="ow">in</span> <span class="n">a_cart_list</span><span class="p">]</span>
+                          <span class="k">for</span> <span class="n">a_cart_list</span> <span class="ow">in</span> <span class="n">a_cart</span><span class="p">])</span>
+
+        <span class="n">ct_theta</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">e_theta</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">conj</span><span class="p">(</span><span class="n">_a_cart</span><span class="p">))</span>
+                              <span class="k">for</span> <span class="n">_a_cart</span> <span class="ow">in</span> <span class="n">a_cart_list</span><span class="p">]</span> <span class="k">for</span> <span class="n">a_cart_list</span> <span class="ow">in</span> <span class="n">a_cart</span><span class="p">])</span>
+        <span class="n">ct_phi</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">e_phi</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">conj</span><span class="p">(</span><span class="n">_a_cart</span><span class="p">))</span>
+                            <span class="k">for</span> <span class="n">_a_cart</span> <span class="ow">in</span> <span class="n">a_cart_list</span><span class="p">]</span> <span class="k">for</span> <span class="n">a_cart_list</span> <span class="ow">in</span> <span class="n">a_cart</span><span class="p">])</span>
+
+        <span class="n">axes</span> <span class="o">=</span> <span class="p">[</span><span class="n">ax</span> <span class="k">for</span> <span class="n">ax</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">axis</span><span class="p">)]</span>
+        <span class="k">if</span> <span class="n">axes</span><span class="p">:</span>
+            <span class="n">c_theta</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">c_theta</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="n">axes</span><span class="p">)</span>
+            <span class="n">c_phi</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">c_phi</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="n">axes</span><span class="p">)</span>
+            <span class="n">ct_theta</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">ct_theta</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="n">axes</span><span class="p">)</span>
+            <span class="n">ct_phi</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">ct_phi</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="n">axes</span><span class="p">)</span>
+        <span class="n">axes</span> <span class="o">=</span> <span class="p">[</span><span class="n">axis</span> <span class="o">+</span> <span class="n">ax</span> <span class="o">+</span> <span class="mi">2</span> <span class="k">for</span> <span class="n">ax</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">rho</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">-</span> <span class="n">axis</span> <span class="o">-</span> <span class="mi">2</span><span class="p">)]</span>
+        <span class="k">if</span> <span class="n">axes</span><span class="p">:</span>
+            <span class="n">c_theta</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">c_theta</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="n">axes</span><span class="p">)</span>
+            <span class="n">c_phi</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">c_phi</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="n">axes</span><span class="p">)</span>
+            <span class="n">ct_theta</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">ct_theta</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="n">axes</span><span class="p">)</span>
+            <span class="n">ct_phi</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">ct_phi</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="n">axes</span><span class="p">)</span>
+
+        <span class="n">sr</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">tools</span><span class="o">.</span><span class="n">get_subarray</span><span class="p">(</span><span class="n">c_theta</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">axis</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="n">axis</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+                      <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">tools</span><span class="o">.</span><span class="n">get_subarray</span><span class="p">(</span><span class="n">rho</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">axis</span> <span class="o">+</span> <span class="mi">1</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="n">axis</span><span class="p">)</span>
+                      <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">size</span><span class="p">)],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+              <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">tools</span><span class="o">.</span><span class="n">get_subarray</span><span class="p">(</span><span class="n">ct_theta</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">axis</span> <span class="o">+</span> <span class="mi">1</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="n">axis</span><span class="p">)</span>
+                        <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">tools</span><span class="o">.</span><span class="n">get_subarray</span><span class="p">(</span><span class="n">rho</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">axis</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="n">axis</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+                        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">size</span><span class="p">)],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">))</span>
+        
+        <span class="n">sr</span> <span class="o">+=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">tools</span><span class="o">.</span><span class="n">get_subarray</span><span class="p">(</span><span class="n">c_phi</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">axis</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="n">axis</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+                       <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">tools</span><span class="o">.</span><span class="n">get_subarray</span><span class="p">(</span><span class="n">rho</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">axis</span> <span class="o">+</span> <span class="mi">1</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="n">axis</span><span class="p">)</span>
+                       <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">size</span><span class="p">)],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+               <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">tools</span><span class="o">.</span><span class="n">get_subarray</span><span class="p">(</span><span class="n">ct_phi</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">axis</span> <span class="o">+</span> <span class="mi">1</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="n">axis</span><span class="p">)</span>
+                         <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">tools</span><span class="o">.</span><span class="n">get_subarray</span><span class="p">(</span><span class="n">rho</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">axis</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="n">axis</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+                         <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">size</span><span class="p">)],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">))</span>
+        <span class="k">return</span> <span class="mi">3</span> <span class="o">/</span> <span class="p">(</span><span class="mi">8</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">sr</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="n">axis</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="n">axis</span><span class="p">)</span><span class="o">.</span><span class="n">real</span></div>
+
+<div class="viewcode-block" id="Atom.scattering_rate_old"><a class="viewcode-back" href="../../../qspec.html#qspec.simulate.Atom.scattering_rate_old">[docs]</a>    <span class="k">def</span> <span class="nf">scattering_rate_old</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rho</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">i</span><span class="p">:</span> <span class="n">array_like</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">j</span><span class="p">:</span> <span class="n">array_like</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">axis</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param rho: The population of the atom. Must have the same size as the atom along the specified &#39;axis&#39;.</span>
-<span class="sd">        :param i: The initial state indexes to consider for spontaneous decay. If None, all states are considered.</span>
-<span class="sd">        :param j: The final state indexes to consider for spontaneous decay. If None, all states are considered.</span>
+<span class="sd">        :param i: The initially excited state indexes to consider for spontaneous decay.</span>
+<span class="sd">         If None, all states are considered.</span>
+<span class="sd">        :param j: The final decayed state indexes to consider for spontaneous decay. If None, all states are considered.</span>
 <span class="sd">        :param axis: The axis along which the population is aligned in &#39;rho&#39;.</span>
 <span class="sd">        :returns: The scattering rate of the atom given the population &#39;rho&#39; (MHz or Events / s).</span>
 <span class="sd">        :raises ValueError: &#39;rho&#39; must have the same size as the atom along the specified &#39;axis&#39;.</span>
@@ -902,10 +949,7 @@
         <span class="n">sr</span> <span class="o">=</span> <span class="n">tools</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">l0</span><span class="p">,</span> <span class="n">rho</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="n">axis</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">sr</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="n">axis</span><span class="p">)</span></div>
 
-
-<div class="viewcode-block" id="Atom.plot">
-<a class="viewcode-back" href="../../../qspec.html#qspec.simulate.Atom.plot">[docs]</a>
-    <span class="k">def</span> <span class="nf">plot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">indices</span><span class="p">:</span> <span class="n">array_like</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">draw_bounds</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">show</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">):</span>
+<div class="viewcode-block" id="Atom.plot"><a class="viewcode-back" href="../../../qspec.html#qspec.simulate.Atom.plot">[docs]</a>    <span class="k">def</span> <span class="nf">plot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">indices</span><span class="p">:</span> <span class="n">array_like</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">draw_bounds</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">show</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Plot a term scheme of the atom.</span>
 
@@ -950,9 +994,7 @@
         <span class="k">if</span> <span class="n">show</span><span class="p">:</span>
             <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
             <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
-        <span class="k">return</span> <span class="n">ret_x</span><span class="p">,</span> <span class="n">ret_y</span><span class="p">,</span> <span class="n">d</span></div>
-</div>
-
+        <span class="k">return</span> <span class="n">ret_x</span><span class="p">,</span> <span class="n">ret_y</span><span class="p">,</span> <span class="n">d</span></div></div>
 
 
 <span class="k">def</span> <span class="nf">_cast_delta</span><span class="p">(</span><span class="n">delta</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">m</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="n">size</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ndarray</span><span class="p">:</span>
@@ -1062,9 +1104,7 @@
     <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\&#39;</span><span class="s1">v</span><span class="se">\&#39;</span><span class="s1"> must be a scalar or have shape (n, ) or (n, 3) but has shape </span><span class="si">{}</span><span class="s1">.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">v</span><span class="o">.</span><span class="n">shape</span><span class="p">))</span>
     
 
-<div class="viewcode-block" id="Interaction">
-<a class="viewcode-back" href="../../../qspec.html#qspec.simulate.Interaction">[docs]</a>
-<span class="k">class</span> <span class="nc">Interaction</span><span class="p">:</span>
+<div class="viewcode-block" id="Interaction"><a class="viewcode-back" href="../../../qspec.html#qspec.simulate.Interaction">[docs]</a><span class="k">class</span> <span class="nc">Interaction</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Class representing an Interaction between lasers and an atom.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -1122,9 +1162,7 @@
         <span class="k">return</span> <span class="p">[</span><span class="n">Laser</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">instance</span><span class="o">=</span><span class="n">dll</span><span class="o">.</span><span class="n">interaction_get_laser</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="p">,</span> <span class="n">m</span><span class="p">))</span>
                 <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">dll</span><span class="o">.</span><span class="n">interaction_get_lasers_size</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="p">))]</span>
 
-<div class="viewcode-block" id="Interaction.update">
-<a class="viewcode-back" href="../../../qspec.html#qspec.simulate.Interaction.update">[docs]</a>
-    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="Interaction.update"><a class="viewcode-back" href="../../../qspec.html#qspec.simulate.Interaction.update">[docs]</a>    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Updates the Interaction.</span>
 
@@ -1132,10 +1170,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">dll</span><span class="o">.</span><span class="n">interaction_update</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="p">)</span></div>
 
-
-<div class="viewcode-block" id="Interaction.resonance_info">
-<a class="viewcode-back" href="../../../qspec.html#qspec.simulate.Interaction.resonance_info">[docs]</a>
-    <span class="k">def</span> <span class="nf">resonance_info</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="Interaction.resonance_info"><a class="viewcode-back" href="../../../qspec.html#qspec.simulate.Interaction.resonance_info">[docs]</a>    <span class="k">def</span> <span class="nf">resonance_info</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Prints the detunings of the base frequencies of the lasers in the given atomic system.</span>
 <span class="sd">        In particular useful for systems with a hyperfine structure. Here</span>
@@ -1161,7 +1196,6 @@
             <span class="k">if</span> <span class="n">n</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
                 <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;No resonances!&#39;</span><span class="p">)</span>
         <span class="nb">print</span><span class="p">()</span></div>
-
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">environment</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -1289,9 +1323,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">dll</span><span class="o">.</span><span class="n">interaction_set_time_dependent</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="p">,</span> <span class="n">c_bool</span><span class="p">(</span><span class="n">value</span><span class="p">))</span>
 
-<div class="viewcode-block" id="Interaction.get_rabi">
-<a class="viewcode-back" href="../../../qspec.html#qspec.simulate.Interaction.get_rabi">[docs]</a>
-    <span class="k">def</span> <span class="nf">get_rabi</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">m</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="Interaction.get_rabi"><a class="viewcode-back" href="../../../qspec.html#qspec.simulate.Interaction.get_rabi">[docs]</a>    <span class="k">def</span> <span class="nf">get_rabi</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">m</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param m: The laser number &#39;m&#39;. If None, the Rabi frequencies are returned for all lasers</span>
 <span class="sd">         as an array with shape (#lasers, atom.size, atom.size).</span>
@@ -1303,7 +1335,6 @@
             <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">dll</span><span class="o">.</span><span class="n">interaction_get_rabi</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="p">,</span> <span class="n">c_size_t</span><span class="p">(</span><span class="n">_m</span><span class="p">))</span>
                              <span class="k">for</span> <span class="n">_m</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lasers</span><span class="p">))],</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">complex</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">dll</span><span class="o">.</span><span class="n">interaction_get_rabi</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="p">,</span> <span class="n">c_size_t</span><span class="p">(</span><span class="n">m</span><span class="p">))</span></div>
-
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">summap</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -1334,13 +1365,10 @@
         <span class="n">set_restype</span><span class="p">(</span><span class="n">dll</span><span class="o">.</span><span class="n">interaction_get_deltamap</span><span class="p">,</span> <span class="n">matrix_d_p</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">dll</span><span class="o">.</span><span class="n">interaction_get_deltamap</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="p">)</span><span class="o">.</span><span class="n">T</span>
 
-<div class="viewcode-block" id="Interaction.get_delta">
-<a class="viewcode-back" href="../../../qspec.html#qspec.simulate.Interaction.get_delta">[docs]</a>
-    <span class="k">def</span> <span class="nf">get_delta</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="Interaction.get_delta"><a class="viewcode-back" href="../../../qspec.html#qspec.simulate.Interaction.get_delta">[docs]</a>    <span class="k">def</span> <span class="nf">get_delta</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">vector_d_p</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ctypeslib</span><span class="o">.</span><span class="n">ndpointer</span><span class="p">(</span><span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atom</span><span class="o">.</span><span class="n">size</span><span class="p">,</span> <span class="p">))</span>
         <span class="n">set_restype</span><span class="p">(</span><span class="n">dll</span><span class="o">.</span><span class="n">interaction_get_delta</span><span class="p">,</span> <span class="n">vector_d_p</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">dll</span><span class="o">.</span><span class="n">interaction_get_delta</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="p">)</span></div>
-
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">history_size</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -1358,9 +1386,7 @@
         <span class="n">set_restype</span><span class="p">(</span><span class="n">dll</span><span class="o">.</span><span class="n">interaction_get_history</span><span class="p">,</span> <span class="n">vector_i_p</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">dll</span><span class="o">.</span><span class="n">interaction_get_history</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="p">)</span>
 
-<div class="viewcode-block" id="Interaction.rates">
-<a class="viewcode-back" href="../../../qspec.html#qspec.simulate.Interaction.rates">[docs]</a>
-    <span class="k">def</span> <span class="nf">rates</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">delta</span><span class="p">:</span> <span class="n">array_like</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">m</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">v</span><span class="p">:</span> <span class="n">array_like</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<div class="viewcode-block" id="Interaction.rates"><a class="viewcode-back" href="../../../qspec.html#qspec.simulate.Interaction.rates">[docs]</a>    <span class="k">def</span> <span class="nf">rates</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">delta</span><span class="p">:</span> <span class="n">array_like</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">m</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">v</span><span class="p">:</span> <span class="n">array_like</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
               <span class="n">y0</span><span class="p">:</span> <span class="n">array_like</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param t: The times when to compute the solution.</span>
@@ -1402,10 +1428,7 @@
                               <span class="n">results</span><span class="o">.</span><span class="n">ctypes</span><span class="o">.</span><span class="n">data_as</span><span class="p">(</span><span class="n">c_double_p</span><span class="p">),</span> <span class="n">c_size_t</span><span class="p">(</span><span class="n">t_size</span><span class="p">),</span> <span class="n">c_size_t</span><span class="p">(</span><span class="n">sample_size</span><span class="p">))</span>
         <span class="k">return</span> <span class="n">results</span></div>
 
-
-<div class="viewcode-block" id="Interaction.schroedinger">
-<a class="viewcode-back" href="../../../qspec.html#qspec.simulate.Interaction.schroedinger">[docs]</a>
-    <span class="k">def</span> <span class="nf">schroedinger</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">delta</span><span class="p">:</span> <span class="n">array_like</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">m</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">v</span><span class="p">:</span> <span class="n">array_like</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<div class="viewcode-block" id="Interaction.schroedinger"><a class="viewcode-back" href="../../../qspec.html#qspec.simulate.Interaction.schroedinger">[docs]</a>    <span class="k">def</span> <span class="nf">schroedinger</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">delta</span><span class="p">:</span> <span class="n">array_like</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">m</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">v</span><span class="p">:</span> <span class="n">array_like</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
                      <span class="n">y0</span><span class="p">:</span> <span class="n">array_like</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param t: The times when to compute the solution.</span>
@@ -1435,22 +1458,19 @@
             <span class="n">v</span> <span class="o">=</span> <span class="n">_cast_v</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
             <span class="n">y0</span><span class="p">,</span> <span class="n">ctype</span> <span class="o">=</span> <span class="n">_cast_y0</span><span class="p">(</span><span class="n">y0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">atom</span><span class="p">)</span>
 
-            <span class="n">sample_size</span> <span class="o">=</span> <span class="nb">max</span><span class="p">([</span><span class="n">delta</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">v</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">1</span><span class="p">])</span>
+            <span class="n">sample_size</span> <span class="o">=</span> <span class="nb">max</span><span class="p">([</span><span class="n">delta</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">v</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">y0</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">1</span><span class="p">])</span>
 
             <span class="n">delta</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">broadcast_to</span><span class="p">(</span><span class="n">delta</span><span class="p">,</span> <span class="p">(</span><span class="n">sample_size</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lasers</span><span class="p">))),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="s1">&#39;C&#39;</span><span class="p">)</span>
             <span class="n">v</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">broadcast_to</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="p">(</span><span class="n">sample_size</span><span class="p">,</span> <span class="mi">3</span><span class="p">)),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="s1">&#39;C&#39;</span><span class="p">)</span>
-            <span class="n">y0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">broadcast_to</span><span class="p">(</span><span class="n">y0</span><span class="p">,</span> <span class="p">(</span><span class="n">sample_size</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">atom</span><span class="o">.</span><span class="n">size</span><span class="p">)),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="s1">&#39;C&#39;</span><span class="p">)</span>
+            <span class="n">y0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">broadcast_to</span><span class="p">(</span><span class="n">y0</span><span class="p">,</span> <span class="p">(</span><span class="n">sample_size</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">atom</span><span class="o">.</span><span class="n">size</span><span class="p">)),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">complex</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="s1">&#39;C&#39;</span><span class="p">)</span>
 
-        <span class="n">results</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">sample_size</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">atom</span><span class="o">.</span><span class="n">size</span><span class="p">,</span> <span class="n">t_size</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+        <span class="n">results</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">sample_size</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">atom</span><span class="o">.</span><span class="n">size</span><span class="p">,</span> <span class="n">t_size</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">complex</span><span class="p">)</span>
         <span class="n">dll</span><span class="o">.</span><span class="n">interaction_schroedinger</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="p">,</span> <span class="n">t</span><span class="o">.</span><span class="n">ctypes</span><span class="o">.</span><span class="n">data_as</span><span class="p">(</span><span class="n">c_double_p</span><span class="p">),</span> <span class="n">delta</span><span class="o">.</span><span class="n">ctypes</span><span class="o">.</span><span class="n">data_as</span><span class="p">(</span><span class="n">c_double_p</span><span class="p">),</span>
                                      <span class="n">v</span><span class="o">.</span><span class="n">ctypes</span><span class="o">.</span><span class="n">data_as</span><span class="p">(</span><span class="n">c_double_p</span><span class="p">),</span> <span class="n">y0</span><span class="o">.</span><span class="n">ctypes</span><span class="o">.</span><span class="n">data_as</span><span class="p">(</span><span class="n">c_complex_p</span><span class="p">),</span>
                                      <span class="n">results</span><span class="o">.</span><span class="n">ctypes</span><span class="o">.</span><span class="n">data_as</span><span class="p">(</span><span class="n">c_complex_p</span><span class="p">),</span> <span class="n">c_size_t</span><span class="p">(</span><span class="n">t_size</span><span class="p">),</span> <span class="n">c_size_t</span><span class="p">(</span><span class="n">sample_size</span><span class="p">))</span>
         <span class="k">return</span> <span class="n">results</span></div>
 
-
-<div class="viewcode-block" id="Interaction.master">
-<a class="viewcode-back" href="../../../qspec.html#qspec.simulate.Interaction.master">[docs]</a>
-    <span class="k">def</span> <span class="nf">master</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">delta</span><span class="p">:</span> <span class="n">array_like</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">m</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">v</span><span class="p">:</span> <span class="n">array_like</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<div class="viewcode-block" id="Interaction.master"><a class="viewcode-back" href="../../../qspec.html#qspec.simulate.Interaction.master">[docs]</a>    <span class="k">def</span> <span class="nf">master</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">delta</span><span class="p">:</span> <span class="n">array_like</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">m</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">v</span><span class="p">:</span> <span class="n">array_like</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
                <span class="n">y0</span><span class="p">:</span> <span class="n">array_like</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param t: The times when to compute the solution.</span>
@@ -1493,11 +1513,8 @@
                                <span class="n">results</span><span class="o">.</span><span class="n">ctypes</span><span class="o">.</span><span class="n">data_as</span><span class="p">(</span><span class="n">c_complex_p</span><span class="p">),</span> <span class="n">c_size_t</span><span class="p">(</span><span class="n">t_size</span><span class="p">),</span> <span class="n">c_size_t</span><span class="p">(</span><span class="n">sample_size</span><span class="p">))</span>
         <span class="k">return</span> <span class="n">results</span></div>
 
-
-<div class="viewcode-block" id="Interaction.mc_schroedinger">
-<a class="viewcode-back" href="../../../qspec.html#qspec.simulate.Interaction.mc_schroedinger">[docs]</a>
-    <span class="k">def</span> <span class="nf">mc_schroedinger</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">delta</span><span class="p">:</span> <span class="n">array_like</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">m</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">v</span><span class="p">:</span> <span class="n">array_like</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-                        <span class="n">y0</span><span class="p">:</span> <span class="n">array_like</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">dynamics</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">ntraj</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">500</span><span class="p">):</span>
+<div class="viewcode-block" id="Interaction.mc_master"><a class="viewcode-back" href="../../../qspec.html#qspec.simulate.Interaction.mc_master">[docs]</a>    <span class="k">def</span> <span class="nf">mc_master</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">delta</span><span class="p">:</span> <span class="n">array_like</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">m</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">v</span><span class="p">:</span> <span class="n">array_like</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                  <span class="n">y0</span><span class="p">:</span> <span class="n">array_like</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">dynamics</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">ntraj</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">500</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param t: The times when to compute the solution.</span>
 <span class="sd">        :param delta: An array of frequency shifts for the laser(s). &#39;delta&#39; must be a scalar or a 1d- or 2d-array</span>
@@ -1542,13 +1559,11 @@
             <span class="n">v</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">broadcast_to</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="p">(</span><span class="n">sample_size</span><span class="p">,</span> <span class="mi">3</span><span class="p">)),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="s1">&#39;C&#39;</span><span class="p">)</span>
             <span class="n">y0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">broadcast_to</span><span class="p">(</span><span class="n">y0</span><span class="p">,</span> <span class="p">(</span><span class="n">sample_size</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">atom</span><span class="o">.</span><span class="n">size</span><span class="p">)),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">complex</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="s1">&#39;C&#39;</span><span class="p">)</span>
 
-        <span class="n">results</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">sample_size</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">atom</span><span class="o">.</span><span class="n">size</span><span class="p">,</span> <span class="n">t_size</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
-        <span class="n">dll</span><span class="o">.</span><span class="n">interaction_schroedinger</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="p">,</span> <span class="n">t</span><span class="o">.</span><span class="n">ctypes</span><span class="o">.</span><span class="n">data_as</span><span class="p">(</span><span class="n">c_double_p</span><span class="p">),</span> <span class="n">delta</span><span class="o">.</span><span class="n">ctypes</span><span class="o">.</span><span class="n">data_as</span><span class="p">(</span><span class="n">c_double_p</span><span class="p">),</span>
-                                     <span class="n">v</span><span class="o">.</span><span class="n">ctypes</span><span class="o">.</span><span class="n">data_as</span><span class="p">(</span><span class="n">c_double_p</span><span class="p">),</span> <span class="n">y0</span><span class="o">.</span><span class="n">ctypes</span><span class="o">.</span><span class="n">data_as</span><span class="p">(</span><span class="n">c_complex_p</span><span class="p">),</span> <span class="n">c_bool</span><span class="p">(</span><span class="n">dynamics</span><span class="p">),</span>
-                                     <span class="n">results</span><span class="o">.</span><span class="n">ctypes</span><span class="o">.</span><span class="n">data_as</span><span class="p">(</span><span class="n">c_complex_p</span><span class="p">),</span> <span class="n">c_size_t</span><span class="p">(</span><span class="n">t_size</span><span class="p">),</span> <span class="n">c_size_t</span><span class="p">(</span><span class="n">sample_size</span><span class="p">))</span>
-        <span class="k">return</span> <span class="n">results</span></div>
-</div>
-
+        <span class="n">results</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">sample_size</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">atom</span><span class="o">.</span><span class="n">size</span><span class="p">,</span> <span class="n">t_size</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">complex</span><span class="p">)</span>
+        <span class="n">dll</span><span class="o">.</span><span class="n">interaction_mc_master</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="p">,</span> <span class="n">t</span><span class="o">.</span><span class="n">ctypes</span><span class="o">.</span><span class="n">data_as</span><span class="p">(</span><span class="n">c_double_p</span><span class="p">),</span> <span class="n">delta</span><span class="o">.</span><span class="n">ctypes</span><span class="o">.</span><span class="n">data_as</span><span class="p">(</span><span class="n">c_double_p</span><span class="p">),</span>
+                                  <span class="n">v</span><span class="o">.</span><span class="n">ctypes</span><span class="o">.</span><span class="n">data_as</span><span class="p">(</span><span class="n">c_double_p</span><span class="p">),</span> <span class="n">y0</span><span class="o">.</span><span class="n">ctypes</span><span class="o">.</span><span class="n">data_as</span><span class="p">(</span><span class="n">c_complex_p</span><span class="p">),</span> <span class="n">c_bool</span><span class="p">(</span><span class="n">dynamics</span><span class="p">),</span>
+                                  <span class="n">results</span><span class="o">.</span><span class="n">ctypes</span><span class="o">.</span><span class="n">data_as</span><span class="p">(</span><span class="n">c_complex_p</span><span class="p">),</span> <span class="n">c_size_t</span><span class="p">(</span><span class="n">t_size</span><span class="p">),</span> <span class="n">c_size_t</span><span class="p">(</span><span class="n">sample_size</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">results</span><span class="p">,</span> <span class="n">v</span></div></div>
 
 
 <span class="k">def</span> <span class="nf">_define_colors</span><span class="p">(</span><span class="n">n</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">label_map</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">colormap</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>

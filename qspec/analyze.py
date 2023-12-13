@@ -212,12 +212,16 @@ def draw_sigma2d(x: array_iter, y: array_iter, sigma_x: array_iter, sigma_y: arr
     :param corr: The correlation coefficients between the x and y data.
     :param n: The maximum sigma region to draw
     :param kwargs: Additional keyword arguments are passed to plt.plot().
+     Use key 'fmt' to specify the third argument of plt.plot().
     :returns: None. Draws the sigma-bounds of the given data points (x, y) until the n-sigma region.
     """
+    fmt = '-k'
+    if 'fmt' in list(kwargs.keys()):
+        fmt = kwargs.pop('fmt')
     phi = np.arange(0., 2 * np.pi, 0.001)
     for x_i, y_i, s_x, s_y, r in zip(x, y, sigma_x, sigma_y, corr):
         for i in range(1, n + 1, 1):
-            plt.plot(*ellipse2d(x_i, y_i, i * s_x, i * s_y, phi, r), '-k', **kwargs)
+            plt.plot(*ellipse2d(x_i, y_i, i * s_x, i * s_y, phi, r), fmt, **kwargs)
 
 
 def weight(sigma):
@@ -1137,7 +1141,7 @@ class King:
                 plt.plot((add_xy[:, 0] - alpha) * scale_x,
                          add_xy[:, 2] * self.scale_y, 'r.', label='Data')
                 draw_sigma2d((add_xy[:, 0] - alpha) * scale_x, add_xy[:, 2] * self.scale_y,
-                             add_xy[:, 1] * scale_x, add_xy[:, 3] * self.scale_y, self.corr, n=2, **{'color': 'r'})
+                             add_xy[:, 1] * scale_x, add_xy[:, 3] * self.scale_y, self.corr, n=2, **{'fmt': '-r'})
         else:
             plt.errorbar((self.x_mod[:, 0] - alpha) * scale_x, self.y_mod[:, 0] * self.scale_y,
                          xerr=self.x_mod[:, 1] * scale_x, yerr=self.y_mod[:, 1] * self.scale_y,

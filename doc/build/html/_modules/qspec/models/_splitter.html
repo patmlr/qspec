@@ -1,22 +1,24 @@
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" >
+<html class="writer-html5" lang="en">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>qspec.models._splitter &mdash; qspec 20.05.2023 documentation</title>
-      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
-      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <title>qspec.models._splitter &mdash; qspec 13.12.2023 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
       <link rel="stylesheet" href="../../../_static/css/borders.css" type="text/css" />
       <link rel="stylesheet" href="../../../_static/css/wy-nav-content.css" type="text/css" />
+
+  
   <!--[if lt IE 9]>
     <script src="../../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
         <script src="../../../_static/jquery.js?v=5d32c60e"></script>
         <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="../../../_static/documentation_options.js?v=52e4f5b1"></script>
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js?v=7f3357fe"></script>
         <script src="../../../_static/doctools.js?v=888ff710"></script>
-        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=4825356b"></script>
     <script src="../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" /> 
@@ -96,9 +98,7 @@
            <span class="s1">&#39;SplitterSummed&#39;</span><span class="p">,</span> <span class="s1">&#39;Hyperfine&#39;</span><span class="p">,</span> <span class="s1">&#39;HyperfineQI&#39;</span><span class="p">,</span> <span class="s1">&#39;HyperfineMixed&#39;</span><span class="p">]</span>
 
 
-<div class="viewcode-block" id="gen_splitter_model">
-<a class="viewcode-back" href="../../../qspec.html#qspec.models.gen_splitter_model">[docs]</a>
-<span class="k">def</span> <span class="nf">gen_splitter_model</span><span class="p">(</span><span class="n">qi</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">hf_mixing</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+<div class="viewcode-block" id="gen_splitter_model"><a class="viewcode-back" href="../../../qspec.html#qspec.models.gen_splitter_model">[docs]</a><span class="k">def</span> <span class="nf">gen_splitter_model</span><span class="p">(</span><span class="n">qi</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">hf_mixing</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
     <span class="k">if</span> <span class="n">qi</span> <span class="ow">and</span> <span class="n">hf_mixing</span><span class="p">:</span>
         <span class="k">pass</span>
     <span class="k">elif</span> <span class="n">qi</span><span class="p">:</span>
@@ -110,18 +110,12 @@
     <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Specified splitter model not available.&#39;</span><span class="p">)</span></div>
 
 
-
-<div class="viewcode-block" id="get_all_f">
-<a class="viewcode-back" href="../../../qspec.html#qspec.models.get_all_f">[docs]</a>
-<span class="k">def</span> <span class="nf">get_all_f</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">):</span>
+<div class="viewcode-block" id="get_all_f"><a class="viewcode-back" href="../../../qspec.html#qspec.models.get_all_f">[docs]</a><span class="k">def</span> <span class="nf">get_all_f</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">):</span>
     <span class="n">i</span><span class="p">,</span> <span class="n">j</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="nb">float</span><span class="p">)</span><span class="o">.</span><span class="n">flatten</span><span class="p">(),</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">j</span><span class="p">,</span> <span class="nb">float</span><span class="p">)</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
     <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">f</span> <span class="o">+</span> <span class="nb">abs</span><span class="p">(</span><span class="n">_i</span> <span class="o">-</span> <span class="n">_j</span><span class="p">)</span> <span class="k">for</span> <span class="n">_i</span> <span class="ow">in</span> <span class="n">i</span> <span class="k">for</span> <span class="n">_j</span> <span class="ow">in</span> <span class="n">j</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">_i</span> <span class="o">+</span> <span class="n">_j</span> <span class="o">-</span> <span class="nb">abs</span><span class="p">(</span><span class="n">_i</span> <span class="o">-</span> <span class="n">_j</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))))</span></div>
 
 
-
-<div class="viewcode-block" id="hf_coeff">
-<a class="viewcode-back" href="../../../qspec.html#qspec.models.hf_coeff">[docs]</a>
-<span class="k">def</span> <span class="nf">hf_coeff</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="n">f</span><span class="p">):</span>
+<div class="viewcode-block" id="hf_coeff"><a class="viewcode-back" href="../../../qspec.html#qspec.models.hf_coeff">[docs]</a><span class="k">def</span> <span class="nf">hf_coeff</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="n">f</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot; Return the tuple of hyperfine coefficients for A and B-factor for a given quantum state &quot;&quot;&quot;</span>
     <span class="c1"># First and third order are taken from https://journals.aps.org/pra/abstract/10.1103/PhysRevA.103.032826.</span>
     <span class="c1"># Second order from https://link.springer.com/referencework/10.1007/978-0-387-26308-3.</span>
@@ -149,10 +143,7 @@
     <span class="k">return</span> <span class="n">co_a</span><span class="p">,</span> <span class="n">co_b</span><span class="p">,</span> <span class="n">co_c</span>  <span class="c1"># Highest implemented order.</span></div>
 
 
-
-<div class="viewcode-block" id="hf_trans">
-<a class="viewcode-back" href="../../../qspec.html#qspec.models.hf_trans">[docs]</a>
-<span class="k">def</span> <span class="nf">hf_trans</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">j_l</span><span class="p">,</span> <span class="n">j_u</span><span class="p">):</span>
+<div class="viewcode-block" id="hf_trans"><a class="viewcode-back" href="../../../qspec.html#qspec.models.hf_trans">[docs]</a><span class="k">def</span> <span class="nf">hf_trans</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">j_l</span><span class="p">,</span> <span class="n">j_u</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Calculate all allowed hyperfine transitions and their hyperfine coefficients.</span>
 <span class="sd">    Returns (f_l, f_u, coAl, coBl, coAu, coBu)</span>
@@ -162,10 +153,7 @@
             <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">f_u</span> <span class="o">-</span> <span class="n">f_l</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mf">1.1</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">f_u</span> <span class="o">==</span> <span class="n">f_l</span> <span class="o">==</span> <span class="mi">0</span><span class="p">]</span></div>
 
 
-
-<div class="viewcode-block" id="hf_shift">
-<a class="viewcode-back" href="../../../qspec.html#qspec.models.hf_shift">[docs]</a>
-<span class="k">def</span> <span class="nf">hf_shift</span><span class="p">(</span><span class="n">hyper_l</span><span class="p">,</span> <span class="n">hyper_u</span><span class="p">,</span> <span class="n">coeff_l</span><span class="p">,</span> <span class="n">coeff_u</span><span class="p">):</span>
+<div class="viewcode-block" id="hf_shift"><a class="viewcode-back" href="../../../qspec.html#qspec.models.hf_shift">[docs]</a><span class="k">def</span> <span class="nf">hf_shift</span><span class="p">(</span><span class="n">hyper_l</span><span class="p">,</span> <span class="n">hyper_u</span><span class="p">,</span> <span class="n">coeff_l</span><span class="p">,</span> <span class="n">coeff_u</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    :param hyper_l: The hyperfine structure constants of the lower state (Al, Bl, Cl, ...).</span>
 <span class="sd">    :param hyper_u: The hyperfine structure constants of the upper state (Au, Bu, Cu, ...).</span>
@@ -177,19 +165,13 @@
         <span class="o">-</span> <span class="nb">sum</span><span class="p">(</span><span class="n">const</span> <span class="o">*</span> <span class="n">coeff</span> <span class="k">for</span> <span class="n">const</span><span class="p">,</span> <span class="n">coeff</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">hyper_l</span><span class="p">,</span> <span class="n">coeff_l</span><span class="p">))</span></div>
 
 
-
-<div class="viewcode-block" id="hf_int">
-<a class="viewcode-back" href="../../../qspec.html#qspec.models.hf_int">[docs]</a>
-<span class="k">def</span> <span class="nf">hf_int</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">j_l</span><span class="p">,</span> <span class="n">j_u</span><span class="p">,</span> <span class="n">transitions</span><span class="p">):</span>
+<div class="viewcode-block" id="hf_int"><a class="viewcode-back" href="../../../qspec.html#qspec.models.hf_int">[docs]</a><span class="k">def</span> <span class="nf">hf_int</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">j_l</span><span class="p">,</span> <span class="n">j_u</span><span class="p">,</span> <span class="n">transitions</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot; Calculate relative line intensities &quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">around</span><span class="p">((</span><span class="mi">2</span> <span class="o">*</span> <span class="n">f_u</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">f_l</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">wigner_6j</span><span class="p">(</span><span class="n">j_l</span><span class="p">,</span> <span class="n">f_l</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">f_u</span><span class="p">,</span> <span class="n">j_u</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">as_sympy</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">),</span>
                       <span class="n">decimals</span><span class="o">=</span><span class="mi">9</span><span class="p">)</span> <span class="k">for</span> <span class="p">(</span><span class="n">f_l</span><span class="p">,</span> <span class="n">f_u</span><span class="p">),</span> <span class="o">*</span><span class="n">r</span> <span class="ow">in</span> <span class="n">transitions</span><span class="p">]</span></div>
 
 
-
-<div class="viewcode-block" id="Splitter">
-<a class="viewcode-back" href="../../../qspec.html#qspec.models.Splitter">[docs]</a>
-<span class="k">class</span> <span class="nc">Splitter</span><span class="p">(</span><span class="n">Model</span><span class="p">):</span>
+<div class="viewcode-block" id="Splitter"><a class="viewcode-back" href="../../../qspec.html#qspec.models.Splitter">[docs]</a><span class="k">class</span> <span class="nc">Splitter</span><span class="p">(</span><span class="n">Model</span><span class="p">):</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">j_l</span><span class="p">,</span> <span class="n">j_u</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="s1">&#39;Splitter&#39;</span>
@@ -202,40 +184,28 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">racah_indices</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">racah_intensities</span> <span class="o">=</span> <span class="p">[]</span>
 
-<div class="viewcode-block" id="Splitter.racah">
-<a class="viewcode-back" href="../../../qspec.html#qspec.models.Splitter.racah">[docs]</a>
-    <span class="k">def</span> <span class="nf">racah</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="Splitter.racah"><a class="viewcode-back" href="../../../qspec.html#qspec.models.Splitter.racah">[docs]</a>    <span class="k">def</span> <span class="nf">racah</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">intensity</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">racah_indices</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">racah_intensities</span><span class="p">):</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">vals</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">intensity</span></div>
-</div>
+            <span class="bp">self</span><span class="o">.</span><span class="n">vals</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">intensity</span></div></div>
 
 
-
-<div class="viewcode-block" id="SplitterSummed">
-<a class="viewcode-back" href="../../../qspec.html#qspec.models.SplitterSummed">[docs]</a>
-<span class="k">class</span> <span class="nc">SplitterSummed</span><span class="p">(</span><span class="n">Summed</span><span class="p">):</span>
+<div class="viewcode-block" id="SplitterSummed"><a class="viewcode-back" href="../../../qspec.html#qspec.models.SplitterSummed">[docs]</a><span class="k">class</span> <span class="nc">SplitterSummed</span><span class="p">(</span><span class="n">Summed</span><span class="p">):</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">splitter_models</span><span class="p">):</span>
         <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">Splitter</span><span class="p">)</span> <span class="k">for</span> <span class="n">model</span> <span class="ow">in</span> <span class="n">splitter_models</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;All models passed to </span><span class="se">\&#39;</span><span class="s1">SplitterSummed</span><span class="se">\&#39;</span><span class="s1"> must have type </span><span class="se">\&#39;</span><span class="s1">Splitter</span><span class="se">\&#39;</span><span class="s1">.&#39;</span><span class="p">)</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">splitter_models</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;(</span><span class="si">{}</span><span class="s1">)&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">name</span><span class="p">)</span> <span class="k">for</span> <span class="n">model</span> <span class="ow">in</span> <span class="n">splitter_models</span><span class="p">]</span>
                          <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">splitter_models</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="k">else</span> <span class="kc">None</span><span class="p">)</span>
 
-<div class="viewcode-block" id="SplitterSummed.racah">
-<a class="viewcode-back" href="../../../qspec.html#qspec.models.SplitterSummed.racah">[docs]</a>
-    <span class="k">def</span> <span class="nf">racah</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="SplitterSummed.racah"><a class="viewcode-back" href="../../../qspec.html#qspec.models.SplitterSummed.racah">[docs]</a>    <span class="k">def</span> <span class="nf">racah</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">i0</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="k">for</span> <span class="n">model</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">models</span><span class="p">:</span>
             <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">intensity</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">racah_indices</span><span class="p">,</span> <span class="n">model</span><span class="o">.</span><span class="n">racah_intensities</span><span class="p">):</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">set_val</span><span class="p">(</span><span class="n">i0</span> <span class="o">+</span> <span class="n">i</span><span class="p">,</span> <span class="n">intensity</span><span class="p">,</span> <span class="n">force</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
             <span class="n">i0</span> <span class="o">+=</span> <span class="n">model</span><span class="o">.</span><span class="n">size</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">set_vals</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vals</span><span class="p">,</span> <span class="n">force</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
-</div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_vals</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vals</span><span class="p">,</span> <span class="n">force</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div></div>
 
 
-
-<div class="viewcode-block" id="Hyperfine">
-<a class="viewcode-back" href="../../../qspec.html#qspec.models.Hyperfine">[docs]</a>
-<span class="k">class</span> <span class="nc">Hyperfine</span><span class="p">(</span><span class="n">Splitter</span><span class="p">):</span>
+<div class="viewcode-block" id="Hyperfine"><a class="viewcode-back" href="../../../qspec.html#qspec.models.Hyperfine">[docs]</a><span class="k">class</span> <span class="nc">Hyperfine</span><span class="p">(</span><span class="n">Splitter</span><span class="p">):</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">j_l</span><span class="p">,</span> <span class="n">j_u</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">j_l</span><span class="p">,</span> <span class="n">j_u</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="s1">&#39;Hyperfine&#39;</span>
@@ -258,47 +228,31 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">racah_indices</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_index</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_add_arg</span><span class="p">(</span><span class="s1">&#39;int(</span><span class="si">{}</span><span class="s1">, </span><span class="si">{}</span><span class="s1">)&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">t</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="n">t</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]),</span> <span class="n">intensity</span><span class="p">,</span> <span class="n">i</span> <span class="o">==</span> <span class="mi">0</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
 
-<div class="viewcode-block" id="Hyperfine.evaluate">
-<a class="viewcode-back" href="../../../qspec.html#qspec.models.Hyperfine.evaluate">[docs]</a>
-    <span class="k">def</span> <span class="nf">evaluate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="Hyperfine.evaluate"><a class="viewcode-back" href="../../../qspec.html#qspec.models.Hyperfine.evaluate">[docs]</a>    <span class="k">def</span> <span class="nf">evaluate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="n">const_l</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">size</span> <span class="o">+</span> <span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_l</span><span class="p">))</span>
         <span class="n">const_u</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">size</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_l</span> <span class="o">+</span> <span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_u</span><span class="p">))</span>
         <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">([</span><span class="n">args</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">x</span> <span class="o">-</span> <span class="n">hf_shift</span><span class="p">(</span><span class="n">const_l</span><span class="p">,</span> <span class="n">const_u</span><span class="p">,</span> <span class="n">t</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">t</span><span class="p">[</span><span class="mi">2</span><span class="p">]),</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
                        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">t</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">racah_indices</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">transitions</span><span class="p">)],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span></div>
 
-
-<div class="viewcode-block" id="Hyperfine.min">
-<a class="viewcode-back" href="../../../qspec.html#qspec.models.Hyperfine.min">[docs]</a>
-    <span class="k">def</span> <span class="nf">min</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="Hyperfine.min"><a class="viewcode-back" href="../../../qspec.html#qspec.models.Hyperfine.min">[docs]</a>    <span class="k">def</span> <span class="nf">min</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">const_l</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vals</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">size</span> <span class="o">+</span> <span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_l</span><span class="p">))</span>
         <span class="n">const_u</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vals</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">size</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_l</span> <span class="o">+</span> <span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_u</span><span class="p">))</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">min</span><span class="p">()</span> <span class="o">+</span> <span class="nb">min</span><span class="p">(</span><span class="n">hf_shift</span><span class="p">(</span><span class="n">const_l</span><span class="p">,</span> <span class="n">const_u</span><span class="p">,</span> <span class="n">t</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">t</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">transitions</span><span class="p">)</span></div>
 
-
-<div class="viewcode-block" id="Hyperfine.max">
-<a class="viewcode-back" href="../../../qspec.html#qspec.models.Hyperfine.max">[docs]</a>
-    <span class="k">def</span> <span class="nf">max</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="Hyperfine.max"><a class="viewcode-back" href="../../../qspec.html#qspec.models.Hyperfine.max">[docs]</a>    <span class="k">def</span> <span class="nf">max</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">const_l</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vals</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">size</span> <span class="o">+</span> <span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_l</span><span class="p">))</span>
         <span class="n">const_u</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vals</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">size</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_l</span> <span class="o">+</span> <span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_u</span><span class="p">))</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">max</span><span class="p">()</span> <span class="o">+</span> <span class="nb">max</span><span class="p">(</span><span class="n">hf_shift</span><span class="p">(</span><span class="n">const_l</span><span class="p">,</span> <span class="n">const_u</span><span class="p">,</span> <span class="n">t</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">t</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">transitions</span><span class="p">)</span></div>
 
-
-<div class="viewcode-block" id="Hyperfine.intervals">
-<a class="viewcode-back" href="../../../qspec.html#qspec.models.Hyperfine.intervals">[docs]</a>
-    <span class="k">def</span> <span class="nf">intervals</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="Hyperfine.intervals"><a class="viewcode-back" href="../../../qspec.html#qspec.models.Hyperfine.intervals">[docs]</a>    <span class="k">def</span> <span class="nf">intervals</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">const_l</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vals</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">size</span> <span class="o">+</span> <span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_l</span><span class="p">))</span>
         <span class="n">const_u</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vals</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">size</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_l</span> <span class="o">+</span> <span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_u</span><span class="p">))</span>
         <span class="n">shifts</span> <span class="o">=</span> <span class="p">[</span><span class="n">hf_shift</span><span class="p">(</span><span class="n">const_l</span><span class="p">,</span> <span class="n">const_u</span><span class="p">,</span> <span class="n">t</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">t</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">transitions</span><span class="p">]</span>
         <span class="k">return</span> <span class="n">merge_intervals</span><span class="p">([[</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">min</span><span class="p">()</span> <span class="o">+</span> <span class="n">shift</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">max</span><span class="p">()</span> <span class="o">+</span> <span class="n">shift</span><span class="p">]</span> <span class="k">for</span> <span class="n">shift</span> <span class="ow">in</span> <span class="n">shifts</span><span class="p">])</span></div>
 
-
-<div class="viewcode-block" id="Hyperfine.racah">
-<a class="viewcode-back" href="../../../qspec.html#qspec.models.Hyperfine.racah">[docs]</a>
-    <span class="k">def</span> <span class="nf">racah</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="Hyperfine.racah"><a class="viewcode-back" href="../../../qspec.html#qspec.models.Hyperfine.racah">[docs]</a>    <span class="k">def</span> <span class="nf">racah</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">intensity</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">racah_indices</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">racah_intensities</span><span class="p">):</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">vals</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">intensity</span></div>
-</div>
-
+            <span class="bp">self</span><span class="o">.</span><span class="n">vals</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">intensity</span></div></div>
 
 
 <span class="k">def</span> <span class="nf">load_qi</span><span class="p">(</span><span class="n">filepath</span><span class="p">):</span>
@@ -309,9 +263,7 @@
     <span class="k">return</span> <span class="n">ret</span><span class="p">[</span><span class="s1">&#39;a&#39;</span><span class="p">],</span> <span class="n">ret</span><span class="p">[</span><span class="s1">&#39;b&#39;</span><span class="p">],</span> <span class="n">ret</span><span class="p">[</span><span class="s1">&#39;c&#39;</span><span class="p">]</span>
 
 
-<div class="viewcode-block" id="HyperfineQI">
-<a class="viewcode-back" href="../../../qspec.html#qspec.models.HyperfineQI">[docs]</a>
-<span class="k">class</span> <span class="nc">HyperfineQI</span><span class="p">(</span><span class="n">Splitter</span><span class="p">):</span>
+<div class="viewcode-block" id="HyperfineQI"><a class="viewcode-back" href="../../../qspec.html#qspec.models.HyperfineQI">[docs]</a><span class="k">class</span> <span class="nc">HyperfineQI</span><span class="p">(</span><span class="n">Splitter</span><span class="p">):</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">j_l</span><span class="p">,</span> <span class="n">j_u</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">qi_path</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">LorentzQI</span><span class="p">(),</span> <span class="n">i</span><span class="p">,</span> <span class="n">j_l</span><span class="p">,</span> <span class="n">j_u</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="s1">&#39;HyperfineQI&#39;</span>
@@ -366,9 +318,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">racah_indices</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_index</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_add_arg</span><span class="p">(</span><span class="s1">&#39;geo&#39;</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
 
-<div class="viewcode-block" id="HyperfineQI.evaluate">
-<a class="viewcode-back" href="../../../qspec.html#qspec.models.HyperfineQI.evaluate">[docs]</a>
-    <span class="k">def</span> <span class="nf">evaluate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="HyperfineQI.evaluate"><a class="viewcode-back" href="../../../qspec.html#qspec.models.HyperfineQI.evaluate">[docs]</a>    <span class="k">def</span> <span class="nf">evaluate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="n">const_l</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">size</span> <span class="o">+</span> <span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_l</span><span class="p">))</span>
         <span class="n">const_u</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">size</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_l</span> <span class="o">+</span> <span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_u</span><span class="p">))</span>
         <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">([(</span><span class="n">_a</span> <span class="o">+</span> <span class="n">_b</span> <span class="o">*</span> <span class="n">args</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">racah_indices</span><span class="p">[</span><span class="mi">0</span><span class="p">]])</span>
@@ -381,43 +331,27 @@
                        <span class="k">for</span> <span class="n">t</span><span class="p">,</span> <span class="n">_a</span><span class="p">,</span> <span class="n">_b</span><span class="p">,</span> <span class="n">t_list</span><span class="p">,</span> <span class="n">c_list</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">transitions</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">a_qi</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">b_qi</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">transitions_qi</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">c_qi</span><span class="p">)],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">a_qi</span><span class="p">)</span></div>
 
-
-<div class="viewcode-block" id="HyperfineQI.min">
-<a class="viewcode-back" href="../../../qspec.html#qspec.models.HyperfineQI.min">[docs]</a>
-    <span class="k">def</span> <span class="nf">min</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="HyperfineQI.min"><a class="viewcode-back" href="../../../qspec.html#qspec.models.HyperfineQI.min">[docs]</a>    <span class="k">def</span> <span class="nf">min</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">const_l</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vals</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">size</span> <span class="o">+</span> <span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_l</span><span class="p">))</span>
         <span class="n">const_u</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vals</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">size</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_l</span> <span class="o">+</span> <span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_u</span><span class="p">))</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">min</span><span class="p">()</span> <span class="o">+</span> <span class="nb">min</span><span class="p">(</span><span class="n">hf_shift</span><span class="p">(</span><span class="n">const_l</span><span class="p">,</span> <span class="n">const_u</span><span class="p">,</span> <span class="n">t</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">t</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">transitions</span><span class="p">)</span></div>
 
-
-<div class="viewcode-block" id="HyperfineQI.max">
-<a class="viewcode-back" href="../../../qspec.html#qspec.models.HyperfineQI.max">[docs]</a>
-    <span class="k">def</span> <span class="nf">max</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="HyperfineQI.max"><a class="viewcode-back" href="../../../qspec.html#qspec.models.HyperfineQI.max">[docs]</a>    <span class="k">def</span> <span class="nf">max</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">const_l</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vals</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">size</span> <span class="o">+</span> <span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_l</span><span class="p">))</span>
         <span class="n">const_u</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vals</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">size</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_l</span> <span class="o">+</span> <span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_u</span><span class="p">))</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">max</span><span class="p">()</span> <span class="o">+</span> <span class="nb">max</span><span class="p">(</span><span class="n">hf_shift</span><span class="p">(</span><span class="n">const_l</span><span class="p">,</span> <span class="n">const_u</span><span class="p">,</span> <span class="n">t</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">t</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">transitions</span><span class="p">)</span></div>
 
-
-<div class="viewcode-block" id="HyperfineQI.intervals">
-<a class="viewcode-back" href="../../../qspec.html#qspec.models.HyperfineQI.intervals">[docs]</a>
-    <span class="k">def</span> <span class="nf">intervals</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="HyperfineQI.intervals"><a class="viewcode-back" href="../../../qspec.html#qspec.models.HyperfineQI.intervals">[docs]</a>    <span class="k">def</span> <span class="nf">intervals</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">const_l</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vals</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">size</span> <span class="o">+</span> <span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_l</span><span class="p">))</span>
         <span class="n">const_u</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vals</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">size</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_l</span> <span class="o">+</span> <span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_u</span><span class="p">))</span>
         <span class="n">shifts</span> <span class="o">=</span> <span class="p">[</span><span class="n">hf_shift</span><span class="p">(</span><span class="n">const_l</span><span class="p">,</span> <span class="n">const_u</span><span class="p">,</span> <span class="n">t</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">t</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">transitions</span><span class="p">]</span>
         <span class="k">return</span> <span class="n">merge_intervals</span><span class="p">([[</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">min</span><span class="p">()</span> <span class="o">+</span> <span class="n">shift</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">max</span><span class="p">()</span> <span class="o">+</span> <span class="n">shift</span><span class="p">]</span> <span class="k">for</span> <span class="n">shift</span> <span class="ow">in</span> <span class="n">shifts</span><span class="p">])</span></div>
 
-
-<div class="viewcode-block" id="HyperfineQI.racah">
-<a class="viewcode-back" href="../../../qspec.html#qspec.models.HyperfineQI.racah">[docs]</a>
-    <span class="k">def</span> <span class="nf">racah</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">vals</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">racah_indices</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span> <span class="o">=</span> <span class="mf">0.</span></div>
-</div>
+<div class="viewcode-block" id="HyperfineQI.racah"><a class="viewcode-back" href="../../../qspec.html#qspec.models.HyperfineQI.racah">[docs]</a>    <span class="k">def</span> <span class="nf">racah</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">vals</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">racah_indices</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span> <span class="o">=</span> <span class="mf">0.</span></div></div>
 
 
-
-<div class="viewcode-block" id="HyperfineMixed">
-<a class="viewcode-back" href="../../../qspec.html#qspec.models.HyperfineMixed">[docs]</a>
-<span class="k">class</span> <span class="nc">HyperfineMixed</span><span class="p">(</span><span class="n">Splitter</span><span class="p">):</span>
+<div class="viewcode-block" id="HyperfineMixed"><a class="viewcode-back" href="../../../qspec.html#qspec.models.HyperfineMixed">[docs]</a><span class="k">class</span> <span class="nc">HyperfineMixed</span><span class="p">(</span><span class="n">Splitter</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Hyperfine-mixing model based on https://doi.org/10.1103/PhysRevA.55.2728 [1].</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -485,9 +419,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">_add_arg</span><span class="p">(</span><span class="s1">&#39;int</span><span class="si">{}</span><span class="s1">([</span><span class="si">{}</span><span class="s1">, </span><span class="si">{}</span><span class="s1">] -&gt; [</span><span class="si">{}</span><span class="s1">, </span><span class="si">{}</span><span class="s1">])&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">t</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="n">t</span><span class="p">[</span><span class="mi">2</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="n">t</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">],</span> <span class="n">t</span><span class="p">[</span><span class="mi">2</span><span class="p">][</span><span class="mi">1</span><span class="p">]),</span>
                           <span class="n">intensity</span><span class="p">,</span> <span class="n">i</span> <span class="o">==</span> <span class="mi">0</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
 
-<div class="viewcode-block" id="HyperfineMixed.x0">
-<a class="viewcode-back" href="../../../qspec.html#qspec.models.HyperfineMixed.x0">[docs]</a>
-    <span class="k">def</span> <span class="nf">x0</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+<div class="viewcode-block" id="HyperfineMixed.x0"><a class="viewcode-back" href="../../../qspec.html#qspec.models.HyperfineMixed.x0">[docs]</a>    <span class="k">def</span> <span class="nf">x0</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
         <span class="n">x0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">transitions</span><span class="p">))</span>
         <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">states</span><span class="p">:</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">enabled</span><span class="p">[</span><span class="n">s</span><span class="p">]:</span>
@@ -513,39 +445,22 @@
         <span class="c1"># print(f&#39;[{&quot;, &quot;.join([str(_x0) for _x0 in x0])}]&#39;)</span>
         <span class="k">return</span> <span class="n">x0</span></div>
 
-
-<div class="viewcode-block" id="HyperfineMixed.evaluate">
-<a class="viewcode-back" href="../../../qspec.html#qspec.models.HyperfineMixed.evaluate">[docs]</a>
-    <span class="k">def</span> <span class="nf">evaluate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="HyperfineMixed.evaluate"><a class="viewcode-back" href="../../../qspec.html#qspec.models.HyperfineMixed.evaluate">[docs]</a>    <span class="k">def</span> <span class="nf">evaluate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">([</span><span class="n">args</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">x</span> <span class="o">-</span> <span class="n">_x0</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
                        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">_x0</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">racah_indices</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">x0</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">))],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span></div>
 
-
-<div class="viewcode-block" id="HyperfineMixed.min">
-<a class="viewcode-back" href="../../../qspec.html#qspec.models.HyperfineMixed.min">[docs]</a>
-    <span class="k">def</span> <span class="nf">min</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="HyperfineMixed.min"><a class="viewcode-back" href="../../../qspec.html#qspec.models.HyperfineMixed.min">[docs]</a>    <span class="k">def</span> <span class="nf">min</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">min</span><span class="p">()</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x0</span><span class="p">(</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">vals</span><span class="p">))</span></div>
 
-
-<div class="viewcode-block" id="HyperfineMixed.max">
-<a class="viewcode-back" href="../../../qspec.html#qspec.models.HyperfineMixed.max">[docs]</a>
-    <span class="k">def</span> <span class="nf">max</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="HyperfineMixed.max"><a class="viewcode-back" href="../../../qspec.html#qspec.models.HyperfineMixed.max">[docs]</a>    <span class="k">def</span> <span class="nf">max</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">max</span><span class="p">()</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x0</span><span class="p">(</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">vals</span><span class="p">))</span></div>
 
-
-<div class="viewcode-block" id="HyperfineMixed.intervals">
-<a class="viewcode-back" href="../../../qspec.html#qspec.models.HyperfineMixed.intervals">[docs]</a>
-    <span class="k">def</span> <span class="nf">intervals</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="HyperfineMixed.intervals"><a class="viewcode-back" href="../../../qspec.html#qspec.models.HyperfineMixed.intervals">[docs]</a>    <span class="k">def</span> <span class="nf">intervals</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">merge_intervals</span><span class="p">([[</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">min</span><span class="p">()</span> <span class="o">+</span> <span class="n">_x0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">max</span><span class="p">()</span> <span class="o">+</span> <span class="n">_x0</span><span class="p">]</span> <span class="k">for</span> <span class="n">_x0</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">x0</span><span class="p">(</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">vals</span><span class="p">)])</span></div>
 
-
-<div class="viewcode-block" id="HyperfineMixed.racah">
-<a class="viewcode-back" href="../../../qspec.html#qspec.models.HyperfineMixed.racah">[docs]</a>
-    <span class="k">def</span> <span class="nf">racah</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="HyperfineMixed.racah"><a class="viewcode-back" href="../../../qspec.html#qspec.models.HyperfineMixed.racah">[docs]</a>    <span class="k">def</span> <span class="nf">racah</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">intensity</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">racah_indices</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">racah_intensities</span><span class="p">):</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">vals</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">intensity</span></div>
-</div>
-
+            <span class="bp">self</span><span class="o">.</span><span class="n">vals</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">intensity</span></div></div>
 </pre></div>
 
            </div>

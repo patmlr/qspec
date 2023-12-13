@@ -1,22 +1,24 @@
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" >
+<html class="writer-html5" lang="en">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>qspec.physics &mdash; qspec 20.05.2023 documentation</title>
-      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
-      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <title>qspec.physics &mdash; qspec 13.12.2023 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=19f00094" />
       <link rel="stylesheet" href="../../_static/css/borders.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/css/wy-nav-content.css" type="text/css" />
+
+  
   <!--[if lt IE 9]>
     <script src="../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
         <script src="../../_static/jquery.js?v=5d32c60e"></script>
         <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="../../_static/documentation_options.js?v=52e4f5b1"></script>
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js?v=7f3357fe"></script>
         <script src="../../_static/doctools.js?v=888ff710"></script>
-        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script src="../../_static/sphinx_highlight.js?v=4825356b"></script>
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" /> 
@@ -120,9 +122,7 @@
 <span class="sd">&quot;&quot;&quot; Units &quot;&quot;&quot;</span>
 
 
-<div class="viewcode-block" id="inv_cm_to_freq">
-<a class="viewcode-back" href="../../qspec.html#qspec.physics.inv_cm_to_freq">[docs]</a>
-<span class="k">def</span> <span class="nf">inv_cm_to_freq</span><span class="p">(</span><span class="n">k</span><span class="p">:</span> <span class="n">array_like</span><span class="p">):</span>
+<div class="viewcode-block" id="inv_cm_to_freq"><a class="viewcode-back" href="../../qspec.html#qspec.physics.inv_cm_to_freq">[docs]</a><span class="k">def</span> <span class="nf">inv_cm_to_freq</span><span class="p">(</span><span class="n">k</span><span class="p">:</span> <span class="n">array_like</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    :param k: The wavenumber k of a transition (cm ** -1)</span>
 <span class="sd">    :returns: The frequency corresponding to the wavenumber k (MHz).</span>
@@ -130,10 +130,7 @@
     <span class="k">return</span> <span class="n">k</span> <span class="o">*</span> <span class="n">sc</span><span class="o">.</span><span class="n">c</span> <span class="o">*</span> <span class="mf">1e-4</span></div>
 
 
-
-<div class="viewcode-block" id="freq_to_inv_cm">
-<a class="viewcode-back" href="../../qspec.html#qspec.physics.freq_to_inv_cm">[docs]</a>
-<span class="k">def</span> <span class="nf">freq_to_inv_cm</span><span class="p">(</span><span class="n">freq</span><span class="p">:</span> <span class="n">array_like</span><span class="p">):</span>
+<div class="viewcode-block" id="freq_to_inv_cm"><a class="viewcode-back" href="../../qspec.html#qspec.physics.freq_to_inv_cm">[docs]</a><span class="k">def</span> <span class="nf">freq_to_inv_cm</span><span class="p">(</span><span class="n">freq</span><span class="p">:</span> <span class="n">array_like</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    :param freq: The frequency f of a transition (MHz)</span>
 <span class="sd">    :returns: The wavenumber k corresponding to the frequency freq (cm ** -1).</span>
@@ -141,10 +138,7 @@
     <span class="k">return</span> <span class="n">freq</span> <span class="o">/</span> <span class="n">sc</span><span class="o">.</span><span class="n">c</span> <span class="o">*</span> <span class="mf">1e4</span></div>
 
 
-
-<div class="viewcode-block" id="wavelength_to_freq">
-<a class="viewcode-back" href="../../qspec.html#qspec.physics.wavelength_to_freq">[docs]</a>
-<span class="k">def</span> <span class="nf">wavelength_to_freq</span><span class="p">(</span><span class="n">lam</span><span class="p">:</span> <span class="n">array_like</span><span class="p">):</span>
+<div class="viewcode-block" id="wavelength_to_freq"><a class="viewcode-back" href="../../qspec.html#qspec.physics.wavelength_to_freq">[docs]</a><span class="k">def</span> <span class="nf">wavelength_to_freq</span><span class="p">(</span><span class="n">lam</span><span class="p">:</span> <span class="n">array_like</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    :param lam: The wavelength lambda of a transition (um)</span>
 <span class="sd">    :returns: The frequency corresponding to the wavelength lam (MHz).</span>
@@ -152,10 +146,7 @@
     <span class="k">return</span> <span class="n">sc</span><span class="o">.</span><span class="n">c</span> <span class="o">/</span> <span class="n">lam</span></div>
 
 
-
-<div class="viewcode-block" id="freq_to_wavelength">
-<a class="viewcode-back" href="../../qspec.html#qspec.physics.freq_to_wavelength">[docs]</a>
-<span class="k">def</span> <span class="nf">freq_to_wavelength</span><span class="p">(</span><span class="n">freq</span><span class="p">:</span> <span class="n">array_like</span><span class="p">):</span>
+<div class="viewcode-block" id="freq_to_wavelength"><a class="viewcode-back" href="../../qspec.html#qspec.physics.freq_to_wavelength">[docs]</a><span class="k">def</span> <span class="nf">freq_to_wavelength</span><span class="p">(</span><span class="n">freq</span><span class="p">:</span> <span class="n">array_like</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    :param freq: The frequency f of a transition (MHz)</span>
 <span class="sd">    :returns: The wavelength corresponding to the frequency freq (um).</span>
@@ -163,10 +154,7 @@
     <span class="k">return</span> <span class="n">sc</span><span class="o">.</span><span class="n">c</span> <span class="o">/</span> <span class="n">freq</span></div>
 
 
-
-<div class="viewcode-block" id="inv_cm_to_wavelength">
-<a class="viewcode-back" href="../../qspec.html#qspec.physics.inv_cm_to_wavelength">[docs]</a>
-<span class="k">def</span> <span class="nf">inv_cm_to_wavelength</span><span class="p">(</span><span class="n">k</span><span class="p">:</span> <span class="n">array_like</span><span class="p">):</span>
+<div class="viewcode-block" id="inv_cm_to_wavelength"><a class="viewcode-back" href="../../qspec.html#qspec.physics.inv_cm_to_wavelength">[docs]</a><span class="k">def</span> <span class="nf">inv_cm_to_wavelength</span><span class="p">(</span><span class="n">k</span><span class="p">:</span> <span class="n">array_like</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    :param k: The wavenumber k of a transition (cm ** -1)</span>
 <span class="sd">    :returns: The wavelength corresponding to the wavenumber k (um).</span>
@@ -174,10 +162,7 @@
     <span class="k">return</span> <span class="mf">1e4</span> <span class="o">/</span> <span class="n">k</span></div>
 
 
-
-<div class="viewcode-block" id="wavelength_to_inv_cm">
-<a class="viewcode-back" href="../../qspec.html#qspec.physics.wavelength_to_inv_cm">[docs]</a>
-<span class="k">def</span> <span class="nf">wavelength_to_inv_cm</span><span class="p">(</span><span class="n">lam</span><span class="p">:</span> <span class="n">array_like</span><span class="p">):</span>
+<div class="viewcode-block" id="wavelength_to_inv_cm"><a class="viewcode-back" href="../../qspec.html#qspec.physics.wavelength_to_inv_cm">[docs]</a><span class="k">def</span> <span class="nf">wavelength_to_inv_cm</span><span class="p">(</span><span class="n">lam</span><span class="p">:</span> <span class="n">array_like</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    :param lam: The wavelength lambda of a transition (um)</span>
 <span class="sd">    :returns: The wavenumber k corresponding to the wavelength lam (cm ** -1).</span>
@@ -185,13 +170,10 @@
     <span class="k">return</span> <span class="mf">1e4</span> <span class="o">/</span> <span class="n">lam</span></div>
 
 
-
 <span class="sd">&quot;&quot;&quot; 1-D kinematics &quot;&quot;&quot;</span>
 
 
-<div class="viewcode-block" id="beta">
-<a class="viewcode-back" href="../../qspec.html#qspec.physics.beta">[docs]</a>
-<span class="k">def</span> <span class="nf">beta</span><span class="p">(</span><span class="n">v</span><span class="p">:</span> <span class="n">array_like</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">array_like</span><span class="p">:</span>
+<div class="viewcode-block" id="beta"><a class="viewcode-back" href="../../qspec.html#qspec.physics.beta">[docs]</a><span class="k">def</span> <span class="nf">beta</span><span class="p">(</span><span class="n">v</span><span class="p">:</span> <span class="n">array_like</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">array_like</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    :param v: The velocity of a body (m/s).</span>
 <span class="sd">    :returns: The velocity v relative to light speed.</span>
@@ -200,10 +182,7 @@
     <span class="k">return</span> <span class="n">v</span> <span class="o">/</span> <span class="n">sc</span><span class="o">.</span><span class="n">c</span></div>
 
 
-
-<div class="viewcode-block" id="gamma">
-<a class="viewcode-back" href="../../qspec.html#qspec.physics.gamma">[docs]</a>
-<span class="k">def</span> <span class="nf">gamma</span><span class="p">(</span><span class="n">v</span><span class="p">:</span> <span class="n">array_like</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">array_like</span><span class="p">:</span>
+<div class="viewcode-block" id="gamma"><a class="viewcode-back" href="../../qspec.html#qspec.physics.gamma">[docs]</a><span class="k">def</span> <span class="nf">gamma</span><span class="p">(</span><span class="n">v</span><span class="p">:</span> <span class="n">array_like</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">array_like</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    :param v: The velocity of a body (m/s).</span>
 <span class="sd">    :returns: The time-dilation/Lorentz factor corresponding to the velocity v.</span>
@@ -211,10 +190,7 @@
     <span class="k">return</span> <span class="mf">1.</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mf">1.</span> <span class="o">-</span> <span class="n">beta</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span></div>
 
 
-
-<div class="viewcode-block" id="gamma_e">
-<a class="viewcode-back" href="../../qspec.html#qspec.physics.gamma_e">[docs]</a>
-<span class="k">def</span> <span class="nf">gamma_e</span><span class="p">(</span><span class="n">e</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">m</span><span class="p">:</span> <span class="n">array_like</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">array_like</span><span class="p">:</span>
+<div class="viewcode-block" id="gamma_e"><a class="viewcode-back" href="../../qspec.html#qspec.physics.gamma_e">[docs]</a><span class="k">def</span> <span class="nf">gamma_e</span><span class="p">(</span><span class="n">e</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">m</span><span class="p">:</span> <span class="n">array_like</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">array_like</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    :param e: The total energy of a body, including the energy of the rest mass (eV).</span>
 <span class="sd">    :param m: The mass of the body (amu).</span>
@@ -224,10 +200,7 @@
     <span class="k">return</span> <span class="n">e</span> <span class="o">/</span> <span class="n">e_rest</span><span class="p">(</span><span class="n">m</span><span class="p">)</span></div>
 
 
-
-<div class="viewcode-block" id="gamma_e_kin">
-<a class="viewcode-back" href="../../qspec.html#qspec.physics.gamma_e_kin">[docs]</a>
-<span class="k">def</span> <span class="nf">gamma_e_kin</span><span class="p">(</span><span class="n">e</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">m</span><span class="p">:</span> <span class="n">array_like</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">array_like</span><span class="p">:</span>
+<div class="viewcode-block" id="gamma_e_kin"><a class="viewcode-back" href="../../qspec.html#qspec.physics.gamma_e_kin">[docs]</a><span class="k">def</span> <span class="nf">gamma_e_kin</span><span class="p">(</span><span class="n">e</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">m</span><span class="p">:</span> <span class="n">array_like</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">array_like</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    :param e: The kinetic energy of a body (eV).</span>
 <span class="sd">    :param m: The mass of the body (amu).</span>
@@ -236,10 +209,7 @@
     <span class="k">return</span> <span class="mf">1.</span> <span class="o">+</span> <span class="n">gamma_e</span><span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="n">m</span><span class="p">)</span></div>
 
 
-
-<div class="viewcode-block" id="e_rest">
-<a class="viewcode-back" href="../../qspec.html#qspec.physics.e_rest">[docs]</a>
-<span class="k">def</span> <span class="nf">e_rest</span><span class="p">(</span><span class="n">m</span><span class="p">:</span> <span class="n">array_like</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">array_like</span><span class="p">:</span>
+<div class="viewcode-block" id="e_rest"><a class="viewcode-back" href="../../qspec.html#qspec.physics.e_rest">[docs]</a><span class="k">def</span> <span class="nf">e_rest</span><span class="p">(</span><span class="n">m</span><span class="p">:</span> <span class="n">array_like</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">array_like</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    :param m: The mass of a body (amu).</span>
 <span class="sd">    :returns: The resting energy of the body with mass m (eV).</span>
@@ -248,10 +218,7 @@
     <span class="k">return</span> <span class="n">m</span> <span class="o">*</span> <span class="n">sc</span><span class="o">.</span><span class="n">atomic_mass</span> <span class="o">*</span> <span class="n">sc</span><span class="o">.</span><span class="n">c</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">/</span> <span class="n">E_NORM</span></div>
 
 
-
-<div class="viewcode-block" id="e_kin">
-<a class="viewcode-back" href="../../qspec.html#qspec.physics.e_kin">[docs]</a>
-<span class="k">def</span> <span class="nf">e_kin</span><span class="p">(</span><span class="n">v</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">m</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">relativistic</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">array_like</span><span class="p">:</span>
+<div class="viewcode-block" id="e_kin"><a class="viewcode-back" href="../../qspec.html#qspec.physics.e_kin">[docs]</a><span class="k">def</span> <span class="nf">e_kin</span><span class="p">(</span><span class="n">v</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">m</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">relativistic</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">array_like</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    :param v: The velocity of a body (m/s).</span>
 <span class="sd">    :param m: The mass of the body (amu).</span>
@@ -265,10 +232,7 @@
         <span class="k">return</span> <span class="n">m</span> <span class="o">*</span> <span class="n">sc</span><span class="o">.</span><span class="n">atomic_mass</span> <span class="o">*</span> <span class="n">v</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">/</span> <span class="mf">2.</span> <span class="o">/</span> <span class="n">E_NORM</span></div>
 
 
-
-<div class="viewcode-block" id="e_total">
-<a class="viewcode-back" href="../../qspec.html#qspec.physics.e_total">[docs]</a>
-<span class="k">def</span> <span class="nf">e_total</span><span class="p">(</span><span class="n">v</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">m</span><span class="p">:</span> <span class="n">array_like</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">array_like</span><span class="p">:</span>
+<div class="viewcode-block" id="e_total"><a class="viewcode-back" href="../../qspec.html#qspec.physics.e_total">[docs]</a><span class="k">def</span> <span class="nf">e_total</span><span class="p">(</span><span class="n">v</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">m</span><span class="p">:</span> <span class="n">array_like</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">array_like</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    :param v: The velocity of a body (m/s).</span>
 <span class="sd">    :param m: The mass of the body (amu).</span>
@@ -276,10 +240,7 @@
     <span class="k">return</span> <span class="n">gamma</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="o">*</span> <span class="n">e_rest</span><span class="p">(</span><span class="n">m</span><span class="p">)</span></div>
 
 
-
-<div class="viewcode-block" id="e_el">
-<a class="viewcode-back" href="../../qspec.html#qspec.physics.e_el">[docs]</a>
-<span class="k">def</span> <span class="nf">e_el</span><span class="p">(</span><span class="n">u</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">q</span><span class="p">:</span> <span class="n">array_like</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">array_like</span><span class="p">:</span>
+<div class="viewcode-block" id="e_el"><a class="viewcode-back" href="../../qspec.html#qspec.physics.e_el">[docs]</a><span class="k">def</span> <span class="nf">e_el</span><span class="p">(</span><span class="n">u</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">q</span><span class="p">:</span> <span class="n">array_like</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">array_like</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    :param u: The electric potential difference (V).</span>
 <span class="sd">    :param q: The charge of a body (e).</span>
@@ -289,10 +250,7 @@
     <span class="k">return</span> <span class="n">q</span> <span class="o">*</span> <span class="n">u</span></div>
 
 
-
-<div class="viewcode-block" id="v_e">
-<a class="viewcode-back" href="../../qspec.html#qspec.physics.v_e">[docs]</a>
-<span class="k">def</span> <span class="nf">v_e</span><span class="p">(</span><span class="n">e</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">m</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">v0</span><span class="p">:</span> <span class="n">array_like</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">relativistic</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">array_like</span><span class="p">:</span>
+<div class="viewcode-block" id="v_e"><a class="viewcode-back" href="../../qspec.html#qspec.physics.v_e">[docs]</a><span class="k">def</span> <span class="nf">v_e</span><span class="p">(</span><span class="n">e</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">m</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">v0</span><span class="p">:</span> <span class="n">array_like</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">relativistic</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">array_like</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    :param e: Energy which is added to the kinetic energy of a body with velocity v0 (eV).</span>
 <span class="sd">    :param m: The mass of the body (amu).</span>
@@ -307,10 +265,7 @@
         <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">v0</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="mf">2.</span> <span class="o">*</span> <span class="n">e</span> <span class="o">*</span> <span class="n">E_NORM</span> <span class="o">/</span> <span class="p">(</span><span class="n">m</span> <span class="o">*</span> <span class="n">sc</span><span class="o">.</span><span class="n">atomic_mass</span><span class="p">))</span></div>
 
 
-
-<div class="viewcode-block" id="v_e_d1">
-<a class="viewcode-back" href="../../qspec.html#qspec.physics.v_e_d1">[docs]</a>
-<span class="k">def</span> <span class="nf">v_e_d1</span><span class="p">(</span><span class="n">e</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">m</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">v0</span><span class="p">:</span> <span class="n">array_like</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">relativistic</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">array_like</span><span class="p">:</span>
+<div class="viewcode-block" id="v_e_d1"><a class="viewcode-back" href="../../qspec.html#qspec.physics.v_e_d1">[docs]</a><span class="k">def</span> <span class="nf">v_e_d1</span><span class="p">(</span><span class="n">e</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">m</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">v0</span><span class="p">:</span> <span class="n">array_like</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">relativistic</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">array_like</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    :param e: Energy which is added to the kinetic energy of a body with velocity v0 (eV).</span>
 <span class="sd">    :param m: The mass of the body (amu).</span>
@@ -325,10 +280,7 @@
     <span class="k">return</span> <span class="n">dv</span> <span class="o">*</span> <span class="n">E_NORM</span></div>
 
 
-
-<div class="viewcode-block" id="v_el">
-<a class="viewcode-back" href="../../qspec.html#qspec.physics.v_el">[docs]</a>
-<span class="k">def</span> <span class="nf">v_el</span><span class="p">(</span><span class="n">u</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">q</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">m</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">v0</span><span class="p">:</span> <span class="n">array_like</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">relativistic</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">array_like</span><span class="p">:</span>
+<div class="viewcode-block" id="v_el"><a class="viewcode-back" href="../../qspec.html#qspec.physics.v_el">[docs]</a><span class="k">def</span> <span class="nf">v_el</span><span class="p">(</span><span class="n">u</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">q</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">m</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">v0</span><span class="p">:</span> <span class="n">array_like</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">relativistic</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">array_like</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    :param u: The electric potential difference added to the kinetic energy of a body with velocity v0 (V).</span>
 <span class="sd">    :param q: The charge of a body (e).</span>
@@ -341,10 +293,7 @@
     <span class="k">return</span> <span class="n">v_e</span><span class="p">(</span><span class="n">e_el</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">q</span><span class="p">),</span> <span class="n">m</span><span class="p">,</span> <span class="n">v0</span><span class="o">=</span><span class="n">v0</span><span class="p">,</span> <span class="n">relativistic</span><span class="o">=</span><span class="n">relativistic</span><span class="p">)</span></div>
 
 
-
-<div class="viewcode-block" id="v_el_d1">
-<a class="viewcode-back" href="../../qspec.html#qspec.physics.v_el_d1">[docs]</a>
-<span class="k">def</span> <span class="nf">v_el_d1</span><span class="p">(</span><span class="n">u</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">q</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">m</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">v0</span><span class="p">:</span> <span class="n">array_like</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">relativistic</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">array_like</span><span class="p">:</span>
+<div class="viewcode-block" id="v_el_d1"><a class="viewcode-back" href="../../qspec.html#qspec.physics.v_el_d1">[docs]</a><span class="k">def</span> <span class="nf">v_el_d1</span><span class="p">(</span><span class="n">u</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">q</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">m</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">v0</span><span class="p">:</span> <span class="n">array_like</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">relativistic</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">array_like</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    :param u: The electric potential difference added to the kinetic energy of a body with velocity v0 (V).</span>
 <span class="sd">    :param q: The charge of a body (e).</span>
@@ -356,10 +305,7 @@
     <span class="k">return</span> <span class="n">v_e_d1</span><span class="p">(</span><span class="n">e_el</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">q</span><span class="p">),</span> <span class="n">m</span><span class="p">,</span> <span class="n">v0</span><span class="o">=</span><span class="n">v0</span><span class="p">,</span> <span class="n">relativistic</span><span class="o">=</span><span class="n">relativistic</span><span class="p">)</span> <span class="o">*</span> <span class="n">q</span></div>
 
 
-
-<div class="viewcode-block" id="p_v">
-<a class="viewcode-back" href="../../qspec.html#qspec.physics.p_v">[docs]</a>
-<span class="k">def</span> <span class="nf">p_v</span><span class="p">(</span><span class="n">v</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">m</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">relativistic</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">array_like</span><span class="p">:</span>
+<div class="viewcode-block" id="p_v"><a class="viewcode-back" href="../../qspec.html#qspec.physics.p_v">[docs]</a><span class="k">def</span> <span class="nf">p_v</span><span class="p">(</span><span class="n">v</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">m</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">relativistic</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">array_like</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    :param v: The velocity of a body (m/s).</span>
 <span class="sd">    :param m: The mass of the body (amu).</span>
@@ -373,10 +319,7 @@
         <span class="k">return</span> <span class="n">m</span> <span class="o">*</span> <span class="n">sc</span><span class="o">.</span><span class="n">atomic_mass</span> <span class="o">*</span> <span class="n">v</span></div>
 
 
-
-<div class="viewcode-block" id="p_e">
-<a class="viewcode-back" href="../../qspec.html#qspec.physics.p_e">[docs]</a>
-<span class="k">def</span> <span class="nf">p_e</span><span class="p">(</span><span class="n">e</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">m</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">p0</span><span class="p">:</span> <span class="n">array_like</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">relativistic</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">array_like</span><span class="p">:</span>
+<div class="viewcode-block" id="p_e"><a class="viewcode-back" href="../../qspec.html#qspec.physics.p_e">[docs]</a><span class="k">def</span> <span class="nf">p_e</span><span class="p">(</span><span class="n">e</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">m</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">p0</span><span class="p">:</span> <span class="n">array_like</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">relativistic</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">array_like</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    :param e: Energy which is added to the kinetic energy of a body with velocity v0 (eV).</span>
 <span class="sd">    :param m: The mass of the body (amu).</span>
@@ -394,10 +337,7 @@
         <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">p0</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">m</span> <span class="o">*</span> <span class="n">sc</span><span class="o">.</span><span class="n">atomic_mass</span> <span class="o">*</span> <span class="n">e</span> <span class="o">*</span> <span class="n">E_NORM</span><span class="p">)</span></div>
 
 
-
-<div class="viewcode-block" id="p_el">
-<a class="viewcode-back" href="../../qspec.html#qspec.physics.p_el">[docs]</a>
-<span class="k">def</span> <span class="nf">p_el</span><span class="p">(</span><span class="n">u</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">q</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">m</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">p0</span><span class="p">:</span> <span class="n">array_like</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">relativistic</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">array_like</span><span class="p">:</span>
+<div class="viewcode-block" id="p_el"><a class="viewcode-back" href="../../qspec.html#qspec.physics.p_el">[docs]</a><span class="k">def</span> <span class="nf">p_el</span><span class="p">(</span><span class="n">u</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">q</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">m</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">p0</span><span class="p">:</span> <span class="n">array_like</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">relativistic</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">array_like</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    :param u: The electric potential difference added to the kinetic energy of a body with velocity v0 (V).</span>
 <span class="sd">    :param q: The charge of a body (e).</span>
@@ -410,10 +350,7 @@
     <span class="k">return</span> <span class="n">p_e</span><span class="p">(</span><span class="n">e_el</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">q</span><span class="p">),</span> <span class="n">m</span><span class="p">,</span> <span class="n">p0</span><span class="p">,</span> <span class="n">relativistic</span><span class="o">=</span><span class="n">relativistic</span><span class="p">)</span></div>
 
 
-
-<div class="viewcode-block" id="doppler">
-<a class="viewcode-back" href="../../qspec.html#qspec.physics.doppler">[docs]</a>
-<span class="k">def</span> <span class="nf">doppler</span><span class="p">(</span><span class="n">f</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">v</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">alpha</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">return_frame</span><span class="o">=</span><span class="s1">&#39;atom&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">array_like</span><span class="p">:</span>
+<div class="viewcode-block" id="doppler"><a class="viewcode-back" href="../../qspec.html#qspec.physics.doppler">[docs]</a><span class="k">def</span> <span class="nf">doppler</span><span class="p">(</span><span class="n">f</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">v</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">alpha</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">return_frame</span><span class="o">=</span><span class="s1">&#39;atom&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">array_like</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    :param f: The frequency of light (arb. units).</span>
 <span class="sd">    :param v: The velocity of a body (m/s).</span>
@@ -433,10 +370,7 @@
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;rest_frame must be either &quot;atom&quot; or &quot;lab&quot;.&#39;</span><span class="p">)</span></div>
 
 
-
-<div class="viewcode-block" id="doppler_d1">
-<a class="viewcode-back" href="../../qspec.html#qspec.physics.doppler_d1">[docs]</a>
-<span class="k">def</span> <span class="nf">doppler_d1</span><span class="p">(</span><span class="n">f</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">v</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">alpha</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">return_frame</span><span class="o">=</span><span class="s1">&#39;atom&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">array_like</span><span class="p">:</span>
+<div class="viewcode-block" id="doppler_d1"><a class="viewcode-back" href="../../qspec.html#qspec.physics.doppler_d1">[docs]</a><span class="k">def</span> <span class="nf">doppler_d1</span><span class="p">(</span><span class="n">f</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">v</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">alpha</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">return_frame</span><span class="o">=</span><span class="s1">&#39;atom&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">array_like</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    :param f: The frequency of light (arb. units).</span>
 <span class="sd">    :param v: The velocity of a body (m/s).</span>
@@ -457,10 +391,7 @@
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;rest_frame must be either &quot;atom&quot; or &quot;lab&quot;.&#39;</span><span class="p">)</span></div>
 
 
-
-<div class="viewcode-block" id="doppler_e_d1">
-<a class="viewcode-back" href="../../qspec.html#qspec.physics.doppler_e_d1">[docs]</a>
-<span class="k">def</span> <span class="nf">doppler_e_d1</span><span class="p">(</span><span class="n">f</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">alpha</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">e</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">m</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span>
+<div class="viewcode-block" id="doppler_e_d1"><a class="viewcode-back" href="../../qspec.html#qspec.physics.doppler_e_d1">[docs]</a><span class="k">def</span> <span class="nf">doppler_e_d1</span><span class="p">(</span><span class="n">f</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">alpha</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">e</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">m</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span>
                  <span class="n">v0</span><span class="p">:</span> <span class="n">array_like</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">return_frame</span><span class="o">=</span><span class="s1">&#39;atom&#39;</span><span class="p">,</span> <span class="n">relativistic</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">array_like</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    :param f: The frequency of light (arb. units).</span>
@@ -477,10 +408,7 @@
     <span class="k">return</span> <span class="n">doppler_d1</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="n">alpha</span><span class="p">,</span> <span class="n">return_frame</span><span class="o">=</span><span class="n">return_frame</span><span class="p">)</span> <span class="o">*</span> <span class="n">v_e_d1</span><span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="n">m</span><span class="p">,</span> <span class="n">v0</span><span class="o">=</span><span class="n">v0</span><span class="p">,</span> <span class="n">relativistic</span><span class="o">=</span><span class="n">relativistic</span><span class="p">)</span></div>
 
 
-
-<div class="viewcode-block" id="doppler_el_d1">
-<a class="viewcode-back" href="../../qspec.html#qspec.physics.doppler_el_d1">[docs]</a>
-<span class="k">def</span> <span class="nf">doppler_el_d1</span><span class="p">(</span><span class="n">f</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">alpha</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">u</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">q</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">m</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span>
+<div class="viewcode-block" id="doppler_el_d1"><a class="viewcode-back" href="../../qspec.html#qspec.physics.doppler_el_d1">[docs]</a><span class="k">def</span> <span class="nf">doppler_el_d1</span><span class="p">(</span><span class="n">f</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">alpha</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">u</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">q</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">m</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span>
                   <span class="n">v0</span><span class="p">:</span> <span class="n">array_like</span> <span class="o">=</span> <span class="mf">0.</span><span class="p">,</span> <span class="n">return_frame</span><span class="o">=</span><span class="s1">&#39;atom&#39;</span><span class="p">,</span> <span class="n">relativistic</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">array_like</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    :param f: The frequency of light (arb. units).</span>
@@ -498,10 +426,7 @@
     <span class="k">return</span> <span class="n">doppler_d1</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="n">alpha</span><span class="p">,</span> <span class="n">return_frame</span><span class="o">=</span><span class="n">return_frame</span><span class="p">)</span> <span class="o">*</span> <span class="n">v_el_d1</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">q</span><span class="p">,</span> <span class="n">m</span><span class="p">,</span> <span class="n">v0</span><span class="o">=</span><span class="n">v0</span><span class="p">,</span> <span class="n">relativistic</span><span class="o">=</span><span class="n">relativistic</span><span class="p">)</span></div>
 
 
-
-<div class="viewcode-block" id="inverse_doppler">
-<a class="viewcode-back" href="../../qspec.html#qspec.physics.inverse_doppler">[docs]</a>
-<span class="k">def</span> <span class="nf">inverse_doppler</span><span class="p">(</span><span class="n">f_atom</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">f_lab</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">alpha</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span>
+<div class="viewcode-block" id="inverse_doppler"><a class="viewcode-back" href="../../qspec.html#qspec.physics.inverse_doppler">[docs]</a><span class="k">def</span> <span class="nf">inverse_doppler</span><span class="p">(</span><span class="n">f_atom</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">f_lab</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">alpha</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span>
                     <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;raise-raise&#39;</span><span class="p">,</span> <span class="n">return_mask</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">array_like</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    :param f_lab: The frequency of light in the laboratory frame (arb. units).</span>
@@ -565,10 +490,7 @@
     <span class="k">return</span> <span class="n">bet</span> <span class="o">*</span> <span class="n">sc</span><span class="o">.</span><span class="n">c</span></div>
 
 
-
-<div class="viewcode-block" id="inverse_doppler_d1">
-<a class="viewcode-back" href="../../qspec.html#qspec.physics.inverse_doppler_d1">[docs]</a>
-<span class="k">def</span> <span class="nf">inverse_doppler_d1</span><span class="p">(</span><span class="n">f_atom</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">f_lab</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">alpha</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span>
+<div class="viewcode-block" id="inverse_doppler_d1"><a class="viewcode-back" href="../../qspec.html#qspec.physics.inverse_doppler_d1">[docs]</a><span class="k">def</span> <span class="nf">inverse_doppler_d1</span><span class="p">(</span><span class="n">f_atom</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">f_lab</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">alpha</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span>
                        <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;raise-raise&#39;</span><span class="p">,</span> <span class="n">return_mask</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">array_like</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    :param f_lab: The frequency of light in the laboratory frame (arb. units).</span>
@@ -606,10 +528,7 @@
     <span class="k">return</span> <span class="n">bet</span> <span class="o">*</span> <span class="n">sc</span><span class="o">.</span><span class="n">c</span> <span class="o">/</span> <span class="p">(</span><span class="n">f_lab</span> <span class="o">*</span> <span class="n">square_sum</span><span class="p">)</span></div>
 
 
-
-<div class="viewcode-block" id="alpha_atom">
-<a class="viewcode-back" href="../../qspec.html#qspec.physics.alpha_atom">[docs]</a>
-<span class="k">def</span> <span class="nf">alpha_atom</span><span class="p">(</span><span class="n">alpha</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">v</span><span class="p">:</span> <span class="n">array_like</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">array_like</span><span class="p">:</span>
+<div class="viewcode-block" id="alpha_atom"><a class="viewcode-back" href="../../qspec.html#qspec.physics.alpha_atom">[docs]</a><span class="k">def</span> <span class="nf">alpha_atom</span><span class="p">(</span><span class="n">alpha</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">v</span><span class="p">:</span> <span class="n">array_like</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">array_like</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    :param alpha: The angle between a velocity- and a wave-vector in the laboratory frame (rad).</span>
 <span class="sd">    :param v: The velocity of a body (m/s).</span>
@@ -621,10 +540,7 @@
     <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">arccos</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span></div>
 
 
-
-<div class="viewcode-block" id="v_rec">
-<a class="viewcode-back" href="../../qspec.html#qspec.physics.v_rec">[docs]</a>
-<span class="k">def</span> <span class="nf">v_rec</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">m</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">array_like</span><span class="p">:</span>
+<div class="viewcode-block" id="v_rec"><a class="viewcode-back" href="../../qspec.html#qspec.physics.v_rec">[docs]</a><span class="k">def</span> <span class="nf">v_rec</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">m</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">array_like</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    :param f: The frequency of light in the atoms rest frame (MHz).</span>
 <span class="sd">    :param m: The mass of a body (amu).</span>
@@ -635,10 +551,7 @@
     <span class="k">return</span> <span class="n">sc</span><span class="o">.</span><span class="n">h</span> <span class="o">*</span> <span class="n">f</span> <span class="o">/</span> <span class="p">(</span><span class="n">m</span> <span class="o">*</span> <span class="n">sc</span><span class="o">.</span><span class="n">atomic_mass</span> <span class="o">*</span> <span class="n">sc</span><span class="o">.</span><span class="n">c</span><span class="p">)</span> <span class="o">*</span> <span class="mf">1e6</span></div>
 
 
-
-<div class="viewcode-block" id="photon_recoil">
-<a class="viewcode-back" href="../../qspec.html#qspec.physics.photon_recoil">[docs]</a>
-<span class="k">def</span> <span class="nf">photon_recoil</span><span class="p">(</span><span class="n">f</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">m</span><span class="p">:</span> <span class="n">array_like</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">array_like</span><span class="p">:</span>
+<div class="viewcode-block" id="photon_recoil"><a class="viewcode-back" href="../../qspec.html#qspec.physics.photon_recoil">[docs]</a><span class="k">def</span> <span class="nf">photon_recoil</span><span class="p">(</span><span class="n">f</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">m</span><span class="p">:</span> <span class="n">array_like</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">array_like</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    :param f: The frequency of light in the atoms rest frame (MHz).</span>
 <span class="sd">    :param m: The mass of a body (amu).</span>
@@ -649,10 +562,7 @@
     <span class="k">return</span> <span class="p">(</span><span class="n">sc</span><span class="o">.</span><span class="n">h</span> <span class="o">*</span> <span class="p">(</span><span class="n">f</span> <span class="o">*</span> <span class="mf">1e6</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">m</span> <span class="o">*</span> <span class="n">sc</span><span class="o">.</span><span class="n">atomic_mass</span> <span class="o">*</span> <span class="n">sc</span><span class="o">.</span><span class="n">c</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="mf">1e-6</span></div>
 
 
-
-<div class="viewcode-block" id="photon_recoil_v">
-<a class="viewcode-back" href="../../qspec.html#qspec.physics.photon_recoil_v">[docs]</a>
-<span class="k">def</span> <span class="nf">photon_recoil_v</span><span class="p">(</span><span class="n">v</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">alpha</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">f_lab</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">m</span><span class="p">:</span> <span class="n">array_like</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">array_like</span><span class="p">:</span>
+<div class="viewcode-block" id="photon_recoil_v"><a class="viewcode-back" href="../../qspec.html#qspec.physics.photon_recoil_v">[docs]</a><span class="k">def</span> <span class="nf">photon_recoil_v</span><span class="p">(</span><span class="n">v</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">alpha</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">f_lab</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">m</span><span class="p">:</span> <span class="n">array_like</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">array_like</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    :param v: The velocity of a body (m/s).</span>
 <span class="sd">    :param alpha: The angle between a velocity- and a wave-vector in the laboratory frame (rad).</span>
@@ -665,13 +575,10 @@
     <span class="k">return</span> <span class="n">photon_recoil</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">m</span><span class="p">)</span></div>
 
 
-
 <span class="sd">&quot;&quot;&quot; Atomic physics &quot;&quot;&quot;</span>
 
 
-<div class="viewcode-block" id="get_f">
-<a class="viewcode-back" href="../../qspec.html#qspec.physics.get_f">[docs]</a>
-<span class="k">def</span> <span class="nf">get_f</span><span class="p">(</span><span class="n">i</span><span class="p">:</span> <span class="n">scalar</span><span class="p">,</span> <span class="n">j</span><span class="p">:</span> <span class="n">scalar</span><span class="p">):</span>
+<div class="viewcode-block" id="get_f"><a class="viewcode-back" href="../../qspec.html#qspec.physics.get_f">[docs]</a><span class="k">def</span> <span class="nf">get_f</span><span class="p">(</span><span class="n">i</span><span class="p">:</span> <span class="n">scalar</span><span class="p">,</span> <span class="n">j</span><span class="p">:</span> <span class="n">scalar</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    :param i: The nuclear spin quantum number I.</span>
 <span class="sd">    :param j: The electronic total angular momentum quantum number J.</span>
@@ -680,10 +587,7 @@
     <span class="k">return</span> <span class="p">[</span><span class="n">k</span> <span class="o">+</span> <span class="nb">abs</span><span class="p">(</span><span class="n">i</span> <span class="o">-</span> <span class="n">j</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="n">j</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">-</span> <span class="nb">abs</span><span class="p">(</span><span class="n">i</span> <span class="o">-</span> <span class="n">j</span><span class="p">)))]</span></div>
 
 
-
-<div class="viewcode-block" id="get_m">
-<a class="viewcode-back" href="../../qspec.html#qspec.physics.get_m">[docs]</a>
-<span class="k">def</span> <span class="nf">get_m</span><span class="p">(</span><span class="n">f</span><span class="p">:</span> <span class="n">scalar</span><span class="p">):</span>
+<div class="viewcode-block" id="get_m"><a class="viewcode-back" href="../../qspec.html#qspec.physics.get_m">[docs]</a><span class="k">def</span> <span class="nf">get_m</span><span class="p">(</span><span class="n">f</span><span class="p">:</span> <span class="n">scalar</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    :param f: The total angular momentum quantum number F (= J if I == 0).</span>
 <span class="sd">    :returns: All possible zeeman substates of the specified quantum number.</span>
@@ -691,10 +595,7 @@
     <span class="k">return</span> <span class="p">[</span><span class="n">k</span> <span class="o">-</span> <span class="n">f</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">f</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))]</span></div>
 
 
-
-<div class="viewcode-block" id="hyperfine">
-<a class="viewcode-back" href="../../qspec.html#qspec.physics.hyperfine">[docs]</a>
-<span class="k">def</span> <span class="nf">hyperfine</span><span class="p">(</span><span class="n">i</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">j</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">f</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">a</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">b</span><span class="p">:</span> <span class="n">array_like</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">array_like</span><span class="p">:</span>
+<div class="viewcode-block" id="hyperfine"><a class="viewcode-back" href="../../qspec.html#qspec.physics.hyperfine">[docs]</a><span class="k">def</span> <span class="nf">hyperfine</span><span class="p">(</span><span class="n">i</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">j</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">f</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">a</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">b</span><span class="p">:</span> <span class="n">array_like</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">array_like</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    :param i: The nuclear spin quantum number I.</span>
 <span class="sd">    :param j: The electronic total angular momentum quantum number J.</span>
@@ -723,10 +624,7 @@
     <span class="k">return</span> <span class="n">shift</span></div>
 
 
-
-<div class="viewcode-block" id="lande_n">
-<a class="viewcode-back" href="../../qspec.html#qspec.physics.lande_n">[docs]</a>
-<span class="k">def</span> <span class="nf">lande_n</span><span class="p">(</span><span class="n">gyro</span><span class="p">:</span> <span class="n">array_like</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">array_like</span><span class="p">:</span>
+<div class="viewcode-block" id="lande_n"><a class="viewcode-back" href="../../qspec.html#qspec.physics.lande_n">[docs]</a><span class="k">def</span> <span class="nf">lande_n</span><span class="p">(</span><span class="n">gyro</span><span class="p">:</span> <span class="n">array_like</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">array_like</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    :param gyro: The gyromagnetic ratio (MHz).</span>
 <span class="sd">    :returns: The nuclear g-factor.</span>
@@ -735,10 +633,7 @@
     <span class="k">return</span> <span class="n">gyro</span> <span class="o">*</span> <span class="n">sc</span><span class="o">.</span><span class="n">h</span> <span class="o">/</span> <span class="n">mu_N</span></div>
 
 
-
-<div class="viewcode-block" id="lande_j">
-<a class="viewcode-back" href="../../qspec.html#qspec.physics.lande_j">[docs]</a>
-<span class="k">def</span> <span class="nf">lande_j</span><span class="p">(</span><span class="n">s</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">ll</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">j</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">approx_g_s</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<div class="viewcode-block" id="lande_j"><a class="viewcode-back" href="../../qspec.html#qspec.physics.lande_j">[docs]</a><span class="k">def</span> <span class="nf">lande_j</span><span class="p">(</span><span class="n">s</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">ll</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">j</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">approx_g_s</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    :param s: The electron spin quantum number S.</span>
 <span class="sd">    :param ll: The electronic angular momentum quantum number L.</span>
@@ -756,10 +651,7 @@
     <span class="k">return</span> <span class="n">val</span></div>
 
 
-
-<div class="viewcode-block" id="lande_f">
-<a class="viewcode-back" href="../../qspec.html#qspec.physics.lande_f">[docs]</a>
-<span class="k">def</span> <span class="nf">lande_f</span><span class="p">(</span><span class="n">i</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">j</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">f</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">g_n</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">g_j</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<div class="viewcode-block" id="lande_f"><a class="viewcode-back" href="../../qspec.html#qspec.physics.lande_f">[docs]</a><span class="k">def</span> <span class="nf">lande_f</span><span class="p">(</span><span class="n">i</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">j</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">f</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">g_n</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">g_j</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    :param i: The nuclear spin quantum number I.</span>
 <span class="sd">    :param j: The electronic total angular momentum quantum number J.</span>
@@ -775,10 +667,7 @@
     <span class="k">return</span> <span class="n">val</span></div>
 
 
-
-<div class="viewcode-block" id="zeeman">
-<a class="viewcode-back" href="../../qspec.html#qspec.physics.zeeman">[docs]</a>
-<span class="k">def</span> <span class="nf">zeeman</span><span class="p">(</span><span class="n">m</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">b</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">g</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">as_freq</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">array_like</span><span class="p">:</span>
+<div class="viewcode-block" id="zeeman"><a class="viewcode-back" href="../../qspec.html#qspec.physics.zeeman">[docs]</a><span class="k">def</span> <span class="nf">zeeman</span><span class="p">(</span><span class="n">m</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">b</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">g</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">as_freq</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">array_like</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    :param m: The B-field-axis component quantum number m of the total angular momentum.</span>
 <span class="sd">    :param b: The B-field (T).</span>
@@ -793,10 +682,7 @@
     <span class="k">return</span> <span class="n">delta</span></div>
 
 
-
-<div class="viewcode-block" id="hyper_zeeman">
-<a class="viewcode-back" href="../../qspec.html#qspec.physics.hyper_zeeman">[docs]</a>
-<span class="k">def</span> <span class="nf">hyper_zeeman</span><span class="p">(</span><span class="n">i</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">s</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">ll</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">j</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">f</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">m</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">g_n</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+<div class="viewcode-block" id="hyper_zeeman"><a class="viewcode-back" href="../../qspec.html#qspec.physics.hyper_zeeman">[docs]</a><span class="k">def</span> <span class="nf">hyper_zeeman</span><span class="p">(</span><span class="n">i</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">s</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">ll</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">j</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">f</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">m</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">g_n</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
                  <span class="n">a_hyper</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">b_hyper</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">b</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span>
                  <span class="n">g_n_as_gyro</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">as_freq</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">array_like</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
@@ -823,10 +709,7 @@
     <span class="k">return</span> <span class="n">shift</span></div>
 
 
-
-<div class="viewcode-block" id="a_hyper_mu">
-<a class="viewcode-back" href="../../qspec.html#qspec.physics.a_hyper_mu">[docs]</a>
-<span class="k">def</span> <span class="nf">a_hyper_mu</span><span class="p">(</span><span class="n">i</span><span class="p">:</span> <span class="n">scalar</span><span class="p">,</span> <span class="n">j</span><span class="p">:</span> <span class="n">scalar</span><span class="p">,</span> <span class="n">mu</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">b</span><span class="p">:</span> <span class="n">array_like</span><span class="p">):</span>
+<div class="viewcode-block" id="a_hyper_mu"><a class="viewcode-back" href="../../qspec.html#qspec.physics.a_hyper_mu">[docs]</a><span class="k">def</span> <span class="nf">a_hyper_mu</span><span class="p">(</span><span class="n">i</span><span class="p">:</span> <span class="n">scalar</span><span class="p">,</span> <span class="n">j</span><span class="p">:</span> <span class="n">scalar</span><span class="p">,</span> <span class="n">mu</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">b</span><span class="p">:</span> <span class="n">array_like</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    :param i: The nuclear spin quantum number I.</span>
 <span class="sd">    :param j: The electronic total angular momentum quantum number J.</span>
@@ -840,40 +723,30 @@
     <span class="k">return</span> <span class="n">mu</span> <span class="o">*</span> <span class="n">b</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">i</span> <span class="o">*</span> <span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">j</span> <span class="o">*</span> <span class="p">(</span><span class="n">j</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))</span> <span class="o">/</span> <span class="n">sc</span><span class="o">.</span><span class="n">h</span></div>
 
 
-
-<div class="viewcode-block" id="saturation_intensity">
-<a class="viewcode-back" href="../../qspec.html#qspec.physics.saturation_intensity">[docs]</a>
-<span class="k">def</span> <span class="nf">saturation_intensity</span><span class="p">(</span><span class="n">f</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">a</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">a_dipole</span><span class="p">:</span> <span class="n">array_like</span><span class="p">):</span>
+<div class="viewcode-block" id="saturation_intensity"><a class="viewcode-back" href="../../qspec.html#qspec.physics.saturation_intensity">[docs]</a><span class="k">def</span> <span class="nf">saturation_intensity</span><span class="p">(</span><span class="n">f</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">a</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">a_dipole</span><span class="p">:</span> <span class="n">array_like</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    :param f: The frequency of the transition.</span>
+<span class="sd">    :param f: The frequency of the transition (MHz).</span>
 <span class="sd">    :param a: The Einstein A coefficient (MHz).</span>
 <span class="sd">    :param a_dipole: The reduced dipole coefficient of the transition (see algebra.a_dipole).</span>
 <span class="sd">    :returns: The saturation intensity.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">f</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">a_dipole</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">f</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">a</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">a_dipole</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">f</span> <span class="o">**</span> <span class="mi">3</span> <span class="o">*</span> <span class="n">sc</span><span class="o">.</span><span class="n">h</span> <span class="o">*</span> <span class="n">a</span> <span class="o">/</span> <span class="p">(</span><span class="mi">3</span> <span class="o">*</span> <span class="n">sc</span><span class="o">.</span><span class="n">c</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">a_dipole</span><span class="p">)</span> <span class="o">*</span> <span class="mf">1e24</span></div>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="p">(</span><span class="n">f</span> <span class="o">*</span> <span class="mf">1e6</span><span class="p">)</span> <span class="o">**</span> <span class="mi">3</span> <span class="o">*</span> <span class="n">sc</span><span class="o">.</span><span class="n">h</span> <span class="o">*</span> <span class="n">a</span> <span class="o">*</span> <span class="mf">1e6</span> <span class="o">/</span> <span class="p">(</span><span class="mi">3</span> <span class="o">*</span> <span class="n">sc</span><span class="o">.</span><span class="n">c</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">a_dipole</span><span class="p">)</span></div>
 
 
-
-<div class="viewcode-block" id="saturation">
-<a class="viewcode-back" href="../../qspec.html#qspec.physics.saturation">[docs]</a>
-<span class="k">def</span> <span class="nf">saturation</span><span class="p">(</span><span class="n">i</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">f</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">a</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">a_dipole</span><span class="p">:</span> <span class="n">array_like</span><span class="p">):</span>
+<div class="viewcode-block" id="saturation"><a class="viewcode-back" href="../../qspec.html#qspec.physics.saturation">[docs]</a><span class="k">def</span> <span class="nf">saturation</span><span class="p">(</span><span class="n">i</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">f</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">a</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">a_dipole</span><span class="p">:</span> <span class="n">array_like</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    :param i: The intensity of the laser.</span>
-<span class="sd">    :param f: The frequency of the transition.</span>
+<span class="sd">    :param i: The intensity of the laser (MHz).</span>
+<span class="sd">    :param f: The frequency of the transition (MHz).</span>
 <span class="sd">    :param a: The Einstein A coefficient (MHz).</span>
 <span class="sd">    :param a_dipole: The reduced dipole coefficient of the transition (see algebra.a_dipole).</span>
 <span class="sd">    :returns: The saturation parameter.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">i</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">a_dipole</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">i</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">f</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">a</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">a_dipole</span><span class="p">)</span>
-    <span class="n">i0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">f</span> <span class="o">**</span> <span class="mi">3</span> <span class="o">*</span> <span class="n">sc</span><span class="o">.</span><span class="n">h</span> <span class="o">*</span> <span class="n">a</span> <span class="o">/</span> <span class="p">(</span><span class="mi">3</span> <span class="o">*</span> <span class="n">sc</span><span class="o">.</span><span class="n">c</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">a_dipole</span><span class="p">)</span> <span class="o">*</span> <span class="mf">1e24</span>
-    <span class="k">return</span> <span class="n">i</span> <span class="o">/</span> <span class="n">i0</span></div>
+    <span class="n">i</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">i</span> <span class="o">/</span> <span class="n">saturation_intensity</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">a_dipole</span><span class="p">)</span></div>
 
 
-
-<div class="viewcode-block" id="rabi">
-<a class="viewcode-back" href="../../qspec.html#qspec.physics.rabi">[docs]</a>
-<span class="k">def</span> <span class="nf">rabi</span><span class="p">(</span><span class="n">a</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">s</span><span class="p">:</span> <span class="n">array_like</span><span class="p">):</span>
+<div class="viewcode-block" id="rabi"><a class="viewcode-back" href="../../qspec.html#qspec.physics.rabi">[docs]</a><span class="k">def</span> <span class="nf">rabi</span><span class="p">(</span><span class="n">a</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">s</span><span class="p">:</span> <span class="n">array_like</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    :param a: The Einstein A coefficient (MHz).</span>
 <span class="sd">    :param s: The saturation parameter.</span>
@@ -883,10 +756,7 @@
     <span class="k">return</span> <span class="n">a</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">s</span> <span class="o">/</span> <span class="mf">2.</span><span class="p">)</span></div>
 
 
-
-<div class="viewcode-block" id="scattering_rate">
-<a class="viewcode-back" href="../../qspec.html#qspec.physics.scattering_rate">[docs]</a>
-<span class="k">def</span> <span class="nf">scattering_rate</span><span class="p">(</span><span class="n">df</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">a</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">s</span><span class="p">:</span> <span class="n">array_like</span><span class="p">):</span>
+<div class="viewcode-block" id="scattering_rate"><a class="viewcode-back" href="../../qspec.html#qspec.physics.scattering_rate">[docs]</a><span class="k">def</span> <span class="nf">scattering_rate</span><span class="p">(</span><span class="n">df</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">a</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">s</span><span class="p">:</span> <span class="n">array_like</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    :param df: The detuning of to be scattered light from the transition.</span>
 <span class="sd">     This must be differences of real frequencies, such that w = 2 pi * df (MHz).</span>
@@ -898,10 +768,7 @@
     <span class="k">return</span> <span class="mf">0.125</span> <span class="o">*</span> <span class="n">s</span> <span class="o">*</span> <span class="n">a</span> <span class="o">**</span> <span class="mi">3</span> <span class="o">/</span> <span class="p">(</span><span class="mf">0.25</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">s</span><span class="p">)</span> <span class="o">*</span> <span class="n">a</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">df</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span></div>
 
 
-
-<div class="viewcode-block" id="mass_factor">
-<a class="viewcode-back" href="../../qspec.html#qspec.physics.mass_factor">[docs]</a>
-<span class="k">def</span> <span class="nf">mass_factor</span><span class="p">(</span><span class="n">m</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">m_ref</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">m_d</span><span class="p">:</span> <span class="n">array_like</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">m_ref_d</span><span class="p">:</span> <span class="n">array_like</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">k_inf</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> \
+<div class="viewcode-block" id="mass_factor"><a class="viewcode-back" href="../../qspec.html#qspec.physics.mass_factor">[docs]</a><span class="k">def</span> <span class="nf">mass_factor</span><span class="p">(</span><span class="n">m</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">m_ref</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">m_d</span><span class="p">:</span> <span class="n">array_like</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">m_ref_d</span><span class="p">:</span> <span class="n">array_like</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">k_inf</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> \
         <span class="o">-&gt;</span> <span class="p">(</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">ndarray</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    :param m: The mass of the isotope (amu).</span>
@@ -932,10 +799,7 @@
     <span class="k">return</span> <span class="n">mu</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">mu_d</span><span class="p">)</span></div>
 
 
-
-<div class="viewcode-block" id="delta_r2">
-<a class="viewcode-back" href="../../qspec.html#qspec.physics.delta_r2">[docs]</a>
-<span class="k">def</span> <span class="nf">delta_r2</span><span class="p">(</span><span class="n">r</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">r_d</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">r_ref</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">r_ref_d</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span>
+<div class="viewcode-block" id="delta_r2"><a class="viewcode-back" href="../../qspec.html#qspec.physics.delta_r2">[docs]</a><span class="k">def</span> <span class="nf">delta_r2</span><span class="p">(</span><span class="n">r</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">r_d</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">r_ref</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">r_ref_d</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span>
              <span class="n">delta_r</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">delta_r_d</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">v2</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">v2_ref</span><span class="p">:</span> <span class="n">array_like</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    :param r: The Barrett radius of an isotope.</span>
@@ -964,10 +828,7 @@
     <span class="k">return</span> <span class="n">val</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">err</span><span class="p">)</span></div>
 
 
-
-<div class="viewcode-block" id="delta_r4">
-<a class="viewcode-back" href="../../qspec.html#qspec.physics.delta_r4">[docs]</a>
-<span class="k">def</span> <span class="nf">delta_r4</span><span class="p">(</span><span class="n">r</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">r_d</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">r_ref</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">r_ref_d</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span>
+<div class="viewcode-block" id="delta_r4"><a class="viewcode-back" href="../../qspec.html#qspec.physics.delta_r4">[docs]</a><span class="k">def</span> <span class="nf">delta_r4</span><span class="p">(</span><span class="n">r</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">r_d</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">r_ref</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">r_ref_d</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span>
              <span class="n">delta_r</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">delta_r_d</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">v4</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">v4_ref</span><span class="p">:</span> <span class="n">array_like</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    :param r: The Barrett radius of an isotope.</span>
@@ -996,10 +857,7 @@
     <span class="k">return</span> <span class="n">val</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">err</span><span class="p">)</span></div>
 
 
-
-<div class="viewcode-block" id="delta_r6">
-<a class="viewcode-back" href="../../qspec.html#qspec.physics.delta_r6">[docs]</a>
-<span class="k">def</span> <span class="nf">delta_r6</span><span class="p">(</span><span class="n">r</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">r_d</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">r_ref</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">r_ref_d</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span>
+<div class="viewcode-block" id="delta_r6"><a class="viewcode-back" href="../../qspec.html#qspec.physics.delta_r6">[docs]</a><span class="k">def</span> <span class="nf">delta_r6</span><span class="p">(</span><span class="n">r</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">r_d</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">r_ref</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">r_ref_d</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span>
              <span class="n">delta_r</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">delta_r_d</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">v6</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">v6_ref</span><span class="p">:</span> <span class="n">array_like</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    :param r: The Barrett radius of an isotope.</span>
@@ -1032,10 +890,7 @@
     <span class="k">return</span> <span class="n">val</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">err</span><span class="p">)</span></div>
 
 
-
-<div class="viewcode-block" id="lambda_r">
-<a class="viewcode-back" href="../../qspec.html#qspec.physics.lambda_r">[docs]</a>
-<span class="k">def</span> <span class="nf">lambda_r</span><span class="p">(</span><span class="n">r</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">r_d</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">r_ref</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">r_ref_d</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">delta_r</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">delta_r_d</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+<div class="viewcode-block" id="lambda_r"><a class="viewcode-back" href="../../qspec.html#qspec.physics.lambda_r">[docs]</a><span class="k">def</span> <span class="nf">lambda_r</span><span class="p">(</span><span class="n">r</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">r_d</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">r_ref</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">r_ref_d</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">delta_r</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">delta_r_d</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
              <span class="n">v2</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">v2_ref</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">v4</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">v4_ref</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">v6</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">v6_ref</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">c2c1</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">c3c1</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    :param r: The Barrett radius of an isotope.</span>
@@ -1061,10 +916,7 @@
     <span class="k">return</span> <span class="n">lambda_rn</span><span class="p">(</span><span class="n">r2</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">r2</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">r4</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">r4</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">r6</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">r6</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">c2c1</span><span class="p">,</span> <span class="n">c3c1</span><span class="p">)</span></div>
 
 
-
-<div class="viewcode-block" id="lambda_rn">
-<a class="viewcode-back" href="../../qspec.html#qspec.physics.lambda_rn">[docs]</a>
-<span class="k">def</span> <span class="nf">lambda_rn</span><span class="p">(</span><span class="n">r_2</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">r_2_d</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">r_4</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">r_4_d</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">r_6</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">r_6_d</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">c2c1</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">c3c1</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>
+<div class="viewcode-block" id="lambda_rn"><a class="viewcode-back" href="../../qspec.html#qspec.physics.lambda_rn">[docs]</a><span class="k">def</span> <span class="nf">lambda_rn</span><span class="p">(</span><span class="n">r_2</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">r_2_d</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">r_4</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">r_4_d</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">r_6</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">r_6_d</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">c2c1</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">c3c1</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    :param r_2: The difference of the mean square nuclear charge radius between two isotopes.</span>
 <span class="sd">    :param r_2_d: The uncertainty of the difference of the mean square nuclear charge radius.</span>
@@ -1084,10 +936,7 @@
     <span class="k">return</span> <span class="n">val</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">err</span><span class="p">)</span></div>
 
 
-
-<div class="viewcode-block" id="schmidt_line">
-<a class="viewcode-back" href="../../qspec.html#qspec.physics.schmidt_line">[docs]</a>
-<span class="k">def</span> <span class="nf">schmidt_line</span><span class="p">(</span><span class="n">ll</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="n">is_proton</span><span class="p">):</span>
+<div class="viewcode-block" id="schmidt_line"><a class="viewcode-back" href="../../qspec.html#qspec.physics.schmidt_line">[docs]</a><span class="k">def</span> <span class="nf">schmidt_line</span><span class="p">(</span><span class="n">ll</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="n">is_proton</span><span class="p">):</span>
     <span class="n">_g_s</span> <span class="o">=</span> <span class="n">gp_s</span> <span class="k">if</span> <span class="n">is_proton</span> <span class="k">else</span> <span class="n">gn_s</span>
     <span class="n">_g_l</span> <span class="o">=</span> <span class="mi">1</span> <span class="k">if</span> <span class="n">is_proton</span> <span class="k">else</span> <span class="mi">0</span>
     <span class="k">if</span> <span class="n">j</span> <span class="o">&lt;</span> <span class="n">ll</span><span class="p">:</span>
@@ -1095,13 +944,10 @@
     <span class="k">return</span> <span class="n">ll</span> <span class="o">*</span> <span class="n">_g_l</span> <span class="o">+</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">_g_s</span></div>
 
 
-
 <span class="sd">&quot;&quot;&quot; Optics &quot;&quot;&quot;</span>
 
 
-<div class="viewcode-block" id="sellmeier">
-<a class="viewcode-back" href="../../qspec.html#qspec.physics.sellmeier">[docs]</a>
-<span class="k">def</span> <span class="nf">sellmeier</span><span class="p">(</span><span class="n">w</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">a</span><span class="p">:</span> <span class="n">array_iter</span><span class="p">,</span> <span class="n">b</span><span class="p">:</span> <span class="n">array_iter</span><span class="p">):</span>
+<div class="viewcode-block" id="sellmeier"><a class="viewcode-back" href="../../qspec.html#qspec.physics.sellmeier">[docs]</a><span class="k">def</span> <span class="nf">sellmeier</span><span class="p">(</span><span class="n">w</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">a</span><span class="p">:</span> <span class="n">array_iter</span><span class="p">,</span> <span class="n">b</span><span class="p">:</span> <span class="n">array_iter</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    :param w: The wavelength in µm.</span>
 <span class="sd">    :param a: The a coefficients.</span>
@@ -1114,13 +960,10 @@
     <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">sum_term</span><span class="p">)</span></div>
 
 
-
 <span class="sd">&quot;&quot;&quot; 3-D kinematics &quot;&quot;&quot;</span>
 
 
-<div class="viewcode-block" id="gamma_3d">
-<a class="viewcode-back" href="../../qspec.html#qspec.physics.gamma_3d">[docs]</a>
-<span class="k">def</span> <span class="nf">gamma_3d</span><span class="p">(</span><span class="n">v</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">array_like</span><span class="p">:</span>
+<div class="viewcode-block" id="gamma_3d"><a class="viewcode-back" href="../../qspec.html#qspec.physics.gamma_3d">[docs]</a><span class="k">def</span> <span class="nf">gamma_3d</span><span class="p">(</span><span class="n">v</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">array_like</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    :param v: The velocity 3-vector (m/s).</span>
 <span class="sd">    :param axis: The axis along which the vector components are aligned.</span>
@@ -1131,10 +974,7 @@
     <span class="k">return</span> <span class="n">gamma</span><span class="p">(</span><span class="n">tools</span><span class="o">.</span><span class="n">absolute</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="n">axis</span><span class="p">))</span></div>
 
 
-
-<div class="viewcode-block" id="boost">
-<a class="viewcode-back" href="../../qspec.html#qspec.physics.boost">[docs]</a>
-<span class="k">def</span> <span class="nf">boost</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">v</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">array_like</span><span class="p">:</span>
+<div class="viewcode-block" id="boost"><a class="viewcode-back" href="../../qspec.html#qspec.physics.boost">[docs]</a><span class="k">def</span> <span class="nf">boost</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">v</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">array_like</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    :param x: The 4-vector x in the current rest frame (arb. units).</span>
 <span class="sd">    :param v: The velocity 3-vector (m/s).</span>
@@ -1169,10 +1009,7 @@
     <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">axes</span><span class="o">=</span><span class="n">axes</span><span class="p">)</span></div>
 
 
-
-<div class="viewcode-block" id="doppler_3d">
-<a class="viewcode-back" href="../../qspec.html#qspec.physics.doppler_3d">[docs]</a>
-<span class="k">def</span> <span class="nf">doppler_3d</span><span class="p">(</span><span class="n">k</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">v</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">return_frame</span><span class="o">=</span><span class="s1">&#39;atom&#39;</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">array_like</span><span class="p">:</span>
+<div class="viewcode-block" id="doppler_3d"><a class="viewcode-back" href="../../qspec.html#qspec.physics.doppler_3d">[docs]</a><span class="k">def</span> <span class="nf">doppler_3d</span><span class="p">(</span><span class="n">k</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">v</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">return_frame</span><span class="o">=</span><span class="s1">&#39;atom&#39;</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">array_like</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    :param k: The k-wave-3-vector of light (arb. units).</span>
 <span class="sd">    :param v: The velocity 3-vector (m/s).</span>
@@ -1195,10 +1032,7 @@
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;rest_frame must be either &quot;atom&quot; or &quot;lab&quot;.&#39;</span><span class="p">)</span></div>
 
 
-
-<div class="viewcode-block" id="gaussian_beam_3d">
-<a class="viewcode-back" href="../../qspec.html#qspec.physics.gaussian_beam_3d">[docs]</a>
-<span class="k">def</span> <span class="nf">gaussian_beam_3d</span><span class="p">(</span><span class="n">r</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">k</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">w0</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span>
+<div class="viewcode-block" id="gaussian_beam_3d"><a class="viewcode-back" href="../../qspec.html#qspec.physics.gaussian_beam_3d">[docs]</a><span class="k">def</span> <span class="nf">gaussian_beam_3d</span><span class="p">(</span><span class="n">r</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">k</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">w0</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span>
                      <span class="n">r0</span><span class="p">:</span> <span class="n">array_like</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">p0</span><span class="p">:</span> <span class="n">array_like</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">axis</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">array_like</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    :param r: The position 3-vector where to calculate the beam intensity (m).</span>
@@ -1227,10 +1061,7 @@
     <span class="k">return</span> <span class="mf">2.</span> <span class="o">*</span> <span class="n">p0</span> <span class="o">/</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">w_z</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="mf">2.</span> <span class="o">*</span> <span class="p">(</span><span class="n">rho</span> <span class="o">/</span> <span class="n">w_z</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span></div>
 
 
-
-<div class="viewcode-block" id="gaussian_doppler_3d">
-<a class="viewcode-back" href="../../qspec.html#qspec.physics.gaussian_doppler_3d">[docs]</a>
-<span class="k">def</span> <span class="nf">gaussian_doppler_3d</span><span class="p">(</span><span class="n">r</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">k</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">w0</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">v</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">r0</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">array_like</span><span class="p">:</span>
+<div class="viewcode-block" id="gaussian_doppler_3d"><a class="viewcode-back" href="../../qspec.html#qspec.physics.gaussian_doppler_3d">[docs]</a><span class="k">def</span> <span class="nf">gaussian_doppler_3d</span><span class="p">(</span><span class="n">r</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">k</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">w0</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">v</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">r0</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">array_like</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    :param r: The position 3-vector relative to &#39;r0&#39; where to calculate the doppler-shifted wave number (m).</span>
 <span class="sd">    :param k: The k-wave-3-vector of light (rad / m).</span>
@@ -1262,13 +1093,10 @@
                                   <span class="o">-</span> <span class="n">bet_abs</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">alpha</span><span class="p">)</span> <span class="o">*</span> <span class="n">rho</span> <span class="o">*</span> <span class="n">z</span> <span class="o">/</span> <span class="n">z_plus</span><span class="p">)</span></div>
 
 
-
 <span class="sd">&quot;&quot;&quot; Probability distributions &quot;&quot;&quot;</span>
 
 
-<div class="viewcode-block" id="thermal_v_pdf">
-<a class="viewcode-back" href="../../qspec.html#qspec.physics.thermal_v_pdf">[docs]</a>
-<span class="k">def</span> <span class="nf">thermal_v_pdf</span><span class="p">(</span><span class="n">v</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">m</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">t</span><span class="p">:</span> <span class="n">array_like</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">array_like</span><span class="p">:</span>
+<div class="viewcode-block" id="thermal_v_pdf"><a class="viewcode-back" href="../../qspec.html#qspec.physics.thermal_v_pdf">[docs]</a><span class="k">def</span> <span class="nf">thermal_v_pdf</span><span class="p">(</span><span class="n">v</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">m</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">t</span><span class="p">:</span> <span class="n">array_like</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">array_like</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    :param v: velocity quantiles (m/s).</span>
 <span class="sd">    :param m: The mass of the ensembles bodies (amu).</span>
@@ -1280,10 +1108,7 @@
     <span class="k">return</span> <span class="n">st</span><span class="o">.</span><span class="n">norm</span><span class="o">.</span><span class="n">pdf</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="n">scale</span><span class="p">)</span></div>
 
 
-
-<div class="viewcode-block" id="thermal_v_rvs">
-<a class="viewcode-back" href="../../qspec.html#qspec.physics.thermal_v_rvs">[docs]</a>
-<span class="k">def</span> <span class="nf">thermal_v_rvs</span><span class="p">(</span><span class="n">m</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">t</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">size</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">array_like</span><span class="p">:</span>
+<div class="viewcode-block" id="thermal_v_rvs"><a class="viewcode-back" href="../../qspec.html#qspec.physics.thermal_v_rvs">[docs]</a><span class="k">def</span> <span class="nf">thermal_v_rvs</span><span class="p">(</span><span class="n">m</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">t</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">size</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">array_like</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    :param m: The mass of the ensembles bodies (amu).</span>
 <span class="sd">    :param t: The temperature of the ensemble (K).</span>
@@ -1296,10 +1121,7 @@
     <span class="k">return</span> <span class="n">st</span><span class="o">.</span><span class="n">norm</span><span class="o">.</span><span class="n">rvs</span><span class="p">(</span><span class="n">scale</span><span class="o">=</span><span class="n">scale</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">size</span><span class="p">)</span></div>
 
 
-
-<div class="viewcode-block" id="thermal_e_pdf">
-<a class="viewcode-back" href="../../qspec.html#qspec.physics.thermal_e_pdf">[docs]</a>
-<span class="k">def</span> <span class="nf">thermal_e_pdf</span><span class="p">(</span><span class="n">e</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">t</span><span class="p">:</span> <span class="n">array_like</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">array_like</span><span class="p">:</span>
+<div class="viewcode-block" id="thermal_e_pdf"><a class="viewcode-back" href="../../qspec.html#qspec.physics.thermal_e_pdf">[docs]</a><span class="k">def</span> <span class="nf">thermal_e_pdf</span><span class="p">(</span><span class="n">e</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">t</span><span class="p">:</span> <span class="n">array_like</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">array_like</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    :param e: energy quantiles (eV).</span>
 <span class="sd">    :param t: The temperature of the ensemble (K).</span>
@@ -1310,10 +1132,7 @@
     <span class="k">return</span> <span class="n">st</span><span class="o">.</span><span class="n">chi2</span><span class="o">.</span><span class="n">pdf</span><span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="n">scale</span><span class="p">)</span></div>
 
 
-
-<div class="viewcode-block" id="thermal_e_rvs">
-<a class="viewcode-back" href="../../qspec.html#qspec.physics.thermal_e_rvs">[docs]</a>
-<span class="k">def</span> <span class="nf">thermal_e_rvs</span><span class="p">(</span><span class="n">t</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">size</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">array_like</span><span class="p">:</span>
+<div class="viewcode-block" id="thermal_e_rvs"><a class="viewcode-back" href="../../qspec.html#qspec.physics.thermal_e_rvs">[docs]</a><span class="k">def</span> <span class="nf">thermal_e_rvs</span><span class="p">(</span><span class="n">t</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">size</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">array_like</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    :param t: The temperature of the ensemble (K).</span>
 <span class="sd">    :param size: Either the size (int) or shape (tuple) of the returned energy array.</span>
@@ -1325,10 +1144,7 @@
     <span class="k">return</span> <span class="n">st</span><span class="o">.</span><span class="n">chi2</span><span class="o">.</span><span class="n">rvs</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="n">scale</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">size</span><span class="p">)</span></div>
 
 
-
-<div class="viewcode-block" id="convolved_boltzmann_norm_pdf">
-<a class="viewcode-back" href="../../qspec.html#qspec.physics.convolved_boltzmann_norm_pdf">[docs]</a>
-<span class="k">def</span> <span class="nf">convolved_boltzmann_norm_pdf</span><span class="p">(</span><span class="n">e</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">t</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">scale_e</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">e0</span><span class="p">:</span> <span class="n">array_like</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">array_like</span><span class="p">:</span>
+<div class="viewcode-block" id="convolved_boltzmann_norm_pdf"><a class="viewcode-back" href="../../qspec.html#qspec.physics.convolved_boltzmann_norm_pdf">[docs]</a><span class="k">def</span> <span class="nf">convolved_boltzmann_norm_pdf</span><span class="p">(</span><span class="n">e</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">t</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">scale_e</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">e0</span><span class="p">:</span> <span class="n">array_like</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">array_like</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    :param e: energy quantiles (eV).</span>
 <span class="sd">    :param t: The temperature of the ensemble (K).</span>
@@ -1357,10 +1173,7 @@
     <span class="k">return</span> <span class="n">main</span></div>
 
 
-
-<div class="viewcode-block" id="convolved_thermal_norm_v_pdf">
-<a class="viewcode-back" href="../../qspec.html#qspec.physics.convolved_thermal_norm_v_pdf">[docs]</a>
-<span class="k">def</span> <span class="nf">convolved_thermal_norm_v_pdf</span><span class="p">(</span><span class="n">v</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">m</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">t</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span>
+<div class="viewcode-block" id="convolved_thermal_norm_v_pdf"><a class="viewcode-back" href="../../qspec.html#qspec.physics.convolved_thermal_norm_v_pdf">[docs]</a><span class="k">def</span> <span class="nf">convolved_thermal_norm_v_pdf</span><span class="p">(</span><span class="n">v</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">m</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">t</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span>
                                  <span class="n">scale_e</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">e0</span><span class="p">:</span> <span class="n">array_like</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">relativistic</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">array_like</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    :param v: velocity quantiles. All values must have the same sign (m/s).</span>
@@ -1382,10 +1195,7 @@
     <span class="k">return</span> <span class="n">convolved_boltzmann_norm_pdf</span><span class="p">(</span><span class="n">energy</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">scale_e</span><span class="p">,</span> <span class="n">e0</span><span class="o">=</span><span class="n">e0</span><span class="p">)</span> <span class="o">*</span> <span class="n">tr</span> <span class="o">/</span> <span class="n">E_NORM</span></div>
 
 
-
-<div class="viewcode-block" id="convolved_thermal_norm_f_pdf">
-<a class="viewcode-back" href="../../qspec.html#qspec.physics.convolved_thermal_norm_f_pdf">[docs]</a>
-<span class="k">def</span> <span class="nf">convolved_thermal_norm_f_pdf</span><span class="p">(</span><span class="n">f</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">f_lab</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">alpha</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">m</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">t</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span>
+<div class="viewcode-block" id="convolved_thermal_norm_f_pdf"><a class="viewcode-back" href="../../qspec.html#qspec.physics.convolved_thermal_norm_f_pdf">[docs]</a><span class="k">def</span> <span class="nf">convolved_thermal_norm_f_pdf</span><span class="p">(</span><span class="n">f</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">f_lab</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">alpha</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">m</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">t</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span>
                                  <span class="n">scale_e</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">e0</span><span class="p">:</span> <span class="n">array_like</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">relativistic</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">array_like</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    :param f: Frequency quantiles (arb. units).</span>
@@ -1411,10 +1221,7 @@
     <span class="k">return</span> <span class="n">ret</span></div>
 
 
-
-<div class="viewcode-block" id="convolved_thermal_norm_f_lin_pdf">
-<a class="viewcode-back" href="../../qspec.html#qspec.physics.convolved_thermal_norm_f_lin_pdf">[docs]</a>
-<span class="k">def</span> <span class="nf">convolved_thermal_norm_f_lin_pdf</span><span class="p">(</span><span class="n">f</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">xi</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">sigma</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">col</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">array_like</span><span class="p">:</span>
+<div class="viewcode-block" id="convolved_thermal_norm_f_lin_pdf"><a class="viewcode-back" href="../../qspec.html#qspec.physics.convolved_thermal_norm_f_lin_pdf">[docs]</a><span class="k">def</span> <span class="nf">convolved_thermal_norm_f_lin_pdf</span><span class="p">(</span><span class="n">f</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">xi</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">sigma</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">col</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">array_like</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    :param f: Frequency quantiles (arb. units).</span>
 <span class="sd">    :param xi: The proportionality constant between kinetic energy differences and frequency differences ([f]).</span>
@@ -1451,10 +1258,7 @@
     <span class="k">return</span> <span class="n">main</span> <span class="o">*</span> <span class="n">norm</span></div>
 
 
-
-<div class="viewcode-block" id="source_energy_pdf">
-<a class="viewcode-back" href="../../qspec.html#qspec.physics.source_energy_pdf">[docs]</a>
-<span class="k">def</span> <span class="nf">source_energy_pdf</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">f0</span><span class="p">,</span> <span class="n">sigma</span><span class="p">,</span> <span class="n">xi</span><span class="p">,</span> <span class="n">collinear</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<div class="viewcode-block" id="source_energy_pdf"><a class="viewcode-back" href="../../qspec.html#qspec.physics.source_energy_pdf">[docs]</a><span class="k">def</span> <span class="nf">source_energy_pdf</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">f0</span><span class="p">,</span> <span class="n">sigma</span><span class="p">,</span> <span class="n">xi</span><span class="p">,</span> <span class="n">collinear</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    :param f: Frequency quantiles (arb. units).</span>
 <span class="sd">    :param f0: Frequency offset (arb. units).</span>
@@ -1481,7 +1285,6 @@
         <span class="o">*</span> <span class="p">(</span><span class="n">sp</span><span class="o">.</span><span class="n">ive</span><span class="p">(</span><span class="mf">0.25</span><span class="p">,</span> <span class="n">b_arg</span><span class="p">[</span><span class="o">~</span><span class="n">mask</span><span class="p">])</span> <span class="o">+</span> <span class="n">sp</span><span class="o">.</span><span class="n">ive</span><span class="p">(</span><span class="o">-</span><span class="mf">0.25</span><span class="p">,</span> <span class="n">b_arg</span><span class="p">[</span><span class="o">~</span><span class="n">mask</span><span class="p">]))</span>
     <span class="n">main</span><span class="p">[</span><span class="n">nonzero</span><span class="p">]</span> <span class="o">=</span> <span class="n">main_nonzero</span>
     <span class="k">return</span> <span class="n">main</span> <span class="o">*</span> <span class="n">_norm</span></div>
-
 </pre></div>
 
            </div>

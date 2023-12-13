@@ -125,8 +125,8 @@ def example(n=None):
         a_ref = a[i_ref]  # Choose individual reference isotopes
 
         xy = (0, 1)  # Choose the x- and y-axis (observables) to fit, i.e. vals[:, xy[1]] against vals[:, xy[0]].
-        results = king.fit(a_fit, a_ref, xy=xy, mode='shifts')  # Do a simple 1d-King fit.
-        results = king.fit_nd(a_fit, a_ref, axis=0, mode='shifts')  # Do a 4d-King fit.
+        results = king.fit(a_fit, a_ref, xy=xy, mode='shifts')  # Do a simple 2d-King fit.
+        results = king.fit_nd(a_fit, a_ref, axis=0, mode='shifts')  # Do a 5d-King fit.
 
         # Put in values for isotopes known only for one observable, ...
         a_unknown = [43, 46]
@@ -147,4 +147,4 @@ def example(n=None):
 
 
 if __name__ == '__main__':
-    example({0, 1, })
+    example({1, })

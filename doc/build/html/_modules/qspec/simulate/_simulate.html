@@ -1,22 +1,24 @@
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" >
+<html class="writer-html5" lang="en">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>qspec.simulate._simulate &mdash; qspec 20.05.2023 documentation</title>
-      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
-      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <title>qspec.simulate._simulate &mdash; qspec 13.12.2023 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
       <link rel="stylesheet" href="../../../_static/css/borders.css" type="text/css" />
       <link rel="stylesheet" href="../../../_static/css/wy-nav-content.css" type="text/css" />
+
+  
   <!--[if lt IE 9]>
     <script src="../../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
         <script src="../../../_static/jquery.js?v=5d32c60e"></script>
         <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="../../../_static/documentation_options.js?v=52e4f5b1"></script>
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js?v=7f3357fe"></script>
         <script src="../../../_static/doctools.js?v=888ff710"></script>
-        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=4825356b"></script>
     <script src="../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" /> 
@@ -111,9 +113,7 @@
 <span class="n">LINESTYLES</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;-&#39;</span><span class="p">,</span> <span class="s1">&#39;:&#39;</span><span class="p">,</span> <span class="s1">&#39;--&#39;</span><span class="p">,</span> <span class="s1">&#39;-.&#39;</span><span class="p">]</span>
 
 
-<div class="viewcode-block" id="ct_markov_analytic">
-<a class="viewcode-back" href="../../../qspec.html#qspec.simulate.ct_markov_analytic">[docs]</a>
-<span class="k">def</span> <span class="nf">ct_markov_analytic</span><span class="p">(</span><span class="n">t</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">n</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">rates</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">r</span><span class="p">:</span> <span class="n">array_like</span> <span class="o">=</span> <span class="mf">1.</span><span class="p">):</span>
+<div class="viewcode-block" id="ct_markov_analytic"><a class="viewcode-back" href="../../../qspec.html#qspec.simulate.ct_markov_analytic">[docs]</a><span class="k">def</span> <span class="nf">ct_markov_analytic</span><span class="p">(</span><span class="n">t</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">n</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">rates</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">r</span><span class="p">:</span> <span class="n">array_like</span> <span class="o">=</span> <span class="mf">1.</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Computes the analytic solution of the evolution of a linear continuous-time markov chain.</span>
 
@@ -195,10 +195,7 @@
     <span class="k">return</span> <span class="n">ret</span></div>
 
 
-
-<div class="viewcode-block" id="ct_markov_dgl">
-<a class="viewcode-back" href="../../../qspec.html#qspec.simulate.ct_markov_dgl">[docs]</a>
-<span class="k">def</span> <span class="nf">ct_markov_dgl</span><span class="p">(</span><span class="n">t</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">n</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">rates</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">r</span><span class="p">:</span> <span class="n">array_like</span> <span class="o">=</span> <span class="mf">1.</span><span class="p">,</span> <span class="n">p0</span><span class="p">:</span> <span class="n">array_like</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<div class="viewcode-block" id="ct_markov_dgl"><a class="viewcode-back" href="../../../qspec.html#qspec.simulate.ct_markov_dgl">[docs]</a><span class="k">def</span> <span class="nf">ct_markov_dgl</span><span class="p">(</span><span class="n">t</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">n</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">rates</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">r</span><span class="p">:</span> <span class="n">array_like</span> <span class="o">=</span> <span class="mf">1.</span><span class="p">,</span> <span class="n">p0</span><span class="p">:</span> <span class="n">array_like</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
                   <span class="n">time_resolved</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">show</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Computes the evolution of a linear continuous-time markov chain numerically by solving the underlying ODE system.</span>
@@ -279,10 +276,7 @@
     <span class="k">return</span> <span class="n">y_array</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="p">:]</span></div>
 
 
-
-<div class="viewcode-block" id="lambda_states">
-<a class="viewcode-back" href="../../../qspec.html#qspec.simulate.lambda_states">[docs]</a>
-<span class="k">def</span> <span class="nf">lambda_states</span><span class="p">(</span><span class="n">t</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">delta_1</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">delta_2</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">a_ge</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">a_me</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span>
+<div class="viewcode-block" id="lambda_states"><a class="viewcode-back" href="../../../qspec.html#qspec.simulate.lambda_states">[docs]</a><span class="k">def</span> <span class="nf">lambda_states</span><span class="p">(</span><span class="n">t</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">delta_1</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">delta_2</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">a_ge</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">a_me</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span>
                   <span class="n">s_1</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">s_2</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">lw_1</span><span class="p">:</span> <span class="n">array_like</span> <span class="o">=</span> <span class="mf">0.</span><span class="p">,</span> <span class="n">lw_2</span><span class="p">:</span> <span class="n">array_like</span> <span class="o">=</span> <span class="mf">0.</span><span class="p">,</span> <span class="n">p0</span><span class="p">:</span> <span class="n">array_like</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
                   <span class="n">time_resolved</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">show</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
@@ -369,10 +363,7 @@
     <span class="k">return</span> <span class="n">y_array</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="p">:]</span></div>
 
 
-
-<div class="viewcode-block" id="lambda_ge_rec">
-<a class="viewcode-back" href="../../../qspec.html#qspec.simulate.lambda_ge_rec">[docs]</a>
-<span class="k">def</span> <span class="nf">lambda_ge_rec</span><span class="p">(</span><span class="n">t</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">n</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">delta</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">a_ge</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">a_me</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">s</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span>
+<div class="viewcode-block" id="lambda_ge_rec"><a class="viewcode-back" href="../../../qspec.html#qspec.simulate.lambda_ge_rec">[docs]</a><span class="k">def</span> <span class="nf">lambda_ge_rec</span><span class="p">(</span><span class="n">t</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">n</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">delta</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">a_ge</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">a_me</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">s</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span>
                   <span class="n">f</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">m</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">p0</span><span class="p">:</span> <span class="n">array_like</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">dt</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">time_resolved</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
                   <span class="n">show</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
@@ -514,10 +505,7 @@
     <span class="k">return</span> <span class="n">y_array</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="p">:(</span><span class="mi">3</span> <span class="o">*</span> <span class="p">(</span><span class="n">n</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))]</span><span class="o">.</span><span class="n">real</span></div>
 
 
-
-<div class="viewcode-block" id="Geometry">
-<a class="viewcode-back" href="../../../qspec.html#qspec.simulate.Geometry">[docs]</a>
-<span class="k">class</span> <span class="nc">Geometry</span><span class="p">:</span>
+<div class="viewcode-block" id="Geometry"><a class="viewcode-back" href="../../../qspec.html#qspec.simulate.Geometry">[docs]</a><span class="k">class</span> <span class="nc">Geometry</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Class representing a fluorescence detection geometry. The solid angle over which fluorescence light is detected</span>
 <span class="sd">    can be defined through intervals of the two angles &#39;theta&#39; and &#39;phi&#39;.</span>
@@ -551,9 +539,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">weights</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">rotation</span> <span class="o">=</span> <span class="n">tools</span><span class="o">.</span><span class="n">Rotation</span><span class="p">()</span>
 
-<div class="viewcode-block" id="Geometry.set_intervals">
-<a class="viewcode-back" href="../../../qspec.html#qspec.simulate.Geometry.set_intervals">[docs]</a>
-    <span class="k">def</span> <span class="nf">set_intervals</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">theta</span><span class="p">:</span> <span class="n">array_iter</span><span class="p">,</span> <span class="n">phi</span><span class="p">:</span> <span class="n">array_iter</span><span class="p">):</span>
+<div class="viewcode-block" id="Geometry.set_intervals"><a class="viewcode-back" href="../../../qspec.html#qspec.simulate.Geometry.set_intervals">[docs]</a>    <span class="k">def</span> <span class="nf">set_intervals</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">theta</span><span class="p">:</span> <span class="n">array_iter</span><span class="p">,</span> <span class="n">phi</span><span class="p">:</span> <span class="n">array_iter</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param theta: An interval or a list of intervals for the angle &#39;theta&#39;.</span>
 <span class="sd">        :param phi: An interval or a list of intervals for the angle &#39;phi&#39;.</span>
@@ -577,10 +563,7 @@
         <span class="n">y_int</span> <span class="o">*=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">([</span><span class="n">p</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">phi_int</span><span class="p">])</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">solid_angle</span> <span class="o">=</span> <span class="n">y_int</span></div>
 
-
-<div class="viewcode-block" id="Geometry.set_weights">
-<a class="viewcode-back" href="../../../qspec.html#qspec.simulate.Geometry.set_weights">[docs]</a>
-    <span class="k">def</span> <span class="nf">set_weights</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">weights</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">array_iter</span><span class="p">,</span> <span class="kc">None</span><span class="p">]):</span>
+<div class="viewcode-block" id="Geometry.set_weights"><a class="viewcode-back" href="../../../qspec.html#qspec.simulate.Geometry.set_weights">[docs]</a>    <span class="k">def</span> <span class="nf">set_weights</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">weights</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">array_iter</span><span class="p">,</span> <span class="kc">None</span><span class="p">]):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param weights: None or a matrix of weights for the defined disjoint intervals.</span>
 <span class="sd">         The shape of the weights must fulfill weights.shape == (len(self.theta_intervals), len(self.phi_intervals)).</span>
@@ -593,10 +576,7 @@
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Weights must have shape </span><span class="si">{}</span><span class="s1">, but have shape </span><span class="si">{}</span><span class="s1">.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">shape</span><span class="p">,</span> <span class="n">weights</span><span class="o">.</span><span class="n">shape</span><span class="p">))</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">weights</span> <span class="o">=</span> <span class="n">weights</span></div>
 
-
-<div class="viewcode-block" id="Geometry.set_pdf">
-<a class="viewcode-back" href="../../../qspec.html#qspec.simulate.Geometry.set_pdf">[docs]</a>
-    <span class="k">def</span> <span class="nf">set_pdf</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pdf</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Callable</span><span class="p">,</span> <span class="kc">None</span><span class="p">]):</span>
+<div class="viewcode-block" id="Geometry.set_pdf"><a class="viewcode-back" href="../../../qspec.html#qspec.simulate.Geometry.set_pdf">[docs]</a>    <span class="k">def</span> <span class="nf">set_pdf</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pdf</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Callable</span><span class="p">,</span> <span class="kc">None</span><span class="p">]):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param pdf: None or a callable which accepts two arguments (theta, phi).</span>
 <span class="sd">        :returns: None. Sets the &#39;pdf&#39; attribute of the Geometry object.</span>
@@ -608,10 +588,7 @@
                 <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="s1">&#39;The pdf must be a callable which takes two arguments *(theta, phi).&#39;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">pdf</span> <span class="o">=</span> <span class="n">pdf</span></div>
 
-
-<div class="viewcode-block" id="Geometry.set_rotation">
-<a class="viewcode-back" href="../../../qspec.html#qspec.simulate.Geometry.set_rotation">[docs]</a>
-    <span class="k">def</span> <span class="nf">set_rotation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">r</span><span class="p">:</span> <span class="n">tools</span><span class="o">.</span><span class="n">Rotation</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="Geometry.set_rotation"><a class="viewcode-back" href="../../../qspec.html#qspec.simulate.Geometry.set_rotation">[docs]</a>    <span class="k">def</span> <span class="nf">set_rotation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">r</span><span class="p">:</span> <span class="n">tools</span><span class="o">.</span><span class="n">Rotation</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param r: None or a 3x3 matrix defining a rotation.Therefore, dot(r, r.T) = I and Det(r) = 1 must be fulfilled.</span>
 <span class="sd">         If r == None, the Identity matrix is used.</span>
@@ -623,10 +600,7 @@
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;r must be a </span><span class="se">\&#39;</span><span class="s1">Rotation</span><span class="se">\&#39;</span><span class="s1"> object but is of type </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">r</span><span class="p">)))</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">rotation</span> <span class="o">=</span> <span class="n">r</span></div>
 
-
-<div class="viewcode-block" id="Geometry.integration_sample">
-<a class="viewcode-back" href="../../../qspec.html#qspec.simulate.Geometry.integration_sample">[docs]</a>
-    <span class="k">def</span> <span class="nf">integration_sample</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">step</span><span class="p">:</span> <span class="n">scalar</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+<div class="viewcode-block" id="Geometry.integration_sample"><a class="viewcode-back" href="../../../qspec.html#qspec.simulate.Geometry.integration_sample">[docs]</a>    <span class="k">def</span> <span class="nf">integration_sample</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">step</span><span class="p">:</span> <span class="n">scalar</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param step: None or a scalar which defines the approximate spacing</span>
 <span class="sd">         between the equidistant values of the integration sample.</span>
@@ -642,17 +616,12 @@
         <span class="n">phi</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">p</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">tools</span><span class="o">.</span><span class="n">odd</span><span class="p">((</span><span class="n">p</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">/</span> <span class="n">step</span> <span class="o">+</span> <span class="mf">1.</span><span class="p">))</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">phi_intervals</span><span class="p">]</span>
         <span class="k">return</span> <span class="n">theta</span><span class="p">,</span> <span class="n">phi</span></div>
 
-
-<div class="viewcode-block" id="Geometry.plot">
-<a class="viewcode-back" href="../../../qspec.html#qspec.simulate.Geometry.plot">[docs]</a>
-    <span class="k">def</span> <span class="nf">plot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">show</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">):</span>
+<div class="viewcode-block" id="Geometry.plot"><a class="viewcode-back" href="../../../qspec.html#qspec.simulate.Geometry.plot">[docs]</a>    <span class="k">def</span> <span class="nf">plot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">show</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Shows a 3d plot of the angular range covered by the geometry object.</span>
 <span class="sd">        :returns: The axes object.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">theta</span><span class="p">,</span> <span class="n">phi</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">integration_sample</span><span class="p">(</span><span class="n">step</span><span class="o">=</span><span class="mf">0.02</span><span class="p">)</span>
-        <span class="n">r</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="n">tools</span><span class="o">.</span><span class="n">e_r</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">p</span><span class="p">)</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">phi</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">theta</span><span class="p">[</span><span class="mi">0</span><span class="p">]])</span>
-        <span class="n">r</span> <span class="o">=</span> <span class="n">tools</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rotation</span><span class="o">.</span><span class="n">R</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)),</span> <span class="n">r</span><span class="p">)</span>
+
         <span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">num</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">[</span><span class="mi">8</span><span class="p">,</span> <span class="mi">8</span><span class="p">],</span> <span class="n">clear</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="n">ax</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="mi">111</span><span class="p">,</span> <span class="n">projection</span><span class="o">=</span><span class="s1">&#39;3d&#39;</span><span class="p">)</span>
         <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;$x$ / arb. units&#39;</span><span class="p">)</span>
@@ -668,29 +637,31 @@
         <span class="n">ax</span><span class="o">.</span><span class="n">set_yticks</span><span class="p">(</span><span class="n">ticks</span><span class="p">)</span>
         <span class="n">ax</span><span class="o">.</span><span class="n">set_zticks</span><span class="p">(</span><span class="n">ticks</span><span class="p">)</span>
         <span class="n">ax</span><span class="o">.</span><span class="n">pbaspect</span> <span class="o">=</span> <span class="p">[</span><span class="mf">1.</span><span class="p">,</span> <span class="mf">1.</span><span class="p">,</span> <span class="mf">1.</span><span class="p">]</span>
-        <span class="n">radius</span> <span class="o">=</span> <span class="mf">0.8</span>
-        <span class="n">r</span> <span class="o">*=</span> <span class="n">radius</span>
-        <span class="n">surf</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">plot_surface</span><span class="p">(</span><span class="n">r</span><span class="p">[:,</span> <span class="p">:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">r</span><span class="p">[:,</span> <span class="p">:,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">r</span><span class="p">[:,</span> <span class="p">:,</span> <span class="mi">2</span><span class="p">],</span> <span class="n">zorder</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">rcount</span><span class="o">=</span><span class="mi">40</span><span class="p">,</span> <span class="n">ccount</span><span class="o">=</span><span class="mi">40</span><span class="p">,</span>
-                               <span class="n">cmap</span><span class="o">=</span><span class="n">plt</span><span class="o">.</span><span class="n">get_cmap</span><span class="p">(</span><span class="s1">&#39;cividis&#39;</span><span class="p">),</span> <span class="n">antialiased</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.3</span><span class="p">)</span>
-        <span class="n">surf</span><span class="o">.</span><span class="n">set_clim</span><span class="p">([</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
+
+        <span class="n">radius</span> <span class="o">=</span> <span class="mf">0.9</span>
+        <span class="n">theta</span><span class="p">,</span> <span class="n">phi</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">integration_sample</span><span class="p">(</span><span class="n">step</span><span class="o">=</span><span class="mf">0.02</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">t_arr</span> <span class="ow">in</span> <span class="n">theta</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">p_arr</span> <span class="ow">in</span> <span class="n">phi</span><span class="p">:</span>
+                <span class="n">r</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="n">tools</span><span class="o">.</span><span class="n">e_r</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">p</span><span class="p">)</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">p_arr</span><span class="p">]</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">t_arr</span><span class="p">])</span>
+                <span class="n">r</span> <span class="o">=</span> <span class="n">tools</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rotation</span><span class="o">.</span><span class="n">R</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)),</span> <span class="n">r</span><span class="p">)</span>
+                <span class="n">r</span> <span class="o">*=</span> <span class="n">radius</span>
+                <span class="n">surf</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">plot_surface</span><span class="p">(</span><span class="n">r</span><span class="p">[:,</span> <span class="p">:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">r</span><span class="p">[:,</span> <span class="p">:,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">r</span><span class="p">[:,</span> <span class="p">:,</span> <span class="mi">2</span><span class="p">],</span> <span class="n">zorder</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">rcount</span><span class="o">=</span><span class="mi">40</span><span class="p">,</span> <span class="n">ccount</span><span class="o">=</span><span class="mi">40</span><span class="p">,</span>
+                                       <span class="n">cmap</span><span class="o">=</span><span class="n">plt</span><span class="o">.</span><span class="n">get_cmap</span><span class="p">(</span><span class="s1">&#39;cividis&#39;</span><span class="p">),</span> <span class="n">antialiased</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+                <span class="n">surf</span><span class="o">.</span><span class="n">set_clim</span><span class="p">([</span><span class="o">-</span><span class="n">radius</span><span class="p">,</span> <span class="n">radius</span><span class="p">])</span>
         <span class="c1"># cb = plt.colorbar(surf, ax=ax, shrink=0.5)</span>
         <span class="c1"># cb.set_label(&#39;z / arb. units&#39;)</span>
         <span class="c1"># cb.set_ticks([-1, 0, 1])</span>
 
-        <span class="n">plt</span><span class="o">.</span><span class="n">style</span><span class="o">.</span><span class="n">use</span><span class="p">(</span><span class="s1">&#39;seaborn&#39;</span><span class="p">)</span>
-        <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+        <span class="c1"># plt.style.use(&#39;seaborn&#39;)</span>
+        <span class="c1"># plt.tight_layout()</span>
         <span class="k">if</span> <span class="n">show</span><span class="p">:</span>
             <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
             <span class="n">plt</span><span class="o">.</span><span class="n">style</span><span class="o">.</span><span class="n">use</span><span class="p">(</span><span class="s1">&#39;default&#39;</span><span class="p">)</span>
 
-        <span class="k">return</span> <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span></div>
-</div>
+        <span class="k">return</span> <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span></div></div>
 
 
-
-<div class="viewcode-block" id="ScatteringRate">
-<a class="viewcode-back" href="../../../qspec.html#qspec.simulate.ScatteringRate">[docs]</a>
-<span class="k">class</span> <span class="nc">ScatteringRate</span><span class="p">:</span>
+<div class="viewcode-block" id="ScatteringRate"><a class="viewcode-back" href="../../../qspec.html#qspec.simulate.ScatteringRate">[docs]</a><span class="k">class</span> <span class="nc">ScatteringRate</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Class representing the perturbative scattering rate of a closed electronic transition.</span>
 <span class="sd">    The spectrum is excited by a laser with the specified &#39;polarization&#39;</span>
@@ -729,9 +700,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">generate_dipoles</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">set_b</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>  <span class="c1"># TODO: Implement Environments in C++.</span>
     
-<div class="viewcode-block" id="ScatteringRate.check_atom">
-<a class="viewcode-back" href="../../../qspec.html#qspec.simulate.ScatteringRate.check_atom">[docs]</a>
-    <span class="k">def</span> <span class="nf">check_atom</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="ScatteringRate.check_atom"><a class="viewcode-back" href="../../../qspec.html#qspec.simulate.ScatteringRate.check_atom">[docs]</a>    <span class="k">def</span> <span class="nf">check_atom</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Check whether the structure of the atom fulfills all requirements to calculate the scattering rate.</span>
 
@@ -748,10 +717,7 @@
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">state_l</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">i</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">state_u</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">i</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;The lower and upper states must be part of the same nuclear state.&#39;</span><span class="p">)</span></div>
 
-
-<div class="viewcode-block" id="ScatteringRate.set_geometry">
-<a class="viewcode-back" href="../../../qspec.html#qspec.simulate.ScatteringRate.set_geometry">[docs]</a>
-    <span class="k">def</span> <span class="nf">set_geometry</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">geometry</span><span class="p">:</span> <span class="n">Geometry</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="ScatteringRate.set_geometry"><a class="viewcode-back" href="../../../qspec.html#qspec.simulate.ScatteringRate.set_geometry">[docs]</a>    <span class="k">def</span> <span class="nf">set_geometry</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">geometry</span><span class="p">:</span> <span class="n">Geometry</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param geometry: The geometry object. If None, the entire solid angle is covered by the detector.</span>
 <span class="sd">        :return: None. Sets the geometry object.</span>
@@ -761,10 +727,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">geometry</span> <span class="o">=</span> <span class="n">Geometry</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">R</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">rotation</span><span class="o">.</span><span class="n">R</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">R_b</span><span class="p">)</span></div>
 
-
-<div class="viewcode-block" id="ScatteringRate.set_polarization">
-<a class="viewcode-back" href="../../../qspec.html#qspec.simulate.ScatteringRate.set_polarization">[docs]</a>
-    <span class="k">def</span> <span class="nf">set_polarization</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">polarization</span><span class="p">:</span> <span class="n">Polarization</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="ScatteringRate.set_polarization"><a class="viewcode-back" href="../../../qspec.html#qspec.simulate.ScatteringRate.set_polarization">[docs]</a>    <span class="k">def</span> <span class="nf">set_polarization</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">polarization</span><span class="p">:</span> <span class="n">Polarization</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param polarization: The polarization object. If None, the light is linearly polarized along the z-axis.</span>
 <span class="sd">        :returns: None. Sets the polarization object and the local polarization vector &#39;e_l&#39;.</span>
@@ -775,10 +738,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">e_l</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">R_b</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">polarization</span><span class="o">.</span><span class="n">x</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">polarization</span><span class="o">.</span><span class="n">def_q_axis</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">e_r_b</span><span class="p">)</span></div>
 
-
-<div class="viewcode-block" id="ScatteringRate.set_states">
-<a class="viewcode-back" href="../../../qspec.html#qspec.simulate.ScatteringRate.set_states">[docs]</a>
-    <span class="k">def</span> <span class="nf">set_states</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="ScatteringRate.set_states"><a class="viewcode-back" href="../../../qspec.html#qspec.simulate.ScatteringRate.set_states">[docs]</a>    <span class="k">def</span> <span class="nf">set_states</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Define lower and upper states.</span>
 
@@ -795,20 +755,14 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">state_u</span> <span class="o">=</span> <span class="n">state_l</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">state_l</span> <span class="o">=</span> <span class="n">state_u</span></div>
 
-
-<div class="viewcode-block" id="ScatteringRate.set_x0">
-<a class="viewcode-back" href="../../../qspec.html#qspec.simulate.ScatteringRate.set_x0">[docs]</a>
-    <span class="k">def</span> <span class="nf">set_x0</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="ScatteringRate.set_x0"><a class="viewcode-back" href="../../../qspec.html#qspec.simulate.ScatteringRate.set_x0">[docs]</a>    <span class="k">def</span> <span class="nf">set_x0</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :returns: None. Updates the resonance positions.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">x0</span> <span class="o">=</span> <span class="p">[[</span><span class="n">state_u</span><span class="o">.</span><span class="n">freq</span> <span class="o">-</span> <span class="n">state_l</span><span class="o">.</span><span class="n">freq</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">freq_0</span> <span class="k">for</span> <span class="n">state_u</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">state_u</span><span class="p">]</span> <span class="k">for</span> <span class="n">state_l</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">state_l</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">x0_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">x0</span><span class="p">[</span><span class="n">col</span><span class="p">[</span><span class="mi">0</span><span class="p">]][</span><span class="n">col</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span> <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">indices</span> <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">row</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span></div>
 
-
-<div class="viewcode-block" id="ScatteringRate.generate_dipoles">
-<a class="viewcode-back" href="../../../qspec.html#qspec.simulate.ScatteringRate.generate_dipoles">[docs]</a>
-    <span class="k">def</span> <span class="nf">generate_dipoles</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="ScatteringRate.generate_dipoles"><a class="viewcode-back" href="../../../qspec.html#qspec.simulate.ScatteringRate.generate_dipoles">[docs]</a>    <span class="k">def</span> <span class="nf">generate_dipoles</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :returns: None. Generates an array of frequencies which cover the entire spectrum</span>
 <span class="sd">         and saves it to the x attribute of the Spectrum object.</span>
@@ -836,10 +790,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">counts</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="nb">len</span><span class="p">(</span><span class="n">row</span><span class="p">)</span> <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">indices</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">set_x0</span><span class="p">()</span></div>
 
-
-<div class="viewcode-block" id="ScatteringRate.set_b">
-<a class="viewcode-back" href="../../../qspec.html#qspec.simulate.ScatteringRate.set_b">[docs]</a>
-    <span class="k">def</span> <span class="nf">set_b</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">b</span><span class="p">:</span> <span class="n">array_like</span><span class="p">):</span>
+<div class="viewcode-block" id="ScatteringRate.set_b"><a class="viewcode-back" href="../../../qspec.html#qspec.simulate.ScatteringRate.set_b">[docs]</a>    <span class="k">def</span> <span class="nf">set_b</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">b</span><span class="p">:</span> <span class="n">array_like</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param b: The magnetic field vector.</span>
 <span class="sd">        :returns: None. Sets the new magnetic field for all states</span>
@@ -867,10 +818,7 @@
             <span class="n">state</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">environment</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">set_x0</span><span class="p">()</span></div>
 
-
-<div class="viewcode-block" id="ScatteringRate.generate_x">
-<a class="viewcode-back" href="../../../qspec.html#qspec.simulate.ScatteringRate.generate_x">[docs]</a>
-    <span class="k">def</span> <span class="nf">generate_x</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">width</span><span class="p">:</span> <span class="n">scalar</span> <span class="o">=</span> <span class="mf">20.</span><span class="p">,</span> <span class="n">step</span><span class="p">:</span> <span class="n">scalar</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="ScatteringRate.generate_x"><a class="viewcode-back" href="../../../qspec.html#qspec.simulate.ScatteringRate.generate_x">[docs]</a>    <span class="k">def</span> <span class="nf">generate_x</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">width</span><span class="p">:</span> <span class="n">scalar</span> <span class="o">=</span> <span class="mf">20.</span><span class="p">,</span> <span class="n">step</span><span class="p">:</span> <span class="n">scalar</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param width: The covered width around resonances in natural linewidths.</span>
 <span class="sd">        :param step: The step size between generated x values.</span>
@@ -884,10 +832,7 @@
         <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">i</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">i</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">tools</span><span class="o">.</span><span class="n">odd</span><span class="p">((</span><span class="n">i</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">i</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">/</span> <span class="n">step</span> <span class="o">+</span> <span class="mf">1.</span><span class="p">))</span>
                                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">intervals</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span></div>
 
-
-<div class="viewcode-block" id="ScatteringRate.generate_y0">
-<a class="viewcode-back" href="../../../qspec.html#qspec.simulate.ScatteringRate.generate_y0">[docs]</a>
-    <span class="k">def</span> <span class="nf">generate_y0</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">array_like</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">array_like</span><span class="p">:</span>
+<div class="viewcode-block" id="ScatteringRate.generate_y0"><a class="viewcode-back" href="../../../qspec.html#qspec.simulate.ScatteringRate.generate_y0">[docs]</a>    <span class="k">def</span> <span class="nf">generate_y0</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">array_like</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">array_like</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param x: The frequency of light in an atoms rest frame (MHz).</span>
 <span class="sd">        :returns: The spectrum for the case of unpolarized light</span>
@@ -900,10 +845,7 @@
                 <span class="n">y0</span> <span class="o">+=</span> <span class="n">a_const</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">/</span> <span class="n">denominator</span>
         <span class="k">return</span> <span class="n">y0</span> <span class="o">*</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">gamma</span> <span class="o">/</span> <span class="mf">2.</span><span class="p">)</span> <span class="o">**</span> <span class="mi">3</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x0</span><span class="p">)</span> <span class="o">/</span> <span class="mi">3</span> <span class="o">*</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span></div>
 
-
-<div class="viewcode-block" id="ScatteringRate.generate_y_4pi">
-<a class="viewcode-back" href="../../../qspec.html#qspec.simulate.ScatteringRate.generate_y_4pi">[docs]</a>
-    <span class="k">def</span> <span class="nf">generate_y_4pi</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">array_like</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">array_like</span><span class="p">:</span>
+<div class="viewcode-block" id="ScatteringRate.generate_y_4pi"><a class="viewcode-back" href="../../../qspec.html#qspec.simulate.ScatteringRate.generate_y_4pi">[docs]</a>    <span class="k">def</span> <span class="nf">generate_y_4pi</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">array_like</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">array_like</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param x: The frequency of light in an atoms rest frame (MHz).</span>
 <span class="sd">        :returns: The spectrum for the detection of the complete solid angle (4 pi).</span>
@@ -917,10 +859,7 @@
                 <span class="n">y0</span> <span class="o">+=</span> <span class="n">a_const</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">/</span> <span class="n">denominator</span> <span class="o">*</span> <span class="n">tools</span><span class="o">.</span><span class="n">absolute_complex</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">polarization</span><span class="o">.</span><span class="n">q</span><span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">m</span> <span class="o">-</span> <span class="n">ll</span><span class="o">.</span><span class="n">m</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">])</span> <span class="o">**</span> <span class="mi">2</span>
         <span class="k">return</span> <span class="n">y0</span> <span class="o">*</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">gamma</span> <span class="o">/</span> <span class="mf">2.</span><span class="p">)</span> <span class="o">**</span> <span class="mi">3</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x0</span><span class="p">)</span> <span class="o">*</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span></div>
 
-
-<div class="viewcode-block" id="ScatteringRate.generate_y">
-<a class="viewcode-back" href="../../../qspec.html#qspec.simulate.ScatteringRate.generate_y">[docs]</a>
-    <span class="k">def</span> <span class="nf">generate_y</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">theta</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">phi</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">decimals</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">8</span><span class="p">):</span>
+<div class="viewcode-block" id="ScatteringRate.generate_y"><a class="viewcode-back" href="../../../qspec.html#qspec.simulate.ScatteringRate.generate_y">[docs]</a>    <span class="k">def</span> <span class="nf">generate_y</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">theta</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">phi</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">decimals</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">8</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param x: The frequency of light in an atoms rest frame (MHz).</span>
 <span class="sd">        :param theta: The angle between the emission direction of the fluorescence light and the x-axis + 90°.</span>
@@ -961,10 +900,7 @@
         <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Time: </span><span class="si">{}</span><span class="s1">s&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">t0</span><span class="p">))</span>
         <span class="k">return</span> <span class="n">ret</span> <span class="o">*</span> <span class="n">norm</span></div>
 
-
-<div class="viewcode-block" id="ScatteringRate.integrate_y">
-<a class="viewcode-back" href="../../../qspec.html#qspec.simulate.ScatteringRate.integrate_y">[docs]</a>
-    <span class="k">def</span> <span class="nf">integrate_y</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">step</span><span class="p">:</span> <span class="n">scalar</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="ScatteringRate.integrate_y"><a class="viewcode-back" href="../../../qspec.html#qspec.simulate.ScatteringRate.integrate_y">[docs]</a>    <span class="k">def</span> <span class="nf">integrate_y</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">step</span><span class="p">:</span> <span class="n">scalar</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param x: The frequency of light in an atoms rest frame (MHz).</span>
 <span class="sd">        :param step: The step size used for the integration over the angles theta and phi.</span>
@@ -986,10 +922,7 @@
                 <span class="n">y_int</span> <span class="o">+=</span> <span class="n">y</span>
         <span class="k">return</span> <span class="n">y_int</span></div>
 
-
-<div class="viewcode-block" id="ScatteringRate.plot_spectrum">
-<a class="viewcode-back" href="../../../qspec.html#qspec.simulate.ScatteringRate.plot_spectrum">[docs]</a>
-    <span class="k">def</span> <span class="nf">plot_spectrum</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">norm_to_4pi</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">step</span><span class="p">:</span> <span class="n">scalar</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="ScatteringRate.plot_spectrum"><a class="viewcode-back" href="../../../qspec.html#qspec.simulate.ScatteringRate.plot_spectrum">[docs]</a>    <span class="k">def</span> <span class="nf">plot_spectrum</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">norm_to_4pi</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">step</span><span class="p">:</span> <span class="n">scalar</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 
 <span class="sd">        :param norm_to_4pi: Whether to renormalize the spectrum defined by geometry to have the same maximum</span>
@@ -1015,10 +948,7 @@
         <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
         <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span></div>
 
-
-<div class="viewcode-block" id="ScatteringRate.plot_angular_distribution">
-<a class="viewcode-back" href="../../../qspec.html#qspec.simulate.ScatteringRate.plot_angular_distribution">[docs]</a>
-    <span class="k">def</span> <span class="nf">plot_angular_distribution</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">scalar</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">n</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">5</span><span class="p">,</span> <span class="n">theta</span><span class="p">:</span> <span class="n">array_iter</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">phi</span><span class="p">:</span> <span class="n">array_iter</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<div class="viewcode-block" id="ScatteringRate.plot_angular_distribution"><a class="viewcode-back" href="../../../qspec.html#qspec.simulate.ScatteringRate.plot_angular_distribution">[docs]</a>    <span class="k">def</span> <span class="nf">plot_angular_distribution</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">scalar</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">n</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">5</span><span class="p">,</span> <span class="n">theta</span><span class="p">:</span> <span class="n">array_iter</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">phi</span><span class="p">:</span> <span class="n">array_iter</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
                                   <span class="n">mode</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">show</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">save</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param x: The frequency of light in an atoms rest frame (MHz).</span>
@@ -1105,10 +1035,7 @@
         <span class="n">plt</span><span class="o">.</span><span class="n">style</span><span class="o">.</span><span class="n">use</span><span class="p">(</span><span class="s1">&#39;default&#39;</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">theta</span><span class="p">,</span> <span class="n">phi</span><span class="p">,</span> <span class="n">y</span></div>
 
-
-<div class="viewcode-block" id="ScatteringRate.plot_mixed_distribution">
-<a class="viewcode-back" href="../../../qspec.html#qspec.simulate.ScatteringRate.plot_mixed_distribution">[docs]</a>
-    <span class="k">def</span> <span class="nf">plot_mixed_distribution</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">5</span><span class="p">,</span> <span class="n">mode</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">show</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">save</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="ScatteringRate.plot_mixed_distribution"><a class="viewcode-back" href="../../../qspec.html#qspec.simulate.ScatteringRate.plot_mixed_distribution">[docs]</a>    <span class="k">def</span> <span class="nf">plot_mixed_distribution</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">5</span><span class="p">,</span> <span class="n">mode</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">show</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">save</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param n: 2 ** n + 1 samples for &#39;theta&#39; and 2 ** (n + 1) + 1 samples for &#39;phi&#39; are drawn,</span>
 <span class="sd">         giving a total of (2 ** n + 1) * len(self.x) and (2 ** (n + 1) + 1) * len(self.x)</span>
@@ -1177,10 +1104,7 @@
             <span class="k">if</span> <span class="n">show</span><span class="p">:</span>
                 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span></div>
 
-
-<div class="viewcode-block" id="ScatteringRate.plot_setup">
-<a class="viewcode-back" href="../../../qspec.html#qspec.simulate.ScatteringRate.plot_setup">[docs]</a>
-    <span class="k">def</span> <span class="nf">plot_setup</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="ScatteringRate.plot_setup"><a class="viewcode-back" href="../../../qspec.html#qspec.simulate.ScatteringRate.plot_setup">[docs]</a>    <span class="k">def</span> <span class="nf">plot_setup</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :returns: None. Creates a 3D-plot of the physical situation, including the axis</span>
 <span class="sd">         of the magnetic field (quantization axis), the real and imaginary axis of the polarization</span>
@@ -1215,9 +1139,7 @@
 
         <span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
         <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
-        <span class="n">plt</span><span class="o">.</span><span class="n">style</span><span class="o">.</span><span class="n">use</span><span class="p">(</span><span class="s1">&#39;default&#39;</span><span class="p">)</span></div>
-</div>
-
+        <span class="n">plt</span><span class="o">.</span><span class="n">style</span><span class="o">.</span><span class="n">use</span><span class="p">(</span><span class="s1">&#39;default&#39;</span><span class="p">)</span></div></div>
 </pre></div>
 
            </div>

@@ -1,22 +1,24 @@
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" >
+<html class="writer-html5" lang="en">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>qspec.models._fit &mdash; qspec 20.05.2023 documentation</title>
-      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
-      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <title>qspec.models._fit &mdash; qspec 13.12.2023 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
       <link rel="stylesheet" href="../../../_static/css/borders.css" type="text/css" />
       <link rel="stylesheet" href="../../../_static/css/wy-nav-content.css" type="text/css" />
+
+  
   <!--[if lt IE 9]>
     <script src="../../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
         <script src="../../../_static/jquery.js?v=5d32c60e"></script>
         <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="../../../_static/documentation_options.js?v=52e4f5b1"></script>
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js?v=7f3357fe"></script>
         <script src="../../../_static/doctools.js?v=888ff710"></script>
-        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=4825356b"></script>
     <script src="../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" /> 
@@ -126,32 +128,21 @@
 
 
 <span class="c1"># noinspection PyUnusedLocal</span>
-<div class="viewcode-block" id="sigma_poisson">
-<a class="viewcode-back" href="../../../qspec.html#qspec.models.sigma_poisson">[docs]</a>
-<span class="k">def</span> <span class="nf">sigma_poisson</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">y_model</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="o">*</span><span class="n">params</span><span class="p">):</span>
+<div class="viewcode-block" id="sigma_poisson"><a class="viewcode-back" href="../../../qspec.html#qspec.models.sigma_poisson">[docs]</a><span class="k">def</span> <span class="nf">sigma_poisson</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">y_model</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="o">*</span><span class="n">params</span><span class="p">):</span>
     <span class="k">return</span> <span class="n">_sqrt_zero_free</span><span class="p">(</span><span class="n">y_model</span><span class="p">)</span></div>
 
 
-
-<div class="viewcode-block" id="residuals">
-<a class="viewcode-back" href="../../../qspec.html#qspec.models.residuals">[docs]</a>
-<span class="k">def</span> <span class="nf">residuals</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+<div class="viewcode-block" id="residuals"><a class="viewcode-back" href="../../../qspec.html#qspec.models.residuals">[docs]</a><span class="k">def</span> <span class="nf">residuals</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
     <span class="k">return</span> <span class="n">y</span> <span class="o">-</span> <span class="n">model</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="o">*</span><span class="n">model</span><span class="o">.</span><span class="n">vals</span><span class="p">)</span></div>
 
 
-
-<div class="viewcode-block" id="reduced_chi2">
-<a class="viewcode-back" href="../../../qspec.html#qspec.models.reduced_chi2">[docs]</a>
-<span class="k">def</span> <span class="nf">reduced_chi2</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">sigma_y</span><span class="p">):</span>
+<div class="viewcode-block" id="reduced_chi2"><a class="viewcode-back" href="../../../qspec.html#qspec.models.reduced_chi2">[docs]</a><span class="k">def</span> <span class="nf">reduced_chi2</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">sigma_y</span><span class="p">):</span>
     <span class="n">fixed</span><span class="p">,</span> <span class="n">bounds</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">fit_prepare</span><span class="p">()</span>
     <span class="n">n_free</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="ow">not</span> <span class="n">f</span><span class="p">)</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">fixed</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">residuals</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">/</span> <span class="n">sigma_y</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">y</span><span class="o">.</span><span class="n">size</span> <span class="o">-</span> <span class="n">n_free</span><span class="p">)</span></div>
 
 
-
-<div class="viewcode-block" id="fit">
-<a class="viewcode-back" href="../../../qspec.html#qspec.models.fit">[docs]</a>
-<span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="n">model</span><span class="p">:</span> <span class="n">_base</span><span class="o">.</span><span class="n">Model</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">array_iter</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">array_iter</span><span class="p">,</span> <span class="n">sigma_x</span><span class="p">:</span> <span class="n">array_iter</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<div class="viewcode-block" id="fit"><a class="viewcode-back" href="../../../qspec.html#qspec.models.fit">[docs]</a><span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="n">model</span><span class="p">:</span> <span class="n">_base</span><span class="o">.</span><span class="n">Model</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">array_iter</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">array_iter</span><span class="p">,</span> <span class="n">sigma_x</span><span class="p">:</span> <span class="n">array_iter</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">sigma_y</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">array_iter</span><span class="p">,</span> <span class="n">Callable</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">report</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">routine</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Callable</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">guess_offset</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">mc_sigma</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
@@ -325,7 +316,6 @@
 
     <span class="n">info</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">warn</span><span class="o">=</span><span class="n">warn</span><span class="p">,</span> <span class="n">err</span><span class="o">=</span><span class="n">err</span><span class="p">,</span> <span class="n">chi2</span><span class="o">=</span><span class="n">chi2</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">popt</span><span class="p">,</span> <span class="n">pcov</span><span class="p">,</span> <span class="n">info</span></div>
-
 </pre></div>
 
            </div>

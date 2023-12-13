@@ -1438,8 +1438,8 @@ class Interaction:
                                results.ctypes.data_as(c_complex_p), c_size_t(t_size), c_size_t(sample_size))
         return results
 
-    def mc_schroedinger(self, t: array_like, delta: array_like = None, m: Optional[int] = 0, v: array_like = None,
-                        y0: array_like = None, dynamics: bool = False, ntraj: int = 500):
+    def mc_master(self, t: array_like, delta: array_like = None, m: Optional[int] = 0, v: array_like = None,
+                  y0: array_like = None, dynamics: bool = False, ntraj: int = 500):
         """
         :param t: The times when to compute the solution.
         :param delta: An array of frequency shifts for the laser(s). 'delta' must be a scalar or a 1d- or 2d-array

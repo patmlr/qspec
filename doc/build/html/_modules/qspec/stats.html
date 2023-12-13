@@ -1,22 +1,24 @@
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" >
+<html class="writer-html5" lang="en">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>qspec.stats &mdash; qspec 20.05.2023 documentation</title>
-      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
-      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <title>qspec.stats &mdash; qspec 13.12.2023 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=19f00094" />
       <link rel="stylesheet" href="../../_static/css/borders.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/css/wy-nav-content.css" type="text/css" />
+
+  
   <!--[if lt IE 9]>
     <script src="../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
         <script src="../../_static/jquery.js?v=5d32c60e"></script>
         <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="../../_static/documentation_options.js?v=52e4f5b1"></script>
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js?v=7f3357fe"></script>
         <script src="../../_static/doctools.js?v=888ff710"></script>
-        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script src="../../_static/sphinx_highlight.js?v=4825356b"></script>
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" /> 
@@ -97,9 +99,7 @@
            <span class="s1">&#39;combined_pdf&#39;</span><span class="p">,</span> <span class="s1">&#39;relevant_interval&#39;</span><span class="p">,</span> <span class="s1">&#39;uniform&#39;</span><span class="p">,</span> <span class="s1">&#39;uniform_pumped&#39;</span><span class="p">,</span> <span class="s1">&#39;info&#39;</span><span class="p">]</span>
 
 
-<div class="viewcode-block" id="Observable">
-<a class="viewcode-back" href="../../qspec.html#qspec.stats.Observable">[docs]</a>
-<span class="k">class</span> <span class="nc">Observable</span><span class="p">(</span><span class="nb">float</span><span class="p">):</span>
+<div class="viewcode-block" id="Observable"><a class="viewcode-back" href="../../qspec.html#qspec.stats.Observable">[docs]</a><span class="k">class</span> <span class="nc">Observable</span><span class="p">(</span><span class="nb">float</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    A float object which has a &#39;label&#39; and optionally both a left- and right-sided or a symmetric uncertainty.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -159,9 +159,7 @@
     <span class="k">def</span> <span class="fm">__rpow__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">power</span><span class="p">,</span> <span class="n">modulo</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">propagate</span><span class="p">(</span><span class="nb">pow</span><span class="p">,</span> <span class="p">[</span><span class="n">power</span><span class="p">,</span> <span class="bp">self</span><span class="p">])</span>
 
-<div class="viewcode-block" id="Observable.set_popt">
-<a class="viewcode-back" href="../../qspec.html#qspec.stats.Observable.set_popt">[docs]</a>
-    <span class="k">def</span> <span class="nf">set_popt</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">popt</span><span class="p">:</span> <span class="n">array_like</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="Observable.set_popt"><a class="viewcode-back" href="../../qspec.html#qspec.stats.Observable.set_popt">[docs]</a>    <span class="k">def</span> <span class="nf">set_popt</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">popt</span><span class="p">:</span> <span class="n">array_like</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param popt: The new value of &#39;popt&#39;.</span>
 <span class="sd">        :returns: None. Sets the &#39;popt&#39; attribute.</span>
@@ -171,10 +169,7 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">popt</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">popt</span><span class="p">)</span></div>
 
-
-<div class="viewcode-block" id="Observable.rvs">
-<a class="viewcode-back" href="../../qspec.html#qspec.stats.Observable.rvs">[docs]</a>
-    <span class="k">def</span> <span class="nf">rvs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ndarray</span><span class="p">:</span>
+<div class="viewcode-block" id="Observable.rvs"><a class="viewcode-back" href="../../qspec.html#qspec.stats.Observable.rvs">[docs]</a>    <span class="k">def</span> <span class="nf">rvs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ndarray</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param size: The defining number of random variates (default is 1).</span>
 <span class="sd">        :returns: Random variates of the observable of given &#39;size&#39;. If asymmetric uncertainties are specified,</span>
@@ -190,10 +185,7 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="n">size</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span></div>
 
-
-<div class="viewcode-block" id="Observable.pdf">
-<a class="viewcode-back" href="../../qspec.html#qspec.stats.Observable.pdf">[docs]</a>
-    <span class="k">def</span> <span class="nf">pdf</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Callable</span><span class="p">:</span>
+<div class="viewcode-block" id="Observable.pdf"><a class="viewcode-back" href="../../qspec.html#qspec.stats.Observable.pdf">[docs]</a>    <span class="k">def</span> <span class="nf">pdf</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Callable</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :returns: The probability distribution function (pdf) of the observable.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -206,10 +198,7 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">full_like</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span></div>
 
-
-<div class="viewcode-block" id="Observable.hist">
-<a class="viewcode-back" href="../../qspec.html#qspec.stats.Observable.hist">[docs]</a>
-    <span class="k">def</span> <span class="nf">hist</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1000000</span><span class="p">,</span> <span class="n">n_bins</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">200</span><span class="p">):</span>
+<div class="viewcode-block" id="Observable.hist"><a class="viewcode-back" href="../../qspec.html#qspec.stats.Observable.hist">[docs]</a>    <span class="k">def</span> <span class="nf">hist</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1000000</span><span class="p">,</span> <span class="n">n_bins</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">200</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param size: The defining number of random variates (default is 1,000,000).</span>
 <span class="sd">        :param n_bins: The number of bins.</span>
@@ -220,14 +209,10 @@
         <span class="n">bins</span> <span class="o">=</span> <span class="n">bins</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="n">bins</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">bins</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">/</span> <span class="n">n_bins</span>
         <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">bins</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">pdf</span><span class="p">()(</span><span class="n">bins</span><span class="p">),</span> <span class="s1">&#39;C0&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Est. PDF&#39;</span><span class="p">)</span>
         <span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-        <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span></div>
-</div>
+        <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span></div></div>
 
 
-
-<div class="viewcode-block" id="add">
-<a class="viewcode-back" href="../../qspec.html#qspec.stats.add">[docs]</a>
-<span class="k">def</span> <span class="nf">add</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
+<div class="viewcode-block" id="add"><a class="viewcode-back" href="../../qspec.html#qspec.stats.add">[docs]</a><span class="k">def</span> <span class="nf">add</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    :param a: The first summand.</span>
 <span class="sd">    :param b: The second summand.</span>
@@ -236,10 +221,7 @@
     <span class="k">return</span> <span class="n">a</span> <span class="o">+</span> <span class="n">b</span></div>
 
 
-
-<div class="viewcode-block" id="mul">
-<a class="viewcode-back" href="../../qspec.html#qspec.stats.mul">[docs]</a>
-<span class="k">def</span> <span class="nf">mul</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
+<div class="viewcode-block" id="mul"><a class="viewcode-back" href="../../qspec.html#qspec.stats.mul">[docs]</a><span class="k">def</span> <span class="nf">mul</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    :param a: The first factor.</span>
 <span class="sd">    :param b: The second factor.</span>
@@ -248,10 +230,7 @@
     <span class="k">return</span> <span class="n">a</span> <span class="o">*</span> <span class="n">b</span></div>
 
 
-
-<div class="viewcode-block" id="average">
-<a class="viewcode-back" href="../../qspec.html#qspec.stats.average">[docs]</a>
-<span class="k">def</span> <span class="nf">average</span><span class="p">(</span><span class="n">a</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">std</span><span class="p">:</span> <span class="n">array_like</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">cov</span><span class="p">:</span> <span class="n">array_iter</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">axis</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="p">(</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">ndarray</span><span class="p">):</span>
+<div class="viewcode-block" id="average"><a class="viewcode-back" href="../../qspec.html#qspec.stats.average">[docs]</a><span class="k">def</span> <span class="nf">average</span><span class="p">(</span><span class="n">a</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">std</span><span class="p">:</span> <span class="n">array_like</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">cov</span><span class="p">:</span> <span class="n">array_iter</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">axis</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="p">(</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">ndarray</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    :param a: The sample data.</span>
 <span class="sd">    :param axis: The axis along which the average is computed.</span>
@@ -310,10 +289,7 @@
     <span class="k">return</span> <span class="n">av</span><span class="p">,</span> <span class="n">av_d</span></div>
 
 
-
-<div class="viewcode-block" id="median">
-<a class="viewcode-back" href="../../qspec.html#qspec.stats.median">[docs]</a>
-<span class="k">def</span> <span class="nf">median</span><span class="p">(</span><span class="n">a</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">axis</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="p">(</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">ndarray</span><span class="p">,</span> <span class="n">ndarray</span><span class="p">):</span>
+<div class="viewcode-block" id="median"><a class="viewcode-back" href="../../qspec.html#qspec.stats.median">[docs]</a><span class="k">def</span> <span class="nf">median</span><span class="p">(</span><span class="n">a</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">axis</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="p">(</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">ndarray</span><span class="p">,</span> <span class="n">ndarray</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    :param a: The sample data.</span>
 <span class="sd">    :param axis: The axis along which the three percentiles are computed.</span>
@@ -326,10 +302,7 @@
     <span class="k">return</span> <span class="n">med</span><span class="p">,</span> <span class="n">neg</span><span class="p">,</span> <span class="n">pos</span></div>
 
 
-
-<div class="viewcode-block" id="estimate_skewnorm">
-<a class="viewcode-back" href="../../qspec.html#qspec.stats.estimate_skewnorm">[docs]</a>
-<span class="k">def</span> <span class="nf">estimate_skewnorm</span><span class="p">(</span><span class="n">med</span><span class="p">:</span> <span class="n">scalar</span><span class="p">,</span> <span class="n">per_0</span><span class="p">:</span> <span class="n">scalar</span><span class="p">,</span> <span class="n">per_1</span><span class="p">:</span> <span class="n">scalar</span><span class="p">):</span>
+<div class="viewcode-block" id="estimate_skewnorm"><a class="viewcode-back" href="../../qspec.html#qspec.stats.estimate_skewnorm">[docs]</a><span class="k">def</span> <span class="nf">estimate_skewnorm</span><span class="p">(</span><span class="n">med</span><span class="p">:</span> <span class="n">scalar</span><span class="p">,</span> <span class="n">per_0</span><span class="p">:</span> <span class="n">scalar</span><span class="p">,</span> <span class="n">per_1</span><span class="p">:</span> <span class="n">scalar</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    :param med: The median (0.5-percentile) of a random variable.</span>
 <span class="sd">    :param per_0: The left-sided 1-sigma percentile (~0.1587-percentile) relative to &#39;med&#39;.</span>
@@ -357,10 +330,7 @@
     <span class="k">return</span> <span class="n">root</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">x0</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.</span><span class="p">,</span> <span class="n">med</span><span class="p">,</span> <span class="n">per_0</span><span class="p">]),</span> <span class="n">jac</span><span class="o">=</span><span class="n">df</span><span class="p">)</span><span class="o">.</span><span class="n">x</span></div>
 
 
-
-<div class="viewcode-block" id="propagate">
-<a class="viewcode-back" href="../../qspec.html#qspec.stats.propagate">[docs]</a>
-<span class="k">def</span> <span class="nf">propagate</span><span class="p">(</span><span class="n">f</span><span class="p">:</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">array_like</span><span class="p">,</span> <span class="n">Observable</span><span class="p">],</span> <span class="n">x_d</span><span class="p">:</span> <span class="n">array_like</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">cov</span><span class="p">:</span> <span class="n">array_iter</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<div class="viewcode-block" id="propagate"><a class="viewcode-back" href="../../qspec.html#qspec.stats.propagate">[docs]</a><span class="k">def</span> <span class="nf">propagate</span><span class="p">(</span><span class="n">f</span><span class="p">:</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">array_like</span><span class="p">,</span> <span class="n">Observable</span><span class="p">],</span> <span class="n">x_d</span><span class="p">:</span> <span class="n">array_like</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">cov</span><span class="p">:</span> <span class="n">array_iter</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
               <span class="n">unc_places</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">sample_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1000000</span><span class="p">,</span> <span class="n">rtol</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1e-3</span><span class="p">,</span> <span class="n">atol</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
               <span class="n">force_sym</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">full_output</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">show</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="p">(</span><span class="n">Observable</span><span class="p">,</span> <span class="nb">list</span><span class="p">,</span> <span class="n">ndarray</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
@@ -456,10 +426,7 @@
         <span class="k">return</span> <span class="n">ob</span></div>
 
 
-
-<div class="viewcode-block" id="propagate_fit">
-<a class="viewcode-back" href="../../qspec.html#qspec.stats.propagate_fit">[docs]</a>
-<span class="k">def</span> <span class="nf">propagate_fit</span><span class="p">(</span><span class="n">f</span><span class="p">:</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">popt</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">pcov</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">sample_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1000000</span><span class="p">):</span>
+<div class="viewcode-block" id="propagate_fit"><a class="viewcode-back" href="../../qspec.html#qspec.stats.propagate_fit">[docs]</a><span class="k">def</span> <span class="nf">propagate_fit</span><span class="p">(</span><span class="n">f</span><span class="p">:</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">popt</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">pcov</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">sample_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1000000</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    :param f: The function to compute. :math:`f` needs to be vectorized.</span>
 <span class="sd">    :param x: The input values.</span>
@@ -476,10 +443,7 @@
     <span class="k">return</span> <span class="n">med</span><span class="p">,</span> <span class="n">per_0</span><span class="p">,</span> <span class="n">per_1</span></div>
 
 
-
-<div class="viewcode-block" id="combined_pdf">
-<a class="viewcode-back" href="../../qspec.html#qspec.stats.combined_pdf">[docs]</a>
-<span class="k">def</span> <span class="nf">combined_pdf</span><span class="p">(</span><span class="n">z</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">pdf_1</span><span class="p">:</span> <span class="n">Callable</span> <span class="o">=</span> <span class="n">st</span><span class="o">.</span><span class="n">norm</span><span class="o">.</span><span class="n">pdf</span><span class="p">,</span> <span class="n">pdf_2</span><span class="p">:</span> <span class="n">Callable</span> <span class="o">=</span> <span class="n">st</span><span class="o">.</span><span class="n">norm</span><span class="o">.</span><span class="n">pdf</span><span class="p">,</span>
+<div class="viewcode-block" id="combined_pdf"><a class="viewcode-back" href="../../qspec.html#qspec.stats.combined_pdf">[docs]</a><span class="k">def</span> <span class="nf">combined_pdf</span><span class="p">(</span><span class="n">z</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">pdf_1</span><span class="p">:</span> <span class="n">Callable</span> <span class="o">=</span> <span class="n">st</span><span class="o">.</span><span class="n">norm</span><span class="o">.</span><span class="n">pdf</span><span class="p">,</span> <span class="n">pdf_2</span><span class="p">:</span> <span class="n">Callable</span> <span class="o">=</span> <span class="n">st</span><span class="o">.</span><span class="n">norm</span><span class="o">.</span><span class="n">pdf</span><span class="p">,</span>
                  <span class="n">loc_1</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.</span><span class="p">,</span> <span class="n">scale_1</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.</span><span class="p">,</span> <span class="n">loc_2</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.</span><span class="p">,</span> <span class="n">scale_2</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.</span><span class="p">,</span>
                  <span class="n">operator</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;+&#39;</span><span class="p">,</span> <span class="n">n</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">10</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ndarray</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
@@ -526,10 +490,7 @@
     <span class="k">return</span> <span class="n">result</span></div>
 
 
-
-<div class="viewcode-block" id="relevant_interval">
-<a class="viewcode-back" href="../../qspec.html#qspec.stats.relevant_interval">[docs]</a>
-<span class="k">def</span> <span class="nf">relevant_interval</span><span class="p">(</span><span class="n">dist</span><span class="p">:</span> <span class="n">Callable</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">show</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="relevant_interval"><a class="viewcode-back" href="../../qspec.html#qspec.stats.relevant_interval">[docs]</a><span class="k">def</span> <span class="nf">relevant_interval</span><span class="p">(</span><span class="n">dist</span><span class="p">:</span> <span class="n">Callable</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">show</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    :param dist: The probability distribution function (pdf).</span>
 <span class="sd">    :param args: Additional arguments for the pdf.</span>
@@ -576,20 +537,16 @@
     <span class="k">return</span> <span class="n">ret</span></div>
 
 
-
 <span class="sd">&quot;&quot;&quot; Probability density functions &quot;&quot;&quot;</span>
 
 
-<div class="viewcode-block" id="uniform">
-<a class="viewcode-back" href="../../qspec.html#qspec.stats.uniform">[docs]</a>
-<span class="k">def</span> <span class="nf">uniform</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">width</span><span class="p">:</span> <span class="n">array_like</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ndarray</span><span class="p">:</span>
+<div class="viewcode-block" id="uniform"><a class="viewcode-back" href="../../qspec.html#qspec.stats.uniform">[docs]</a><span class="k">def</span> <span class="nf">uniform</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">width</span><span class="p">:</span> <span class="n">array_like</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ndarray</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    :param x: The x quantiles.</span>
 <span class="sd">    :param width: The width of the uniform distribution.</span>
 <span class="sd">    :returns: The probability density at &#39;x&#39;.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">st</span><span class="o">.</span><span class="n">uniform</span><span class="o">.</span><span class="n">pdf</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">loc</span><span class="o">=-</span><span class="mf">0.5</span> <span class="o">*</span> <span class="n">width</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="n">width</span><span class="p">)</span></div>
-
 
 
 <span class="k">def</span> <span class="nf">_uniform_pumped</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">gamma_u</span><span class="p">,</span> <span class="n">depth</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ndarray</span><span class="p">:</span>
@@ -613,9 +570,7 @@
     <span class="k">return</span> <span class="n">ret</span>
 
 
-<div class="viewcode-block" id="uniform_pumped">
-<a class="viewcode-back" href="../../qspec.html#qspec.stats.uniform_pumped">[docs]</a>
-<span class="k">def</span> <span class="nf">uniform_pumped</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">gamma_u</span><span class="p">,</span> <span class="n">depth</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ndarray</span><span class="p">:</span>
+<div class="viewcode-block" id="uniform_pumped"><a class="viewcode-back" href="../../qspec.html#qspec.stats.uniform_pumped">[docs]</a><span class="k">def</span> <span class="nf">uniform_pumped</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">gamma_u</span><span class="p">,</span> <span class="n">depth</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ndarray</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    :param x: The x quantiles.</span>
 <span class="sd">    :param width: The width of the uniform distribution.</span>
@@ -629,10 +584,7 @@
     <span class="k">return</span> <span class="n">_uniform_pumped</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">gamma_u</span><span class="p">,</span> <span class="n">depth</span><span class="p">)</span> <span class="o">/</span> <span class="n">norm</span></div>
 
 
-
-<div class="viewcode-block" id="info">
-<a class="viewcode-back" href="../../qspec.html#qspec.stats.info">[docs]</a>
-<span class="k">def</span> <span class="nf">info</span><span class="p">():</span>
+<div class="viewcode-block" id="info"><a class="viewcode-back" href="../../qspec.html#qspec.stats.info">[docs]</a><span class="k">def</span> <span class="nf">info</span><span class="p">():</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Plots the 1-sigma percentiles (and their ratio) of a skew normal distribution relative to its median</span>
 <span class="sd">    for different values of the parameter alpha.</span>
@@ -659,7 +611,6 @@
     <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">neg</span> <span class="o">/</span> <span class="n">pos</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Ratio left/right&#39;</span><span class="p">)</span>
     <span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="s1">&#39;lower center&#39;</span><span class="p">)</span>
     <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span></div>
-
 </pre></div>
 
            </div>

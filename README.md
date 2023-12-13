@@ -1,7 +1,7 @@
 qspec
 =====
 
-A python package for calculations surrounding Collinear Laser Spectroscopy.
+A python package for calculations surrounding laser spectroscopy.
 
 The [_qspec_](https://github.com/lasersphere/qspec) Python package provides mathematical and physical functions
 frequently used in laser spectroscopy but also more general methods for data processing. 

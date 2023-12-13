@@ -74,8 +74,8 @@ class Interaction {
     +<color:MediumPurple>ndarray</color> rates(<color:MediumPurple>ndarray</color> t, delta v, y0)
     +<color:MediumPurple>ndarray</color> schroedinger(<color:MediumPurple>ndarray</color> t, delta v, y0)
     +<color:MediumPurple>ndarray</color> master(<color:MediumPurple>ndarray</color> t, delta v, y0)
-    +<color:MediumPurple>ndarray</color> mc_schroedinger(<color:MediumPurple>ndarray</color> t, delta v, y0,
-    \t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t<color:MediumPurple>bool</color> dynamics, <color:MediumPurple>int</color> ntraj)
+    +<color:MediumPurple>ndarray</color> mc_master(<color:MediumPurple>ndarray</color> t, delta v, y0,
+    \t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t<color:MediumPurple>bool</color> dynamics, <color:MediumPurple>int</color> ntraj)
 }
 
 Atom .> Interaction

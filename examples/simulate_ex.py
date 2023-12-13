@@ -17,12 +17,10 @@ Example script / Guide for the qspec.simulate module.
 """
 
 import numpy as np
-import qspec
 import scipy.constants as sc
 import matplotlib.pyplot as plt
-import scipy.integrate as si
 
-import qspec as pc
+import qspec as qs
 import qspec.simulate as sim
 
 
@@ -212,7 +210,7 @@ def example(n=None):
         # Solve the rate equation for all times, assuming equal population in all s-states.
 
         # Plot the population of all d5-states.
-        for f in pc.get_f(i, 2.5):
+        for f in qs.get_f(i, 2.5):
             plt.plot(delta, np.sum(results[:, ca43.get_state_indexes('d5', f), -1], axis=1), label='F={}'.format(f))
         plt.xlabel('f - {} (MHz)'.format(laser_sp.freq))
         plt.ylabel('d5-state population after {} us'.format(times[-1]))
@@ -234,7 +232,7 @@ def example(n=None):
         """
         Example 3: Interaction between a singly-charged lithium ion and two lasers.
         
-        In example 3, Fig. 5 from [Noertershaeuser et pc. Phys. Rev. Accel. Beams 24, 024701 (2021),
+        In example 3, Fig. 5 from [Noertershaeuser et al. Phys. Rev. Accel. Beams 24, 024701 (2021),
         https://doi.org/10.1103/PhysRevAccelBeams.24.024701] is calculated.
         """
 
@@ -261,8 +259,8 @@ def example(n=None):
         laser_b = sim.Laser(freq=f + 6234.29, polarization=pol_b, intensity=i_b)  # blue laser
         laser_r = sim.Laser(freq=f - 13566., polarization=pol_r, intensity=i_r)  # red laser
 
-        print('Saturation s(blue): {}'.format(pc.saturation(i_b, f, a, pc.a(1.5, 1, 1.5, 2, 2.5))))
-        print('Saturation s(red): {}'.format(pc.saturation(i_r, f, a, pc.a(1.5, 1, 2.5, 2, 2.5))))
+        print('Saturation s(blue): {}'.format(qs.saturation(i_b, f, a, qs.a(1.5, 1, 1.5, 2, 2.5))))
+        print('Saturation s(red): {}'.format(qs.saturation(i_r, f, a, qs.a(1.5, 1, 2.5, 2, 2.5))))
         # The saturation intensity can be compared easily to the specified values in the paper.
 
         inter = sim.Interaction(atom=li7, lasers=[laser_b, laser_r])
@@ -293,125 +291,16 @@ def example(n=None):
         plt.show()
 
     if 4 in n:
-        f_sp3 = 761905013  # The 4s -> 4p 2P3/2 transition frequency.
-        a_sp3 = 147
-
-        # s_hyper = [-806.4, ]
-        # p3_hyper = [-31., -6.9]
-
-        s_hyper = [-806.4, ]
-        p3_hyper = [-31., -6.9]
-
-        i = 3.5
-
-        s = sim.construct_electronic_state(freq_0=0, s=0.5, l=0, j=0.5, i=i, hyper_const=s_hyper, label='s')
-        p3 = sim.construct_electronic_state(f_sp3, 0.5, 1, 1.5, i=i, hyper_const=p3_hyper, label='p3')
-
-        decay = sim.DecayMap(labels=[('s', 'p3')], a=[a_sp3])
-        # The states are linked by Einstein-A coefficients via the specified labels.
-
-        states = s + p3
-        ca43 = sim.Atom(states=states, decay_map=decay)
-        # ca43.plot()
-
-        intensity = 0.1
-        pol_sp = sim.Polarization([0, 1, 0], q_axis=2)
-        laser_sp = sim.Laser(freq=f_sp3 - 1700, polarization=pol_sp, intensity=intensity)
-
-        inter = sim.Interaction(atom=ca43, lasers=[laser_sp, ], delta_max=1000.)
-        inter.resonance_info()  # Print the detunings of the lasers from the considered transitions.
-        # inter.controlled = True  # Use an error controlled solver to deal with fast dynamics.
-        # inter.dt = 1e-4  # Alternatively, decrease the step size.
-
-        times = [0., 0.2]  # Integration time in us.
-        delta = np.linspace(-200, 200, 201)
-        theta, phi = np.pi / 2, 0.
-        theta, phi = 0., 0.
-
-        results = inter.rates(times, delta)
-        y = a_sp3 * np.sum(results[:, ca43.get_state_indexes('p3'), -1], axis=1) / (4 * np.pi)
-        plt.plot(delta, y, label='p-state')
-
-        rho = inter.master(times, delta)
-        y = a_sp3 * 3 / (8 * np.pi) * (2 * i + 1) * ca43.scattering_rate(rho, theta, phi)[:, -1]
-        # th, ph = np.linspace(-np.pi / 2, np.pi / 2, 9), np.linspace(0, 2 * np.pi, 17)
-        # y = np.array([[ca43.scattering_rate(rho, _t, _p).real * np.cos(_t) for _t in th] for _p in ph])
-        # y = si.simps(y, x=th, axis=1)
-        # y = si.simps(y, x=ph, axis=0)
-        plt.plot(delta, y, label='QI')
-
-        sr = sim.ScatteringRate(ca43, polarization=pol_sp)
-        y = sr.generate_y(delta - 1700, theta, phi)[:, 0, 0]
-        s = pc.saturation(intensity, f_sp3, a_sp3, 1)  # pc.a_dipole(0, 0.5, 0.5, 0.5, 1.5, 1.5, 1.5, 1))  # pc.a(0, 0.5, 0.5, 1.5, 1.5)
-        plt.plot(delta, s * y, '-C2', label='QI pert.')
-
-        plt.xlabel('f - {} (MHz)'.format(laser_sp.freq))
-        plt.ylabel('scattering rate after {} us'.format(times[-1]))
-        plt.legend()
-        plt.show()
-
-    if 5 in n:
+        """
+        Example 4: Scattering rate of a para-he-like system.
+        
+        In example 4, the scattering rate, including quantum interference effects, is derived from the rate equations,
+        the master equation and perturbatively for the lowest lying transition in the singlet system of a he-like atom.
+        """
         f_p = 7e8
         a_p = 100.
 
         i = 1.5
-        s_hyper = [0.]
-        p_hyper = [30.]
-
-        s = sim.construct_electronic_state(freq_0=0, s=0, l=0, j=0, i=i, hyper_const=s_hyper, label='s')
-        p = sim.construct_electronic_state(freq_0=f_p, s=0, l=1, j=1, i=i, hyper_const=p_hyper, label='p')
-
-        decay = sim.DecayMap(labels=[('s', 'p')], a=[a_p])
-
-        states = s + p
-        he = sim.Atom(states=states, decay_map=decay)
-        # he.plot()
-
-        intensity = 0.1
-        pol_sp = sim.Polarization([0, 1, 0], vec_as_q=False, q_axis=2)
-        print(pol_sp.x)
-        print(pol_sp.q)
-        laser_sp = sim.Laser(freq=f_p, polarization=pol_sp, intensity=intensity)
-
-        inter = sim.Interaction(atom=he, lasers=[laser_sp, ], delta_max=500.)
-        inter.resonance_info()
-
-        times = [0., 0.2]
-        delta = np.linspace(-100, 100, 201)
-        theta, phi = np.pi / 2, 0.
-        # theta, phi = 0., 0.
-
-        results = inter.rates(times, delta)
-        y = a_p * np.sum(results[:, he.get_state_indexes('p'), :], axis=1) / (4 * np.pi)
-        # y = he.scattering_rate_old(results, i=he.get_state_indexes('p')) / (4 * np.pi)
-        plt.plot(delta, y[:, -1], label='p-state')
-
-        # rho = np.array([np.diag(results[_i, :, -1]) for _i in range(delta.size)])
-        # y = he.scattering_rate(rho, theta, phi)
-        rho = inter.master(times, delta)
-        y = he.scattering_rate(rho, theta, phi)[:, -1]
-        # th, ph = np.linspace(-np.pi / 2, np.pi / 2, 9), np.linspace(0, 2 * np.pi, 17)
-        # y = np.array([[he.scattering_rate(rho, _t, _p).real * np.cos(_t) for _t in th] for _p in ph])
-        # y = si.simps(y, x=th, axis=1)
-        # y = si.simps(y, x=ph, axis=0)
-        plt.plot(delta, y, label='QI')
-
-        sr = sim.ScatteringRate(he, polarization=pol_sp)
-        y = sr.generate_y(delta, theta, phi)[:, 0, 0]
-        # y = sr.integrate_y(delta) / (4 * np.pi)
-        s = pc.saturation(intensity, f_p, a_p, 1)  # pc.a_dipole(0, 0, 0, 0, 1, 1, 1, 1))  # pc.a(0, 0, 0, 1, 1)
-        plt.plot(delta, s * y, '-C2', label='QI pert.')
-
-        plt.xlabel('f - {} (MHz)'.format(laser_sp.freq))
-        plt.ylabel('scattering rate after {} us'.format(times[-1]))
-        plt.legend()
-        plt.show()
-
-    if 6 in n:
-        f_p = 7e8
-        a_p = 100.
-
-        i = 0.
         s_hyper = [0.]
         p_hyper = [10.]
 
@@ -425,49 +314,43 @@ def example(n=None):
         # he.plot()
 
         intensity = 0.1
-        pol_sp = sim.Polarization([1, 1, 0], vec_as_q=False, q_axis=2)
-        print('x:', pol_sp.x)
-        print('q:', pol_sp.q)
+        pol_sp = sim.Polarization([0, 1, 0], vec_as_q=True, q_axis=2)
+        print(pol_sp.x)
+        print(pol_sp.q)
         laser_sp = sim.Laser(freq=f_p, polarization=pol_sp, intensity=intensity)
 
         inter = sim.Interaction(atom=he, lasers=[laser_sp, ], delta_max=500.)
         # inter.resonance_info()
 
-        times = np.linspace(0, 0.2, 101)
-        theta, phi = 0, 0.
-        # theta, phi = 0., 0.
+        times = [0., 0.2]
+        delta = np.linspace(-100, 100, 201)
+        # theta, phi = np.pi / 2, 0.
+        theta, phi = 0., 0.
 
-        # results = inter.rates(times)
-        rho = inter.master(times)
-        results = np.diagonal(rho, axis1=1, axis2=2).real
-        results = np.transpose(results, axes=[0, 2, 1])
-        for i in range(1, 4, 1):
-            y = a_p * results[:, i, :] / (4 * np.pi)
-            # y = he.scattering_rate_old(results, i=he.get_state_indexes('p')) / (4 * np.pi)
-            plt.plot(times, y[0], 'C0', ls=[':', '-.', '--'][i - 1], label=f'{i - 2}')
-        plt.plot(times, np.sum(a_p * results[0, he.get_state_indexes('p'), :] / (4 * np.pi), axis=0),
-                 '-C0', label='$p$-state')
+        results = inter.rates(times, delta)
+        y = a_p * np.sum(results[:, he.get_state_indexes('p'), :], axis=1) / (4 * np.pi)
+        plt.plot(delta, y[:, -1], label='isotropic')
 
-        rho = inter.master(times)
-        y = he.scattering_rate(rho, theta, phi)
-        # th, ph = np.linspace(-np.pi / 2, np.pi / 2, 9), np.linspace(0, 2 * np.pi, 17)
-        # y = np.array([[he.scattering_rate(rho, _t, _p).real * np.cos(_t) for _t in th] for _p in ph])
-        # y = si.simps(y, x=th, axis=1)
-        # y = si.simps(y, x=ph, axis=0)
-        plt.plot(times, y[0], '-C1', label='QI')
+        rho = inter.master(times, delta)
+        y = he.scattering_rate(rho, theta, phi)[:, -1]
+        plt.plot(delta, y, label='QI')
 
         sr = sim.ScatteringRate(he, polarization=pol_sp)
-        y = sr.generate_y(0, theta, phi)[:, 0, 0]
-        # y = sr.integrate_y(delta) / (4 * np.pi)
-        s = pc.saturation(intensity, f_p, a_p, 1)  # pc.a_dipole(0, 0, 0, 0, 1, 1, 1, 1))  # pc.a(0, 0, 0, 1, 1)
-        plt.hlines(s * y, times[0], times[-1], ls='--', colors='C2', label='QI pert.')
+        y = sr.generate_y(delta, theta, phi)[:, 0, 0]
+        s = qs.saturation(intensity, f_p, a_p, 1)
+        plt.plot(delta, s * y, '-C2', label='QI pert.')
 
         plt.xlabel('f - {} (MHz)'.format(laser_sp.freq))
-        plt.ylabel('scattering rate after {} us'.format(times[-1]))
+        plt.ylabel('scattering rate after {} us (MHz)'.format(times[-1]))
         plt.legend()
         plt.show()
 
-    if 7 in n:
+    if 5 in n:
+        """
+        Example 5: Coherence of two laser beams / Time-dependent Rabi frequencies.
+        
+        In example 5, time-dependent Rabi frequencies are tested using two laser beams that drive the same transition.
+        """
         f_p = 7e8
         a_p = 10.
 
@@ -486,7 +369,7 @@ def example(n=None):
 
         intensity = 1000.
         pol_0 = sim.Polarization([0, 0, 1], vec_as_q=False, q_axis=2)
-        pol_1 = sim.Polarization([0, 0, -1], vec_as_q=False, q_axis=2)
+        pol_1 = sim.Polarization([0, 0, 1], vec_as_q=False, q_axis=2)
         print('x:', pol_0.x)
         print('q:', pol_0.q)
         laser_0 = sim.Laser(freq=f_p - 0.1, polarization=pol_0, intensity=intensity)
@@ -497,22 +380,24 @@ def example(n=None):
         # inter.resonance_info()
 
         times = np.linspace(0, 10., 10001)
-        theta, phi = 0, 0.
-        # theta, phi = 0., 0.
 
-        # results = inter.rates(times)
-        # y = inter.schroedinger(times)
-        # y = np.abs(y) ** 2
+        y = inter.rates(times)
+        plt.plot(times, np.sum(y[0, he.get_state_indexes('s')], axis=0), '--C0')
+        plt.plot(times, np.sum(y[0, he.get_state_indexes('p')], axis=0), '--C1')
+
         rho = inter.master(times)
         y = np.diagonal(rho, axis1=1, axis2=2).real
         y = np.transpose(y, axes=[0, 2, 1])
         ys = np.sum(y[0, he.get_state_indexes('s')], axis=0)
         yp = np.sum(y[0, he.get_state_indexes('p')], axis=0)
 
-        plt.plot(times, ys)
-        plt.plot(times, yp)
+        plt.plot(times, ys, '-C0', label='s')
+        plt.plot(times, yp, '-C1', label='p')
+        plt.legend()
+        plt.xlabel('time (us)')
+        plt.ylabel('state population')
         plt.show()
 
 
 if __name__ == '__main__':
-    example({7})
+    example({4})
