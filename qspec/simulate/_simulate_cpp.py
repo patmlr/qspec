@@ -758,12 +758,13 @@ class Atom:
         return np.array([i for i, s in enumerate(self.states) if s.label in labels and s.f in f], dtype=int)
 
     def scattering_rate(self, rho: array_like, theta: array_like = None, phi: array_like = None,
-                        i: array_like = None, j: array_like = None, axis: int = 1):
+                        as_density_matrix: bool = True, i: array_like = None, j: array_like = None, axis: int = 1):
         """
-        :param rho: The density matrix of the atom. Must have the same size as the atom
-         along the specified 'axis' and 'axis' + 1.
+        :param rho: The state vector (density matrix) of the atom. Must have the same size as the atom
+         along the specified 'axis' (and 'axis' + 1).
         :param theta: The elevation angle of detection.
         :param phi: The azimuthal angle of detection.
+        :param as_density_matrix: Whether 'rho' is a state vector or a density matrix.
         :param i: The initially excited state indexes to consider for spontaneous decay.
          If None, all states are considered.
         :param j: The final decayed state indexes to consider for spontaneous decay. If None, all states are considered.
@@ -787,6 +788,30 @@ class Atom:
 
         l0 = np.array([[1. if _i in i and _j in j else 0. for _i in range(self.size)] for _j in range(self.size)])
         l0 *= self.l0
+
+        if theta is None and phi is None:
+            if as_density_matrix:
+                rho = np.diagonal(rho, axis1=axis, axis2=axis + 1)
+                if len(rho.shape) > axis + 1:
+                    axes = list(range(len(rho.shape)))
+                    axes[axis + 1:] = axes[axis:-1]
+                    axes[axis] = len(rho.shape) - 1
+                    rho = np.transpose(rho, axes=axes)
+            axes = [ax for ax in range(axis)]
+            if axes:
+                l0 = np.expand_dims(self.l0, axis=axes)
+            axes = [axis + ax + 2 for ax in range(len(rho.shape) - axis - 1)]
+            if axes:
+                l0 = np.expand_dims(l0, axis=axes)
+
+            sr = tools.transform(l0, rho, axis=axis)
+            return np.sum(sr, axis=axis)
+
+        elif theta is None or phi is None:
+            raise ValueError('\'theta\' and \'phi\' must either both be specified or both be None.')
+
+        if not as_density_matrix:
+            rho = tools.vector_to_diag_matrix(rho, axis=axis)
 
         a_cart = [[al.a_dipole_cart(self.states[_j].i, self.states[_j].j, self.states[_j].f, self.states[_j].m,
                                     self.states[_i].j, self.states[_i].f, self.states[_i].m)
@@ -834,45 +859,6 @@ class Atom:
                          * np.expand_dims(tools.get_subarray(rho, k, axis), axis=axis + 1)
                          for k in range(self.size)], axis=0))
         return 3 / (8 * np.pi) * np.sum(np.sum(sr, axis=axis), axis=axis).real
-
-    def scattering_rate_old(self, rho: array_like, i: array_like = None, j: array_like = None, axis: int = 1):
-        """
-        :param rho: The population of the atom. Must have the same size as the atom along the specified 'axis'.
-        :param i: The initially excited state indexes to consider for spontaneous decay.
-         If None, all states are considered.
-        :param j: The final decayed state indexes to consider for spontaneous decay. If None, all states are considered.
-        :param axis: The axis along which the population is aligned in 'rho'.
-        :returns: The scattering rate of the atom given the population 'rho' (MHz or Events / s).
-        :raises ValueError: 'rho' must have the same size as the atom along the specified 'axis'.
-        """
-        rho = np.asarray(rho).real
-        if rho.shape[axis] != self.size:
-            raise ValueError('\'rho\' must have the same size as the atom along the specified \'axis\'.')
-
-        if i is None:
-            i = np.arange(self.size, dtype=int)
-        else:
-            i = np.array(i).flatten()
-        if j is None:
-            j = np.arange(self.size, dtype=int)
-        else:
-            j = np.array(j).flatten()
-
-        if axis < 0:
-            axis += len(rho.shape)
-
-        l0 = np.array([[1. if _i in i and _j in j else 0. for _i in range(self.size)] for _j in range(self.size)])
-        l0 *= self.l0
-
-        axes = [ax for ax in range(axis)]
-        if axes:
-            l0 = np.expand_dims(self.l0, axis=axes)
-        axes = [axis + ax + 2 for ax in range(len(rho.shape) - axis - 1)]
-        if axes:
-            l0 = np.expand_dims(l0, axis=axes)
-
-        sr = tools.transform(l0, rho, axis=axis)
-        return np.sum(sr, axis=axis)
 
     def plot(self, indices: array_like = None, draw_bounds: bool = False, show: bool = True):
         """
@@ -1489,6 +1475,22 @@ class Interaction:
                                   v.ctypes.data_as(c_double_p), y0.ctypes.data_as(c_complex_p), c_bool(dynamics),
                                   results.ctypes.data_as(c_complex_p), c_size_t(t_size), c_size_t(sample_size))
         return results, v
+
+    def scattering_rate(self, rho: array_like, theta: array_like = None, phi: array_like = None,
+                        i: array_like = None, j: array_like = None, axis: int = 1):
+        """
+        :param rho: The density matrix of the atom. Must have the same size as the atom
+         along the specified 'axis' and 'axis' + 1.
+        :param theta: The elevation angle of detection.
+        :param phi: The azimuthal angle of detection.
+        :param i: The initially excited state indexes to consider for spontaneous decay.
+         If None, all states are considered.
+        :param j: The final decayed state indexes to consider for spontaneous decay. If None, all states are considered.
+        :param axis: The axis along which the population is aligned in 'rho'.
+        :returns: The scattering rate of the atom given the population 'rho' (MHz or Events / s).
+        :raises ValueError: 'rho' must have the same size as the atom along the specified 'axis'.
+        """
+        return self.atom.scattering_rate(rho, theta=theta, phi=phi, i=i, j=j, axis=axis)
 
 
 def _define_colors(n: int, label_map: dict, colormap: str = None):

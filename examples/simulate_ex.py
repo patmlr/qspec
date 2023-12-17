@@ -22,6 +22,7 @@ import matplotlib.pyplot as plt
 
 import qspec as qs
 import qspec.simulate as sim
+import qspec.models as mod
 
 
 def example(n=None):
@@ -324,21 +325,25 @@ def example(n=None):
 
         times = [0., 0.2]
         delta = np.linspace(-100, 100, 201)
-        # theta, phi = np.pi / 2, 0.
-        theta, phi = 0., 0.
+        theta, phi = np.pi / 2, 0.
+        # theta, phi = 0., 0.
 
         results = inter.rates(times, delta)
-        y = a_p * np.sum(results[:, he.get_state_indexes('p'), :], axis=1) / (4 * np.pi)
-        plt.plot(delta, y[:, -1], label='isotropic')
+        y = he.scattering_rate(results, as_density_matrix=False)[:, -1] / (4 * np.pi)
+        plt.plot(delta, y, '-C3', label=r'$4\pi$ rates')
+        y = he.scattering_rate(results, theta, phi, as_density_matrix=False)[:, -1]
+        plt.plot(delta, y, '-C2', label='angular non-QI')
 
         rho = inter.master(times, delta)
+        y = he.scattering_rate(rho.real)[:, -1] / (4 * np.pi)
+        plt.plot(delta, y, '--C0', label=r'$4\pi$ master')
         y = he.scattering_rate(rho, theta, phi)[:, -1]
-        plt.plot(delta, y, label='QI')
+        plt.plot(delta, y, '-C1', label='full QI')
 
         sr = sim.ScatteringRate(he, polarization=pol_sp)
         y = sr.generate_y(delta, theta, phi)[:, 0, 0]
         s = qs.saturation(intensity, f_p, a_p, 1)
-        plt.plot(delta, s * y, '-C2', label='QI pert.')
+        plt.plot(delta, s * y, '--C7', label='QI pert.')
 
         plt.xlabel('f - {} (MHz)'.format(laser_sp.freq))
         plt.ylabel('scattering rate after {} us (MHz)'.format(times[-1]))

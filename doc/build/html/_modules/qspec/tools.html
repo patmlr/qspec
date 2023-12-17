@@ -1,24 +1,19 @@
 <!DOCTYPE html>
-<html class="writer-html5" lang="en">
+<html class="writer-html5" lang="en" >
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>qspec.tools &mdash; qspec 13.12.2023 documentation</title>
-      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
-      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=19f00094" />
+  <title>qspec.tools &mdash; qspec 13.12.2023 documentation</title><link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/css/borders.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/css/wy-nav-content.css" type="text/css" />
-
-  
   <!--[if lt IE 9]>
     <script src="../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
-  
-        <script src="../../_static/jquery.js?v=5d32c60e"></script>
-        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js?v=7f3357fe"></script>
-        <script src="../../_static/doctools.js?v=888ff710"></script>
-        <script src="../../_static/sphinx_highlight.js?v=4825356b"></script>
+  <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" /> 
@@ -29,21 +24,17 @@
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-
-          
-          
-          <a href="../../index.html" class="icon icon-home">
-            qspec
+            <a href="../../index.html" class="icon icon-home"> qspec
           </a>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="text" name="q" placeholder="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+              <p class="caption"><span class="caption-text">Contents:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../modules.html">qspec</a></li>
 </ul>
@@ -61,9 +52,9 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
-          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
-      <li class="breadcrumb-item active">qspec.tools</li>
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+      <li>qspec.tools</li>
       <li class="wy-breadcrumbs-aside">
       </li>
   </ul>
@@ -125,7 +116,7 @@
 
 
 <div class="viewcode-block" id="get_rgb_print_command"><a class="viewcode-back" href="../../qspec.html#qspec.tools.get_rgb_print_command">[docs]</a><span class="k">def</span> <span class="nf">get_rgb_print_command</span><span class="p">(</span><span class="n">r</span><span class="p">,</span> <span class="n">g</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    :param r: The fraction of red (0-255).</span>
 <span class="sd">    :param g: The fraction of green (0-255).</span>
 <span class="sd">    :param b: The fraction of blue (0-255).</span>
@@ -135,7 +126,7 @@
 
 
 <div class="viewcode-block" id="print_colored"><a class="viewcode-back" href="../../qspec.html#qspec.tools.print_colored">[docs]</a><span class="k">def</span> <span class="nf">print_colored</span><span class="p">(</span><span class="n">specifier</span><span class="p">,</span> <span class="o">*</span><span class="n">values</span><span class="p">,</span> <span class="n">returned</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Print with the specified color.</span>
 
 <span class="sd">    :param specifier: str of the color name defined in the COLORS class or an RGB-value (0-255, 0-255, 0-255).</span>
@@ -155,7 +146,7 @@
 
 
 <div class="viewcode-block" id="printh"><a class="viewcode-back" href="../../qspec.html#qspec.tools.printh">[docs]</a><span class="k">def</span> <span class="nf">printh</span><span class="p">(</span><span class="o">*</span><span class="n">values</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Print with the HEADER color (pink).</span>
 
 <span class="sd">    :param values: The values to print.</span>
@@ -167,7 +158,7 @@
 
 
 <div class="viewcode-block" id="printw"><a class="viewcode-back" href="../../qspec.html#qspec.tools.printw">[docs]</a><span class="k">def</span> <span class="nf">printw</span><span class="p">(</span><span class="o">*</span><span class="n">values</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Print with the WARNING color (yellow).</span>
 
 <span class="sd">    :param values: The values to print.</span>
@@ -179,7 +170,7 @@
 
 
 <div class="viewcode-block" id="printf"><a class="viewcode-back" href="../../qspec.html#qspec.tools.printf">[docs]</a><span class="k">def</span> <span class="nf">printf</span><span class="p">(</span><span class="o">*</span><span class="n">values</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Print with the FAIL color (red).</span>
 
 <span class="sd">    :param values: The values to print.</span>
@@ -191,7 +182,7 @@
 
 
 <div class="viewcode-block" id="map_corr_coeff_to_color"><a class="viewcode-back" href="../../qspec.html#qspec.tools.map_corr_coeff_to_color">[docs]</a><span class="k">def</span> <span class="nf">map_corr_coeff_to_color</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="n">clip</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;</span>
 
 <span class="sd">    :param val: A value between -1 and 1.</span>
 <span class="sd">    :param clip: Whether to clip vals outside -1 and 1. If False, raise ValueError.</span>
@@ -211,7 +202,7 @@
 
 
 <div class="viewcode-block" id="print_cov"><a class="viewcode-back" href="../../qspec.html#qspec.tools.print_cov">[docs]</a><span class="k">def</span> <span class="nf">print_cov</span><span class="p">(</span><span class="n">cov</span><span class="p">,</span> <span class="n">normalize</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">decimals</span><span class="o">=</span><span class="mi">2</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Print a covariance &quot;as is&quot; or as color-coded Pearson correlation coefficients.</span>
 
 <span class="sd">    :param cov: A covariance matrix.</span>
@@ -236,7 +227,7 @@
 
 
 <div class="viewcode-block" id="get_default_path"><a class="viewcode-back" href="../../qspec.html#qspec.tools.get_default_path">[docs]</a><span class="k">def</span> <span class="nf">get_default_path</span><span class="p">():</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    :returns: The absolute path to the &quot;PyCLS user folder.&quot;</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">csidl_personal</span> <span class="o">=</span> <span class="mi">5</span>  <span class="c1"># My Documents</span>
@@ -248,7 +239,7 @@
 
 
 <div class="viewcode-block" id="create_doc_link"><a class="viewcode-back" href="../../qspec.html#qspec.tools.create_doc_link">[docs]</a><span class="k">def</span> <span class="nf">create_doc_link</span><span class="p">(</span><span class="n">env_path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    :param env_path: The path to the virtual environment where the &#39;Lib&#39; folder resides in.</span>
 <span class="sd">     If None, the path is inherited from the currently running Python-executable.</span>
 <span class="sd">    :returns: None. Creates an html document redirecting to the API-Documentation inside the PyCLS installation.</span>
@@ -267,7 +258,7 @@
 
 
 <div class="viewcode-block" id="create_data_dir"><a class="viewcode-back" href="../../qspec.html#qspec.tools.create_data_dir">[docs]</a><span class="k">def</span> <span class="nf">create_data_dir</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">overwrite</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    :param path: The path were to create the user folder &quot;PyCLS&quot; (do not include &quot;PyCLS&quot; in &#39;path&#39;).</span>
 <span class="sd">     If None, the user folder is created in the &quot;Documents&quot; Windows library.</span>
 <span class="sd">    :param overwrite: Whether to overwrite the current &quot;PyCLS&quot; user folder if it exists.</span>
@@ -300,7 +291,7 @@
 
 
 <div class="viewcode-block" id="get_config_dict"><a class="viewcode-back" href="../../qspec.html#qspec.tools.get_config_dict">[docs]</a><span class="k">def</span> <span class="nf">get_config_dict</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    :returns: A dictionary containing the content of the currently used config file.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">path</span> <span class="o">=</span> <span class="n">get_default_path</span><span class="p">()</span>
@@ -316,7 +307,7 @@
 
 
 <div class="viewcode-block" id="fraction"><a class="viewcode-back" href="../../qspec.html#qspec.tools.fraction">[docs]</a><span class="k">def</span> <span class="nf">fraction</span><span class="p">(</span><span class="n">r</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Rational</span><span class="p">,</span> <span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    :param r: A sympy.Rational or a str with the signature &quot;&#39;num&#39;/&#39;denom&#39;&quot;.</span>
 <span class="sd">    :returns: the numerator and denominator of &#39;r&#39;.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -334,7 +325,7 @@
 
 
 <div class="viewcode-block" id="check_half_integer"><a class="viewcode-back" href="../../qspec.html#qspec.tools.check_half_integer">[docs]</a><span class="k">def</span> <span class="nf">check_half_integer</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">scalar</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    :param args: Scalar arguments.</span>
 <span class="sd">    :returns: None. Checks whether the given arguments are multiples of 1/2.</span>
 <span class="sd">    :raises ValueError: If any argument is not a multiple of 1/2.</span>
@@ -344,7 +335,7 @@
 
 
 <div class="viewcode-block" id="half_integer_to_fraction"><a class="viewcode-back" href="../../qspec.html#qspec.tools.half_integer_to_fraction">[docs]</a><span class="k">def</span> <span class="nf">half_integer_to_fraction</span><span class="p">(</span><span class="n">val</span><span class="p">:</span> <span class="n">scalar</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    :param val: A scalar value.</span>
 <span class="sd">    :returns: The numerator and denominator of the half-integer.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -355,7 +346,7 @@
 
 
 <div class="viewcode-block" id="half_integer_to_str"><a class="viewcode-back" href="../../qspec.html#qspec.tools.half_integer_to_str">[docs]</a><span class="k">def</span> <span class="nf">half_integer_to_str</span><span class="p">(</span><span class="n">val</span><span class="p">:</span> <span class="n">scalar</span><span class="p">,</span> <span class="n">symbol</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;_&#39;</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    :param val: A scalar value.</span>
 <span class="sd">    :param symbol: The symbol to use for the fraction.</span>
 <span class="sd">    :returns: A rational str-representation of a half-integer.</span>
@@ -367,7 +358,7 @@
 
 
 <div class="viewcode-block" id="get_val_with_unc"><a class="viewcode-back" href="../../qspec.html#qspec.tools.get_val_with_unc">[docs]</a><span class="k">def</span> <span class="nf">get_val_with_unc</span><span class="p">(</span><span class="n">val_string</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    :param val_string: The str representation of a number with uncertainty of the format &#39;1.234(56)&#39;.</span>
 <span class="sd">     Decimal separators can be used or spared arbitrarily.</span>
 <span class="sd">    :returns: The value and its uncertainty.</span>
@@ -393,7 +384,7 @@
 
 
 <div class="viewcode-block" id="roman_to_int"><a class="viewcode-back" href="../../qspec.html#qspec.tools.roman_to_int">[docs]</a><span class="k">def</span> <span class="nf">roman_to_int</span><span class="p">(</span><span class="n">roman</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Convert from Roman numerals to an integer</span>
 <span class="sd">    [jonrsharpe, https://codereview.stackexchange.com/questions/68297/convert-roman-to-int].</span>
 
@@ -416,7 +407,7 @@
 
 
 <div class="viewcode-block" id="odd"><a class="viewcode-back" href="../../qspec.html#qspec.tools.odd">[docs]</a><span class="k">def</span> <span class="nf">odd</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    :param x: A float value.</span>
 <span class="sd">    :returns: The closest odd integer value.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -424,7 +415,7 @@
 
 
 <div class="viewcode-block" id="even"><a class="viewcode-back" href="../../qspec.html#qspec.tools.even">[docs]</a><span class="k">def</span> <span class="nf">even</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    :param x: A float value.</span>
 <span class="sd">    :returns: The closest even integer value.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -432,7 +423,7 @@
 
 
 <div class="viewcode-block" id="get_decimals"><a class="viewcode-back" href="../../qspec.html#qspec.tools.get_decimals">[docs]</a><span class="k">def</span> <span class="nf">get_decimals</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    :param x: A float value.</span>
 <span class="sd">    :return: The number of displayed decimals of the float value &#39;x&#39;.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -442,7 +433,7 @@
 
 
 <div class="viewcode-block" id="floor_log2"><a class="viewcode-back" href="../../qspec.html#qspec.tools.floor_log2">[docs]</a><span class="k">def</span> <span class="nf">floor_log2</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">array_like</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ndarray</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    :param x: Scalar values.</span>
 <span class="sd">    :returns: The closest integer values below the logarithm with basis 10 of the absolute value of &#39;x&#39;.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -458,7 +449,7 @@
 
 
 <div class="viewcode-block" id="floor_log10"><a class="viewcode-back" href="../../qspec.html#qspec.tools.floor_log10">[docs]</a><span class="k">def</span> <span class="nf">floor_log10</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">array_like</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ndarray</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    :param x: Scalar values.</span>
 <span class="sd">    :returns: The closest integer values below the logarithm with basis 10 of the absolute value of &#39;x&#39;.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -474,7 +465,7 @@
 
 
 <div class="viewcode-block" id="round_to_n"><a class="viewcode-back" href="../../qspec.html#qspec.tools.round_to_n">[docs]</a><span class="k">def</span> <span class="nf">round_to_n</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">n</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="p">(</span><span class="n">scalar</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    :param x: The input data.</span>
 <span class="sd">    :param n: The number of significant decimal places to round to.</span>
 <span class="sd">    :returns: x rounded to &#39;n&#39; significant decimal places and</span>
@@ -492,14 +483,14 @@
 
 
 <div class="viewcode-block" id="factorial"><a class="viewcode-back" href="../../qspec.html#qspec.tools.factorial">[docs]</a><span class="k">def</span> <span class="nf">factorial</span><span class="p">(</span><span class="n">n</span><span class="p">:</span> <span class="n">array_like</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    :param n: The integer number.</span>
 <span class="sd">    :returns: n! (array compatible).</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">n</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
     <span class="n">mask</span> <span class="o">=</span> <span class="n">n</span> <span class="o">&gt;</span> <span class="mi">1</span>
     <span class="n">ret</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones_like</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">mask</span><span class="o">.</span><span class="n">any</span><span class="p">():</span>
+    <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">mask</span><span class="p">):</span>
         <span class="n">ret</span><span class="p">[</span><span class="n">mask</span><span class="p">]</span> <span class="o">=</span> <span class="n">n</span><span class="p">[</span><span class="n">mask</span><span class="p">]</span> <span class="o">*</span> <span class="n">factorial</span><span class="p">(</span><span class="n">n</span><span class="p">[</span><span class="n">mask</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">ret</span></div>
 
@@ -508,7 +499,7 @@
 
 
 <div class="viewcode-block" id="asarray_optional"><a class="viewcode-back" href="../../qspec.html#qspec.tools.asarray_optional">[docs]</a><span class="k">def</span> <span class="nf">asarray_optional</span><span class="p">(</span><span class="n">a</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">array_like</span><span class="p">],</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    :param a: Input data, see numpy docs.</span>
 <span class="sd">    :param kwargs: The keyword arguments are passed to numpy.asarray.</span>
 <span class="sd">    :returns: None if &#39;a&#39; is None else &#39;numpy.asarray(a, \*\*kwargs)&#39;.</span>
@@ -517,7 +508,7 @@
 
 
 <div class="viewcode-block" id="in_nested"><a class="viewcode-back" href="../../qspec.html#qspec.tools.in_nested">[docs]</a><span class="k">def</span> <span class="nf">in_nested</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">nested</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    :param a: The element to look for.</span>
 <span class="sd">    :param nested: The nested list.</span>
 <span class="sd">    :returns: Whether a is inside the &#39;nested&#39; list.</span>
@@ -535,7 +526,7 @@
 
 
 <div class="viewcode-block" id="check_iterable"><a class="viewcode-back" href="../../qspec.html#qspec.tools.check_iterable">[docs]</a><span class="k">def</span> <span class="nf">check_iterable</span><span class="p">(</span><span class="n">arg</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">dtype</span><span class="p">:</span> <span class="nb">type</span> <span class="o">=</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    :param arg: The argument that is checked.</span>
 <span class="sd">    :param dtype: The type that has to be matched by the elements of arg or arg itself.</span>
 <span class="sd">    :returns: &#39;arg&#39; as a list if it is a &#39;list&#39;, &#39;tuple&#39; or &#39;set&#39; of values of type &#39;dtype&#39;,</span>
@@ -552,7 +543,7 @@
 
 
 <div class="viewcode-block" id="make_str_iterable_unique"><a class="viewcode-back" href="../../qspec.html#qspec.tools.make_str_iterable_unique">[docs]</a><span class="k">def</span> <span class="nf">make_str_iterable_unique</span><span class="p">(</span><span class="n">a</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">identifier</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    :param a: An Iterable of str values.</span>
 <span class="sd">    :param identifier: An Iterable of str values to append to the values of &#39;a&#39; if they appear more than once.</span>
 <span class="sd">     If None, &#39;_i&#39; is used as the identifier for the ith appearance of a value in &#39;a&#39;.</span>
@@ -582,7 +573,7 @@
 
 
 <div class="viewcode-block" id="check_dimension"><a class="viewcode-back" href="../../qspec.html#qspec.tools.check_dimension">[docs]</a><span class="k">def</span> <span class="nf">check_dimension</span><span class="p">(</span><span class="n">dim</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">axis</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    :param dim: The number of components the axis &#39;axis&#39; must have.</span>
 <span class="sd">    :param axis: The axis which must have &#39;dim&#39; components.</span>
 <span class="sd">    :param args: The arguments which must have &#39;dim&#39; components along axis &#39;axis&#39;.</span>
@@ -604,7 +595,7 @@
 
 
 <div class="viewcode-block" id="check_shape_like"><a class="viewcode-back" href="../../qspec.html#qspec.tools.check_shape_like">[docs]</a><span class="k">def</span> <span class="nf">check_shape_like</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">ndarray</span><span class="p">,</span> <span class="n">allow_scalar</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    :param args: The arguments which must have shapes that can be broadcast together.</span>
 <span class="sd">    :param allow_scalar: Whether scalar values (shape=()) are seen as compatible with arbitrary shapes.</span>
 <span class="sd">    :returns: None</span>
@@ -627,7 +618,7 @@
 
 
 <div class="viewcode-block" id="check_shape"><a class="viewcode-back" href="../../qspec.html#qspec.tools.check_shape">[docs]</a><span class="k">def</span> <span class="nf">check_shape</span><span class="p">(</span><span class="n">shape</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">ndarray</span><span class="p">,</span> <span class="n">allow_scalar</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">return_mode</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">bool</span><span class="p">,</span> <span class="kc">None</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    :param shape: The shape which must be matched by the specified arguments.</span>
 <span class="sd">    :param args: The arguments which must match the specified shape.</span>
 <span class="sd">    :param allow_scalar: Whether scalar values (shape=()) are seen as compatible with arbitrary shapes.</span>
@@ -652,7 +643,7 @@
 
 
 <div class="viewcode-block" id="nan_helper"><a class="viewcode-back" href="../../qspec.html#qspec.tools.nan_helper">[docs]</a><span class="k">def</span> <span class="nf">nan_helper</span><span class="p">(</span><span class="n">y</span><span class="p">:</span> <span class="n">array_like</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="p">(</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">Callable</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    :param y: An array like value.</span>
 <span class="sd">    :returns: The mask where y is NaN and a function which returns the nonzero indices of an array.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -660,7 +651,7 @@
 
 
 <div class="viewcode-block" id="dict_to_list"><a class="viewcode-back" href="../../qspec.html#qspec.tools.dict_to_list">[docs]</a><span class="k">def</span> <span class="nf">dict_to_list</span><span class="p">(</span><span class="n">a</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    :param a: A dictionary.</span>
 <span class="sd">    :returns: Two lists with the keys and values of &#39;a&#39;, respectively.</span>
 <span class="sd">     The lists are in the same order, however, they are not sorted.</span>
@@ -670,7 +661,7 @@
 
 
 <div class="viewcode-block" id="list_to_dict"><a class="viewcode-back" href="../../qspec.html#qspec.tools.list_to_dict">[docs]</a><span class="k">def</span> <span class="nf">list_to_dict</span><span class="p">(</span><span class="n">values</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">keys</span><span class="p">:</span> <span class="n">array_like</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    :param values: The values of the dictionary.</span>
 <span class="sd">    :param keys: The keys of the dictionary. If omitted, the keys will be the indices of the values.</span>
 <span class="sd">    :returns: A dictionary with the given &#39;values&#39; and &#39;keys&#39;.</span>
@@ -684,7 +675,7 @@
 
 
 <div class="viewcode-block" id="list_to_excel"><a class="viewcode-back" href="../../qspec.html#qspec.tools.list_to_excel">[docs]</a><span class="k">def</span> <span class="nf">list_to_excel</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">array_iter</span><span class="p">,</span> <span class="n">save</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">delimiter</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="se">\t</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">header</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">align</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;top&#39;</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;</span>
 
 <span class="sd">    :param args: 1- or 2-dimensional iterables to print or save in an excel-compatible format.</span>
 <span class="sd">    :param save: The filepath, either absolute or relative to the working directory. If None, the output is printed.</span>
@@ -729,7 +720,7 @@
 
 
 <div class="viewcode-block" id="add_nested_key"><a class="viewcode-back" href="../../qspec.html#qspec.tools.add_nested_key">[docs]</a><span class="k">def</span> <span class="nf">add_nested_key</span><span class="p">(</span><span class="n">a</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">key_list</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">val</span><span class="p">:</span> <span class="n">array_like</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    :param a: The target dictionary.</span>
 <span class="sd">    :param key_list: A list of nested keys of a.</span>
 <span class="sd">    :param val: The value that is assigned to the last key in key_list.</span>
@@ -748,7 +739,7 @@
 
 
 <div class="viewcode-block" id="merge_dicts"><a class="viewcode-back" href="../../qspec.html#qspec.tools.merge_dicts">[docs]</a><span class="k">def</span> <span class="nf">merge_dicts</span><span class="p">(</span><span class="n">a</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">b</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    :param a: The first dictionary.</span>
 <span class="sd">    :param b: The second dictionary.</span>
 <span class="sd">    :param path: _.</span>
@@ -770,7 +761,7 @@
 
 <div class="viewcode-block" id="convolve_dict"><a class="viewcode-back" href="../../qspec.html#qspec.tools.convolve_dict">[docs]</a><span class="k">def</span> <span class="nf">convolve_dict</span><span class="p">(</span><span class="n">a</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="o">*</span><span class="n">key_lists</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">operator</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;+&#39;</span><span class="p">,</span> <span class="n">short_keys</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> \
         <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">dict</span><span class="p">,</span> <span class="ne">ValueError</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    :param a: A dictionary to be convolved.</span>
 <span class="sd">    :param key_lists: An arbitrary number of Iterables of the same length which include keys from &#39;a&#39;.</span>
 <span class="sd">    :param operator: The operator which is used to combine the key_lists.</span>
@@ -793,7 +784,7 @@
 
 <div class="viewcode-block" id="combine_dicts"><a class="viewcode-back" href="../../qspec.html#qspec.tools.combine_dicts">[docs]</a><span class="k">def</span> <span class="nf">combine_dicts</span><span class="p">(</span><span class="n">dicts</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">key_lists</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">operator</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;+&#39;</span><span class="p">,</span> <span class="n">short_keys</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> \
         <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">dict</span><span class="p">,</span> <span class="ne">ValueError</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    :param dicts: A list of dictionaries to be combined.</span>
 <span class="sd">    :param key_lists: A list of Iterables of the same lengths which include keys from &#39;a&#39;.</span>
 <span class="sd">     Must have the same length as &#39;dicts&#39;.</span>
@@ -818,7 +809,7 @@
 
 
 <div class="viewcode-block" id="merge_intervals"><a class="viewcode-back" href="../../qspec.html#qspec.tools.merge_intervals">[docs]</a><span class="k">def</span> <span class="nf">merge_intervals</span><span class="p">(</span><span class="n">intervals</span><span class="p">:</span> <span class="n">array_iter</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ndarray</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    :param intervals: An iterable of intervals.</span>
 <span class="sd">     An interval i is itself an iterable of two scalar values. If i[1] &lt; i[0], the interval is reversed.</span>
 <span class="sd">    :returns: An iterable of non-overlapping intervals.</span>
@@ -847,7 +838,7 @@
 
 
 <span class="k">def</span> <span class="nf">get_subarray</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">axis</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    :param a: The array.</span>
 <span class="sd">    :param i: The indexes to select along the &#39;axis&#39;</span>
 <span class="sd">    :param axis: The axis along which the indexes &#39;i&#39; are selected.</span>
@@ -863,7 +854,7 @@
 
 
 <div class="viewcode-block" id="absolute"><a class="viewcode-back" href="../../qspec.html#qspec.tools.absolute">[docs]</a><span class="k">def</span> <span class="nf">absolute</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">array_like</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    :param x: A real vector or an array of real vectors.</span>
 <span class="sd">    :param axis: The axis along which the vector components are aligned.</span>
 <span class="sd">    :returns: The length(s) of the vector(s) x.</span>
@@ -873,7 +864,7 @@
 
 
 <div class="viewcode-block" id="absolute_complex"><a class="viewcode-back" href="../../qspec.html#qspec.tools.absolute_complex">[docs]</a><span class="k">def</span> <span class="nf">absolute_complex</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    :param x: A complex vector or an array of complex vectors.</span>
 <span class="sd">    :param axis: The axis along which the vector components are aligned.</span>
 <span class="sd">    :returns: The length(s) of the vector(s) x.</span>
@@ -883,7 +874,7 @@
 
 
 <div class="viewcode-block" id="angle"><a class="viewcode-back" href="../../qspec.html#qspec.tools.angle">[docs]</a><span class="k">def</span> <span class="nf">angle</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">array_like</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    :param x: The first vectors (arb. units).</span>
 <span class="sd">    :param y: The second vectors ([x]).</span>
 <span class="sd">    :param axis: The axis along which the vector components are aligned.</span>
@@ -896,7 +887,7 @@
 
 
 <div class="viewcode-block" id="angle_d"><a class="viewcode-back" href="../../qspec.html#qspec.tools.angle_d">[docs]</a><span class="k">def</span> <span class="nf">angle_d</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">x_d</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">y_d</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    :param x: The first vectors (arb. units).</span>
 <span class="sd">    :param x_d: The uncertainties of the first vectors ([x]).</span>
 <span class="sd">    :param y: The second vectors ([x]).</span>
@@ -914,7 +905,7 @@
 
 
 <div class="viewcode-block" id="transform"><a class="viewcode-back" href="../../qspec.html#qspec.tools.transform">[docs]</a><span class="k">def</span> <span class="nf">transform</span><span class="p">(</span><span class="n">t</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">vec</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">array_like</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    :param t: The transformation matrix which must hold t.shape[axis+1] == vec.shape[axis].</span>
 <span class="sd">    :param vec: The vector to be transformed.</span>
 <span class="sd">    :param axis: The axis along which the vector components of &#39;vec&#39; are aligned and that is summed over.</span>
@@ -928,13 +919,39 @@
     <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">t</span> <span class="o">*</span> <span class="n">vec</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="n">ax</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="unit_vector"><a class="viewcode-back" href="../../qspec.html#qspec.tools.unit_vector">[docs]</a><span class="k">def</span> <span class="nf">unit_vector</span><span class="p">(</span><span class="n">index</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">dim</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">axis</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">dtype</span><span class="p">:</span> <span class="nb">type</span> <span class="o">=</span> <span class="nb">float</span><span class="p">):</span>
-    <span class="n">index</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">index</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
+<div class="viewcode-block" id="unit_vector"><a class="viewcode-back" href="../../qspec.html#qspec.tools.unit_vector">[docs]</a><span class="k">def</span> <span class="nf">unit_vector</span><span class="p">(</span><span class="n">indexes</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">dim</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">axis</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">dtype</span><span class="p">:</span> <span class="nb">type</span> <span class="o">=</span> <span class="nb">float</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    :param indexes: The indexes of the vectors that are filled with a 1.</span>
+<span class="sd">    :param dim: The dimension of the unit vectors.</span>
+<span class="sd">    :param axis: The axis with the dimension &#39;dim&#39;.</span>
+<span class="sd">    :param dtype: The data type of the unit vectors.</span>
+<span class="sd">    :returns: Unit vectors in the specified &#39;indexes&#39; with dimension &#39;dim&#39; along the specified &#39;axis&#39;.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">index</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">indexes</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">moveaxis</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">choose</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">index</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">identity</span><span class="p">(</span><span class="n">dim</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">)),</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">axis</span><span class="p">)</span></div>
 
 
+<span class="k">def</span> <span class="nf">vector_to_diag_matrix</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">axis</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    :param a: The vector to be transformed into a diagonal matrix.</span>
+<span class="sd">    :param axis: The axis of the vector elements to be aligned along the diagonal of the matrix.</span>
+<span class="sd">    :returns: A diagonal matrix with one extra axis compared with &#39;a&#39; at &#39;axis&#39; + 1.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">a</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">axis</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">axis</span> <span class="o">+=</span> <span class="nb">len</span><span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+    <span class="n">shape</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">x1</span> <span class="k">if</span> <span class="n">i</span> <span class="o">&gt;</span> <span class="n">axis</span> <span class="k">else</span> <span class="n">x0</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">x0</span><span class="p">,</span> <span class="n">x1</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">shape</span> <span class="o">+</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="p">),</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="p">)</span> <span class="o">+</span> <span class="n">a</span><span class="o">.</span><span class="n">shape</span><span class="p">)))</span>
+    <span class="n">b</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">broadcast_to</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="n">axis</span> <span class="o">+</span> <span class="mi">1</span><span class="p">),</span> <span class="n">shape</span><span class="p">)</span>
+    <span class="n">ident</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">identity</span><span class="p">(</span><span class="n">shape</span><span class="p">[</span><span class="n">axis</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">a</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">axis</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">ident</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">ident</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="nb">tuple</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">axis</span><span class="p">)))</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span> <span class="o">&gt;</span> <span class="n">axis</span><span class="p">:</span>
+        <span class="n">ident</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">ident</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="nb">tuple</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">axis</span> <span class="o">+</span> <span class="mi">2</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">b</span><span class="o">.</span><span class="n">shape</span><span class="p">))))</span>
+    <span class="k">return</span> <span class="n">b</span> <span class="o">*</span> <span class="n">ident</span>
+
+
 <div class="viewcode-block" id="e_r"><a class="viewcode-back" href="../../qspec.html#qspec.tools.e_r">[docs]</a><span class="k">def</span> <span class="nf">e_r</span><span class="p">(</span><span class="n">theta</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">phi</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">array_like</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    :param theta: The angle theta.</span>
 <span class="sd">    :param phi: The angle phi.</span>
 <span class="sd">    :param axis: The axis along which the vector components are aligned.</span>
@@ -950,7 +967,7 @@
 
 
 <div class="viewcode-block" id="e_theta"><a class="viewcode-back" href="../../qspec.html#qspec.tools.e_theta">[docs]</a><span class="k">def</span> <span class="nf">e_theta</span><span class="p">(</span><span class="n">theta</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">phi</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">array_like</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    :param theta: The angle theta.</span>
 <span class="sd">    :param phi: The angle phi.</span>
 <span class="sd">    :param axis: The axis along which the vector components are aligned.</span>
@@ -966,7 +983,7 @@
 
 
 <div class="viewcode-block" id="e_phi"><a class="viewcode-back" href="../../qspec.html#qspec.tools.e_phi">[docs]</a><span class="k">def</span> <span class="nf">e_phi</span><span class="p">(</span><span class="n">theta</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">phi</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">array_like</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    :param theta: The angle theta.</span>
 <span class="sd">    :param phi: The angle phi.</span>
 <span class="sd">    :param axis: The axis along which the vector components are aligned.</span>
@@ -982,7 +999,7 @@
 
 
 <div class="viewcode-block" id="orthonormal_rtp"><a class="viewcode-back" href="../../qspec.html#qspec.tools.orthonormal_rtp">[docs]</a><span class="k">def</span> <span class="nf">orthonormal_rtp</span><span class="p">(</span><span class="n">r</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="p">(</span><span class="n">array_like</span><span class="p">,</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">array_like</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    :param r: The first vector of the orthonormal system. Does not have to be normalized.</span>
 <span class="sd">    :param axis: The axis along which the vector components are aligned.</span>
 <span class="sd">    :returns: The three orthonormal vectors &#39;e_r&#39;, &#39;e_theta&#39; and &#39;e_phi&#39;</span>
@@ -1001,7 +1018,7 @@
 
 
 <div class="viewcode-block" id="orthonormal"><a class="viewcode-back" href="../../qspec.html#qspec.tools.orthonormal">[docs]</a><span class="k">def</span> <span class="nf">orthonormal</span><span class="p">(</span><span class="n">r</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="p">(</span><span class="n">array_like</span><span class="p">,</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">array_like</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    :param r: The first vector of the orthonormal system. Does not have to be normalized.</span>
 <span class="sd">    :param axis: The axis along which the vector components are aligned.</span>
 <span class="sd">    :returns: Three orthonormal vectors, given the first vector &#39;r&#39;.</span>
@@ -1023,7 +1040,7 @@
 
 
 <div class="viewcode-block" id="rotation_matrix"><a class="viewcode-back" href="../../qspec.html#qspec.tools.rotation_matrix">[docs]</a><span class="k">def</span> <span class="nf">rotation_matrix</span><span class="p">(</span><span class="n">alpha</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">dr</span><span class="p">:</span> <span class="n">array_iter</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    :param alpha: The angle to rotate.</span>
 <span class="sd">    :param dr: The vector to rotate about.</span>
 <span class="sd">    :returns: The rotation matrix defined by the angle alpha and the vector dr.</span>
@@ -1037,13 +1054,13 @@
 
 
 <div class="viewcode-block" id="Rotation"><a class="viewcode-back" href="../../qspec.html#qspec.tools.Rotation">[docs]</a><span class="k">class</span> <span class="nc">Rotation</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    An object specifying a rotation in 3d-space. The rotation is defined</span>
 <span class="sd">     through an angle &#39;alpha&#39; and an rotational axis &#39;dr&#39; by the user.</span>
 <span class="sd">     Additional instance attributes are the angle in degree &#39;alpha_deg&#39; and the rotational matrix &#39;R&#39;.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">alpha</span><span class="p">:</span> <span class="n">scalar</span> <span class="o">=</span> <span class="mf">0.</span><span class="p">,</span> <span class="n">dr</span><span class="p">:</span> <span class="n">array_iter</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+        <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param alpha: The angle of the rotation (rad).</span>
 <span class="sd">        :param dr: The rotational axis of the rotation.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -1058,7 +1075,7 @@
 
 
 <div class="viewcode-block" id="rotation_to_vector"><a class="viewcode-back" href="../../qspec.html#qspec.tools.rotation_to_vector">[docs]</a><span class="k">def</span> <span class="nf">rotation_to_vector</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">array_iter</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">array_iter</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    :param x: The first vector.</span>
 <span class="sd">    :param y: The second vector.</span>
 <span class="sd">    :returns: A Rotation object which rotates the first vector onto the second.</span>
@@ -1082,7 +1099,7 @@
 
 
 <div class="viewcode-block" id="import_iso_shifts_tilda"><a class="viewcode-back" href="../../qspec.html#qspec.tools.import_iso_shifts_tilda">[docs]</a><span class="k">def</span> <span class="nf">import_iso_shifts_tilda</span><span class="p">(</span><span class="n">db</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">iso_shifts</span><span class="p">:</span> <span class="nb">dict</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    :param db: Location of a Tilda-compatible database.</span>
 <span class="sd">    :param iso_shifts: A dictionary of isotope shifts</span>
 <span class="sd">     with the structure {iso_str: {line_str: [val, stat_err, syst_err]}}.</span>

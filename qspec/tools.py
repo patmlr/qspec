@@ -424,7 +424,7 @@ def factorial(n: array_like):
     n = np.asarray(n, dtype=int)
     mask = n > 1
     ret = np.ones_like(n)
-    if mask.any():
+    if np.any(mask):
         ret[mask] = n[mask] * factorial(n[mask] - 1)
     return ret
 
@@ -853,9 +853,35 @@ def transform(t: array_like, vec: array_like, axis=-1) -> array_like:
     return np.sum(t * vec, axis=ax + 1)
 
 
-def unit_vector(index: array_like, dim: int, axis: int = -1, dtype: type = float):
-    index = np.asarray(index, dtype=int)
+def unit_vector(indexes: array_like, dim: int, axis: int = -1, dtype: type = float):
+    """
+    :param indexes: The indexes of the vectors that are filled with a 1.
+    :param dim: The dimension of the unit vectors.
+    :param axis: The axis with the dimension 'dim'.
+    :param dtype: The data type of the unit vectors.
+    :returns: Unit vectors in the specified 'indexes' with dimension 'dim' along the specified 'axis'.
+    """
+    index = np.asarray(indexes, dtype=int)
     return np.moveaxis(np.choose(np.expand_dims(index, axis=-1), np.identity(dim, dtype=dtype)), -1, axis)
+
+
+def vector_to_diag_matrix(a, axis: int = -1):
+    """
+    :param a: The vector to be transformed into a diagonal matrix.
+    :param axis: The axis of the vector elements to be aligned along the diagonal of the matrix.
+    :returns: A diagonal matrix with one extra axis compared with 'a' at 'axis' + 1.
+    """
+    a = np.asarray(a)
+    if axis < 0:
+        axis += len(a.shape)
+    shape = tuple(x1 if i > axis else x0 for i, (x0, x1) in enumerate(zip(a.shape + (1, ), (1, ) + a.shape)))
+    b = np.broadcast_to(np.expand_dims(a, axis=axis + 1), shape)
+    ident = np.identity(shape[axis], dtype=a.dtype)
+    if axis > 0:
+        ident = np.expand_dims(ident, axis=tuple(range(axis)))
+    if len(a.shape) - 1 > axis:
+        ident = np.expand_dims(ident, axis=tuple(range(axis + 2, len(b.shape))))
+    return b * ident
 
 
 def e_r(theta: array_like, phi: array_like, axis=-1) -> array_like:

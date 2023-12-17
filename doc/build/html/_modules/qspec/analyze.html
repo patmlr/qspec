@@ -1,24 +1,19 @@
 <!DOCTYPE html>
-<html class="writer-html5" lang="en">
+<html class="writer-html5" lang="en" >
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>qspec.analyze &mdash; qspec 13.12.2023 documentation</title>
-      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
-      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=19f00094" />
+  <title>qspec.analyze &mdash; qspec 13.12.2023 documentation</title><link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/css/borders.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/css/wy-nav-content.css" type="text/css" />
-
-  
   <!--[if lt IE 9]>
     <script src="../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
-  
-        <script src="../../_static/jquery.js?v=5d32c60e"></script>
-        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js?v=7f3357fe"></script>
-        <script src="../../_static/doctools.js?v=888ff710"></script>
-        <script src="../../_static/sphinx_highlight.js?v=4825356b"></script>
+  <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" /> 
@@ -29,21 +24,17 @@
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-
-          
-          
-          <a href="../../index.html" class="icon icon-home">
-            qspec
+            <a href="../../index.html" class="icon icon-home"> qspec
           </a>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="text" name="q" placeholder="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+              <p class="caption"><span class="caption-text">Contents:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../modules.html">qspec</a></li>
 </ul>
@@ -61,9 +52,9 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
-          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
-      <li class="breadcrumb-item active">qspec.analyze</li>
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+      <li>qspec.analyze</li>
       <li class="wy-breadcrumbs-aside">
       </li>
   </ul>
@@ -122,7 +113,7 @@
 
 
 <span class="k">def</span> <span class="nf">_get_rtype2</span><span class="p">(</span><span class="n">ab_dict</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">a</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Iterable</span><span class="p">,</span> <span class="nb">any</span><span class="p">],</span> <span class="n">b</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Iterable</span><span class="p">,</span> <span class="nb">any</span><span class="p">],</span> <span class="n">rtype</span><span class="p">:</span> <span class="nb">type</span> <span class="o">=</span> <span class="n">ndarray</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    :param ab_dict: The nested dictionary of depth 2, where values are extracted from.</span>
 <span class="sd">    :param a: The list of keys of the first level of &#39;ab_dict&#39;.</span>
 <span class="sd">    :param b: The list of keys of the second level of &#39;ab_dict&#39;.</span>
@@ -179,7 +170,7 @@
     <span class="k">if</span> <span class="n">transform</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">def</span> <span class="nf">func_wrapped</span><span class="p">(</span><span class="n">params</span><span class="p">):</span>
             <span class="k">return</span> <span class="n">func</span><span class="p">(</span><span class="n">xdata</span><span class="p">,</span> <span class="o">*</span><span class="n">params</span><span class="p">)</span> <span class="o">-</span> <span class="n">ydata</span>
-    <span class="k">elif</span> <span class="nb">callable</span><span class="p">(</span><span class="n">transform</span><span class="p">):</span>
+    <span class="k">elif</span> <span class="n">callable</span><span class="p">(</span><span class="n">transform</span><span class="p">):</span>
         <span class="k">def</span> <span class="nf">func_wrapped</span><span class="p">(</span><span class="n">params</span><span class="p">):</span>
             <span class="n">yfunc</span> <span class="o">=</span> <span class="n">func</span><span class="p">(</span><span class="n">xdata</span><span class="p">,</span> <span class="o">*</span><span class="n">params</span><span class="p">)</span>
             <span class="k">return</span> <span class="n">transform</span><span class="p">(</span><span class="n">xdata</span><span class="p">,</span> <span class="n">ydata</span><span class="p">,</span> <span class="n">yfunc</span><span class="p">,</span> <span class="o">*</span><span class="n">params</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">yfunc</span> <span class="o">-</span> <span class="n">ydata</span><span class="p">)</span>
@@ -193,7 +184,7 @@
 
 
 <div class="viewcode-block" id="straight"><a class="viewcode-back" href="../../qspec.html#qspec.analyze.straight">[docs]</a><span class="k">def</span> <span class="nf">straight</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">a</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">b</span><span class="p">:</span> <span class="n">array_like</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ndarray</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    :param x: The x values.</span>
 <span class="sd">    :param a: The y-intercept.</span>
 <span class="sd">    :param b: The slope.</span>
@@ -204,7 +195,7 @@
 
 
 <div class="viewcode-block" id="straight_slope"><a class="viewcode-back" href="../../qspec.html#qspec.analyze.straight_slope">[docs]</a><span class="k">def</span> <span class="nf">straight_slope</span><span class="p">(</span><span class="n">p_0</span><span class="p">:</span> <span class="n">array_iter</span><span class="p">,</span> <span class="n">p_1</span><span class="p">:</span> <span class="n">array_iter</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ndarray</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    :param p_0: The first point(s).</span>
 <span class="sd">    :param p_1: The second point(s).</span>
 <span class="sd">    :param axis: The axis along which the vector components are aligned.</span>
@@ -216,7 +207,7 @@
 
 
 <div class="viewcode-block" id="straight_std"><a class="viewcode-back" href="../../qspec.html#qspec.analyze.straight_std">[docs]</a><span class="k">def</span> <span class="nf">straight_std</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">sigma_a</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">sigma_b</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">corr_ab</span><span class="p">:</span> <span class="n">array_like</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ndarray</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    :param x: The x values.</span>
 <span class="sd">    :param sigma_a: The standard deviation of the y-intercept.</span>
 <span class="sd">    :param sigma_b: The standard deviation of the slope.</span>
@@ -230,7 +221,7 @@
 
 <div class="viewcode-block" id="straight_x_std"><a class="viewcode-back" href="../../qspec.html#qspec.analyze.straight_x_std">[docs]</a><span class="k">def</span> <span class="nf">straight_x_std</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">b</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">sigma_x</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span>
                    <span class="n">sigma_a</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">sigma_b</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">corr_ab</span><span class="p">:</span> <span class="n">array_like</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ndarray</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    :param x: The x values.</span>
 <span class="sd">    :param b: The slope.</span>
 <span class="sd">    :param sigma_x: The standard deviation of the x values.</span>
@@ -247,7 +238,7 @@
 
 <div class="viewcode-block" id="draw_straight_unc_area"><a class="viewcode-back" href="../../qspec.html#qspec.analyze.draw_straight_unc_area">[docs]</a><span class="k">def</span> <span class="nf">draw_straight_unc_area</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">sigma_a</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">sigma_b</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span>
                            <span class="n">corr_ab</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    :param x: The x values.</span>
 <span class="sd">    :param y: The y values.</span>
 <span class="sd">    :param sigma_a: The standard deviation of the y-intercept.</span>
@@ -262,7 +253,7 @@
 
 <div class="viewcode-block" id="ellipse2d"><a class="viewcode-back" href="../../qspec.html#qspec.analyze.ellipse2d">[docs]</a><span class="k">def</span> <span class="nf">ellipse2d</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">scale_x</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">scale_y</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span>
               <span class="n">phi</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">corr</span><span class="p">:</span> <span class="n">array_like</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="p">(</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">ndarray</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    :param x: The x-component of the position of the ellipse.</span>
 <span class="sd">    :param y: The y-component of the position of the ellipse.</span>
 <span class="sd">    :param scale_x: The amplitude of the x-component.</span>
@@ -279,7 +270,7 @@
 
 <div class="viewcode-block" id="draw_sigma2d"><a class="viewcode-back" href="../../qspec.html#qspec.analyze.draw_sigma2d">[docs]</a><span class="k">def</span> <span class="nf">draw_sigma2d</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">array_iter</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">array_iter</span><span class="p">,</span> <span class="n">sigma_x</span><span class="p">:</span> <span class="n">array_iter</span><span class="p">,</span> <span class="n">sigma_y</span><span class="p">:</span> <span class="n">array_iter</span><span class="p">,</span>
                  <span class="n">corr</span><span class="p">:</span> <span class="n">array_iter</span><span class="p">,</span> <span class="n">n</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    :param x: The x data.</span>
 <span class="sd">    :param y: The y data.</span>
 <span class="sd">    :param sigma_x: The 1-sigma uncertainties of the x data.</span>
@@ -300,7 +291,7 @@
 
 
 <div class="viewcode-block" id="weight"><a class="viewcode-back" href="../../qspec.html#qspec.analyze.weight">[docs]</a><span class="k">def</span> <span class="nf">weight</span><span class="p">(</span><span class="n">sigma</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    :param sigma: The 1-sigma uncertainty.</span>
 <span class="sd">    :returns: The weight corresponding to the 1-sigma uncertainty &#39;sigma&#39;</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -309,7 +300,7 @@
 
 <div class="viewcode-block" id="york"><a class="viewcode-back" href="../../qspec.html#qspec.analyze.york">[docs]</a><span class="k">def</span> <span class="nf">york</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">array_iter</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">array_iter</span><span class="p">,</span> <span class="n">sigma_x</span><span class="p">:</span> <span class="n">array_iter</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">sigma_y</span><span class="p">:</span> <span class="n">array_iter</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
          <span class="n">corr</span><span class="p">:</span> <span class="n">array_iter</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">iter_max</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">200</span><span class="p">,</span> <span class="n">report</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">show</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    A linear regression algorithm to find the best straight line, given normally distributed errors for x and y</span>
 <span class="sd">    and correlation coefficients between errors in x and y. The algorithm is described in</span>
 <span class="sd">    [&#39;Unified equations for the slope, intercept, and standard errors of the best straight line&#39;,</span>
@@ -402,7 +393,7 @@
 
 <div class="viewcode-block" id="linear_monte_carlo"><a class="viewcode-back" href="../../qspec.html#qspec.analyze.linear_monte_carlo">[docs]</a><span class="k">def</span> <span class="nf">linear_monte_carlo</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">array_iter</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">array_iter</span><span class="p">,</span> <span class="n">sigma_x</span><span class="p">:</span> <span class="n">array_iter</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">sigma_y</span><span class="p">:</span> <span class="n">array_iter</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
                        <span class="n">corr</span><span class="p">:</span> <span class="n">array_iter</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">n</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1000000</span><span class="p">,</span> <span class="n">report</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">show</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    :param x: The x data.</span>
 <span class="sd">    :param y: The y data.</span>
 <span class="sd">    :param sigma_x: The 1-sigma uncertainties of the x data.</span>
@@ -434,7 +425,7 @@
 
 
 <span class="k">def</span> <span class="nf">_test_order_linear_monte_carlo_nd</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">ndarray</span><span class="p">,</span> <span class="n">cov</span><span class="p">:</span> <span class="n">ndarray</span><span class="p">,</span> <span class="n">n</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    :param x: The x data. &#39;x&#39; is a numpy array of vectors with arbitrary but fixed dimension.</span>
 <span class="sd">    :param cov: The covariance matrices of the x data vectors. Must have shape (x.shape[0], x.shape[1], x.shape[1]).</span>
 <span class="sd">    :param n: The number of samples generated for each data point.</span>
@@ -455,7 +446,7 @@
 
 
 <span class="k">def</span> <span class="nf">_generate_collinear_points</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">ndarray</span><span class="p">,</span> <span class="n">cov</span><span class="p">:</span> <span class="n">ndarray</span><span class="p">,</span> <span class="n">n</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    :param x: The x data. &#39;x&#39; is a numpy array of vectors with arbitrary but fixed dimension.</span>
 <span class="sd">    :param cov: The covariance matrices of the x data vectors. Must have shape (x.shape[0], x.shape[1], x.shape[1]).</span>
 <span class="sd">    :param n: The number of samples generated for each data point.</span>
@@ -490,7 +481,7 @@
 
 <div class="viewcode-block" id="linear_monte_carlo_nd"><a class="viewcode-back" href="../../qspec.html#qspec.analyze.linear_monte_carlo_nd">[docs]</a><span class="k">def</span> <span class="nf">linear_monte_carlo_nd</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">array_iter</span><span class="p">,</span> <span class="n">cov</span><span class="p">:</span> <span class="n">array_iter</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">axis</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
                           <span class="n">n</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1000000</span><span class="p">,</span> <span class="n">full_output</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">report</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">show</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    A Monte-Carlo fitter that finds a straight line in n-dimensional space.</span>
 
 <span class="sd">    :param x: The x data. &#39;x&#39; is an iterable of vectors with arbitrary but fixed dimension.</span>
@@ -571,7 +562,7 @@
 <div class="viewcode-block" id="linear_alpha"><a class="viewcode-back" href="../../qspec.html#qspec.analyze.linear_alpha">[docs]</a><span class="k">def</span> <span class="nf">linear_alpha</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">array_iter</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">array_iter</span><span class="p">,</span> <span class="n">sigma_x</span><span class="p">:</span> <span class="n">array_like</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">sigma_y</span><span class="p">:</span> <span class="n">array_like</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
                  <span class="n">corr</span><span class="p">:</span> <span class="n">array_iter</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">func</span><span class="p">:</span> <span class="n">Callable</span> <span class="o">=</span> <span class="n">york</span><span class="p">,</span> <span class="n">alpha</span><span class="p">:</span> <span class="n">scalar</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">find_alpha</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
                  <span class="n">report</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">show</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    :param x: The x data.</span>
 <span class="sd">    :param y: The y data.</span>
 <span class="sd">    :param sigma_x: The 1-sigma uncertainty of the x data.</span>
@@ -610,7 +601,7 @@
 <div class="viewcode-block" id="odr_fit"><a class="viewcode-back" href="../../qspec.html#qspec.analyze.odr_fit">[docs]</a><span class="k">def</span> <span class="nf">odr_fit</span><span class="p">(</span><span class="n">f</span><span class="p">:</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">array_iter</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">array_iter</span><span class="p">,</span> <span class="n">sigma_x</span><span class="p">:</span> <span class="n">array_iter</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">sigma_y</span><span class="p">:</span> <span class="n">array_iter</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
             <span class="n">p0</span><span class="p">:</span> <span class="n">array_iter</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">p0_d</span><span class="p">:</span> <span class="n">array_iter</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">p0_fixed</span><span class="p">:</span> <span class="n">array_iter</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
             <span class="n">report</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="p">(</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">ndarray</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    :param f: The model function to fit to the data.</span>
 <span class="sd">    :param x: The x data.</span>
 <span class="sd">    :param y: The y data.</span>
@@ -672,7 +663,7 @@
               <span class="n">p0_fixed</span><span class="p">:</span> <span class="n">array_iter</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">sigma</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">array_iter</span><span class="p">,</span> <span class="n">Callable</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">absolute_sigma</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
               <span class="n">check_finite</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">bounds</span><span class="p">:</span> <span class="p">(</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">ndarray</span><span class="p">)</span> <span class="o">=</span> <span class="p">(</span><span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">),</span> <span class="n">method</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
               <span class="n">jac</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Callable</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">full_output</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">report</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    :param f: The model function to fit to the data.</span>
 <span class="sd">    :param x: The x data.</span>
 <span class="sd">    :param y: The y data.</span>
@@ -756,7 +747,7 @@
 
     <span class="c1"># Determine type of sigma</span>
     <span class="k">if</span> <span class="n">sigma</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">if</span> <span class="nb">callable</span><span class="p">(</span><span class="n">sigma</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">callable</span><span class="p">(</span><span class="n">sigma</span><span class="p">):</span>
             <span class="n">transform</span> <span class="o">=</span> <span class="n">_wrap_func_sigma</span><span class="p">(</span><span class="n">sigma</span><span class="p">,</span> <span class="n">p0</span><span class="p">,</span> <span class="n">p0_fixed</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">sigma</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">sigma</span><span class="p">)</span>
@@ -778,8 +769,8 @@
         <span class="n">transform</span> <span class="o">=</span> <span class="kc">None</span>
 
     <span class="n">func</span> <span class="o">=</span> <span class="n">_wrap_func</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">transform</span><span class="p">)</span>
-    <span class="k">if</span> <span class="nb">callable</span><span class="p">(</span><span class="n">jac</span><span class="p">):</span>
-        <span class="k">if</span> <span class="nb">callable</span><span class="p">(</span><span class="n">sigma</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">callable</span><span class="p">(</span><span class="n">jac</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">callable</span><span class="p">(</span><span class="n">sigma</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;&#39;jac&#39; must not be callable if &#39;sigma&#39; is callable.&quot;</span><span class="p">)</span>
         <span class="n">jac</span> <span class="o">=</span> <span class="n">_wrap_jac</span><span class="p">(</span><span class="n">jac</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">transform</span><span class="p">)</span>
     <span class="k">elif</span> <span class="n">jac</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">method</span> <span class="o">!=</span> <span class="s1">&#39;lm&#39;</span><span class="p">:</span>
@@ -850,7 +841,7 @@
         <span class="n">digits</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">p0</span><span class="o">.</span><span class="n">size</span><span class="p">))))</span> <span class="o">+</span> <span class="mi">1</span>
         <span class="n">tools</span><span class="o">.</span><span class="n">printh</span><span class="p">(</span><span class="s2">&quot;curve_fit result:&quot;</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="n">err</span><span class="p">,</span> <span class="n">fix</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">popt_ret</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">pcov_ret</span><span class="p">)),</span> <span class="n">p0_fixed</span><span class="p">)):</span>
-            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="o">.</span><span class="n">zfill</span><span class="p">(</span><span class="n">digits</span><span class="p">)</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">val</span><span class="si">}</span><span class="s2"> +/- </span><span class="si">{</span><span class="n">err</span><span class="si">}</span><span class="s2"> (</span><span class="si">{</span><span class="s1">&#39;fixed&#39;</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="n">fix</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="s1">&#39;free&#39;</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="o">.</span><span class="n">zfill</span><span class="p">(</span><span class="n">digits</span><span class="p">)</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">val</span><span class="si">}</span><span class="s2"> +/- </span><span class="si">{</span><span class="n">err</span><span class="si">}</span><span class="s2"> (</span><span class="si">{</span><span class="s1">&#39;fixed&#39;</span> <span class="k">if</span> <span class="n">fix</span> <span class="k">else</span> <span class="s1">&#39;free&#39;</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">warn_cov</span><span class="p">:</span>
         <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;Covariance of the parameters could not be estimated&quot;</span><span class="p">,</span> <span class="n">category</span><span class="o">=</span><span class="n">OptimizeWarning</span><span class="p">)</span>
@@ -864,7 +855,7 @@
 <div class="viewcode-block" id="King"><a class="viewcode-back" href="../../qspec.html#qspec.analyze.King">[docs]</a><span class="k">class</span> <span class="nc">King</span><span class="p">:</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">a</span><span class="p">:</span> <span class="n">array_iter</span><span class="p">,</span> <span class="n">m</span><span class="p">:</span> <span class="n">array_iter</span><span class="p">,</span> <span class="n">x_abs</span><span class="p">:</span> <span class="n">array_iter</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
                  <span class="n">subtract_electrons</span><span class="p">:</span> <span class="n">scalar</span> <span class="o">=</span> <span class="mf">0.</span><span class="p">,</span> <span class="n">element_label</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+        <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param a: An Iterable of the mass numbers of the used isotopes.</span>
 <span class="sd">        :param m: The masses and their uncertainties of the isotopes &#39;a&#39; (amu). &#39;m&#39; must have shape (len(a), 2).</span>
 <span class="sd">        :param x_abs: Absolute values of the x-axis corresponding to the mass numbers a.</span>
@@ -912,7 +903,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">axis</span> <span class="o">=</span> <span class="mi">0</span>
 
     <span class="k">def</span> <span class="nf">_correlation</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+        <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :returns: None. Sets the correlation coefficients of the modified x- and y-data points by sampling the data.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">i</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">a</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">a_i</span><span class="p">)</span> <span class="k">for</span> <span class="n">a_i</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">a_fit</span><span class="p">])</span>
@@ -926,7 +917,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">corr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">corrcoef</span><span class="p">(</span><span class="n">x_mod</span><span class="p">,</span> <span class="n">y_mod</span><span class="p">)[:</span><span class="n">x_mod</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">x_mod</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]:])</span>
 
     <span class="k">def</span> <span class="nf">_correlation_nd</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+        <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :returns: None. Sets the correlation coefficients of the modified data by sampling it.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">i</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">a</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">a_i</span><span class="p">)</span> <span class="k">for</span> <span class="n">a_i</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">a_fit</span><span class="p">])</span>
@@ -942,7 +933,7 @@
 <div class="viewcode-block" id="King.fit"><a class="viewcode-back" href="../../qspec.html#qspec.analyze.King.fit">[docs]</a>    <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">a</span><span class="p">:</span> <span class="n">array_iter</span><span class="p">,</span> <span class="n">a_ref</span><span class="p">:</span> <span class="n">array_iter</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">array_iter</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">array_iter</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
             <span class="n">xy</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">func</span><span class="p">:</span> <span class="n">Callable</span> <span class="o">=</span> <span class="n">york</span><span class="p">,</span> <span class="n">alpha</span><span class="p">:</span> <span class="n">scalar</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">find_alpha</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
             <span class="n">show</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+        <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param a: An Iterable of the mass numbers of the used isotopes.</span>
 <span class="sd">        :param a_ref: An Iterable of the mass numbers of the used reference isotopes.</span>
 <span class="sd">        :param x: The x-values and their uncertainties of the King-fit to be performed. If &#39;mode&#39; is &quot;radii&quot;,</span>
@@ -995,7 +986,7 @@
 
 <div class="viewcode-block" id="King.fit_nd"><a class="viewcode-back" href="../../qspec.html#qspec.analyze.King.fit_nd">[docs]</a>    <span class="k">def</span> <span class="nf">fit_nd</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">a</span><span class="p">:</span> <span class="n">array_iter</span><span class="p">,</span> <span class="n">a_ref</span><span class="p">:</span> <span class="n">array_iter</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">array_iter</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
                <span class="n">axis</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">show</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+        <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param a: An Iterable of the mass numbers of the used isotopes.</span>
 <span class="sd">        :param a_ref: An Iterable of the mass numbers of the used reference isotopes.</span>
 <span class="sd">        :param x: The x data. &#39;x&#39; is an iterable of vectors with uncertainties with arbitrary but fixed dimension n_vec.</span>
@@ -1036,7 +1027,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">results_nd</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">x_results</span></div>
 
 <div class="viewcode-block" id="King.get_popt"><a class="viewcode-back" href="../../qspec.html#qspec.analyze.King.get_popt">[docs]</a>    <span class="k">def</span> <span class="nf">get_popt</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="p">(</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">ndarray</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+        <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :returns: The y-intercept and slope of the performed fit and their correlation,</span>
 <span class="sd">         if alpha was zero (Only changes the y-intercept).</span>
 <span class="sd">         This returns the mass- and field-shift factors K and F if the x-axis are radii</span>
@@ -1053,7 +1044,7 @@
         <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">k</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">f</span><span class="p">),</span> <span class="n">corr</span></div>
 
 <div class="viewcode-block" id="King.get_popt_nd"><a class="viewcode-back" href="../../qspec.html#qspec.analyze.King.get_popt_nd">[docs]</a>    <span class="k">def</span> <span class="nf">get_popt_nd</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="p">(</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">ndarray</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+        <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :returns: The slopes and y-intercepts of the performed fit.</span>
 <span class="sd">         This returns the mass- and field-shift factors K and F if the x-axis are radii</span>
 <span class="sd">         and the y-intercept Ky - Fy/Fx * Kx and field-shift ratio Fy/Fx if the x-axis are isotope shifts.</span>
@@ -1074,7 +1065,7 @@
 
 <div class="viewcode-block" id="King.get_unmodified_x"><a class="viewcode-back" href="../../qspec.html#qspec.analyze.King.get_unmodified_x">[docs]</a>    <span class="k">def</span> <span class="nf">get_unmodified_x</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">a</span><span class="p">:</span> <span class="n">array_iter</span><span class="p">,</span> <span class="n">a_ref</span><span class="p">:</span> <span class="n">array_iter</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">array_iter</span><span class="p">,</span> <span class="n">results</span><span class="p">:</span> <span class="nb">tuple</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
                          <span class="n">show</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">ndarray</span><span class="p">,</span> <span class="kc">None</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+        <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param a: An Iterable of mass numbers corresponding to the isotopes of the given &#39;y&#39; values.</span>
 <span class="sd">        :param a_ref: An Iterable of mass numbers corresponding to reference isotopes of the given &#39;y&#39; values.</span>
 <span class="sd">        :param y: The unmodified y values of the given mass numbers. Must have shape (len(a), 2).</span>
@@ -1109,7 +1100,7 @@
 
 <div class="viewcode-block" id="King.get_unmodified_y"><a class="viewcode-back" href="../../qspec.html#qspec.analyze.King.get_unmodified_y">[docs]</a>    <span class="k">def</span> <span class="nf">get_unmodified_y</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">a</span><span class="p">:</span> <span class="n">array_iter</span><span class="p">,</span> <span class="n">a_ref</span><span class="p">:</span> <span class="n">array_iter</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">array_iter</span><span class="p">,</span> <span class="n">results</span><span class="p">:</span> <span class="nb">tuple</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> \
             <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">ndarray</span><span class="p">,</span> <span class="kc">None</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+        <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param a: An Iterable of mass numbers corresponding to the isotopes of the given &#39;x&#39; values.</span>
 <span class="sd">        :param a_ref: An Iterable of mass numbers corresponding to reference isotopes of the given &#39;x&#39; values.</span>
 <span class="sd">        :param x: The unmodified x values of the given mass numbers. Must have shape (len(a), 2).</span>
@@ -1136,7 +1127,7 @@
         <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">y_mod</span> <span class="o">/</span> <span class="n">m_mod</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">y_mod_d</span> <span class="o">/</span> <span class="n">m_mod</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]])</span><span class="o">.</span><span class="n">T</span></div>
 
 <div class="viewcode-block" id="King.get_unmodified_input_x_nd"><a class="viewcode-back" href="../../qspec.html#qspec.analyze.King.get_unmodified_input_x_nd">[docs]</a>    <span class="k">def</span> <span class="nf">get_unmodified_input_x_nd</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">ndarray</span><span class="p">,</span> <span class="kc">None</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+        <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :returns: The unmodified x values improved by the &#39;fit_nd&#39;.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">x_results</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -1149,7 +1140,7 @@
         <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">ddof</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)]),</span> <span class="n">axes</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span></div>
 
 <div class="viewcode-block" id="King.get_unmodified_x_nd"><a class="viewcode-back" href="../../qspec.html#qspec.analyze.King.get_unmodified_x_nd">[docs]</a>    <span class="k">def</span> <span class="nf">get_unmodified_x_nd</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">a</span><span class="p">:</span> <span class="n">array_iter</span><span class="p">,</span> <span class="n">a_ref</span><span class="p">:</span> <span class="n">array_iter</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">array_iter</span><span class="p">,</span> <span class="n">axis</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">ndarray</span><span class="p">,</span> <span class="kc">None</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+        <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param a: An Iterable of mass numbers corresponding to the isotopes of the given &#39;y&#39; values.</span>
 <span class="sd">        :param a_ref: An Iterable of mass numbers corresponding to reference isotopes of the given &#39;y&#39; values.</span>
 <span class="sd">        :param y: The unmodified y values of the given mass numbers. Must have shape (len(a), 2).</span>
@@ -1178,7 +1169,7 @@
 
 <div class="viewcode-block" id="King.plot"><a class="viewcode-back" href="../../qspec.html#qspec.analyze.King.plot">[docs]</a>    <span class="k">def</span> <span class="nf">plot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mode</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">sigma2d</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">show</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">add_xy</span><span class="p">:</span> <span class="n">array_like</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
              <span class="n">add_a</span><span class="p">:</span> <span class="n">array_like</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+        <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param mode: The mode of the King-fit. If mode=&#39;radii&#39;, the :math:&#39;x&#39;-axis must contain the differences of</span>
 <span class="sd">         mean square nuclear charge radii or the Lambda-factor. For every other value,</span>
 <span class="sd">         the :math:&#39;x&#39;-axis is assumed to be an isotope shift such that the slope corresponds to</span>
@@ -1262,7 +1253,7 @@
             <span class="n">plt</span><span class="o">.</span><span class="n">gcf</span><span class="p">()</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="King.plot_nd"><a class="viewcode-back" href="../../qspec.html#qspec.analyze.King.plot_nd">[docs]</a>    <span class="k">def</span> <span class="nf">plot_nd</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">axis</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">mode</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">sigma2d</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+        <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param axis: The axis which is used as the x-axis throughout the plots.</span>
 <span class="sd">        :param mode: The mode of the King-plot. If mode=&#39;radii&#39;, the :math:&#39;x&#39;-axis must contain the differences of</span>
 <span class="sd">         mean square nuclear charge radii or the Lambda-factor. For every other value,</span>

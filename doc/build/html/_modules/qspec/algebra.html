@@ -1,24 +1,19 @@
 <!DOCTYPE html>
-<html class="writer-html5" lang="en">
+<html class="writer-html5" lang="en" >
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>qspec.algebra &mdash; qspec 13.12.2023 documentation</title>
-      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
-      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=19f00094" />
+  <title>qspec.algebra &mdash; qspec 13.12.2023 documentation</title><link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/css/borders.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/css/wy-nav-content.css" type="text/css" />
-
-  
   <!--[if lt IE 9]>
     <script src="../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
-  
-        <script src="../../_static/jquery.js?v=5d32c60e"></script>
-        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js?v=7f3357fe"></script>
-        <script src="../../_static/doctools.js?v=888ff710"></script>
-        <script src="../../_static/sphinx_highlight.js?v=4825356b"></script>
+  <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" /> 
@@ -29,21 +24,17 @@
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-
-          
-          
-          <a href="../../index.html" class="icon icon-home">
-            qspec
+            <a href="../../index.html" class="icon icon-home"> qspec
           </a>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="text" name="q" placeholder="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+              <p class="caption"><span class="caption-text">Contents:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../modules.html">qspec</a></li>
 </ul>
@@ -61,9 +52,9 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
-          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
-      <li class="breadcrumb-item active">qspec.algebra</li>
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+      <li>qspec.algebra</li>
       <li class="wy-breadcrumbs-aside">
       </li>
   </ul>
@@ -97,7 +88,7 @@
 
 
 <div class="viewcode-block" id="cast_sympy"><a class="viewcode-back" href="../../qspec.html#qspec.algebra.cast_sympy">[docs]</a><span class="k">def</span> <span class="nf">cast_sympy</span><span class="p">(</span><span class="n">as_sympy</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">sympy_like</span><span class="p">,</span> <span class="n">dtype</span><span class="p">:</span> <span class="nb">type</span> <span class="o">=</span> <span class="nb">float</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    :param as_sympy: Whether to return the result as a sympy type.</span>
 <span class="sd">    :param args: sympy_like arguments.</span>
 <span class="sd">    :param dtype: The type to use if as_sympy is False.</span>
@@ -111,7 +102,7 @@
 
 <div class="viewcode-block" id="clebsch_gordan"><a class="viewcode-back" href="../../qspec.html#qspec.algebra.clebsch_gordan">[docs]</a><span class="k">def</span> <span class="nf">clebsch_gordan</span><span class="p">(</span><span class="n">j_1</span><span class="p">:</span> <span class="n">sympy_qn</span><span class="p">,</span> <span class="n">j_2</span><span class="p">:</span> <span class="n">sympy_qn</span><span class="p">,</span> <span class="n">j_3</span><span class="p">:</span> <span class="n">sympy_qn</span><span class="p">,</span> <span class="n">m_1</span><span class="p">:</span> <span class="n">sympy_qn</span><span class="p">,</span> <span class="n">m_2</span><span class="p">:</span> <span class="n">sympy_qn</span><span class="p">,</span> <span class="n">m_3</span><span class="p">:</span> <span class="n">sympy_qn</span><span class="p">,</span>
                    <span class="n">as_sympy</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    .. math::</span>
 
 <span class="sd">        \\langle J_1, m_1, J_2, m_2\\, |\\, J_3, m_3\\rangle</span>
@@ -131,7 +122,7 @@
 
 <div class="viewcode-block" id="wigner_3j"><a class="viewcode-back" href="../../qspec.html#qspec.algebra.wigner_3j">[docs]</a><span class="k">def</span> <span class="nf">wigner_3j</span><span class="p">(</span><span class="n">j_1</span><span class="p">:</span> <span class="n">sympy_qn</span><span class="p">,</span> <span class="n">j_2</span><span class="p">:</span> <span class="n">sympy_qn</span><span class="p">,</span> <span class="n">j_3</span><span class="p">:</span> <span class="n">sympy_qn</span><span class="p">,</span> <span class="n">m_1</span><span class="p">:</span> <span class="n">sympy_qn</span><span class="p">,</span> <span class="n">m_2</span><span class="p">:</span> <span class="n">sympy_qn</span><span class="p">,</span> <span class="n">m_3</span><span class="p">:</span> <span class="n">sympy_qn</span><span class="p">,</span>
               <span class="n">as_sympy</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    .. math::</span>
 
 <span class="sd">        \\begin{pmatrix}</span>
@@ -155,7 +146,7 @@
 
 <div class="viewcode-block" id="wigner_6j"><a class="viewcode-back" href="../../qspec.html#qspec.algebra.wigner_6j">[docs]</a><span class="k">def</span> <span class="nf">wigner_6j</span><span class="p">(</span><span class="n">j_1</span><span class="p">:</span> <span class="n">sympy_qn</span><span class="p">,</span> <span class="n">j_2</span><span class="p">:</span> <span class="n">sympy_qn</span><span class="p">,</span> <span class="n">j_3</span><span class="p">:</span> <span class="n">sympy_qn</span><span class="p">,</span> <span class="n">j_4</span><span class="p">:</span> <span class="n">sympy_qn</span><span class="p">,</span> <span class="n">j_5</span><span class="p">:</span> <span class="n">sympy_qn</span><span class="p">,</span> <span class="n">j_6</span><span class="p">:</span> <span class="n">sympy_qn</span><span class="p">,</span>
               <span class="n">as_sympy</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    .. math::</span>
 
 <span class="sd">        \\begin{Bmatrix}</span>
@@ -182,7 +173,7 @@
 
 <div class="viewcode-block" id="a"><a class="viewcode-back" href="../../qspec.html#qspec.algebra.a">[docs]</a><span class="k">def</span> <span class="nf">a</span><span class="p">(</span><span class="n">i</span><span class="p">:</span> <span class="n">sympy_qn</span><span class="p">,</span> <span class="n">j_l</span><span class="p">:</span> <span class="n">sympy_qn</span><span class="p">,</span> <span class="n">f_l</span><span class="p">:</span> <span class="n">sympy_qn</span><span class="p">,</span> <span class="n">j_u</span><span class="p">:</span> <span class="n">sympy_qn</span><span class="p">,</span> <span class="n">f_u</span><span class="p">:</span> <span class="n">sympy_qn</span><span class="p">,</span> <span class="n">as_sympy</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> \
         <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">sympy_core</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    :param i: The nuclear spin quantum number I.</span>
 <span class="sd">    :param j_l: The electronic total angular momentum quantum number J of the lower state.</span>
 <span class="sd">    :param f_l: The total angular momentum quantum number F of the lower state.</span>
@@ -200,7 +191,7 @@
 
 <div class="viewcode-block" id="b"><a class="viewcode-back" href="../../qspec.html#qspec.algebra.b">[docs]</a><span class="k">def</span> <span class="nf">b</span><span class="p">(</span><span class="n">i</span><span class="p">:</span> <span class="n">sympy_qn</span><span class="p">,</span> <span class="n">j_l</span><span class="p">:</span> <span class="n">sympy_qn</span><span class="p">,</span> <span class="n">f_l</span><span class="p">:</span> <span class="n">sympy_qn</span><span class="p">,</span> <span class="n">j_u</span><span class="p">:</span> <span class="n">sympy_qn</span><span class="p">,</span> <span class="n">f_u</span><span class="p">:</span> <span class="n">sympy_qn</span><span class="p">,</span> <span class="n">as_sympy</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> \
         <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">sympy_core</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    :param i: The nuclear spin quantum number I.</span>
 <span class="sd">    :param j_l: The electronic total angular momentum quantum number J of the lower state.</span>
 <span class="sd">    :param j_u: The electronic total angular momentum quantum number J of the upper state.</span>
@@ -215,7 +206,7 @@
 
 <div class="viewcode-block" id="ab"><a class="viewcode-back" href="../../qspec.html#qspec.algebra.ab">[docs]</a><span class="k">def</span> <span class="nf">ab</span><span class="p">(</span><span class="n">i</span><span class="p">:</span> <span class="n">sympy_qn</span><span class="p">,</span> <span class="n">j_l</span><span class="p">:</span> <span class="n">sympy_qn</span><span class="p">,</span> <span class="n">f_l</span><span class="p">:</span> <span class="n">sympy_qn</span><span class="p">,</span> <span class="n">j_u</span><span class="p">:</span> <span class="n">sympy_qn</span><span class="p">,</span> <span class="n">f_u</span><span class="p">:</span> <span class="n">sympy_qn</span><span class="p">,</span> <span class="n">as_sympy</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> \
         <span class="o">-&gt;</span> <span class="p">(</span><span class="n">Union</span><span class="p">[</span><span class="n">sympy_core</span><span class="p">,</span> <span class="nb">float</span><span class="p">],</span> <span class="n">Union</span><span class="p">[</span><span class="n">sympy_core</span><span class="p">,</span> <span class="nb">float</span><span class="p">]):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    :param i: The nuclear spin quantum number I.</span>
 <span class="sd">    :param j_l: The electronic total angular momentum quantum number J of the lower state.</span>
 <span class="sd">    :param j_u: The electronic total angular momentum quantum number J of the upper state.</span>
@@ -229,7 +220,7 @@
 
 <div class="viewcode-block" id="c"><a class="viewcode-back" href="../../qspec.html#qspec.algebra.c">[docs]</a><span class="k">def</span> <span class="nf">c</span><span class="p">(</span><span class="n">i</span><span class="p">:</span> <span class="n">sympy_qn</span><span class="p">,</span> <span class="n">j_l</span><span class="p">:</span> <span class="n">sympy_qn</span><span class="p">,</span> <span class="n">f_l</span><span class="p">:</span> <span class="n">sympy_qn</span><span class="p">,</span> <span class="n">j_u</span><span class="p">:</span> <span class="n">sympy_qn</span><span class="p">,</span> <span class="n">f1_u</span><span class="p">:</span> <span class="n">sympy_qn</span><span class="p">,</span> <span class="n">f2_u</span><span class="p">:</span> <span class="n">sympy_qn</span><span class="p">,</span>
       <span class="n">as_sympy</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">sympy_core</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    :param i: The nuclear spin quantum number I.</span>
 <span class="sd">    :param j_l: The electronic total angular momentum quantum number J of the lower state.</span>
 <span class="sd">    :param j_u: The electronic total angular momentum quantum number J of the upper state.</span>
@@ -245,7 +236,7 @@
 
 <div class="viewcode-block" id="abc"><a class="viewcode-back" href="../../qspec.html#qspec.algebra.abc">[docs]</a><span class="k">def</span> <span class="nf">abc</span><span class="p">(</span><span class="n">i</span><span class="p">:</span> <span class="n">sympy_qn</span><span class="p">,</span> <span class="n">j_l</span><span class="p">:</span> <span class="n">sympy_qn</span><span class="p">,</span> <span class="n">f_l</span><span class="p">:</span> <span class="n">sympy_qn</span><span class="p">,</span> <span class="n">j_u</span><span class="p">:</span> <span class="n">sympy_qn</span><span class="p">,</span> <span class="n">f1_u</span><span class="p">:</span> <span class="n">sympy_qn</span><span class="p">,</span> <span class="n">f2_u</span><span class="p">:</span> <span class="n">sympy_qn</span><span class="p">,</span>
         <span class="n">as_sympy</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="p">(</span><span class="n">Union</span><span class="p">[</span><span class="n">sympy_core</span><span class="p">,</span> <span class="nb">float</span><span class="p">],</span> <span class="n">Union</span><span class="p">[</span><span class="n">sympy_core</span><span class="p">,</span> <span class="nb">float</span><span class="p">],</span> <span class="n">Union</span><span class="p">[</span><span class="n">sympy_core</span><span class="p">,</span> <span class="nb">float</span><span class="p">]):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    :param i: The nuclear spin quantum number I.</span>
 <span class="sd">    :param j_l: The electronic total angular momentum quantum number J of the lower state.</span>
 <span class="sd">    :param j_u: The electronic total angular momentum quantum number J of the upper state.</span>
@@ -261,7 +252,7 @@
 
 <div class="viewcode-block" id="f_0"><a class="viewcode-back" href="../../qspec.html#qspec.algebra.f_0">[docs]</a><span class="k">def</span> <span class="nf">f_0</span><span class="p">(</span><span class="n">i</span><span class="p">:</span> <span class="n">sympy_qn</span><span class="p">,</span> <span class="n">j_l</span><span class="p">:</span> <span class="n">sympy_qn</span><span class="p">,</span> <span class="n">f_l</span><span class="p">:</span> <span class="n">sympy_qn</span><span class="p">,</span> <span class="n">j_u</span><span class="p">:</span> <span class="n">sympy_qn</span><span class="p">,</span> <span class="n">f_u</span><span class="p">:</span> <span class="n">sympy_qn</span><span class="p">,</span> <span class="n">theta_l</span><span class="p">:</span> <span class="n">sympy_like</span><span class="p">,</span>
         <span class="n">as_sympy</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">sympy_core</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    :param i: The nuclear spin quantum number I.</span>
 <span class="sd">    :param j_l: The electronic total angular momentum quantum number J of the lower state.</span>
 <span class="sd">    :param j_u: The electronic total angular momentum quantum number J of the upper state.</span>
@@ -296,7 +287,7 @@
 
 <div class="viewcode-block" id="g_0"><a class="viewcode-back" href="../../qspec.html#qspec.algebra.g_0">[docs]</a><span class="k">def</span> <span class="nf">g_0</span><span class="p">(</span><span class="n">i</span><span class="p">:</span> <span class="n">sympy_qn</span><span class="p">,</span> <span class="n">j_l</span><span class="p">:</span> <span class="n">sympy_qn</span><span class="p">,</span> <span class="n">f_l</span><span class="p">:</span> <span class="n">sympy_qn</span><span class="p">,</span> <span class="n">j_u</span><span class="p">:</span> <span class="n">sympy_qn</span><span class="p">,</span> <span class="n">f1_u</span><span class="p">:</span> <span class="n">sympy_qn</span><span class="p">,</span> <span class="n">f2_u</span><span class="p">:</span> <span class="n">sympy_qn</span><span class="p">,</span> <span class="n">theta_l</span><span class="p">:</span> <span class="n">sympy_like</span><span class="p">,</span>
         <span class="n">as_sympy</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">sympy_core</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    :param i: The nuclear spin quantum number I.</span>
 <span class="sd">    :param j_l: The electronic total angular momentum quantum number J of the lower state.</span>
 <span class="sd">    :param j_u: The electronic total angular momentum quantum number J of the upper state.</span>
@@ -333,7 +324,7 @@
 <div class="viewcode-block" id="c_dipole"><a class="viewcode-back" href="../../qspec.html#qspec.algebra.c_dipole">[docs]</a><span class="k">def</span> <span class="nf">c_dipole</span><span class="p">(</span><span class="n">i</span><span class="p">:</span> <span class="n">sympy_qn</span><span class="p">,</span> <span class="n">j_i</span><span class="p">:</span> <span class="n">sympy_qn</span><span class="p">,</span> <span class="n">f_i</span><span class="p">:</span> <span class="n">sympy_qn</span><span class="p">,</span> <span class="n">m_i</span><span class="p">:</span> <span class="n">sympy_qn</span><span class="p">,</span> <span class="n">j_u</span><span class="p">:</span> <span class="n">sympy_qn</span><span class="p">,</span> <span class="n">f_u</span><span class="p">:</span> <span class="n">sympy_qn</span><span class="p">,</span>
              <span class="n">j_f</span><span class="p">:</span> <span class="n">sympy_qn</span><span class="p">,</span> <span class="n">f_f</span><span class="p">:</span> <span class="n">sympy_qn</span><span class="p">,</span> <span class="n">m_f</span><span class="p">:</span> <span class="n">sympy_qn</span><span class="p">,</span>
              <span class="n">theta_l</span><span class="p">:</span> <span class="n">sympy_like</span><span class="p">,</span> <span class="n">scatter_pol</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">as_sympy</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">sympy_core</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    :param i: The nuclear spin quantum number I.</span>
 <span class="sd">    :param j_i: The electronic total angular momentum quantum number J of the initial lower state.</span>
 <span class="sd">    :param f_i: The total angular momentum quantum number F of the initial lower state.</span>
@@ -376,7 +367,7 @@
 <div class="viewcode-block" id="a_dipole"><a class="viewcode-back" href="../../qspec.html#qspec.algebra.a_dipole">[docs]</a><span class="k">def</span> <span class="nf">a_dipole</span><span class="p">(</span><span class="n">i</span><span class="p">:</span> <span class="n">sympy_qn</span><span class="p">,</span> <span class="n">j_l</span><span class="p">:</span> <span class="n">sympy_qn</span><span class="p">,</span> <span class="n">f_l</span><span class="p">:</span> <span class="n">sympy_qn</span><span class="p">,</span> <span class="n">m_l</span><span class="p">:</span> <span class="n">sympy_qn</span><span class="p">,</span>
              <span class="n">j_u</span><span class="p">:</span> <span class="n">sympy_qn</span><span class="p">,</span> <span class="n">f_u</span><span class="p">:</span> <span class="n">sympy_qn</span><span class="p">,</span> <span class="n">m_u</span><span class="p">:</span> <span class="n">sympy_qn</span><span class="p">,</span> <span class="n">q</span><span class="p">:</span> <span class="n">sympy_qn</span><span class="p">,</span> <span class="n">as_sympy</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> \
         <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">sympy_core</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    :param i: The nuclear spin quantum number I.</span>
 <span class="sd">    :param j_l: The electronic total angular momentum quantum number J of the lower state.</span>
 <span class="sd">    :param f_l: The total angular momentum quantum number F of the lower state.</span>
@@ -402,7 +393,7 @@
 
 <div class="viewcode-block" id="a_dipole_cart"><a class="viewcode-back" href="../../qspec.html#qspec.algebra.a_dipole_cart">[docs]</a><span class="k">def</span> <span class="nf">a_dipole_cart</span><span class="p">(</span><span class="n">i</span><span class="p">:</span> <span class="n">sympy_qn</span><span class="p">,</span> <span class="n">j_l</span><span class="p">:</span> <span class="n">sympy_qn</span><span class="p">,</span> <span class="n">f_l</span><span class="p">:</span> <span class="n">sympy_qn</span><span class="p">,</span> <span class="n">m_l</span><span class="p">:</span> <span class="n">sympy_qn</span><span class="p">,</span>
                   <span class="n">j_u</span><span class="p">:</span> <span class="n">sympy_qn</span><span class="p">,</span> <span class="n">f_u</span><span class="p">:</span> <span class="n">sympy_qn</span><span class="p">,</span> <span class="n">m_u</span><span class="p">:</span> <span class="n">sympy_qn</span><span class="p">,</span> <span class="n">as_sympy</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ndarray</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    :param i: The nuclear spin quantum number I.</span>
 <span class="sd">    :param j_l: The electronic total angular momentum quantum number J of the lower state.</span>
 <span class="sd">    :param f_l: The total angular momentum quantum number F of the lower state.</span>
@@ -427,7 +418,7 @@
 
 
 <div class="viewcode-block" id="reduced_f_root"><a class="viewcode-back" href="../../qspec.html#qspec.algebra.reduced_f_root">[docs]</a><span class="k">def</span> <span class="nf">reduced_f_root</span><span class="p">(</span><span class="n">i</span><span class="p">:</span> <span class="n">sympy_qn</span><span class="p">,</span> <span class="n">j_l</span><span class="p">:</span> <span class="n">sympy_qn</span><span class="p">,</span> <span class="n">f_l</span><span class="p">:</span> <span class="n">sympy_qn</span><span class="p">,</span> <span class="n">j_u</span><span class="p">:</span> <span class="n">sympy_qn</span><span class="p">,</span> <span class="n">f_u</span><span class="p">:</span> <span class="n">sympy_qn</span><span class="p">,</span> <span class="n">as_sympy</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    :param i: The nuclear spin quantum number I.</span>
 <span class="sd">    :param j_l: The electronic total angular momentum quantum number J of the lower state.</span>
 <span class="sd">    :param f_l: The total angular momentum quantum number F of the lower state.</span>
@@ -445,7 +436,7 @@
 
 
 <div class="viewcode-block" id="reduced_f"><a class="viewcode-back" href="../../qspec.html#qspec.algebra.reduced_f">[docs]</a><span class="k">def</span> <span class="nf">reduced_f</span><span class="p">(</span><span class="n">i</span><span class="p">:</span> <span class="n">sympy_qn</span><span class="p">,</span> <span class="n">j_l</span><span class="p">:</span> <span class="n">sympy_qn</span><span class="p">,</span> <span class="n">f_l</span><span class="p">:</span> <span class="n">sympy_qn</span><span class="p">,</span> <span class="n">j_u</span><span class="p">:</span> <span class="n">sympy_qn</span><span class="p">,</span> <span class="n">f_u</span><span class="p">:</span> <span class="n">sympy_qn</span><span class="p">,</span> <span class="n">as_sympy</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    :param i: The nuclear spin quantum number I.</span>
 <span class="sd">    :param j_l: The electronic total angular momentum quantum number J of the lower state.</span>
 <span class="sd">    :param f_l: The total angular momentum quantum number F of the lower state.</span>
@@ -459,7 +450,7 @@
 
 
 <div class="viewcode-block" id="a_tilda"><a class="viewcode-back" href="../../qspec.html#qspec.algebra.a_tilda">[docs]</a><span class="k">def</span> <span class="nf">a_tilda</span><span class="p">(</span><span class="n">i</span><span class="p">:</span> <span class="n">sympy_qn</span><span class="p">,</span> <span class="n">j_l</span><span class="p">:</span> <span class="n">sympy_qn</span><span class="p">,</span> <span class="n">f_l</span><span class="p">:</span> <span class="n">sympy_qn</span><span class="p">,</span> <span class="n">j_u</span><span class="p">:</span> <span class="n">sympy_qn</span><span class="p">,</span> <span class="n">f_u</span><span class="p">:</span> <span class="n">sympy_qn</span><span class="p">,</span> <span class="n">as_sympy</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    :param i: The nuclear spin quantum number I.</span>
 <span class="sd">    :param j_l: The electronic total angular momentum quantum number J of the lower state.</span>
 <span class="sd">    :param j_u: The electronic total angular momentum quantum number J of the upper state.</span>
@@ -474,7 +465,7 @@
 
 <div class="viewcode-block" id="a_m_tilda"><a class="viewcode-back" href="../../qspec.html#qspec.algebra.a_m_tilda">[docs]</a><span class="k">def</span> <span class="nf">a_m_tilda</span><span class="p">(</span><span class="n">i</span><span class="p">:</span> <span class="n">sympy_qn</span><span class="p">,</span> <span class="n">j_l</span><span class="p">:</span> <span class="n">sympy_qn</span><span class="p">,</span> <span class="n">f_l</span><span class="p">:</span> <span class="n">sympy_qn</span><span class="p">,</span> <span class="n">m_l</span><span class="p">:</span> <span class="n">sympy_qn</span><span class="p">,</span>
               <span class="n">j_u</span><span class="p">:</span> <span class="n">sympy_qn</span><span class="p">,</span> <span class="n">f_u</span><span class="p">:</span> <span class="n">sympy_qn</span><span class="p">,</span> <span class="n">m_u</span><span class="p">:</span> <span class="n">sympy_qn</span><span class="p">,</span> <span class="n">as_sympy</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    :param i: The nuclear spin quantum number I.</span>
 <span class="sd">    :param j_l: The electronic total angular momentum quantum number J of the lower state.</span>
 <span class="sd">    :param f_l: The total angular momentum quantum number F of the lower state.</span>
