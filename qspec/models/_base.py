@@ -231,7 +231,9 @@ class Model:
 
     def _eval_zero_division(self, args, expr):
         try:
-            return eval(expr, {}, {'self': self, 'args': args})
+            with np.errstate(divide='ignore', invalid='ignore'):
+                ret = eval(expr, {}, {'self': self, 'args': args})
+            return 0. if np.isnan(ret) or np.isinf(ret) else ret
         except ZeroDivisionError:
             return 0.
 

@@ -104,6 +104,7 @@ def example(n=None):
         """
         Example 1: Interaction between 40Ca+ and two lasers off-resonance,
         leading to Rabi oscillations between s and d state without going through p.
+        The simulation also shows the ac-Stark shift
         
         In example 1, the master equation is solved for 40Ca+ with two lasers off-resonance.
         Same atomic system as in example 1.
@@ -124,19 +125,19 @@ def example(n=None):
         ca40 = sim.Atom(states=s + p + d, decay_map=decay)  # The Atom with all states and the decay information.
 
         pol = sim.Polarization([0, 1, 0], q_axis=2)
-        laser_sp = sim.Laser(freq=f_sp + 5000, polarization=pol, intensity=10000)  # Linear polarized laser for
+        laser_sp = sim.Laser(freq=f_sp + 1000, polarization=pol, intensity=10000)  # Linear polarized laser for
         # the ground-state transition.
-        laser_dp = sim.Laser(freq=f_dp + 5000, polarization=pol, intensity=10000)  # Linear polarized laser for
+        laser_dp = sim.Laser(freq=f_dp + 1000, polarization=pol, intensity=100)  # Linear polarized laser for
         # the metastable-state transition.
 
         inter = sim.Interaction(atom=ca40, lasers=[laser_sp, laser_dp], delta_max=10000)
         inter.controlled = True  # Use the controlled solver.
         # inter.dt = 4e-5  # or small step sizes.
 
-        times = [0, 2]  # Integration time in us.
+        times = [0, 4]  # Integration time in us.
         delta = np.linspace(-1.5, 1.5, 101)
 
-        results = inter.master(times, delta, m=0)  # m=0 for delta in first laser.
+        results = inter.master(times, delta, m=1)  # m=0 for delta in first laser.
         # Solve the master equation for t, assuming equal population in all s-states.
 
         print('Shape of the resulting density-matrices object: ', results.shape)
@@ -403,6 +404,18 @@ def example(n=None):
         plt.ylabel('state population')
         plt.show()
 
+    if 6 in n:
+        p = sim.State(0., 1, 1, 2, i=1, f=2, m=0, hyper_const=[1.], label='p')
+        d = sim.State(7e8, 1, 2, 2, i=1, f=2, m=1, hyper_const=[1.], label='d')
+        decay = sim.DecayMap([('p', 'd')], [50.])
+        atom = sim.Atom([p, d], decay)
+
+        pol = sim.Polarization([1, 1, 1], q_axis=2, vec_as_q=True)
+        laser = sim.Laser(7e8, intensity=100, polarization=pol)
+
+        inter = sim.Interaction(atom, [laser])
+        print(inter.get_rabi(0))
+
 
 if __name__ == '__main__':
-    example({4})
+    example({1})
