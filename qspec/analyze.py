@@ -1022,7 +1022,7 @@ class King:
         i_ref = np.array([self.a.index(a_i) for a_i in a_ref])
         m_mod = self.m_mod[i_ref, i, :]
         y_mod = y[:, 0] * m_mod[:, 0]
-        y_mod_d = y[:, 1] * m_mod[:, 0]
+        y_mod_d = np.abs(y[:, 1] * m_mod[:, 0])
         x_mod = straight(y_mod, -_a / b, 1. / b) + alpha
         x_mod_d = np.sqrt((y_mod_d / b) ** 2 + (sigma_a / b) ** 2 + (sigma_b * (x_mod - alpha) / b) ** 2
                           + 2. * (x_mod - alpha) / (b ** 2) * sigma_a * sigma_b * corr)

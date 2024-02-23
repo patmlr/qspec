@@ -125,9 +125,9 @@ def example(n=None):
         ca40 = sim.Atom(states=s + p + d, decay_map=decay)  # The Atom with all states and the decay information.
 
         pol = sim.Polarization([0, 1, 0], q_axis=2)
-        laser_sp = sim.Laser(freq=f_sp + 1000, polarization=pol, intensity=10000)  # Linear polarized laser for
+        laser_sp = sim.Laser(freq=f_sp + 200, polarization=pol, intensity=10000)  # Linear polarized laser for
         # the ground-state transition.
-        laser_dp = sim.Laser(freq=f_dp + 1000, polarization=pol, intensity=100)  # Linear polarized laser for
+        laser_dp = sim.Laser(freq=f_dp + 200, polarization=pol, intensity=100)  # Linear polarized laser for
         # the metastable-state transition.
 
         inter = sim.Interaction(atom=ca40, lasers=[laser_sp, laser_dp], delta_max=10000)
@@ -135,7 +135,7 @@ def example(n=None):
         # inter.dt = 4e-5  # or small step sizes.
 
         times = [0, 4]  # Integration time in us.
-        delta = np.linspace(-1.5, 1.5, 101)
+        delta = np.linspace(-6.5, 6.5, 501)
 
         results = inter.master(times, delta, m=1)  # m=0 for delta in first laser.
         # Solve the master equation for t, assuming equal population in all s-states.

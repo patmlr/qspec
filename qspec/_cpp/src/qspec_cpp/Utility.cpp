@@ -21,6 +21,17 @@ VectorXcd cast_VectorXcd(std::complex<double>* x, size_t size)
     return _y0;
 }
 
+MatrixXd cast_MatrixXd(double* x, size_t size)
+{
+    MatrixXd _y0(size, size);
+    _y0 = MatrixXd::Zero(size, size);
+    for (size_t j = 0; j < size; ++j)
+    {
+        for (size_t i = 0; i < size; ++i) _y0(i, j) = x[size * j + i];
+    }
+    return _y0;
+}
+
 MatrixXcd cast_MatrixXcd(std::complex<double>* x, size_t size)
 {
     MatrixXcd _y0(size, size);

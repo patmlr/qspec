@@ -72,6 +72,7 @@ AtomHandler = ctypes.POINTER(ctypes.c_char)
 InteractionHandler = ctypes.POINTER(ctypes.c_char)
 ResultHandler = ctypes.POINTER(ctypes.c_char)
 SpectrumHandler = ctypes.POINTER(ctypes.c_char)
+MultivariateNormalHandler = ctypes.POINTER(ctypes.c_char)
 
 dll_path = os.path.abspath(os.path.dirname(__file__))
 x64 = r'\x64' if ctypes.sizeof(ctypes.c_void_p) == 8 else ''
@@ -308,3 +309,16 @@ dll.interaction_mc_master.restype = ctypes.c_void_p
 # @ScatteringRate
 dll.sr_generate_y.argtypes = (c_complex_p, c_complex_p, c_complex_p, c_int_p, c_int_p, c_double_p)
 dll.sr_generate_y.restype = ctypes.c_void_p
+
+
+# King
+dll.multivariatenormal_construct.argtypes = (c_double_p, c_double_p, c_size_t)
+dll.multivariatenormal_construct.restype = MultivariateNormalHandler
+
+dll.multivariatenormal_size.restype = c_size_t
+
+dll.multivariatenormal_destruct.argtypes = (MultivariateNormalHandler, )
+
+dll.multivariatenormal_rvs.restype = ctypes.c_void_p
+
+dll.gen_collinear.restype = ctypes.c_void_p

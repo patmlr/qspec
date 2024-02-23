@@ -10,6 +10,7 @@ using namespace Eigen;
 
 VectorXd cast_VectorXd(double* x, size_t size);
 VectorXcd cast_VectorXcd(std::complex<double>* x, size_t size);
+MatrixXd cast_MatrixXd(double* x, size_t size);
 MatrixXcd cast_MatrixXcd(std::complex<double>* x, size_t size);
 
 std::vector<double> cast_samples_double(double* x, size_t sample_size);

@@ -4,6 +4,7 @@
 #include "Light.h"
 #include "Matter.h"
 #include "Interaction.h"
+#include "King.h"
 #include <complex>
 
 BOOL APIENTRY DllMain( HMODULE hModule,
@@ -711,4 +712,46 @@ extern "C"
         }
     }
 
+
+    __declspec(dllexport) MultivariateNormal* multivariatenormal_construct(double* mean, double* cov, size_t size)
+    {
+        return new MultivariateNormal(cast_VectorXd(mean, size), cast_MatrixXd(cov, size));
+    }
+
+    __declspec(dllexport) void multivariatenormal_destruct(MultivariateNormal* mvn)
+    {
+        delete mvn;
+    }
+
+    __declspec(dllexport) size_t multivariatenormal_size(MultivariateNormal* mvn)
+    {
+        return mvn->get_size();
+    }
+
+    __declspec(dllexport) void multivariatenormal_rvs(MultivariateNormal* mvn, double* ret)
+    {
+        VectorXd _ret = mvn->rvs();
+        for (size_t i = 0; i < _ret.size(); ++i) ret[i] = _ret(i);
+    }
+
+    __declspec(dllexport) void gen_collinear()
+    {
+        std::vector<VectorXd> mean;
+        for (size_t i = 0; i < 4; ++i)
+        {
+            VectorXd x(2);
+            x << 0.5 * i, i;
+            mean.push_back(x);
+        }
+        std::vector<MatrixXd> cov;
+        for (size_t i = 0; i < 4; ++i)
+        {
+            MatrixXd x(2, 2);
+            x.row(0) << 0.7, 0.2 * i;
+            x.row(1) << 0.2 * i, 1.;
+            cov.push_back(x);
+        }
+        
+        gen_collinear(mean, cov, 20);
+    }
 };
