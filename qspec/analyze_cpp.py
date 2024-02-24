@@ -4,6 +4,8 @@ import numpy as np
 from qspec._types import *
 from qspec._cpp import *
 
+__all__ = ['gen_collinear']
+
 
 class MultivariateNormal:
     def __init__(self, mean: array_like, cov: array_like, instance=None):
@@ -26,8 +28,17 @@ class MultivariateNormal:
         return ret
 
 
+def gen_collinear(mean, cov, n):
+    mean, cov = np.ascontiguousarray(mean, dtype=float), np.ascontiguousarray(cov, dtype=float)
+    size = mean.shape[0]
+    dim = mean.shape[1]
+    x = np.zeros((n, size, dim), dtype=float)
+    dll.gen_collinear(x.ctypes.data_as(c_double_p), mean.ctypes.data_as(c_double_p), cov.ctypes.data_as(c_double_p),
+                      c_size_t(n), c_size_t(size), c_size_t(dim))
+    return x
+
+
 if __name__ == '__main__':
-    dll.gen_collinear()
     # size = 10000
     # m, c = np.array([0, 1]), np.array([[1, 1], [1, 4]])
     # mvn = MultivariateNormal(m, c)
@@ -36,3 +47,4 @@ if __name__ == '__main__':
     # plt.plot(*y.T, '.C0')
     # plt.plot(*x.T, '.C1')
     # plt.show()
+    pass

@@ -321,4 +321,5 @@ dll.multivariatenormal_destruct.argtypes = (MultivariateNormalHandler, )
 
 dll.multivariatenormal_rvs.restype = ctypes.c_void_p
 
+dll.gen_collinear.argtypes = (c_double_p, c_double_p, c_double_p, c_size_t, c_size_t, c_size_t)
 dll.gen_collinear.restype = ctypes.c_void_p

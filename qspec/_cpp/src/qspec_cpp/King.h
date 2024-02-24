@@ -57,8 +57,12 @@ protected:
 	Index size = mean.size();
 
 public:
+	MultivariateNormal();
 	MultivariateNormal(VectorXd _mean, MatrixXd _cov);
 	~MultivariateNormal();
+	VectorXd& get_mean();
+	MatrixXd& get_cov();
+	MatrixXd& get_cov_inv();
 	Index get_size();
 	multivariatenormal_op rvs{mean, cov};
 	double pdf(VectorXd x);
@@ -70,8 +74,10 @@ class CollinearPoints
 {
 };
 
+double normal_pdf(double x, double mean, double sigma);
 
-void gen_collinear(std::vector<VectorXd> x, std::vector<MatrixXd> cov, size_t n);
+
+std::vector<std::vector<VectorXd>> collinear(std::vector<VectorXd> x, std::vector<MatrixXd> cov, size_t n);
 
 
 class KingResult

@@ -734,9 +734,9 @@ extern "C"
         for (size_t i = 0; i < _ret.size(); ++i) ret[i] = _ret(i);
     }
 
-    __declspec(dllexport) void gen_collinear()
+    __declspec(dllexport) void gen_collinear(double* x, double* mean, double* cov, size_t n, size_t size, size_t dim)
     {
-        std::vector<VectorXd> mean;
+        /*std::vector<VectorXd> mean;
         for (size_t i = 0; i < 4; ++i)
         {
             VectorXd x(2);
@@ -752,6 +752,18 @@ extern "C"
             cov.push_back(x);
         }
         
-        gen_collinear(mean, cov, 20);
+        gen_collinear(mean, cov, 20);*/
+
+        std::vector<VectorXd> _mean = cast_samples_VectorXd(mean, size, dim);
+        std::vector<MatrixXd> _cov = cast_samples_MatrixXd(cov, size, dim);
+        std::vector<std::vector<VectorXd>> p = collinear(_mean, _cov, n);
+        for (size_t i = 0; i < n; ++i)
+        {
+            for (size_t j = 0; j < size; ++j)
+            {
+                for (size_t k = 0; k < dim; ++k)
+                    x[i * size * dim + j * dim + k] = p.at(i).at(j)(k);
+            }
+        }
     }
 };

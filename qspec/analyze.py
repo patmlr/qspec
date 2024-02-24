@@ -392,8 +392,9 @@ def _generate_collinear_points(x: ndarray, cov: ndarray, n: int):
     p_1 = multivariate_normal.rvs(mean=x[-1], cov=cov[-1], size=n)
     dr = straight_slope(p_0, p_1, axis=-1)
 
+    # cov_inv = [np.linalg.inv(cov_i) for cov_i in cov[1:-1]]
     t_0 = [np.einsum('ij,ij->i', np.expand_dims(x_i, axis=0) - p_0, dr) for x_i in x[1:-1]]
-    t = [norm.rvs(loc=t_0_i, scale=np.sqrt(np.min(np.diag(cov_i)))) for t_0_i, cov_i in zip(t_0, cov[1:-1])]
+    t = [norm.rvs(loc=t_0_i, scale=np.sqrt(np.max(np.diag(cov_i)))) for t_0_i, cov_i in zip(t_0, cov[1:-1])]
 
     p_new = [p_0 + np.expand_dims(t_i, axis=-1) * dr for t_i in t]
     f = np.prod([multivariate_normal.pdf(p_i, mean=x_i, cov=cov_i)
