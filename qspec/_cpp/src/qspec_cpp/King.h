@@ -1,6 +1,9 @@
 #pragma once
 
+#include <chrono>
+#include <limits>
 #include <random>
+#include <set>
 #include <vector>
 #include <Eigen/Dense>
 
@@ -39,8 +42,15 @@ struct multivariatenormal_op
 
 	VectorXd operator()() const
 	{
-		static std::mt19937 gen{ std::random_device{}() };
-		static  std::normal_distribution<double> dist;
+		std::mt19937 gen{ std::random_device{}() };
+		std::normal_distribution<double> dist;
+
+		return mean + transform * VectorXd{ mean.size() }.unaryExpr([&](auto x) { return dist(gen); });
+	}
+
+	VectorXd operator()(std::mt19937& gen) const
+	{
+		std::normal_distribution<double> dist;
 
 		return mean + transform * VectorXd{ mean.size() }.unaryExpr([&](auto x) { return dist(gen); });
 	}
@@ -70,34 +80,27 @@ public:
 
 
 
-class CollinearPoints
+class CollinearResult
 {
+protected:
+	size_t n_samples;
+	size_t n_accepted;
+	std::vector<std::vector<VectorXd>> p;
+
+public:
+	CollinearResult();
+	CollinearResult(size_t n, size_t size, size_t dim);
+	~CollinearResult();
+
+	size_t get_n_samples();
+	size_t get_n_accepted();
+	std::vector<std::vector<VectorXd>>& get_p();
+
+	void set_n_samples(size_t n);
+	void set_n_accepted(size_t n);
 };
 
 double normal_pdf(double x, double mean, double sigma);
 
 
-std::vector<std::vector<VectorXd>> collinear(std::vector<VectorXd> x, std::vector<MatrixXd> cov, size_t n);
-
-
-class KingResult
-{
-};
-
-
-class King
-{
-protected:
-	std::vector<int> a;
-	std::vector<double> m;
-	std::vector<double> m_d;
-	std::vector<VectorXd> x_abs;
-	std::vector<VectorXd> x_abs_d;
-
-public:
-	King(std::vector<int> _a, std::vector<double> _m, std::vector<double> _m_d, std::vector<VectorXd> _x_abs, std::vector<VectorXd> _x_abs_d);
-	~King();
-	KingResult fit();
-	KingResult fit_nd();
-
-};
+CollinearResult collinear(std::vector<VectorXd> x, std::vector<MatrixXd> cov, size_t n, size_t n_max, unsigned int seed);

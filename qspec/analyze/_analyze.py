@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
-qspec.analyze
-=============
+qspec._analyze
+==============
 
 Created on 07.05.2020
 
@@ -10,7 +10,7 @@ Created on 07.05.2020
 Module for analyzing/evaluating/fitting data.
 
 Linear regression algorithms:
-    - york(); [York et al., Am. J. Phys. 72, 367 (2004)]
+    - york_fit(); [York et al., Am. J. Phys. 72, 367 (2004)]
     - linear_monte_carlo(); based on [Gebert et al., Phys. Rev. Lett. 115, 053003 (2015), Suppl.]
     - linear_monte_carlo_nd(); based on [Gebert et al., Phys. Rev. Lett. 115, 053003 (2015), Suppl.]
 
@@ -29,6 +29,7 @@ LICENSE NOTES:
 
 import inspect
 import warnings
+import autograd as ag
 import numpy as np
 from scipy.optimize._minpack_py import Bounds, LinAlgError, OptimizeWarning, _getfullargspec, _initialize_feasible, \
     _wrap_jac, cholesky, least_squares, leastsq, prepare_bounds, solve_triangular, svd
@@ -40,10 +41,12 @@ import matplotlib.pyplot as plt
 from qspec._types import *
 from qspec import tools
 from qspec.physics import me_u, me_u_d, mass_factor
+from qspec.analyze._analyze_cpp import generate_collinear_points
 
-__all__ = ['straight', 'straight_slope', 'straight_std', 'straight_x_std', 'draw_straight_unc_area',
-           'ellipse2d', 'draw_sigma2d', 'weight', 'york', 'linear_monte_carlo', 'linear_monte_carlo_nd', 'linear_alpha',
-           'odr_fit', 'curve_fit', 'King']
+__all__ = ['poly', 'const', 'straight', 'straight_direction', 'straight_std', 'straight_x_std',
+           'draw_straight_unc_area', 'ellipse2d', 'draw_sigma2d', 'weight', 'york_fit', 'linear_nd_fit',
+           'generate_collinear_points_py', 'linear_nd_monte_carlo_py', 'linear_nd_monte_carlo', 'linear_monte_carlo',
+           'linear_alpha_fit', 'odr_fit', 'curve_fit', 'King']
 
 
 def _get_rtype2(ab_dict: dict, a: Union[Iterable, any], b: Union[Iterable, any], rtype: type = ndarray):
@@ -117,6 +120,24 @@ def _wrap_func(func, xdata, ydata, transform):
     return func_wrapped
 
 
+def poly(x, *args):
+    """
+    :param x: The x values.
+    :param args: The coefficients of the polynomial.
+    :returns: args[0] + args[1] * x + args[2] / 2 * x ** 2 + args[3] / 6 * x ** 3 + ...
+    """
+    return np.sum([args[n] / tools.factorial(n) * x ** n for n in range(len(args))], axis=0)
+
+
+def const(x: array_like, a: array_like) -> ndarray:
+    """
+    :param x: The x values.
+    :param a: The y-intercept.
+    :returns: A constant function with value 'a'.
+    """
+    return np.full_like(x, a)
+
+
 def straight(x: array_like, a: array_like, b: array_like) -> ndarray:
     """
     :param x: The x values.
@@ -128,12 +149,12 @@ def straight(x: array_like, a: array_like, b: array_like) -> ndarray:
     return a + b * x
 
 
-def straight_slope(p_0: array_iter, p_1: array_iter, axis=-1) -> ndarray:
+def straight_direction(p_0: array_iter, p_1: array_iter, axis=-1) -> ndarray:
     """
     :param p_0: The first point(s).
     :param p_1: The second point(s).
     :param axis: The axis along which the vector components are aligned.
-    :returns: The parametrization of a straight line in n dimensions.
+    :returns: The direction of a straight line in n dimensions.
     """
     p_0, p_1 = np.asarray(p_0), np.asarray(p_1)
     dr = p_1 - p_0
@@ -232,8 +253,8 @@ def weight(sigma):
     return 1. / sigma ** 2
 
 
-def york(x: array_iter, y: array_iter, sigma_x: array_iter = None, sigma_y: array_iter = None,
-         corr: array_iter = None, iter_max: int = 200, report: bool = False, show: bool = False):
+def york_fit(x: array_iter, y: array_iter, sigma_x: array_iter = None, sigma_y: array_iter = None,
+             corr: array_iter = None, iter_max: int = 200, report: bool = False, show: bool = False):
     """
     A linear regression algorithm to find the best straight line, given normally distributed errors for x and y
     and correlation coefficients between errors in x and y. The algorithm is described in
@@ -325,40 +346,78 @@ def york(x: array_iter, y: array_iter, sigma_x: array_iter = None, sigma_y: arra
     return a, b, sigma_a, sigma_b, corr_ab
 
 
-def linear_monte_carlo(x: array_iter, y: array_iter, sigma_x: array_iter = None, sigma_y: array_iter = None,
-                       corr: array_iter = None, n: int = 1000000, report: bool = True, show: bool = False):
+def linear_nd_fit(x: array_iter, cov: array_iter = None, sigma: array_iter = None, corr: array_iter = None,
+                  p0: array_iter = None, axis: int = 0):
     """
-    :param x: The x data.
-    :param y: The y data.
-    :param sigma_x: The 1-sigma uncertainties of the x data.
-    :param sigma_y: The 1-sigma uncertainties of the y data.
-    :param corr: The correlation coefficients between the x and y data.
-    :param n: The number of samples generated for each data point.
-    :param report: Whether to print the result of the fit.
-    :param show: Whether to plot the fit result.
-    :returns: a, b, sigma_a, sigma_b, corr_ab. The best y-intercept and slope,
-     their respective 1-sigma uncertainties and their correlation coefficient.
+    :param x: The data vectors. Must have shape (k, n), where k is the number of data points
+     and n is the number of dimensions of each point.
+    :param cov: The covariance matrices of the data vectors. Must have shape (k, n, n).
+     If None, the parameters 'sigma' and 'corr' are used.
+    :param sigma: The standard deviations of the data vectors. Must have shape (k, n).
+     If None, it is an array of vectors with 1 in each component. It is omitted if 'cov' is specified.
+    :param corr: The correlation matrices of the data vectors. Must have shape (k, n, n).
+     If None, it is an array of identity matrices. It is omitted if 'cov' is specified.
+    :param p0: The start parameters for the linear fit. Must have shape (2n, ).
+     The first n elements specify the origin vector of the straight,
+     the second n elements specify the direction of the straight.
+    :param axis: The component of the n-dimensional vectors which are fixed for fitting.
+     This is required since a straight in n dimensions is fully described by 2 (n - 1) parameters.
+    :returns: popt, pcov. The optimized parameters and their covariances. The resulting shapes are (2n, ) and (2n, 2n).
     """
-    if sigma_x is None:
-        sigma_x = [1., ] * len(x)
-        if report:
-            print('\nNo uncertainties for \'x\' were given. Assuming \'sigma_x\'=1.')
-    if sigma_y is None:
-        sigma_y = [1., ] * len(y)
-        if report:
-            print('\nNo uncertainties for \'y\' were given. Assuming \'sigma_y\'=1.')
-    x, y, sigma_x, sigma_y, corr = np.asarray(x), np.asarray(y),\
-        np.asarray(sigma_x), np.asarray(sigma_y), np.asarray(corr)
-    tools.check_shape_like(x, y, sigma_x, sigma_y, corr, allow_scalar=False)
-    tools.check_dimension(x.size, 0, x, y, sigma_x, sigma_y, corr)
-    mean = np.concatenate((np.expand_dims(x, axis=1), np.expand_dims(y, axis=1)), axis=1)
-    cov = np.array([[[s_x ** 2, r * s_x * s_y],
-                     [r * s_y * s_x, s_y ** 2]] for s_x, s_y, r in zip(sigma_x, sigma_y, corr)])
-    a, b, sigma_a, sigma_b, corr_ab = linear_monte_carlo_nd(mean, cov=cov, axis=0, n=n, report=report, show=show)
-    return a[0], b[0], sigma_a[0], sigma_b[0], corr_ab[0, 1]
+    x = np.asarray(x)
+    size, dim = x.shape
+
+    cov, sigma, corr = (tools.asarray_optional(cov, dtype=float),
+                        tools.asarray_optional(sigma, dtype=float), tools.asarray_optional(corr, dtype=float))
+    if cov is None:
+        if sigma is None:
+            sigma = np.ones(x.shape, dtype=float)
+        if corr is None:
+            corr = np.array([np.identity(dim) for _ in range(size)], dtype=float)
+        cov = sigma[:, :, None] * sigma[:, None, :] * corr
+
+    try:
+        cov_inv = np.linalg.inv(cov)
+    except np.linalg.LinAlgError as e:
+        raise np.linalg.LinAlgError(f'Unable to invert covariance matrix ("{e}")')
+
+    if axis < 0:
+        axis += dim
+
+    if p0 is None:
+        p0 = np.ones(2 * dim, dtype=float)
+        p0[axis] = 0.
+    else:
+        p0 = np.asarray(p0, dtype=float)
+        tools.check_dimension(2 * dim, 0, p0)
+
+    _p0 = np.concatenate([np.delete(p0[:dim], axis, axis=0), np.delete(p0[dim:], axis, axis=0)])
+
+    def neg_log_likelihood(p):
+        x0 = np.insert(p[:dim-1], axis, p0[axis])  # (dim, )
+        xi = x0[None, :] - x  # (size, dim)
+        r = np.insert(p[dim-1:], axis, p0[dim + axis])  # (dim, )
+
+        a = np.sum(cov_inv * r[None, None, :], axis=-1)  # (size, dim)
+        b = np.sum(cov_inv * xi[:, None, :], axis=-1)  # (size, dim)
+        var_t = 1 / np.sum(r[None, :] * a, axis=-1)  # (size, )
+        t0 = -var_t * np.sum(xi * a, axis=-1)  # (size, )
+        tx = np.sum(xi * b, axis=-1)  # (size, )
+        return 0.5 * np.sum(tx - t0 ** 2 / var_t, axis=-1)  # ()
+
+    res = minimize(neg_log_likelihood, _p0, method='BFGS')
+
+    hess = ag.hessian(neg_log_likelihood)
+    hess_inv = np.linalg.inv(hess(res.x))
+
+    popt = np.insert(res.x, [axis, dim - 1 + axis], [p0[axis], p0[dim + axis]])
+    pcov = np.insert(hess_inv, [axis, dim - 1 + axis], np.zeros(2), axis=0)
+    pcov = np.insert(pcov, [axis, dim - 1 + axis], np.zeros(2), axis=1)
+
+    return popt, pcov
 
 
-def _test_order_linear_monte_carlo_nd(x: ndarray, cov: ndarray, n: int):
+def _test_order_linear_nd_monte_carlo_py(x: ndarray, cov: ndarray, n: int):
     """
     :param x: The x data. 'x' is a numpy array of vectors with arbitrary but fixed dimension.
     :param cov: The covariance matrices of the x data vectors. Must have shape (x.shape[0], x.shape[1], x.shape[1]).
@@ -370,16 +429,41 @@ def _test_order_linear_monte_carlo_nd(x: ndarray, cov: ndarray, n: int):
     best_order = np.arange(x.shape[0], dtype=int)
     for (i, j) in indices:
         order = np.array([i, ] + [k for k in range(x.shape[0]) if k != i and k != j] + [j, ])
-        n_accepted = np.sum(_generate_collinear_points(x[order], cov[order], n)[2])
-        # print(n_accepted)
+        n_accepted = np.sum(generate_collinear_points_py(x[order], cov[order], n)[2])
         if n_accepted > best_n:
             best_n = n_accepted
             best_order = order
-    # print(best_n, best_order)
     return best_order
 
 
-def _generate_collinear_points(x: ndarray, cov: ndarray, n: int):
+def _test_order_linear_nd_monte_carlo(x: ndarray, cov: ndarray, n: int, max_samples: int = None, seed: int = None):
+    """
+    :param x: The x data. 'x' is a numpy array of vectors with arbitrary but fixed dimension.
+    :param cov: The covariance matrices of the x data vectors. Must have shape (x.shape[0], x.shape[1], x.shape[1]).
+    :param n: The number of samples to be accepted for each data point.
+    :param max_samples: Maximum number of generated samples.
+     If None, samples are generated until n samples get accepted.
+    :param seed: Specify a seed for the random number generator.
+    :returns: The order of axis 0 of 'x' which yields the most accepted samples.
+    """
+    indices = [(i, j) for i in range(x.shape[0]) for j in range(x.shape[0]) if j > i]
+    best_n = 0
+    # best_n = np.inf
+    best_order = np.arange(x.shape[0], dtype=int)
+    for (i, j) in indices:
+        order = np.array([i, ] + [k for k in range(x.shape[0]) if k != i and k != j] + [j, ])
+        _x, _cov = np.ascontiguousarray(x[order]), np.ascontiguousarray(cov[order])
+        _, n_accepted, n_samples = generate_collinear_points(_x, _cov, n, max_samples=max_samples, seed=seed)
+        if n_accepted > best_n:
+            best_n = n_accepted
+            best_order = order
+        # if n_samples < best_n:
+        #     best_n = n_samples
+        #     best_order = order
+    return best_order
+
+
+def generate_collinear_points_py(x: ndarray, cov: ndarray, n: int):
     """
     :param x: The x data. 'x' is a numpy array of vectors with arbitrary but fixed dimension.
     :param cov: The covariance matrices of the x data vectors. Must have shape (x.shape[0], x.shape[1], x.shape[1]).
@@ -390,18 +474,19 @@ def _generate_collinear_points(x: ndarray, cov: ndarray, n: int):
     """
     p_0 = multivariate_normal.rvs(mean=x[0], cov=cov[0], size=n)
     p_1 = multivariate_normal.rvs(mean=x[-1], cov=cov[-1], size=n)
-    dr = straight_slope(p_0, p_1, axis=-1)
+    dr = straight_direction(p_0, p_1, axis=-1)
 
-    # cov_inv = [np.linalg.inv(cov_i) for cov_i in cov[1:-1]]
-    t_0 = [np.einsum('ij,ij->i', np.expand_dims(x_i, axis=0) - p_0, dr) for x_i in x[1:-1]]
-    t = [norm.rvs(loc=t_0_i, scale=np.sqrt(np.max(np.diag(cov_i)))) for t_0_i, cov_i in zip(t_0, cov[1:-1])]
+    cov_inv = [np.linalg.inv(cov_i)[None, :, :] for cov_i in cov[1:-1]]
+    a = [tools.transform(cov_i, dr, axis=-1) for cov_i in cov_inv]
+    sigma = [1 / np.sqrt(np.sum(dr * a_i, axis=-1)) for a_i in a]
+    t_0 = [-np.sum((p_0 - x_i) * a_i, axis=-1) * sigma_i ** 2 for x_i, a_i, sigma_i in zip(x[1:-1], a, sigma)]
+    t = [norm.rvs(loc=t_0_i, scale=sigma_i) for t_0_i, sigma_i in zip(t_0, sigma)]
 
     p_new = [p_0 + np.expand_dims(t_i, axis=-1) * dr for t_i in t]
     f = np.prod([multivariate_normal.pdf(p_i, mean=x_i, cov=cov_i)
                  for p_i, x_i, cov_i in zip(p_new, x[1:-1], cov[1:-1])], axis=0)
+    g = np.prod([norm.pdf(t_i, loc=t_0_i, scale=sigma_i) for t_i, t_0_i, sigma_i in zip(t, t_0, sigma)], axis=0)
 
-    g = np.prod([norm.pdf(t_i, loc=t_0_i, scale=np.sqrt(np.max(np.diag(cov_i))))
-                 for t_i, t_0_i, cov_i in zip(t, t_0, cov[1:-1])], axis=0)
     if p_new:
         u = f / g
         u /= np.max(u)
@@ -414,8 +499,8 @@ def _generate_collinear_points(x: ndarray, cov: ndarray, n: int):
     return p, dr, accepted
 
 
-def linear_monte_carlo_nd(x: array_iter, cov: array_iter = None, axis: int = None,
-                          n: int = 1000000, full_output: bool = False, report: bool = True, show: bool = False):
+def linear_nd_monte_carlo_py(x: array_iter, cov: array_iter = None, axis: int = None,
+                             n: int = 1000000, full_output: bool = False, report: bool = True, show: bool = False):
     """
     A Monte-Carlo fitter that finds a straight line in n-dimensional space.
 
@@ -443,10 +528,10 @@ def linear_monte_carlo_nd(x: array_iter, cov: array_iter = None, axis: int = Non
         cov = [np.identity(x.shape[1]), ] * x.shape[0]
     cov = np.asarray(cov)
     tools.check_shape((x.shape[0], x.shape[1], x.shape[1]), cov, allow_scalar=False)
-    order = _test_order_linear_monte_carlo_nd(x, cov, 100000)
+    order = _test_order_linear_nd_monte_carlo_py(x, cov, 100000)
     inverse_order = np.array([int(np.where(order == i)[0])
                               for i in range(order.size)])  # Invert the order for later.
-    p, dr, accepted = _generate_collinear_points(x[order], cov[order], n)
+    p, dr, accepted = generate_collinear_points_py(x[order], cov[order], n)
     p = p[:, inverse_order, :]
     n_accepted = np.sum(accepted)
     p_0 = p[accepted, 0, :]
@@ -484,7 +569,7 @@ def linear_monte_carlo_nd(x: array_iter, cov: array_iter = None, axis: int = Non
     # plt.plot(p[accepted, :, 0], dr[:, 1], '.')
     # plt.show()
     if report:
-        tools.printh('Linear Monte-Carlo-fit result:')
+        tools.printh('\nLinear Monte-Carlo-fit result:')
         print('Accepted samples: {} / {} ({}%)\na: {} +- {}\nb: {} +- {}\ncorr_ab:'
               .format(n_accepted, n, np.around(n_accepted / n * 100, decimals=2),
                       a, sigma_a, b, sigma_b))
@@ -494,16 +579,140 @@ def linear_monte_carlo_nd(x: array_iter, cov: array_iter = None, axis: int = Non
     return a, b, sigma_a, sigma_b, corr_ab
 
 
-def linear_alpha(x: array_iter, y: array_iter, sigma_x: array_like = None, sigma_y: array_like = None,
-                 corr: array_iter = None, func: Callable = york, alpha: scalar = 0, find_alpha: bool = True,
-                 report: bool = True, show: bool = False, **kwargs):
+def linear_nd_monte_carlo(x: array_iter, cov: array_iter = None, n: int = 1000000,
+                          max_samples: int = None, seed: int = None, axis: int = None,
+                          optimize_sampling: bool = True, full_output: bool = False,
+                          report: bool = True, show: bool = False):
+    """
+    A Monte-Carlo fitter that finds a straight line in n-dimensional space.
+
+    :param x: The x data. 'x' is an iterable of vectors with arbitrary but fixed dimension.
+    :param cov: The covariance matrices of the x data vectors. Must have shape (x.shape[0], x.shape[1], x.shape[1]).
+    :param n: The number of samples to be accepted for each data point.
+    :param max_samples: Maximum number of generated samples.
+     If None, samples are generated until n samples get accepted.
+    :param seed: Specify a seed for the random number generator.
+    :param axis: The axis to use for the parametrization. If None, the directional vector is normalized.
+    :param optimize_sampling: Whether to optimize the sampling from the data.
+    :param full_output: Whether to also return the generated points 'p' and a mask for the 'accepted' points.
+     The accepted points are p[accepted]. p has shape (n, x.shape).
+    :param report: Whether to print the result of the fit.
+    :param show: Whether to plot the fit result.
+    :returns: A list of results as defined by the routine 'linear_monte_carlo_nd':
+     A tuple (a, b, sigma_a, sigma_b, corr_ab) of arrays. The best y-intercepts and slopes,
+     their respective 1-sigma uncertainties and their correlation matrix.
+     The y-intercepts and slopes are defined through 'axis' by a(x[axis] == 0)
+     and b(dx[i != axis] / dx[axis]), respectively.
+     Additionally, a second tuple with the accepted points, offsets, slopes and a mask
+     for the accepted points is returned if full_output == True.
+    """
+    x = np.asarray(x)
+    if len(x.shape) != 2:
+        raise ValueError('x must be an iterable of vectors with arbitrary but fixed dimension.'
+                         ' Hence, len(x.shape) =: 2, but is {}.'.format(len(x.shape)))
+    if cov is None:
+        cov = [np.identity(x.shape[1]), ] * x.shape[0]
+    cov = np.asarray(cov)
+    tools.check_shape((x.shape[0], x.shape[1], x.shape[1]), cov, allow_scalar=False)
+    if optimize_sampling:
+        tools.printh('\nOptimizing sampling:')
+        order = _test_order_linear_nd_monte_carlo(x, cov, 100000, max_samples=100000)
+    else:
+        order = np.arange(x.shape[0], dtype=int)
+    inverse_order = np.array([int(np.where(order == i)[0])
+                              for i in range(order.size)])  # Invert the order for later.
+    _x, _cov = np.ascontiguousarray(x[order]), np.ascontiguousarray(cov[order])
+    tools.printh('\nGenerating samples:')
+    p, n_accepted, n_samples = generate_collinear_points(_x, _cov, n, max_samples=max_samples, seed=seed)
+    p = p[:, inverse_order, :]
+    p_0 = p[:, 0, :]
+    dr = p[:, -1, :] - p_0
+
+    if show:
+        for sample in range(0, int(n_accepted), int(n_accepted / 10)):
+            x_plot = p[sample, :, 0]
+            y_plot = p[sample, :, 1]
+            plot_order = np.argsort(x_plot)
+            x_plot = x_plot[plot_order]
+            y_plot = y_plot[plot_order]
+            plt.plot([x_plot[0], x_plot[-1]], [y_plot[0], y_plot[-1]], 'C0-')
+            plt.plot(x_plot, y_plot, 'C1.')
+        # plt.errorbar(x[:, 0], x[:, 1], xerr=np.sqrt(cov[:, 0, 0]), yerr=np.sqrt(cov[:, 1, 1]), fmt='k.')
+        draw_sigma2d(x[:, 0], x[:, 1], np.sqrt(cov[:, 0, 0]), np.sqrt(cov[:, 1, 1]),
+                     cov[:, 0, 1] / (cov[:, 0, 0] * cov[:, 1, 1]), n=2)
+        # plt.gca().set_aspect('equal')
+        plt.show()
+
+    mask = [True, ] * x.shape[1]
+    if axis is not None:
+        if axis == -1:
+            axis = x.shape[1] - 1
+        mask = np.arange(x.shape[1]) != axis
+        t = -p_0[:, axis] / dr[:, axis]
+        p_0 = p_0 + np.expand_dims(t, axis=-1) * dr
+        dr = dr / dr[:, [axis]]
+    a = np.mean(p_0, axis=0)[mask]
+    b = np.mean(dr, axis=0)[mask]
+    sigma_a = np.std(p_0, axis=0, ddof=1)[mask]
+    sigma_b = np.std(dr, axis=0, ddof=1)[mask]
+    corr_ab = np.corrcoef(p_0.T[mask], dr.T[mask])
+    # print(dr.shape)
+    # plt.plot(p[accepted, :, 0], dr[:, 1], '.')
+    # plt.show()
+    if report:
+        tools.printh('\nLinear Monte-Carlo-fit result:')
+        print('Accepted samples: {} / {} ({}%)\na: {} +- {}\nb: {} +- {}\ncorr_ab:'
+              .format(n_accepted, n_samples, np.around(n_accepted / n_samples * 100, decimals=2),
+                      a, sigma_a, b, sigma_b))
+        tools.print_cov(corr_ab, normalize=True)
+    if full_output:
+        return (a, b, sigma_a, sigma_b, corr_ab), (p, p_0, dr, slice(None, None, None))
+    return a, b, sigma_a, sigma_b, corr_ab
+
+
+def linear_monte_carlo(x: array_iter, y: array_iter, sigma_x: array_iter = None, sigma_y: array_iter = None,
+                       corr: array_iter = None, n: int = 1000000, report: bool = True, show: bool = False):
+    """
+    :param x: The x data.
+    :param y: The y data.
+    :param sigma_x: The 1-sigma uncertainties of the x data.
+    :param sigma_y: The 1-sigma uncertainties of the y data.
+    :param corr: The correlation coefficients between the x and y data.
+    :param n: The number of samples generated for each data point.
+    :param report: Whether to print the result of the fit.
+    :param show: Whether to plot the fit result.
+    :returns: a, b, sigma_a, sigma_b, corr_ab. The best y-intercept and slope,
+     their respective 1-sigma uncertainties and their correlation coefficient.
+    """
+    if sigma_x is None:
+        sigma_x = [1., ] * len(x)
+        if report:
+            print('\nNo uncertainties for \'x\' were given. Assuming \'sigma_x\'=1.')
+    if sigma_y is None:
+        sigma_y = [1., ] * len(y)
+        if report:
+            print('\nNo uncertainties for \'y\' were given. Assuming \'sigma_y\'=1.')
+    x, y, sigma_x, sigma_y, corr = np.asarray(x), np.asarray(y),\
+        np.asarray(sigma_x), np.asarray(sigma_y), np.asarray(corr)
+    tools.check_shape_like(x, y, sigma_x, sigma_y, corr, allow_scalar=False)
+    tools.check_dimension(x.size, 0, x, y, sigma_x, sigma_y, corr)
+    mean = np.concatenate((np.expand_dims(x, axis=1), np.expand_dims(y, axis=1)), axis=1)
+    cov = np.array([[[s_x ** 2, r * s_x * s_y],
+                     [r * s_y * s_x, s_y ** 2]] for s_x, s_y, r in zip(sigma_x, sigma_y, corr)])
+    a, b, sigma_a, sigma_b, corr_ab = linear_nd_monte_carlo_py(mean, cov=cov, axis=0, n=n, report=report, show=show)
+    return a[0], b[0], sigma_a[0], sigma_b[0], corr_ab[0, 1]
+
+
+def linear_alpha_fit(x: array_iter, y: array_iter, sigma_x: array_like = None, sigma_y: array_like = None,
+                     corr: array_iter = None, func: Callable = york_fit, alpha: scalar = 0, find_alpha: bool = True,
+                     report: bool = True, show: bool = False, **kwargs):
     """
     :param x: The x data.
     :param y: The y data.
     :param sigma_x: The 1-sigma uncertainty of the x data.
     :param sigma_y: The 1-sigma uncertainty of the y data.
     :param corr: The correlation coefficients between the x and y data.
-    :param func: The fitting routine.
+    :param func: The fitting routine. Supports {'york_fit', 'linear_monte_carlo'}.
     :param alpha: An x-axis offset to reduce the correlation coefficient between the y-intercept and the slope.
     :param find_alpha: Whether to search for the best 'alpha'. Uses the given 'alpha' as a starting point.
      May not give the desired result if 'alpha' was initialized to far from its optimal value.
@@ -789,7 +998,7 @@ def curve_fit(f: Callable, x: Union[array_like, object], y: array_like, p0: arra
 
 class King:
     def __init__(self, a: array_iter, m: array_iter, x_abs: array_iter = None,
-                 subtract_electrons: scalar = 0., element_label: str = None):
+                 subtract_electrons: scalar = 0., n_samples: int = 100000, element_label: str = None):
         """
         :param a: An Iterable of the mass numbers of the used isotopes.
         :param m: The masses and their uncertainties of the isotopes 'a' (amu). 'm' must have shape (len(a), 2).
@@ -804,7 +1013,7 @@ class King:
         """
         self.fontsize = 12.
         self.scale_y = 1e-3
-        self.n = 1000000
+        self.n = n_samples
         self.subtract_electrons = subtract_electrons
         self.element_label = element_label
         if self.element_label is None:
@@ -866,7 +1075,7 @@ class King:
         self.cov = np.array([np.cov(x_mod_i) for x_mod_i in x_mod])
 
     def fit(self, a: array_iter, a_ref: array_iter, x: array_iter = None, y: array_iter = None,
-            xy: Iterable[int] = None, func: Callable = york, alpha: scalar = 0, find_alpha: bool = False,
+            xy: Iterable[int] = None, func: Callable = york_fit, alpha: scalar = 0, find_alpha: bool = False,
             show: bool = True, **kwargs):
         """
         :param a: An Iterable of the mass numbers of the used isotopes.
@@ -912,9 +1121,9 @@ class King:
         self.y_mod = np.array([self.y[:, 0] * m_mod[:, 0],
                                straight_x_std(self.y[:, 0], m_mod[:, 0], self.y[:, 1], 0., m_mod[:, 1], 0.)]).T
         self._correlation()
-        self.results = linear_alpha(self.x_mod[:, 0], self.y_mod[:, 0],
-                                    sigma_x=self.x_mod[:, 1], sigma_y=self.y_mod[:, 1],
-                                    corr=self.corr, func=func, alpha=alpha, find_alpha=find_alpha, show=False)
+        self.results = linear_alpha_fit(self.x_mod[:, 0], self.y_mod[:, 0],
+                                        sigma_x=self.x_mod[:, 1], sigma_y=self.y_mod[:, 1],
+                                        corr=self.corr, func=func, alpha=alpha, find_alpha=find_alpha, show=False)
         if show:
             self.plot(**kwargs)
         return self.results
@@ -953,8 +1162,8 @@ class King:
         m_mod = np.expand_dims(self.m_mod[i_ref, i, 0], axis=1)
         self.x_nd_mod = m_mod * self.x_nd[:, :, 0]
         self._correlation_nd()
-        self.results_nd, self.x_results = linear_monte_carlo_nd(self.x_nd_mod, cov=self.cov,
-                                                                axis=axis, full_output=True, show=False)
+        self.results_nd, self.x_results = linear_nd_monte_carlo_py(self.x_nd_mod, cov=self.cov, n=self.n,
+                                                                   axis=axis, full_output=True, show=False)
         # plt.plot(self.x_results[0][self.x_results[1], :, 0], self.x_results[1][self.x_results[1], :, 1], '.')
         # plt.show()
         if show:

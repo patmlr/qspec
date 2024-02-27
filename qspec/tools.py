@@ -847,7 +847,7 @@ def transform(t: array_like, vec: array_like, axis=-1) -> array_like:
     """
     ax = axis if axis != -1 else len(vec.shape) - 1
     t, vec = np.asarray(t), np.asarray(vec)
-    check_dimension(vec.shape[ax], ax + 1, t)
+    # check_dimension(vec.shape[ax], ax + 1, t)
     vec = np.expand_dims(vec, ax)
     check_shape_like(t, vec)
     return np.sum(t * vec, axis=ax + 1)

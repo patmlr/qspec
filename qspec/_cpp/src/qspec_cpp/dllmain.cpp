@@ -734,30 +734,16 @@ extern "C"
         for (size_t i = 0; i < _ret.size(); ++i) ret[i] = _ret(i);
     }
 
-    __declspec(dllexport) void gen_collinear(double* x, double* mean, double* cov, size_t n, size_t size, size_t dim)
+    __declspec(dllexport) void gen_collinear(double* x, double* mean, double* cov, size_t* n, size_t size, size_t dim,
+        size_t* n_max, bool user_seed, size_t seed)
     {
-        /*std::vector<VectorXd> mean;
-        for (size_t i = 0; i < 4; ++i)
-        {
-            VectorXd x(2);
-            x << 0.5 * i, i;
-            mean.push_back(x);
-        }
-        std::vector<MatrixXd> cov;
-        for (size_t i = 0; i < 4; ++i)
-        {
-            MatrixXd x(2, 2);
-            x.row(0) << 0.7, 0.2 * i;
-            x.row(1) << 0.2 * i, 1.;
-            cov.push_back(x);
-        }
-        
-        gen_collinear(mean, cov, 20);*/
-
         std::vector<VectorXd> _mean = cast_samples_VectorXd(mean, size, dim);
         std::vector<MatrixXd> _cov = cast_samples_MatrixXd(cov, size, dim);
-        std::vector<std::vector<VectorXd>> p = collinear(_mean, _cov, n);
-        for (size_t i = 0; i < n; ++i)
+        unsigned int _seed = std::random_device{}();
+        if (user_seed) _seed = seed;
+        CollinearResult res = collinear(_mean, _cov, *n, *n_max, _seed);
+        std::vector<std::vector<VectorXd>>& p = res.get_p();
+        for (size_t i = 0; i < *n; ++i)
         {
             for (size_t j = 0; j < size; ++j)
             {
@@ -765,5 +751,7 @@ extern "C"
                     x[i * size * dim + j * dim + k] = p.at(i).at(j)(k);
             }
         }
+        *n = res.get_n_accepted();
+        *n_max = res.get_n_samples();
     }
 };

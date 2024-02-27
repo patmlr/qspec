@@ -9,10 +9,11 @@ Created on 15.08.2021
 Example script / Guide for the qspec.analyze module.
 """
 
+from time import time
 import numpy as np
 import matplotlib.pyplot as plt
 
-import qspec as pc
+import qspec as qs
 
 
 def example(n=None):
@@ -43,7 +44,7 @@ def example(n=None):
 
         # Data
         x = np.sort(np.random.random(num)) * 1
-        y = pc.straight(x, 69, 0.42)
+        y = qs.straight(x, 69, 0.42)
         sx = np.full(num, sigma_x)
         sy = np.full(num, sigma_y)
         c = np.sort(np.random.random(num))
@@ -56,30 +57,30 @@ def example(n=None):
         y += dxy[:, 1]
 
         # Fitting and plotting
-        popt_cf, pcov_cf = pc.curve_fit(pc.straight, x, y, sigma=sy, report=True)
+        popt_cf, pcov_cf = qs.curve_fit(qs.straight, x, y, sigma=sy, report=True)
         # Do a standard fit with y-axis uncertainties.
 
-        popt_of, pcov_of = pc.odr_fit(pc.straight, x, y, sigma_x=sx, sigma_y=sy, report=True)
+        popt_of, pcov_of = qs.odr_fit(qs.straight, x, y, sigma_x=sx, sigma_y=sy, report=True)
         # Do an orthogonal-distance-regression fit with x- and y-axis uncertainties.
 
-        a, b, sigma_a, sigma_b, c_ab = pc.york(x, y, sigma_x=sx, sigma_y=sy, corr=c, report=True)
+        a, b, sigma_a, sigma_b, c_ab = qs.york_fit(x, y, sigma_x=sx, sigma_y=sy, corr=c, report=True)
         # Do an orthogonal-distance-regression linear fit using the algorithm
         # of York et al. [York et al., Am. J. Phys. 72, 367 (2004)]
         # with x- and y-axis uncertainties as well as correlations between the two axes.
 
         plt.plot(x, y, 'k.')
-        pc.draw_sigma2d(x, y, sx, sy, c, n=1)  # Draw 2d-uncertainties with correlations.
+        qs.draw_sigma2d(x, y, sx, sy, c, n=1)  # Draw 2d-uncertainties with correlations.
 
         x_cont = np.linspace(-0.1, 1.1, 1001)
 
-        plt.plot(x_cont, pc.straight(x_cont, *popt_cf), label='curve_fit')
+        plt.plot(x_cont, qs.straight(x_cont, *popt_cf), label='curve_fit')
 
-        pc.draw_straight_unc_area(  # Draw the uncertainty area of the curve_fit result.
-            x_cont, pc.straight(x_cont, *popt_cf), np.sqrt(pcov_cf[0, 0]), np.sqrt(pcov_cf[1, 1]),
+        qs.draw_straight_unc_area(  # Draw the uncertainty area of the curve_fit result.
+            x_cont, qs.straight(x_cont, *popt_cf), np.sqrt(pcov_cf[0, 0]), np.sqrt(pcov_cf[1, 1]),
             pcov_cf[0, 1] / (np.sqrt(pcov_cf[0, 0]) * np.sqrt(pcov_cf[1, 1])))
 
-        plt.plot(x_cont, pc.straight(x_cont, *popt_of), label='odr_fit')
-        plt.plot(x_cont, pc.straight(x_cont, a, b), label='york')
+        plt.plot(x_cont, qs.straight(x_cont, *popt_of), label='odr_fit')
+        plt.plot(x_cont, qs.straight(x_cont, a, b), label='york')
         plt.legend(loc=2)
         plt.show()
 
@@ -116,7 +117,7 @@ def example(n=None):
         vals = np.array(vals, dtype=float)
 
         # Construct a King object
-        king = pc.King(a=a, m=m, x_abs=vals, subtract_electrons=20, element_label='Ca')
+        king = qs.King(a=a, m=m, x_abs=vals, subtract_electrons=20, element_label='Ca', n_samples=2325764)  # 2325764, 500000
 
         i_fit = np.array([1, 3, 5])
         a_fit = a[i_fit]  # Choose the isotopes to fit.
@@ -126,7 +127,9 @@ def example(n=None):
 
         xy = (0, 1)  # Choose the x- and y-axis (observables) to fit, i.e. vals[:, xy[1]] against vals[:, xy[0]].
         results = king.fit(a_fit, a_ref, xy=xy, mode='shifts')  # Do a simple 2d-King fit.
-        results = king.fit_nd(a_fit, a_ref, axis=0, mode='shifts')  # Do a 5d-King fit.
+        t = time()
+        results = king.fit_nd(a_fit, a_ref, axis=0, mode='shifts', show=False)  # Do a 5d-King fit.
+        print(f'Time difference (sec) = {time() - t:.3f}')
 
         # Put in values for isotopes known only for one observable, ...
         a_unknown = [43, 46]
@@ -135,16 +138,52 @@ def example(n=None):
 
         # ... get spectroscopically improved values for the other observables and ...
         x = king.get_unmodified_x(a_unknown, a_unknown_ref, y, show=True)  # Requires king.fit().
-        pc.printh('\nD1 isotope shifts (43, 46):')  # Print in pink!
+        qs.printh('\nD1 isotope shifts (43, 46):')  # Print in pink!
         print(x)
         x = king.get_unmodified_x_nd(a_unknown, a_unknown_ref, y, 1)  # Requires king.fit_nd().
-        pc.printh('\n(D1, D2, D3P1, D3P3, D5P3) isotope shifts (43, 46):')
+        qs.printh('\n(D1, D2, D3P1, D3P3, D5P3) isotope shifts (43, 46):')
         print(x)
 
         # ... return the parameters for the straight fit.
         k, f, corr = king.get_popt()
         k, f, corr = king.get_popt_nd()
 
+    if 2 in n:
+        size = 5
+        dim = 2
+        
+        s = 2.
+        d = 0.5
+        rho = -0.8
+
+        sigma = np.array([np.ones(dim) * d for _ in range(size)], dtype=float)
+        mean = np.array([np.zeros(dim) + t * s for t in range(size)], dtype=float)
+        mean = np.array([np.random.normal(scale=sigma[0]) + t * s for t in range(size)])
+        corr = np.array([np.array([[1, rho], [rho, 1]]) for _ in range(size)], dtype=float)
+        cov = sigma[:, :, None] * sigma[:, None, :] * corr
+
+        plt.plot(mean[:, 0], mean[:, 1], '.k')
+        qs.draw_sigma2d(mean[:, 0], mean[:, 1], sigma[:, 0], sigma[:, 1], corr[:, 0, 1])
+        x_lim = plt.xlim()
+        t = np.linspace(x_lim[0], x_lim[1], 2)
+
+        a, b, sigma_a, sigma_b, corr_ab = qs.york_fit(mean[:, 0], mean[:, 1], sigma[:, 0], sigma[:, 1], corr[:, 0, 1])
+        plt.plot(t, qs.straight(t, a, b), label='york')
+        print(sigma_a ** 2, sigma_b ** 2, corr_ab * sigma_a * sigma_b)
+
+        p0 = np.array([0, -2, 1, 0.5])
+        popt, pcov = qs.linear_nd_fit(mean, sigma=sigma, corr=corr, p0=p0)
+        plt.plot(t, qs.straight(t, popt[1], popt[3]), label='mvn')
+        print(popt)
+        print(pcov)
+
+        # a, b, *_ = qs.linear_monte_carlo_nd(mean, cov, n=1000000, axis=0, optimize_sampling=False, report=False)
+        a, b, *_ = qs.linear_nd_monte_carlo_py(mean, cov, n=1000000, axis=0, report=False)
+        plt.plot(t, qs.straight(t, a, b), label='mc')
+
+        plt.legend()
+        plt.show()
+
 
 if __name__ == '__main__':
-    example({1, })
+    example({2, })
