@@ -10,9 +10,12 @@ Created on 07.05.2020
 Module for analyzing/evaluating/fitting data.
 
 Linear regression algorithms:
+    2d:
     - york_fit(); [York et al., Am. J. Phys. 72, 367 (2004)]
-    - linear_nd_fit(); n-dimensional maximum likelihood fit.
     - linear_monte_carlo(); based on [Gebert et al., Phys. Rev. Lett. 115, 053003 (2015), Suppl.]
+
+    nd:
+    - linear_nd_fit(); n-dimensional maximum likelihood fit.
     - linear_nd_monte_carlo(); based on [Gebert et al., Phys. Rev. Lett. 115, 053003 (2015), Suppl.]
 
 Curve fitting methods:

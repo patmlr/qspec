@@ -15,7 +15,7 @@ import numpy as np
 from qspec._types import *
 from qspec._cpp import *
 
-__all__ = ['generate_collinear_points']
+__all__ = ['generate_collinear_points_cpp']
 
 
 class MultivariateNormal:
@@ -39,25 +39,30 @@ class MultivariateNormal:
         return ret
 
 
-def generate_collinear_points(mean: ndarray, cov: ndarray, n: int, max_samples=None, seed=None):
+def generate_collinear_points_cpp(mean: ndarray, cov: ndarray, n_samples: int = 100000, n_accepted: int = None,
+                                  seed: int = None):
     mean, cov = np.ascontiguousarray(mean, dtype=float), np.ascontiguousarray(cov, dtype=float)
     size = mean.shape[0]
     dim = mean.shape[1]
-    if max_samples is None:
-        max_samples = 0
+    if n_samples is None:
+        n_samples = 0
     else:
-        max_samples = int(max_samples)
+        n_samples = int(n_samples)
+    if n_accepted is None:
+        n_accepted = max(100000, n_samples)
+    else:
+        n_accepted = int(n_accepted)
     if seed is None:
         user_seed, seed = False, 0
     else:
         user_seed, seed = True, int(seed)
-    n_target = int(n)
-    x = np.zeros((n, size, dim), dtype=float)
-    n = c_size_t(n)
-    max_samples = c_size_t(max_samples)
+    n_target = n_accepted
+    x = np.zeros((n_accepted, size, dim), dtype=float)
+    n_accepted = c_size_t(n_accepted)
+    n_samples = c_size_t(n_samples)
     dll.gen_collinear(x.ctypes.data_as(c_double_p), mean.ctypes.data_as(c_double_p), cov.ctypes.data_as(c_double_p),
-                      c_size_t_p(n), c_size_t(size), c_size_t(dim),
-                      c_size_t_p(max_samples), c_bool(user_seed), c_size_t(seed))
-    if n.value < n_target:
-        x = x[:max_samples.value]
-    return x, n.value, max_samples.value
+                      c_size_t_p(n_accepted), c_size_t(size), c_size_t(dim),
+                      c_size_t_p(n_samples), c_bool(user_seed), c_size_t(seed))
+    if n_accepted.value < n_target:
+        x = x[:n_accepted.value]
+    return x, n_accepted.value, n_samples.value

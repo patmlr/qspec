@@ -152,7 +152,7 @@ def example(n=None):
         size = 5
         dim = 2
         
-        s = 2.
+        s = np.array([1, 2.7])  # 2.
         d = 0.5
         rho = -0.8
 
@@ -169,17 +169,21 @@ def example(n=None):
 
         a, b, sigma_a, sigma_b, corr_ab = qs.york_fit(mean[:, 0], mean[:, 1], sigma[:, 0], sigma[:, 1], corr[:, 0, 1])
         plt.plot(t, qs.straight(t, a, b), label='york')
+        print(a, b)
         print(sigma_a ** 2, sigma_b ** 2, corr_ab * sigma_a * sigma_b)
 
-        p0 = np.array([0, -2, 1, 0.5])
-        popt, pcov = qs.linear_nd_fit(mean, sigma=sigma, corr=corr, p0=p0)
-        plt.plot(t, qs.straight(t, popt[1], popt[3]), label='mvn')
+        p0 = np.array([0, 3, 1, 1])
+        popt, pcov = qs.linear_nd_fit(mean, cov=cov, p0=p0, axis=None, optimize_cov=True)
+        # plt.plot(t, qs.straight(t, popt[1], popt[3]), label='mvn')
+        plt.plot(popt[0] + t * popt[2], popt[1] + t * popt[3], label='mvn')
         print(popt)
         print(pcov)
 
-        # a, b, *_ = qs.linear_monte_carlo_nd(mean, cov, n=1000000, axis=0, optimize_sampling=False, report=False)
-        a, b, *_ = qs.linear_nd_monte_carlo_py(mean, cov, n=1000000, axis=0, report=False)
-        plt.plot(t, qs.straight(t, a, b), label='mc')
+        popt, pcov, *_ = qs.linear_nd_monte_carlo(mean, cov, n_samples=100000, method='py', axis=None,
+                                                  optimize_cov=True, report=False)
+        plt.plot(popt[0] + t * popt[2], popt[1] + t * popt[3], label='mc')
+        print(popt)
+        print(pcov)
 
         plt.legend()
         plt.show()
