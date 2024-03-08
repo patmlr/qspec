@@ -167,10 +167,10 @@ def example(n=None):
         x_lim = plt.xlim()
         t = np.linspace(x_lim[0], x_lim[1], 2)
 
-        a, b, sigma_a, sigma_b, corr_ab = qs.york_fit(mean[:, 0], mean[:, 1], sigma[:, 0], sigma[:, 1], corr[:, 0, 1])
-        plt.plot(t, qs.straight(t, a, b), label='york')
-        print(a, b)
-        print(sigma_a ** 2, sigma_b ** 2, corr_ab * sigma_a * sigma_b)
+        popt, pcov = qs.york_fit(mean[:, 0], mean[:, 1], sigma[:, 0], sigma[:, 1], corr[:, 0, 1])
+        plt.plot(t, qs.straight(t, *popt), label='york')
+        print(popt)
+        print(pcov)
 
         p0 = np.array([0, 3, 1, 1])
         popt, pcov = qs.linear_nd_fit(mean, cov=cov, p0=p0, axis=None, optimize_cov=True)
@@ -188,6 +188,82 @@ def example(n=None):
         plt.legend()
         plt.show()
 
+    if 3 in n:
+        size = 5
+        dim = 3
+
+        s = np.array([1, 2.7, -0.001])
+        d = 0.5
+        rho = -0.8
+
+        sigma = np.array([np.ones(dim) * d for _ in range(size)], dtype=float)
+        mean = np.array([np.zeros(dim) + t * s for t in range(size)], dtype=float)
+        mean = np.array([np.random.normal(scale=sigma[0]) + t * s for t in range(size)])
+        # corr = np.array([np.array([[1, rho], [rho, 1]]) for _ in range(size)], dtype=float)
+        corr = np.array([np.identity(dim) for _ in range(size)], dtype=float)
+        cov = sigma[:, :, None] * sigma[:, None, :] * corr
+
+        plt.subplot(1, 2, 1)
+        plt.plot(mean[:, 0], mean[:, 1], '.k')
+        qs.draw_sigma2d(mean[:, 0], mean[:, 1], sigma[:, 0], sigma[:, 1], corr[:, 0, 1])
+        x_lim = plt.xlim()
+        t = np.linspace(x_lim[0], x_lim[1], 2)
+
+        popt, pcov = qs.linear_nd_fit(mean, cov=cov, p0=None, axis=0, optimize_cov=False)
+
+        plt.plot(popt[0] + t * popt[3], popt[1] + t * popt[4], label='mvn')
+        plt.fill_between(popt[0] + t * popt[3], popt[1] + t * popt[4] - qs.straight_std(
+            popt[0] + t * popt[3], np.sqrt(
+                pcov[1, 1]), np.sqrt(pcov[3, 3]), pcov[1, 3] / (np.sqrt(pcov[1, 1]) * np.sqrt(pcov[3, 3]))),
+                         popt[1] + t * popt[4] + qs.straight_std(popt[0] + t * popt[3], np.sqrt(pcov[1, 1]),
+                                                                 np.sqrt(pcov[3, 3]), pcov[1, 3] / (np.sqrt(pcov[1, 1]) * np.sqrt(pcov[3, 3]))))
+
+        plt.subplot(1, 2, 2)
+        plt.plot(mean[:, 0], mean[:, 2], '.k')
+        qs.draw_sigma2d(mean[:, 0], mean[:, 2], sigma[:, 0], sigma[:, 2], corr[:, 0, 2])
+        plt.plot(popt[0] + t * popt[3], popt[2] + t * popt[5], label='mvn')
+        print(popt)
+        print(pcov)
+        plt.show()
+
+    if 4 in n:
+        # The mass numbers of the stable Ca isotopes.
+        a = np.array([40, 42, 43, 44, 46, 48])
+
+        # The masses of the isotopes.
+        m = np.array([(39.962590865, 22e-9), (41.958617828, 159e-9), (42.958766430, 244e-9),
+                      (43.955481543, 348e-9), (45.953687988, 2399e-9), (47.952522904, 103e-9)])
+
+        # Use absolute values given in the shape (#isotopes, #observables, 2).
+        # (D1, D2, D3P1, D3P3, D5P3)
+        vals = [[(755222765.661, 0.099), (761905012.531, 0.107),  # 40Ca
+                 (346000235.128, 0.138), (352682481.933, 0.131), (350862882.626, 0.133)],
+
+                [(755223191.147, 0.104), (761905438.574, 0.096),  # 42Ca
+                 (345997884.981, 0.302), (352680132.391, 0.311), (350860536.899, 0.268)],
+
+                [(0, 0), ] * 5,  # Fill the unkown axes.  # 43Ca
+
+                [(755223614.656, 0.098), (761905862.618, 0.092),  # 44Ca
+                 (345995736.343, 0.298), (352677984.496, 0.258), (350858392.304, 0.261)],
+
+                [(0, 0), ] * 5,  # Fill the unkown axes.  # 46Ca
+
+                [(755224471.117, 0.102), (761906720.109, 0.114),  # 48Ca
+                 (345991937.638, 0.284), (352674186.532, 0.368), (350854600.002, 0.215)]]
+
+        king = qs.King(a, m, vals)
+
+        i_fit = np.array([1, 3, 5])
+        a_fit = a[i_fit]  # Choose the isotopes to fit.
+
+        i_ref = np.array([0, 5, 1])
+        a_ref = a[i_ref]  # Choose individual reference isotopes
+
+        xy = (0, 1)  # Choose the x- and y-axis (observables) to fit, i.e. vals[:, xy[1]] against vals[:, xy[0]].
+        # results = king.fit(a_fit, a_ref, xy=xy, mode='shifts')  # Do a simple 2d-King fit.
+        results = king.fit_nd(a_fit, a_ref, optimize_cov=False, axis=0, mode='shifts')  # Do a 5d-King fit.
+
 
 if __name__ == '__main__':
-    example({2, })
+    example({4, })

@@ -20,8 +20,8 @@ from qspec._types import *
 from qspec import tools
 from qspec.analyze import curve_fit
 
-__all__ = ['Observable', 'add', 'mul', 'average', 'median', 'estimate_skewnorm', 'propagate', 'propagate_fit',
-           'combined_pdf', 'relevant_interval', 'uniform', 'uniform_pumped', 'info']
+__all__ = ['Observable', 'add', 'mul', 'average', 'median', 'mode_lognormal', 'estimate_skewnorm', 'propagate',
+           'propagate_fit', 'combined_pdf', 'relevant_interval', 'uniform', 'uniform_pumped', 'info']
 
 
 class Observable(float):
@@ -253,6 +253,33 @@ def estimate_skewnorm(med: scalar, per_0: scalar, per_1: scalar):
         return np.array([xi0, xi1, xi2]).T
 
     return root(f, x0=np.array([0., med, per_0]), jac=df).x
+
+
+def lognormal(x, s=0., loc=0., scale=1., a=1.):
+    return a * st.lognorm.pdf(x, s=s, loc=loc, scale=scale)
+
+
+def mode_lognormal(x, bins=100):
+    y, edges = np.histogram(x, bins=bins)
+    delta = np.mean(edges[1:] - edges[:-1])
+    x = edges[:-1] + 0.5 * delta
+
+    loc = np.min(x) - 0.1 * (np.max(x) - np.min(x))
+    scale = np.mean(x - loc)
+    s = np.std(np.log(x - loc))
+    a = scale * np.max(y)
+    p0 = [s, loc, scale, a]
+
+    # popt, pcov = curve_fit(lognormal, x, y, p0=p0)
+    # mode = popt[1] + popt[2] * np.exp(-popt[0] ** 2)
+    mode = p0[1] + p0[2] * np.exp(-p0[0] ** 2)
+
+    plt.bar(x, y, width=delta)
+    plt.plot(x, lognormal(x, *p0), '-C1')
+    # plt.plot(x, lognormal(x, *popt), '-C2')
+    plt.vlines(mode, 0, np.max(y), colors='k')
+    plt.show()
+    return mode
 
 
 def propagate(f: Callable, x: Union[array_like, Observable], x_d: array_like = None, cov: array_iter = None,

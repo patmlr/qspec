@@ -12,6 +12,7 @@ Module for analyzing/evaluating/fitting data.
 Linear regression algorithms:
     2d:
     - york_fit(); [York et al., Am. J. Phys. 72, 367 (2004)]
+    - linear_fit(); 2-dimensional maximum likelihood fit.
     - linear_monte_carlo(); based on [Gebert et al., Phys. Rev. Lett. 115, 053003 (2015), Suppl.]
     
     nd:
@@ -40,6 +41,7 @@ from scipy.optimize._minpack_py import Bounds, LinAlgError, OptimizeWarning, _ge
 from scipy.optimize import minimize
 from scipy.stats import norm, multivariate_normal
 from scipy import odr
+import matplotlib
 import matplotlib.pyplot as plt
 
 from qspec._types import *
@@ -48,7 +50,7 @@ from qspec.physics import me_u, me_u_d, mass_factor
 from qspec.analyze._analyze_cpp import generate_collinear_points_cpp
 
 __all__ = ['poly', 'const', 'straight', 'straight_direction', 'straight_std', 'straight_x_std',
-           'draw_straight_unc_area', 'ellipse2d', 'draw_sigma2d', 'weight', 'york_fit', 'linear_nd_fit',
+           'draw_straight_unc_area', 'ellipse2d', 'draw_sigma2d', 'weight', 'york_fit', 'linear_nd_fit', 'linear_fit',
            'generate_collinear_points_py', 'linear_nd_monte_carlo', 'linear_monte_carlo', 'linear_alpha_fit',
            'odr_fit', 'curve_fit', 'King']
 
@@ -206,7 +208,7 @@ def draw_sigma2d(x: array_iter, y: array_iter, sigma_x: array_iter, sigma_y: arr
     fmt = '-k'
     if 'fmt' in list(kwargs.keys()):
         fmt = kwargs.pop('fmt')
-    phi = np.arange(0., 2 * np.pi, 0.001)
+    phi = np.linspace(0., 2 * np.pi, 361)
     for x_i, y_i, s_x, s_y, r in zip(x, y, sigma_x, sigma_y, corr):
         for i in range(1, n + 1, 1):
             plt.plot(*ellipse2d(x_i, y_i, i * s_x, i * s_y, phi, r), fmt, **kwargs)
@@ -221,7 +223,7 @@ def weight(sigma):
 
 
 def york_fit(x: array_iter, y: array_iter, sigma_x: array_iter = None, sigma_y: array_iter = None,
-             corr: array_iter = None, iter_max: int = 200, report: bool = False, show: bool = False):
+             corr: array_iter = None, iter_max: int = 200, report: bool = False, show: bool = False, **kwargs):
     """
     A linear regression algorithm to find the best straight line, given normally distributed errors for x and y
     and correlation coefficients between errors in x and y. The algorithm is described in
@@ -236,8 +238,7 @@ def york_fit(x: array_iter, y: array_iter, sigma_x: array_iter = None, sigma_y: 
     :param iter_max: The maximum number of iterations to find the best slope.
     :param report: Whether to print the result of the fit.
     :param show: Whether to plot the fit result.
-    :returns: a, b, sigma_a, sigma_b, corr_ab. The best y-intercept and slope,
-     their respective 1-sigma uncertainties and their correlation coefficient.
+    :returns: popt, pcov. The best y-intercept and slope, their covariance matrix and the used alpha.
     """
     x, y = np.asarray(x), np.asarray(y)
     if sigma_x is None:
@@ -310,7 +311,10 @@ def york_fit(x: array_iter, y: array_iter, sigma_x: array_iter = None, sigma_y: 
         plt.legend(loc='best', numpoints=1)
         plt.show()
 
-    return a, b, sigma_a, sigma_b, corr_ab
+    popt = np.array([a, b], dtype=float)
+    pcov = np.array([[sigma_a ** 2, sigma_a * sigma_b * corr_ab],
+                     [sigma_a * sigma_b * corr_ab, sigma_b ** 2]], dtype=float)
+    return popt, pcov
 
 
 def covariance_matrix(cov: array_iter = None, sigma: array_iter = None, corr: array_iter = None,
@@ -356,7 +360,7 @@ def covariance_matrix(cov: array_iter = None, sigma: array_iter = None, corr: ar
 
 
 def linear_nd_fit(x: array_iter, cov: array_iter = None, p0: array_iter = None, axis: int = None,
-                  optimize_cov: bool = False):
+                  optimize_cov: bool = False, **kwargs):
     """
     :param x: The data vectors. Must have shape (k, n), where k is the number of data points
      and n is the number of dimensions of each point.
@@ -367,30 +371,43 @@ def linear_nd_fit(x: array_iter, cov: array_iter = None, p0: array_iter = None, 
      the second n elements specify the direction of the straight.
     :param axis: The component of the n-dimensional vectors which are fixed for fitting.
      This is required since a straight in n dimensions is fully described by 2 (n - 1) parameters.
-     If None,
+     If None, the best axis is determined from the data and the direction vector of the straight is normalized.
     :param optimize_cov: If True, the origin vector of the straight is optimized to yield the smallest covariances.
     :returns: popt, pcov. The optimized parameters and their covariances. The resulting shapes are (2n, ) and (2n, 2n).
     """
-    x = np.asarray(x)
-    size, dim = x.shape
+    x_temp = np.array(x, dtype=float)
+    size, dim = x_temp.shape
 
     cov = covariance_matrix(cov, k=size, n=dim)
 
+    x_off = x_temp[0].copy()
+    x_temp -= x_off[None, :]
+    x_fac = np.max(tools.absolute(x_temp, axis=1))
+    x_temp /= x_fac
+    cov_temp = cov / x_fac ** 2
+
     try:
-        cov_inv = np.linalg.inv(cov)
+        cov_inv = np.linalg.inv(cov_temp)
     except np.linalg.LinAlgError as e:
         raise np.linalg.LinAlgError(f'Unable to invert covariance matrix ("{e}")')
 
     axis_was_none = False
     if axis is None:
         axis_was_none = True
-        axis = np.argmax(np.abs(np.std(x, ddof=1, axis=0) / np.mean(x, axis=0)), axis=0)
+        axis = np.argmax(np.abs(np.std(x_temp, ddof=1, axis=0) / np.mean(x_temp, axis=0)), axis=0)
     elif axis < 0:
         axis += dim
 
     if p0 is None:
         popt = np.ones(2 * dim, dtype=float)
-        popt[axis] = 0
+        x_abs = np.sum(x_temp, axis=1)
+        i_min, i_max = np.argmin(x_abs), np.argmax(x_abs)
+        popt[dim:] = x_temp[i_max] - x_temp[i_min]
+        popt[dim:] /= popt[dim + axis]
+        popt[:dim] = x_temp[i_min]
+        popt[:dim] -= popt[dim:] * popt[axis] / popt[dim + axis]
+        popt[1:dim] += 1
+        popt[dim+1:] *= 1.5
     else:
         popt = np.asarray(p0, dtype=float)
         tools.check_dimension(2 * dim, 0, popt)
@@ -402,7 +419,7 @@ def linear_nd_fit(x: array_iter, cov: array_iter = None, p0: array_iter = None, 
     p0_red = popt[mask]
 
     def get_t_pars(x0, r):
-        xi = x0[None, :] - x  # (size, dim)
+        xi = x0[None, :] - x_temp  # (size, dim)
         a = np.sum(cov_inv * r[None, None, :], axis=-1)  # (size, dim)
         b = np.sum(cov_inv * xi[:, None, :], axis=-1)  # (size, dim)
         var_t = 1 / np.sum(r[None, :] * a, axis=-1)  # (size, )
@@ -417,13 +434,21 @@ def linear_nd_fit(x: array_iter, cov: array_iter = None, p0: array_iter = None, 
 
     def neg_log_likelihood_r(p, _p0, _axis):
         _p = np.insert(p, [_axis, _axis + dim - 1], [_p0[_axis], _p0[_axis + dim]])
-        return neg_log_likelihood(_p)
+        ret = neg_log_likelihood(_p)
+        print('ll', ret)
+        return ret
 
     def get_neg_log_likelihood_r(_p0, _axis):
         return lambda p: neg_log_likelihood_r(p, _p0, _axis)
 
-    res = minimize(get_neg_log_likelihood_r(popt, axis), p0_red, method='BFGS')
+    res = minimize(get_neg_log_likelihood_r(popt, axis), p0_red, jac='3-point', method='BFGS')  # , method='BFGS'
+    # res = minimize(get_neg_log_likelihood_r(popt, axis), p0_red, jac=ag.jacobian(get_neg_log_likelihood_r(popt, axis)),
+    #                hess=ag.hessian(get_neg_log_likelihood_r(popt, axis)), method='Newton-CG')  # , method='BFGS'
     popt[mask] = res.x
+    popt[:dim] += x_off
+    x_temp *= x_fac
+    x_temp += x_off[None, :]
+    cov_inv = np.linalg.inv(cov_temp * x_fac ** 2)
 
     def get_cov(_popt, _axis):
         _hess = ag.hessian(get_neg_log_likelihood_r(_popt, axis))
@@ -437,7 +462,9 @@ def linear_nd_fit(x: array_iter, cov: array_iter = None, p0: array_iter = None, 
 
         def cost_cov(t, _popt, _axis):
             _pcov = get_cov_t(t, _popt, _axis)
-            return np.sum(np.triu(_pcov, k=1) ** 2)  # Sum over the square of all covariances.
+            ret = np.sum(np.triu(_pcov, k=1) ** 2)  # Sum over the square of all covariances.
+            print(ret)
+            return ret
 
         def get_cost_cov(_popt, _axis):
             return lambda t: cost_cov(t, _popt, _axis)
@@ -453,9 +480,37 @@ def linear_nd_fit(x: array_iter, cov: array_iter = None, p0: array_iter = None, 
     if axis_was_none:
         popt[dim:] /= tools.absolute(popt[dim:])
 
-    pcov = get_cov(popt, axis)
-    pcov = np.insert(pcov, [axis, dim - 1 + axis], np.zeros(2, dtype=float), axis=0)
-    pcov = np.insert(pcov, [axis, dim - 1 + axis], np.zeros(2, dtype=float), axis=1)
+    pcov = np.zeros((2 * dim, 2 * dim), dtype=float)
+    pcov[np.ix_(mask, mask)] = get_cov(popt, axis)
+
+    return popt, pcov
+
+
+def linear_fit(x: array_iter, y: array_iter, sigma_x: array_iter = None, sigma_y: array_iter = None,
+               corr: array_iter = None, optimize_cov: bool = True, **kwargs):
+    """
+    Maximum likelihood fit for a straight line in 2d. This is a wrapper for the more general 'linear_nd_fit' function.
+
+    :param x: The x data.
+    :param y: The y data.
+    :param sigma_x: The 1-sigma uncertainties of the x data.
+    :param sigma_y: The 1-sigma uncertainties of the y data.
+    :param corr: The correlation coefficients between the x and y data.
+    :param optimize_cov: If True, the origin vector of the straight is optimized to yield the smallest covariances.
+    :returns: a, b, sigma_a, sigma_b, corr_ab. The best y-intercept and slope,
+     their respective 1-sigma uncertainties and their correlation coefficient.
+    """
+
+    x, y = np.asarray(x), np.asarray(y)
+    sigma_x, sigma_y = tools.asarray_optional(sigma_x, dtype=float), tools.asarray_optional(sigma_y, dtype=float)
+
+    mean = np.concatenate([x[:, None], y[:, None]], axis=1)
+    sigma = np.concatenate([sigma_x[:, None], sigma_y[:, None]], axis=1)
+    cov = covariance_matrix(mean, sigma, corr)
+
+    popt, pcov = linear_nd_fit(mean, cov=cov, axis=0, optimize_cov=optimize_cov)
+    i = np.array([1, 3], dtype=int)
+    popt, pcov = popt[i], pcov[np.ix_(i, i)]
 
     return popt, pcov
 
@@ -558,7 +613,7 @@ def generate_collinear_points(x: ndarray, cov: ndarray, n_accepted: int = None, 
 def linear_nd_monte_carlo(x: array_iter, cov: array_iter = None, axis: int = None, optimize_cov: bool = False,
                           n_accepted: int = None, n_samples: int = 100000, optimize_sampling: bool = True,
                           return_samples: bool = False, method: str = 'py', report: bool = False, **kwargs):
-    """ TODO: Check lognormal.
+    """
     A Monte-Carlo fitter that finds a straight line in n-dimensional space.
 
     :param x: The data vectors. Must have shape (k, n), where k is the number of data points
@@ -618,7 +673,7 @@ def linear_nd_monte_carlo(x: array_iter, cov: array_iter = None, axis: int = Non
     if optimize_cov:
         def get_cov_t(t_opt, _p0, _dr):
             p0_opt = _p0.copy()
-            _t = (t_opt - p0_mean) / dr_mean
+            _t = (t_opt - p0[:, [axis]]) / dr[:, [axis]]
             p0_opt += _t * _dr  # Shift the origin vector by t.
             return np.cov(p0_opt.T, _dr.T)
 
@@ -632,13 +687,13 @@ def linear_nd_monte_carlo(x: array_iter, cov: array_iter = None, axis: int = Non
         res = minimize(get_cost_cov(p0, dr), np.full(1, 0.1), method='BFGS')
         s = res.x[0]
 
-    t = (s - p0_mean) / dr_mean
+    t = (s - p0[:, [axis]]) / dr[:, [axis]]
     p0 += t * dr
 
     if axis_was_none:
         dr /= tools.absolute(dr, axis=1)[:, None]
     else:
-        dr /= dr_mean
+        dr /= dr[:, [axis]]
 
     popt = np.concatenate([np.mean(p0, axis=0), np.mean(dr, axis=0)], axis=0)
     pcov = np.cov(p0.T, dr.T)
@@ -651,7 +706,7 @@ def linear_nd_monte_carlo(x: array_iter, cov: array_iter = None, axis: int = Non
 def linear_monte_carlo(x: array_iter, y: array_iter, sigma_x: array_iter = None, sigma_y: array_iter = None,
                        corr: array_iter = None, optimize_cov: bool = True, n_accepted: int = None,
                        n_samples: int = 100000, optimize_sampling: bool = True, return_samples: bool = False,
-                       report: bool = True):
+                       report: bool = True, **kwargs):
     """
     Wrapper for linear_nd_monte_carlo.
 
@@ -670,7 +725,6 @@ def linear_monte_carlo(x: array_iter, y: array_iter, sigma_x: array_iter = None,
     :returns: a, b, sigma_a, sigma_b, corr_ab. The best y-intercept and slope,
      their respective 1-sigma uncertainties and their correlation coefficient.
     """
-
     x, y = np.asarray(x), np.asarray(y)
     sigma_x, sigma_y = tools.asarray_optional(sigma_x, dtype=float), tools.asarray_optional(sigma_y, dtype=float)
 
@@ -690,43 +744,46 @@ def linear_monte_carlo(x: array_iter, y: array_iter, sigma_x: array_iter = None,
 
 
 def linear_alpha_fit(x: array_iter, y: array_iter, sigma_x: array_like = None, sigma_y: array_like = None,
-                     corr: array_iter = None, func: Callable = york_fit, alpha: scalar = 0, find_alpha: bool = True,
-                     report: bool = True, show: bool = False, **kwargs):
+                     corr: array_iter = None, func: Union[Callable, str] = york_fit, alpha: scalar = 0,
+                     find_alpha: bool = True, report: bool = True, show: bool = False, **kwargs):
     """
-    TODO
+    TODO: minimize tolerances.
     :param x: The x data.
     :param y: The y data.
     :param sigma_x: The 1-sigma uncertainty of the x data.
     :param sigma_y: The 1-sigma uncertainty of the y data.
     :param corr: The correlation coefficients between the x and y data.
-    :param func: The fitting routine. Supports {'york_fit', 'linear_monte_carlo'}.
+    :param func: The fitting routine. Supports {'york_fit', 'linear_fit', 'linear_monte_carlo'}.
     :param alpha: An x-axis offset to reduce the correlation coefficient between the y-intercept and the slope.
     :param find_alpha: Whether to search for the best 'alpha'. Uses the given 'alpha' as a starting point.
      May not give the desired result if 'alpha' was initialized to far from its optimal value.
     :param report: Whether to print the result of the fit.
     :param show: Whether to plot the fit result.
     :param kwargs: Additional keyword arguments are passed to the fitting routine.
-    :returns: a, b, sigma_a, sigma_b, corr_ab, alpha. The best y-intercept and slope,
-     their respective 1-sigma uncertainties, their correlation coefficient and the used alpha.
+    :returns: popt, pcov. The best y-intercept and slope, their covariance matrix and the used alpha.
     """
     n = tools.floor_log10(alpha)
+    x = np.asarray(x, dtype=float)
+
+    if isinstance(func, str):
+        funcs = {'york_fit', 'linear_fit', 'linear_monte_carlo'}
+        if func not in funcs:
+            raise ValueError(f'\'func\' must be in {funcs} but is \'{func}\'.')
+        func = eval(func)
 
     def cost(x0):
-        _, _, _, _, c = func(x - x0[0], y, sigma_x=sigma_x, sigma_y=sigma_y, corr=corr,
-                             report=False, show=False, **kwargs)
-        print('alpha: {}(1.), \tcost: {}({})'.format(x0[0], c ** 2 * 10. ** (n + 1), 10. ** (n - 3)))
-        return c ** 2 * 10. ** (n + 1)
+        _, c = func(x - x0[0], y, sigma_x=sigma_x, sigma_y=sigma_y, corr=corr, show=False, **kwargs)
+        # print('alpha: {}(1.), \tcost: {}({})'.format(x0[0], c ** 2 * 10. ** (n + 1), 10. ** (n - 3)))
+        return c[0, 1] ** 2 * 10. ** (n + 1)
 
     if find_alpha:
         alpha = minimize(cost, np.array([alpha]), method='Nelder-Mead',
                          options={'xatol': 1., 'fatol': 0.01 ** 2 * 10. ** (n + 1)}).x[0]
 
-    a, b, sigma_a, sigma_b, corr_ab =\
-        func(x - alpha, y, sigma_x=sigma_x, sigma_y=sigma_y, corr=corr,
-             report=report, show=show, **kwargs)
+    popt, pcov = func(x - alpha, y, sigma_x=sigma_x, sigma_y=sigma_y, corr=corr, report=report, show=show, **kwargs)
     if report:
         print('alpha: {}'.format(alpha))
-    return a, b, sigma_a, sigma_b, corr_ab, alpha
+    return popt, pcov, alpha
 
 
 def odr_fit(f: Callable, x: array_iter, y: array_iter, sigma_x: array_iter = None, sigma_y: array_iter = None,
@@ -983,7 +1040,412 @@ def curve_fit(f: Callable, x: Union[array_like, object], y: array_like, p0: arra
         return popt_ret, pcov_ret
 
 
+def _mass_factor_array(m0, m1, m0_d, m1_d):
+    m_rel = m0 - m1
+    mask = m_rel == 0
+    m_rel[mask] = 1
+
+    m0_e = m0 + me_u
+    m1_e = m1 + me_u
+    
+    mu = m0_e * m1_e / m_rel
+    mu_d = ((mu / m0_e + mu / m1_e) * me_u_d) ** 2
+    mu_d += ((mu / m0_e - mu / m_rel) * m0_d) ** 2
+    mu_d += ((mu / m1_e + mu / m_rel) * m1_d) ** 2
+    mu_d = np.sqrt(mu_d)
+
+    mu[mask] = np.inf
+    mu_d[mask] = 0
+    return mu, np.sqrt(mu_d)
+
+
 class King:
+    def __init__(self, a: array_iter, m: array_iter, x_abs: array_iter = None,
+                 subtract_electrons: scalar = 0., n_samples: int = 100000, element_label: str = None):
+        """
+        :param a: An iterable of the mass numbers of the considered isotopes with shape (k, ),
+         where k is the number of isotopes.
+        :param m: The masses and their uncertainties of the isotopes 'a' (u). 'm' must have shape (k, 2).
+        :param x_abs: The absolute values of the data vectors and their uncertainties
+         corresponding to the mass numbers 'a'. If given, the 'x' and 'y' parameters can be omitted when fitting
+         (in 'fit' and 'fit_nd') and is determined automatically as the difference between the mass numbers 'a'
+         and 'a_ref'. Must have shape (k, n, 2) where n is the number of dimensions of the king plot.
+        :param subtract_electrons: The number of electron masses that should be subtracted from the specified isotope
+         masses. 'subtract_electrons' does not have to be an integer if the ionization energy must be considered.
+        :param n_samples: The number of generated samples to estimate the covariance matrix of the data
+         and the default value for the monte-carlo routines.
+        :param element_label: The label of the element to enhance the printed and plotted information.
+        """
+        self.a = np.asarray(a, dtype=int)
+        if len(set(self.a)) < self.a.size:
+            raise ValueError('The given mass numbers must be unique.')
+        self.m = np.asarray(m, dtype=float)
+        self.x_abs = tools.asarray_optional(x_abs, dtype=float)
+        self.subtract_electrons = float(subtract_electrons)
+        self.n_samples = int(n_samples)
+        self.element_label = '' if element_label is None else str(element_label)
+
+        self.n = 2 if self.x_abs is None else self.x_abs.shape[1]
+
+        self.m_sub = self.m.copy()
+        self.m_sub[:, 0] -= subtract_electrons * me_u
+        self.m_sub[:, 1] = np.sqrt(self.m[:, 1] ** 2 + (subtract_electrons * me_u_d) ** 2)
+
+        self.m_mod = _mass_factor_array(self.m_sub[None, :, 0], self.m_sub[:, None, 0],
+                                        self.m_sub[None, :, 1], self.m_sub[:, None, 1])
+        self.m_mod = np.transpose(self.m_mod, axes=[1, 2, 0])
+        
+        self.nd = False
+        self.a_fit, self.a_ref = None, None
+        self.x = None
+        self.x_mod = None
+        self.corr = None
+        self.alpha = None
+        self.cov = None
+        self.popt, self.pcov = None, None
+
+    def _sample_xmod(self):
+        # noinspection PyUnresolvedReferences
+        i = np.array([self.a.tolist().index(_a) for _a in self.a_fit])
+        # noinspection PyUnresolvedReferences
+        i_ref = np.array([self.a.tolist().index(_a) for _a in self.a_ref])
+        m = norm.rvs(loc=self.m[:, 0], scale=self.m[:, 1], size=(self.n_samples, self.m.shape[0])).T
+        x = norm.rvs(loc=self.x[:, :, 0], scale=self.x[:, :, 1],
+                     size=(self.n_samples, self.x.shape[0], self.x.shape[1]))
+        x = np.transpose(x, axes=[1, 2, 0])
+
+        m_mod = _mass_factor_array(m[i], m[i_ref], 0., 0.)[0]
+        x_mod = m_mod[:, None, :] * x
+        return x_mod
+
+    def _cov(self):
+        """
+        :returns: The covariance matrices of the data vectors by sampling the data.
+        """
+        x_mod = self._sample_xmod()
+        return np.array([np.cov(x_mod_i) for x_mod_i in x_mod])
+
+    def _corr(self):
+        """
+        :returns: The correlation coefficients of the modified x- and y-data points by sampling the data.
+        """
+        x_mod = self._sample_xmod()
+        return np.array([np.corrcoef(x_mod_i)[0, 1] for x_mod_i in x_mod])
+
+    def fit(self, a: array_iter, a_ref: array_iter, x: array_iter = None, y: array_iter = None,
+            xy: Iterable[int] = None, func: Union[str, Callable] = york_fit, alpha: scalar = 0,
+            find_alpha: bool = False, show: bool = True, **kwargs):
+        """
+        :param a: An Iterable of the mass numbers of the used isotopes.
+        :param a_ref: An Iterable of the mass numbers of the used reference isotopes.
+        :param x: The x-values and their uncertainties of the King-fit to be performed. If 'mode' is "radii",
+         this must contain the differences of mean square nuclear charge radii or the Lambda-factor.
+         'x' must have shape (len(a), 2). Units: (fm ** 2) or (MHz).
+        :param y: The isotope shifts and their uncertainties of the King-fit to be performed.
+         'y' must have shape (len(a), 2). If None, 'y' is tried to be inherited from 'self.f'. Units: (MHz).
+        :param xy: A 2-tuple of indices (ix, iy) which select the axes to use for the King-fit from 'King.x_abs'
+         if x or y is not specified. The default value is (0, 1), fitting the second against the first axis.
+        :param func: The fitting routine. Must be one of {'york_fit' (default), 'linear_fit', 'linear_monte_carlo'}.
+        :param alpha: An x-axis offset to reduce the correlation coefficient between the y-intercept and the slope.
+         Unit: (u fm ** 2) or (u MHz).
+        :param find_alpha: Whether to search for the best 'alpha'. Uses the given 'alpha' as a starting point.
+         May not give the desired result if 'alpha' was initialized to far from its optimal value.
+        :param show: Whether to plot the fit result.
+        :param kwargs: Additional keyword arguments are passed to 'self.plot'.
+        :returns: A list of results as defined by the routine 'linear_alpha':
+         a, b, sigma_a, sigma_b, corr_ab, alpha. The best y-intercept and slope,
+         their respective 1-sigma uncertainties, their correlation coefficient and the used alpha.
+        """
+        self.nd = False
+        self.a_fit, self.a_ref = np.asarray(a, dtype=int), np.asarray(a_ref, dtype=int)
+        # noinspection PyUnresolvedReferences
+        i = np.array([self.a.tolist().index(_a) for _a in self.a_fit])
+        # noinspection PyUnresolvedReferences
+        i_ref = np.array([self.a.tolist().index(_a) for _a in self.a_ref])
+
+        if xy is None:
+            xy = (0, 1)
+
+        self.x = np.zeros((self.a_fit.size, 2, 2), dtype=float)
+        if x is None:
+            self.x[:, 0, 0] = self.x_abs[i, xy[0], 0] - self.x_abs[i_ref, xy[0], 0]
+            self.x[:, 0, 1] = np.sqrt(self.x_abs[i, xy[0], 1] ** 2 + self.x_abs[i_ref, xy[0], 1] ** 2)
+        else:
+            self.x[:, 0, :] = np.asarray(x, dtype=float)
+        if y is None:
+            self.x[:, 1, 0] = self.x_abs[i, xy[1], 0] - self.x_abs[i_ref, xy[1], 0]
+            self.x[:, 1, 1] = np.sqrt(self.x_abs[i, xy[1], 1] ** 2 + self.x_abs[i_ref, xy[1], 1] ** 2)
+        else:
+            self.x[:, 1, :] = np.asarray(y, dtype=float)
+
+        m_mod = self.m_mod[i_ref, i, :]
+        m_mod = m_mod[:, None, :]
+
+        self.x_mod = np.array([self.x[:, :, 0] * m_mod[:, :, 0], straight_x_std(
+            self.x[:, :, 0], m_mod[:, :, 0], self.x[:, :, 1], 0., m_mod[:, :, 1], 0.)])
+        self.x_mod = np.transpose(self.x_mod, axes=[1, 2, 0])
+
+        self.corr = self._corr()
+        self.popt, self.pcov, self.alpha = linear_alpha_fit(
+            self.x_mod[:, 0, 0], self.x_mod[:, 1, 0], sigma_x=self.x_mod[:, 0, 1], sigma_y=self.x_mod[:, 1, 1],
+            corr=self.corr, func=func, alpha=alpha, find_alpha=find_alpha, show=False)
+        
+        if show:
+            self.plot(**kwargs)
+        
+        return self.popt, self.pcov, self.alpha
+
+    def fit_nd(self, a: array_iter, a_ref: array_iter, x: array_iter = None,
+               axis: int = 0, optimize_cov: bool = False, func: Union[Callable, str] = linear_nd_fit,
+               show: bool = True, **kwargs):
+        """
+        :param a: An Iterable of the mass numbers of the used isotopes with shape (k, ).
+        :param a_ref: An Iterable of the mass numbers of the used reference isotopes with shape (k, ).
+        :param x: The x data as an iterable of vectors with uncertainties of shape (k, n, 2), where k is the
+         number of data points and n is the number of dimensions of each point.
+        :param axis: The axis to use for the parametrization. For example, a King plot with the isotope shifts
+         of two transitions ['D1', 'D2'] yields the slope F_D2 / F_D1 if 'axis' == 0.
+        :param optimize_cov: If True, the origin vector of the straight is optimized to yield the smallest covariances.
+        :param func: The fitting routine. Must be one of {'linear_nd_fit', 'linear_nd_monte_carlo'}.
+        :param show: Whether to plot the fit result.
+        :param kwargs: Additional keyword arguments are passed to 'func' and 'self.plot_nd'.
+        :returns: popt, pcov. The optimized parameters and their covariances. The resulting shapes are (2n, )
+         and (2n, 2n).
+        """
+        self.nd = True
+        self.a_fit, self.a_ref = np.asarray(a, dtype=int), np.asarray(a_ref, dtype=int)
+        # noinspection PyUnresolvedReferences
+        i = np.array([self.a.tolist().index(_a) for _a in self.a_fit])
+        # noinspection PyUnresolvedReferences
+        i_ref = np.array([self.a.tolist().index(_a) for _a in self.a_ref])
+
+        if x is None:
+            self.x = np.zeros((self.a_fit.size, self.x_abs.shape[1], 2), dtype=float)
+            self.x[:, :, 0] = self.x_abs[i, :, 0] - self.x_abs[i_ref, :, 0]
+            self.x[:, :, 1] = np.sqrt(self.x_abs[i, :, 1] ** 2 + self.x_abs[i_ref, :, 1] ** 2)
+        else:
+            self.x = np.asarray(x, dtype=float)
+
+        m_mod = self.m_mod[i_ref, i, :]
+        m_mod = m_mod[:, None, :]
+
+        self.x_mod = np.array([self.x[:, :, 0] * m_mod[:, :, 0], straight_x_std(
+            self.x[:, :, 0], m_mod[:, :, 0], self.x[:, :, 1], 0., m_mod[:, :, 1], 0.)])
+        self.x_mod = np.transpose(self.x_mod, axes=[1, 2, 0])
+
+        if isinstance(func, str):
+            funcs = {'linear_nd_fit', 'linear_nd_monte_carlo'}
+            if func not in funcs:
+                raise ValueError(f'\'func\' must be in {funcs} but is \'{func}\'.')
+            func = eval(func)
+
+        self.cov = self._cov()
+
+        self.popt, self.pcov, *_ = \
+            func(self.x_mod[:, :, 0], cov=self.cov, axis=axis, optimize_cov=optimize_cov, **kwargs)
+        self.alpha = self.popt[axis]
+
+        if show:
+            self.plot_nd(**{**{'axis': axis}, **kwargs})
+        return self.popt, self.pcov
+
+    def plot(self, mode: str = '', sigma2d: int = 1, scale: tuple = None, add_xy: array_like = None,
+             add_a: array_like = None, font_dict: dict = None, show: bool = True, **kwargs):
+        """
+        :param mode: The mode of the King-fit. If mode='radii', the x-axis must contain the differences of
+         mean square nuclear charge radii or the Lambda-factor. For every other value,
+         the x-axis is assumed to be an isotope shift such that the slope corresponds to
+         a field-shift ratio F(y_i) / F(x).
+        :param sigma2d: Whether to draw the actual two-dimensional uncertainty bounds or the classical errorbars.
+         The integer number corresponds to the number of drawn sigma regions.
+        :param scale: Factors to scale the x and the y-axis.
+        :param add_xy: Additional x and y data to plot. Must have shape (k, 2, 2),
+         where the additional k data points are arrays of the form [[x, x_d], [y, y_d]].
+        :param add_a: Additional mass numbers for the additional data. Must have shape (k, 2),
+         where each row is a tuple [A, A_ref].
+        :param font_dict: The font_dict passed to matplotlib.rc('font', font_dict).
+        :param show: Whether to show the plot.
+        :returns: None. Generates a King-Plot based on the modified axes 'self.x_mod' and 'self.y_mod'
+         as well as the fit results 'self.results'.
+        """
+        if font_dict is None:
+            font_dict = {'size': 12, 'family': 'arial'}
+        matplotlib.rc('font', **font_dict)
+        
+        if self.popt is None:
+            print('There are no results yet. Please use one of the fitting options.')
+            return
+
+        a, b = self.popt
+        sigma_a, sigma_b = np.sqrt(np.diag(self.pcov))
+        corr = self.pcov[0, 1] / (sigma_a * sigma_b)
+
+        scale_x = 1e-3 if scale is None else scale[0]
+        scale_y = 1e-3 if scale is None else scale[1]
+        offset_str = ' - {}'.format(round(self.alpha * scale_x, 1)) if self.alpha != 0 else ''
+        xlabel = 'x{} (mode=\'shifts\' or =\'radii\' for right x-label)'.format(offset_str)
+        if mode == 'radii':
+            if scale is None:
+                scale_x = 1.
+            offset_str = ' - {}'.format(round(self.alpha * scale_x, 1)) if self.alpha != 0 else ''
+            xlabel = r'$\mu\,\delta\langle r^2\rangle^{A, A^\prime}' + offset_str + r'\quad(\mathrm{u}\,\mathrm{fm}^2)$'
+        elif mode == 'shifts':
+            if scale is None:
+                scale_x = 1e-3
+            offset_str = ' - {}'.format(round(self.alpha * scale_x, 1)) if self.alpha != 0 else ''
+            xlabel = r'$\mu\,\delta\nu_x^{A, A^\prime}' + offset_str + r'\quad(\mathrm{u\,GHz})$'
+
+        if sigma2d:
+            plt.plot((self.x_mod[:, 0, 0] - self.alpha) * scale_x,
+                     self.x_mod[:, 1, 0] * scale_y, 'k.', label='Data')
+            draw_sigma2d((self.x_mod[:, 0, 0] - self.alpha) * scale_x, self.x_mod[:, 1, 0] * scale_y,
+                         self.x_mod[:, 0, 1] * scale_x, self.x_mod[:, 1, 1] * scale_y, self.corr, n=sigma2d)
+            if add_xy is not None:
+                plt.plot((add_xy[:, 0] - self.alpha) * scale_x,
+                         add_xy[:, 2] * scale_y, 'r.', label='Data')
+                draw_sigma2d((add_xy[:, 0] - self.alpha) * scale_x, add_xy[:, 2] * scale_y,
+                             add_xy[:, 1] * scale_x, add_xy[:, 3] * scale_y, self.corr, n=sigma2d, **{'fmt': '-r'})
+        else:
+            plt.errorbar((self.x_mod[:, 0, 0] - self.alpha) * scale_x, self.x_mod[:, 1, 0] * scale_y,
+                         xerr=self.x_mod[:, 0, 1] * scale_x, yerr=self.x_mod[:, 1, 1] * scale_y,
+                         fmt='k.', label='Data')
+            if add_xy is not None:
+                plt.errorbar((add_xy[:, 0] - self.alpha) * scale_x, add_xy[:, 2] * scale_y,
+                             xerr=add_xy[:, 1] * scale_x, yerr=add_xy[:, 3] * scale_y,
+                             fmt='r.', label='Add. Data')
+
+        for j in range(len(self.a_fit)):
+            pm = -1. if b > 0 else 1.
+            plt.text((self.x_mod[j, 0, 0] + 1. * self.x_mod[j, 0, 1] - self.alpha) * scale_x,
+                     (self.x_mod[j, 1, 0] + pm * 5. * self.x_mod[j, 1, 1]) * scale_y,
+                     '{} - {}'.format(self.a_fit[j], self.a_ref[j]), ha='left', va='top' if b > 0 else 'bottom')
+
+        if add_a is not None and add_xy is not None:
+            for j in range(add_xy.shape[0]):
+                pm = 1. if b > 0 else -1.
+                plt.text((add_xy[j, 0] - 1. * add_xy[j, 1] - self.alpha) * scale_x,
+                         (add_xy[j, 2] + pm * 5. * add_xy[j, 3]) * scale_y,
+                         '{} - {}'.format(*add_a[j]), ha='right', va='bottom' if b > 0 else 'top')
+
+        min_x, max_x = np.min(self.x_mod[:, 0, 0]), np.max(self.x_mod[:, 0, 0])
+        if add_xy is not None:
+            min_x, max_x = np.min([min_x, np.min(add_xy[:, 0])]), np.max([max_x, np.max(add_xy[:, 0])])
+        x_cont = np.linspace(min_x - 0.1 * (max_x - min_x), max_x + 0.1 * (max_x - min_x), 1001) - self.alpha
+        plt.plot(x_cont * scale_x, straight(x_cont, a, b) * scale_y, 'b-', label='Fit')
+        y_min = straight(x_cont, a, b) - straight_std(x_cont, sigma_a, sigma_b, corr)
+        y_max = straight(x_cont, a, b) + straight_std(x_cont, sigma_a, sigma_b, corr)
+        plt.fill_between(x_cont * scale_x, y_min * scale_y, y_max * scale_y,
+                         color='b', alpha=0.3, antialiased=True)
+
+        plt.xlabel(xlabel)
+        plt.ylabel(r'$\mu\,\delta\nu_y^{A, A^\prime}\quad(\mathrm{u\,GHz})$')
+
+        plt.legend(numpoints=1, loc='best')
+        plt.margins(0.1)
+        plt.tight_layout()
+        if show:
+            plt.show()
+            plt.clf()
+
+    def plot_nd(self, mode: str = '', sigma2d: int = 1, scale: tuple = None, add_xy: array_like = None,
+                add_a: array_like = None, axis: int = 0, font_dict: dict = None, show: bool = True, **kwargs):
+        """
+        :param mode: The mode of the King-fit. If mode='radii', the x-axis must contain the differences of
+         mean square nuclear charge radii or the Lambda-factor. For every other value,
+         the x-axis is assumed to be an isotope shift such that the slope corresponds to
+         a field-shift ratio F(y_i) / F(x).
+        :param sigma2d: Whether to draw the actual two-dimensional uncertainty bounds or the classical errorbars.
+         The integer number corresponds to the number of drawn sigma regions.
+        :param scale: Factors to scale the x and the y-axis.
+        :param add_xy: Additional x and y data to plot. Must have shape (k, n, 2),
+         where the additional k data points are arrays of the form [[x0, x0_d], [x1, x1_d], ... ].
+        :param add_a: Additional mass numbers for the additional data. Must have shape (k, 2),
+         where each row is a tuple [A, A_ref].
+        :param axis: The axis which is used as the x-axis throughout the plots.
+        :param font_dict: The font_dict passed to matplotlib.rc('font', font_dict).
+        :param show: Whether to show the plot.
+        :returns: None. Generates a King-Plot based on the modified axes 'self.x_mod_nd' and 'self.y_mod_nd'
+         as well as the fit results 'self.results_nd'.
+        """
+        if font_dict is None:
+            font_dict = {}
+        font_dict = {**{'size': 12, 'family': 'arial'}, **font_dict}
+        matplotlib.rc('font', **font_dict)
+        
+        if self.popt is None:
+            print('There are no results yet. Please use one of the fitting options.')
+            return
+        if not self.nd:
+            self.plot(mode=mode, sigma2d=sigma2d, scale=scale, font_dict=font_dict)
+        
+        dim = int(self.popt.size / 2)
+        a, b = self.popt[:dim], self.popt[dim:]
+        sigma_a, sigma_b = np.sqrt(np.diag(self.pcov)[:dim]), np.sqrt(np.diag(self.pcov)[dim:])
+
+        scale_x = 1e-3 if scale is None else scale[0]
+        scale_y = 1e-3 if scale is None else scale[1]
+        offset_str = ' - {}'.format(round(self.alpha * scale_x, 1)) if self.alpha != 0 else ''
+        xlabel = 'x{} (mode=\'shifts\' or =\'radii\' for right x-label)'.format(offset_str)
+        if mode == 'radii':
+            if scale is None:
+                scale_x = 1.
+            offset_str = ' - {}'.format(round(self.alpha * scale_x, 1)) if self.alpha != 0 else ''
+            xlabel = r'$\mu\,\delta\langle r^2\rangle^{A, A^\prime}' + offset_str + r'\quad(\mathrm{u}\,\mathrm{fm}^2)$'
+        elif mode == 'shifts':
+            if scale is None:
+                scale_x = 1e-3
+            offset_str = ' - {}'.format(round(self.alpha * scale_x, 1)) if self.alpha != 0 else ''
+            xlabel = r'$\mu\,\delta\nu_x^{A, A^\prime}' + offset_str + r'\quad(\mathrm{u\,GHz})$'
+
+        n_plots = self.x_mod.shape[1] - 1
+        n_cols = int(np.ceil(np.sqrt(n_plots)))
+        n_rows = int(np.ceil(n_plots / n_cols))
+        plot_indexes = [i for i in range(n_plots + 1) if i != axis]
+        for i, iy in enumerate(plot_indexes):
+            # i_col = i % n_cols
+            # i_row = i // n_cols
+            plt.subplot(n_rows, n_cols, i + 1)
+
+            if sigma2d:
+                plt.plot((self.x_mod[:, axis, 0] - self.alpha) * scale_x,
+                         self.x_mod[:, iy, 0] * scale_y, 'k.', label='Data')
+                draw_sigma2d((self.x_mod[:, axis, 0] - self.alpha) * scale_x, self.x_mod[:, iy, 0] * scale_y,
+                             np.sqrt(self.cov[:, axis, axis]) * scale_x, np.sqrt(self.cov[:, iy, iy]) * scale_y,
+                             self.cov[:, axis, iy] / np.sqrt(self.cov[:, axis, axis] * self.cov[:, iy, iy]), n=sigma2d)
+            else:
+                plt.errorbar((self.x_mod[:, axis, 0] - self.alpha) * scale_x, self.x_mod[:, iy, 0] * scale_y,
+                             xerr=np.sqrt(self.cov[:, axis, axis]) * scale_x,
+                             yerr=np.sqrt(self.cov[:, iy, iy]) * scale_y, fmt='k.', label='Data')
+
+            for j in range(len(self.a_fit)):
+                pm = -1. if b[iy] > 0 else 1.
+                plt.text((self.x_mod[j, axis, 0] + 1. * np.sqrt(self.cov[j, axis, axis]) - self.alpha) * scale_x,
+                         (self.x_mod[j, iy, 0] + pm * 5. * np.sqrt(self.cov[j, iy, iy])) * scale_y,
+                         '{} - {}'.format(self.a_fit[j], self.a_ref[j]),
+                         ha='left', va='top' if b[iy] > 0 else 'bottom')
+
+            min_x, max_x = np.min(self.x_mod[:, axis, 0]), np.max(self.x_mod[:, axis, 0])
+            x_cont = np.linspace(min_x - 0.1 * (max_x - min_x), max_x + 0.1 * (max_x - min_x), 1001) - self.alpha
+
+            plt.plot(x_cont * scale_x, straight(x_cont, a[iy], b[iy]) * scale_y, 'b-', label='Fit')
+
+            corr = self.pcov[iy, dim + iy] / (sigma_a[iy] * sigma_b[iy])
+            y_min = straight(x_cont, a[iy], b[iy]) - straight_std(x_cont, sigma_a[iy], sigma_b[iy], corr)
+            y_max = straight(x_cont, a[iy], b[iy]) + straight_std(x_cont, sigma_a[iy], sigma_b[iy], corr)
+            plt.fill_between(x_cont * scale_x, y_min * scale_y, y_max * scale_y, color='b', alpha=0.3, antialiased=True)
+
+            plt.xlabel(xlabel)
+            plt.ylabel(r'$\mu\,\delta\nu_{y' + str(i) + r'}^{A, A^\prime}\quad(\mathrm{u\,GHz})$')
+            plt.legend(numpoints=1, loc='best')
+            plt.margins(0.1)
+            # plt.tight_layout()
+        
+        if show:
+            plt.show()
+            plt.clf()
+
+
+class KingOld:
     def __init__(self, a: array_iter, m: array_iter, x_abs: array_iter = None,
                  subtract_electrons: scalar = 0., n_samples: int = 100000, element_label: str = None):
         """

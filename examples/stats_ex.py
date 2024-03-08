@@ -10,9 +10,10 @@ Example script / Guide for the qspec.stats module.
 """
 
 import numpy as np
+import scipy.stats as st
 import matplotlib.pyplot as plt
 
-import qspec as pc
+import qspec as qs
 
 
 def example(n=None):
@@ -39,7 +40,7 @@ def example(n=None):
         """
         Example 0: Create an observable with uncertainties and do statistics.
         """
-        f = pc.Observable(60, 1, 1.4)  # Create an observable with possibly asymmetric uncertainties.
+        f = qs.Observable(60, 1, 1.4)  # Create an observable with possibly asymmetric uncertainties.
         # f.hist()  # show the statistics of f.
 
         # Currently the ratio between the uncertainties must not exceed 1.5.
@@ -50,19 +51,19 @@ def example(n=None):
         # it is more efficient/necessary to use propagate and define the function (see 'sin' above):
 
         x, a, b, c = 0.2, 3, 10, 5
-        print('\n1. sin = {}'.format(pc.propagate(sin, [x, f, a, b, c])))
+        print('\n1. sin = {}'.format(qs.propagate(sin, [x, f, a, b, c])))
 
-        x = pc.Observable(x, 0.01)  # All values with uncertainties.
-        a = pc.Observable(a, 0.2, 0.18)
-        b = pc.Observable(b, 0.8)
-        c = pc.Observable(c, 1, 1.1)
-        print('2. sin = {}'.format(pc.propagate(sin, [x, f, a, b, c])))
+        x = qs.Observable(x, 0.01)  # All values with uncertainties.
+        a = qs.Observable(a, 0.2, 0.18)
+        b = qs.Observable(b, 0.8)
+        c = qs.Observable(c, 1, 1.1)
+        print('2. sin = {}'.format(qs.propagate(sin, [x, f, a, b, c])))
 
         num = 101
         x = np.linspace(-0.2, 0.2, num)
         p0 = f.rvs(num), a.rvs(num), b.rvs(num), c.rvs(num)
         y = sin(x, *p0)  # generate samples with .rvs()
-        popt, pcov = pc.curve_fit(sin, x, y, p0=np.array(p0)[:, 0])
+        popt, pcov = qs.curve_fit(sin, x, y, p0=np.array(p0)[:, 0])
         plt.plot(x, y, 'C0.')
         plt.plot(x, sin(x, *popt), 'C1-')
         plt.show()
@@ -71,10 +72,10 @@ def example(n=None):
         """
         Example 1: Fit a function and plot its median and 1-sigma percentiles.
         """
-        f = pc.Observable(60, 0.5, 0.7)
-        a = pc.Observable(3, 0.1, 0.13)
-        b = pc.Observable(10, 0.8)
-        c = pc.Observable(5, 1, 1.1)
+        f = qs.Observable(60, 0.5, 0.7)
+        a = qs.Observable(3, 0.1, 0.13)
+        b = qs.Observable(10, 0.8)
+        c = qs.Observable(5, 1, 1.1)
 
         num = 101
         x = np.linspace(-0.2, 0.2, num)
@@ -84,7 +85,7 @@ def example(n=None):
         # until here its just generating data. The use case starts below.
 
         # fit the sin-function, use the first sample for initialization.
-        popt, pcov = pc.curve_fit(sin, x, y, sigma=sigma, absolute_sigma=True, p0=np.array(p0)[:, 0])
+        popt, pcov = qs.curve_fit(sin, x, y, sigma=sigma, absolute_sigma=True, p0=np.array(p0)[:, 0])
         y_fit = sin(x, *popt)
 
         # plot the data and fitted function
@@ -92,13 +93,21 @@ def example(n=None):
         plt.plot(x, y_fit, 'C2-', label='Fit')
 
         # get proper error bands including correlations.
-        y_med, y_min, y_max = pc.propagate_fit(sin, x, popt, pcov, sample_size=100000)
+        y_med, y_min, y_max = qs.propagate_fit(sin, x, popt, pcov, sample_size=100000)
         plt.plot(x, y_med, 'C1-', label='Median')
         plt.fill_between(x, y_min, y_max, color='C1', alpha=0.7)
 
         plt.legend(loc=4)
         plt.show()
+    
+    if 2 in n:
+        size = 100000
+        s = 0.1
+        loc = 100.
+        scale = 10.1
+        x = st.lognorm.rvs(s, loc, scale, size=size)
+        qs.mode_lognormal(x)
 
 
 if __name__ == '__main__':
-    example({0, 1, })
+    example({2})
