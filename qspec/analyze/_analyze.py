@@ -378,19 +378,6 @@ def linear_nd_fit(x: array_iter, cov: array_iter = None, p0: array_iter = None, 
     x_temp = np.array(x, dtype=float)
     size, dim = x_temp.shape
 
-    cov = covariance_matrix(cov, k=size, n=dim)
-
-    x_off = x_temp[0].copy()
-    x_temp -= x_off[None, :]
-    x_fac = np.max(tools.absolute(x_temp, axis=1))
-    x_temp /= x_fac
-    cov_temp = cov / x_fac ** 2
-
-    try:
-        cov_inv = np.linalg.inv(cov_temp)
-    except np.linalg.LinAlgError as e:
-        raise np.linalg.LinAlgError(f'Unable to invert covariance matrix ("{e}")')
-
     axis_was_none = False
     if axis is None:
         axis_was_none = True
@@ -398,16 +385,32 @@ def linear_nd_fit(x: array_iter, cov: array_iter = None, p0: array_iter = None, 
     elif axis < 0:
         axis += dim
 
+    cov = covariance_matrix(cov, k=size, n=dim)
+
+    x_off = np.min(x_temp, axis=0)
+    x_temp -= x_off[None, :]
+    # x_fac = np.max(tools.absolute(x_temp, axis=1))
+    x_fac = np.max(x_temp, axis=0)
+    x_temp /= x_fac[None, :]
+    cov_temp = cov / (x_fac[None, None, :] * x_fac[None, :, None])
+
+    try:
+        cov_inv = np.linalg.inv(cov_temp)
+    except np.linalg.LinAlgError as e:
+        raise np.linalg.LinAlgError(f'Unable to invert covariance matrix ("{e}")')
+
     if p0 is None:
-        popt = np.ones(2 * dim, dtype=float)
-        x_abs = np.sum(x_temp, axis=1)
-        i_min, i_max = np.argmin(x_abs), np.argmax(x_abs)
-        popt[dim:] = x_temp[i_max] - x_temp[i_min]
-        popt[dim:] /= popt[dim + axis]
-        popt[:dim] = x_temp[i_min]
-        popt[:dim] -= popt[dim:] * popt[axis] / popt[dim + axis]
-        popt[1:dim] += 1
-        popt[dim+1:] *= 1.5
+        popt = np.zeros(2 * dim, dtype=float)
+        popt[dim:] = np.ones(dim, dtype=float)
+        # x_abs = np.sum(x_temp, axis=1)
+        # i_min, i_max = np.argmin(x_abs), np.argmax(x_abs)
+        # popt[dim:] = x_temp[i_max] - x_temp[i_min]
+        # popt[dim:] /= popt[dim + axis]
+        # popt[:dim] = x_temp[i_min]
+        # popt[:dim] -= popt[dim:] * popt[axis] / popt[dim + axis]
+        # popt[1:dim] += 1
+        # popt[dim+1:] *= 1.5
+        # popt[axis] = -x_off
     else:
         popt = np.asarray(p0, dtype=float)
         tools.check_dimension(2 * dim, 0, popt)
@@ -446,9 +449,9 @@ def linear_nd_fit(x: array_iter, cov: array_iter = None, p0: array_iter = None, 
     #                hess=ag.hessian(get_neg_log_likelihood_r(popt, axis)), method='Newton-CG')  # , method='BFGS'
     popt[mask] = res.x
     popt[:dim] += x_off
-    x_temp *= x_fac
+    x_temp *= x_fac[None, :]
     x_temp += x_off[None, :]
-    cov_inv = np.linalg.inv(cov_temp * x_fac ** 2)
+    cov_inv = np.linalg.inv(cov_temp * (x_fac[None, None, :] * x_fac[None, :, None]))
 
     def get_cov(_popt, _axis):
         _hess = ag.hessian(get_neg_log_likelihood_r(_popt, axis))
