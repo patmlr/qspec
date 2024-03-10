@@ -214,14 +214,19 @@ def example(n=None):
         plt.plot(popt[0] + t * popt[3], popt[1] + t * popt[4], label='mvn')
         plt.fill_between(popt[0] + t * popt[3], popt[1] + t * popt[4] - qs.straight_std(
             popt[0] + t * popt[3], np.sqrt(
-                pcov[1, 1]), np.sqrt(pcov[3, 3]), pcov[1, 3] / (np.sqrt(pcov[1, 1]) * np.sqrt(pcov[3, 3]))),
+                pcov[1, 1]), np.sqrt(pcov[4, 4]), pcov[1, 4] / (np.sqrt(pcov[1, 1]) * np.sqrt(pcov[4, 4]))),
                          popt[1] + t * popt[4] + qs.straight_std(popt[0] + t * popt[3], np.sqrt(pcov[1, 1]),
-                                                                 np.sqrt(pcov[3, 3]), pcov[1, 3] / (np.sqrt(pcov[1, 1]) * np.sqrt(pcov[3, 3]))))
+                                                                 np.sqrt(pcov[4, 4]), pcov[1, 4] / (np.sqrt(pcov[1, 1]) * np.sqrt(pcov[4, 4]))), alpha=0.3)
 
         plt.subplot(1, 2, 2)
         plt.plot(mean[:, 0], mean[:, 2], '.k')
         qs.draw_sigma2d(mean[:, 0], mean[:, 2], sigma[:, 0], sigma[:, 2], corr[:, 0, 2])
         plt.plot(popt[0] + t * popt[3], popt[2] + t * popt[5], label='mvn')
+        plt.fill_between(popt[0] + t * popt[3], popt[2] + t * popt[5] - qs.straight_std(
+            popt[0] + t * popt[3], np.sqrt(
+                pcov[2, 2]), np.sqrt(pcov[5, 5]), pcov[2, 5] / (np.sqrt(pcov[2, 2]) * np.sqrt(pcov[5, 5]))),
+                         popt[2] + t * popt[5] + qs.straight_std(popt[0] + t * popt[3], np.sqrt(pcov[2, 2]),
+                                                                 np.sqrt(pcov[5, 5]), pcov[2, 5] / (np.sqrt(pcov[2, 2]) * np.sqrt(pcov[5, 5]))), alpha=0.3)
         print(popt)
         print(pcov)
         plt.show()
@@ -233,6 +238,7 @@ def example(n=None):
         # The masses of the isotopes.
         m = np.array([(39.962590865, 22e-9), (41.958617828, 159e-9), (42.958766430, 244e-9),
                       (43.955481543, 348e-9), (45.953687988, 2399e-9), (47.952522904, 103e-9)])
+        m[:, 1] *= 5e4
 
         # Use absolute values given in the shape (#isotopes, #observables, 2).
         # (D1, D2, D3P1, D3P3, D5P3)
@@ -262,7 +268,7 @@ def example(n=None):
 
         xy = (0, 1)  # Choose the x- and y-axis (observables) to fit, i.e. vals[:, xy[1]] against vals[:, xy[0]].
         # results = king.fit(a_fit, a_ref, xy=xy, mode='shifts')  # Do a simple 2d-King fit.
-        results = king.fit_nd(a_fit, a_ref, optimize_cov=False, axis=0, mode='shifts')  # Do a 5d-King fit.
+        results = king.fit_nd(a_fit, a_ref, optimize_cov=True, axis=0, mode='shifts')  # Do a 5d-King fit.
 
 
 if __name__ == '__main__':

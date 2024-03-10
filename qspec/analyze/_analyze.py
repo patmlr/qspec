@@ -387,10 +387,9 @@ def linear_nd_fit(x: array_iter, cov: array_iter = None, p0: array_iter = None, 
 
     cov = covariance_matrix(cov, k=size, n=dim)
 
-    x_off = np.min(x_temp, axis=0)
+    x_off = x_temp[np.argmin(x_temp[:, axis], axis=0)].copy()
     x_temp -= x_off[None, :]
-    # x_fac = np.max(tools.absolute(x_temp, axis=1))
-    x_fac = np.max(x_temp, axis=0)
+    x_fac = np.max(np.abs(x_temp), axis=0)
     x_temp /= x_fac[None, :]
     cov_temp = cov / (x_fac[None, None, :] * x_fac[None, :, None])
 
@@ -445,13 +444,8 @@ def linear_nd_fit(x: array_iter, cov: array_iter = None, p0: array_iter = None, 
         return lambda p: neg_log_likelihood_r(p, _p0, _axis)
 
     res = minimize(get_neg_log_likelihood_r(popt, axis), p0_red, jac='3-point', method='BFGS')  # , method='BFGS'
-    # res = minimize(get_neg_log_likelihood_r(popt, axis), p0_red, jac=ag.jacobian(get_neg_log_likelihood_r(popt, axis)),
-    #                hess=ag.hessian(get_neg_log_likelihood_r(popt, axis)), method='Newton-CG')  # , method='BFGS'
+
     popt[mask] = res.x
-    popt[:dim] += x_off
-    x_temp *= x_fac[None, :]
-    x_temp += x_off[None, :]
-    cov_inv = np.linalg.inv(cov_temp * (x_fac[None, None, :] * x_fac[None, :, None]))
 
     def get_cov(_popt, _axis):
         _hess = ag.hessian(get_neg_log_likelihood_r(_popt, axis))
@@ -466,7 +460,7 @@ def linear_nd_fit(x: array_iter, cov: array_iter = None, p0: array_iter = None, 
         def cost_cov(t, _popt, _axis):
             _pcov = get_cov_t(t, _popt, _axis)
             ret = np.sum(np.triu(_pcov, k=1) ** 2)  # Sum over the square of all covariances.
-            print(ret)
+            print('cc', ret)
             return ret
 
         def get_cost_cov(_popt, _axis):
@@ -482,6 +476,25 @@ def linear_nd_fit(x: array_iter, cov: array_iter = None, p0: array_iter = None, 
 
     if axis_was_none:
         popt[dim:] /= tools.absolute(popt[dim:])
+
+    # plt.cla()
+    # plt.clf()
+    # for i in range(4):
+    #     plt.subplot(2, 2, i + 1)
+    #     draw_sigma2d(x_temp[:, 0], x_temp[:, i + 1], np.sqrt(cov_temp[:, 0, 0]),
+    #                  np.sqrt(cov_temp[:, i + 1, i + 1]), cov_temp[:, 0, i + 1] / (np.sqrt(cov_temp[:, 0, 0]) * np.sqrt(cov_temp[:, i + 1, i + 1])))
+    #     plt.plot(x_temp[:, 0], straight(x_temp[:, 0], popt[i + 1], popt[6 + i]))
+    # plt.show()
+
+    popt[dim:] *= x_fac / x_fac[axis]
+    popt[:dim] *= x_fac
+    x_temp *= x_fac[None, :]
+    cov_temp *= x_fac[None, None, :] * x_fac[None, :, None]
+
+    popt[:dim] += x_off
+    # popt[:dim] -= popt[dim:] * popt[axis] / popt[dim + axis]
+    x_temp += x_off[None, :]
+    cov_inv = np.linalg.inv(cov_temp)
 
     pcov = np.zeros((2 * dim, 2 * dim), dtype=float)
     pcov[np.ix_(mask, mask)] = get_cov(popt, axis)
