@@ -173,17 +173,17 @@ def example(n=None):
         print(pcov)
 
         p0 = np.array([0, 3, 1, 1])
-        popt, pcov = qs.linear_nd_fit(mean, cov=cov, p0=p0, axis=None, optimize_cov=True)
+        popt, pcov = qs.linear_nd_fit(mean, cov=cov, p0=p0, axis=0, optimize_cov=True)
         # plt.plot(t, qs.straight(t, popt[1], popt[3]), label='mvn')
         plt.plot(popt[0] + t * popt[2], popt[1] + t * popt[3], label='mvn')
         print(popt)
         print(pcov)
 
-        popt, pcov, *_ = qs.linear_nd_monte_carlo(mean, cov, n_samples=100000, method='py', axis=None,
-                                                  optimize_cov=True, report=False)
-        plt.plot(popt[0] + t * popt[2], popt[1] + t * popt[3], label='mc')
-        print(popt)
-        print(pcov)
+        # popt, pcov, *_ = qs.linear_nd_monte_carlo(mean, cov, n_samples=100000, method='py', axis=None,
+        #                                           optimize_cov=True, report=False)
+        # plt.plot(popt[0] + t * popt[2], popt[1] + t * popt[3], label='mc')
+        # print(popt)
+        # print(pcov)
 
         plt.legend()
         plt.show()
@@ -268,8 +268,8 @@ def example(n=None):
 
         xy = (0, 1)  # Choose the x- and y-axis (observables) to fit, i.e. vals[:, xy[1]] against vals[:, xy[0]].
         # results = king.fit(a_fit, a_ref, xy=xy, mode='shifts')  # Do a simple 2d-King fit.
-        results = king.fit_nd(a_fit, a_ref, optimize_cov=True, axis=0, mode='shifts')  # Do a 5d-King fit.
+        results = king.fit_nd(a_fit, a_ref, optimize_cov=False, axis=0, mode='shifts')  # Do a 5d-King fit.
 
 
 if __name__ == '__main__':
-    example({4, })
+    example({2, })

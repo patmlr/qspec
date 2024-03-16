@@ -32,6 +32,7 @@ LICENSE NOTES:
     Therefore, it is licensed under the 'BSD 3-Clause "New" or "Revised" License' provided with scipy.
 """
 
+from time import time
 import inspect
 import warnings
 import autograd as ag
@@ -359,8 +360,196 @@ def covariance_matrix(cov: array_iter = None, sigma: array_iter = None, corr: ar
     return cov
 
 
+def _x0_r_from_p(p):
+    dim = p.shape[0] // 2
+    return p[:dim], p[dim:]
+
+
+def _linear_nd_t0(p, x, cov_inv):
+    x0, r = _x0_r_from_p(p)
+    xi = x0[None, :] - x  # (size, dim)
+    ax = np.sum(cov_inv * r[None, None, :], axis=-1)  # (size, dim)
+
+    var_t = 1 / np.sum(r[None, :] * ax, axis=-1)  # (size, )
+    return -var_t * np.sum(xi * ax, axis=-1)  # (size, )
+
+
+def _linear_nd_func(p, x, cov_inv):
+    x0, r = _x0_r_from_p(p)
+    xi = x0[None, :] - x  # (size, dim)
+    ax = np.sum(cov_inv * r[None, None, :], axis=-1)  # (size, dim)
+    ar = np.sum(cov_inv * xi[:, None, :], axis=-1)  # (size, dim)
+
+    var_t = 1 / np.sum(r[None, :] * ax, axis=-1)  # (size, )
+    t0 = -var_t * np.sum(xi * ax, axis=-1)  # (size, )
+    tx = np.sum(xi * ar, axis=-1)  # (size, )
+    return 0.5 * np.sum(tx - t0 ** 2 / var_t, axis=-1)  # ()
+
+
+def _linear_nd_jac(p, x, cov_inv):
+    x0, r = _x0_r_from_p(p)
+    xi = x0[None, :] - x  # (size, dim)
+    ax = np.sum(cov_inv * r[None, None, :], axis=-1)  # = da/dx = 0.5 * db/dr, (size, dim)
+    ar = np.sum(cov_inv * xi[:, None, :], axis=-1)  # = da/dr, (size, dim)
+    a = np.sum(xi * ax, axis=-1)[:, None]  # (size, 1)
+    b = np.sum(r[None, :] * ax, axis=-1)[:, None]  # (size, 1)
+
+    xx = np.sum(ar - a / b * ax, axis=0)  # (dim, )
+    rr = -np.sum(a / b * ar - a ** 2 / b ** 2 * ax, axis=0)  # (dim, )
+
+    return np.concatenate([xx, rr], axis=0)  # (2 * dim, )
+
+
+def _linear_nd_hess(p, x, cov_inv):
+    x0, r = _x0_r_from_p(p)
+    xi = x0[None, :] - x  # (size, dim)
+    ax = np.sum(cov_inv * r[None, None, :], axis=-1)  # = da/dx, (size, dim)
+    ar = np.sum(cov_inv * xi[:, None, :], axis=-1)  # = da/dr, (size, dim)
+    a = np.sum(xi * ax, axis=-1)[:, None, None]  # (size, 1, 1)
+    b = np.sum(r[None, :] * ax, axis=-1)[:, None, None]  # (size, 1, 1)
+
+    xx = np.sum(cov_inv - ax[:, :, None] * ax[:, None, :] / b, axis=0)  # (dim, dim)
+    rr = -np.sum((ar[:, :, None] / b - 2 * a / b ** 2 * ax[:, :, None]) * ar[:, None, :]
+                 + 2 * (2 * a ** 2 / b ** 3 * ax[:, :, None] - a / b ** 2 * ar[:, :, None]) * ax[:, None, :]
+                 - a ** 2 / b ** 2 * cov_inv, axis=0)  # (dim, dim)
+    xr = -np.sum((ar[:, :, None] / b - 2 * a / b ** 2 * ax[:, :, None]) * ax[:, None, :]
+                 + a / b * cov_inv, axis=0)  # (dim, dim)
+
+    return np.block([[xx, xr], [xr.T, rr]])  # (2 * dim, 2 * dim)
+
+
+def _get_linear_nd_reduced(x, cov_inv, p0, mask, method):
+    m = eval(f'_linear_nd_{method}')
+    dim = p0.shape[0] // 2
+    axis = list(mask).index(False)
+    i = {'func': None, 'jac': mask, 'hess': np.ix_(mask, mask)}[method]
+
+    def func(p):
+        _p = np.insert(p, [axis, axis + dim - 1], [p0[axis], p0[axis + dim]])
+        return m(_p, x, cov_inv) if i is None else m(_p, x, cov_inv)[i]
+
+    return func
+
+
 def linear_nd_fit(x: array_iter, cov: array_iter = None, p0: array_iter = None, axis: int = None,
                   optimize_cov: bool = False, **kwargs):
+    """
+    :param x: The data vectors. Must have shape (k, n), where k is the number of data points
+     and n is the number of dimensions of each point.
+    :param cov: The covariance matrices of the data vectors. Must have shape (k, n, n).
+     Use 'covariance_matrix' to construct covariance matrices.
+    :param p0: The start parameters for the linear fit. Must have shape (2n, ).
+     The first n elements specify the origin vector of the straight,
+     the second n elements specify the direction of the straight.
+    :param axis: The component of the n-dimensional vectors which are fixed for fitting.
+     This is required since a straight in n dimensions is fully described by 2 (n - 1) parameters.
+     If None, the best axis is determined from the data and the direction vector of the straight is normalized.
+    :param optimize_cov: If True, the origin vector of the straight is optimized to yield the smallest covariances.
+    :returns: popt, pcov. The optimized parameters and their covariances. The resulting shapes are (2n, ) and (2n, 2n).
+    """
+    x_temp = np.array(x, dtype=float)
+    size, dim = x_temp.shape
+
+    axis_was_none = False
+    if axis is None:
+        axis_was_none = True
+        axis = np.argmax(np.abs(np.std(x_temp, ddof=1, axis=0) / np.mean(x_temp, axis=0)), axis=0)
+    elif axis < 0:
+        axis += dim
+
+    cov = covariance_matrix(cov, k=size, n=dim)
+
+    x_off = x_temp[np.argmin(x_temp[:, axis], axis=0)].copy()
+    x_temp -= x_off[None, :]
+    x_fac = np.max(np.abs(x_temp), axis=0)
+    x_temp /= x_fac[None, :]
+    cov_temp = cov / (x_fac[None, None, :] * x_fac[None, :, None])
+
+    try:
+        cov_inv = np.linalg.inv(cov_temp)
+    except np.linalg.LinAlgError as e:
+        raise np.linalg.LinAlgError(f'Unable to invert covariance matrix ("{e}")')
+
+    if p0 is None:
+        popt = np.zeros(2 * dim, dtype=float)
+        popt[dim:] = np.ones(dim, dtype=float)
+    else:
+        popt = np.asarray(p0, dtype=float)
+        tools.check_dimension(2 * dim, 0, popt)
+        popt[:dim] -= x_off
+        popt[:dim] /= x_fac
+        popt[dim:] /= x_fac / x_fac[axis]
+
+    i = np.arange(2 * dim, dtype=int)
+    mask = i == axis
+    mask += i == dim + axis
+    mask = ~mask
+    p0_red = popt[mask]
+
+    res = minimize(_get_linear_nd_reduced(x_temp, cov_inv, popt, mask, 'func'), p0_red, method='newton-cg',
+                   jac=_get_linear_nd_reduced(x_temp, cov_inv, popt, mask, 'jac'),
+                   hess=_get_linear_nd_reduced(x_temp, cov_inv, popt, mask, 'hess'), options={'xtol': 1e-15})
+
+    # res = minimize(_get_linear_nd_reduced(x_temp, cov_inv, popt, mask, 'func'), p0_red, jac='3-point', method='BFGS')
+
+    popt[mask] = res.x
+
+    def get_cov(_popt):
+        h2 = _linear_nd_hess(_popt, x_temp, cov_inv)[np.ix_(mask, mask)]
+        return np.linalg.inv(h2)
+
+    if optimize_cov:  # Minimize the covariances by shifting the origin vector of the straight.
+        def get_cov_t(t, _popt):
+            _popt_cov = _popt.copy()
+            _popt_cov[:dim] += t * _popt_cov[dim:]  # Shift the origin vector by t.
+            return get_cov(_popt_cov)
+
+        def cost_cov(t, _popt):
+            _pcov = get_cov_t(t, _popt)
+            ret = np.sum(np.triu(_pcov, k=1) ** 2)  # Sum over the square of all covariances.
+            return ret
+
+        def get_cost_cov(_popt):
+            return lambda t: cost_cov(t, _popt)
+
+        # Set the origin point to the center of the data before optimization.
+        tp = _linear_nd_t0(popt, x_temp, cov_inv)
+        popt[:dim] += np.mean(tp, axis=-1) * popt[dim:]
+        tp = 0.1 * (np.max(tp, axis=-1) - np.min(tp, axis=-1))  # Start at a value between all data points other than 0.
+
+        res = minimize(get_cost_cov(popt), np.full(1, tp), method='BFGS')
+        popt[:dim] += res.x[0] * popt[dim:]
+
+    if axis_was_none:
+        popt[dim:] /= tools.absolute(popt[dim:])
+
+    # plt.cla()
+    # plt.clf()
+    # for i in range(4):
+    #     plt.subplot(2, 2, i + 1)
+    #     draw_sigma2d(x_temp[:, 0], x_temp[:, i + 1], np.sqrt(cov_temp[:, 0, 0]),
+    #                  np.sqrt(cov_temp[:, i + 1, i + 1]), cov_temp[:, 0, i + 1]
+    #                  / (np.sqrt(cov_temp[:, 0, 0]) * np.sqrt(cov_temp[:, i + 1, i + 1])))
+    #     plt.plot(x_temp[:, 0], straight(x_temp[:, 0], popt[i + 1], popt[6 + i]))
+    # plt.show()
+
+    popt[:dim] *= x_fac
+    popt[dim:] *= x_fac / x_fac[axis]
+    x_temp *= x_fac[None, :]
+    cov_temp *= x_fac[None, None, :] * x_fac[None, :, None]
+
+    popt[:dim] += x_off
+    x_temp += x_off[None, :]
+    cov_inv = np.linalg.inv(cov_temp)
+
+    pcov = np.zeros((2 * dim, 2 * dim), dtype=float)
+    pcov[np.ix_(mask, mask)] = get_cov(popt)
+
+    return popt, pcov
+
+
+def linear_nd_fit_old(x: array_iter, cov: array_iter = None, p0: array_iter = None, axis: int = None,
+                      optimize_cov: bool = False, **kwargs):
     """
     :param x: The data vectors. Must have shape (k, n), where k is the number of data points
      and n is the number of dimensions of each point.
@@ -443,13 +632,26 @@ def linear_nd_fit(x: array_iter, cov: array_iter = None, p0: array_iter = None, 
     def get_neg_log_likelihood_r(_p0, _axis):
         return lambda p: neg_log_likelihood_r(p, _p0, _axis)
 
-    res = minimize(get_neg_log_likelihood_r(popt, axis), p0_red, jac='3-point', method='BFGS')  # , method='BFGS'
+    res = minimize(get_neg_log_likelihood_r(popt, axis), p0_red, jac='3-point', method='BFGS')
+    res = minimize(get_neg_log_likelihood_r(popt, axis), p0_red, jac='3-point', method='newton-cg')
 
     popt[mask] = res.x
 
     def get_cov(_popt, _axis):
+        _jac = ag.jacobian(get_neg_log_likelihood_r(_popt, axis))
         _hess = ag.hessian(get_neg_log_likelihood_r(_popt, axis))
-        return np.linalg.inv(_hess(_popt[mask]))
+        t0 = time()
+        j1 = _jac(_popt[mask])
+        h1 = _hess(_popt[mask])
+        print(f'ag: {time() - t0} s')
+        # print('ag: ', h1)
+        x0, r = _popt[:dim], _popt[dim:]
+        t0 = time()
+        j2 = _linear_nd_jac(x0, r, x_temp, cov_inv)[mask]
+        h2 = _linear_nd_hess(x0, r, x_temp, cov_inv)[np.ix_(mask, mask)]
+        print(f'co: {time() - t0} s')
+        # print('co: ', h2)
+        return np.linalg.inv(h2)
 
     if optimize_cov:  # Minimize the covariances by shifting the origin vector of the straight.
         def get_cov_t(t, _popt, _axis):

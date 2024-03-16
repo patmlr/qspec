@@ -791,7 +791,7 @@ class Atom:
 
         if theta is None and phi is None:
             if as_density_matrix:
-                rho = np.diagonal(rho, axis1=axis, axis2=axis + 1)
+                rho = np.diagonal(rho.real, axis1=axis, axis2=axis + 1)
                 if len(rho.shape) > axis + 1:
                     axes = list(range(len(rho.shape)))
                     axes[axis + 1:] = axes[axis:-1]
@@ -1477,12 +1477,13 @@ class Interaction:
         return results, v
 
     def scattering_rate(self, rho: array_like, theta: array_like = None, phi: array_like = None,
-                        i: array_like = None, j: array_like = None, axis: int = 1):
+                        as_density_matrix: bool = True, i: array_like = None, j: array_like = None, axis: int = 1):
         """
         :param rho: The density matrix of the atom. Must have the same size as the atom
          along the specified 'axis' and 'axis' + 1.
         :param theta: The elevation angle of detection.
         :param phi: The azimuthal angle of detection.
+        :param as_density_matrix: Whether 'rho' is a state vector or a density matrix.
         :param i: The initially excited state indexes to consider for spontaneous decay.
          If None, all states are considered.
         :param j: The final decayed state indexes to consider for spontaneous decay. If None, all states are considered.
@@ -1490,7 +1491,8 @@ class Interaction:
         :returns: The scattering rate of the atom given the population 'rho' (MHz or Events / s).
         :raises ValueError: 'rho' must have the same size as the atom along the specified 'axis'.
         """
-        return self.atom.scattering_rate(rho, theta=theta, phi=phi, i=i, j=j, axis=axis)
+        return self.atom.scattering_rate(rho, theta=theta, phi=phi, as_density_matrix=as_density_matrix,
+                                         i=i, j=j, axis=axis)
 
 
 def _define_colors(n: int, label_map: dict, colormap: str = None):
