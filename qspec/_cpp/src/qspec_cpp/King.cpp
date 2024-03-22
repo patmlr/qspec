@@ -102,7 +102,7 @@ void CollinearResult::set_n_accepted(size_t n)
 	n_accepted = n;
 }
 
-CollinearResult collinear(std::vector<VectorXd> x, std::vector<MatrixXd> cov, size_t n, size_t n_max, unsigned int seed)
+CollinearResult collinear(std::vector<VectorXd> x, std::vector<MatrixXd> cov, size_t n, size_t n_max, unsigned int seed, bool report)
 {
 	size_t size = x.size();
 	size_t size_x2 = size - 2;
@@ -199,9 +199,9 @@ CollinearResult collinear(std::vector<VectorXd> x, std::vector<MatrixXd> cov, si
 		}
 		// std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
 		// time += std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count() / 1000000.0;
-		if ((n_accepted + n_samples) % 100000 == 0) printf("\r\033[92mAccepted samples: %zu / %zu \033[0m", n_accepted, n_samples);
+		if (report && (n_accepted + n_samples) % 100000 == 0) printf("\r\033[92mAccepted samples: %zu / %zu \033[0m", n_accepted, n_samples);
 	}
-	printf("\r\033[92mAccepted samples: %zu / %zu \033[0m\n", n_accepted, n_samples);
+	if (report) printf("\r\033[92mAccepted samples: %zu / %zu \033[0m\n", n_accepted, n_samples);
 	// printf("Time difference (sec) = %1.3f", time);
 
 	res.set_n_samples(n_samples);

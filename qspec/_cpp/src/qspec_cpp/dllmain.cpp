@@ -735,13 +735,13 @@ extern "C"
     }
 
     __declspec(dllexport) void gen_collinear(double* x, double* mean, double* cov, size_t* n, size_t size, size_t dim,
-        size_t* n_max, bool user_seed, size_t seed)
+        size_t* n_max, bool user_seed, size_t seed, bool report)
     {
         std::vector<VectorXd> _mean = cast_samples_VectorXd(mean, size, dim);
         std::vector<MatrixXd> _cov = cast_samples_MatrixXd(cov, size, dim);
         unsigned int _seed = std::random_device{}();
         if (user_seed) _seed = seed;
-        CollinearResult res = collinear(_mean, _cov, *n, *n_max, _seed);
+        CollinearResult res = collinear(_mean, _cov, *n, *n_max, _seed, report);
         std::vector<std::vector<VectorXd>>& p = res.get_p();
         for (size_t i = 0; i < *n; ++i)
         {

@@ -238,7 +238,7 @@ def example(n=None):
         # The masses of the isotopes.
         m = np.array([(39.962590865, 22e-9), (41.958617828, 159e-9), (42.958766430, 244e-9),
                       (43.955481543, 348e-9), (45.953687988, 2399e-9), (47.952522904, 103e-9)])
-        m[:, 1] *= 5e4
+        # m[:, 1] *= 3e4
 
         # Use absolute values given in the shape (#isotopes, #observables, 2).
         # (D1, D2, D3P1, D3P3, D5P3)
@@ -257,8 +257,9 @@ def example(n=None):
 
                 [(755224471.117, 0.102), (761906720.109, 0.114),  # 48Ca
                  (345991937.638, 0.284), (352674186.532, 0.368), (350854600.002, 0.215)]]
+        vals = np.array(vals)
 
-        king = qs.King(a, m, vals)
+        king = qs.King(a, m, vals[:, :, :], n_samples=1000000)
 
         i_fit = np.array([1, 3, 5])
         a_fit = a[i_fit]  # Choose the isotopes to fit.
@@ -267,9 +268,18 @@ def example(n=None):
         a_ref = a[i_ref]  # Choose individual reference isotopes
 
         xy = (0, 1)  # Choose the x- and y-axis (observables) to fit, i.e. vals[:, xy[1]] against vals[:, xy[0]].
-        # results = king.fit(a_fit, a_ref, xy=xy, mode='shifts')  # Do a simple 2d-King fit.
-        results = king.fit_nd(a_fit, a_ref, optimize_cov=False, axis=0, mode='shifts')  # Do a 5d-King fit.
+        popt, pcov = king.fit(a_fit, a_ref, alpha=400000, find_alpha=True, xy=xy, mode='shifts')  # Do a simple 2d-King fit.
+        # popt, pcov = king.fit_nd(a_fit, a_ref, optimize_cov=True, axis=0, mode='shifts')  # Do a 5d-King fit.
+
+        # Put in values for isotopes known only for one observable, ...
+        a_unknown = [43, 46]
+        a_unknown_ref = [40, 40]
+        y = np.array([(679.443, 0.568), (1299.071, 0.583)])
+        # y[:, 1] *= 1e-2
+
+        # ... get spectroscopically improved values for the other observables and ...
+        x = king.get_unmodified(a_unknown, a_unknown_ref, y, axis=1, show=True, mode='shifts')  # Requires king.fit().
 
 
 if __name__ == '__main__':
-    example({2, })
+    example({4, })

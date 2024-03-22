@@ -320,5 +320,5 @@ dll.multivariatenormal_size.restype = c_size_t
 dll.multivariatenormal_rvs.restype = ctypes.c_void_p
 
 dll.gen_collinear.argtypes = (c_double_p, c_double_p, c_double_p, c_size_t_p, c_size_t, c_size_t,
-                              c_size_t_p, c_bool, c_size_t)
+                              c_size_t_p, c_bool, c_size_t, c_bool)
 dll.gen_collinear.restype = ctypes.c_size_t

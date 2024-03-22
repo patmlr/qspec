@@ -103,4 +103,4 @@ public:
 double normal_pdf(double x, double mean, double sigma);
 
 
-CollinearResult collinear(std::vector<VectorXd> x, std::vector<MatrixXd> cov, size_t n, size_t n_max, unsigned int seed);
+CollinearResult collinear(std::vector<VectorXd> x, std::vector<MatrixXd> cov, size_t n, size_t n_max, unsigned int seed, bool report);

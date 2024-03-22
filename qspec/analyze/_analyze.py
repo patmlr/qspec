@@ -35,7 +35,6 @@ LICENSE NOTES:
 from time import time
 import inspect
 import warnings
-import autograd as ag
 import numpy as np
 from scipy.optimize._minpack_py import Bounds, LinAlgError, OptimizeWarning, _getfullargspec, _initialize_feasible, \
     _wrap_jac, cholesky, least_squares, leastsq, prepare_bounds, solve_triangular, svd
@@ -445,6 +444,7 @@ def linear_nd_fit(x: array_iter, cov: array_iter = None, p0: array_iter = None, 
      This is required since a straight in n dimensions is fully described by 2 (n - 1) parameters.
      If None, the best axis is determined from the data and the direction vector of the straight is normalized.
     :param optimize_cov: If True, the origin vector of the straight is optimized to yield the smallest covariances.
+    :param kwargs: Additional keyword arguments.
     :returns: popt, pcov. The optimized parameters and their covariances. The resulting shapes are (2n, ) and (2n, 2n).
     """
     x_temp = np.array(x, dtype=float)
@@ -461,7 +461,9 @@ def linear_nd_fit(x: array_iter, cov: array_iter = None, p0: array_iter = None, 
 
     x_off = x_temp[np.argmin(x_temp[:, axis], axis=0)].copy()
     x_temp -= x_off[None, :]
-    x_fac = np.max(np.abs(x_temp), axis=0)
+    i_fac = np.argmax(np.abs(x_temp), axis=0)
+    x_fac = x_temp[i_fac, np.arange(dim)]
+    # x_fac = np.max(np.abs(x_temp), axis=0)
     x_temp /= x_fac[None, :]
     cov_temp = cov / (x_fac[None, None, :] * x_fac[None, :, None])
 
@@ -539,167 +541,13 @@ def linear_nd_fit(x: array_iter, cov: array_iter = None, p0: array_iter = None, 
     cov_temp *= x_fac[None, None, :] * x_fac[None, :, None]
 
     popt[:dim] += x_off
+    if not optimize_cov:
+        popt[:dim] -= popt[dim:] * popt[axis] / popt[dim + axis]
     x_temp += x_off[None, :]
     cov_inv = np.linalg.inv(cov_temp)
 
     pcov = np.zeros((2 * dim, 2 * dim), dtype=float)
     pcov[np.ix_(mask, mask)] = get_cov(popt)
-
-    return popt, pcov
-
-
-def linear_nd_fit_old(x: array_iter, cov: array_iter = None, p0: array_iter = None, axis: int = None,
-                      optimize_cov: bool = False, **kwargs):
-    """
-    :param x: The data vectors. Must have shape (k, n), where k is the number of data points
-     and n is the number of dimensions of each point.
-    :param cov: The covariance matrices of the data vectors. Must have shape (k, n, n).
-     Use 'covariance_matrix' to construct covariance matrices.
-    :param p0: The start parameters for the linear fit. Must have shape (2n, ).
-     The first n elements specify the origin vector of the straight,
-     the second n elements specify the direction of the straight.
-    :param axis: The component of the n-dimensional vectors which are fixed for fitting.
-     This is required since a straight in n dimensions is fully described by 2 (n - 1) parameters.
-     If None, the best axis is determined from the data and the direction vector of the straight is normalized.
-    :param optimize_cov: If True, the origin vector of the straight is optimized to yield the smallest covariances.
-    :returns: popt, pcov. The optimized parameters and their covariances. The resulting shapes are (2n, ) and (2n, 2n).
-    """
-    x_temp = np.array(x, dtype=float)
-    size, dim = x_temp.shape
-
-    axis_was_none = False
-    if axis is None:
-        axis_was_none = True
-        axis = np.argmax(np.abs(np.std(x_temp, ddof=1, axis=0) / np.mean(x_temp, axis=0)), axis=0)
-    elif axis < 0:
-        axis += dim
-
-    cov = covariance_matrix(cov, k=size, n=dim)
-
-    x_off = x_temp[np.argmin(x_temp[:, axis], axis=0)].copy()
-    x_temp -= x_off[None, :]
-    x_fac = np.max(np.abs(x_temp), axis=0)
-    x_temp /= x_fac[None, :]
-    cov_temp = cov / (x_fac[None, None, :] * x_fac[None, :, None])
-
-    try:
-        cov_inv = np.linalg.inv(cov_temp)
-    except np.linalg.LinAlgError as e:
-        raise np.linalg.LinAlgError(f'Unable to invert covariance matrix ("{e}")')
-
-    if p0 is None:
-        popt = np.zeros(2 * dim, dtype=float)
-        popt[dim:] = np.ones(dim, dtype=float)
-        # x_abs = np.sum(x_temp, axis=1)
-        # i_min, i_max = np.argmin(x_abs), np.argmax(x_abs)
-        # popt[dim:] = x_temp[i_max] - x_temp[i_min]
-        # popt[dim:] /= popt[dim + axis]
-        # popt[:dim] = x_temp[i_min]
-        # popt[:dim] -= popt[dim:] * popt[axis] / popt[dim + axis]
-        # popt[1:dim] += 1
-        # popt[dim+1:] *= 1.5
-        # popt[axis] = -x_off
-    else:
-        popt = np.asarray(p0, dtype=float)
-        tools.check_dimension(2 * dim, 0, popt)
-
-    i = np.arange(2 * dim, dtype=int)
-    mask = i == axis
-    mask += i == dim + axis
-    mask = ~mask
-    p0_red = popt[mask]
-
-    def get_t_pars(x0, r):
-        xi = x0[None, :] - x_temp  # (size, dim)
-        a = np.sum(cov_inv * r[None, None, :], axis=-1)  # (size, dim)
-        b = np.sum(cov_inv * xi[:, None, :], axis=-1)  # (size, dim)
-        var_t = 1 / np.sum(r[None, :] * a, axis=-1)  # (size, )
-        t0 = -var_t * np.sum(xi * a, axis=-1)  # (size, )
-        tx = np.sum(xi * b, axis=-1)  # (size, )
-        return tx, t0, var_t
-
-    def neg_log_likelihood(p):
-        x0, r = p[:dim], p[dim:]  # (dim, )
-        tx, t0, var_t = get_t_pars(x0, r)  # (size, )
-        return 0.5 * np.sum(tx - t0 ** 2 / var_t, axis=-1)  # ()
-
-    def neg_log_likelihood_r(p, _p0, _axis):
-        _p = np.insert(p, [_axis, _axis + dim - 1], [_p0[_axis], _p0[_axis + dim]])
-        ret = neg_log_likelihood(_p)
-        print('ll', ret)
-        return ret
-
-    def get_neg_log_likelihood_r(_p0, _axis):
-        return lambda p: neg_log_likelihood_r(p, _p0, _axis)
-
-    res = minimize(get_neg_log_likelihood_r(popt, axis), p0_red, jac='3-point', method='BFGS')
-    res = minimize(get_neg_log_likelihood_r(popt, axis), p0_red, jac='3-point', method='newton-cg')
-
-    popt[mask] = res.x
-
-    def get_cov(_popt, _axis):
-        _jac = ag.jacobian(get_neg_log_likelihood_r(_popt, axis))
-        _hess = ag.hessian(get_neg_log_likelihood_r(_popt, axis))
-        t0 = time()
-        j1 = _jac(_popt[mask])
-        h1 = _hess(_popt[mask])
-        print(f'ag: {time() - t0} s')
-        # print('ag: ', h1)
-        x0, r = _popt[:dim], _popt[dim:]
-        t0 = time()
-        j2 = _linear_nd_jac(x0, r, x_temp, cov_inv)[mask]
-        h2 = _linear_nd_hess(x0, r, x_temp, cov_inv)[np.ix_(mask, mask)]
-        print(f'co: {time() - t0} s')
-        # print('co: ', h2)
-        return np.linalg.inv(h2)
-
-    if optimize_cov:  # Minimize the covariances by shifting the origin vector of the straight.
-        def get_cov_t(t, _popt, _axis):
-            _popt_cov = _popt.copy()
-            _popt_cov[:dim] += t * _popt_cov[dim:]  # Shift the origin vector by t.
-            return get_cov(_popt_cov, _axis)
-
-        def cost_cov(t, _popt, _axis):
-            _pcov = get_cov_t(t, _popt, _axis)
-            ret = np.sum(np.triu(_pcov, k=1) ** 2)  # Sum over the square of all covariances.
-            print('cc', ret)
-            return ret
-
-        def get_cost_cov(_popt, _axis):
-            return lambda t: cost_cov(t, _popt, _axis)
-
-        # Set the origin point to the center of the data before optimization.
-        _, tp, _ = get_t_pars(popt[:dim], popt[dim:])
-        popt[:dim] += np.mean(tp, axis=-1) * popt[dim:]
-        tp = 0.1 * (np.max(tp, axis=-1) - np.min(tp, axis=-1))  # Start at a value between all data points other than 0.
-
-        res = minimize(get_cost_cov(popt, axis), np.full(1, tp), method='BFGS')
-        popt[:dim] += res.x[0] * popt[dim:]
-
-    if axis_was_none:
-        popt[dim:] /= tools.absolute(popt[dim:])
-
-    # plt.cla()
-    # plt.clf()
-    # for i in range(4):
-    #     plt.subplot(2, 2, i + 1)
-    #     draw_sigma2d(x_temp[:, 0], x_temp[:, i + 1], np.sqrt(cov_temp[:, 0, 0]),
-    #                  np.sqrt(cov_temp[:, i + 1, i + 1]), cov_temp[:, 0, i + 1] / (np.sqrt(cov_temp[:, 0, 0]) * np.sqrt(cov_temp[:, i + 1, i + 1])))
-    #     plt.plot(x_temp[:, 0], straight(x_temp[:, 0], popt[i + 1], popt[6 + i]))
-    # plt.show()
-
-    popt[dim:] *= x_fac / x_fac[axis]
-    popt[:dim] *= x_fac
-    x_temp *= x_fac[None, :]
-    cov_temp *= x_fac[None, None, :] * x_fac[None, :, None]
-
-    popt[:dim] += x_off
-    # popt[:dim] -= popt[dim:] * popt[axis] / popt[dim + axis]
-    x_temp += x_off[None, :]
-    cov_inv = np.linalg.inv(cov_temp)
-
-    pcov = np.zeros((2 * dim, 2 * dim), dtype=float)
-    pcov[np.ix_(mask, mask)] = get_cov(popt, axis)
 
     return popt, pcov
 
@@ -733,8 +581,8 @@ def linear_fit(x: array_iter, y: array_iter, sigma_x: array_iter = None, sigma_y
     return popt, pcov
 
 
-def _test_order_linear_nd_monte_carlo(x: ndarray, cov: ndarray, n_accepted: int = None, n_samples: int = 100000,
-                                      method: str = 'py', **kwargs):
+def _test_order_linear_nd_monte_carlo(x: ndarray, cov: ndarray, n_samples: int = 100000,
+                                      method: str = 'py', report: bool = False, **kwargs):
     """
     :param x: The data vectors. Must have shape (k, n), where k is the number of data points
      and n is the number of dimensions of each point.
@@ -742,37 +590,41 @@ def _test_order_linear_nd_monte_carlo(x: ndarray, cov: ndarray, n_accepted: int 
      Use 'covariance_matrix' to construct covariance matrices.
     :param n_samples: Maximum number of generated samples.
      If None and method == 'cpp', samples are generated until 'n_accepted' samples get accepted.
-    :param n_accepted: The number of samples to be accepted for each data point. Only available if method == 'cpp'.
     :param method: The method to generate the collinear points. Can be one of {'py', 'cpp'}.
      The 'py' version is faster but only allows to specify 'n_samples'.
      The 'cpp' version is slower but allows to specify both 'n_accepted' and 'n_samples'.
+    :param report: Whether to report the number of samples.
     :param kwargs: Additional keyword arguments to be passed to the chosen method. 'py': {}. 'cpp': {seed=None}.
     :returns: The order of axis 0 of 'x' which yields the most accepted samples.
     """
     indices = [(i, j) for i in range(x.shape[0]) for j in range(x.shape[0]) if j > i]
     best_n = 0
     best_order = np.arange(x.shape[0], dtype=int)
+
     for (i, j) in indices:
         order = np.array([i, ] + [k for k in range(x.shape[0]) if k != i and k != j] + [j, ])
         _x, _cov = np.ascontiguousarray(x[order]), np.ascontiguousarray(cov[order])
-        _, n_accepted, n_samples = generate_collinear_points(_x, _cov, n_accepted=n_accepted, n_samples=n_samples,
-                                                             method=method, **kwargs)
+        _, n_accepted, n_samples = \
+            generate_collinear_points(_x, _cov, n_samples=n_samples, method=method, report=report, **kwargs)
         if n_accepted > best_n:
             best_n = n_accepted
             best_order = order
     return best_order
 
 
-def generate_collinear_points_py(x: ndarray, cov: ndarray, n_samples: int = 100000):
+def generate_collinear_points_py(x: ndarray, cov: ndarray, n_samples: int = 100000, report: bool = False):
     """
     :param x: The data vectors. Must have shape (k, n), where k is the number of data points
      and n is the number of dimensions of each point.
     :param cov: The covariance matrices of the data vectors. Must have shape (k, n, n).
      Use 'covariance_matrix' to construct covariance matrices.
     :param n_samples: The number of samples generated for each data point.
+    :param report: Whether to report the number of samples.
     :returns: The randomly generated data vectors p with shape (n_accepted, k ,n) aligned along a straight line
      and the number of accepted and generated samples.
     """
+    if n_samples is None:
+        n_samples = 100000
     p_0 = multivariate_normal.rvs(mean=x[0], cov=cov[0], size=n_samples)
     p_1 = multivariate_normal.rvs(mean=x[-1], cov=cov[-1], size=n_samples)
     dr = straight_direction(p_0, p_1, axis=-1)
@@ -797,12 +649,16 @@ def generate_collinear_points_py(x: ndarray, cov: ndarray, n_samples: int = 1000
         accepted = np.full(n_samples, True, dtype=bool)
         p = np.concatenate((np.expand_dims(p_0, 0), np.expand_dims(p_1, 0)), axis=0)
 
+    n_accepted = np.sum(accepted)
+    if report:
+        tools.print_colored('OKGREEN', f'Accepted samples: {n_accepted} / {n_samples}')
+
     p = np.transpose(p, axes=[1, 0, 2])
-    return p[accepted], np.sum(accepted), n_samples
+    return p[accepted], n_accepted, n_samples
 
 
-def generate_collinear_points(x: ndarray, cov: ndarray, n_accepted: int = None, n_samples: int = None,
-                              method: str = 'py', **kwargs):
+def generate_collinear_points(x: ndarray, cov: ndarray, n_samples: int = None, n_accepted: int = None,
+                              method: str = 'py', report: bool = True, **kwargs):
     """
     :param x: The data vectors. Must have shape (k, n), where k is the number of data points
      and n is the number of dimensions of each point.
@@ -814,6 +670,7 @@ def generate_collinear_points(x: ndarray, cov: ndarray, n_accepted: int = None, 
     :param method: The method to generate the collinear points. Can be one of {'py', 'cpp'}.
      The 'py' version is faster but only allows to specify 'n_samples'.
      The 'cpp' version is slower but allows to specify both 'n_accepted' and 'n_samples'.
+    :param report: Whether to report the number of samples.
     :param kwargs: Additional keyword arguments to be passed to the chosen method. 'py': {}. 'cpp': {seed=None}.
     :returns: The randomly generated data vectors p with shape (n_accepted, k ,n) aligned along a straight line
      and the number of accepted and generated samples.
@@ -823,13 +680,14 @@ def generate_collinear_points(x: ndarray, cov: ndarray, n_accepted: int = None, 
     if method.lower() not in m:
         raise ValueError(f'\'method\' ({method}) must be in {m}.')
     if method == 'py':
-        return generate_collinear_points_py(x, cov, n_samples=n_samples)
+        return generate_collinear_points_py(x, cov, n_samples=n_samples, report=report)
     else:
-        return generate_collinear_points_cpp(x, cov, n_samples=n_samples, n_accepted=n_accepted, **kwargs)
+        return generate_collinear_points_cpp(x, cov, n_samples=n_samples, n_accepted=n_accepted, report=report,
+                                             **kwargs)
 
 
 def linear_nd_monte_carlo(x: array_iter, cov: array_iter = None, axis: int = None, optimize_cov: bool = False,
-                          n_accepted: int = None, n_samples: int = 100000, optimize_sampling: bool = True,
+                          n_samples: int = None, n_accepted: int = None, optimize_sampling: bool = True,
                           return_samples: bool = False, method: str = 'py', report: bool = False, **kwargs):
     """
     A Monte-Carlo fitter that finds a straight line in n-dimensional space.
@@ -842,8 +700,9 @@ def linear_nd_monte_carlo(x: array_iter, cov: array_iter = None, axis: int = Non
     :param axis: The component of the n-dimensional vectors which are fixed for fitting.
      This is required since a straight in n dimensions is fully described by 2 (n - 1) parameters.
     :param optimize_cov: If True, the origin vector of the straight is optimized to yield the smallest covariances.
-    :param n_accepted: The number of samples to be accepted for each data point.
     :param n_samples: Maximum number of generated samples.
+     If None and method == 'cpp', samples are generated until 'n_accepted' samples get accepted.
+    :param n_accepted: The number of samples to be accepted for each data point. Only available if method == 'cpp'.
     :param optimize_sampling: Whether to optimize the sampling from the data.
     :param return_samples: Whether to also return the generated points 'p'. 'p' has shape (n_samples, k ,n).
     :param method: The method to generate the collinear points. Can be one of {'py', 'cpp'}.
@@ -870,7 +729,7 @@ def linear_nd_monte_carlo(x: array_iter, cov: array_iter = None, axis: int = Non
     if optimize_sampling:
         if report:
             tools.printh('\nOptimizing sampling:')
-        order = _test_order_linear_nd_monte_carlo(x, cov, n_samples=100000, method=method)
+        order = _test_order_linear_nd_monte_carlo(x, cov, n_samples=100000, method=method, report=report)
     else:
         order = np.arange(size, dtype=int)
 
@@ -879,8 +738,8 @@ def linear_nd_monte_carlo(x: array_iter, cov: array_iter = None, axis: int = Non
     if report:
         tools.printh('\nGenerating samples:')
     _x, _cov = np.ascontiguousarray(x[order]), np.ascontiguousarray(cov[order])
-    p, n_accepted, n_samples \
-        = generate_collinear_points(_x, _cov, n_accepted=n_accepted, n_samples=n_samples, method=method, **kwargs)
+    p, n_accepted, n_samples = generate_collinear_points(_x, _cov, n_accepted=n_accepted, n_samples=n_samples,
+                                                         method=method, report=report, **kwargs)
 
     p0 = p[:, 0, :]
     dr = p[:, -1, :] - p0
@@ -922,9 +781,9 @@ def linear_nd_monte_carlo(x: array_iter, cov: array_iter = None, axis: int = Non
 
 
 def linear_monte_carlo(x: array_iter, y: array_iter, sigma_x: array_iter = None, sigma_y: array_iter = None,
-                       corr: array_iter = None, optimize_cov: bool = True, n_accepted: int = None,
-                       n_samples: int = 100000, optimize_sampling: bool = True, return_samples: bool = False,
-                       report: bool = True, **kwargs):
+                       corr: array_iter = None, optimize_cov: bool = True, n_samples: int = None,
+                       n_accepted: int = None, optimize_sampling: bool = True, return_samples: bool = False,
+                       method: str = 'py', report: bool = True, **kwargs):
     """
     Wrapper for linear_nd_monte_carlo.
 
@@ -934,11 +793,14 @@ def linear_monte_carlo(x: array_iter, y: array_iter, sigma_x: array_iter = None,
     :param sigma_y: The 1-sigma uncertainties of the y data. Must be a 1-d array.
     :param corr: The correlation coefficients between the x and y data. Must be a 1-d array.
     :param optimize_cov: If True, the origin vector of the straight is optimized to yield the smallest covariances.
-    :param n_accepted: The number of samples to be accepted for each data point.
     :param n_samples: Maximum number of generated samples.
-     If None, samples are generated until n samples get accepted.
+     If None and method == 'cpp', samples are generated until 'n_accepted' samples get accepted.
+    :param n_accepted: The number of samples to be accepted for each data point. Only available if method == 'cpp'.
     :param optimize_sampling: Whether to optimize the sampling from the data.
     :param return_samples: Whether to also return the generated points 'p'. 'p' has shape (n_samples, k ,2).
+    :param method: The method to generate the collinear points. Can be one of {'py', 'cpp'}.
+     The 'py' version is faster but only allows to specify 'n_samples'.
+     The 'cpp' version is slower but allows to specify both 'n_accepted' and 'n_samples'.
     :param report: Whether to print the result of the fit.
     :returns: a, b, sigma_a, sigma_b, corr_ab. The best y-intercept and slope,
      their respective 1-sigma uncertainties and their correlation coefficient.
@@ -952,7 +814,7 @@ def linear_monte_carlo(x: array_iter, y: array_iter, sigma_x: array_iter = None,
 
     popt, pcov, p = linear_nd_monte_carlo(mean, cov=cov, axis=0, optimize_cov=optimize_cov, n_accepted=n_accepted,
                                           n_samples=n_samples, optimize_sampling=optimize_sampling,
-                                          return_samples=True, report=report)
+                                          return_samples=True, method=method, report=report)
     i = np.array([1, 3], dtype=int)
     popt, pcov = popt[i], pcov[np.ix_(i, i)]
 
@@ -974,11 +836,11 @@ def linear_alpha_fit(x: array_iter, y: array_iter, sigma_x: array_like = None, s
     :param func: The fitting routine. Supports {'york_fit', 'linear_fit', 'linear_monte_carlo'}.
     :param alpha: An x-axis offset to reduce the correlation coefficient between the y-intercept and the slope.
     :param find_alpha: Whether to search for the best 'alpha'. Uses the given 'alpha' as a starting point.
-     May not give the desired result if 'alpha' was initialized to far from its optimal value.
+     May not give the desired result if 'alpha' was initialized too far from its optimal value.
     :param report: Whether to print the result of the fit.
     :param show: Whether to plot the fit result.
     :param kwargs: Additional keyword arguments are passed to the fitting routine.
-    :returns: popt, pcov. The best y-intercept and slope, their covariance matrix and the used alpha.
+    :returns: popt, pcov, alpha. The best y-intercept and slope, their covariance matrix and the used alpha.
     """
     n = tools.floor_log10(alpha)
     x = np.asarray(x, dtype=float)
@@ -1274,7 +1136,12 @@ def _mass_factor_array(m0, m1, m0_d, m1_d):
 
     mu[mask] = np.inf
     mu_d[mask] = 0
-    return mu, np.sqrt(mu_d)
+    return mu, mu_d
+
+
+def _mass_factor_inv_array(m0, m1, m0_d, m1_d):
+    m_fac, m_fac_d = _mass_factor_array(m0, m1, m0_d, m1_d)
+    return 1 / m_fac, np.abs(m_fac_d / m_fac ** 2)
 
 
 class King:
@@ -1318,15 +1185,19 @@ class King:
         self.x = None
         self.x_mod = None
         self.corr = None
-        self.alpha = None
         self.cov = None
         self.popt, self.pcov = None, None
+        self.alpha = None
+        self.axis = 0
+
+    # noinspection PyUnresolvedReferences
+    def _get_i(self, a, a_ref):
+        i = np.array([self.a.tolist().index(_a) for _a in a])
+        i_ref = np.array([self.a.tolist().index(_a) for _a in a_ref])
+        return i, i_ref
 
     def _sample_xmod(self):
-        # noinspection PyUnresolvedReferences
-        i = np.array([self.a.tolist().index(_a) for _a in self.a_fit])
-        # noinspection PyUnresolvedReferences
-        i_ref = np.array([self.a.tolist().index(_a) for _a in self.a_ref])
+        i, i_ref = self._get_i(self.a_fit, self.a_ref)
         m = norm.rvs(loc=self.m[:, 0], scale=self.m[:, 1], size=(self.n_samples, self.m.shape[0])).T
         x = norm.rvs(loc=self.x[:, :, 0], scale=self.x[:, :, 1],
                      size=(self.n_samples, self.x.shape[0], self.x.shape[1]))
@@ -1336,19 +1207,31 @@ class King:
         x_mod = m_mod[:, None, :] * x
         return x_mod
 
-    def _cov(self):
+    def _cov_mc(self):
         """
         :returns: The covariance matrices of the data vectors by sampling the data.
         """
         x_mod = self._sample_xmod()
         return np.array([np.cov(x_mod_i) for x_mod_i in x_mod])
 
-    def _corr(self):
+    def _corr_mc(self):
         """
         :returns: The correlation coefficients of the modified x- and y-data points by sampling the data.
         """
         x_mod = self._sample_xmod()
-        return np.array([np.corrcoef(x_mod_i)[0, 1] for x_mod_i in x_mod])
+        return np.array([np.corrcoef(x_mod_i) for x_mod_i in x_mod])
+
+    def _cov(self):
+        i, i_ref = self._get_i(self.a_fit, self.a_ref)
+        dim = self.x.shape[1]
+        m_mod = self.m_mod[i_ref, i, :]
+        cov_x = [np.diag(np.insert(_x[:, 1], 0, _m_mod[1])) ** 2 for _m_mod, _x in zip(m_mod, self.x)]
+        jac = [np.concatenate([_x[:, 0, None], np.diag(np.full(dim, _m_mod[0]))], axis=1)
+               for _m_mod, _x in zip(m_mod, self.x)]
+        return np.array([_jac @ (_cov_x @ _jac.T) for _jac, _cov_x in zip(jac, cov_x)])
+
+    def _corr(self):
+        return np.array([_cov / np.sqrt(np.diag(_cov)[:, None] * np.diag(_cov)[None, :]) for _cov in self._cov()])
 
     def fit(self, a: array_iter, a_ref: array_iter, x: array_iter = None, y: array_iter = None,
             xy: Iterable[int] = None, func: Union[str, Callable] = york_fit, alpha: scalar = 0,
@@ -1376,10 +1259,7 @@ class King:
         """
         self.nd = False
         self.a_fit, self.a_ref = np.asarray(a, dtype=int), np.asarray(a_ref, dtype=int)
-        # noinspection PyUnresolvedReferences
-        i = np.array([self.a.tolist().index(_a) for _a in self.a_fit])
-        # noinspection PyUnresolvedReferences
-        i_ref = np.array([self.a.tolist().index(_a) for _a in self.a_ref])
+        i, i_ref = self._get_i(self.a_fit, self.a_ref)
 
         if xy is None:
             xy = (0, 1)
@@ -1403,7 +1283,7 @@ class King:
             self.x[:, :, 0], m_mod[:, :, 0], self.x[:, :, 1], 0., m_mod[:, :, 1], 0.)])
         self.x_mod = np.transpose(self.x_mod, axes=[1, 2, 0])
 
-        self.corr = self._corr()
+        self.corr = self._corr()[:, 0, 1]
         self.popt, self.pcov, self.alpha = linear_alpha_fit(
             self.x_mod[:, 0, 0], self.x_mod[:, 1, 0], sigma_x=self.x_mod[:, 0, 1], sigma_y=self.x_mod[:, 1, 1],
             corr=self.corr, func=func, alpha=alpha, find_alpha=find_alpha, show=False)
@@ -1411,7 +1291,7 @@ class King:
         if show:
             self.plot(**kwargs)
         
-        return self.popt, self.pcov, self.alpha
+        return self.popt, self.pcov
 
     def fit_nd(self, a: array_iter, a_ref: array_iter, x: array_iter = None,
                axis: int = 0, optimize_cov: bool = False, func: Union[Callable, str] = linear_nd_fit,
@@ -1432,10 +1312,7 @@ class King:
         """
         self.nd = True
         self.a_fit, self.a_ref = np.asarray(a, dtype=int), np.asarray(a_ref, dtype=int)
-        # noinspection PyUnresolvedReferences
-        i = np.array([self.a.tolist().index(_a) for _a in self.a_fit])
-        # noinspection PyUnresolvedReferences
-        i_ref = np.array([self.a.tolist().index(_a) for _a in self.a_ref])
+        i, i_ref = self._get_i(self.a_fit, self.a_ref)
 
         if x is None:
             self.x = np.zeros((self.a_fit.size, self.x_abs.shape[1], 2), dtype=float)
@@ -1458,17 +1335,204 @@ class King:
             func = eval(func)
 
         self.cov = self._cov()
-
         self.popt, self.pcov, *_ = \
             func(self.x_mod[:, :, 0], cov=self.cov, axis=axis, optimize_cov=optimize_cov, **kwargs)
         self.alpha = self.popt[axis]
+        self.axis = axis
 
         if show:
-            self.plot_nd(**{**{'axis': axis}, **kwargs})
+            self.plot(**kwargs)
+
         return self.popt, self.pcov
 
-    def plot(self, mode: str = '', sigma2d: int = 1, scale: tuple = None, add_xy: array_like = None,
-             add_a: array_like = None, font_dict: dict = None, show: bool = True, **kwargs):
+    def _get_gradient(self, x, m_mod, index, axis):
+        dim = self.popt.size // 2
+        _a, _b = self.popt[:dim], self.popt[dim:]
+        br = _b[index] / _b[axis]
+        t = (x - _a[axis] / m_mod) / _b[axis]
+
+        yi = [br]
+        ai = [0 if index == axis or index != d != axis
+              else (1 / m_mod if d == index else -br / m_mod) for d in range(dim)]
+        bi = [0 if index == axis or index != d != axis else (t if d == index else -br * t) for d in range(dim)]
+        mu = [0 if index == axis else (br * _a[axis] - _a[index]) / m_mod ** 2]
+        return np.array(ai + bi + mu + yi, dtype=float)
+
+    def _get_gradient_mod(self, x, index, axis):
+        dim = self.popt.size // 2
+        _a, _b = self.popt[:dim], self.popt[dim:]
+        br = _b[index] / _b[axis]
+        t = (x - _a[axis]) / _b[axis]
+
+        yi = [br]
+        ai = [0 if index == axis or index != d != axis else (1 if d == index else -br) for d in range(dim)]
+        bi = [_ai * t for _ai in ai]
+        return np.array(ai + bi + yi, dtype=float)
+
+    def get_unmodified(self, a: array_iter, a_ref: array_iter, x: array_iter, axis: int = 0,
+                       show: bool = False, **kwargs):
+        """
+        :param a: An Iterable of mass numbers corresponding to the isotopes of the given 'y' values.
+        :param a_ref: An Iterable of mass numbers corresponding to reference isotopes of the given 'y' values.
+        :param x: The unmodified input values of the given mass numbers. Must have shape (len(a), 2).
+        :param axis: The axis of the input values.
+        :param show: Whether to draw the King plot with the specified values.
+        :param kwargs: Additional keyword arguments are passed to 'self.plot'.
+        :returns: The unmodified x values calculated with the fit results and the given 'y' values.
+        """
+        if self.popt is None:
+            print('There are no results yet. Please use one of the fitting options {\'fit\' or \'fit_nd\'}.')
+            return
+
+        mask = None
+        if not self.nd:
+            indexes = np.arange(4, dtype=int)
+            mask = indexes == self.axis
+            mask += indexes == 2 + self.axis
+            mask = ~mask
+
+            pcov = self.pcov.copy()
+            self.popt = np.insert(self.popt, [0, 1], [self.alpha, 1.])
+            self.pcov = np.zeros((4, 4), dtype=float)
+            self.pcov[np.ix_(mask, mask)] = pcov
+
+        a, a_ref, x = np.asarray(a), np.asarray(a_ref), np.asarray(x)
+        i, i_ref = self._get_i(a, a_ref)
+
+        dim = self.popt.size // 2
+
+        _a, _b = self.popt[:dim], self.popt[dim:]
+
+        m_mod = self.m_mod[i_ref, i, :]
+        x_mod = x[:, 0] * m_mod[:, 0]
+        x_mod_d = np.sqrt((x[:, 1] * m_mod[:, 0]) ** 2 + (x[:, 0] * m_mod[:, 1]) ** 2)
+
+        # Uncertainty propagation for the modified data including covariances (for plot only).
+        jac = [np.array([self._get_gradient_mod(_x_mod, d, axis) for d in range(dim)]) for _x_mod in x_mod]
+        cov_x = [np.block([[self.pcov, np.zeros((2 * dim, 1))],
+                           [np.zeros((1, 2 * dim)), _x_mod_d ** 2]]) for _x_mod_d in x_mod_d]
+        cov_mod = [_jac @ (_cov_x @ _jac.T) for _jac, _cov_x in zip(jac, cov_x)]
+        corr_mod = [_cov / np.sqrt(np.diag(_cov)[:, None] * np.diag(_cov)[None, :]) for _cov in cov_mod]
+
+        y_mod = _a[None, :] + _b[None, :] / _b[axis] * (x_mod[:, None] - _a[axis])
+
+        # Calculate the unmodified values including covariances ...
+        jac = [np.array([self._get_gradient(_x, _m_mod, d, axis) for d in range(dim)])
+               for _m_mod, _x in zip(m_mod[:, 0], x[:, 0])]
+        cov_x = [np.block([[self.pcov, np.zeros((2 * dim, 2))],
+                           [np.zeros((2, 2 * dim)), np.diag([_m_mod_d ** 2, _x_d ** 2])]])
+                 for _m_mod_d, _x_d in zip(m_mod[:, 1], x[:, 1])]
+        cov_stat = [np.block([[np.zeros((2 * dim, 2 * dim)), np.zeros((2 * dim, 2))],
+                              [np.zeros((2, 2 * dim)), np.diag([_m_mod_d ** 2, _x_d ** 2])]])
+                    for _m_mod_d, _x_d in zip(m_mod[:, 1], x[:, 1])]
+
+        # ... with and without uncertainties of fit parameters.
+        cov = np.array([_jac @ (_cov_x @ _jac.T) for _jac, _cov_x in zip(jac, cov_x)])
+        cov_stat = np.array([_jac @ (_cov_stat @ _jac.T) for _jac, _cov_stat in zip(jac, cov_stat)])
+
+        y = y_mod / m_mod[:, 0, None]
+
+        if show:
+            add_xy = np.array([[[_y_mod[self.axis], np.sqrt(_cov[self.axis, self.axis]),
+                                 _y_mod[d], np.sqrt(_cov[d, d]), _corr[self.axis, d]]
+                                for _y_mod, _cov, _corr in zip(y_mod, cov_mod, corr_mod)]
+                               for d in range(dim) if d != self.axis])
+            add_a = np.array([a, a_ref]).T
+            if not self.nd:
+                self.popt = self.popt[mask]
+                self.pcov = self.pcov[np.ix_(mask, mask)]
+                add_xy = add_xy[0]
+            self.plot(add_xy=add_xy, add_a=add_a, **kwargs)
+
+        return y, cov, cov_stat
+
+    # def _get_unmodified_mc(self, a: array_iter, a_ref: array_iter, x: array_iter, axis: int = 0,
+    #                        show: bool = False, **kwargs):
+    #     a, a_ref, x = np.asarray(a), np.asarray(a_ref), np.asarray(x)
+    #     i, i_ref = self._get_i(a, a_ref)
+    #
+    #     popt_s = multivariate_normal.rvs(mean=self.popt, cov=self.pcov, size=self.n_samples).T
+    #     if axis == 0:
+    #         _a, _b = self.popt[0], self.popt[1]
+    #         _a_s, _b_s = popt_s[0], popt_s[1]
+    #     else:
+    #         _a, _b = -self.popt[0] / self.popt[1], 1 / self.popt[1]
+    #         _a_s, _b_s = -popt_s[0] / popt_s[1], 1 / popt_s[1]
+    #
+    #     m_s = norm.rvs(loc=self.m[:, 0], scale=self.m[:, 1], size=(self.n_samples, self.m.shape[0])).T
+    #     m_mod_s = _mass_factor_array(m_s[i], m_s[i_ref], 0., 0.)[0]
+    #
+    #     x_s = norm.rvs(loc=x[:, 0], scale=x[:, 1], size=(self.n_samples, x.shape[0])).T
+    #     x_mod_s = m_mod_s * x_s
+    #
+    #     y_mod_s = straight(x_mod_s, _a_s, _b_s)
+    #     y_s = y_mod_s / m_mod_s
+    #
+    #     y_mod_stat_s = straight(x_mod_s, _a, _b)
+    #     y_stat_s = y_mod_stat_s / m_mod_s  # For non-fit uncertainties only
+    #
+    #     x_mod = np.array([np.mean(x_mod_s, axis=-1), np.std(x_mod_s, ddof=1, axis=-1)]).T
+    #     y_mod = np.array([np.mean(y_mod_s, axis=-1), np.std(y_mod_s, ddof=1, axis=-1)]).T
+    #     corr_mod = np.array([np.corrcoef(_x, _y)[0, 1] for _x, _y in zip(x_mod_s, y_mod_s)])
+    #
+    #     y = np.mean(y_s, axis=-1)
+    #     y_d = np.std(y_s, ddof=1, axis=-1)
+    #     ys_d = np.std(y_stat_s, ddof=1, axis=-1)
+    #
+    #     if show:
+    #         if axis == 0:
+    #             add_xy = np.array([x_mod[:, 0], x_mod[:, 1], y_mod[:, 0], y_mod[:, 1], corr_mod]).T
+    #         else:
+    #             add_xy = np.array([y_mod[:, 0], y_mod[:, 1], x_mod[:, 0], x_mod[:, 1], corr_mod]).T
+    #         add_a = np.array([a, a_ref]).T
+    #         self.plot(add_xy=add_xy, add_a=add_a, **kwargs)
+    #
+    #     return y, y_d, ys_d
+    #
+    # def _get_unmodified_nd_mc(self, a: array_iter, a_ref: array_iter, x: array_iter, axis: int = 0,
+    #                           show: bool = False, **kwargs):
+    #     a, a_ref, x = np.asarray(a), np.asarray(a_ref), np.asarray(x)
+    #     i, i_ref = self._get_i(a, a_ref)
+    #
+    #     dim = self.popt.size // 2
+    #     indexes = np.arange(2 * dim, dtype=int)
+    #     mask = indexes == self.axis
+    #     mask += indexes == dim + self.axis
+    #     mask = ~mask
+    #
+    #     popt_s = multivariate_normal.rvs(mean=self.popt[mask], cov=self.pcov[np.ix_(mask, mask)], size=self.n_samples).T
+    #     popt_s = np.insert(popt_s, [self.axis, dim + self.axis],
+    #                        [np.full(self.n_samples, self.popt[self.axis]),
+    #                         np.full(self.n_samples, self.popt[dim + self.axis])], axis=0)
+    #
+    #     m_s = norm.rvs(loc=self.m[:, 0], scale=self.m[:, 1], size=(self.n_samples, self.m.shape[0])).T
+    #     m_mod_s = _mass_factor_array(m_s[i], m_s[i_ref], 0., 0.)[0]
+    #
+    #     x_s = norm.rvs(loc=x[:, 0], scale=x[:, 1], size=(self.n_samples, x.shape[0])).T
+    #     x_mod_s = m_mod_s * x_s
+    #
+    #     t_s = (x_mod_s - popt_s[axis][None, :]) / popt_s[dim + axis][None, :]
+    #     # t_s = (x_mod_s - self.popt[axis]) / self.popt[dim + axis]
+    #     y_mod_s = popt_s[:dim][:, None, :] + t_s[None, :, :] * popt_s[dim:][:, None, :]
+    #     y_s = y_mod_s / m_mod_s[None, :, :]
+    #
+    #     m_mod = _mass_factor_array(self.m[i, 0], self.m[i_ref, 0], self.m[i, 1], self.m[i_ref, 1])
+    #     x_modt = np.array([m_mod[0] * x[:, 0], np.sqrt((m_mod[1] * x[:, 0]) ** 2 + (m_mod[0] * x[:, 1]) ** 2)]).T
+    #
+    #     x_mod = np.array([np.mean(y_mod_s[self.axis], axis=-1), np.std(y_mod_s[self.axis], ddof=1, axis=-1)]).T
+    #     y_mod = np.array([np.array([np.mean(y_mod_s[d], axis=-1), np.std(y_mod_s[d], ddof=1, axis=-1)]).T
+    #                       for d in range(dim) if d != self.axis])
+    #     corr_mod = np.array([np.array([np.corrcoef(_x, _y)[0, 1] for _x, _y in zip(y_mod_s[self.axis], _y_mod_s)])
+    #                          for d, _y_mod_s in enumerate(y_mod_s) if d != self.axis])
+    #
+    #     if show:
+    #         add_xy = np.array([np.array([x_mod[:, 0], x_mod[:, 1], _y_mod[:, 0], _y_mod[:, 1], _corr_mod]).T
+    #                            for _y_mod, _corr_mod in zip(y_mod, corr_mod)])
+    #         add_a = np.array([a, a_ref]).T
+    #         self.plot_nd(add_xy=add_xy, add_a=add_a, **kwargs)
+
+    def _plot_2d(self, mode: str = '', sigma2d: int = 1, scale: tuple = None, add_xy: array_like = None,
+                 add_a: array_like = None, font_dict: dict = None, show: bool = True, **kwargs):
         """
         :param mode: The mode of the King-fit. If mode='radii', the x-axis must contain the differences of
          mean square nuclear charge radii or the Lambda-factor. For every other value,
@@ -1477,23 +1541,16 @@ class King:
         :param sigma2d: Whether to draw the actual two-dimensional uncertainty bounds or the classical errorbars.
          The integer number corresponds to the number of drawn sigma regions.
         :param scale: Factors to scale the x and the y-axis.
-        :param add_xy: Additional x and y data to plot. Must have shape (k, 2, 2),
-         where the additional k data points are arrays of the form [[x, x_d], [y, y_d]].
+        :param add_xy: Additional x and y data to plot. Must have shape (k, 5),
+         where the additional k data points are arrays of the form [x, x_d, y, y_d, corr_xy].
         :param add_a: Additional mass numbers for the additional data. Must have shape (k, 2),
          where each row is a tuple [A, A_ref].
         :param font_dict: The font_dict passed to matplotlib.rc('font', font_dict).
         :param show: Whether to show the plot.
+        :param kwargs: Additional keyword arguments.
         :returns: None. Generates a King-Plot based on the modified axes 'self.x_mod' and 'self.y_mod'
          as well as the fit results 'self.results'.
         """
-        if font_dict is None:
-            font_dict = {'size': 12, 'family': 'arial'}
-        matplotlib.rc('font', **font_dict)
-        
-        if self.popt is None:
-            print('There are no results yet. Please use one of the fitting options.')
-            return
-
         a, b = self.popt
         sigma_a, sigma_b = np.sqrt(np.diag(self.pcov))
         corr = self.pcov[0, 1] / (sigma_a * sigma_b)
@@ -1522,7 +1579,7 @@ class King:
                 plt.plot((add_xy[:, 0] - self.alpha) * scale_x,
                          add_xy[:, 2] * scale_y, 'r.', label='Data')
                 draw_sigma2d((add_xy[:, 0] - self.alpha) * scale_x, add_xy[:, 2] * scale_y,
-                             add_xy[:, 1] * scale_x, add_xy[:, 3] * scale_y, self.corr, n=sigma2d, **{'fmt': '-r'})
+                             add_xy[:, 1] * scale_x, add_xy[:, 3] * scale_y, add_xy[:, 4], n=sigma2d, **{'fmt': '-r'})
         else:
             plt.errorbar((self.x_mod[:, 0, 0] - self.alpha) * scale_x, self.x_mod[:, 1, 0] * scale_y,
                          xerr=self.x_mod[:, 0, 1] * scale_x, yerr=self.x_mod[:, 1, 1] * scale_y,
@@ -1534,15 +1591,15 @@ class King:
 
         for j in range(len(self.a_fit)):
             pm = -1. if b > 0 else 1.
-            plt.text((self.x_mod[j, 0, 0] + 1. * self.x_mod[j, 0, 1] - self.alpha) * scale_x,
-                     (self.x_mod[j, 1, 0] + pm * 5. * self.x_mod[j, 1, 1]) * scale_y,
+            plt.text((self.x_mod[j, 0, 0] + 1.5 * self.x_mod[j, 0, 1] - self.alpha) * scale_x,
+                     (self.x_mod[j, 1, 0] + pm * 1.5 * self.x_mod[j, 1, 1]) * scale_y,
                      '{} - {}'.format(self.a_fit[j], self.a_ref[j]), ha='left', va='top' if b > 0 else 'bottom')
 
         if add_a is not None and add_xy is not None:
             for j in range(add_xy.shape[0]):
                 pm = 1. if b > 0 else -1.
-                plt.text((add_xy[j, 0] - 1. * add_xy[j, 1] - self.alpha) * scale_x,
-                         (add_xy[j, 2] + pm * 5. * add_xy[j, 3]) * scale_y,
+                plt.text((add_xy[j, 0] - 1.5 * add_xy[j, 1] - self.alpha) * scale_x,
+                         (add_xy[j, 2] + pm * 1.5 * add_xy[j, 3]) * scale_y,
                          '{} - {}'.format(*add_a[j]), ha='right', va='bottom' if b > 0 else 'top')
 
         min_x, max_x = np.min(self.x_mod[:, 0, 0]), np.max(self.x_mod[:, 0, 0])
@@ -1565,8 +1622,8 @@ class King:
             plt.show()
             plt.clf()
 
-    def plot_nd(self, mode: str = '', sigma2d: int = 1, scale: tuple = None, add_xy: array_like = None,
-                add_a: array_like = None, axis: int = 0, font_dict: dict = None, show: bool = True, **kwargs):
+    def plot(self, mode: str = '', sigma2d: int = 1, scale: tuple = None, add_xy: array_like = None,
+             add_a: array_like = None, font_dict: dict = None, show: bool = True, **kwargs):
         """
         :param mode: The mode of the King-fit. If mode='radii', the x-axis must contain the differences of
          mean square nuclear charge radii or the Lambda-factor. For every other value,
@@ -1575,11 +1632,11 @@ class King:
         :param sigma2d: Whether to draw the actual two-dimensional uncertainty bounds or the classical errorbars.
          The integer number corresponds to the number of drawn sigma regions.
         :param scale: Factors to scale the x and the y-axis.
-        :param add_xy: Additional x and y data to plot. Must have shape (k, n, 2),
-         where the additional k data points are arrays of the form [[x0, x0_d], [x1, x1_d], ... ].
+        :param add_xy: Additional x and y data to plot. Must have shape (n - 1, k, 5),
+         where n is the dimension of the data vectors, k is the number of additional data points and the five entries
+         in the last axis correspond to arrays of the form [x, x_d, y, y_d, corr_xy].
         :param add_a: Additional mass numbers for the additional data. Must have shape (k, 2),
          where each row is a tuple [A, A_ref].
-        :param axis: The axis which is used as the x-axis throughout the plots.
         :param font_dict: The font_dict passed to matplotlib.rc('font', font_dict).
         :param show: Whether to show the plot.
         :returns: None. Generates a King-Plot based on the modified axes 'self.x_mod_nd' and 'self.y_mod_nd'
@@ -1593,8 +1650,10 @@ class King:
         if self.popt is None:
             print('There are no results yet. Please use one of the fitting options.')
             return
+
         if not self.nd:
-            self.plot(mode=mode, sigma2d=sigma2d, scale=scale, font_dict=font_dict)
+            return self._plot_2d(mode=mode, sigma2d=sigma2d, scale=scale, add_xy=add_xy, add_a=add_a,
+                                 font_dict=font_dict, show=show, **kwargs)
         
         dim = int(self.popt.size / 2)
         a, b = self.popt[:dim], self.popt[dim:]
@@ -1618,31 +1677,48 @@ class King:
         n_plots = self.x_mod.shape[1] - 1
         n_cols = int(np.ceil(np.sqrt(n_plots)))
         n_rows = int(np.ceil(n_plots / n_cols))
-        plot_indexes = [i for i in range(n_plots + 1) if i != axis]
+        plot_indexes = [i for i in range(n_plots + 1) if i != self.axis]
         for i, iy in enumerate(plot_indexes):
             # i_col = i % n_cols
             # i_row = i // n_cols
             plt.subplot(n_rows, n_cols, i + 1)
 
             if sigma2d:
-                plt.plot((self.x_mod[:, axis, 0] - self.alpha) * scale_x,
+                plt.plot((self.x_mod[:, self.axis, 0] - self.alpha) * scale_x,
                          self.x_mod[:, iy, 0] * scale_y, 'k.', label='Data')
-                draw_sigma2d((self.x_mod[:, axis, 0] - self.alpha) * scale_x, self.x_mod[:, iy, 0] * scale_y,
-                             np.sqrt(self.cov[:, axis, axis]) * scale_x, np.sqrt(self.cov[:, iy, iy]) * scale_y,
-                             self.cov[:, axis, iy] / np.sqrt(self.cov[:, axis, axis] * self.cov[:, iy, iy]), n=sigma2d)
+                draw_sigma2d(
+                    (self.x_mod[:, self.axis, 0] - self.alpha) * scale_x, self.x_mod[:, iy, 0] * scale_y,
+                    np.sqrt(self.cov[:, self.axis, self.axis]) * scale_x, np.sqrt(self.cov[:, iy, iy]) * scale_y,
+                    self.cov[:, self.axis, iy] / np.sqrt(self.cov[:, self.axis, self.axis] * self.cov[:, iy, iy]),
+                    n=sigma2d)
+                if add_xy is not None:
+                    plt.plot((add_xy[i, :, 0] - self.alpha) * scale_x,
+                             add_xy[i, :, 2] * scale_y, 'r.', label='Data')
+                    draw_sigma2d((add_xy[i, :, 0] - self.alpha) * scale_x, add_xy[i, :, 2] * scale_y,
+                                 add_xy[i, :, 1] * scale_x, add_xy[i, :, 3] * scale_y, add_xy[i, :, 4],
+                                 n=sigma2d, **{'fmt': '-r'})
             else:
-                plt.errorbar((self.x_mod[:, axis, 0] - self.alpha) * scale_x, self.x_mod[:, iy, 0] * scale_y,
-                             xerr=np.sqrt(self.cov[:, axis, axis]) * scale_x,
+                plt.errorbar((self.x_mod[:, self.axis, 0] - self.alpha) * scale_x, self.x_mod[:, iy, 0] * scale_y,
+                             xerr=np.sqrt(self.cov[:, self.axis, self.axis]) * scale_x,
                              yerr=np.sqrt(self.cov[:, iy, iy]) * scale_y, fmt='k.', label='Data')
 
             for j in range(len(self.a_fit)):
                 pm = -1. if b[iy] > 0 else 1.
-                plt.text((self.x_mod[j, axis, 0] + 1. * np.sqrt(self.cov[j, axis, axis]) - self.alpha) * scale_x,
-                         (self.x_mod[j, iy, 0] + pm * 5. * np.sqrt(self.cov[j, iy, iy])) * scale_y,
-                         '{} - {}'.format(self.a_fit[j], self.a_ref[j]),
-                         ha='left', va='top' if b[iy] > 0 else 'bottom')
+                plt.text((self.x_mod[j, self.axis, 0] + 1.5 * np.sqrt(self.cov[j, self.axis, self.axis]) - self.alpha)
+                         * scale_x, (self.x_mod[j, iy, 0] + pm * 1.5 * np.sqrt(self.cov[j, iy, iy])) * scale_y,
+                         '{} - {}'.format(self.a_fit[j], self.a_ref[j]), ha='left', va='top' if b[iy] > 0 else 'bottom')
 
-            min_x, max_x = np.min(self.x_mod[:, axis, 0]), np.max(self.x_mod[:, axis, 0])
+            if add_a is not None and add_xy is not None:
+                for j in range(add_xy.shape[1]):
+                    pm = 1. if b[iy] > 0 else -1.
+                    plt.text((add_xy[i, j, 0] - 1.5 * add_xy[i, j, 1] - self.alpha) * scale_x,
+                             (add_xy[i, j, 2] + pm * 1.5 * add_xy[i, j, 3]) * scale_y,
+                             '{} - {}'.format(*add_a[j]), ha='right', va='bottom' if b[iy] > 0 else 'top')
+
+            min_x, max_x = np.min(self.x_mod[:, self.axis, 0]), np.max(self.x_mod[:, self.axis, 0])
+            if add_xy is not None:
+                min_x, max_x = np.min([min_x, np.min(add_xy[i, :, 0])]), np.max([max_x, np.max(add_xy[i, :, 0])])
+
             x_cont = np.linspace(min_x - 0.1 * (max_x - min_x), max_x + 0.1 * (max_x - min_x), 1001) - self.alpha
 
             plt.plot(x_cont * scale_x, straight(x_cont, a[iy], b[iy]) * scale_y, 'b-', label='Fit')
@@ -1657,6 +1733,7 @@ class King:
             plt.legend(numpoints=1, loc='best')
             plt.margins(0.1)
             # plt.tight_layout()
+            # plt.subplots_adjust(left=0.2, bottom=0.1, right=0.9, top=0.9, wspace=0.5, hspace=0.4)
         
         if show:
             plt.show()
@@ -1788,12 +1865,14 @@ class KingOld:
         self.y_mod = np.array([self.y[:, 0] * m_mod[:, 0],
                                straight_x_std(self.y[:, 0], m_mod[:, 0], self.y[:, 1], 0., m_mod[:, 1], 0.)]).T
         self._correlation()
-        self.results = linear_alpha_fit(self.x_mod[:, 0], self.y_mod[:, 0],
-                                        sigma_x=self.x_mod[:, 1], sigma_y=self.y_mod[:, 1],
-                                        corr=self.corr, func=func, alpha=alpha, find_alpha=find_alpha, show=False)
+        self.popt, self.pcov, self.alpha = linear_alpha_fit(
+            self.x_mod[:, 0], self.y_mod[:, 0], sigma_x=self.x_mod[:, 1], sigma_y=self.y_mod[:, 1], corr=self.corr,
+            func=func, alpha=alpha, find_alpha=find_alpha, show=False)
+
         if show:
             self.plot(**kwargs)
-        return self.results
+
+        return self.popt, self.pcov
 
     def fit_nd(self, a: array_iter, a_ref: array_iter, x: array_iter = None,
                axis: int = 0, show: bool = True, **kwargs):
