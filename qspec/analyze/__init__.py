@@ -12,6 +12,7 @@ Module for analyzing/evaluating/fitting data.
 Linear regression algorithms:
     2d:
     - york_fit(); [York et al., Am. J. Phys. 72, 367 (2004)]
+    - linear_fit(); 2-dimensional maximum likelihood fit.
     - linear_monte_carlo(); based on [Gebert et al., Phys. Rev. Lett. 115, 053003 (2015), Suppl.]
 
     nd:
