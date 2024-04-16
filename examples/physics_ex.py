@@ -184,6 +184,25 @@ def example(n=None):
         for k, v in locals().items():
             print('{} = {}'.format(k, v))
 
+    if 4 in n:
+        """
+        Example 4: The velocity distribution of thermal accelerated ions. 
+        """
+        m = 88.  # u, The mass of the ions.
+        q = 1  # e  # The electric charge of the ions.
+        u = 2e4  # V, The acceleration voltage.
+        t = 2000.  # K, The temperature in the source.
+        scale_e = 0.4  # eV, The sigma of the gaussian energy distribution in the source.
+
+        v0 = pc.v_el(u, q, m)  # m/s  # The expected ion velocity.
+        v = np.linspace(-20, 20, 1001, dtype=float)  # m/s
+        y = pc.convolved_thermal_norm_v_pdf(v0 + v, m, t, 0.4, u)  # The distribution of the ion velocities.
+
+        plt.xlabel('$v - v_0$ (m/s)')
+        plt.ylabel('Abundance')
+        plt.plot(v, y)
+        plt.show()
+
 
 if __name__ == '__main__':
-    example({0, 1, 2, 3})
+    example({0, 1, 2, 3, 4})

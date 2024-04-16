@@ -155,7 +155,7 @@ def fit(model: _base.Model, x: array_iter, y: array_iter, sigma_x: array_iter = 
         y = np.concatenate([y, vals], axis=0)
         if callable(sigma_y):
             sigma_y = _wrap_sigma_y(sigma_y, uncs)
-        else:
+        elif sigma_y is not None:
             sigma_y = np.concatenate([sigma_y, uncs], axis=0)
 
     p0_fixed, bounds = model.fit_prepare()
