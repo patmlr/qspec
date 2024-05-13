@@ -201,4 +201,4 @@ def example(n=None):
 
 
 if __name__ == '__main__':
-    example({1, })
+    example({0, 1, 2})

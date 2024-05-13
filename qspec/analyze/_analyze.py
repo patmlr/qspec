@@ -382,7 +382,7 @@ def _linear_nd_t0(p, x, cov_inv):
 
 
 def _linear_nd_func(p, x, cov_inv):
-    x0, r = _x0_r_from_p(p)
+    x0, r = _x0_r_from_p(p)  # (dim, ), (dim, )
     xi = x0[None, :] - x  # (size, dim)
     ax = np.sum(cov_inv * r[None, None, :], axis=-1)  # (size, dim)
     ar = np.sum(cov_inv * xi[:, None, :], axis=-1)  # (size, dim)
@@ -394,7 +394,7 @@ def _linear_nd_func(p, x, cov_inv):
 
 
 def _linear_nd_jac(p, x, cov_inv):
-    x0, r = _x0_r_from_p(p)
+    x0, r = _x0_r_from_p(p)  # (dim, ), (dim, )
     xi = x0[None, :] - x  # (size, dim)
     ax = np.sum(cov_inv * r[None, None, :], axis=-1)  # = da/dx = 0.5 * db/dr, (size, dim)
     ar = np.sum(cov_inv * xi[:, None, :], axis=-1)  # = da/dr, (size, dim)
@@ -408,7 +408,7 @@ def _linear_nd_jac(p, x, cov_inv):
 
 
 def _linear_nd_hess(p, x, cov_inv):
-    x0, r = _x0_r_from_p(p)
+    x0, r = _x0_r_from_p(p)  # (dim, ), (dim, )
     xi = x0[None, :] - x  # (size, dim)
     ax = np.sum(cov_inv * r[None, None, :], axis=-1)  # = da/dx, (size, dim)
     ar = np.sum(cov_inv * xi[:, None, :], axis=-1)  # = da/dr, (size, dim)
@@ -496,7 +496,7 @@ def linear_nd_fit(x: array_iter, cov: array_iter = None, p0: array_iter = None, 
     mask = ~mask
     p0_red = popt[mask]
 
-    res = minimize(_get_linear_nd_reduced(x_temp, cov_inv, popt, mask, 'func'), p0_red, method='newton-cg',
+    res = minimize(_get_linear_nd_reduced(x_temp, cov_inv, popt, mask, 'func'), p0_red, method='Newton-CG',
                    jac=_get_linear_nd_reduced(x_temp, cov_inv, popt, mask, 'jac'),
                    hess=_get_linear_nd_reduced(x_temp, cov_inv, popt, mask, 'hess'), options={'xtol': 1e-15})
 

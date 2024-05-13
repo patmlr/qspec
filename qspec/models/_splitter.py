@@ -97,14 +97,14 @@ def hf_int(i, j_l, j_u, transitions):
 
 
 class Splitter(Model):
-    def __init__(self, model, i, j_l, j_u, name):
+    def __init__(self, model, i, j_l, j_u, label=None):
         super().__init__(model=model)
         self.type = 'Splitter'
 
         self.i = i
         self.j_l = j_l
         self.j_u = j_u
-        self.name = name
+        self.label = label
 
         self.racah_indices = []
         self.racah_intensities = []
@@ -118,7 +118,8 @@ class SplitterSummed(Summed):
     def __init__(self, splitter_models):
         if any(not isinstance(model, Splitter) for model in splitter_models):
             raise TypeError('All models passed to \'SplitterSummed\' must have type \'Splitter\'.')
-        super().__init__(splitter_models, labels=['({})'.format(model.name) for model in splitter_models]
+        super().__init__(splitter_models, labels=['({})'.format(i if model.label is None else model.label)
+                                                  for i, model in enumerate(splitter_models)]
                          if len(splitter_models) > 1 else None)
 
     def racah(self):
@@ -131,8 +132,8 @@ class SplitterSummed(Summed):
 
 
 class Hyperfine(Splitter):
-    def __init__(self, model, i, j_l, j_u, name):
-        super().__init__(model, i, j_l, j_u, name)
+    def __init__(self, model, i, j_l, j_u, label=None):
+        super().__init__(model, i, j_l, j_u, label=label)
         self.type = 'Hyperfine'
 
         self.transitions = hf_trans(self.i, self.j_l, self.j_u)
