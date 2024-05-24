@@ -264,6 +264,16 @@ void Interaction::set_controlled(bool _controlled)
 	controlled = _controlled;
 }
 
+bool Interaction::get_dense()
+{
+	return dense;
+}
+
+void Interaction::set_dense(bool _dense)
+{
+	dense = _dense;
+}
+
 double Interaction::get_dt()
 {
 	return dt;
@@ -272,6 +282,36 @@ double Interaction::get_dt()
 void Interaction::set_dt(double _dt)
 {
 	dt = _dt;
+}
+
+double Interaction::get_dt_max()
+{
+	return dt_max;
+}
+
+void Interaction::set_dt_max(double _dt_max)
+{
+	dt_max = _dt_max;
+}
+
+double Interaction::get_atol()
+{
+	return atol;
+}
+
+void Interaction::set_atol(double _atol)
+{
+	atol = _atol;
+}
+
+double Interaction::get_rtol()
+{
+	return rtol;
+}
+
+void Interaction::set_rtol(double _rtol)
+{
+	rtol = _rtol;
 }
 
 bool Interaction::get_loop()
@@ -307,6 +347,16 @@ MatrixXd* Interaction::get_atommap()
 MatrixXd* Interaction::get_deltamap()
 {
 	return &deltamap;
+}
+
+MatrixXcd* Interaction::get_hamiltonian(const double t, const VectorXd& delta, const Vector3d& v)
+{
+	VectorXd w0 = *atom->get_w0();
+	VectorXd* w = gen_w(delta, v);
+	MatrixXcd* H = gen_hamiltonian(w0, *w);
+	if (time_dependent) update_hamiltonian(*H, w0, *w, t);
+	delete w;
+	return H;
 }
 
 void Interaction::update()
@@ -762,9 +812,15 @@ std::vector<std::vector<VectorXd>> Interaction::rates(
 			VectorXd* R_sum = gen_rates_sum(*R);
 			size_t n = 0;
 
-			if (controlled)
+			if (dense)
 			{
-				d_dopri5_vd_type dopri5 = make_dense_output(1e-5, 1e-5, dt, dopri5_vd_type());
+				d_dopri5_vd_type dopri5 = make_dense_output(atol, rtol, dt_max, dopri5_vd_type());
+				n = integrate_times(dopri5, f_rate_equations(*R, *R_sum, *atom->get_L0(), *atom->get_Lsum()),
+					x0.at(i), t.begin(), t.end(), dt, push_back_VectorXd(results.at(i)));
+			}
+			else if (controlled)
+			{
+				c_dopri5_vd_type dopri5 = make_controlled(atol, rtol, dt_max, dopri5_vd_type());
 				n = integrate_times(dopri5, f_rate_equations(*R, *R_sum, *atom->get_L0(), *atom->get_Lsum()),
 					x0.at(i), t.begin(), t.end(), dt, push_back_VectorXd(results.at(i)));
 			}
@@ -807,19 +863,34 @@ std::vector<std::vector<VectorXcd>> Interaction::schroedinger(
 			MatrixXcd* H = gen_hamiltonian(w0, *w);
 			size_t n = 0;
 
-			if (controlled)
+			if (dense)
 			{
 				if (time_dependent)
 				{
-					d_dopri5_vcd_type dopri5 = make_dense_output(1e-5, 1e-5, dt_var, dopri5_vcd_type());
+					d_dopri5_vcd_type dopri5 = make_dense_output(atol, rtol, dt_max, dopri5_vcd_type());
 					n = integrate_times(dopri5, f_schroedinger_t(*H, w0, *w, *this),
-						x0.at(i), t.begin(), t.end(), dt_var, push_back_VectorXcd(results.at(i)));
+						x0.at(i), t.begin(), t.end(), dt, push_back_VectorXcd(results.at(i)));
 				}
 				else
 				{
-					d_dopri5_vcd_type dopri5 = make_dense_output(1e-5, 1e-5, dt_var, dopri5_vcd_type());
+					d_dopri5_vcd_type dopri5 = make_dense_output(atol, rtol, dt_max, dopri5_vcd_type());
 					n = integrate_times(dopri5, f_schroedinger(*H),
-						x0.at(i), t.begin(), t.end(), dt_var, push_back_VectorXcd(results.at(i)));
+						x0.at(i), t.begin(), t.end(), dt, push_back_VectorXcd(results.at(i)));
+				}
+			}
+			else if (controlled)
+			{
+				if (time_dependent)
+				{
+					c_dopri5_vcd_type dopri5 = make_controlled(atol, rtol, dt_max, dopri5_vcd_type());
+					n = integrate_times(dopri5, f_schroedinger_t(*H, w0, *w, *this),
+						x0.at(i), t.begin(), t.end(), dt, push_back_VectorXcd(results.at(i)));
+				}
+				else
+				{
+					c_dopri5_vcd_type dopri5 = make_controlled(atol, rtol, dt_max, dopri5_vcd_type());
+					n = integrate_times(dopri5, f_schroedinger(*H),
+						x0.at(i), t.begin(), t.end(), dt, push_back_VectorXcd(results.at(i)));
 				}
 			}
 			else
@@ -827,12 +898,12 @@ std::vector<std::vector<VectorXcd>> Interaction::schroedinger(
 				if (time_dependent)
 				{
 					n = integrate_times(rk4_vcd_type(), f_schroedinger_t(*H, w0, *w, *this),
-						x0.at(i), t.begin(), t.end(), dt_var, push_back_VectorXcd(results.at(i)));
+						x0.at(i), t.begin(), t.end(), dt, push_back_VectorXcd(results.at(i)));
 				}
 				else
 				{
 					n = integrate_times(rk4_vcd_type(), f_schroedinger(*H),
-						x0.at(i), t.begin(), t.end(), dt_var, push_back_VectorXcd(results.at(i)));
+						x0.at(i), t.begin(), t.end(), dt, push_back_VectorXcd(results.at(i)));
 				}
 			}
 			delete w;
@@ -870,17 +941,32 @@ std::vector<std::vector<MatrixXcd>> Interaction::master(
 			MatrixXcd* H = gen_hamiltonian(w0, *w);
 			size_t n = 0;
 
-			if (controlled)
+			if (dense)
 			{
 				if (time_dependent)
 				{
-					d_dopri5_mcd_type dopri5 = make_dense_output(1e-5, 1e-5, dt, dopri5_mcd_type());
+					d_dopri5_mcd_type dopri5 = make_dense_output(atol, rtol, dt_max, dopri5_mcd_type());
 					n = integrate_times(dopri5, f_master_t(*H, L0, L1, w0, *w, *this),
 						x0.at(i), t.begin(), t.end(), dt, push_back_MatrixXcd(results.at(i)));
 				}
 				else
 				{
-					d_dopri5_mcd_type dopri5 = make_dense_output(1e-5, 1e-5, dt, dopri5_mcd_type());
+					d_dopri5_mcd_type dopri5 = make_dense_output(atol, rtol, dt_max, dopri5_mcd_type());
+					n = integrate_times(dopri5, f_master(*H, L0, L1),
+						x0.at(i), t.begin(), t.end(), dt, push_back_MatrixXcd(results.at(i)));
+				}
+			}
+			else if (controlled)
+			{
+				if (time_dependent)
+				{
+					d_dopri5_mcd_type dopri5 = make_controlled(atol, rtol, dt_max, dopri5_mcd_type());
+					n = integrate_times(dopri5, f_master_t(*H, L0, L1, w0, *w, *this),
+						x0.at(i), t.begin(), t.end(), dt, push_back_MatrixXcd(results.at(i)));
+				}
+				else
+				{
+					d_dopri5_mcd_type dopri5 = make_controlled(atol, rtol, dt_max, dopri5_mcd_type());
 					n = integrate_times(dopri5, f_master(*H, L0, L1),
 						x0.at(i), t.begin(), t.end(), dt, push_back_MatrixXcd(results.at(i)));
 				}
@@ -912,6 +998,7 @@ std::vector<std::vector<MatrixXcd>> Interaction::master(
 std::vector<std::vector<VectorXcd>> Interaction::mc_master(
 	const std::vector<double>& t, const std::vector<VectorXd>& delta, std::vector<Vector3d>& v, std::vector<VectorXcd>& x0, const bool dynamics)
 {
+	// if (controlled || dense) printf("\r\033[93mWarning: Interaction.mc_master does not support controlled or dense steppers.\033[0m");
 	std::vector<std::vector<VectorXcd>> results = std::vector<std::vector<VectorXcd>>(x0.size());
 
 	std::vector<size_t> c_i;
@@ -941,7 +1028,7 @@ std::vector<std::vector<VectorXcd>> Interaction::mc_master(
 	std::for_each(std::execution::par_unseq, n_vec.begin(), n_vec.end(),
 		[this, &x0, &delta, &v, dynamics, &c_i, &c_j, &c_a, &t, &results, &progress](size_t n)
 		{
-			// d_dopri5_vcd_type dopri5 = make_dense_output(1e-5, 1e-5, dt_var, dopri5_vcd_type());
+			// d_dopri5_vcd_type dopri5 = make_dense_output(atol, rtol, dt_max, dopri5_vcd_type());
 			VectorXd w0 = *atom->get_w0();
 			VectorXd* w = gen_w(delta.at(n), v.at(0), dynamics);
 			MatrixXcd H(atom->get_size(), atom->get_size());
@@ -965,13 +1052,13 @@ std::vector<std::vector<VectorXcd>> Interaction::mc_master(
 			size_t i_t = 1;
 			double _t = t.front();
 			double _t1 = 0;
-			double _dt = dt_var;
+			double _dt = dt;
 			results.at(n).push_back(x0.at(n));
 			bool break_loop = false;
 			while (true)
 			{
-				_t1 = _t + dt_var;
-				_dt = dt_var;
+				_t1 = _t + dt;
+				_dt = dt;
 				while (t.at(i_t) < _t + _dt)
 				{
 					_dt = t.at(i_t) - _t;
@@ -979,7 +1066,7 @@ std::vector<std::vector<VectorXcd>> Interaction::mc_master(
 						f_schroedinger_leaky_t(H, w0, *w, std::ref(*this)), x0.at(n), _t, _dt);
 					else rk4_vcd_type().do_step(f_schroedinger(H), x0.at(n), _t, _dt);
 
-					results.at(n).push_back(x0.at(n).cwiseAbs2() / x0.at(n).cwiseAbs2().sum());
+					results.at(n).push_back(x0.at(n) / sqrt(x0.at(n).cwiseAbs2().sum()));
 					_t += _dt;
 					_dt = _t1 - _t;
 					if (++i_t == t.size())

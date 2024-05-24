@@ -8,6 +8,7 @@
 using namespace Eigen;
 
 
+Vector3d cast_Vector3d(double* x);
 VectorXd cast_VectorXd(double* x, size_t size);
 VectorXcd cast_VectorXcd(std::complex<double>* x, size_t size);
 MatrixXd cast_MatrixXd(double* x, size_t size);

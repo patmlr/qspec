@@ -47,11 +47,14 @@ protected:
 	Environment* env;
 
 	double dt = 1e-3;
-	double dt_var = 1e-3;
+	double dt_max = 1e-3;
+	double atol = 1e-6;
+	double rtol = 1e-6;
 	double delta_max = 1e3;
 	bool loop = false;
 	bool time_dependent = false;
-	bool controlled = false;
+	bool controlled = true;
+	bool dense = true;
 
 	std::array<std::vector<MatrixXi>, 3> lasermap;
 	MatrixXi summap;
@@ -87,17 +90,30 @@ public:
 	bool get_controlled();
 	void set_controlled(bool _controlled);
 
+	bool get_dense();
+	void set_dense(bool _dense);
+
 	bool get_time_dependent();
 	void set_time_dependent(bool _time_dependent);
 
 	double get_dt();
 	void set_dt(double _dt);
 
+	double get_dt_max();
+	void set_dt_max(double _dt_max);
+
+	double get_atol();
+	void set_atol(double _atol);
+
+	double get_rtol();
+	void set_rtol(double _rtol);
+
 	bool get_loop();
 	MatrixXi* get_summap();
 	std::vector<MatrixXcd>* get_rabimap();
 	MatrixXd* get_atommap();
 	MatrixXd* get_deltamap();
+	MatrixXcd* get_hamiltonian(const double t, const VectorXd& delta, const Vector3d& v);
 
 	void update();
 	void gen_coordinates();

@@ -531,6 +531,16 @@ extern "C"
         interaction->set_controlled(controlled);
     }
 
+    __declspec(dllexport) bool interaction_get_dense(Interaction* interaction)
+    {
+        return interaction->get_dense();
+    }
+
+    __declspec(dllexport) void interaction_set_dense(Interaction* interaction, bool dense)
+    {
+        interaction->set_dense(dense);
+    }
+
     __declspec(dllexport) double interaction_get_dt(Interaction* interaction)
     {
         return interaction->get_dt();
@@ -539,6 +549,36 @@ extern "C"
     __declspec(dllexport) void interaction_set_dt(Interaction* interaction, double dt)
     {
         interaction->set_dt(dt);
+    }
+
+    __declspec(dllexport) double interaction_get_dt_max(Interaction* interaction)
+    {
+        return interaction->get_dt_max();
+    }
+
+    __declspec(dllexport) void interaction_set_dt_max(Interaction* interaction, double dt_max)
+    {
+        interaction->set_dt_max(dt_max);
+    }
+
+    __declspec(dllexport) double interaction_get_atol(Interaction* interaction)
+    {
+        return interaction->get_atol();
+    }
+
+    __declspec(dllexport) void interaction_set_atol(Interaction* interaction, double atol)
+    {
+        interaction->set_atol(atol);
+    }
+
+    __declspec(dllexport) double interaction_get_rtol(Interaction* interaction)
+    {
+        return interaction->get_rtol();
+    }
+
+    __declspec(dllexport) void interaction_set_rtol(Interaction* interaction, double rtol)
+    {
+        interaction->set_rtol(rtol);
     }
 
     __declspec(dllexport) int* interaction_get_summap(Interaction* interaction)
@@ -593,6 +633,29 @@ extern "C"
     __declspec(dllexport) int interaction_get_n_history(Interaction* interaction)
     {
         return interaction->n_history;
+    }
+
+    __declspec(dllexport) void interaction_get_hamiltonian(Interaction* interaction, double* t, double* delta, double* v, std::complex<double>* h, size_t t_size, size_t sample_size)
+    {
+        const std::vector<double> _t = cast_samples_double(t, t_size);
+        const std::vector<VectorXd> _delta = cast_samples_VectorXd(delta, sample_size, interaction->get_lasers()->size());
+        const std::vector<Vector3d> _v = cast_samples_Vector3d(v, sample_size);
+        size_t size = interaction->get_atom()->get_size();
+        for (size_t i = 0; i < sample_size; ++i)
+        {
+            for (size_t k = 0; k < t_size; ++k)
+            {
+                MatrixXcd* _h = interaction->get_hamiltonian(_t.at(k), _delta.at(i), _v.at(i));
+                for (size_t m = 0; m < size; ++m)
+                {
+                    for (size_t n = 0; n < size; ++n)
+                    {
+                        h[i * size * size * t_size + m * size * t_size + n * t_size + k] = (*_h)(n, m);
+                    }
+                }
+                delete _h;
+            }
+        }
     }
 
     __declspec(dllexport) void interaction_rates(

@@ -4,6 +4,12 @@
 
 
 
+Vector3d cast_Vector3d(double* x)
+{
+    Vector3d _x = Vector3d::Zero();
+    for (size_t i = 0; i < 3; ++i) _x(i) = x[i];
+    return _x;
+}
 
 VectorXd cast_VectorXd(double* x, size_t size)
 {

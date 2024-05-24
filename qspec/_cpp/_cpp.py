@@ -268,9 +268,25 @@ dll.interaction_get_controlled.argtypes = (InteractionHandler, )
 dll.interaction_get_controlled.restype = c_bool
 dll.interaction_set_controlled.argtypes = (InteractionHandler, c_bool)
 
+dll.interaction_get_dense.argtypes = (InteractionHandler, )
+dll.interaction_get_dense.restype = c_bool
+dll.interaction_set_dense.argtypes = (InteractionHandler, c_bool)
+
 dll.interaction_get_dt.argtypes = (InteractionHandler, )
 dll.interaction_get_dt.restype = c_double
 dll.interaction_set_dt.argtypes = (InteractionHandler, c_double)
+
+dll.interaction_get_dt_max.argtypes = (InteractionHandler, )
+dll.interaction_get_dt_max.restype = c_double
+dll.interaction_set_dt_max.argtypes = (InteractionHandler, c_double)
+
+dll.interaction_get_atol.argtypes = (InteractionHandler, )
+dll.interaction_get_atol.restype = c_double
+dll.interaction_set_atol.argtypes = (InteractionHandler, c_double)
+
+dll.interaction_get_rtol.argtypes = (InteractionHandler, )
+dll.interaction_get_rtol.restype = c_double
+dll.interaction_set_rtol.argtypes = (InteractionHandler, c_double)
 
 dll.interaction_get_n_history.argtypes = (InteractionHandler, )
 dll.interaction_get_n_history.restype = c_int
@@ -288,6 +304,10 @@ dll.interaction_get_rabi.argtypes = (InteractionHandler, c_size_t)
 dll.interaction_get_atommap.argtypes = (InteractionHandler, )
 dll.interaction_get_deltamap.argtypes = (InteractionHandler, )
 dll.interaction_get_delta.argtypes = (InteractionHandler, )
+
+dll.interaction_get_hamiltonian.argtypes = \
+    (InteractionHandler, c_double_p, c_double_p, c_double_p, c_complex_p, c_size_t, c_size_t)
+dll.interaction_get_hamiltonian.restype = ctypes.c_void_p
 
 dll.interaction_rates.argtypes = \
     (InteractionHandler, c_double_p, c_double_p, c_double_p, c_double_p, c_double_p, c_size_t, c_size_t)

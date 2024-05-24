@@ -117,8 +117,8 @@ class Atom
 protected:
 	std::vector<State*> states;
 	DecayMap* decays;
-	double mass;
-	size_t size;
+	double mass = 0;
+	size_t size = 0;
 
 	std::vector<size_t> gs;
 	std::array<MatrixXd, 3> m_dipole;  // -1, 0, +1

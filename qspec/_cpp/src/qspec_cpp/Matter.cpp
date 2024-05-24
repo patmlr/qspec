@@ -315,9 +315,7 @@ double DecayMap::get_gamma(std::string state_0, std::string state_1)
 
 Atom::Atom()
 {
-	size = 0;
 	decays = new DecayMap();
-	mass = 0;
 }
 
 Atom::~Atom()

@@ -908,6 +908,17 @@ class Atom:
         return ret_x, ret_y, d
 
 
+def _cast_t(t) -> (ndarray, int):
+    t = np.asarray(t, dtype=float).flatten()
+    t.sort()
+    t_size = t.size
+    if t[0] != 0:
+        if t[0] < 0:
+            raise ValueError('All times \'t\' must be positive.')
+        t = np.ascontiguousarray(np.concatenate([np.zeros(1, dtype=float), t], axis=0), dtype=float)
+    return t, t.size, t_size != t.size
+
+
 def _cast_delta(delta: array_like, m: Optional[int], size: int) -> ndarray:
     """
     :param delta: An array of frequency shifts for the laser(s). 'delta' must be a scalar or a 1d- or 2d-array
@@ -946,7 +957,9 @@ def _cast_delta(delta: array_like, m: Optional[int], size: int) -> ndarray:
 
 def _cast_y0(y0: Optional[array_like], i_solver: int, atom: Atom):
     """
-    :param y0: The initial state of an ensemble of atoms. Depending on the solver, this must be (...).
+    :param y0: The initial states of an ensemble of n atoms. Depending on the solver, this must have shape
+     i_solver = 0 and 1: (#states, ) or (n, #states).
+     i_solver = 2: (#states, ), (n, #states) or (n, #states, #states).
     :param i_solver: The index of the solver.
     :param atom: The atom.
     :returns: The correctly shaped 'y0' for the chosen solver and its C type.
@@ -959,38 +972,68 @@ def _cast_y0(y0: Optional[array_like], i_solver: int, atom: Atom):
             y0 = np.zeros(size, dtype=float)
             y0[gs] = 1 / gs.size
             return y0, c_double_p
+
         y0 = np.array(y0, dtype=float, order='C')
+
         if not y0.shape or y0.shape[-1] != size:
             raise ValueError('\'y0\' must have size {} in the last axis but has shape {}.'.format(size, y0.shape))
-        y0 /= np.expand_dims(np.sum(y0, axis=-1), axis=-1)
-        return y0, c_double_p
 
-    elif i_solver == 1:  # Schroedinger equation.
+        if len(y0.shape) < 2:  # Add the missing sample axis.
+            y0 = np.expand_dims(y0, axis=0)
+        elif len(y0.shape) > 2:  # Flatten all but the last axis.
+            shape = (sum(y0.shape[:-1]), y0.shape[-1])
+            y0 = y0.reshape(shape, order='C')
+        y0 /= np.sum(y0, axis=-1)[:, None]
+        dtype, pointer = float, c_double_p
+
+    elif i_solver == 1:  # Schroedinger equation / MC master.
         if y0 is None:
             y0 = np.zeros(size, dtype=complex)
             y0[gs[0]] = 1
             return y0, c_complex_p
+
         y0 = np.array(y0, dtype=complex, order='C')
+
         if not y0.shape or y0.shape[-1] != size:
             raise ValueError('\'y0\' must have size {} in the last axis but has shape {}.'.format(size, y0.shape))
-        y0 /= np.expand_dims(tools.absolute_complex(y0, axis=-1), axis=-1)
-        return y0, c_complex_p
+
+        if len(y0.shape) < 2:  # Add the missing sample axis.
+            y0 = np.expand_dims(y0, axis=0)
+        elif len(y0.shape) > 2:  # Flatten all but the last axis.
+            shape = (sum(y0.shape[:-1]), y0.shape[-1])
+            y0 = y0.reshape(shape, order='C')
+        y0 /= tools.absolute_complex(y0, axis=-1)[:, None]  # Normalize
+        dtype, pointer = complex, c_complex_p
 
     elif i_solver == 2:  # Master equation.
         if y0 is None:
             y0 = np.zeros(size, dtype=complex)
             y0[gs] = 1 / gs.size
             return np.diag(y0), c_complex_p
+
         y0 = np.array(y0, dtype=complex, order='C')
-        if not y0.shape or (len(y0.shape) == 1 and y0.shape[-1] != size) \
-                or (len(y0.shape) > 1 and y0.shape[-2:] != (size, size)):
-            raise ValueError('\'y0\' must have a total shape of {}, or shape {} in the last two axes but has shape {}.'
-                             .format((size, ), (size, size), y0.shape))
-        if len(y0.shape) > 1:
+
+        if not y0.shape or (len(y0.shape) <= 2 and y0.shape[-1] != size) \
+                or (len(y0.shape) > 2 and y0.shape[-2:] != (size, size)):
+            raise ValueError('\'y0\' must have size {} in the last axis if len(y0.shape) <= 2,'
+                             ' or shape {} in the last two axes if len(y0.shape) > 2.'
+                             .format(size, (size, size), y0.shape))
+
+        if len(y0.shape) == 2:  # Normalize and create n diagonal matrices.
+            y0 /= np.sum(y0, axis=1)[:, None]
+            y0 = np.array([np.diag(_y0) for _y0 in y0])
+        elif len(y0.shape) > 2:  # Flatten all but the last two axes and normalize.
+            shape = (sum(y0.shape[:-2]), y0.shape[-2], y0.shape[-1])
+            y0 = y0.reshape(shape, order='C')
             y0 /= np.sum(np.diagonal(y0, axis1=-2, axis2=-1), axis=-1)[:, None, None]
-        else:
-            y0 = np.diag(y0 / np.sum(y0))
-        return y0, c_complex_p
+        else:  # Normalize and add the missing sample axis.
+            y0 = np.expand_dims(np.diag(y0 / np.sum(y0)), axis=0)
+        dtype, pointer = complex, c_complex_p
+
+    else:
+        raise ValueError('Solver ' + str(i_solver) + ' not available \'i_solver\' must be in {0, 1, 2}.')
+
+    return np.ascontiguousarray(y0, dtype=dtype), pointer
 
 
 def _cast_v(v: Optional[array_like]):
@@ -1020,7 +1063,7 @@ class Interaction:
     Class representing an Interaction between lasers and an atom.
     """
     def __init__(self, atom: Atom = None, lasers: Iterable[Laser] = None, delta_max: scalar = 1e3,
-                 controlled: bool = False, instance=None):
+                 controlled: bool = True, instance=None):
         """
         :param atom: The atom.
         :param lasers: The lasers.
@@ -1197,20 +1240,85 @@ class Interaction:
         dll.interaction_set_controlled(self.instance, c_bool(value))
 
     @property
+    def dense(self):
+        """
+        :returns: Whether the ODE solver uses an error controlled dense output stepper.
+         If True, this overrides the controlled flag.
+         Setting this to True is particularly useful for dynamics where a changing resolution is required.
+         However, this comes at the cost of computing time.
+        """
+        return dll.interaction_get_dense(self.instance)
+
+    @dense.setter
+    def dense(self, value: bool):
+        """
+        :param value: Whether the ODE solver uses an error controlled dense output stepper.
+         If True, this overrides the controlled flag.
+         Setting this to True is particularly useful for dynamics where a changing resolution is required.
+         However, this comes at the cost of computing time.
+        :returns: None.
+        """
+        dll.interaction_set_dense(self.instance, c_bool(value))
+
+    @property
     def dt(self):
         """
-        :returns: The maximum step size of the solver and the rough time spacing of generated results.
-         However, this comes at the cost of computing time.
+        :returns: The (initial) step size of (controlled) solvers.
         """
         return dll.interaction_get_dt(self.instance)
 
     @dt.setter
     def dt(self, value: scalar):
         """
-        :param value: The maximum step size of the solver and the rough time spacing of generated results.
+        :param value: The (initial) step size of (controlled) solvers.
         :returns: None.
         """
         dll.interaction_set_dt(self.instance, c_double(value))
+
+    @property
+    def dt_max(self):
+        """
+        :returns: The maximum step size of controlled solvers.
+        """
+        return dll.interaction_get_dt_max(self.instance)
+
+    @dt_max.setter
+    def dt_max(self, value: scalar):
+        """
+        :param value: The maximum step size of controlled solvers.
+        :returns: None.
+        """
+        dll.interaction_set_dt_max(self.instance, c_double(value))
+
+    @property
+    def atol(self):
+        """
+        :returns: The absolute error tolerance of controlled solver.
+        """
+        return dll.interaction_get_atol(self.instance)
+
+    @atol.setter
+    def atol(self, value: scalar):
+        """
+        :param value: The absolute error tolerance of controlled solver.
+        :returns: None.
+        """
+        dll.interaction_set_atol(self.instance, c_double(value))
+
+    @property
+    def rtol(self):
+        """
+        :returns: The relative error tolerance of controlled solver.
+        """
+        return dll.interaction_get_rtol(self.instance)
+
+    @rtol.setter
+    def rtol(self, value: scalar):
+        """
+        :param value: The relative error tolerance of controlled solver.
+        :returns: None.
+        """
+        dll.interaction_set_rtol(self.instance, c_double(value))
 
     @property
     def loop(self):
@@ -1297,22 +1405,59 @@ class Interaction:
         set_restype(dll.interaction_get_history, vector_i_p)
         return dll.interaction_get_history(self.instance)
 
-    def rates(self, t: array_like, delta: array_like = None, m: Optional[int] = 0, v: array_like = None,
-              y0: array_like = None):
+    def hamiltonian(self, t: array_like, delta: array_like = None, m: Optional[int] = 0, v: array_like = None):
         """
         :param t: The times when to compute the solution.
         :param delta: An array of frequency shifts for the laser(s). 'delta' must be a scalar or a 1d- or 2d-array
          with shapes (n, ) or (n, #lasers), respectively.
         :param m: The index of the shifted laser. If delta is a 2d-array, 'm' ist omitted.
         :param v: Atom velocities. Must be a scalar or have shape (n, ) or (n, 3). In the first two cases,
-         the velocity vector(s) is assumed to be aligned with the x-axis.
-        :param y0: The initial state of the atom. This must be None or have shape (n, #states).
+         the velocity vector(s) are assumed to be aligned with the x-axis.
+        :returns: The integrated master equation as a complex-valued array of shape (n, #states, #states, #times).
+        """
+        t, t_size, ex = _cast_t(t)
+
+        if isinstance(delta, np.ndarray) and isinstance(v, np.ndarray):
+            if delta.shape == v.shape:
+                if delta.flags.f_contiguous:
+                    delta = np.ascontiguousarray(delta)
+                if v.flags.f_contiguous:
+                    v = np.ascontiguousarray(v)
+            sample_size = delta.shape[0]
+        else:
+            delta = _cast_delta(delta, m, len(self.lasers))
+            v = _cast_v(v)
+
+            sample_size = max([delta.shape[0], v.shape[0], 1])
+
+            delta = np.array(np.broadcast_to(delta, (sample_size, len(self.lasers))), dtype=float, order='C')
+            v = np.array(np.broadcast_to(v, (sample_size, 3)), dtype=float, order='C')
+
+        results = np.zeros((sample_size, self.atom.size, self.atom.size, t_size), dtype=complex)
+        dll.interaction_get_hamiltonian(self.instance, t.ctypes.data_as(c_double_p), delta.ctypes.data_as(c_double_p),
+                                        v.ctypes.data_as(c_double_p), results.ctypes.data_as(c_complex_p),
+                                        c_size_t(t_size), c_size_t(sample_size))
+        if ex:
+            results = results[:, :, :, 1:]
+        return results
+
+    def rates(self, t: array_like, delta: array_like = None, m: Optional[int] = 0, v: array_like = None,
+              y0: array_like = None):
+        """
+        Solver for the rate equations. Solutions for n samples can be calculated in parallel.
+
+        :param t: The times when to compute the solution (us).
+        :param delta: An array of frequency shifts for the laser(s) (MHz).
+         'delta' must be a scalar or a 1d- or 2d-array with shapes (n, ) or (n, #lasers), respectively.
+        :param m: The index of the shifted laser. If delta is a 2d-array, 'm' ist omitted.
+        :param v: Atom velocities (m/s). Must be a scalar or have shape (n, ) or (n, 3). In the first two cases,
+         the velocity vector(s) is(are) assumed to be aligned with the x-axis.
+        :param y0: The initial state of the atom. This must be None or have shape (#states, ) or (n, #states).
          If None, the ground states are populated equally.
         :returns: The integrated rate equations as a real-valued array of shape (n, #states, #times).
         """
-        t = np.asarray(t, dtype=float).flatten()
-        t.sort()
-        t_size = t.size
+        t, t_size, ex = _cast_t(t)
+
         if isinstance(delta, np.ndarray) and isinstance(v, np.ndarray) and isinstance(y0, np.ndarray):
             if delta.shape == v.shape == y0.shape:
                 if delta.flags.f_contiguous:
@@ -1337,24 +1482,27 @@ class Interaction:
         dll.interaction_rates(self.instance, t.ctypes.data_as(c_double_p), delta.ctypes.data_as(c_double_p),
                               v.ctypes.data_as(c_double_p), y0.ctypes.data_as(c_double_p),
                               results.ctypes.data_as(c_double_p), c_size_t(t_size), c_size_t(sample_size))
+        if ex:
+            results = results[:, :, 1:]
         return results
 
     def schroedinger(self, t: array_like, delta: array_like = None, m: Optional[int] = 0, v: array_like = None,
                      y0: array_like = None):
         """
-        :param t: The times when to compute the solution.
-        :param delta: An array of frequency shifts for the laser(s). 'delta' must be a scalar or a 1d- or 2d-array
-         with shapes (n, ) or (n, #lasers), respectively.
+        Solver for the Schroedinger equation. Solutions for n samples can be calculated in parallel.
+
+        :param t: The times when to compute the solution (us).
+        :param delta: An array of frequency shifts for the laser(s) (MHz).
+         'delta' must be a scalar or a 1d- or 2d-array with shapes (n, ) or (n, #lasers), respectively.
         :param m: The index of the shifted laser. If delta is a 2d-array, 'm' ist omitted.
-        :param v: Atom velocities. Must be a scalar or have shape (n, ) or (n, 3). In the first two cases,
-         the velocity vector(s) are assumed to be aligned with the x-axis.
+        :param v: Atom velocities (m/s). Must be a scalar or have shape (n, ) or (n, 3). In the first two cases,
+         the velocity vector(s) is(are) assumed to be aligned with the x-axis.
         :param y0: The initial state of the atom. This must be None or have shape (n, #states).
          If None, only the first ground state is populated.
         :returns: The integrated Schroedinger equation as a complex-valued array of shape (n, #states, #times).
         """
-        t = np.asarray(t, dtype=float).flatten()
-        t.sort()
-        t_size = t.size
+        t, t_size, ex = _cast_t(t)
+
         if isinstance(delta, np.ndarray) and isinstance(v, np.ndarray) and isinstance(y0, np.ndarray):
             if delta.shape == v.shape == y0.shape:
                 if delta.flags.f_contiguous:
@@ -1379,25 +1527,29 @@ class Interaction:
         dll.interaction_schroedinger(self.instance, t.ctypes.data_as(c_double_p), delta.ctypes.data_as(c_double_p),
                                      v.ctypes.data_as(c_double_p), y0.ctypes.data_as(c_complex_p),
                                      results.ctypes.data_as(c_complex_p), c_size_t(t_size), c_size_t(sample_size))
+        if ex:
+            results = results[:, :, 1:]
         return results
 
     def master(self, t: array_like, delta: array_like = None, m: Optional[int] = 0, v: array_like = None,
                y0: array_like = None):
         """
-        :param t: The times when to compute the solution.
-        :param delta: An array of frequency shifts for the laser(s). 'delta' must be a scalar or a 1d- or 2d-array
-         with shapes (n, ) or (n, #lasers), respectively.
+        Solver for the master equation. Solutions for n samples can be calculated in parallel.
+
+        :param t: The times when to compute the solution (us).
+        :param delta: An array of frequency shifts for the laser(s) (MHz).
+         'delta' must be a scalar or a 1d- or 2d-array with shapes (n, ) or (n, #lasers), respectively.
         :param m: The index of the shifted laser. If delta is a 2d-array, 'm' ist omitted.
-        :param v: Atom velocities. Must be a scalar or have shape (n, ) or (n, 3). In the first two cases,
-         the velocity vector(s) are assumed to be aligned with the x-axis.
+        :param v: Atom velocities (m/s). Must be a scalar or have shape (n, ) or (n, 3). In the first two cases,
+         the velocity vector(s) is(are) assumed to be aligned with the x-axis.
         :param y0: The initial state / density matrix of the atom.
-         This must be None or have shape (#states, ) or (n, #states, #states).
+         This must be None or have shape (#states, ), (n, #states) or (n, #states, #states).
+         If #states == n, (n, #states) is interpreted
          If None, the ground states are populated equally.
         :returns: The integrated master equation as a complex-valued array of shape (n, #states, #states, #times).
         """
-        t = np.asarray(t, dtype=float).flatten()
-        t.sort()
-        t_size = t.size
+        t, t_size, ex = _cast_t(t)
+
         if isinstance(delta, np.ndarray) and isinstance(v, np.ndarray) and isinstance(y0, np.ndarray):
             if delta.shape == v.shape == y0.shape:
                 if delta.flags.f_contiguous:
@@ -1422,32 +1574,36 @@ class Interaction:
         dll.interaction_master(self.instance, t.ctypes.data_as(c_double_p), delta.ctypes.data_as(c_double_p),
                                v.ctypes.data_as(c_double_p), y0.ctypes.data_as(c_complex_p),
                                results.ctypes.data_as(c_complex_p), c_size_t(t_size), c_size_t(sample_size))
+        if ex:
+            results = results[:, :, :, 1:]
         return results
 
     def mc_master(self, t: array_like, delta: array_like = None, m: Optional[int] = 0, v: array_like = None,
-                  y0: array_like = None, dynamics: bool = False, ntraj: int = 500):
+                  y0: array_like = None, dynamics: bool = False, ntraj: int = 500, as_density_matrix: bool = False):
         """
-        :param t: The times when to compute the solution.
-        :param delta: An array of frequency shifts for the laser(s). 'delta' must be a scalar or a 1d- or 2d-array
-         with shapes (n, ) or (n, #lasers), respectively.
+        Solver for the Monte-Carlo master equation. Solutions for n samples can be calculated in parallel.
+
+        :param t: The times when to compute the solution (us).
+        :param delta: An array of frequency shifts for the laser(s) (MHz).
+         'delta' must be a scalar or a 1d- or 2d-array with shapes (n, ) or (n, #lasers), respectively.
         :param m: The index of the shifted laser. If delta is a 2d-array, 'm' ist omitted.
-        :param v: Atom velocities. Must be a scalar or have shape (n, ) or (n, 3). In the first two cases,
-         the velocity vector(s) are assumed to be aligned with the x-axis.
+        :param v: Atom velocities (m/s). Must be a scalar or have shape (n, ) or (n, 3). In the first two cases,
+         the velocity vector(s) is(are) assumed to be aligned with the x-axis.
         :param y0: The initial state of the atom. This must be None or have shape (n, #states).
          If None, only the first ground state is populated.
         :param dynamics: Whether to compute the dynamics of the photon-atom interactions.
         :param ntraj: The number of samples to compute if no samples were given with 'delta', 'v', or 'y0'.
+        :param as_density_matrix: Whether the result is returned as density matrices or as state vectors.
         :returns: The integrated MC-Schroedinger equation as a complex-valued array of shape (n, #states, #times).
         """
         if self.controlled:
-            raise ValueError('Controlled steppers are not supported with \'master_mc\' yet.'
-                  ' Decrease the step size if necessary.')
+            raise ValueError('Controlled or Dense steppers are not supported for \'master_mc\'.'
+                             ' Decrease the step size if necessary.')
         if dynamics and self.atom.mass <= 0:
             raise ValueError('To simulate mechanical dynamics, the mass of the atom must be specified.')
 
-        t = np.asarray(t, dtype=float).flatten()
-        t.sort()
-        t_size = t.size
+        t, t_size, ex = _cast_t(t)
+
         if isinstance(delta, np.ndarray) and isinstance(v, np.ndarray) and isinstance(y0, np.ndarray):
             if delta.shape == v.shape == y0.shape:
                 if delta.flags.f_contiguous:
@@ -1474,6 +1630,13 @@ class Interaction:
         dll.interaction_mc_master(self.instance, t.ctypes.data_as(c_double_p), delta.ctypes.data_as(c_double_p),
                                   v.ctypes.data_as(c_double_p), y0.ctypes.data_as(c_complex_p), c_bool(dynamics),
                                   results.ctypes.data_as(c_complex_p), c_size_t(t_size), c_size_t(sample_size))
+
+        if ex:
+            results = results[:, :, 1:]
+
+        if as_density_matrix:
+            results = results[:, :, None, :] * results[:, None, :, :].conj()
+
         return results, v
 
     def scattering_rate(self, rho: array_like, theta: array_like = None, phi: array_like = None,
