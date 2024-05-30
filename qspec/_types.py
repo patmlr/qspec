@@ -1,10 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 qspec.types
-
-Created on 16.06.2020
-
-@author: Patrick Mueller
+===========
 
 Module including types for the docstrings.
 """

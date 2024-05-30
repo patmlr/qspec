@@ -3,10 +3,6 @@
 qspec.algebra
 =============
 
-Created on 30.04.2020
-
-@author: Patrick Mueller
-
 Module including methods for calculating dipole coefficients.
 """
 
@@ -41,12 +37,12 @@ def clebsch_gordan(j_1: sympy_qn, j_2: sympy_qn, j_3: sympy_qn, m_1: sympy_qn, m
 
         \\langle J_1, m_1, J_2, m_2\\, |\\, J_3, m_3\\rangle
 
-    :param j_1: J1.
-    :param j_2: J2.
-    :param j_3: The coupled J3 <- J1 + J2.
-    :param m_1: m1.
-    :param m_2: m2.
-    :param m_3: The coupled m3 <- m1 + m2.
+    :param j_1: :math:`J_1`
+    :param j_2: :math:`J_2`
+    :param j_3: :math:`J_3`
+    :param m_1: :math:`m_1`
+    :param m_2: :math:`m_2`
+    :param m_3: :math:`m_3`
     :param as_sympy: Whether to return the result as a sympy type.
     :returns: The Clebsch-Gordan coefficient.
     """
@@ -64,12 +60,12 @@ def wigner_3j(j_1: sympy_qn, j_2: sympy_qn, j_3: sympy_qn, m_1: sympy_qn, m_2: s
         m_1 & m_2 & m_3
         \\end{pmatrix}
 
-    :param j_1: J1.
-    :param j_2: J2.
-    :param j_3: The coupled J3 <- J1 + J2.
-    :param m_1: m1.
-    :param m_2: m2.
-    :param m_3: The coupled m3 <- m1 + m2.
+    :param j_1: :math:`J_1`
+    :param j_2: :math:`J_2`
+    :param j_3: :math:`J_3`
+    :param m_1: :math:`m_1`
+    :param m_2: :math:`m_2`
+    :param m_3: :math:`m_3`
     :param as_sympy: Whether to return the result as a sympy type.
     :returns: The wigner-3j symbol.
 
@@ -88,12 +84,12 @@ def wigner_6j(j_1: sympy_qn, j_2: sympy_qn, j_3: sympy_qn, j_4: sympy_qn, j_5: s
         J_4 & J_5 & J_6
         \\end{Bmatrix}
 
-    :param j_1: :math:`J_1`.
-    :param j_2: :math:`J_2`.
-    :param j_3: :math:`J_3`.
-    :param j_4: :math:`J_4`.
-    :param j_5: :math:`J_5`.
-    :param j_6: :math:`J_6`.
+    :param j_1: :math:`J_1`
+    :param j_2: :math:`J_2`
+    :param j_3: :math:`J_3`
+    :param j_4: :math:`J_4`
+    :param j_5: :math:`J_5`
+    :param j_6: :math:`J_6`
     :param as_sympy: Whether to return the result as a sympy type.
     :returns: The wigner-6j symbol.
     """

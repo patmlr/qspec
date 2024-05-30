@@ -3,10 +3,6 @@
 qspec.simulate
 ==============
 
-Created on 20.05.2023
-
-@author: Patrick Mueller
-
 Module for simulations of laser-atom interactions.
 """
 

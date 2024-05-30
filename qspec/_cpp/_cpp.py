@@ -1,10 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 PyCLS.cpp.cpp
-
-Created on 23.10.2021
-
-@author: Patrick Mueller
+=============
 
 Python/C++ interface.
 """

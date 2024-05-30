@@ -1,10 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 qspec.models._splitter
-
-Created on 14.03.2022
-
-@author: Patrick Mueller
+======================
 
 Splitter classes for lineshape models.
 """

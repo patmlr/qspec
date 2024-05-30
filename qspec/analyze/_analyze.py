@@ -3,19 +3,14 @@
 qspec._analyze
 ==============
 
-Created on 07.05.2020
-
-@author: Patrick Mueller
-
 Module for analyzing/evaluating/fitting data.
 
-Linear regression algorithms:
-    2d:
+Linear regression algorithms (2d):
     - york_fit(); [York et al., Am. J. Phys. 72, 367 (2004)]
     - linear_fit(); 2-dimensional maximum likelihood fit.
     - linear_monte_carlo(); based on [Gebert et al., Phys. Rev. Lett. 115, 053003 (2015), Suppl.]
     
-    nd:
+Linear regression algorithms (nd):
     - linear_nd_fit(); n-dimensional maximum likelihood fit.
     - linear_monte_carlo_nd(); based on [Gebert et al., Phys. Rev. Lett. 115, 053003 (2015), Suppl.]
 
@@ -624,32 +619,33 @@ def _test_order_linear_nd_monte_carlo(x: ndarray, cov: ndarray, n_samples: int =
     return best_order
 
 
-def generate_collinear_points_py(x: ndarray, cov: ndarray, n_samples: int = 100000, report: bool = False):
+def generate_collinear_points_py(mean: ndarray, cov: ndarray, n_samples: int = 100000, report: bool = False, **kwargs):
     """
-    :param x: The data vectors. Must have shape (k, n), where k is the number of data points
+    :param mean: The data vectors. Must have shape (k, n), where k is the number of data points
      and n is the number of dimensions of each point.
     :param cov: The covariance matrices of the data vectors. Must have shape (k, n, n).
      Use 'covariance_matrix' to construct covariance matrices.
     :param n_samples: The number of samples generated for each data point.
     :param report: Whether to report the number of samples.
+    :param kwargs: Additional keyword arguments.
     :returns: The randomly generated data vectors p with shape (n_accepted, k ,n) aligned along a straight line
      and the number of accepted and generated samples.
     """
     if n_samples is None:
         n_samples = 100000
-    p_0 = multivariate_normal.rvs(mean=x[0], cov=cov[0], size=n_samples)
-    p_1 = multivariate_normal.rvs(mean=x[-1], cov=cov[-1], size=n_samples)
+    p_0 = multivariate_normal.rvs(mean=mean[0], cov=cov[0], size=n_samples)
+    p_1 = multivariate_normal.rvs(mean=mean[-1], cov=cov[-1], size=n_samples)
     dr = straight_direction(p_0, p_1, axis=-1)
 
     cov_inv = [np.linalg.inv(cov_i)[None, :, :] for cov_i in cov[1:-1]]
     a = [tools.transform(cov_i, dr, axis=-1) for cov_i in cov_inv]
     sigma = [1 / np.sqrt(np.sum(dr * a_i, axis=-1)) for a_i in a]
-    t_0 = [-np.sum((p_0 - x_i) * a_i, axis=-1) * sigma_i ** 2 for x_i, a_i, sigma_i in zip(x[1:-1], a, sigma)]
+    t_0 = [-np.sum((p_0 - x_i) * a_i, axis=-1) * sigma_i ** 2 for x_i, a_i, sigma_i in zip(mean[1:-1], a, sigma)]
     t = [norm.rvs(loc=t_0_i, scale=sigma_i) for t_0_i, sigma_i in zip(t_0, sigma)]
 
     p_new = [p_0 + np.expand_dims(t_i, axis=-1) * dr for t_i in t]
     f = np.prod([multivariate_normal.pdf(p_i, mean=x_i, cov=cov_i)
-                 for p_i, x_i, cov_i in zip(p_new, x[1:-1], cov[1:-1])], axis=0)
+                 for p_i, x_i, cov_i in zip(p_new, mean[1:-1], cov[1:-1])], axis=0)
     g = np.prod([norm.pdf(t_i, loc=t_0_i, scale=sigma_i) for t_i, t_0_i, sigma_i in zip(t, t_0, sigma)], axis=0)
 
     if p_new:
@@ -840,7 +836,6 @@ def linear_alpha_fit(x: array_iter, y: array_iter, sigma_x: array_like = None, s
                      corr: array_iter = None, func: Union[Callable, str] = york_fit, alpha: scalar = 0,
                      find_alpha: bool = True, report: bool = False, show: bool = False, **kwargs):
     """
-    TODO: minimize tolerances.
     :param x: The x data.
     :param y: The y data.
     :param sigma_x: The 1-sigma uncertainty of the x data.
@@ -855,6 +850,7 @@ def linear_alpha_fit(x: array_iter, y: array_iter, sigma_x: array_like = None, s
     :param kwargs: Additional keyword arguments are passed to the fitting routine.
     :returns: popt, pcov, alpha. The best y-intercept and slope, their covariance matrix and the used alpha.
     """
+    #  TODO: minimize tolerances.
     n = tools.floor_log10(alpha)
     x = np.asarray(x, dtype=float)
 
@@ -1536,7 +1532,7 @@ class King:
     #         self.plot_nd(add_xy=add_xy, add_a=add_a, **kwargs)
 
     def _plot_2d(self, mode: str = '', sigma2d: int = 1, scale: tuple = None, add_xy: array_like = None,
-                 add_a: array_like = None, font_dict: dict = None, show: bool = True, **kwargs):
+                 add_a: array_like = None, show: bool = True, **kwargs):
         """
         :param mode: The mode of the King-fit. If mode='radii', the x-axis must contain the differences of
          mean square nuclear charge radii or the Lambda-factor. For every other value,
@@ -1657,7 +1653,7 @@ class King:
 
         if not self.nd:
             return self._plot_2d(mode=mode, sigma2d=sigma2d, scale=scale, add_xy=add_xy, add_a=add_a,
-                                 font_dict=font_dict, show=show, **kwargs)
+                                 show=show, **kwargs)
         
         dim = int(self.popt.size / 2)
         a, b = self.popt[:dim], self.popt[dim:]

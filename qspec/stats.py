@@ -3,10 +3,6 @@
 qspec.stats
 ===========
 
-Created on 22.04.2020
-
-@author: Patrick Mueller
-
 Module for doing statistical analysis.
 """
 

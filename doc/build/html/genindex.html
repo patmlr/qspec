@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Index &mdash; qspec 13.12.2023 documentation</title><link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <title>Index &mdash; qspec 30.05.2024 documentation</title><link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/borders.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/wy-nav-content.css" type="text/css" />
@@ -137,6 +137,8 @@
 </li>
       <li><a href="qspec.html#qspec.tools.asarray_optional">asarray_optional() (in module qspec.tools)</a>
 </li>
+      <li><a href="qspec.html#qspec.simulate.Interaction.atol">atol() (qspec.simulate.Interaction property)</a>
+</li>
       <li><a href="qspec.html#qspec.simulate.Atom">Atom (class in qspec.simulate)</a>
 </li>
       <li><a href="qspec.html#qspec.simulate.Interaction.atom">atom() (qspec.simulate.Interaction property)</a>
@@ -195,10 +197,12 @@
 </li>
       <li><a href="qspec.html#qspec.stats.combined_pdf">combined_pdf() (in module qspec.stats)</a>
 </li>
-      <li><a href="qspec.html#qspec.simulate.construct_electronic_state">construct_electronic_state() (in module qspec.simulate)</a>
+      <li><a href="qspec.html#qspec.analyze.const">const() (in module qspec.analyze)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="qspec.html#qspec.simulate.construct_electronic_state">construct_electronic_state() (in module qspec.simulate)</a>
+</li>
       <li><a href="qspec.html#qspec.simulate.construct_hyperfine_state">construct_hyperfine_state() (in module qspec.simulate)</a>
 </li>
       <li><a href="qspec.html#qspec.simulate.Interaction.controlled">controlled() (qspec.simulate.Interaction property)</a>
@@ -249,6 +253,8 @@
 </li>
       <li><a href="qspec.html#qspec.simulate.Interaction.deltamap">deltamap() (qspec.simulate.Interaction property)</a>
 </li>
+      <li><a href="qspec.html#qspec.simulate.Interaction.dense">dense() (qspec.simulate.Interaction property)</a>
+</li>
       <li><a href="qspec.html#qspec.models.Model.description">description() (qspec.models.Model property)</a>
 </li>
       <li><a href="qspec.html#qspec.tools.dict_to_list">dict_to_list() (in module qspec.tools)</a>
@@ -272,6 +278,8 @@
       <li><a href="qspec.html#qspec.analyze.draw_straight_unc_area">draw_straight_unc_area() (in module qspec.analyze)</a>
 </li>
       <li><a href="qspec.html#qspec.simulate.Interaction.dt">dt() (qspec.simulate.Interaction property)</a>
+</li>
+      <li><a href="qspec.html#qspec.simulate.Interaction.dt_max">dt_max() (qspec.simulate.Interaction property)</a>
 </li>
       <li><a href="qspec.html#qspec.models.Amplifier.dx">dx() (qspec.models.Amplifier property)</a>
 
@@ -491,20 +499,24 @@
 </li>
       <li><a href="qspec.html#qspec.models.Convolved.gen_x_int">gen_x_int() (qspec.models.Convolved method)</a>
 </li>
+      <li><a href="qspec.html#qspec.analyze.generate_collinear_points_cpp">generate_collinear_points_cpp() (in module qspec.analyze)</a>
+</li>
+      <li><a href="qspec.html#qspec.analyze.generate_collinear_points_py">generate_collinear_points_py() (in module qspec.analyze)</a>
+</li>
       <li><a href="qspec.html#qspec.simulate.ScatteringRate.generate_dipoles">generate_dipoles() (qspec.simulate.ScatteringRate method)</a>
 </li>
       <li><a href="qspec.html#qspec.simulate.ScatteringRate.generate_x">generate_x() (qspec.simulate.ScatteringRate method)</a>
 </li>
       <li><a href="qspec.html#qspec.simulate.ScatteringRate.generate_y">generate_y() (qspec.simulate.ScatteringRate method)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="qspec.html#qspec.simulate.ScatteringRate.generate_y0">generate_y0() (qspec.simulate.ScatteringRate method)</a>
 </li>
       <li><a href="qspec.html#qspec.simulate.ScatteringRate.generate_y_4pi">generate_y_4pi() (qspec.simulate.ScatteringRate method)</a>
 </li>
       <li><a href="qspec.html#qspec.simulate.Geometry">Geometry (class in qspec.simulate)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="qspec.html#qspec.simulate.DecayMap.get">get() (qspec.simulate.DecayMap method)</a>
 </li>
       <li><a href="qspec.html#qspec.models.get_all_f">get_all_f() (in module qspec.models)</a>
@@ -523,10 +535,6 @@
 </li>
       <li><a href="qspec.html#qspec.models.Model.get_pars">get_pars() (qspec.models.Model method)</a>
 </li>
-      <li><a href="qspec.html#qspec.analyze.King.get_popt">get_popt() (qspec.analyze.King method)</a>
-</li>
-      <li><a href="qspec.html#qspec.analyze.King.get_popt_nd">get_popt_nd() (qspec.analyze.King method)</a>
-</li>
       <li><a href="qspec.html#qspec.simulate.Interaction.get_rabi">get_rabi() (qspec.simulate.Interaction method)</a>
 </li>
       <li><a href="qspec.html#qspec.tools.get_rgb_print_command">get_rgb_print_command() (in module qspec.tools)</a>
@@ -535,13 +543,7 @@
 </li>
       <li><a href="qspec.html#qspec.simulate.Atom.get_state_indexes">get_state_indexes() (qspec.simulate.Atom method)</a>
 </li>
-      <li><a href="qspec.html#qspec.analyze.King.get_unmodified_input_x_nd">get_unmodified_input_x_nd() (qspec.analyze.King method)</a>
-</li>
-      <li><a href="qspec.html#qspec.analyze.King.get_unmodified_x">get_unmodified_x() (qspec.analyze.King method)</a>
-</li>
-      <li><a href="qspec.html#qspec.analyze.King.get_unmodified_x_nd">get_unmodified_x_nd() (qspec.analyze.King method)</a>
-</li>
-      <li><a href="qspec.html#qspec.analyze.King.get_unmodified_y">get_unmodified_y() (qspec.analyze.King method)</a>
+      <li><a href="qspec.html#qspec.analyze.King.get_unmodified">get_unmodified() (qspec.analyze.King method)</a>
 </li>
       <li><a href="qspec.html#qspec.tools.get_val_with_unc">get_val_with_unc() (in module qspec.tools)</a>
 </li>
@@ -563,6 +565,8 @@
 </li>
       <li><a href="qspec.html#qspec.tools.half_integer_to_str">half_integer_to_str() (in module qspec.tools)</a>
 </li>
+      <li><a href="qspec.html#qspec.simulate.Interaction.hamiltonian">hamiltonian() (qspec.simulate.Interaction method)</a>
+</li>
       <li><a href="qspec.html#qspec.tools.COLORS.HEADER">HEADER (qspec.tools.COLORS attribute)</a>
 </li>
       <li><a href="qspec.html#qspec.models.hf_coeff">hf_coeff() (in module qspec.models)</a>
@@ -573,10 +577,10 @@
 </li>
       <li><a href="qspec.html#qspec.models.hf_trans">hf_trans() (in module qspec.models)</a>
 </li>
-      <li><a href="qspec.html#qspec.stats.Observable.hist">hist() (qspec.stats.Observable method)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="qspec.html#qspec.stats.Observable.hist">hist() (qspec.stats.Observable method)</a>
+</li>
       <li><a href="qspec.html#qspec.simulate.Interaction.history">history() (qspec.simulate.Interaction property)</a>
 </li>
       <li><a href="qspec.html#qspec.simulate.Interaction.history_size">history_size() (qspec.simulate.Interaction property)</a>
@@ -697,17 +701,21 @@
 </li>
       <li><a href="qspec.html#qspec.physics.lande_n">lande_n() (in module qspec.physics)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="qspec.html#qspec.simulate.Laser">Laser (class in qspec.simulate)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="qspec.html#qspec.simulate.Interaction.lasers">lasers() (qspec.simulate.Interaction property)</a>
 </li>
-      <li><a href="qspec.html#qspec.analyze.linear_alpha">linear_alpha() (in module qspec.analyze)</a>
+      <li><a href="qspec.html#qspec.analyze.linear_alpha_fit">linear_alpha_fit() (in module qspec.analyze)</a>
+</li>
+      <li><a href="qspec.html#qspec.analyze.linear_fit">linear_fit() (in module qspec.analyze)</a>
 </li>
       <li><a href="qspec.html#qspec.analyze.linear_monte_carlo">linear_monte_carlo() (in module qspec.analyze)</a>
 </li>
-      <li><a href="qspec.html#qspec.analyze.linear_monte_carlo_nd">linear_monte_carlo_nd() (in module qspec.analyze)</a>
+      <li><a href="qspec.html#qspec.analyze.linear_nd_fit">linear_nd_fit() (in module qspec.analyze)</a>
+</li>
+      <li><a href="qspec.html#qspec.analyze.linear_nd_monte_carlo">linear_nd_monte_carlo() (in module qspec.analyze)</a>
 </li>
       <li><a href="qspec.html#qspec.models.Linked">Linked (class in qspec.models)</a>
 </li>
@@ -779,8 +787,6 @@
 </li>
       <li><a href="qspec.html#qspec.tools.merge_intervals">merge_intervals() (in module qspec.tools)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="qspec.html#qspec.models.Amplifier.min">min() (qspec.models.Amplifier method)</a>
 
       <ul>
@@ -809,6 +815,10 @@
         <li><a href="qspec.html#qspec.models.Summed.min">(qspec.models.Summed method)</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="qspec.html#qspec.stats.mode_lognormal">mode_lognormal() (in module qspec.stats)</a>
+</li>
       <li><a href="qspec.html#qspec.models.Model">Model (class in qspec.models)</a>
 </li>
       <li><a href="qspec.html#qspec.models.Model.model">model() (qspec.models.Model property)</a>
@@ -902,17 +912,17 @@
 </li>
       <li><a href="qspec.html#qspec.simulate.ScatteringRate.plot_mixed_distribution">plot_mixed_distribution() (qspec.simulate.ScatteringRate method)</a>
 </li>
-      <li><a href="qspec.html#qspec.analyze.King.plot_nd">plot_nd() (qspec.analyze.King method)</a>
+      <li><a href="qspec.html#qspec.simulate.ScatteringRate.plot_setup">plot_setup() (qspec.simulate.ScatteringRate method)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="qspec.html#qspec.simulate.ScatteringRate.plot_setup">plot_setup() (qspec.simulate.ScatteringRate method)</a>
-</li>
       <li><a href="qspec.html#qspec.simulate.ScatteringRate.plot_spectrum">plot_spectrum() (qspec.simulate.ScatteringRate method)</a>
 </li>
       <li><a href="qspec.html#qspec.simulate.Polarization">Polarization (class in qspec.simulate)</a>
 </li>
       <li><a href="qspec.html#qspec.simulate.Laser.polarization">polarization() (qspec.simulate.Laser property)</a>
+</li>
+      <li><a href="qspec.html#qspec.analyze.poly">poly() (in module qspec.analyze)</a>
 </li>
       <li><a href="qspec.html#qspec.tools.print_colored">print_colored() (in module qspec.tools)</a>
 </li>
@@ -1017,10 +1027,10 @@
 </li>
       <li><a href="qspec.html#qspec.algebra.reduced_f">reduced_f() (in module qspec.algebra)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="qspec.html#qspec.algebra.reduced_f_root">reduced_f_root() (in module qspec.algebra)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="qspec.html#qspec.stats.relevant_interval">relevant_interval() (in module qspec.stats)</a>
 </li>
       <li><a href="qspec.html#qspec.models.residuals">residuals() (in module qspec.models)</a>
@@ -1036,6 +1046,8 @@
       <li><a href="qspec.html#qspec.tools.rotation_to_vector">rotation_to_vector() (in module qspec.tools)</a>
 </li>
       <li><a href="qspec.html#qspec.tools.round_to_n">round_to_n() (in module qspec.tools)</a>
+</li>
+      <li><a href="qspec.html#qspec.simulate.Interaction.rtol">rtol() (qspec.simulate.Interaction property)</a>
 </li>
       <li><a href="qspec.html#qspec.stats.Observable.rvs">rvs() (qspec.stats.Observable method)</a>
 </li>
@@ -1147,7 +1159,7 @@
 </li>
       <li><a href="qspec.html#qspec.analyze.straight">straight() (in module qspec.analyze)</a>
 </li>
-      <li><a href="qspec.html#qspec.analyze.straight_slope">straight_slope() (in module qspec.analyze)</a>
+      <li><a href="qspec.html#qspec.analyze.straight_direction">straight_direction() (in module qspec.analyze)</a>
 </li>
       <li><a href="qspec.html#qspec.analyze.straight_std">straight_std() (in module qspec.analyze)</a>
 </li>
@@ -1273,7 +1285,7 @@
 <h2 id="Y">Y</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="qspec.html#qspec.analyze.york">york() (in module qspec.analyze)</a>
+      <li><a href="qspec.html#qspec.analyze.york_fit">york_fit() (in module qspec.analyze)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
@@ -1299,7 +1311,7 @@
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2023, Patrick Mueller.</p>
+    <p>&#169; Copyright 2024, Patrick Mueller.</p>
   </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a

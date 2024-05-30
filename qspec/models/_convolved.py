@@ -1,10 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 qspec.models._convolved
-
-Created on 14.03.2022
-
-@author: Patrick Mueller
+=======================
 
 Convolution classes for lineshape models.
 """

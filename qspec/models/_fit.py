@@ -1,10 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 qspec.models._fit
-
-Created on 06.05.2023
-
-@author: Patrick Mueller
+=================
 
 Module to fit the models to data.
 """

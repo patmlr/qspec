@@ -3,10 +3,6 @@
 qspec._analyze_cpp
 ==================
 
-Created on 24.02.2024
-
-@author: Patrick Mueller
-
 Classes and methods for the 'analyze' module using the Python/C++ interface.
 """
 
@@ -41,6 +37,19 @@ class MultivariateNormal:
 
 def generate_collinear_points_cpp(mean: ndarray, cov: ndarray, n_samples: int = None, n_accepted: int = None,
                                   seed: int = None, report: bool = None, **kwargs):
+    """
+    :param mean: The data vectors. Must have shape (k, n), where k is the number of data points
+     and n is the number of dimensions of each point.
+    :param cov: The covariance matrices of the data vectors. Must have shape (k, n, n).
+     Use 'covariance_matrix' to construct covariance matrices.
+    :param n_samples: The number of samples generated for each data point.
+    :param n_accepted: The number of samples to be accepted for each data point.
+    :param seed: A seed for the random number generator.
+    :param report: Whether to report the number of samples.
+    :param kwargs: Additional keyword arguments.
+    :returns: The randomly generated data vectors p with shape (n_accepted, k ,n) aligned along a straight line
+     and the number of accepted and generated samples.
+    """
     mean, cov = np.ascontiguousarray(mean, dtype=float), np.ascontiguousarray(cov, dtype=float)
     size = mean.shape[0]
     dim = mean.shape[1]

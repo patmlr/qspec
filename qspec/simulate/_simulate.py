@@ -3,10 +3,6 @@
 qspec._simulate
 ===============
 
-Created on 05.05.2020
-
-@author: Patrick Mueller
-
 Module for simulations of laser-atom interaction.
 """
 
@@ -547,7 +543,7 @@ class Geometry:
         :returns: The axes object.
         """
 
-        fig = plt.figure(num=1, figsize=[8, 8], clear=True)
+        fig = plt.figure(num=1, figsize=(8, 8), clear=True)
         ax = fig.add_subplot(111, projection='3d')
         plt.xlabel(r'$x$ / arb. units')
         plt.ylabel(r'$y$ / arb. units')
@@ -857,7 +853,7 @@ class ScatteringRate:
         :returns: None. Plots the spectrum for the given geometry
          and that for the detection with the complete solid angle 4 pi.
         """
-        plt.figure(figsize=[8, 4])
+        plt.figure(figsize=(8, 4))
         x = self.generate_x()
         y_4pi = self.generate_y_4pi(x)
         y = self.integrate_y(x, step=step)
@@ -901,7 +897,7 @@ class ScatteringRate:
             mode = '2d'
         if mode == '3d':
             r = np.array([[tools.transform(self.geometry.rotation.R, tools.e_r(t, p)) for p in phi] for t in theta])
-            fig = plt.figure(num=1, figsize=[8, 8], clear=True)
+            fig = plt.figure(num=1, figsize=(8, 8), clear=True)
             ax = fig.add_subplot(111, projection='3d', label='Surface')
             rad = y[:, :]
             rad = np.expand_dims(rad, axis=-1)
@@ -938,7 +934,7 @@ class ScatteringRate:
             font = {'family': 'Arial',
                     'size': 12}
             matplotlib.rc('font', **font)
-            plt.figure(figsize=[3, 4.5])
+            plt.figure(figsize=(3, 4.5))
             theta, phi = np.meshgrid(theta, phi, indexing='ij')
             ax = plt.gca()
             ax.set_aspect('equal')
@@ -982,7 +978,7 @@ class ScatteringRate:
         if mode is None:
             mode = '2d'
         if mode == '3d':
-            fig = plt.figure(num=1, figsize=[16, 9], clear=True)
+            fig = plt.figure(num=1, figsize=(16, 9), clear=True)
             ax = fig.add_subplot(111, projection='3d', label='Surface')
             ax.set_zlabel(r'$I$ / arb. units')
             ax.plot_surface(x_theta, theta, y[:, :, 0], rcount=200/2, ccount=200/2, cmap=plt.get_cmap('viridis'),
@@ -992,7 +988,7 @@ class ScatteringRate:
                 plt.close()
             if show:
                 plt.show()
-            fig = plt.figure(num=1, figsize=[16, 9], clear=True)
+            fig = plt.figure(num=1, figsize=(16, 9), clear=True)
             ax = fig.add_subplot(111, projection='3d', label='Surface')
             plt.xlabel(r'$\nu - \nu_0$ / MHz')
             plt.ylabel(r'$\phi$ / rad')

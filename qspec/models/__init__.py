@@ -3,10 +3,6 @@
 qspec.models
 ============
 
-Created on 14.03.2022
-
-@author: Patrick Mueller
-
 Module for constructing lineshape models.
 """
 

@@ -3,10 +3,6 @@
 qspec.tools
 ===========
 
-Created on 05.05.2020
-
-@author: Patrick Mueller
-
 Module including mathematical and technical methods.
 """
 
@@ -990,8 +986,8 @@ def rotation_matrix(alpha: array_like, dr: array_iter):
 class Rotation:
     """
     An object specifying a rotation in 3d-space. The rotation is defined
-     through an angle 'alpha' and an rotational axis 'dr' by the user.
-     Additional instance attributes are the angle in degree 'alpha_deg' and the rotational matrix 'R'.
+    through an angle 'alpha' and an rotational axis 'dr' by the user.
+    Additional instance attributes are the angle in degree 'alpha_deg' and the rotational matrix 'R'.
     """
     def __init__(self, alpha: scalar = 0., dr: array_iter = None):
         """

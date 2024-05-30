@@ -1,10 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 qspec.models._spectrum
-
-Created on 14.03.2022
-
-@author: Patrick Mueller
+======================
 
 Spectrum classes for lineshape models.
 """
@@ -210,7 +207,7 @@ def _gauss_chi2_fwhm(sigma, xi):
     return a * x[0] * (np.arctan(b * (np.abs(x[1] / x[0]) ** c - 1)) + np.arctan(b)) + np.sqrt(8 * np.log(2)) * x[0]
 
 
-class GaussChi2(Spectrum):  # TODO: The fwhm of GaussChi2 is fitting quiet good now, but could be improved further.
+class GaussChi2(Spectrum):  # TODO: The fwhm of GaussChi2 is fitting quite well now, but could be improved further.
     def __init__(self):
         super().__init__()
         self.type = 'GaussBoltzmann'

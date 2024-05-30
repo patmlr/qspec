@@ -3,10 +3,6 @@
 qspec._simulate_cpp
 ===================
 
-Created on 09.01.2022
-
-@author: Patrick Mueller
-
 Classes and methods for the 'simulate' module using the Python/C++ interface.
 """
 

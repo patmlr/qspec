@@ -19,11 +19,11 @@ sys.path.insert(0, os.path.abspath('../..'))
 # -- Project information -----------------------------------------------------
 
 project = 'qspec'
-copyright = '2023, Patrick Mueller'
+copyright = '2024, Patrick Mueller'
 author = 'Patrick Mueller'
 
 # The full version, including alpha/beta/rc tags
-release = '13.12.2023'
+release = '30.05.2024'
 
 
 # -- General configuration ---------------------------------------------------

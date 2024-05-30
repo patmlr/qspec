@@ -1,10 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 qspec.models._helper
-
-Created on 08.05.2023
-
-@author: Patrick Mueller
+====================
 
 Helper functions for the models.
 """

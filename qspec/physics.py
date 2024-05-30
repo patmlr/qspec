@@ -3,10 +3,6 @@
 qspec.physics
 =============
 
-Created on 01.04.2020
-
-@author: Patrick Mueller
-
 Module for physical functions useful for CLS.
 """
 
@@ -49,7 +45,7 @@ gn_s = sc.physical_constants['neutron g factor'][0]
 
 def inv_cm_to_freq(k: array_like):
     """
-    :param k: The wavenumber k of a transition (cm ** -1)
+    :param k: The wavenumber k of a transition (1/cm)
     :returns: The frequency corresponding to the wavenumber k (MHz).
     """
     return k * sc.c * 1e-4
@@ -58,7 +54,7 @@ def inv_cm_to_freq(k: array_like):
 def freq_to_inv_cm(freq: array_like):
     """
     :param freq: The frequency f of a transition (MHz)
-    :returns: The wavenumber k corresponding to the frequency freq (cm ** -1).
+    :returns: The wavenumber k corresponding to the frequency freq (1/cm).
     """
     return freq / sc.c * 1e4
 
@@ -81,7 +77,7 @@ def freq_to_wavelength(freq: array_like):
 
 def inv_cm_to_wavelength(k: array_like):
     """
-    :param k: The wavenumber k of a transition (cm ** -1)
+    :param k: The wavenumber k of a transition (1/cm)
     :returns: The wavelength corresponding to the wavenumber k (um).
     """
     return 1e4 / k
@@ -90,7 +86,7 @@ def inv_cm_to_wavelength(k: array_like):
 def wavelength_to_inv_cm(lam: array_like):
     """
     :param lam: The wavelength lambda of a transition (um)
-    :returns: The wavenumber k corresponding to the wavelength lam (cm ** -1).
+    :returns: The wavenumber k corresponding to the wavelength lam (1/cm).
     """
     return 1e4 / lam
 
