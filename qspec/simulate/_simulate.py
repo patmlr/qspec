@@ -18,8 +18,8 @@ from mpl_toolkits.mplot3d.axes3d import Axes3D
 from qspec._types import *
 from qspec import tools
 import qspec.algebra as al
-from qspec.physics import photon_recoil
-from qspec.simulate._simulate_cpp import sr_generate_y, Polarization, Environment, Atom
+from qspec.physics import photon_recoil, saturation
+from qspec.simulate._simulate_cpp import sr_generate_y, Polarization, Environment, Atom, Laser
 
 __all__ = ['ct_markov_analytic', 'ct_markov_dgl', 'lambda_states', 'lambda_ge_rec', 'Geometry', 'ScatteringRate']
 
@@ -588,22 +588,25 @@ class ScatteringRate:
     The spectrum is excited by a laser with the specified 'polarization'
     and recorded with a FDR defined by 'geometry'. An external magnetic field can be defined through 'b'.
     """
-    def __init__(self, atom: Atom, i_decay: int = 0, geometry: Geometry = None,
-                 polarization: Polarization = None, b: array_like = None):
+    def __init__(self, atom: Atom, laser: Laser = None, i_decay: int = 0, geometry: Geometry = None,
+                 b: array_like = None):
         """
         :param atom: The investigated atom.
+        :param laser: The incident laser beam.
+        :param i_decay: The indexing of the transition in atom.decay_map.
         :param geometry: The geometry of the FDR.
-        :param polarization: The polarization of the incident laser beam.
         :param b: The external magnetic field. Can be a vector or a scalar.
          In the latter case, the magnetic field is aligned with the z-axis.
         """
         self.environment = Environment()
         self.atom = atom
+        self.freq_0 = 0.
+        self.laser, self.geometry, self.polarization = None, None, None
         self.i_decay = i_decay
         self.state_l, self.state_u = None, None
         self.i_state_l, self.i_state_u = None, None
-        self.freq_0 = None
         self.v = None
+        self.s = 1.
         self.gamma = None
         self.A, self.a_const = None, None
         self.x0 = None
@@ -613,11 +616,10 @@ class ScatteringRate:
         self.e_r_b = np.array([0., 0., 1.])
         self.e_l = np.array([0., 0., 1.])
         self.R_b, self.R = np.identity(3, dtype=float), np.identity(3, dtype=float)
-        self.geometry, self.polarization = Geometry(), Polarization(self.e_l)
         self.set_states()
         self.check_atom()
+        self.set_laser(laser)
         self.set_geometry(geometry)
-        self.set_polarization(polarization)
         self.generate_dipoles()
         self.set_b(b)  # TODO: Implement Environments in C++.
     
@@ -659,6 +661,13 @@ class ScatteringRate:
         self.e_l = np.dot(self.R_b, self.polarization.x)
         self.polarization.def_q_axis(self.e_r_b)
 
+    def set_laser(self, laser: Laser = None):
+        self.laser = laser
+        if self.laser is None:
+            self.laser = Laser(self.freq_0, intensity=1., polarization=Polarization())
+        self.s = saturation(self.laser.intensity, self.laser.freq, self.atom.decay_map.a[self.i_decay], 1.)
+        self.set_polarization(self.laser.polarization)
+
     def set_states(self):
         """
         Define lower and upper states.
@@ -680,7 +689,8 @@ class ScatteringRate:
         """
         :returns: None. Updates the resonance positions.
         """
-        self.x0 = [[state_u.freq - state_l.freq - self.freq_0 for state_u in self.state_u] for state_l in self.state_l]
+        self.x0 = [[state_u.freq - state_l.freq - self.laser.freq
+                    for state_u in self.state_u] for state_l in self.state_l]
         self.x0_array = np.array([self.x0[col[0]][col[1]] for row in self.indices for col in row], dtype=float)
 
     def generate_dipoles(self):
@@ -764,7 +774,7 @@ class ScatteringRate:
             for x0, a_const in zip(x0_list, a_const_list):
                 denominator = (x - x0) ** 2 + 0.25 * self.gamma ** 2
                 y0 += a_const ** 2 / denominator
-        return y0 * (self.gamma / 2.) ** 3 / len(self.x0) / 3 * 2 * np.pi
+        return y0 * (self.gamma / 2.) ** 3 / len(self.x0) / 3 * 2 * np.pi * self.s
 
     def generate_y_4pi(self, x: array_like) -> array_like:
         """
@@ -778,7 +788,7 @@ class ScatteringRate:
                     continue
                 denominator = (x - x0) ** 2 + 0.25 * self.gamma ** 2
                 y0 += a_const ** 2 / denominator * tools.absolute_complex(self.polarization.q[int(u.m - ll.m) + 1]) ** 2
-        return y0 * (self.gamma / 2.) ** 3 / len(self.x0) * 2 * np.pi
+        return y0 * (self.gamma / 2.) ** 3 / len(self.x0) * 2 * np.pi * self.s
 
     def generate_y(self, x: array_like, theta: array_like, phi: array_like, decimals: int = 8):
         """
@@ -803,7 +813,7 @@ class ScatteringRate:
         #     e_theta /= tools.absolute(e_theta)
         #     e_phi /= tools.absolute(e_phi)
 
-        norm = 3. / (8. * np.pi) * (self.gamma / 2.) ** 3 / len(self.x0) * 2 * np.pi
+        norm = 3. / (8. * np.pi) * (self.gamma / 2.) ** 3 / len(self.x0) * 2 * np.pi * self.s
         denominator = 1. / (-np.expand_dims(x, axis=1) + self.x0_array + 0.5j * self.gamma)
 
         i_l = np.around(np.sum(self.e_l * self.A_i, axis=-1), decimals=decimals)

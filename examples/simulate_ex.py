@@ -341,10 +341,9 @@ def example(n=None):
         y = he.scattering_rate(rho, theta, phi)[:, -1]
         plt.plot(delta, y, '-C1', label='full QI')
 
-        sr = sim.ScatteringRate(he, polarization=pol_sp)
+        sr = sim.ScatteringRate(he, laser=laser_sp)
         y = sr.generate_y(delta, theta, phi)[:, 0, 0]
-        s = qs.saturation(intensity, f_p, a_p, 1)
-        plt.plot(delta, s * y, '--C7', label='QI pert.')
+        plt.plot(delta, y, '--C7', label='QI pert.')
 
         plt.xlabel('f - {} (MHz)'.format(laser_sp.freq))
         plt.ylabel('scattering rate after {} us (MHz)'.format(times[-1]))
@@ -418,4 +417,4 @@ def example(n=None):
 
 
 if __name__ == '__main__':
-    example({1})
+    example({4})
