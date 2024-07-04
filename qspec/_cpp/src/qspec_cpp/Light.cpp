@@ -87,11 +87,12 @@ Laser::Laser()
 	k << 1, 0, 0;
 }
 
-void Laser::init(double _freq, double _intensity, Polarization* _polarization)
+void Laser::init(double _freq, double _intensity, Polarization* _polarization, Vector3d _k)
 {
 	set_freq(_freq);
 	set_intensity(_intensity);
 	set_polarization(_polarization);
+	set_k(_k);
 }
 
 double Laser::get_detuned(const Vector3d& v)
@@ -138,12 +139,17 @@ void Laser::set_freq(double _freq)
 	freq = _freq;
 }
 
-Vector3d* Laser::get_k()
+Vector3d Laser::get_k()
 {
-	return &k;
+	return k;
 }
 
 void Laser::set_k(Vector3d _k)
 {
-	k = _k;
+	k = _k / _k.norm() * freq / sc::c;
+}
+
+Vector3d Laser::get_kn()
+{
+	return k / k.norm();
 }

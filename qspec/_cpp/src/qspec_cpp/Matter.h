@@ -151,8 +151,6 @@ public:
 	VectorXd* get_Lsum();
 	MatrixXd* get_L0();
 	MatrixXd* get_L1();
-
-	Vector3d gen_velocity_change(size_t i, size_t j, size_t f, Vector3d& k, std::mt19937& gen);
 };
 
 

@@ -266,13 +266,13 @@ def mode_lognormal(x, bins=100):
     a = scale * np.max(y)
     p0 = [s, loc, scale, a]
 
-    # popt, pcov = curve_fit(lognormal, x, y, p0=p0)
-    # mode = popt[1] + popt[2] * np.exp(-popt[0] ** 2)
+    popt, pcov = curve_fit(lognormal, x, y, p0=p0)
+    mode = popt[1] + popt[2] * np.exp(-popt[0] ** 2)
     mode = p0[1] + p0[2] * np.exp(-p0[0] ** 2)
 
     plt.bar(x, y, width=delta)
     plt.plot(x, lognormal(x, *p0), '-C1')
-    # plt.plot(x, lognormal(x, *popt), '-C2')
+    plt.plot(x, lognormal(x, *popt), '-C2')
     plt.vlines(mode, 0, np.max(y), colors='k')
     plt.show()
     return mode

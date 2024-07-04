@@ -81,9 +81,10 @@ extern "C"
         delete laser;
     }
 
-    __declspec(dllexport) void laser_init(Laser* laser, double freq, double intensity, Polarization* polarization)
+    __declspec(dllexport) void laser_init(Laser* laser, double freq, double intensity, Polarization* polarization, double* k)
     {
-        laser->init(freq, intensity, polarization);
+        Vector3d _k = cast_Vector3d(k);
+        laser->init(freq, intensity, polarization, _k);
     }
 
     __declspec(dllexport) double laser_get_freq(Laser* laser)
@@ -118,14 +119,12 @@ extern "C"
 
     __declspec(dllexport) double* laser_get_k(Laser* laser)
     {
-        return laser->get_k()->data();
+        return laser->get_k().data();
     }
 
     __declspec(dllexport) void laser_set_k(Laser* laser, double* k)
     {
-        Vector3d _k;
-        _k << k[0], k[1], k[2];
-        _k /= _k.norm();
+        Vector3d _k = cast_Vector3d(k);
         return laser->set_k(_k);
     }
 
@@ -606,7 +605,7 @@ extern "C"
     __declspec(dllexport) double* interaction_get_delta(Interaction* interaction)
     {
         VectorXd* delta = new VectorXd(interaction->get_atom()->get_size());
-        *delta = interaction->gen_delta(*interaction->get_atom()->get_w0(), *interaction->gen_w());
+        *delta = interaction->gen_delta(*interaction->get_atom()->get_w0(), interaction->gen_w());
         return delta->data();
     }
 
@@ -645,15 +644,14 @@ extern "C"
         {
             for (size_t k = 0; k < t_size; ++k)
             {
-                MatrixXcd* _h = interaction->get_hamiltonian(_t.at(k), _delta.at(i), _v.at(i));
+                MatrixXcd _h = interaction->get_hamiltonian(_t.at(k), _delta.at(i), _v.at(i));
                 for (size_t m = 0; m < size; ++m)
                 {
                     for (size_t n = 0; n < size; ++n)
                     {
-                        h[i * size * size * t_size + m * size * t_size + n * t_size + k] = (*_h)(n, m);
+                        h[i * size * size * t_size + m * size * t_size + n * t_size + k] = _h(n, m);
                     }
                 }
-                delete _h;
             }
         }
     }

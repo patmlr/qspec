@@ -1,7 +1,7 @@
 
 How to compile
 =====
-- include the Boost and Eigen libraries.
+- include the Boost (1.79.0) and Eigen (3.4.0) libraries.
 - Manual changes:
     * In _/boost/numeric/odeint/integrate/max_step_checker.hpp_ replace ```std::sprintf``` with ```sprintf_s```.
     * In _/boost/numeric/external/eigen/eigen_algebra.hpp_, function ```vector_space_norm_inf```,

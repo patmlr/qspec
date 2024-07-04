@@ -349,13 +349,12 @@ MatrixXd* Interaction::get_deltamap()
 	return &deltamap;
 }
 
-MatrixXcd* Interaction::get_hamiltonian(const double t, const VectorXd& delta, const Vector3d& v)
+MatrixXcd Interaction::get_hamiltonian(const double t, const VectorXd& delta, const Vector3d& v)
 {
 	VectorXd w0 = *atom->get_w0();
-	VectorXd* w = gen_w(delta, v);
-	MatrixXcd* H = gen_hamiltonian(w0, *w);
-	if (time_dependent) update_hamiltonian(*H, w0, *w, t);
-	delete w;
+	VectorXd w = gen_w(delta, v);
+	MatrixXcd H = gen_hamiltonian(w0, w);
+	if (time_dependent) update_hamiltonian(H, w0, w, t);
 	return H;
 }
 
@@ -600,50 +599,50 @@ void Interaction::propagate(size_t i, size_t i0, std::set<size_t>& visited, cons
 	path.at(0).pop_back();
 }
 
-VectorXd* Interaction::gen_w(const bool dynamics)
+VectorXd Interaction::gen_w(const bool dynamics)
 {
-	VectorXd* w = new VectorXd(lasers.size());
+	VectorXd w = VectorXd(lasers.size());
 	for (size_t m = 0; m < lasers.size(); ++m)
 	{
-		(*w)(m) = lasers.at(m)->get_freq();
-		if (dynamics) (*w)(m) -= recoil((*w)(m), atom->get_mass());
-		(*w)(m) *= 2 * sc::pi;
+		w(m) = lasers.at(m)->get_freq();
+		if (dynamics) w(m) -= recoil(w(m), atom->get_mass());
+		w(m) *= 2 * sc::pi;
 	}
 	return w;
 }
 
-VectorXd* Interaction::gen_w(const VectorXd& delta, const bool dynamics)
+VectorXd Interaction::gen_w(const VectorXd& delta, const bool dynamics)
 {
-	VectorXd* w = new VectorXd(lasers.size());
+	VectorXd w = VectorXd(lasers.size());
 	for (size_t m = 0; m < lasers.size(); ++m)
 	{
-		(*w)(m) = (lasers.at(m)->get_freq() + delta(m));
-		if (dynamics) (*w)(m) -= recoil((*w)(m), atom->get_mass());
-		(*w)(m) *= 2 * sc::pi;
+		w(m) = (lasers.at(m)->get_freq() + delta(m));
+		if (dynamics) w(m) -= recoil(w(m), atom->get_mass());
+		w(m) *= 2 * sc::pi;
 	}
 	return w;
 }
 
-VectorXd* Interaction::gen_w(const Vector3d& v, const bool dynamics)
+VectorXd Interaction::gen_w(const Vector3d& v, const bool dynamics)
 {
-	VectorXd* w = new VectorXd(lasers.size());
+	VectorXd w = VectorXd(lasers.size());
 	for (size_t m = 0; m < lasers.size(); ++m)
 	{
-		(*w)(m) = lasers.at(m)->get_detuned(v);
-		if (dynamics) (*w)(m) -= recoil((*w)(m), atom->get_mass());
-		(*w)(m) *= 2 * sc::pi;
+		w(m) = lasers.at(m)->get_detuned(v);
+		if (dynamics) w(m) -= recoil(w(m), atom->get_mass());
+		w(m) *= 2 * sc::pi;
 	}
 	return w;
 }
 
-VectorXd* Interaction::gen_w(const VectorXd& delta, const Vector3d& v, const bool dynamics)
+VectorXd Interaction::gen_w(const VectorXd& delta, const Vector3d& v, const bool dynamics)
 {
-	VectorXd* w = new VectorXd(lasers.size());
+	VectorXd w = VectorXd(lasers.size());
 	for (size_t m = 0; m < lasers.size(); ++m)
 	{
-		(*w)(m) = lasers.at(m)->get_detuned(delta(m), v);
-		if (dynamics) (*w)(m) -= recoil((*w)(m), atom->get_mass());
-		(*w)(m) *= 2 * sc::pi;
+		w(m) = lasers.at(m)->get_detuned(delta(m), v);
+		if (dynamics) w(m) -= recoil(w(m), atom->get_mass());
+		w(m) *= 2 * sc::pi;
 	}
 	return w;
 }
@@ -665,18 +664,101 @@ VectorXd Interaction::gen_delta(const VectorXd& w0, const VectorXd& w)
 	return delta_diag;
 }
 
-MatrixXd* Interaction::gen_rates(VectorXd& w0, VectorXd& w)
+std::vector<MatrixXd> Interaction::gen_R_k(VectorXd& w0, VectorXd& w)
 {
-	MatrixXd* R = new MatrixXd(atom->get_size(), atom->get_size());
-	*R = MatrixXd::Zero(atom->get_size(), atom->get_size());
-	update_rates(*R, w0, w);
+	std::vector<MatrixXd> Rk(lasers.size());
+	double _w0;
+	double a;
+	double gamma;
+	double r;
+
+	for (size_t m = 0; m < lasers.size(); ++m)
+	{
+		//Rk.at(m).setZero();
+		MatrixXd R = MatrixXd::Zero(atom->get_size(), atom->get_size());
+		for (size_t j = 1; j < atom->get_size(); ++j)
+		{
+			for (size_t i = 0; i < j; ++i)
+			{
+				a = atom->get_decay_map()->get_item(atom->get(i)->get_label(), atom->get(j)->get_label());  // (*atom->get_L0())(i, j) + (*atom->get_L0())(j, i);
+				if (a == 0) continue;
+				gamma = atom->get_decay_map()->get_gamma(atom->get(i)->get_label(), atom->get(j)->get_label());
+				r = 4 * std::pow(std::abs(rabimap.at(m)(i, j)), 2);
+				if (r == 0) continue;
+				_w0 = abs(w0(i) - w0(j));
+				R(i, j) += lorentz(w(m), _w0, gamma, r);
+				R(j, i) = R(i, j);
+			}
+		}
+		Rk.at(m) = R;
+	}
+	return Rk;
+}
+
+Vector3d Interaction::gen_k_up(std::mt19937& gen, VectorXd& w0, VectorXd& w, size_t i, size_t j)
+{
+	Vector3d k_up = Vector3d::Zero();
+	std::vector<MatrixXd> Rk = gen_R_k(w0, w);
+	std::uniform_real_distribution<double> d(0, 1);
+	size_t c = i;
+	bool outer_flag = false;
+	while (true)
+	{
+		double choice = d(gen);
+		double chance = 0.;
+		double norm = 0.;
+		bool inner_flag = false;
+		for (size_t m = 0; m < lasers.size(); ++m)
+		{
+			for (size_t l = 0; l < atom->get_size(); ++l) norm += Rk.at(m)(c, l);
+		}
+		for (size_t m = 0; m < lasers.size(); ++m)
+		{
+			for (size_t l = 0; l < atom->get_size(); ++l)
+			{
+				chance += Rk.at(m)(c, l) / norm;
+				if (choice < chance)
+				{
+					k_up += lasers.at(m)->get_k();
+					c = l;
+					inner_flag = true;
+					if (c == j) outer_flag = true;
+					break;
+				}
+			}
+			if (inner_flag) break;
+		}
+		if (outer_flag) break;
+	}
+	return k_up;
+}
+
+Vector3d Interaction::gen_velocity_change(std::mt19937& gen, VectorXd& w0, VectorXd& w, size_t i, size_t j, size_t f)
+{
+	std::normal_distribution<double> d(0, 1);
+	Vector3d e_r;
+	e_r << d(gen), d(gen), d(gen);
+	e_r /= e_r.norm();
+
+	Vector3d k_up = gen_k_up(gen, w0, w, i, j);
+
+	double freq_down = atom->get(j)->get_freq() - atom->get(f)->get_freq();
+	Vector3d k_down = freq_down / sc::c * e_r;
+
+	return sc::h / (atom->get_mass() * sc::amu) * (k_up - k_down) * 1e6;
+}
+
+MatrixXd Interaction::gen_rates(VectorXd& w0, VectorXd& w)
+{
+	MatrixXd R = MatrixXd::Zero(atom->get_size(), atom->get_size());
+	update_rates(R, w0, w);
 	return R;
 }
 
-VectorXd* Interaction::gen_rates_sum(MatrixXd& R)
+VectorXd Interaction::gen_rates_sum(MatrixXd& R)
 {
-	VectorXd* R_sum = new VectorXd(atom->get_size());
-	update_rates_sum(*R_sum, R);
+	VectorXd R_sum = VectorXd::Zero(atom->get_size());
+	update_rates_sum(R_sum, R);
 	return R_sum;
 }
 
@@ -687,16 +769,12 @@ void Interaction::update_rates(MatrixXd& R, VectorXd& w0, VectorXd& w)
 	double a;
 	double gamma;
 	double r;
-	std::set<std::string> labels_i;
-	std::set<std::string> labels_j;
 	for (size_t m = 0; m < lasers.size(); ++m)
 	{
 		for (size_t j = 1; j < atom->get_size(); ++j)
 		{
 			for (size_t i = 0; i < j; ++i)
 			{
-				labels_i.clear();
-				labels_j.clear();
 				a = atom->get_decay_map()->get_item(atom->get(i)->get_label(), atom->get(j)->get_label());  // (*atom->get_L0())(i, j) + (*atom->get_L0())(j, i);
 				if (a == 0) continue;
 				gamma = atom->get_decay_map()->get_gamma(atom->get(i)->get_label(), atom->get(j)->get_label());
@@ -715,12 +793,11 @@ void Interaction::update_rates_sum(VectorXd& R_sum, MatrixXd& R)
 	R_sum = R.colwise().sum();
 }
 
-MatrixXcd* Interaction::gen_hamiltonian(VectorXd& w0, VectorXd& w)
+MatrixXcd Interaction::gen_hamiltonian(VectorXd& w0, VectorXd& w)
 {
-	MatrixXcd* H = new MatrixXcd(atom->get_size(), atom->get_size());
-	*H = MatrixXcd::Zero(atom->get_size(), atom->get_size());
-	H->diagonal() = gen_delta(w0, w);
-	update_hamiltonian_off(*H);
+	MatrixXcd H = MatrixXcd::Zero(atom->get_size(), atom->get_size());
+	H.diagonal() = gen_delta(w0, w);
+	update_hamiltonian_off(H);
 	return H;
 }
 
@@ -768,12 +845,11 @@ void Interaction::update_hamiltonian_diag(MatrixXcd& H, VectorXd& w0, VectorXd& 
 	H.diagonal() = gen_delta(w0, w);
 }
 
-MatrixXcd* Interaction::gen_hamiltonian_leaky(VectorXd& w0, VectorXd& w)
+MatrixXcd Interaction::gen_hamiltonian_leaky(VectorXd& w0, VectorXd& w)
 {
-	MatrixXcd* H = new MatrixXcd(atom->get_size(), atom->get_size());
-	*H = MatrixXcd::Zero(atom->get_size(), atom->get_size());
-	H->diagonal() = gen_delta(w0, w) - sc::i * 0.5 * (*atom->get_Lsum());
-	update_hamiltonian_off(*H);
+	MatrixXcd H = MatrixXcd::Zero(atom->get_size(), atom->get_size());
+	H.diagonal() = gen_delta(w0, w) - sc::i * 0.5 * (*atom->get_Lsum());
+	update_hamiltonian_off(H);
 	return H;
 }
 
@@ -807,31 +883,28 @@ std::vector<std::vector<VectorXd>> Interaction::rates(
 	std::for_each(std::execution::par_unseq, n_vec.begin(), n_vec.end(),
 		[this, &t, &x0, &delta, &v, &w0, &results, &progress](size_t i)
 		{
-			VectorXd* w = gen_w(delta.at(i), v.at(i));
-			MatrixXd* R = gen_rates(w0, *w);
-			VectorXd* R_sum = gen_rates_sum(*R);
+			VectorXd w = gen_w(delta.at(i), v.at(i));
+			MatrixXd R = gen_rates(w0, w);
+			VectorXd R_sum = gen_rates_sum(R);
 			size_t n = 0;
 
 			if (dense)
 			{
 				d_dopri5_vd_type dopri5 = make_dense_output(atol, rtol, dt_max, dopri5_vd_type());
-				n = integrate_times(dopri5, f_rate_equations(*R, *R_sum, *atom->get_L0(), *atom->get_Lsum()),
+				n = integrate_times(dopri5, f_rate_equations(R, R_sum, *atom->get_L0(), *atom->get_Lsum()),
 					x0.at(i), t.begin(), t.end(), dt, push_back_VectorXd(results.at(i)));
 			}
 			else if (controlled)
 			{
 				c_dopri5_vd_type dopri5 = make_controlled(atol, rtol, dt_max, dopri5_vd_type());
-				n = integrate_times(dopri5, f_rate_equations(*R, *R_sum, *atom->get_L0(), *atom->get_Lsum()),
+				n = integrate_times(dopri5, f_rate_equations(R, R_sum, *atom->get_L0(), *atom->get_Lsum()),
 					x0.at(i), t.begin(), t.end(), dt, push_back_VectorXd(results.at(i)));
 			}
 			else
 			{
-				n = integrate_times(rk4_vd_type(), f_rate_equations(*R, *R_sum, *atom->get_L0(), *atom->get_Lsum()),
+				n = integrate_times(rk4_vd_type(), f_rate_equations(R, R_sum, *atom->get_L0(), *atom->get_Lsum()),
 					x0.at(i), t.begin(), t.end(), dt, push_back_VectorXd(results.at(i)));
 			}
-			delete w;
-			delete R;
-			delete R_sum;
 			progress.at(i) = 1;
 			printf("\r\033[92mSolving rate equations ... %3.2f %%\033[0m", 100 * std::reduce(progress.begin(), progress.end()) / x0.size());
 		}
@@ -859,8 +932,8 @@ std::vector<std::vector<VectorXcd>> Interaction::schroedinger(
 	std::for_each(std::execution::par_unseq, n_vec.begin(), n_vec.end(),
 		[this, &t, &x0, &delta, &v, &w0, &results, &progress](size_t i)
 		{
-			VectorXd* w = gen_w(delta.at(i), v.at(i));
-			MatrixXcd* H = gen_hamiltonian(w0, *w);
+			VectorXd w = gen_w(delta.at(i), v.at(i));
+			MatrixXcd H = gen_hamiltonian(w0, w);
 			size_t n = 0;
 
 			if (dense)
@@ -868,13 +941,13 @@ std::vector<std::vector<VectorXcd>> Interaction::schroedinger(
 				if (time_dependent)
 				{
 					d_dopri5_vcd_type dopri5 = make_dense_output(atol, rtol, dt_max, dopri5_vcd_type());
-					n = integrate_times(dopri5, f_schroedinger_t(*H, w0, *w, *this),
+					n = integrate_times(dopri5, f_schroedinger_t(H, w0, w, *this),
 						x0.at(i), t.begin(), t.end(), dt, push_back_VectorXcd(results.at(i)));
 				}
 				else
 				{
 					d_dopri5_vcd_type dopri5 = make_dense_output(atol, rtol, dt_max, dopri5_vcd_type());
-					n = integrate_times(dopri5, f_schroedinger(*H),
+					n = integrate_times(dopri5, f_schroedinger(H),
 						x0.at(i), t.begin(), t.end(), dt, push_back_VectorXcd(results.at(i)));
 				}
 			}
@@ -883,13 +956,13 @@ std::vector<std::vector<VectorXcd>> Interaction::schroedinger(
 				if (time_dependent)
 				{
 					c_dopri5_vcd_type dopri5 = make_controlled(atol, rtol, dt_max, dopri5_vcd_type());
-					n = integrate_times(dopri5, f_schroedinger_t(*H, w0, *w, *this),
+					n = integrate_times(dopri5, f_schroedinger_t(H, w0, w, *this),
 						x0.at(i), t.begin(), t.end(), dt, push_back_VectorXcd(results.at(i)));
 				}
 				else
 				{
 					c_dopri5_vcd_type dopri5 = make_controlled(atol, rtol, dt_max, dopri5_vcd_type());
-					n = integrate_times(dopri5, f_schroedinger(*H),
+					n = integrate_times(dopri5, f_schroedinger(H),
 						x0.at(i), t.begin(), t.end(), dt, push_back_VectorXcd(results.at(i)));
 				}
 			}
@@ -897,17 +970,15 @@ std::vector<std::vector<VectorXcd>> Interaction::schroedinger(
 			{
 				if (time_dependent)
 				{
-					n = integrate_times(rk4_vcd_type(), f_schroedinger_t(*H, w0, *w, *this),
+					n = integrate_times(rk4_vcd_type(), f_schroedinger_t(H, w0, w, *this),
 						x0.at(i), t.begin(), t.end(), dt, push_back_VectorXcd(results.at(i)));
 				}
 				else
 				{
-					n = integrate_times(rk4_vcd_type(), f_schroedinger(*H),
+					n = integrate_times(rk4_vcd_type(), f_schroedinger(H),
 						x0.at(i), t.begin(), t.end(), dt, push_back_VectorXcd(results.at(i)));
 				}
 			}
-			delete w;
-			delete H;
 			progress.at(i) = 1;
 			printf("\r\033[92mSolving schroedinger equation ... %3.2f %%\033[0m", 100 * std::reduce(progress.begin(), progress.end()) / x0.size());
 		}
@@ -937,8 +1008,8 @@ std::vector<std::vector<MatrixXcd>> Interaction::master(
 	std::for_each(std::execution::par_unseq, n_vec.begin(), n_vec.end(),
 		[this, &t, &x0, &delta, &v, &w0, &L0, &L1, &results, &progress](size_t i)
 		{
-			VectorXd* w = gen_w(delta.at(i), v.at(i));
-			MatrixXcd* H = gen_hamiltonian(w0, *w);
+			VectorXd w = gen_w(delta.at(i), v.at(i));
+			MatrixXcd H = gen_hamiltonian(w0, w);
 			size_t n = 0;
 
 			if (dense)
@@ -946,13 +1017,13 @@ std::vector<std::vector<MatrixXcd>> Interaction::master(
 				if (time_dependent)
 				{
 					d_dopri5_mcd_type dopri5 = make_dense_output(atol, rtol, dt_max, dopri5_mcd_type());
-					n = integrate_times(dopri5, f_master_t(*H, L0, L1, w0, *w, *this),
+					n = integrate_times(dopri5, f_master_t(H, L0, L1, w0, w, *this),
 						x0.at(i), t.begin(), t.end(), dt, push_back_MatrixXcd(results.at(i)));
 				}
 				else
 				{
 					d_dopri5_mcd_type dopri5 = make_dense_output(atol, rtol, dt_max, dopri5_mcd_type());
-					n = integrate_times(dopri5, f_master(*H, L0, L1),
+					n = integrate_times(dopri5, f_master(H, L0, L1),
 						x0.at(i), t.begin(), t.end(), dt, push_back_MatrixXcd(results.at(i)));
 				}
 			}
@@ -961,13 +1032,13 @@ std::vector<std::vector<MatrixXcd>> Interaction::master(
 				if (time_dependent)
 				{
 					d_dopri5_mcd_type dopri5 = make_controlled(atol, rtol, dt_max, dopri5_mcd_type());
-					n = integrate_times(dopri5, f_master_t(*H, L0, L1, w0, *w, *this),
+					n = integrate_times(dopri5, f_master_t(H, L0, L1, w0, w, *this),
 						x0.at(i), t.begin(), t.end(), dt, push_back_MatrixXcd(results.at(i)));
 				}
 				else
 				{
 					d_dopri5_mcd_type dopri5 = make_controlled(atol, rtol, dt_max, dopri5_mcd_type());
-					n = integrate_times(dopri5, f_master(*H, L0, L1),
+					n = integrate_times(dopri5, f_master(H, L0, L1),
 						x0.at(i), t.begin(), t.end(), dt, push_back_MatrixXcd(results.at(i)));
 				}
 			}
@@ -975,17 +1046,15 @@ std::vector<std::vector<MatrixXcd>> Interaction::master(
 			{
 				if (time_dependent)
 				{
-					n = integrate_times(rk4_mcd_type(), f_master_t(*H, L0, L1, w0, *w, *this),
+					n = integrate_times(rk4_mcd_type(), f_master_t(H, L0, L1, w0, w, *this),
 						x0.at(i), t.begin(), t.end(), dt, push_back_MatrixXcd(results.at(i)));
 				}
 				else
 				{
-					n = integrate_times(rk4_mcd_type(), f_master(*H, L0, L1),
+					n = integrate_times(rk4_mcd_type(), f_master(H, L0, L1),
 						x0.at(i), t.begin(), t.end(), dt, push_back_MatrixXcd(results.at(i)));
 				}
 			}
-			delete w;
-			delete H;
 			progress.at(i) = 1;
 			printf("\r\033[92mSolving master equation ... %3.2f %%\033[0m", 100 * std::reduce(progress.begin(), progress.end()) / x0.size());
 		}
@@ -1030,17 +1099,16 @@ std::vector<std::vector<VectorXcd>> Interaction::mc_master(
 		{
 			// d_dopri5_vcd_type dopri5 = make_dense_output(atol, rtol, dt_max, dopri5_vcd_type());
 			VectorXd w0 = *atom->get_w0();
-			VectorXd* w = gen_w(delta.at(n), v.at(0), dynamics);
-			MatrixXcd H(atom->get_size(), atom->get_size());
-			H = MatrixXcd::Zero(atom->get_size(), atom->get_size());
+			VectorXd w = gen_w(delta.at(n), v.at(0), dynamics);
+			MatrixXcd H = MatrixXcd::Zero(atom->get_size(), atom->get_size());
 			update_hamiltonian_off(H);
 
 			thread_local std::random_device rd;
 			thread_local std::mt19937 gen(rd());
 			thread_local std::uniform_real_distribution<double> d(0, 1);
 
-			update_w(*w, delta.at(n), v.at(n), dynamics);
-			if (!time_dependent) update_hamiltonian_leaky_diag(H, w0, *w);
+			update_w(w, delta.at(n), v.at(n), dynamics);
+			if (!time_dependent) update_hamiltonian_leaky_diag(H, w0, w);
 
 			Vector3d v_temp = Vector3d::Zero();
 			v_temp += v.at(n);
@@ -1063,7 +1131,7 @@ std::vector<std::vector<VectorXcd>> Interaction::mc_master(
 				{
 					_dt = t.at(i_t) - _t;
 					if (time_dependent) rk4_vcd_type().do_step(
-						f_schroedinger_leaky_t(H, w0, *w, std::ref(*this)), x0.at(n), _t, _dt);
+						f_schroedinger_leaky_t(H, w0, w, std::ref(*this)), x0.at(n), _t, _dt);
 					else rk4_vcd_type().do_step(f_schroedinger(H), x0.at(n), _t, _dt);
 
 					results.at(n).push_back(x0.at(n) / sqrt(x0.at(n).cwiseAbs2().sum()));
@@ -1079,7 +1147,7 @@ std::vector<std::vector<VectorXcd>> Interaction::mc_master(
 				if (_dt > 0)
 				{
 					if (time_dependent) rk4_vcd_type().do_step(
-						f_schroedinger_leaky_t(H, w0, *w, std::ref(*this)), x0.at(n), _t, _dt);
+						f_schroedinger_leaky_t(H, w0, w, std::ref(*this)), x0.at(n), _t, _dt);
 					else rk4_vcd_type().do_step(f_schroedinger(H), x0.at(n), _t, _dt);
 					_t = _t1;
 				}
@@ -1099,9 +1167,9 @@ std::vector<std::vector<VectorXcd>> Interaction::mc_master(
 						{
 							if (dynamics)
 							{
-								v_temp += atom->gen_velocity_change(i, c_i.at(j), c_j.at(j), *lasers.at(0)->get_k(), gen);
-								update_w(*w, delta.at(n), v_temp, dynamics);
-								if (!time_dependent) update_hamiltonian_leaky_diag(H, w0, *w);
+								v_temp += gen_velocity_change(gen, w0, w, i, c_i.at(j), c_j.at(j));
+								update_w(w, delta.at(n), v_temp, dynamics);
+								if (!time_dependent) update_hamiltonian_leaky_diag(H, w0, w);
 							}
 
 							i = c_j.at(j);
@@ -1114,11 +1182,10 @@ std::vector<std::vector<VectorXcd>> Interaction::mc_master(
 				}
 			}
 			if (dynamics) v.at(n) += v_temp;
-			delete w;
 			progress.at(n) = 1;
-			printf("\r\033[92mSolving mc-schroedinger equation ... %3.2f %%\033[0m", 100 * std::reduce(progress.begin(), progress.end()) / x0.size());
+			printf("\r\033[92mSolving MC master equation ... %3.2f %%\033[0m", 100 * std::reduce(progress.begin(), progress.end()) / x0.size());
 		});
-	printf("\r\033[92mSolving mc-schroedinger equation ... 100.00 %%\033[0m");
+	printf("\r\033[92mSolving MC master equation ... 100.00 %%\033[0m");
 	printf("\n");
 	return results;
 }

@@ -99,7 +99,7 @@ dll.polarization_get_q.restype = vector3cd_p
 dll.laser_construct.restype = LaserHandler
 dll.laser_destruct.argtypes = (LaserHandler, )
 
-dll.laser_init.argtype = (LaserHandler, c_double, c_double, PolarizationHandler)
+dll.laser_init.argtype = (LaserHandler, c_double, c_double, PolarizationHandler, c_double_p)
 
 dll.laser_get_freq.argtypes = (LaserHandler, )
 dll.laser_get_freq.restype = c_double

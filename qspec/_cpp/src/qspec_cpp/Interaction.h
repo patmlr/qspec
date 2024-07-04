@@ -113,7 +113,7 @@ public:
 	std::vector<MatrixXcd>* get_rabimap();
 	MatrixXd* get_atommap();
 	MatrixXd* get_deltamap();
-	MatrixXcd* get_hamiltonian(const double t, const VectorXd& delta, const Vector3d& v);
+	MatrixXcd get_hamiltonian(const double t, const VectorXd& delta, const Vector3d& v);
 
 	void update();
 	void gen_coordinates();
@@ -124,26 +124,30 @@ public:
 	void propagate(size_t i, size_t i0, std::set<size_t>& visited, const std::vector<size_t>& tree,
 		std::array<std::vector<size_t>, 2>& path, std::vector<MatrixXd>& shifts);
 
-	VectorXd* gen_w(const bool dynamics = false);
-	VectorXd* gen_w(const VectorXd& delta, const bool dynamics = false);
-	VectorXd* gen_w(const Vector3d& v, const bool dynamics = false);
-	VectorXd* gen_w(const VectorXd& delta, const Vector3d& v, const bool dynamics = false);
+	VectorXd gen_w(const bool dynamics = false);
+	VectorXd gen_w(const VectorXd& delta, const bool dynamics = false);
+	VectorXd gen_w(const Vector3d& v, const bool dynamics = false);
+	VectorXd gen_w(const VectorXd& delta, const Vector3d& v, const bool dynamics = false);
 	void update_w(VectorXd& w, const VectorXd& delta, const Vector3d& v, const bool dynamics = false);
 	// VectorXd gen_delta(VectorXd& w0, VectorXd& w);
 	VectorXd gen_delta(const VectorXd& w0, const VectorXd& w);
 
-	MatrixXd* gen_rates(VectorXd& w0, VectorXd& w);
-	VectorXd* gen_rates_sum(MatrixXd& R);
+	std::vector<MatrixXd> gen_R_k(VectorXd& w0, VectorXd& w);
+	Vector3d gen_k_up(std::mt19937& gen, VectorXd& w0, VectorXd& w, size_t i, size_t j);
+	Vector3d gen_velocity_change(std::mt19937& gen, VectorXd& w0, VectorXd& w, size_t i, size_t j, size_t f);
+
+	MatrixXd gen_rates(VectorXd& w0, VectorXd& w);
+	VectorXd gen_rates_sum(MatrixXd& R);
 	void update_rates(MatrixXd& R, VectorXd& w0, VectorXd& w);
 	void update_rates_sum(VectorXd& R_sum, MatrixXd& R);
 
-	MatrixXcd* gen_hamiltonian(VectorXd& w0, VectorXd& w);
+	MatrixXcd gen_hamiltonian(VectorXd& w0, VectorXd& w);
 	void update_hamiltonian_off(MatrixXcd& H);
 
 	void update_hamiltonian(MatrixXcd& H, VectorXd& w0, VectorXd& w, double t);
 	void update_hamiltonian_off(MatrixXcd& H, VectorXd& w, double t);
 
-	MatrixXcd* gen_hamiltonian_leaky(VectorXd& w0, VectorXd& w);
+	MatrixXcd gen_hamiltonian_leaky(VectorXd& w0, VectorXd& w);
 	void update_hamiltonian_leaky(MatrixXcd& H, VectorXd& w0, VectorXd& w, double t);
 
 	void update_hamiltonian_diag(MatrixXcd& H, VectorXd& w0, VectorXd& w);

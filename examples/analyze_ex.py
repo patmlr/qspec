@@ -1,10 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 examples.analyze_ex
-
-Created on 15.08.2021
-
-@author: Patrick Mueller
+===================
 
 Example script / Guide for the qspec.analyze module.
 """
@@ -23,7 +20,9 @@ def example(n=None):
 
     Example 0: Fit of a straight line with different algorithms.
 
-    Example 1: King-fit with different algorithms.
+    Example 1: Fit of a straight in 3d.
+
+    Example 2: King-fit with different algorithms.
 
     :returns: None.
     """
@@ -201,4 +200,4 @@ def example(n=None):
 
 
 if __name__ == '__main__':
-    example({0, 1, 2})
+    example({0})

@@ -45,7 +45,7 @@ protected:
 
 public:
 	Laser();
-	void init(double _freq, double _intensity, Polarization* _polarization);
+	void init(double _freq, double _intensity, Polarization* _polarization, Vector3d _k);
 	double get_detuned(const Vector3d& v);
 	double get_detuned(double delta, const Vector3d& v);
 
@@ -58,7 +58,8 @@ public:
 	double get_freq();
 	void set_freq(double _freq_0);
 
-	Vector3d* get_k();
+	Vector3d get_k();
 	void set_k(Vector3d _k);
+	Vector3d get_kn();
 
 };

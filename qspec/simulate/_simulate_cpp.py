@@ -148,10 +148,13 @@ class Laser:
             self._polarization = polarization
             if self.polarization is None:
                 self._polarization = Polarization()
-            dll.laser_init(self.instance, c_double(freq), c_double(intensity), polarization.instance)
             if k is None:
                 k = tools.unit_vector(0, 3)
-            self.k = k
+            k = np.asarray(k, dtype=float)
+            if k.shape != (3,):
+                raise ValueError('Interaction.k must be a 3d-vector, but has shape {}.'.format(k.shape))
+            dll.laser_init(self.instance, c_double(freq), c_double(intensity), polarization.instance,
+                           k.ctypes.data_as(c_double_p))
         else:
             self._polarization = Polarization(instance=dll.laser_get_polarization(self.instance))
 
@@ -1539,9 +1542,8 @@ class Interaction:
         :param v: Atom velocities (m/s). Must be a scalar or have shape (n, ) or (n, 3). In the first two cases,
          the velocity vector(s) is(are) assumed to be aligned with the x-axis.
         :param y0: The initial state / density matrix of the atom.
-         This must be None or have shape (#states, ), (n, #states) or (n, #states, #states).
-         If #states == n, (n, #states) is interpreted
-         If None, the ground states are populated equally.
+         This must be None or have shape (#states, ), (n or 1, #states) or (n or 1, #states, #states).
+         If #states == n, it is interpreted as (n, #states). If None, the ground states are populated equally.
         :returns: The integrated master equation as a complex-valued array of shape (n, #states, #states, #times).
         """
         t, t_size, ex = _cast_t(t)

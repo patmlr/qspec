@@ -1,10 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 examples.simulate_ex
-
-Created on 24.06.2021
-
-@author: Patrick Mueller
+====================
 
 Example script / Guide for the qspec.simulate module.
 
@@ -22,7 +19,6 @@ import matplotlib.pyplot as plt
 
 import qspec as qs
 import qspec.simulate as sim
-import qspec.models as mod
 
 
 def example(n=None):
@@ -38,6 +34,12 @@ def example(n=None):
     Example 2: Interaction between 43Ca+ with hyperfine structure and a laser.
 
     Example 3: Interaction between a singly-charged lithium-ion and two lasers.
+
+    Example 4: Time-evolved scattering rate of a para-he-like system.
+
+    Example 5: Coherent excitation with two laser beams resulting in time-dependent Rabi frequencies.
+
+    Example 6: Monte-Carlo simulation of 40Ca+ interacting with two lasers, including photon recoils.
 
     :returns: None.
     """
@@ -404,17 +406,68 @@ def example(n=None):
         plt.show()
 
     if 6 in n:
-        p = sim.State(0., 1, 1, 2, i=1, f=2, m=0, hyper_const=[1.], label='p')
-        d = sim.State(7e8, 1, 2, 2, i=1, f=2, m=1, hyper_const=[1.], label='d')
-        decay = sim.DecayMap([('p', 'd')], [50.])
-        atom = sim.Atom([p, d], decay)
+        """
+        Example 6: Interaction between 40Ca+ and two lasers.
+        
+        In example 6, a Monte-Carlo simulation of 40Ca+ interacting with two lasers,
+        including photon recoils, is implemented.
+        """
+        f_sp = 755222766  # The 4s -> 4p 2P1/2 transition frequency.
+        f_dp = 346000235  # The 3d 2D3/2 -> 4p 2P1/2 transition frequency.
 
-        pol = sim.Polarization([1, 1, 1], q_axis=2, vec_as_q=True)
-        laser = sim.Laser(7e8, intensity=100, polarization=pol)
+        a_sp = 140  # The Einstein coefficients of the two transitions
+        a_dp = 10.7
 
-        inter = sim.Interaction(atom, [laser])
-        print(inter.get_rabi(0))
+        s = sim.construct_electronic_state(freq_0=0, s=0.5, l=0, j=0.5, label='s')  # A list of all 4s substates.
+        p = sim.construct_electronic_state(f_sp, 0.5, 1, 0.5, label='p')  # A list of all 4p 2P1/2 substates.
+        d = sim.construct_electronic_state(f_sp - f_dp, 0.5, 2, 1.5, label='d')  # A list of all 3d 2D3/2 substates.
+
+        decay = sim.DecayMap(labels=[('s', 'p'), ('p', 'd')], a=[a_sp, a_dp])
+        # The states are linked by Einstein-A coefficients via the specified labels.
+
+        ca40 = sim.Atom(states=s + p + d, decay_map=decay, mass=39.9)  # The Atom with all states and the decay information.
+
+        pol_sp = sim.Polarization([1, 1, 1], q_axis=2, vec_as_q=True)
+        laser_sp = sim.Laser(freq=f_sp, polarization=pol_sp, intensity=500)  # Linear polarized laser for the ground-state
+        # transition with 500 uW / mm**2.
+
+        pol_dp = sim.Polarization([1, 1, 1], q_axis=2, vec_as_q=True)
+        laser_dp = sim.Laser(freq=f_dp, polarization=pol_dp, intensity=500, k=[1, 0, 0])  # Linear polarized laser for the ground-state
+        # transition with 500 uW / mm**2.
+
+        inter = sim.Interaction(atom=ca40, lasers=[laser_sp, laser_dp])  # The interaction.
+        inter.controlled = False
+        inter.dense = False
+        inter.dt = 1e-3
+        inter.resonance_info()  # Print the detuning of the lasers from the considered transitions.
+
+        times = np.linspace(0., 3., 1001)  # Integration times.
+        # delta = np.linspace(-50, 50, 101)  # Laser detunings from the given laser frequency.
+
+        sample_size = 1000
+        y0 = np.zeros((sample_size, ca40.size), dtype=complex)
+        y0[:int(sample_size / 2), 0] = np.exp(np.random.random(size=int(sample_size / 2)) * 2 * np.pi * 1j)
+        y0[int(sample_size / 2):, 1] = np.exp(np.random.random(size=int(sample_size / 2)) * 2 * np.pi * 1j)
+        rho, v = inter.mc_master(times, y0=y0, dynamics=True, as_density_matrix=True)
+        y = np.diagonal(rho, axis1=1, axis2=2).real
+        y = np.transpose(y, axes=[0, 2, 1])
+        y = np.mean(y, axis=0)
+
+        ys = np.sum(y[ca40.get_state_indexes('s')], axis=0)
+        yp = np.sum(y[ca40.get_state_indexes('p')], axis=0)
+        yd = np.sum(y[ca40.get_state_indexes('d')], axis=0)
+
+        plt.plot(times, ys, label='s')
+        plt.plot(times, yp, label='p')
+        plt.plot(times, yd, label='d')
+        plt.legend()
+        plt.show()
+
+        plt.hist(v[:, 0], bins=40)
+        plt.hist(v[:, 1], bins=40)
+        plt.show()
+
 
 
 if __name__ == '__main__':
-    example({4})
+    example({6})

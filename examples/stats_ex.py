@@ -1,10 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 examples.stats_ex
-
-Created on 25.01.2022
-
-@author: Patrick Mueller
+=================
 
 Example script / Guide for the qspec.stats module.
 """
@@ -25,6 +22,8 @@ def example(n=None):
     Example 0: Create an observable with uncertainties and do statistics.
 
     Example 1: Fit a function and plot its median and 1-sigma percentiles.
+
+    Example 2: Calculation of the mode of a lognormal distribution.
 
     :returns: None.
     """
@@ -110,4 +109,4 @@ def example(n=None):
 
 
 if __name__ == '__main__':
-    example({2})
+    example({0})
