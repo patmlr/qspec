@@ -732,11 +732,30 @@ class Atom:
         :param ground_state_labels: An Iterable of labels belonging to ground states.
         :returns: The initial population of the atom.
         """
-        y0 = np.zeros(self.size)
         if ground_state_labels is None:
             ground_state_labels = [self.states[0].label]
         indices = np.array([i for i, state in enumerate(self) if state.label in ground_state_labels])
+        y0 = np.zeros(self.size)
         y0[indices] = 1 / indices.size
+        return y0
+    
+    def get_y0_mc(self, n_samples: int = None, ground_state_labels: Union[Iterable[str], str] = None) -> np.ndarray:
+        """
+        :param n_samples: The number of samples to create.
+        :param ground_state_labels: An Iterable of labels belonging to ground states.
+        :returns: The initial population of the atom for the Monte-Carlo master equation solver.
+        """
+        if ground_state_labels is None:
+            ground_state_labels = [self.states[0].label]
+        indices = np.array([i for i, state in enumerate(self) if state.label in ground_state_labels])
+        y0 = np.zeros((n_samples, self.size), dtype=complex)
+        if n_samples % indices.size:
+            raise ValueError(f'The number of samples ({n_samples}) must be a multiple of'
+                             f' the number of ground states ({indices.size})')
+        batch = int(n_samples / indices.size)
+        for i, index in enumerate(indices):
+            y0[i * batch:(i + 1) * batch, index] \
+                = np.exp(np.random.random(size=batch) * 2 * np.pi * 1j)
         return y0
 
     def get_state_indexes(self, labels: Union[Iterable[str], str] = None,
@@ -759,10 +778,16 @@ class Atom:
     def scattering_rate(self, rho: array_like, theta: array_like = None, phi: array_like = None,
                         as_density_matrix: bool = True, i: array_like = None, j: array_like = None, axis: int = 1):
         """
-        :param rho: The state vector (density matrix) of the atom. Must have the same size as the atom
-         along the specified 'axis' (and 'axis' + 1).
-        :param theta: The elevation angle of detection.
-        :param phi: The azimuthal angle of detection.
+        Scattering rate of the atom into the direction
+
+            e_r = (sin(theta), cos(theta) * sin(phi), cos(theta) * cos(phi))
+
+        where the z-axis is the quantization axis, which is either (0, 0, 1) or the B-field axis.
+
+        :param rho: The density matrix of the atom. Must have the same size as the atom
+         along the specified 'axis' and 'axis' + 1.
+        :param theta: The elevation angle of detection relative to the quantization axis.
+        :param phi: The azimuthal angle of detection relative to the quantization axis.
         :param as_density_matrix: Whether 'rho' is a state vector or a density matrix.
         :param i: The initially excited state indexes to consider for spontaneous decay.
          If None, all states are considered.
@@ -1640,10 +1665,16 @@ class Interaction:
     def scattering_rate(self, rho: array_like, theta: array_like = None, phi: array_like = None,
                         as_density_matrix: bool = True, i: array_like = None, j: array_like = None, axis: int = 1):
         """
+        Scattering rate of the atom into the direction
+
+            e_r = (sin(theta), cos(theta) * sin(phi), cos(theta) * cos(phi))
+
+        where the z-axis is the quantization axis, which is either (0, 0, 1) or the B-field axis.
+
         :param rho: The density matrix of the atom. Must have the same size as the atom
          along the specified 'axis' and 'axis' + 1.
-        :param theta: The elevation angle of detection.
-        :param phi: The azimuthal angle of detection.
+        :param theta: The elevation angle of detection relative to the quantization axis.
+        :param phi: The azimuthal angle of detection relative to the quantization axis.
         :param as_density_matrix: Whether 'rho' is a state vector or a density matrix.
         :param i: The initially excited state indexes to consider for spontaneous decay.
          If None, all states are considered.

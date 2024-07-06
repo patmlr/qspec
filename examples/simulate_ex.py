@@ -318,13 +318,22 @@ def example(n=None):
         # he.plot()
 
         intensity = 0.1
-        pol_sp = sim.Polarization([0, 1, 0], vec_as_q=True, q_axis=2)
-        print(pol_sp.x)
-        print(pol_sp.q)
+        pol_sp = sim.Polarization([0, 0, 1], vec_as_q=False, q_axis=[1, 0, 0])
+        qs.printh('Polarization before processing.')
+        print('x:', pol_sp.x)
+        print('q:', pol_sp.q)
+        print('q_axis:', pol_sp.q_axis)
+
         laser_sp = sim.Laser(freq=f_p, polarization=pol_sp, intensity=intensity)
 
-        inter = sim.Interaction(atom=he, lasers=[laser_sp, ], delta_max=500.)
+        inter = sim.Interaction(atom=he, lasers=[laser_sp, ], delta_max=1000.)
+        # inter.dt_max = 1e-4
+        inter.controlled = True
         # inter.resonance_info()
+        qs.printh('\nPolarization after processing.')
+        print('x:', pol_sp.x)
+        print('q:', pol_sp.q)
+        print('q_axis:', pol_sp.q_axis)
 
         times = [0., 0.2]
         delta = np.linspace(-100, 100, 201)
@@ -332,16 +341,16 @@ def example(n=None):
         # theta, phi = 0., 0.
 
         results = inter.rates(times, delta)
-        y = he.scattering_rate(results, as_density_matrix=False)[:, -1] / (4 * np.pi)
-        plt.plot(delta, y, '-C3', label=r'$4\pi$ rates')
         y = he.scattering_rate(results, theta, phi, as_density_matrix=False)[:, -1]
         plt.plot(delta, y, '-C2', label='angular non-QI')
+        y = he.scattering_rate(results, as_density_matrix=False)[:, -1] / (4 * np.pi)
+        plt.plot(delta, y, '-C3', label=r'$4\pi$ rates')
 
         rho = inter.master(times, delta)
         y = he.scattering_rate(rho.real)[:, -1] / (4 * np.pi)
         plt.plot(delta, y, '--C0', label=r'$4\pi$ master')
         y = he.scattering_rate(rho, theta, phi)[:, -1]
-        plt.plot(delta, y, '-C1', label='full QI')
+        plt.plot(delta, y, '-C1', label='QI master')
 
         sr = sim.ScatteringRate(he, laser=laser_sp)
         y = sr.generate_y(delta, theta, phi)[:, 0, 0]
@@ -444,10 +453,7 @@ def example(n=None):
         times = np.linspace(0., 3., 1001)  # Integration times.
         # delta = np.linspace(-50, 50, 101)  # Laser detunings from the given laser frequency.
 
-        sample_size = 1000
-        y0 = np.zeros((sample_size, ca40.size), dtype=complex)
-        y0[:int(sample_size / 2), 0] = np.exp(np.random.random(size=int(sample_size / 2)) * 2 * np.pi * 1j)
-        y0[int(sample_size / 2):, 1] = np.exp(np.random.random(size=int(sample_size / 2)) * 2 * np.pi * 1j)
+        y0 = ca40.get_y0_mc(1000)
         rho, v = inter.mc_master(times, y0=y0, dynamics=True, as_density_matrix=True)
         y = np.diagonal(rho, axis1=1, axis2=2).real
         y = np.transpose(y, axes=[0, 2, 1])
@@ -470,4 +476,4 @@ def example(n=None):
 
 
 if __name__ == '__main__':
-    example({6})
+    example({0})

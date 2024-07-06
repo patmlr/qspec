@@ -18,6 +18,7 @@ protected:
 	Vector3d q_axis;
 	Vector3cd x;
 	Vector3cd q;
+	Vector3d Z;
 
 public:
 	Polarization();

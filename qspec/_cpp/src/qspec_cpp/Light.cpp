@@ -6,7 +6,7 @@
 
 Polarization::Polarization()
 {
-	//T = Matrix3cd{ {1, sc::i, 0}, {0, 0, sqrt(2)}, {1, -sc::i, 0} };
+	Z << 0, 0, 1;
 	T = Matrix3cd{ {1, -sc::i, 0}, {0, 0, sqrt(2)}, {-1, -sc::i, 0} };
 	T /= sqrt(2);
 	R = AngleAxisd(0, Vector3d(0, 0, 1));
@@ -27,8 +27,10 @@ void Polarization::init(Vector3cd vec, Vector3d _q_axis, bool vec_as_q)
 
 void Polarization::calc_R(Vector3d _q_axis)
 {
-	double angle = acos(q_axis.dot(_q_axis) / sqrt(q_axis.dot(q_axis) * _q_axis.dot(_q_axis)));
-	Vector3d rot_axis = q_axis.cross(_q_axis);
+	// double angle = acos(q_axis.dot(_q_axis) / sqrt(q_axis.dot(q_axis) * _q_axis.dot(_q_axis)));
+	// Vector3d rot_axis = q_axis.cross(_q_axis);
+	double angle = acos(Z.dot(_q_axis) / sqrt(_q_axis.dot(_q_axis)));
+	Vector3d rot_axis = Z.cross(_q_axis);
 	if (rot_axis.sum() == 0) rot_axis(2) = 1;
 	rot_axis /= rot_axis.norm();
 	Rq = AngleAxisd(angle, rot_axis);
