@@ -1620,7 +1620,7 @@ class King:
         plt.tight_layout()
         if show:
             plt.show()
-            plt.clf()
+            plt.close()
 
     def plot(self, mode: str = '', sigma2d: int = 1, scale: tuple = None, add_xy: array_like = None,
              add_a: array_like = None, font_dict: dict = None, show: bool = True, **kwargs):
@@ -1737,4 +1737,4 @@ class King:
         
         if show:
             plt.show()
-            plt.clf()
+            plt.close()

@@ -40,24 +40,28 @@ class Laser
 protected:
 	double freq;
 	double intensity;
+	double gamma;
 	Polarization* polarization;
 	int index = 0;
 	Vector3d k;
 
 public:
 	Laser();
-	void init(double _freq, double _intensity, Polarization* _polarization, Vector3d _k);
+	void init(double _freq, double _intensity, double _gamma, Polarization* _polarization, Vector3d _k);
 	double get_detuned(const Vector3d& v);
 	double get_detuned(double delta, const Vector3d& v);
+
+	double get_freq();
+	void set_freq(double _freq_0);
 
 	double get_intensity();
 	void set_intensity(double _intensity);
 
+	double get_gamma();
+	void set_gamma(double _gamma);
+
 	Polarization* get_polarization();
 	void set_polarization(Polarization* _polarization);
-
-	double get_freq();
-	void set_freq(double _freq_0);
 
 	Vector3d get_k();
 	void set_k(Vector3d _k);

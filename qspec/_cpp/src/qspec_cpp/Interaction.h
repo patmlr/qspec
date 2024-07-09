@@ -59,6 +59,7 @@ protected:
 	std::array<std::vector<MatrixXi>, 3> lasermap;
 	MatrixXi summap;
 	std::vector<MatrixXcd> rabimap;
+	MatrixXd laser_gamma_map;
 	std::vector<std::vector<size_t>> trees;
 	std::vector<std::vector<size_t>> con_list;
 	MatrixXd deltamap;

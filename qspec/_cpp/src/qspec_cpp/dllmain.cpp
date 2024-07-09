@@ -81,10 +81,10 @@ extern "C"
         delete laser;
     }
 
-    __declspec(dllexport) void laser_init(Laser* laser, double freq, double intensity, Polarization* polarization, double* k)
+    __declspec(dllexport) void laser_init(Laser* laser, double freq, double intensity, double gamma, Polarization* polarization, double* k)
     {
         Vector3d _k = cast_Vector3d(k);
-        laser->init(freq, intensity, polarization, _k);
+        laser->init(freq, intensity, gamma, polarization, _k);
     }
 
     __declspec(dllexport) double laser_get_freq(Laser* laser)
@@ -105,6 +105,16 @@ extern "C"
     __declspec(dllexport) void laser_set_intensity(Laser* laser, double intensity)
     {
         return laser->set_intensity(intensity);
+    }
+
+    __declspec(dllexport) double laser_get_gamma(Laser* laser)
+    {
+        return laser->get_gamma();
+    }
+
+    __declspec(dllexport) void laser_set_gamma(Laser* laser, double gamma)
+    {
+        return laser->set_gamma(gamma);
     }
 
     __declspec(dllexport) Polarization* laser_get_polarization(Laser* laser)

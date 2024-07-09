@@ -89,10 +89,11 @@ Laser::Laser()
 	k << 1, 0, 0;
 }
 
-void Laser::init(double _freq, double _intensity, Polarization* _polarization, Vector3d _k)
+void Laser::init(double _freq, double _intensity, double _gamma, Polarization* _polarization, Vector3d _k)
 {
 	set_freq(_freq);
 	set_intensity(_intensity);
+	set_gamma(_gamma);
 	set_polarization(_polarization);
 	set_k(_k);
 }
@@ -109,6 +110,16 @@ double Laser::get_detuned(double delta, const Vector3d& v)
 	double angle = 0;
 	if (v.norm() != 0) angle = acos(v.dot(k) / (v.norm() * k.norm()));
 	return doppler(freq + delta, v.norm(), angle);
+}
+
+double Laser::get_freq()
+{
+	return freq;
+}
+
+void Laser::set_freq(double _freq)
+{
+	freq = _freq;
 }
 
 double Laser::get_intensity()
@@ -131,14 +142,14 @@ void Laser::set_polarization(Polarization* _polarization)
 	polarization = _polarization;
 }
 
-double Laser::get_freq()
+double Laser::get_gamma()
 {
-	return freq;
+	return gamma;
 }
 
-void Laser::set_freq(double _freq)
+void Laser::set_gamma(double _gamma)
 {
-	freq = _freq;
+	gamma = _gamma;
 }
 
 Vector3d Laser::get_k()

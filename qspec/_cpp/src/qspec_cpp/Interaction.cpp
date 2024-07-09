@@ -136,15 +136,16 @@ struct f_master
 	MatrixXcd& H;
 	MatrixXd& L0;
 	MatrixXd& L1;
+	MatrixXd& G1;
 	// size_t size;
 	// std::complex<double> sum;
 
-	f_master(MatrixXcd& _H, MatrixXd& _L0, MatrixXd& _L1) : H(_H), L0(_L0), L1(_L1) { }
+	f_master(MatrixXcd& _H, MatrixXd& _L0, MatrixXd& _L1, MatrixXd& _G1) : H(_H), L0(_L0), L1(_L1), G1(_G1) { }
 
 	void operator()(const MatrixXcd& x, MatrixXcd& dxdt, double t)
 	{
 
-		dxdt = -sc::i * (H * x - x * H) + L1.cwiseProduct(x);
+		dxdt = -sc::i * (H * x - x * H) + L1.cwiseProduct(x) - (G1.array() * x.array()).matrix();
 		dxdt.diagonal() += L0 * x.diagonal();
 
 		/*size = H.outerSize();
@@ -229,6 +230,7 @@ void Interaction::add_laser(Laser* _laser)
 		lasermap.at(q_i).push_back(MatrixXi::Zero(atom->get_size(), atom->get_size()));
 	}
 	rabimap.push_back(MatrixXcd::Zero(atom->get_size(), atom->get_size()));
+	laser_gamma_map = MatrixXd::Zero(atom->get_size(), atom->get_size());
 }
 
 Environment* Interaction::get_env()
@@ -378,6 +380,7 @@ void Interaction::gen_coordinates()
 void Interaction::gen_rabi()
 {
 	summap.setZero();
+	laser_gamma_map.setZero();
 	for (size_t m = 0; m < lasers.size(); ++m)
 	{
 		rabimap.at(m).setZero();
@@ -407,14 +410,21 @@ void Interaction::gen_rabi()
 					std::complex<double> q_i = lasers.at(m)->get_polarization()->get_q()->array()[q];
 					if (atom->get_m_dipole()->at(q)(row, col) * abs(q_i)  // q_i.real() * q_i.imag()  // (pow(q_i.real(), 2) + pow(q_i.imag(), 2))
 						* lasers.at(m)->get_intensity() == 0) continue;  // Transition allowed/active?
+
 					lasermap.at(q).at(m)(row, col) = 1;
 					lasermap.at(q).at(m)(col, row) = 1;
+
 					summap(row, col) = 1;
 					summap(col, row) = 1;
 
 					rabimap.at(m)(row, col) += 0.5 * atom->get_m_dipole()->at(q)(row, col)
-					* sqrt(lasers[m]->get_intensity()) * q_i * pow(-1, q_val);  // Calc. Omega/2 for all transitions.
+					* sqrt(lasers.at(m)->get_intensity()) * q_i * pow(-1, q_val);  // Calc. Omega/2 for all transitions.
 					rabimap.at(m)(col, row) = std::conj(rabimap.at(m)(row, col));
+
+					double gamma = lasers.at(m)->get_gamma();
+					if (gamma > 0)
+						laser_gamma_map(row, col) += 0.5 * gamma;
+						laser_gamma_map(col, row) += 0.5 * gamma;
 				}
 			}
 		}
@@ -1023,7 +1033,7 @@ std::vector<std::vector<MatrixXcd>> Interaction::master(
 				else
 				{
 					d_dopri5_mcd_type dopri5 = make_dense_output(atol, rtol, dt_max, dopri5_mcd_type());
-					n = integrate_times(dopri5, f_master(H, L0, L1),
+					n = integrate_times(dopri5, f_master(H, L0, L1, laser_gamma_map),
 						x0.at(i), t.begin(), t.end(), dt, push_back_MatrixXcd(results.at(i)));
 				}
 			}
@@ -1038,7 +1048,7 @@ std::vector<std::vector<MatrixXcd>> Interaction::master(
 				else
 				{
 					d_dopri5_mcd_type dopri5 = make_controlled(atol, rtol, dt_max, dopri5_mcd_type());
-					n = integrate_times(dopri5, f_master(H, L0, L1),
+					n = integrate_times(dopri5, f_master(H, L0, L1, laser_gamma_map),
 						x0.at(i), t.begin(), t.end(), dt, push_back_MatrixXcd(results.at(i)));
 				}
 			}
@@ -1051,7 +1061,7 @@ std::vector<std::vector<MatrixXcd>> Interaction::master(
 				}
 				else
 				{
-					n = integrate_times(rk4_mcd_type(), f_master(H, L0, L1),
+					n = integrate_times(rk4_mcd_type(), f_master(H, L0, L1, laser_gamma_map),
 						x0.at(i), t.begin(), t.end(), dt, push_back_MatrixXcd(results.at(i)));
 				}
 			}

@@ -132,11 +132,12 @@ class Laser:
     Class representing a laser.
     """
 
-    def __init__(self, freq: scalar, intensity: scalar = 1., polarization: Polarization = None,
+    def __init__(self, freq: scalar, intensity: scalar = 1., gamma: scalar = 0., polarization: Polarization = None,
                  k: array_like = None, instance=None):
         """
         :param freq: The frequency of the laser (MHz).
         :param intensity: The intensity of the laser (uW / mm**2 = W / m**2).
+        :param gamma: The linewidth of the laser (MHz).
         :param polarization: The polarization of the laser.
         :param k: The direction of the laser.
         :param instance: A pointer to an existing Laser instance.
@@ -153,7 +154,7 @@ class Laser:
             k = np.asarray(k, dtype=float)
             if k.shape != (3,):
                 raise ValueError('Interaction.k must be a 3d-vector, but has shape {}.'.format(k.shape))
-            dll.laser_init(self.instance, c_double(freq), c_double(intensity), polarization.instance,
+            dll.laser_init(self.instance, c_double(freq), c_double(intensity), c_double(gamma), polarization.instance,
                            k.ctypes.data_as(c_double_p))
         else:
             self._polarization = Polarization(instance=dll.laser_get_polarization(self.instance))
@@ -190,6 +191,21 @@ class Laser:
         :returns: None.
         """
         dll.laser_set_intensity(self.instance, c_double(value))
+
+    @property
+    def gamma(self):
+        """
+        :returns: The linewidth of the laser.
+        """
+        return dll.laser_get_gamma(self.instance)
+
+    @gamma.setter
+    def gamma(self, value: scalar):
+        """
+        :param value: The new linewidth of the laser.
+        :returns: None.
+        """
+        dll.laser_set_gamma(self.instance, c_double(value))
 
     @property
     def polarization(self):
