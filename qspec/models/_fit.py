@@ -137,11 +137,10 @@ def fit(model: _base.Model, x: array_iter, y: array_iter, sigma_x: array_iter = 
 
         models_offset = [_helper.find_model(model, _base.Offset)]
         if models_offset[0] is not None:
-            if models_offset[0] is not None:
-                models_offset[0].update_on_call = False
-                models_offset[0].gen_offset_masks(x)
-                if guess_offset:
-                    models_offset[0].guess_offset(x, y)
+            models_offset[0].update_on_call = False
+            models_offset[0].gen_offset_masks(x)
+            if guess_offset:
+                models_offset[0].guess_offset(x, y)
 
     discard_y_pars = False
     if not isinstance(model, _base.YPars):

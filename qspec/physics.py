@@ -23,8 +23,8 @@ __all__ = ['L_LABEL', 'E_NORM', 'LEMNISCATE', 'mu_N', 'mu_B', 'g_s', 'me_u', 'me
            'photon_recoil_v', 'get_f', 'get_m', 'hyperfine', 'lande_n', 'lande_j', 'lande_f', 'zeeman', 'hyper_zeeman',
            'a_hyper_mu', 'saturation_intensity', 'saturation', 'rabi', 'scattering_rate', 'mass_factor', 'delta_r2',
            'delta_r4', 'delta_r6', 'lambda_r', 'lambda_rn', 'schmidt_line', 'sellmeier', 'gamma_3d', 'boost',
-           'doppler_3d', 'gaussian_beam_3d', 'gaussian_doppler_3d', 'thermal_v_pdf', 'thermal_v_rvs', 'thermal_e_pdf',
-           'thermal_e_rvs', 'convolved_boltzmann_norm_pdf', 'convolved_thermal_norm_v_pdf',
+           'doppler_3d', 'gaussian_beam_3d', 'gaussian_doppler_3d', 't_xi', 'thermal_v_pdf', 'thermal_v_rvs',
+           'thermal_e_pdf', 'thermal_e_rvs', 'convolved_boltzmann_norm_pdf', 'convolved_thermal_norm_v_pdf',
            'convolved_thermal_norm_f_pdf', 'convolved_thermal_norm_f_lin_pdf', 'source_energy_pdf']
 
 
@@ -1017,10 +1017,22 @@ def gaussian_doppler_3d(r: array_like, k: array_like, w0: array_like, v: array_l
 """ Probability distributions """
 
 
+def t_xi(xi, f, u, q, m):
+    """
+    :param xi: The acceleration/bunching parameter xi (MHz).
+    :param f: The rest-frame transition frequency (MHz).
+    :param u: The acceleration voltage (V).
+    :param q: The charge of the ions (e).
+    :param m: The mass of the ensembles bodies (u).
+    :returns: The temperature of an ensemble of ions with acceleration/bunching parameter xi (K).
+    """
+    return xi * np.sqrt(8 * q * sc.e * u * m * sc.u * sc.c ** 2) / (sc.k * f * gamma_e_kin(q * u, m))
+
+
 def thermal_v_pdf(v: array_like, m: array_like, t: array_like) -> array_like:
     """
     :param v: velocity quantiles (m/s).
-    :param m: The mass of the ensembles bodies (amu).
+    :param m: The mass of the ensembles bodies (u).
     :param t: The temperature of the ensemble (K).
     :returns: The probability density in thermal equilibrium at the velocity v (s/m).
     """
@@ -1031,7 +1043,7 @@ def thermal_v_pdf(v: array_like, m: array_like, t: array_like) -> array_like:
 
 def thermal_v_rvs(m: array_like, t: array_like, size: Union[int, tuple] = 1) -> array_like:
     """
-    :param m: The mass of the ensembles bodies (amu).
+    :param m: The mass of the ensembles bodies (u).
     :param t: The temperature of the ensemble (K).
     :param size: Either the size (int) or shape (tuple) of the returned velocity array.
      If 'm' or 't' is an iterable/array, their common shape must be appended to the desired shape of the random samples.
