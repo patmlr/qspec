@@ -1,19 +1,24 @@
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" >
+<html class="writer-html5" lang="en">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>qspec.simulate._simulate &mdash; qspec 30.05.2024 documentation</title><link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
-    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+  <title>qspec.simulate._simulate &mdash; qspec 30.05.2024 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
       <link rel="stylesheet" href="../../../_static/css/borders.css" type="text/css" />
       <link rel="stylesheet" href="../../../_static/css/wy-nav-content.css" type="text/css" />
+
+  
   <!--[if lt IE 9]>
     <script src="../../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
-  <script id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
-        <script src="../../../_static/jquery.js"></script>
-        <script src="../../../_static/underscore.js"></script>
-        <script src="../../../_static/doctools.js"></script>
+  
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js?v=861d89a9"></script>
+        <script src="../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=4825356b"></script>
     <script src="../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" /> 
@@ -24,17 +29,21 @@
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-            <a href="../../../index.html" class="icon icon-home"> qspec
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            qspec
           </a>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <p class="caption"><span class="caption-text">Contents:</span></p>
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../modules.html">qspec</a></li>
 </ul>
@@ -52,9 +61,9 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
-          <li><a href="../../index.html">Module code</a> &raquo;</li>
-      <li>qspec.simulate._simulate</li>
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">qspec.simulate._simulate</li>
       <li class="wy-breadcrumbs-aside">
       </li>
   </ul>
@@ -84,8 +93,8 @@
 <span class="kn">from</span> <span class="nn">qspec._types</span> <span class="kn">import</span> <span class="o">*</span>
 <span class="kn">from</span> <span class="nn">qspec</span> <span class="kn">import</span> <span class="n">tools</span>
 <span class="kn">import</span> <span class="nn">qspec.algebra</span> <span class="k">as</span> <span class="nn">al</span>
-<span class="kn">from</span> <span class="nn">qspec.physics</span> <span class="kn">import</span> <span class="n">photon_recoil</span>
-<span class="kn">from</span> <span class="nn">qspec.simulate._simulate_cpp</span> <span class="kn">import</span> <span class="n">sr_generate_y</span><span class="p">,</span> <span class="n">Polarization</span><span class="p">,</span> <span class="n">Environment</span><span class="p">,</span> <span class="n">Atom</span>
+<span class="kn">from</span> <span class="nn">qspec.physics</span> <span class="kn">import</span> <span class="n">photon_recoil</span><span class="p">,</span> <span class="n">saturation</span>
+<span class="kn">from</span> <span class="nn">qspec.simulate._simulate_cpp</span> <span class="kn">import</span> <span class="n">sr_generate_y</span><span class="p">,</span> <span class="n">Polarization</span><span class="p">,</span> <span class="n">Environment</span><span class="p">,</span> <span class="n">Atom</span><span class="p">,</span> <span class="n">Laser</span>
 
 <span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;ct_markov_analytic&#39;</span><span class="p">,</span> <span class="s1">&#39;ct_markov_dgl&#39;</span><span class="p">,</span> <span class="s1">&#39;lambda_states&#39;</span><span class="p">,</span> <span class="s1">&#39;lambda_ge_rec&#39;</span><span class="p">,</span> <span class="s1">&#39;Geometry&#39;</span><span class="p">,</span> <span class="s1">&#39;ScatteringRate&#39;</span><span class="p">]</span>
 
@@ -654,22 +663,25 @@
 <span class="sd">    The spectrum is excited by a laser with the specified &#39;polarization&#39;</span>
 <span class="sd">    and recorded with a FDR defined by &#39;geometry&#39;. An external magnetic field can be defined through &#39;b&#39;.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atom</span><span class="p">:</span> <span class="n">Atom</span><span class="p">,</span> <span class="n">i_decay</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">geometry</span><span class="p">:</span> <span class="n">Geometry</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-                 <span class="n">polarization</span><span class="p">:</span> <span class="n">Polarization</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">b</span><span class="p">:</span> <span class="n">array_like</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atom</span><span class="p">:</span> <span class="n">Atom</span><span class="p">,</span> <span class="n">laser</span><span class="p">:</span> <span class="n">Laser</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">i_decay</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">geometry</span><span class="p">:</span> <span class="n">Geometry</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="n">b</span><span class="p">:</span> <span class="n">array_like</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param atom: The investigated atom.</span>
+<span class="sd">        :param laser: The incident laser beam.</span>
+<span class="sd">        :param i_decay: The indexing of the transition in atom.decay_map.</span>
 <span class="sd">        :param geometry: The geometry of the FDR.</span>
-<span class="sd">        :param polarization: The polarization of the incident laser beam.</span>
 <span class="sd">        :param b: The external magnetic field. Can be a vector or a scalar.</span>
 <span class="sd">         In the latter case, the magnetic field is aligned with the z-axis.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">environment</span> <span class="o">=</span> <span class="n">Environment</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">atom</span> <span class="o">=</span> <span class="n">atom</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">freq_0</span> <span class="o">=</span> <span class="mf">0.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">laser</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">geometry</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">polarization</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">i_decay</span> <span class="o">=</span> <span class="n">i_decay</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">state_l</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">state_u</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">i_state_l</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">i_state_u</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">freq_0</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">v</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">s</span> <span class="o">=</span> <span class="mf">1.</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">gamma</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">A</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">a_const</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">x0</span> <span class="o">=</span> <span class="kc">None</span>
@@ -679,11 +691,10 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">e_r_b</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">1.</span><span class="p">])</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">e_l</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">1.</span><span class="p">])</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">R_b</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">R</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">identity</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">identity</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">geometry</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">polarization</span> <span class="o">=</span> <span class="n">Geometry</span><span class="p">(),</span> <span class="n">Polarization</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">e_l</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">set_states</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">check_atom</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_laser</span><span class="p">(</span><span class="n">laser</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">set_geometry</span><span class="p">(</span><span class="n">geometry</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">set_polarization</span><span class="p">(</span><span class="n">polarization</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">generate_dipoles</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">set_b</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>  <span class="c1"># TODO: Implement Environments in C++.</span>
     
@@ -725,6 +736,13 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">e_l</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">R_b</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">polarization</span><span class="o">.</span><span class="n">x</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">polarization</span><span class="o">.</span><span class="n">def_q_axis</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">e_r_b</span><span class="p">)</span></div>
 
+<div class="viewcode-block" id="ScatteringRate.set_laser"><a class="viewcode-back" href="../../../qspec.html#qspec.simulate.ScatteringRate.set_laser">[docs]</a>    <span class="k">def</span> <span class="nf">set_laser</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">laser</span><span class="p">:</span> <span class="n">Laser</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">laser</span> <span class="o">=</span> <span class="n">laser</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">laser</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">laser</span> <span class="o">=</span> <span class="n">Laser</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">freq_0</span><span class="p">,</span> <span class="n">intensity</span><span class="o">=</span><span class="mf">1.</span><span class="p">,</span> <span class="n">polarization</span><span class="o">=</span><span class="n">Polarization</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">s</span> <span class="o">=</span> <span class="n">saturation</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">laser</span><span class="o">.</span><span class="n">intensity</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">laser</span><span class="o">.</span><span class="n">freq</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">atom</span><span class="o">.</span><span class="n">decay_map</span><span class="o">.</span><span class="n">a</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">i_decay</span><span class="p">],</span> <span class="mf">1.</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_polarization</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">laser</span><span class="o">.</span><span class="n">polarization</span><span class="p">)</span></div>
+
 <div class="viewcode-block" id="ScatteringRate.set_states"><a class="viewcode-back" href="../../../qspec.html#qspec.simulate.ScatteringRate.set_states">[docs]</a>    <span class="k">def</span> <span class="nf">set_states</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Define lower and upper states.</span>
@@ -746,7 +764,8 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :returns: None. Updates the resonance positions.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">x0</span> <span class="o">=</span> <span class="p">[[</span><span class="n">state_u</span><span class="o">.</span><span class="n">freq</span> <span class="o">-</span> <span class="n">state_l</span><span class="o">.</span><span class="n">freq</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">freq_0</span> <span class="k">for</span> <span class="n">state_u</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">state_u</span><span class="p">]</span> <span class="k">for</span> <span class="n">state_l</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">state_l</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">x0</span> <span class="o">=</span> <span class="p">[[</span><span class="n">state_u</span><span class="o">.</span><span class="n">freq</span> <span class="o">-</span> <span class="n">state_l</span><span class="o">.</span><span class="n">freq</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">laser</span><span class="o">.</span><span class="n">freq</span>
+                    <span class="k">for</span> <span class="n">state_u</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">state_u</span><span class="p">]</span> <span class="k">for</span> <span class="n">state_l</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">state_l</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">x0_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">x0</span><span class="p">[</span><span class="n">col</span><span class="p">[</span><span class="mi">0</span><span class="p">]][</span><span class="n">col</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span> <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">indices</span> <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">row</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="ScatteringRate.generate_dipoles"><a class="viewcode-back" href="../../../qspec.html#qspec.simulate.ScatteringRate.generate_dipoles">[docs]</a>    <span class="k">def</span> <span class="nf">generate_dipoles</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -830,7 +849,7 @@
             <span class="k">for</span> <span class="n">x0</span><span class="p">,</span> <span class="n">a_const</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">x0_list</span><span class="p">,</span> <span class="n">a_const_list</span><span class="p">):</span>
                 <span class="n">denominator</span> <span class="o">=</span> <span class="p">(</span><span class="n">x</span> <span class="o">-</span> <span class="n">x0</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="mf">0.25</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">gamma</span> <span class="o">**</span> <span class="mi">2</span>
                 <span class="n">y0</span> <span class="o">+=</span> <span class="n">a_const</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">/</span> <span class="n">denominator</span>
-        <span class="k">return</span> <span class="n">y0</span> <span class="o">*</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">gamma</span> <span class="o">/</span> <span class="mf">2.</span><span class="p">)</span> <span class="o">**</span> <span class="mi">3</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x0</span><span class="p">)</span> <span class="o">/</span> <span class="mi">3</span> <span class="o">*</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span></div>
+        <span class="k">return</span> <span class="n">y0</span> <span class="o">*</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">gamma</span> <span class="o">/</span> <span class="mf">2.</span><span class="p">)</span> <span class="o">**</span> <span class="mi">3</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x0</span><span class="p">)</span> <span class="o">/</span> <span class="mi">3</span> <span class="o">*</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">s</span></div>
 
 <div class="viewcode-block" id="ScatteringRate.generate_y_4pi"><a class="viewcode-back" href="../../../qspec.html#qspec.simulate.ScatteringRate.generate_y_4pi">[docs]</a>    <span class="k">def</span> <span class="nf">generate_y_4pi</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">array_like</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">array_like</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -844,7 +863,7 @@
                     <span class="k">continue</span>
                 <span class="n">denominator</span> <span class="o">=</span> <span class="p">(</span><span class="n">x</span> <span class="o">-</span> <span class="n">x0</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="mf">0.25</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">gamma</span> <span class="o">**</span> <span class="mi">2</span>
                 <span class="n">y0</span> <span class="o">+=</span> <span class="n">a_const</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">/</span> <span class="n">denominator</span> <span class="o">*</span> <span class="n">tools</span><span class="o">.</span><span class="n">absolute_complex</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">polarization</span><span class="o">.</span><span class="n">q</span><span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">m</span> <span class="o">-</span> <span class="n">ll</span><span class="o">.</span><span class="n">m</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">])</span> <span class="o">**</span> <span class="mi">2</span>
-        <span class="k">return</span> <span class="n">y0</span> <span class="o">*</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">gamma</span> <span class="o">/</span> <span class="mf">2.</span><span class="p">)</span> <span class="o">**</span> <span class="mi">3</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x0</span><span class="p">)</span> <span class="o">*</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span></div>
+        <span class="k">return</span> <span class="n">y0</span> <span class="o">*</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">gamma</span> <span class="o">/</span> <span class="mf">2.</span><span class="p">)</span> <span class="o">**</span> <span class="mi">3</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x0</span><span class="p">)</span> <span class="o">*</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">s</span></div>
 
 <div class="viewcode-block" id="ScatteringRate.generate_y"><a class="viewcode-back" href="../../../qspec.html#qspec.simulate.ScatteringRate.generate_y">[docs]</a>    <span class="k">def</span> <span class="nf">generate_y</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">theta</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">phi</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">decimals</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">8</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -869,7 +888,7 @@
         <span class="c1">#     e_theta /= tools.absolute(e_theta)</span>
         <span class="c1">#     e_phi /= tools.absolute(e_phi)</span>
 
-        <span class="n">norm</span> <span class="o">=</span> <span class="mf">3.</span> <span class="o">/</span> <span class="p">(</span><span class="mf">8.</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">gamma</span> <span class="o">/</span> <span class="mf">2.</span><span class="p">)</span> <span class="o">**</span> <span class="mi">3</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x0</span><span class="p">)</span> <span class="o">*</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span>
+        <span class="n">norm</span> <span class="o">=</span> <span class="mf">3.</span> <span class="o">/</span> <span class="p">(</span><span class="mf">8.</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">gamma</span> <span class="o">/</span> <span class="mf">2.</span><span class="p">)</span> <span class="o">**</span> <span class="mi">3</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x0</span><span class="p">)</span> <span class="o">*</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">s</span>
         <span class="n">denominator</span> <span class="o">=</span> <span class="mf">1.</span> <span class="o">/</span> <span class="p">(</span><span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">x0_array</span> <span class="o">+</span> <span class="mf">0.5</span><span class="n">j</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">gamma</span><span class="p">)</span>
 
         <span class="n">i_l</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">around</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">e_l</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">A_i</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">),</span> <span class="n">decimals</span><span class="o">=</span><span class="n">decimals</span><span class="p">)</span>

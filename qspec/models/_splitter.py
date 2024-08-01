@@ -21,6 +21,11 @@ __all__ = ['gen_splitter_model', 'get_all_f', 'hf_coeff', 'hf_trans', 'hf_shift'
 
 
 def gen_splitter_model(qi: bool = False, hf_mixing: bool = False):
+    """
+    :param qi: Whether to consider QI effects.
+    :param hf_mixing: Whether to consider HF mixing.
+    :returns: The appropriate 'Splitter' model.
+    """
     if qi and hf_mixing:
         pass
     elif qi:
@@ -33,12 +38,22 @@ def gen_splitter_model(qi: bool = False, hf_mixing: bool = False):
 
 
 def get_all_f(i, j):
+    """
+    :param i: The nuclear spin.
+    :param j: The total electron angular momentum.
+    :returns: All possible F quantum numbers of an electronic finestructure state.
+    """
     i, j = np.array(i, float).flatten(), np.array(j, float).flatten()
     return sorted(set(f + abs(_i - _j) for _i in i for _j in j for f in range(int(_i + _j - abs(_i - _j) + 1))))
 
 
 def hf_coeff(i, j, f):
-    """ Return the tuple of hyperfine coefficients for A and B-factor for a given quantum state """
+    """
+    :param i: The nuclear spin.
+    :param j: The total electron angular momentum.
+    :param f: The total angular momentum.
+    :returns: The tuple of hyperfine coefficients for A and B-factors of a given quantum state
+    """
     # First and third order are taken from https://journals.aps.org/pra/abstract/10.1103/PhysRevA.103.032826.
     # Second order from https://link.springer.com/referencework/10.1007/978-0-387-26308-3.
     if i < 0.5 or j < 0.5:
@@ -62,13 +77,15 @@ def hf_coeff(i, j, f):
     co_c *= 1.25
     if i < 2 or j < 2:
         return co_a, co_b, co_c
+
     return co_a, co_b, co_c  # Highest implemented order.
 
 
 def hf_trans(i, j_l, j_u):
     """
     Calculate all allowed hyperfine transitions and their hyperfine coefficients.
-    Returns (f_l, f_u, coAl, coBl, coAu, coBu)
+
+    :returns: (f_l, f_u, coAl, coBl, coAu, coBu)
     """
     return [[(f_l, f_u), hf_coeff(i, j_l, f_l), hf_coeff(i, j_u, f_u)]
             for f_l in get_f(i, j_l) for f_u in get_f(i, j_u)
@@ -88,12 +105,22 @@ def hf_shift(hyper_l, hyper_u, coeff_l, coeff_u):
 
 
 def hf_int(i, j_l, j_u, transitions):
-    """ Calculate relative line intensities """
+    """
+    :param i: The nuclear spin.
+    :param j_l: The total lower state electron angular momentum.
+    :param j_u:  The total upper state electron angular momentum.
+    :param transitions: A list of electronic transition properties. The first two properties of each entry should be
+     f_l and f_u the total angular momenta of lower and upper state.
+    :returns: The relative line intensities.
+    """
     return [np.around((2 * f_u + 1) * (2 * f_l + 1) * (wigner_6j(j_l, f_l, i, f_u, j_u, 1, as_sympy=False) ** 2),
                       decimals=9) for (f_l, f_u), *r in transitions]
 
 
 class Splitter(Model):
+    """
+    The abstract base class for Hyperfine structure models.
+    """
     def __init__(self, model, i, j_l, j_u, label=None):
         super().__init__(model=model)
         self.type = 'Splitter'
@@ -107,11 +134,19 @@ class Splitter(Model):
         self.racah_intensities = []
 
     def racah(self):
+        """
+        Set the intensity values to the Racah intensities.
+
+        :returns: None.
+        """
         for i, intensity in zip(self.racah_indices, self.racah_intensities):
             self.vals[i] = intensity
 
 
 class SplitterSummed(Summed):
+    """
+    A sum of 'Splitter' models.
+    """
     def __init__(self, splitter_models):
         if any(not isinstance(model, Splitter) for model in splitter_models):
             raise TypeError('All models passed to \'SplitterSummed\' must have type \'Splitter\'.')
@@ -129,6 +164,9 @@ class SplitterSummed(Summed):
 
 
 class Hyperfine(Splitter):
+    """
+    A standard hyperfine structure model.
+    """
     def __init__(self, model, i, j_l, j_u, label=None):
         super().__init__(model, i, j_l, j_u, label=label)
         self.type = 'Hyperfine'
@@ -179,6 +217,10 @@ class Hyperfine(Splitter):
 
 
 def load_qi(filepath):
+    """
+    :param filepath: The path to the saved model coefficients.
+    :returns: The QI model coefficients A, B and C.
+    """
     if not os.path.isfile(filepath):
         return None
     with open(os.path.join(filepath), 'r') as file:
@@ -187,6 +229,10 @@ def load_qi(filepath):
 
 
 class HyperfineQI(Splitter):
+    """
+    A perturbative quantum interference (QI) hyperfine structure model
+    based on https://doi.org/10.1103/PhysRevA.87.032504.
+    """
     def __init__(self, model, i, j_l, j_u, name, qi_path=None):
         super().__init__(LorentzQI(), i, j_l, j_u, name)
         self.type = 'HyperfineQI'
@@ -276,7 +322,7 @@ class HyperfineQI(Splitter):
 
 class HyperfineMixed(Splitter):
     """
-    Hyperfine-mixing model based on https://doi.org/10.1103/PhysRevA.55.2728 [1].
+    Hyperfine-mixing model based on https://doi.org/10.1103/PhysRevA.55.2728.
     """
     def __init__(self, model, i, j_l, j_u, name, config):
         super().__init__(model, i, j_l, j_u, name)
@@ -343,6 +389,10 @@ class HyperfineMixed(Splitter):
                           intensity, i == 0, False)
 
     def x0(self, *args):
+        """
+        :param args: The function parameters.
+        :returns: The peak positions.
+        """
         x0 = np.zeros(len(self.transitions))
         for s in self.states:
             if self.enabled[s]:

@@ -1,19 +1,24 @@
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" >
+<html class="writer-html5" lang="en">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>qspec.simulate._simulate_cpp &mdash; qspec 30.05.2024 documentation</title><link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
-    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+  <title>qspec.simulate._simulate_cpp &mdash; qspec 30.05.2024 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
       <link rel="stylesheet" href="../../../_static/css/borders.css" type="text/css" />
       <link rel="stylesheet" href="../../../_static/css/wy-nav-content.css" type="text/css" />
+
+  
   <!--[if lt IE 9]>
     <script src="../../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
-  <script id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
-        <script src="../../../_static/jquery.js"></script>
-        <script src="../../../_static/underscore.js"></script>
-        <script src="../../../_static/doctools.js"></script>
+  
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js?v=861d89a9"></script>
+        <script src="../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=4825356b"></script>
     <script src="../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" /> 
@@ -24,17 +29,21 @@
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-            <a href="../../../index.html" class="icon icon-home"> qspec
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            qspec
           </a>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <p class="caption"><span class="caption-text">Contents:</span></p>
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../modules.html">qspec</a></li>
 </ul>
@@ -52,9 +61,9 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
-          <li><a href="../../index.html">Module code</a> &raquo;</li>
-      <li>qspec.simulate._simulate_cpp</li>
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">qspec.simulate._simulate_cpp</li>
       <li class="wy-breadcrumbs-aside">
       </li>
   </ul>
@@ -214,10 +223,13 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">_polarization</span> <span class="o">=</span> <span class="n">polarization</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">polarization</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_polarization</span> <span class="o">=</span> <span class="n">Polarization</span><span class="p">()</span>
-            <span class="n">dll</span><span class="o">.</span><span class="n">laser_init</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="p">,</span> <span class="n">c_double</span><span class="p">(</span><span class="n">freq</span><span class="p">),</span> <span class="n">c_double</span><span class="p">(</span><span class="n">intensity</span><span class="p">),</span> <span class="n">polarization</span><span class="o">.</span><span class="n">instance</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">k</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">k</span> <span class="o">=</span> <span class="n">tools</span><span class="o">.</span><span class="n">unit_vector</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">k</span> <span class="o">=</span> <span class="n">k</span>
+            <span class="n">k</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">k</span><span class="o">.</span><span class="n">shape</span> <span class="o">!=</span> <span class="p">(</span><span class="mi">3</span><span class="p">,):</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Interaction.k must be a 3d-vector, but has shape </span><span class="si">{}</span><span class="s1">.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">k</span><span class="o">.</span><span class="n">shape</span><span class="p">))</span>
+            <span class="n">dll</span><span class="o">.</span><span class="n">laser_init</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="p">,</span> <span class="n">c_double</span><span class="p">(</span><span class="n">freq</span><span class="p">),</span> <span class="n">c_double</span><span class="p">(</span><span class="n">intensity</span><span class="p">),</span> <span class="n">polarization</span><span class="o">.</span><span class="n">instance</span><span class="p">,</span>
+                           <span class="n">k</span><span class="o">.</span><span class="n">ctypes</span><span class="o">.</span><span class="n">data_as</span><span class="p">(</span><span class="n">c_double_p</span><span class="p">))</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_polarization</span> <span class="o">=</span> <span class="n">Polarization</span><span class="p">(</span><span class="n">instance</span><span class="o">=</span><span class="n">dll</span><span class="o">.</span><span class="n">laser_get_polarization</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="p">))</span>
 
@@ -795,11 +807,30 @@
 <span class="sd">        :param ground_state_labels: An Iterable of labels belonging to ground states.</span>
 <span class="sd">        :returns: The initial population of the atom.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">y0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">size</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">ground_state_labels</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">ground_state_labels</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">states</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">label</span><span class="p">]</span>
         <span class="n">indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">state</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="k">if</span> <span class="n">state</span><span class="o">.</span><span class="n">label</span> <span class="ow">in</span> <span class="n">ground_state_labels</span><span class="p">])</span>
+        <span class="n">y0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">size</span><span class="p">)</span>
         <span class="n">y0</span><span class="p">[</span><span class="n">indices</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">/</span> <span class="n">indices</span><span class="o">.</span><span class="n">size</span>
+        <span class="k">return</span> <span class="n">y0</span></div>
+    
+<div class="viewcode-block" id="Atom.get_y0_mc"><a class="viewcode-back" href="../../../qspec.html#qspec.simulate.Atom.get_y0_mc">[docs]</a>    <span class="k">def</span> <span class="nf">get_y0_mc</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_samples</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">ground_state_labels</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param n_samples: The number of samples to create.</span>
+<span class="sd">        :param ground_state_labels: An Iterable of labels belonging to ground states.</span>
+<span class="sd">        :returns: The initial population of the atom for the Monte-Carlo master equation solver.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">ground_state_labels</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">ground_state_labels</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">states</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">label</span><span class="p">]</span>
+        <span class="n">indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">state</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="k">if</span> <span class="n">state</span><span class="o">.</span><span class="n">label</span> <span class="ow">in</span> <span class="n">ground_state_labels</span><span class="p">])</span>
+        <span class="n">y0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">n_samples</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">size</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">complex</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">n_samples</span> <span class="o">%</span> <span class="n">indices</span><span class="o">.</span><span class="n">size</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;The number of samples (</span><span class="si">{</span><span class="n">n_samples</span><span class="si">}</span><span class="s1">) must be a multiple of&#39;</span>
+                             <span class="sa">f</span><span class="s1">&#39; the number of ground states (</span><span class="si">{</span><span class="n">indices</span><span class="o">.</span><span class="n">size</span><span class="si">}</span><span class="s1">)&#39;</span><span class="p">)</span>
+        <span class="n">batch</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">n_samples</span> <span class="o">/</span> <span class="n">indices</span><span class="o">.</span><span class="n">size</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">index</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">indices</span><span class="p">):</span>
+            <span class="n">y0</span><span class="p">[</span><span class="n">i</span> <span class="o">*</span> <span class="n">batch</span><span class="p">:(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">batch</span><span class="p">,</span> <span class="n">index</span><span class="p">]</span> \
+                <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="n">batch</span><span class="p">)</span> <span class="o">*</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="mi">1</span><span class="n">j</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">y0</span></div>
 
 <div class="viewcode-block" id="Atom.get_state_indexes"><a class="viewcode-back" href="../../../qspec.html#qspec.simulate.Atom.get_state_indexes">[docs]</a>    <span class="k">def</span> <span class="nf">get_state_indexes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">labels</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -822,10 +853,16 @@
 <div class="viewcode-block" id="Atom.scattering_rate"><a class="viewcode-back" href="../../../qspec.html#qspec.simulate.Atom.scattering_rate">[docs]</a>    <span class="k">def</span> <span class="nf">scattering_rate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rho</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">theta</span><span class="p">:</span> <span class="n">array_like</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">phi</span><span class="p">:</span> <span class="n">array_like</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
                         <span class="n">as_density_matrix</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">i</span><span class="p">:</span> <span class="n">array_like</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">j</span><span class="p">:</span> <span class="n">array_like</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">axis</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        :param rho: The state vector (density matrix) of the atom. Must have the same size as the atom</span>
-<span class="sd">         along the specified &#39;axis&#39; (and &#39;axis&#39; + 1).</span>
-<span class="sd">        :param theta: The elevation angle of detection.</span>
-<span class="sd">        :param phi: The azimuthal angle of detection.</span>
+<span class="sd">        Scattering rate of the atom into the direction</span>
+
+<span class="sd">            e_r = (sin(theta), cos(theta) * sin(phi), cos(theta) * cos(phi))</span>
+
+<span class="sd">        where the z-axis is the quantization axis, which is either (0, 0, 1) or the B-field axis.</span>
+
+<span class="sd">        :param rho: The density matrix of the atom. Must have the same size as the atom</span>
+<span class="sd">         along the specified &#39;axis&#39; and &#39;axis&#39; + 1.</span>
+<span class="sd">        :param theta: The elevation angle of detection relative to the quantization axis.</span>
+<span class="sd">        :param phi: The azimuthal angle of detection relative to the quantization axis.</span>
 <span class="sd">        :param as_density_matrix: Whether &#39;rho&#39; is a state vector or a density matrix.</span>
 <span class="sd">        :param i: The initially excited state indexes to consider for spontaneous decay.</span>
 <span class="sd">         If None, all states are considered.</span>
@@ -1605,9 +1642,8 @@
 <span class="sd">        :param v: Atom velocities (m/s). Must be a scalar or have shape (n, ) or (n, 3). In the first two cases,</span>
 <span class="sd">         the velocity vector(s) is(are) assumed to be aligned with the x-axis.</span>
 <span class="sd">        :param y0: The initial state / density matrix of the atom.</span>
-<span class="sd">         This must be None or have shape (#states, ), (n, #states) or (n, #states, #states).</span>
-<span class="sd">         If #states == n, (n, #states) is interpreted</span>
-<span class="sd">         If None, the ground states are populated equally.</span>
+<span class="sd">         This must be None or have shape (#states, ), (n or 1, #states) or (n or 1, #states, #states).</span>
+<span class="sd">         If #states == n, it is interpreted as (n, #states). If None, the ground states are populated equally.</span>
 <span class="sd">        :returns: The integrated master equation as a complex-valued array of shape (n, #states, #states, #times).</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">t</span><span class="p">,</span> <span class="n">t_size</span><span class="p">,</span> <span class="n">ex</span> <span class="o">=</span> <span class="n">_cast_t</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
@@ -1704,10 +1740,16 @@
 <div class="viewcode-block" id="Interaction.scattering_rate"><a class="viewcode-back" href="../../../qspec.html#qspec.simulate.Interaction.scattering_rate">[docs]</a>    <span class="k">def</span> <span class="nf">scattering_rate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rho</span><span class="p">:</span> <span class="n">array_like</span><span class="p">,</span> <span class="n">theta</span><span class="p">:</span> <span class="n">array_like</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">phi</span><span class="p">:</span> <span class="n">array_like</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
                         <span class="n">as_density_matrix</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">i</span><span class="p">:</span> <span class="n">array_like</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">j</span><span class="p">:</span> <span class="n">array_like</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">axis</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Scattering rate of the atom into the direction</span>
+
+<span class="sd">            e_r = (sin(theta), cos(theta) * sin(phi), cos(theta) * cos(phi))</span>
+
+<span class="sd">        where the z-axis is the quantization axis, which is either (0, 0, 1) or the B-field axis.</span>
+
 <span class="sd">        :param rho: The density matrix of the atom. Must have the same size as the atom</span>
 <span class="sd">         along the specified &#39;axis&#39; and &#39;axis&#39; + 1.</span>
-<span class="sd">        :param theta: The elevation angle of detection.</span>
-<span class="sd">        :param phi: The azimuthal angle of detection.</span>
+<span class="sd">        :param theta: The elevation angle of detection relative to the quantization axis.</span>
+<span class="sd">        :param phi: The azimuthal angle of detection relative to the quantization axis.</span>
 <span class="sd">        :param as_density_matrix: Whether &#39;rho&#39; is a state vector or a density matrix.</span>
 <span class="sd">        :param i: The initially excited state indexes to consider for spontaneous decay.</span>
 <span class="sd">         If None, all states are considered.</span>

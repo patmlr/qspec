@@ -20,6 +20,9 @@ CONVOLVE = ['None', 'Gauss', 'Lorentz', 'GaussChi2']
 
 
 class Convolved(Model):
+    """
+    A general numerical convolution model.
+    """
     def __init__(self, model_0, model_1):
         super().__init__(model=model_0)
         self.type = 'Convolved'
@@ -68,6 +71,12 @@ class Convolved(Model):
     """ Preprocessing """
 
     def gen_x_int(self, *args):
+        """
+        Generates x-axis arrays for numerical integration.
+
+        :param args: The function parameters.
+        :returns: None.
+        """
         temp_vals = [v for v in self.vals[:self.j_1]]
         self.set_vals(args[:self.j_1], force=True)
         dx = min([self.model.dx, self.model_1.dx])
@@ -76,6 +85,9 @@ class Convolved(Model):
 
 
 class GaussConvolved(Convolved):
+    """
+    A Gaussian convolution kernel.
+    """
     def __init__(self, model):
         super().__init__(model_0=model, model_1=Gauss())
         self.type = 'GaussConvolved'
@@ -85,6 +97,9 @@ class GaussConvolved(Convolved):
 
 
 class LorentzConvolved(Convolved):
+    """
+    A Lorentzian convolution kernel.
+    """
     def __init__(self, model):
         super().__init__(model_0=model, model_1=Lorentz())
         self.type = 'LorentzConvolved'
@@ -94,6 +109,9 @@ class LorentzConvolved(Convolved):
 
 
 class GaussChi2Convolved(Convolved):
+    """
+    A GaussChi2 convolution kernel.
+    """
     def __init__(self, model):
         super().__init__(model_0=model, model_1=GaussChi2())
         self.type = 'GaussChi2Convolved'

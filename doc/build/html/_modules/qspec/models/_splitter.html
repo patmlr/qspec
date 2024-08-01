@@ -1,19 +1,24 @@
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" >
+<html class="writer-html5" lang="en">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>qspec.models._splitter &mdash; qspec 30.05.2024 documentation</title><link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
-    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+  <title>qspec.models._splitter &mdash; qspec 30.05.2024 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
       <link rel="stylesheet" href="../../../_static/css/borders.css" type="text/css" />
       <link rel="stylesheet" href="../../../_static/css/wy-nav-content.css" type="text/css" />
+
+  
   <!--[if lt IE 9]>
     <script src="../../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
-  <script id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
-        <script src="../../../_static/jquery.js"></script>
-        <script src="../../../_static/underscore.js"></script>
-        <script src="../../../_static/doctools.js"></script>
+  
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js?v=861d89a9"></script>
+        <script src="../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=4825356b"></script>
     <script src="../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" /> 
@@ -24,17 +29,21 @@
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-            <a href="../../../index.html" class="icon icon-home"> qspec
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            qspec
           </a>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <p class="caption"><span class="caption-text">Contents:</span></p>
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../modules.html">qspec</a></li>
 </ul>
@@ -52,9 +61,9 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
-          <li><a href="../../index.html">Module code</a> &raquo;</li>
-      <li>qspec.models._splitter</li>
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">qspec.models._splitter</li>
       <li class="wy-breadcrumbs-aside">
       </li>
   </ul>
@@ -87,6 +96,11 @@
 
 
 <div class="viewcode-block" id="gen_splitter_model"><a class="viewcode-back" href="../../../qspec.html#qspec.models.gen_splitter_model">[docs]</a><span class="k">def</span> <span class="nf">gen_splitter_model</span><span class="p">(</span><span class="n">qi</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">hf_mixing</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    :param qi: Whether to consider QI effects.</span>
+<span class="sd">    :param hf_mixing: Whether to consider HF mixing.</span>
+<span class="sd">    :returns: The appropriate &#39;Splitter&#39; model.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">qi</span> <span class="ow">and</span> <span class="n">hf_mixing</span><span class="p">:</span>
         <span class="k">pass</span>
     <span class="k">elif</span> <span class="n">qi</span><span class="p">:</span>
@@ -99,12 +113,22 @@
 
 
 <div class="viewcode-block" id="get_all_f"><a class="viewcode-back" href="../../../qspec.html#qspec.models.get_all_f">[docs]</a><span class="k">def</span> <span class="nf">get_all_f</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    :param i: The nuclear spin.</span>
+<span class="sd">    :param j: The total electron angular momentum.</span>
+<span class="sd">    :returns: All possible F quantum numbers of an electronic finestructure state.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">i</span><span class="p">,</span> <span class="n">j</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="nb">float</span><span class="p">)</span><span class="o">.</span><span class="n">flatten</span><span class="p">(),</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">j</span><span class="p">,</span> <span class="nb">float</span><span class="p">)</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
     <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">f</span> <span class="o">+</span> <span class="nb">abs</span><span class="p">(</span><span class="n">_i</span> <span class="o">-</span> <span class="n">_j</span><span class="p">)</span> <span class="k">for</span> <span class="n">_i</span> <span class="ow">in</span> <span class="n">i</span> <span class="k">for</span> <span class="n">_j</span> <span class="ow">in</span> <span class="n">j</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">_i</span> <span class="o">+</span> <span class="n">_j</span> <span class="o">-</span> <span class="nb">abs</span><span class="p">(</span><span class="n">_i</span> <span class="o">-</span> <span class="n">_j</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))))</span></div>
 
 
 <div class="viewcode-block" id="hf_coeff"><a class="viewcode-back" href="../../../qspec.html#qspec.models.hf_coeff">[docs]</a><span class="k">def</span> <span class="nf">hf_coeff</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="n">f</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot; Return the tuple of hyperfine coefficients for A and B-factor for a given quantum state &quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    :param i: The nuclear spin.</span>
+<span class="sd">    :param j: The total electron angular momentum.</span>
+<span class="sd">    :param f: The total angular momentum.</span>
+<span class="sd">    :returns: The tuple of hyperfine coefficients for A and B-factors of a given quantum state</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># First and third order are taken from https://journals.aps.org/pra/abstract/10.1103/PhysRevA.103.032826.</span>
     <span class="c1"># Second order from https://link.springer.com/referencework/10.1007/978-0-387-26308-3.</span>
     <span class="k">if</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="mf">0.5</span> <span class="ow">or</span> <span class="n">j</span> <span class="o">&lt;</span> <span class="mf">0.5</span><span class="p">:</span>
@@ -128,13 +152,15 @@
     <span class="n">co_c</span> <span class="o">*=</span> <span class="mf">1.25</span>
     <span class="k">if</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="mi">2</span> <span class="ow">or</span> <span class="n">j</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">co_a</span><span class="p">,</span> <span class="n">co_b</span><span class="p">,</span> <span class="n">co_c</span>
+
     <span class="k">return</span> <span class="n">co_a</span><span class="p">,</span> <span class="n">co_b</span><span class="p">,</span> <span class="n">co_c</span>  <span class="c1"># Highest implemented order.</span></div>
 
 
 <div class="viewcode-block" id="hf_trans"><a class="viewcode-back" href="../../../qspec.html#qspec.models.hf_trans">[docs]</a><span class="k">def</span> <span class="nf">hf_trans</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">j_l</span><span class="p">,</span> <span class="n">j_u</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Calculate all allowed hyperfine transitions and their hyperfine coefficients.</span>
-<span class="sd">    Returns (f_l, f_u, coAl, coBl, coAu, coBu)</span>
+
+<span class="sd">    :returns: (f_l, f_u, coAl, coBl, coAu, coBu)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="p">[[(</span><span class="n">f_l</span><span class="p">,</span> <span class="n">f_u</span><span class="p">),</span> <span class="n">hf_coeff</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">j_l</span><span class="p">,</span> <span class="n">f_l</span><span class="p">),</span> <span class="n">hf_coeff</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">j_u</span><span class="p">,</span> <span class="n">f_u</span><span class="p">)]</span>
             <span class="k">for</span> <span class="n">f_l</span> <span class="ow">in</span> <span class="n">get_f</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">j_l</span><span class="p">)</span> <span class="k">for</span> <span class="n">f_u</span> <span class="ow">in</span> <span class="n">get_f</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">j_u</span><span class="p">)</span>
@@ -154,12 +180,22 @@
 
 
 <div class="viewcode-block" id="hf_int"><a class="viewcode-back" href="../../../qspec.html#qspec.models.hf_int">[docs]</a><span class="k">def</span> <span class="nf">hf_int</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">j_l</span><span class="p">,</span> <span class="n">j_u</span><span class="p">,</span> <span class="n">transitions</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot; Calculate relative line intensities &quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    :param i: The nuclear spin.</span>
+<span class="sd">    :param j_l: The total lower state electron angular momentum.</span>
+<span class="sd">    :param j_u:  The total upper state electron angular momentum.</span>
+<span class="sd">    :param transitions: A list of electronic transition properties. The first two properties of each entry should be</span>
+<span class="sd">     f_l and f_u the total angular momenta of lower and upper state.</span>
+<span class="sd">    :returns: The relative line intensities.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">around</span><span class="p">((</span><span class="mi">2</span> <span class="o">*</span> <span class="n">f_u</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">f_l</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">wigner_6j</span><span class="p">(</span><span class="n">j_l</span><span class="p">,</span> <span class="n">f_l</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">f_u</span><span class="p">,</span> <span class="n">j_u</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">as_sympy</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">),</span>
                       <span class="n">decimals</span><span class="o">=</span><span class="mi">9</span><span class="p">)</span> <span class="k">for</span> <span class="p">(</span><span class="n">f_l</span><span class="p">,</span> <span class="n">f_u</span><span class="p">),</span> <span class="o">*</span><span class="n">r</span> <span class="ow">in</span> <span class="n">transitions</span><span class="p">]</span></div>
 
 
 <div class="viewcode-block" id="Splitter"><a class="viewcode-back" href="../../../qspec.html#qspec.models.Splitter">[docs]</a><span class="k">class</span> <span class="nc">Splitter</span><span class="p">(</span><span class="n">Model</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    The abstract base class for Hyperfine structure models.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">j_l</span><span class="p">,</span> <span class="n">j_u</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="s1">&#39;Splitter&#39;</span>
@@ -173,11 +209,19 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">racah_intensities</span> <span class="o">=</span> <span class="p">[]</span>
 
 <div class="viewcode-block" id="Splitter.racah"><a class="viewcode-back" href="../../../qspec.html#qspec.models.Splitter.racah">[docs]</a>    <span class="k">def</span> <span class="nf">racah</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set the intensity values to the Racah intensities.</span>
+
+<span class="sd">        :returns: None.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">intensity</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">racah_indices</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">racah_intensities</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">vals</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">intensity</span></div></div>
 
 
 <div class="viewcode-block" id="SplitterSummed"><a class="viewcode-back" href="../../../qspec.html#qspec.models.SplitterSummed">[docs]</a><span class="k">class</span> <span class="nc">SplitterSummed</span><span class="p">(</span><span class="n">Summed</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A sum of &#39;Splitter&#39; models.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">splitter_models</span><span class="p">):</span>
         <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">Splitter</span><span class="p">)</span> <span class="k">for</span> <span class="n">model</span> <span class="ow">in</span> <span class="n">splitter_models</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;All models passed to </span><span class="se">\&#39;</span><span class="s1">SplitterSummed</span><span class="se">\&#39;</span><span class="s1"> must have type </span><span class="se">\&#39;</span><span class="s1">Splitter</span><span class="se">\&#39;</span><span class="s1">.&#39;</span><span class="p">)</span>
@@ -195,6 +239,9 @@
 
 
 <div class="viewcode-block" id="Hyperfine"><a class="viewcode-back" href="../../../qspec.html#qspec.models.Hyperfine">[docs]</a><span class="k">class</span> <span class="nc">Hyperfine</span><span class="p">(</span><span class="n">Splitter</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A standard hyperfine structure model.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">j_l</span><span class="p">,</span> <span class="n">j_u</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">j_l</span><span class="p">,</span> <span class="n">j_u</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">label</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="s1">&#39;Hyperfine&#39;</span>
@@ -245,6 +292,10 @@
 
 
 <span class="k">def</span> <span class="nf">load_qi</span><span class="p">(</span><span class="n">filepath</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    :param filepath: The path to the saved model coefficients.</span>
+<span class="sd">    :returns: The QI model coefficients A, B and C.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">filepath</span><span class="p">):</span>
         <span class="k">return</span> <span class="kc">None</span>
     <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">filepath</span><span class="p">),</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">file</span><span class="p">:</span>
@@ -253,6 +304,10 @@
 
 
 <div class="viewcode-block" id="HyperfineQI"><a class="viewcode-back" href="../../../qspec.html#qspec.models.HyperfineQI">[docs]</a><span class="k">class</span> <span class="nc">HyperfineQI</span><span class="p">(</span><span class="n">Splitter</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A perturbative quantum interference (QI) hyperfine structure model</span>
+<span class="sd">    based on https://doi.org/10.1103/PhysRevA.87.032504.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">j_l</span><span class="p">,</span> <span class="n">j_u</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">qi_path</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">LorentzQI</span><span class="p">(),</span> <span class="n">i</span><span class="p">,</span> <span class="n">j_l</span><span class="p">,</span> <span class="n">j_u</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="s1">&#39;HyperfineQI&#39;</span>
@@ -342,7 +397,7 @@
 
 <div class="viewcode-block" id="HyperfineMixed"><a class="viewcode-back" href="../../../qspec.html#qspec.models.HyperfineMixed">[docs]</a><span class="k">class</span> <span class="nc">HyperfineMixed</span><span class="p">(</span><span class="n">Splitter</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Hyperfine-mixing model based on https://doi.org/10.1103/PhysRevA.55.2728 [1].</span>
+<span class="sd">    Hyperfine-mixing model based on https://doi.org/10.1103/PhysRevA.55.2728.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">j_l</span><span class="p">,</span> <span class="n">j_u</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">config</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">j_l</span><span class="p">,</span> <span class="n">j_u</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
@@ -409,6 +464,10 @@
                           <span class="n">intensity</span><span class="p">,</span> <span class="n">i</span> <span class="o">==</span> <span class="mi">0</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
 
 <div class="viewcode-block" id="HyperfineMixed.x0"><a class="viewcode-back" href="../../../qspec.html#qspec.models.HyperfineMixed.x0">[docs]</a>    <span class="k">def</span> <span class="nf">x0</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param args: The function parameters.</span>
+<span class="sd">        :returns: The peak positions.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">x0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">transitions</span><span class="p">))</span>
         <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">states</span><span class="p">:</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">enabled</span><span class="p">[</span><span class="n">s</span><span class="p">]:</span>

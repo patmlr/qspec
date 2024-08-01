@@ -434,15 +434,16 @@ def example(n=None):
         decay = sim.DecayMap(labels=[('s', 'p'), ('p', 'd')], a=[a_sp, a_dp])
         # The states are linked by Einstein-A coefficients via the specified labels.
 
-        ca40 = sim.Atom(states=s + p + d, decay_map=decay, mass=39.9)  # The Atom with all states and the decay information.
+        ca40 = sim.Atom(states=s + p + d, decay_map=decay, mass=39.9)
+        # The Atom with all states and the decay information.
 
         pol_sp = sim.Polarization([1, 1, 1], q_axis=2, vec_as_q=True)
-        laser_sp = sim.Laser(freq=f_sp, polarization=pol_sp, intensity=500)  # Linear polarized laser for the ground-state
-        # transition with 500 uW / mm**2.
+        laser_sp = sim.Laser(freq=f_sp, polarization=pol_sp, intensity=500)
+        # Linear polarized laser for the ground-state transition with 500 uW / mm**2.
 
         pol_dp = sim.Polarization([1, 1, 1], q_axis=2, vec_as_q=True)
-        laser_dp = sim.Laser(freq=f_dp, polarization=pol_dp, intensity=500, k=[1, 0, 0])  # Linear polarized laser for the ground-state
-        # transition with 500 uW / mm**2.
+        laser_dp = sim.Laser(freq=f_dp, polarization=pol_dp, intensity=500, k=[1, 0, 0])
+        # Linear polarized laser for the ground-state transition with 500 uW / mm**2.
 
         inter = sim.Interaction(atom=ca40, lasers=[laser_sp, laser_dp])  # The interaction.
         inter.controlled = False
@@ -472,7 +473,6 @@ def example(n=None):
         plt.hist(v[:, 0], bins=40)
         plt.hist(v[:, 1], bins=40)
         plt.show()
-
 
 
 if __name__ == '__main__':

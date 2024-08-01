@@ -1,19 +1,24 @@
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" >
+<html class="writer-html5" lang="en">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>qspec.models._spectrum &mdash; qspec 30.05.2024 documentation</title><link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
-    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+  <title>qspec.models._spectrum &mdash; qspec 30.05.2024 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
       <link rel="stylesheet" href="../../../_static/css/borders.css" type="text/css" />
       <link rel="stylesheet" href="../../../_static/css/wy-nav-content.css" type="text/css" />
+
+  
   <!--[if lt IE 9]>
     <script src="../../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
-  <script id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
-        <script src="../../../_static/jquery.js"></script>
-        <script src="../../../_static/underscore.js"></script>
-        <script src="../../../_static/doctools.js"></script>
+  
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js?v=861d89a9"></script>
+        <script src="../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=4825356b"></script>
     <script src="../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" /> 
@@ -24,17 +29,21 @@
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-            <a href="../../../index.html" class="icon icon-home"> qspec
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            qspec
           </a>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <p class="caption"><span class="caption-text">Contents:</span></p>
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../modules.html">qspec</a></li>
 </ul>
@@ -52,9 +61,9 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
-          <li><a href="../../index.html">Module code</a> &raquo;</li>
-      <li>qspec.models._spectrum</li>
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">qspec.models._spectrum</li>
       <li class="wy-breadcrumbs-aside">
       </li>
   </ul>
@@ -89,12 +98,24 @@
 
 
 <div class="viewcode-block" id="fwhm_voigt"><a class="viewcode-back" href="../../../qspec.html#qspec.models.fwhm_voigt">[docs]</a><span class="k">def</span> <span class="nf">fwhm_voigt</span><span class="p">(</span><span class="n">gamma</span><span class="p">,</span> <span class="n">sigma</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    :param gamma: The FWHM of the Lorentzian.</span>
+<span class="sd">    :param sigma: The standard deviation of the Gaussian.</span>
+<span class="sd">    :returns: The FWHM of a Voigt profile.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">f_l</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">gamma</span><span class="p">)</span>
     <span class="n">f_g</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">8</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="mi">2</span><span class="p">))</span> <span class="o">*</span> <span class="n">sigma</span><span class="p">)</span>
     <span class="k">return</span> <span class="mf">0.5346</span> <span class="o">*</span> <span class="n">f_l</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mf">0.2166</span> <span class="o">*</span> <span class="n">f_l</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="n">f_g</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="fwhm_voigt_d"><a class="viewcode-back" href="../../../qspec.html#qspec.models.fwhm_voigt_d">[docs]</a><span class="k">def</span> <span class="nf">fwhm_voigt_d</span><span class="p">(</span><span class="n">gamma</span><span class="p">,</span> <span class="n">gamma_d</span><span class="p">,</span> <span class="n">sigma</span><span class="p">,</span> <span class="n">sigma_d</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    :param gamma: The FWHM of the Lorentzian.</span>
+<span class="sd">    :param gamma_d: The uncertainty of &#39;gamma&#39;.</span>
+<span class="sd">    :param sigma: The standard deviation of the Gaussian.</span>
+<span class="sd">    :param sigma_d: The uncertainty of &#39;sigma&#39;.</span>
+<span class="sd">    :returns: The uncertainty of the FWHM of a Voigt profile.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">f_l</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">gamma</span><span class="p">)</span>
     <span class="n">f_l_d</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">gamma_d</span><span class="p">)</span>
     <span class="n">f_g</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">8</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="mi">2</span><span class="p">))</span> <span class="o">*</span> <span class="n">sigma</span><span class="p">)</span>
@@ -117,6 +138,9 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">fwhm</span><span class="p">()</span> <span class="o">*</span> <span class="mf">0.02</span>
 
 <div class="viewcode-block" id="Spectrum.fwhm"><a class="viewcode-back" href="../../../qspec.html#qspec.models.Spectrum.fwhm">[docs]</a>    <span class="k">def</span> <span class="nf">fwhm</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :returns: The full width at half maximum (FWHM) of a spectrum.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="mf">1.</span></div>
 
 <div class="viewcode-block" id="Spectrum.min"><a class="viewcode-back" href="../../../qspec.html#qspec.models.Spectrum.min">[docs]</a>    <span class="k">def</span> <span class="nf">min</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -127,6 +151,9 @@
 
 
 <div class="viewcode-block" id="Lorentz"><a class="viewcode-back" href="../../../qspec.html#qspec.models.Lorentz">[docs]</a><span class="k">class</span> <span class="nc">Lorentz</span><span class="p">(</span><span class="n">Spectrum</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A Lorentzian peak function.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="s1">&#39;Lorentz&#39;</span>
@@ -148,6 +175,9 @@
 
 
 <div class="viewcode-block" id="LorentzQI"><a class="viewcode-back" href="../../../qspec.html#qspec.models.LorentzQI">[docs]</a><span class="k">class</span> <span class="nc">LorentzQI</span><span class="p">(</span><span class="n">Spectrum</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A Lorentzian peak function including a dispersive term for consideration of quantum interference (QI) effects.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="s1">&#39;LorentzQI&#39;</span>
@@ -155,6 +185,13 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_add_arg</span><span class="p">(</span><span class="s1">&#39;Gamma&#39;</span><span class="p">,</span> <span class="mf">1.</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
 
 <div class="viewcode-block" id="LorentzQI.evaluate_qi"><a class="viewcode-back" href="../../../qspec.html#qspec.models.LorentzQI.evaluate_qi">[docs]</a>    <span class="k">def</span> <span class="nf">evaluate_qi</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">x_qi</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param x: The input values.</span>
+<span class="sd">        :param x_qi: The x value of the interfering Lorentzian.</span>
+<span class="sd">        :param args: The function parameters. Must have length self.size.</span>
+<span class="sd">        :param kwargs: Additional keyword arguments.</span>
+<span class="sd">        :returns: The function results of the dispersive Lorentzian at the input values &#39;x&#39;.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">scale</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="k">return</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">scale</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">real</span><span class="p">(</span><span class="mi">1</span> <span class="o">/</span> <span class="p">((</span><span class="n">x</span> <span class="o">+</span> <span class="mi">1</span><span class="n">j</span> <span class="o">*</span> <span class="n">scale</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">x</span> <span class="o">-</span> <span class="n">x_qi</span> <span class="o">-</span> <span class="mi">1</span><span class="n">j</span> <span class="o">*</span> <span class="n">scale</span><span class="p">)))</span></div>
 
@@ -173,6 +210,9 @@
 
 
 <div class="viewcode-block" id="Gauss"><a class="viewcode-back" href="../../../qspec.html#qspec.models.Gauss">[docs]</a><span class="k">class</span> <span class="nc">Gauss</span><span class="p">(</span><span class="n">Spectrum</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A Gaussian peak function.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="s1">&#39;Gauss&#39;</span>
@@ -193,6 +233,9 @@
 
 
 <div class="viewcode-block" id="Voigt"><a class="viewcode-back" href="../../../qspec.html#qspec.models.Voigt">[docs]</a><span class="k">class</span> <span class="nc">Voigt</span><span class="p">(</span><span class="n">Spectrum</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A Voigt peak function.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="s1">&#39;Voigt&#39;</span>
@@ -208,6 +251,9 @@
 
 
 <div class="viewcode-block" id="VoigtDerivative"><a class="viewcode-back" href="../../../qspec.html#qspec.models.VoigtDerivative">[docs]</a><span class="k">class</span> <span class="nc">VoigtDerivative</span><span class="p">(</span><span class="n">Spectrum</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A differential Voigt peak function.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="s1">&#39;VoigtDerivative&#39;</span>
@@ -225,6 +271,9 @@
 
 
 <div class="viewcode-block" id="VoigtAsy"><a class="viewcode-back" href="../../../qspec.html#qspec.models.VoigtAsy">[docs]</a><span class="k">class</span> <span class="nc">VoigtAsy</span><span class="p">(</span><span class="n">Spectrum</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    An asymmetric Voigt peak function.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="s1">&#39;VoigtAsy&#39;</span>
@@ -242,6 +291,9 @@
 
 
 <div class="viewcode-block" id="VoigtCEC"><a class="viewcode-back" href="../../../qspec.html#qspec.models.VoigtCEC">[docs]</a><span class="k">class</span> <span class="nc">VoigtCEC</span><span class="p">(</span><span class="n">Spectrum</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A series of Voigt peak functions.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="s1">&#39;VoigtCEC&#39;</span>
@@ -261,6 +313,11 @@
 
 
 <span class="k">def</span> <span class="nf">_gauss_chi2_taylor_fwhm</span><span class="p">(</span><span class="n">sigma</span><span class="p">,</span> <span class="n">xi</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    :param sigma: The standard deviation of the Gaussian.</span>
+<span class="sd">    :param xi: The asymmetry parameter.</span>
+<span class="sd">    :returns: An estimated Taylor expansion of the FWHM of the &#39;GaussChi2&#39; model.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">a</span> <span class="o">=</span> <span class="p">[</span><span class="mf">2.70991004e+00</span><span class="p">,</span> <span class="mf">2.31314470e-01</span><span class="p">,</span> <span class="o">-</span><span class="mf">8.11610976e-02</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.48897229e-02</span><span class="p">,</span> <span class="mf">1.11677618e-01</span><span class="p">,</span>  <span class="c1"># order 1, 2</span>
          <span class="mf">8.06412708e-03</span><span class="p">,</span> <span class="o">-</span><span class="mf">6.59788156e-04</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.06067275e-02</span><span class="p">,</span> <span class="mf">1.47400503e-03</span><span class="p">]</span>  <span class="c1"># order 3</span>
     <span class="k">return</span> <span class="n">a</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">sigma</span> <span class="o">+</span> <span class="n">a</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">xi</span> <span class="o">+</span> <span class="p">(</span><span class="n">a</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">*</span> <span class="n">sigma</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="n">a</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">*</span> <span class="n">xi</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="n">a</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span> <span class="o">*</span> <span class="n">sigma</span> <span class="o">*</span> <span class="n">xi</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span> \
@@ -268,15 +325,23 @@
 
 
 <span class="k">def</span> <span class="nf">_gauss_chi2_fwhm</span><span class="p">(</span><span class="n">sigma</span><span class="p">,</span> <span class="n">xi</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    :param sigma: The standard deviation of the Gaussian.</span>
+<span class="sd">    :param xi: The asymmetry parameter.</span>
+<span class="sd">    :returns: An estimation of the FWHM of the &#39;GaussChi2&#39; model.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">x</span> <span class="o">=</span> <span class="p">(</span><span class="n">sigma</span><span class="p">,</span> <span class="n">xi</span><span class="p">)</span>
     <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span> <span class="o">=</span> <span class="p">(</span><span class="mf">1.39048239</span><span class="p">,</span> <span class="mf">0.49098627</span><span class="p">,</span> <span class="mf">0.61375536</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">a</span> <span class="o">*</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arctan</span><span class="p">(</span><span class="n">b</span> <span class="o">*</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">/</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">**</span> <span class="n">c</span> <span class="o">-</span> <span class="mi">1</span><span class="p">))</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">arctan</span><span class="p">(</span><span class="n">b</span><span class="p">))</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">8</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="mi">2</span><span class="p">))</span> <span class="o">*</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 
 
 <div class="viewcode-block" id="GaussChi2"><a class="viewcode-back" href="../../../qspec.html#qspec.models.GaussChi2">[docs]</a><span class="k">class</span> <span class="nc">GaussChi2</span><span class="p">(</span><span class="n">Spectrum</span><span class="p">):</span>  <span class="c1"># TODO: The fwhm of GaussChi2 is fitting quite well now, but could be improved further.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    An analytical convolution of a Gaussian with a Boltzmann distribution.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="s1">&#39;GaussBoltzmann&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="s1">&#39;GaussChi2&#39;</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_add_arg</span><span class="p">(</span><span class="s1">&#39;sigma&#39;</span><span class="p">,</span> <span class="mf">1.</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_add_arg</span><span class="p">(</span><span class="s1">&#39;xi&#39;</span><span class="p">,</span> <span class="mf">1.</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>

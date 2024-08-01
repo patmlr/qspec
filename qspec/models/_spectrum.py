@@ -23,12 +23,24 @@ SPECTRA = ['Gauss', 'Lorentz', 'Voigt', 'VoigtDerivative', 'VoigtAsy', 'VoigtCEC
 
 
 def fwhm_voigt(gamma, sigma):
+    """
+    :param gamma: The FWHM of the Lorentzian.
+    :param sigma: The standard deviation of the Gaussian.
+    :returns: The FWHM of a Voigt profile.
+    """
     f_l = abs(gamma)
     f_g = abs(np.sqrt(8 * np.log(2)) * sigma)
     return 0.5346 * f_l + np.sqrt(0.2166 * f_l ** 2 + f_g ** 2)
 
 
 def fwhm_voigt_d(gamma, gamma_d, sigma, sigma_d):
+    """
+    :param gamma: The FWHM of the Lorentzian.
+    :param gamma_d: The uncertainty of 'gamma'.
+    :param sigma: The standard deviation of the Gaussian.
+    :param sigma_d: The uncertainty of 'sigma'.
+    :returns: The uncertainty of the FWHM of a Voigt profile.
+    """
     f_l = abs(gamma)
     f_l_d = abs(gamma_d)
     f_g = abs(np.sqrt(8 * np.log(2)) * sigma)
@@ -51,6 +63,9 @@ class Spectrum(Model):
         return self.fwhm() * 0.02
 
     def fwhm(self):
+        """
+        :returns: The full width at half maximum (FWHM) of a spectrum.
+        """
         return 1.
 
     def min(self):
@@ -61,6 +76,9 @@ class Spectrum(Model):
 
 
 class Lorentz(Spectrum):
+    """
+    A Lorentzian peak function.
+    """
     def __init__(self):
         super().__init__()
         self.type = 'Lorentz'
@@ -82,6 +100,9 @@ class Lorentz(Spectrum):
 
 
 class LorentzQI(Spectrum):
+    """
+    A Lorentzian peak function including a dispersive term for consideration of quantum interference (QI) effects.
+    """
     def __init__(self):
         super().__init__()
         self.type = 'LorentzQI'
@@ -89,6 +110,13 @@ class LorentzQI(Spectrum):
         self._add_arg('Gamma', 1., False, False)
 
     def evaluate_qi(self, x, x_qi, *args, **kwargs):
+        """
+        :param x: The input values.
+        :param x_qi: The x value of the interfering Lorentzian.
+        :param args: The function parameters. Must have length self.size.
+        :param kwargs: Additional keyword arguments.
+        :returns: The function results of the dispersive Lorentzian at the input values 'x'.
+        """
         scale = 0.5 * args[0]
         return 2 * scale ** 2 * np.real(1 / ((x + 1j * scale) * (x - x_qi - 1j * scale)))
 
@@ -107,6 +135,9 @@ class LorentzQI(Spectrum):
 
 
 class Gauss(Spectrum):
+    """
+    A Gaussian peak function.
+    """
     def __init__(self):
         super().__init__()
         self.type = 'Gauss'
@@ -127,6 +158,9 @@ class Gauss(Spectrum):
 
 
 class Voigt(Spectrum):
+    """
+    A Voigt peak function.
+    """
     def __init__(self):
         super().__init__()
         self.type = 'Voigt'
@@ -142,6 +176,9 @@ class Voigt(Spectrum):
 
 
 class VoigtDerivative(Spectrum):
+    """
+    A differential Voigt peak function.
+    """
     def __init__(self):
         super().__init__()
         self.type = 'VoigtDerivative'
@@ -159,6 +196,9 @@ class VoigtDerivative(Spectrum):
 
 
 class VoigtAsy(Spectrum):
+    """
+    An asymmetric Voigt peak function.
+    """
     def __init__(self):
         super().__init__()
         self.type = 'VoigtAsy'
@@ -176,6 +216,9 @@ class VoigtAsy(Spectrum):
 
 
 class VoigtCEC(Spectrum):
+    """
+    A series of Voigt peak functions.
+    """
     def __init__(self):
         super().__init__()
         self.type = 'VoigtCEC'
@@ -195,6 +238,11 @@ class VoigtCEC(Spectrum):
 
 
 def _gauss_chi2_taylor_fwhm(sigma, xi):
+    """
+    :param sigma: The standard deviation of the Gaussian.
+    :param xi: The asymmetry parameter.
+    :returns: An estimated Taylor expansion of the FWHM of the 'GaussChi2' model.
+    """
     a = [2.70991004e+00, 2.31314470e-01, -8.11610976e-02, -1.48897229e-02, 1.11677618e-01,  # order 1, 2
          8.06412708e-03, -6.59788156e-04, -1.06067275e-02, 1.47400503e-03]  # order 3
     return a[0] * sigma + a[1] * xi + (a[2] * sigma ** 2 + a[3] * xi ** 2 + a[4] * sigma * xi) / 2 \
@@ -202,15 +250,23 @@ def _gauss_chi2_taylor_fwhm(sigma, xi):
 
 
 def _gauss_chi2_fwhm(sigma, xi):
+    """
+    :param sigma: The standard deviation of the Gaussian.
+    :param xi: The asymmetry parameter.
+    :returns: An estimation of the FWHM of the 'GaussChi2' model.
+    """
     x = (sigma, xi)
     a, b, c = (1.39048239, 0.49098627, 0.61375536)
     return a * x[0] * (np.arctan(b * (np.abs(x[1] / x[0]) ** c - 1)) + np.arctan(b)) + np.sqrt(8 * np.log(2)) * x[0]
 
 
 class GaussChi2(Spectrum):  # TODO: The fwhm of GaussChi2 is fitting quite well now, but could be improved further.
+    """
+    An analytical convolution of a Gaussian with a Boltzmann distribution.
+    """
     def __init__(self):
         super().__init__()
-        self.type = 'GaussBoltzmann'
+        self.type = 'GaussChi2'
 
         self._add_arg('sigma', 1., False, False)
         self._add_arg('xi', 1., False, False)

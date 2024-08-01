@@ -166,7 +166,7 @@ def example(n=None):
         vals = np.array(vals, dtype=float)
 
         # Construct a King object
-        king = qs.King(a=a, m=m, x_abs=vals, subtract_electrons=20, element_label='Ca', n_samples=2325764)  # 2325764, 500000
+        king = qs.King(a=a, m=m, x_abs=vals, subtract_electrons=20, element_label='Ca', n_samples=500000)
 
         i_fit = np.array([1, 3, 5])
         a_fit = a[i_fit]  # Choose the isotopes to fit.
