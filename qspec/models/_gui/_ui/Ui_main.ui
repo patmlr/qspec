@@ -1,0 +1,1447 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>main</class>
+ <widget class="QMainWindow" name="main">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1200</width>
+    <height>600</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>MainWindow</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <layout class="QVBoxLayout" name="verticalLayout">
+    <item>
+     <widget class="QSplitter" name="splitter">
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+      <property name="childrenCollapsible">
+       <bool>false</bool>
+      </property>
+      <widget class="QWidget" name="vert_files" native="true">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+         <horstretch>1</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <layout class="QVBoxLayout" name="vert_files_layout" stretch="0,1,0">
+        <property name="leftMargin">
+         <number>0</number>
+        </property>
+        <property name="topMargin">
+         <number>0</number>
+        </property>
+        <property name="rightMargin">
+         <number>0</number>
+        </property>
+        <property name="bottomMargin">
+         <number>0</number>
+        </property>
+        <item>
+         <layout class="QHBoxLayout" name="hor_run_select" stretch="0,0,0">
+          <item>
+           <widget class="QComboBox" name="c_db">
+            <property name="maximumSize">
+             <size>
+              <width>80</width>
+              <height>16777215</height>
+             </size>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="b_db">
+            <property name="maximumSize">
+             <size>
+              <width>80</width>
+              <height>16777215</height>
+             </size>
+            </property>
+            <property name="text">
+             <string>open</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="l_db">
+            <property name="text">
+             <string>C:\</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <widget class="QListWidget" name="list_files">
+          <property name="sizeAdjustPolicy">
+           <enum>QAbstractScrollArea::AdjustToContents</enum>
+          </property>
+          <property name="selectionMode">
+           <enum>QAbstractItemView::ExtendedSelection</enum>
+          </property>
+          <property name="resizeMode">
+           <enum>QListView::Adjust</enum>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QScrollArea" name="scroll_files">
+          <property name="minimumSize">
+           <size>
+            <width>0</width>
+            <height>40</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>16777215</width>
+            <height>64</height>
+           </size>
+          </property>
+          <property name="frameShadow">
+           <enum>QFrame::Plain</enum>
+          </property>
+          <property name="verticalScrollBarPolicy">
+           <enum>Qt::ScrollBarAlwaysOff</enum>
+          </property>
+          <property name="horizontalScrollBarPolicy">
+           <enum>Qt::ScrollBarAlwaysOn</enum>
+          </property>
+          <property name="widgetResizable">
+           <bool>true</bool>
+          </property>
+          <widget class="QWidget" name="hor_file_options">
+           <property name="geometry">
+            <rect>
+             <x>0</x>
+             <y>0</y>
+             <width>361</width>
+             <height>45</height>
+            </rect>
+           </property>
+           <layout class="QHBoxLayout" name="hor_file_options_layout">
+            <item>
+             <widget class="QPushButton" name="b_select_all">
+              <property name="minimumSize">
+               <size>
+                <width>0</width>
+                <height>26</height>
+               </size>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>50</width>
+                <height>26</height>
+               </size>
+              </property>
+              <property name="toolTip">
+               <string>Select/Deselect all files.</string>
+              </property>
+              <property name="text">
+               <string>all</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="b_select_favorites">
+              <property name="enabled">
+               <bool>false</bool>
+              </property>
+              <property name="minimumSize">
+               <size>
+                <width>0</width>
+                <height>26</height>
+               </size>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>50</width>
+                <height>26</height>
+               </size>
+              </property>
+              <property name="text">
+               <string>fav</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <spacer name="hor_space_file_options">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>2</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+            <item>
+             <widget class="QCheckBox" name="check_multi">
+              <property name="toolTip">
+               <string>Enable/Disable multiselection.</string>
+              </property>
+              <property name="text">
+               <string>multi</string>
+              </property>
+              <property name="checked">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="vert_parameters" native="true">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+         <horstretch>1</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <layout class="QVBoxLayout" name="vert_parameters_layout" stretch="1,0">
+        <property name="leftMargin">
+         <number>0</number>
+        </property>
+        <property name="topMargin">
+         <number>0</number>
+        </property>
+        <property name="rightMargin">
+         <number>0</number>
+        </property>
+        <property name="bottomMargin">
+         <number>0</number>
+        </property>
+        <item>
+         <widget class="QTableWidget" name="tab_pars">
+          <property name="sizeAdjustPolicy">
+           <enum>QAbstractScrollArea::AdjustToContents</enum>
+          </property>
+          <property name="selectionMode">
+           <enum>QAbstractItemView::ExtendedSelection</enum>
+          </property>
+          <column>
+           <property name="text">
+            <string>Parameter</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>Value</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>Fixed</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>Linked</string>
+           </property>
+          </column>
+         </widget>
+        </item>
+        <item>
+         <widget class="QScrollArea" name="scroll_parameters">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="minimumSize">
+           <size>
+            <width>0</width>
+            <height>40</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>16777215</width>
+            <height>64</height>
+           </size>
+          </property>
+          <property name="frameShadow">
+           <enum>QFrame::Plain</enum>
+          </property>
+          <property name="verticalScrollBarPolicy">
+           <enum>Qt::ScrollBarAlwaysOff</enum>
+          </property>
+          <property name="horizontalScrollBarPolicy">
+           <enum>Qt::ScrollBarAlwaysOn</enum>
+          </property>
+          <property name="widgetResizable">
+           <bool>true</bool>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+          </property>
+          <widget class="QWidget" name="hor_parameters">
+           <property name="geometry">
+            <rect>
+             <x>0</x>
+             <y>0</y>
+             <width>500</width>
+             <height>45</height>
+            </rect>
+           </property>
+           <layout class="QHBoxLayout" name="hor_parameters_layout" stretch="0,0,1,0,0,1,0,0">
+            <property name="leftMargin">
+             <number>6</number>
+            </property>
+            <property name="topMargin">
+             <number>6</number>
+            </property>
+            <property name="rightMargin">
+             <number>6</number>
+            </property>
+            <property name="bottomMargin">
+             <number>6</number>
+            </property>
+            <item>
+             <widget class="QPushButton" name="b_load_pars">
+              <property name="minimumSize">
+               <size>
+                <width>0</width>
+                <height>26</height>
+               </size>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>60</width>
+                <height>26</height>
+               </size>
+              </property>
+              <property name="toolTip">
+               <string>Load all selected files and display the parameters and plot of the first file in the list.</string>
+              </property>
+              <property name="text">
+               <string>load</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="b_save_pars">
+              <property name="minimumSize">
+               <size>
+                <width>0</width>
+                <height>26</height>
+               </size>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>60</width>
+                <height>26</height>
+               </size>
+              </property>
+              <property name="toolTip">
+               <string>Save the parameter tables of all selected files to the database.</string>
+              </property>
+              <property name="text">
+               <string>save</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <spacer name="hor_space_parameters_0">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>0</width>
+                <height>0</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+            <item>
+             <widget class="QPushButton" name="b_up">
+              <property name="minimumSize">
+               <size>
+                <width>0</width>
+                <height>26</height>
+               </size>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>40</width>
+                <height>26</height>
+               </size>
+              </property>
+              <property name="toolTip">
+               <string>Display the parameters and plot of the previous selected file.</string>
+              </property>
+              <property name="text">
+               <string>&lt;</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="b_down">
+              <property name="minimumSize">
+               <size>
+                <width>0</width>
+                <height>26</height>
+               </size>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>40</width>
+                <height>26</height>
+               </size>
+              </property>
+              <property name="toolTip">
+               <string>Display the parameters and plot of the next selected file.</string>
+              </property>
+              <property name="text">
+               <string>&gt;</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <spacer name="hor_space_parameters_1">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>0</width>
+                <height>0</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+            <item>
+             <widget class="QPushButton" name="b_copy">
+              <property name="minimumSize">
+               <size>
+                <width>0</width>
+                <height>26</height>
+               </size>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>60</width>
+                <height>26</height>
+               </size>
+              </property>
+              <property name="toolTip">
+               <string>Copy the content of the current table to the tables of the other files.</string>
+              </property>
+              <property name="text">
+               <string>copy</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="b_reset_pars">
+              <property name="minimumSize">
+               <size>
+                <width>0</width>
+                <height>26</height>
+               </size>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>60</width>
+                <height>26</height>
+               </size>
+              </property>
+              <property name="toolTip">
+               <string>Reset the tables of all selected files to the state of the last save.</string>
+              </property>
+              <property name="text">
+               <string>reset</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="vert_control" native="true">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>300</width>
+         <height>0</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>300</width>
+         <height>16777215</height>
+        </size>
+       </property>
+       <layout class="QVBoxLayout" name="vert_control_layout" stretch="1,0">
+        <property name="leftMargin">
+         <number>0</number>
+        </property>
+        <property name="topMargin">
+         <number>0</number>
+        </property>
+        <property name="rightMargin">
+         <number>0</number>
+        </property>
+        <property name="bottomMargin">
+         <number>0</number>
+        </property>
+        <item>
+         <widget class="QScrollArea" name="scroll_xontrol">
+          <property name="frameShape">
+           <enum>QFrame::StyledPanel</enum>
+          </property>
+          <property name="frameShadow">
+           <enum>QFrame::Sunken</enum>
+          </property>
+          <property name="verticalScrollBarPolicy">
+           <enum>Qt::ScrollBarAlwaysOn</enum>
+          </property>
+          <property name="widgetResizable">
+           <bool>true</bool>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+          <widget class="QWidget" name="vert_options">
+           <property name="geometry">
+            <rect>
+             <x>-6</x>
+             <y>0</y>
+             <width>287</width>
+             <height>738</height>
+            </rect>
+           </property>
+           <layout class="QVBoxLayout" name="vert_options_layout" stretch="1,0,0,0,0,1,0,0,0,0,0,0,0,1,0,0,0,1">
+            <property name="leftMargin">
+             <number>6</number>
+            </property>
+            <property name="topMargin">
+             <number>6</number>
+            </property>
+            <property name="rightMargin">
+             <number>6</number>
+            </property>
+            <property name="bottomMargin">
+             <number>6</number>
+            </property>
+            <item>
+             <spacer name="vert_model">
+              <property name="orientation">
+               <enum>Qt::Vertical</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>0</width>
+                <height>0</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+            <item>
+             <layout class="QHBoxLayout" name="hor_preset">
+              <item>
+               <widget class="QComboBox" name="c_preset">
+                <property name="minimumSize">
+                 <size>
+                  <width>120</width>
+                  <height>0</height>
+                 </size>
+                </property>
+                <property name="editable">
+                 <bool>true</bool>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <spacer name="hor_space_preset">
+                <property name="orientation">
+                 <enum>Qt::Horizontal</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>40</width>
+                  <height>20</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
+              <item>
+               <widget class="QPushButton" name="b_preset_minus">
+                <property name="maximumSize">
+                 <size>
+                  <width>40</width>
+                  <height>16777215</height>
+                 </size>
+                </property>
+                <property name="text">
+                 <string>-</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QPushButton" name="b_preset_plus">
+                <property name="maximumSize">
+                 <size>
+                  <width>40</width>
+                  <height>16777215</height>
+                 </size>
+                </property>
+                <property name="text">
+                 <string>+</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+            <item>
+             <widget class="Line" name="line_model">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <layout class="QHBoxLayout" name="hor_model" stretch="2,3">
+              <item>
+               <widget class="QLabel" name="l_model_options">
+                <property name="font">
+                 <font>
+                  <bold>true</bold>
+                 </font>
+                </property>
+                <property name="text">
+                 <string>Model options</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLabel" name="l_model_file">
+                <property name="styleSheet">
+                 <string notr="true">color: rgb(0, 0, 255);</string>
+                </property>
+                <property name="text">
+                 <string>&lt;file&gt;</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+            <item>
+             <widget class="QWidget" name="grid_model" native="true">
+              <layout class="QGridLayout" name="grid_model_layout" columnstretch="1,1">
+               <property name="leftMargin">
+                <number>0</number>
+               </property>
+               <property name="topMargin">
+                <number>0</number>
+               </property>
+               <property name="rightMargin">
+                <number>0</number>
+               </property>
+               <property name="bottomMargin">
+                <number>0</number>
+               </property>
+               <item row="3" column="0">
+                <widget class="QCheckBox" name="check_offset_per_track">
+                 <property name="toolTip">
+                  <string>Enable individual offsets for each track.</string>
+                 </property>
+                 <property name="text">
+                  <string>offset per track</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="1" column="1">
+                <widget class="QComboBox" name="c_lineshape">
+                 <property name="toolTip">
+                  <string>Choose a lineshape.</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="3" column="1">
+                <layout class="QHBoxLayout" name="hott_offset_order">
+                 <item>
+                  <widget class="QLineEdit" name="edit_offset_order">
+                   <property name="maximumSize">
+                    <size>
+                     <width>100</width>
+                     <height>16777215</height>
+                    </size>
+                   </property>
+                   <property name="toolTip">
+                    <string>Choose the highest orders of the offset parameters track-wise. E. g. [2, 1] means quadratic in track 0 and linear in track 1.</string>
+                   </property>
+                   <property name="text">
+                    <string>[0]</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QLabel" name="l_offset_order">
+                   <property name="text">
+                    <string>order</string>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
+               </item>
+               <item row="5" column="1">
+                <widget class="QPushButton" name="b_racah">
+                 <property name="toolTip">
+                  <string>Set the hyperfine peak intensities to the theoretical values.</string>
+                 </property>
+                 <property name="text">
+                  <string>Racah intensities</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="4" column="0">
+                <widget class="QCheckBox" name="check_qi">
+                 <property name="toolTip">
+                  <string>Consider quantum interference.</string>
+                 </property>
+                 <property name="text">
+                  <string>QI</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="1" column="0">
+                <layout class="QHBoxLayout" name="hor_npeaks">
+                 <item>
+                  <widget class="QSpinBox" name="s_npeaks">
+                   <property name="maximumSize">
+                    <size>
+                     <width>40</width>
+                     <height>16777215</height>
+                    </size>
+                   </property>
+                   <property name="toolTip">
+                    <string>Choose the multiplicity of the model.</string>
+                   </property>
+                   <property name="minimum">
+                    <number>1</number>
+                   </property>
+                   <property name="value">
+                    <number>1</number>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QLabel" name="l_npeaks">
+                   <property name="text">
+                    <string># peaks</string>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
+               </item>
+               <item row="2" column="1">
+                <widget class="QComboBox" name="c_convolve">
+                 <property name="toolTip">
+                  <string>Choose a second lineshape to be convolved with the first.</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="2" column="0">
+                <widget class="QLabel" name="l_convolve">
+                 <property name="text">
+                  <string>Convolve with</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="4" column="1">
+                <layout class="QHBoxLayout" name="hor_hf_mixing">
+                 <item>
+                  <widget class="QCheckBox" name="check_hf_mixing">
+                   <property name="enabled">
+                    <bool>false</bool>
+                   </property>
+                   <property name="toolTip">
+                    <string>Enable HF mixing (Open config ...).</string>
+                   </property>
+                   <property name="text">
+                    <string>HF mixing</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QPushButton" name="b_hf_mixing">
+                   <property name="toolTip">
+                    <string>Configure the model for hyperfine mixing.</string>
+                   </property>
+                   <property name="text">
+                    <string>config ...</string>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
+               </item>
+              </layout>
+             </widget>
+            </item>
+            <item>
+             <spacer name="vert_space_fit">
+              <property name="orientation">
+               <enum>Qt::Vertical</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>0</width>
+                <height>0</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+            <item>
+             <widget class="Line" name="line_data">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="l_data">
+              <property name="font">
+               <font>
+                <bold>true</bold>
+               </font>
+              </property>
+              <property name="text">
+               <string>Data options</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <layout class="QHBoxLayout" name="hor_data_select">
+              <item>
+               <widget class="QPushButton" name="b_data_select">
+                <property name="maximumSize">
+                 <size>
+                  <width>80</width>
+                  <height>16777215</height>
+                 </size>
+                </property>
+                <property name="text">
+                 <string>data</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLabel" name="l_data_select">
+                <property name="text">
+                 <string>.\data</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+            <item>
+             <layout class="QGridLayout" name="grid_data">
+              <item row="1" column="0">
+               <layout class="QHBoxLayout" name="hor_xaxis" stretch="0,0">
+                <item>
+                 <widget class="QLabel" name="l_xaxis">
+                  <property name="text">
+                   <string>&lt;i&gt;x&lt;/i&gt;-axis</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QPushButton" name="b_xaxis">
+                  <property name="text">
+                   <string>config ...</string>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </item>
+              <item row="2" column="0">
+               <layout class="QHBoxLayout" name="horizontalLayout">
+                <item>
+                 <widget class="QLabel" name="l_yaxis">
+                  <property name="text">
+                   <string>&lt;i&gt;y&lt;/i&gt;-axis</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QPushButton" name="b_yaxis">
+                  <property name="text">
+                   <string>config ...</string>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </item>
+             </layout>
+            </item>
+            <item>
+             <widget class="Line" name="line_fit">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="l_fit_options">
+              <property name="font">
+               <font>
+                <bold>true</bold>
+               </font>
+              </property>
+              <property name="text">
+               <string>Fit options</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QWidget" name="grid_fit" native="true">
+              <layout class="QGridLayout" name="grid_fit_layout" columnstretch="1,0">
+               <property name="leftMargin">
+                <number>0</number>
+               </property>
+               <property name="topMargin">
+                <number>0</number>
+               </property>
+               <property name="rightMargin">
+                <number>0</number>
+               </property>
+               <property name="bottomMargin">
+                <number>0</number>
+               </property>
+               <item row="6" column="1">
+                <widget class="QCheckBox" name="check_save_to_disk">
+                 <property name="toolTip">
+                  <string>Save fit results to the disk.</string>
+                 </property>
+                 <property name="text">
+                  <string>save to disk</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="7" column="0">
+                <widget class="QCheckBox" name="check_save_to_db">
+                 <property name="toolTip">
+                  <string>Save fit results to the database.</string>
+                 </property>
+                 <property name="text">
+                  <string>save to db</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="5" column="1">
+                <widget class="QCheckBox" name="check_linked">
+                 <property name="toolTip">
+                  <string>Use linked fitting.</string>
+                 </property>
+                 <property name="text">
+                  <string>linked</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="2" column="1">
+                <layout class="QHBoxLayout" name="hor_delta_f" stretch="0,1">
+                 <item>
+                  <widget class="QCheckBox" name="check_delta_f">
+                   <property name="toolTip">
+                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Calculate the y-axis uncertainties from the fit function. This yields better agreement with data for low statistics (y &amp;lt; 10). Option not available if arithmetics is not a list of scalers.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                   </property>
+                   <property name="text">
+                    <string/>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QLabel" name="l_delta_f">
+                   <property name="toolTip">
+                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Calculate the y-axis uncertainties from the fit function. This yields better agreement with data for low numbers of counts. Option not available if arithmetics is not a list of scalers.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                   </property>
+                   <property name="text">
+                    <string>&lt;nobr&gt;&amp;Delta; from fit (Poisson)&lt;/nobr&gt;</string>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
+               </item>
+               <item row="3" column="0">
+                <widget class="QCheckBox" name="check_cov_mc">
+                 <property name="toolTip">
+                  <string>Calculate the covariance matrix from Monte-Carlo sampling of the data.</string>
+                 </property>
+                 <property name="text">
+                  <string>cov. from Monte-Carlo</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="0" column="1">
+                <widget class="QComboBox" name="c_routine">
+                 <property name="toolTip">
+                  <string>Choose the fit routine.</string>
+                 </property>
+                 <item>
+                  <property name="text">
+                   <string>curve_fit</string>
+                  </property>
+                 </item>
+                </widget>
+               </item>
+               <item row="3" column="1">
+                <layout class="QHBoxLayout" name="hor_samples" stretch="1,0">
+                 <item>
+                  <widget class="QSpinBox" name="s_samples_mc">
+                   <property name="enabled">
+                    <bool>false</bool>
+                   </property>
+                   <property name="minimum">
+                    <number>100</number>
+                   </property>
+                   <property name="maximum">
+                    <number>1000000</number>
+                   </property>
+                   <property name="singleStep">
+                    <number>100</number>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QLabel" name="l_samples_mc">
+                   <property name="enabled">
+                    <bool>false</bool>
+                   </property>
+                   <property name="text">
+                    <string># samples</string>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
+               </item>
+               <item row="1" column="0">
+                <widget class="QCheckBox" name="check_guess_offset">
+                 <property name="toolTip">
+                  <string>Guess initial 1. and 2. order offset parameters upon fitting.</string>
+                 </property>
+                 <property name="text">
+                  <string>guess offset</string>
+                 </property>
+                 <property name="checked">
+                  <bool>true</bool>
+                 </property>
+                </widget>
+               </item>
+               <item row="5" column="0">
+                <widget class="QCheckBox" name="check_summed">
+                 <property name="enabled">
+                  <bool>false</bool>
+                 </property>
+                 <property name="text">
+                  <string>summed</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="4" column="0">
+                <widget class="QCheckBox" name="check_norm_scans">
+                 <property name="text">
+                  <string>normalize to # scans</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="1" column="1">
+                <layout class="QHBoxLayout" name="hor_chi2" stretch="0,0">
+                 <item>
+                  <widget class="QCheckBox" name="check_chi2">
+                   <property name="toolTip">
+                    <string>Scale the covariance matrix for &lt;nobr&gt;&amp;chi; &lt;sup&gt;2&lt;/sup&gt; = 1&lt;/nobr&gt;.</string>
+                   </property>
+                   <property name="text">
+                    <string/>
+                   </property>
+                   <property name="checked">
+                    <bool>true</bool>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QLabel" name="l_chi2">
+                   <property name="toolTip">
+                    <string>Scale the covariance matrix for &lt;nobr&gt;&amp;chi; &lt;sup&gt;2&lt;/sup&gt; = 1&lt;/nobr&gt;.</string>
+                   </property>
+                   <property name="text">
+                    <string>&lt;nobr&gt;&amp;Delta; for &amp;chi; &lt;sup&gt;2&lt;/sup&gt; = 1&lt;/nobr&gt;</string>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
+               </item>
+               <item row="7" column="1">
+                <widget class="QCheckBox" name="check_save_figure">
+                 <property name="toolTip">
+                  <string>Save a plot of the fit to the data for each fitted file.</string>
+                 </property>
+                 <property name="text">
+                  <string>save figure</string>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </widget>
+            </item>
+            <item>
+             <spacer name="vert_space_plot">
+              <property name="orientation">
+               <enum>Qt::Vertical</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>0</width>
+                <height>0</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+            <item>
+             <widget class="Line" name="line_plot">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="l_plot_options">
+              <property name="font">
+               <font>
+                <bold>true</bold>
+               </font>
+              </property>
+              <property name="text">
+               <string>Plot options</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QWidget" name="grid_plot" native="true">
+              <layout class="QGridLayout" name="grid_plot_layout" columnstretch="1,1,1">
+               <property name="leftMargin">
+                <number>0</number>
+               </property>
+               <property name="topMargin">
+                <number>0</number>
+               </property>
+               <property name="rightMargin">
+                <number>0</number>
+               </property>
+               <property name="bottomMargin">
+                <number>0</number>
+               </property>
+               <item row="1" column="2">
+                <layout class="QHBoxLayout" name="hor_fontsize" stretch="0,0">
+                 <item>
+                  <widget class="QSpinBox" name="s_fontsize">
+                   <property name="minimum">
+                    <number>1</number>
+                   </property>
+                   <property name="value">
+                    <number>10</number>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QLabel" name="l_fontsize">
+                   <property name="text">
+                    <string>font size</string>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
+               </item>
+               <item row="2" column="0">
+                <widget class="QPushButton" name="b_save_ascii">
+                 <property name="toolTip">
+                  <string>Save the current plot as an ASCII file.</string>
+                 </property>
+                 <property name="text">
+                  <string>save ASCII</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="2" column="1">
+                <widget class="QPushButton" name="b_save_figure">
+                 <property name="toolTip">
+                  <string>Save the current plot as an image.</string>
+                 </property>
+                 <property name="text">
+                  <string>save figure</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="2" column="2">
+                <layout class="QHBoxLayout" name="hor_save_fig">
+                 <item>
+                  <widget class="QLabel" name="l_as">
+                   <property name="text">
+                    <string>as</string>
+                   </property>
+                   <property name="alignment">
+                    <set>Qt::AlignCenter</set>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QComboBox" name="c_fig">
+                   <item>
+                    <property name="text">
+                     <string>.png</string>
+                    </property>
+                   </item>
+                   <item>
+                    <property name="text">
+                     <string>.pdf</string>
+                    </property>
+                   </item>
+                  </widget>
+                 </item>
+                </layout>
+               </item>
+               <item row="0" column="0">
+                <widget class="QPushButton" name="b_plot">
+                 <property name="toolTip">
+                  <string>Show/update plot.</string>
+                 </property>
+                 <property name="text">
+                  <string>plot</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="1" column="0">
+                <widget class="QCheckBox" name="check_zoom_data">
+                 <property name="toolTip">
+                  <string>Zoom the plot window to the data.</string>
+                 </property>
+                 <property name="text">
+                  <string>zoom data</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="0" column="1">
+                <widget class="QCheckBox" name="check_auto">
+                 <property name="toolTip">
+                  <string>Auto-update plot.</string>
+                 </property>
+                 <property name="text">
+                  <string>auto</string>
+                 </property>
+                 <property name="checked">
+                  <bool>true</bool>
+                 </property>
+                </widget>
+               </item>
+               <item row="1" column="1">
+                <layout class="QHBoxLayout" name="hor_fmt">
+                 <item>
+                  <widget class="QLineEdit" name="edit_fmt">
+                   <property name="maximumSize">
+                    <size>
+                     <width>40</width>
+                     <height>16777215</height>
+                    </size>
+                   </property>
+                   <property name="toolTip">
+                    <string>Choose the errorbar style and color.</string>
+                   </property>
+                   <property name="text">
+                    <string>.k</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QLabel" name="l_fmt">
+                   <property name="text">
+                    <string>fmt</string>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
+               </item>
+              </layout>
+             </widget>
+            </item>
+            <item>
+             <spacer name="vert_space_action">
+              <property name="orientation">
+               <enum>Qt::Vertical</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>0</width>
+                <height>0</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+           </layout>
+          </widget>
+         </widget>
+        </item>
+        <item>
+         <widget class="QFrame" name="vert_action">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="minimumSize">
+           <size>
+            <width>0</width>
+            <height>64</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>16777215</width>
+            <height>64</height>
+           </size>
+          </property>
+          <property name="frameShape">
+           <enum>QFrame::StyledPanel</enum>
+          </property>
+          <layout class="QVBoxLayout" name="vert_action_layout">
+           <property name="leftMargin">
+            <number>6</number>
+           </property>
+           <property name="topMargin">
+            <number>6</number>
+           </property>
+           <property name="rightMargin">
+            <number>6</number>
+           </property>
+           <property name="bottomMargin">
+            <number>6</number>
+           </property>
+           <item>
+            <widget class="QProgressBar" name="progress_fit">
+             <property name="enabled">
+              <bool>false</bool>
+             </property>
+             <property name="maximumSize">
+              <size>
+               <width>16777215</width>
+               <height>16</height>
+              </size>
+             </property>
+             <property name="value">
+              <number>100</number>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QWidget" name="hor_fit" native="true">
+             <property name="minimumSize">
+              <size>
+               <width>0</width>
+               <height>26</height>
+              </size>
+             </property>
+             <layout class="QHBoxLayout" name="hor_fit_layout" stretch="1,1">
+              <property name="leftMargin">
+               <number>0</number>
+              </property>
+              <property name="topMargin">
+               <number>0</number>
+              </property>
+              <property name="rightMargin">
+               <number>0</number>
+              </property>
+              <property name="bottomMargin">
+               <number>0</number>
+              </property>
+              <item>
+               <widget class="QPushButton" name="b_fit">
+                <property name="minimumSize">
+                 <size>
+                  <width>0</width>
+                  <height>26</height>
+                 </size>
+                </property>
+                <property name="maximumSize">
+                 <size>
+                  <width>16777215</width>
+                  <height>26</height>
+                 </size>
+                </property>
+                <property name="toolTip">
+                 <string>Start the fit with the selected model and fit options.</string>
+                </property>
+                <property name="text">
+                 <string>fit</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QPushButton" name="b_abort">
+                <property name="enabled">
+                 <bool>false</bool>
+                </property>
+                <property name="minimumSize">
+                 <size>
+                  <width>0</width>
+                  <height>26</height>
+                 </size>
+                </property>
+                <property name="maximumSize">
+                 <size>
+                  <width>16777215</width>
+                  <height>26</height>
+                 </size>
+                </property>
+                <property name="text">
+                 <string>abort</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>1200</width>
+     <height>22</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

@@ -10,9 +10,17 @@ import numpy as np
 
 from qspec._types import *
 from qspec.models import _base, _convolved, _splitter, _spectrum
+from qspec.models._gui._main import main
 
 
-__all__ = ['gen_model', 'find_model', 'find_models']
+__all__ = ['gen_model', 'find_model', 'find_models', 'gui']
+
+
+def gui():
+    """
+    Run the models GUI.
+    """
+    main()
 
 
 def gen_model(ijj, shape: Union[str, type, _spectrum.Spectrum], qi: bool = False, hf_mixing: bool = False,
