@@ -5,9 +5,9 @@ from PyQt5.QtWidgets import QApplication
 from qspec.models._gui._ui._mainUi import MainUi
 
 
-def main(db_path=None, data_path=''):
+def main():
     app = QApplication(sys.argv)
-    main_window = MainUi(db_path=db_path, data_path=data_path)
+    main_window = MainUi()
     main_window.show()
     sys.exit(app.exec_())
 

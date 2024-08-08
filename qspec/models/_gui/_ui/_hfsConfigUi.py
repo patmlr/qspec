@@ -7,7 +7,7 @@ Created on 16.07.2022
 from copy import deepcopy
 from PyQt5 import QtWidgets, QtCore
 
-from qspec.models._gui.Ui_hfsConfig import Ui_hfsConfig
+from qspec.models._gui._ui.Ui_hfsConfig import Ui_hfsConfig
 
 
 def set_table(tab, t=None):

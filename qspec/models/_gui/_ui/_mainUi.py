@@ -28,15 +28,17 @@ inf_str = ['PINF', 'Infinity', 'infty', 'Inf', 'inf']
 
 
 class MainUi(QtWidgets.QMainWindow, Ui_main):
-    def __init__(self, db_path=None, data_path=''):
+    def __init__(self):
         super(MainUi, self).__init__()
         self.setupUi(self)
 
         self.hf_mixing_config_ui = None
         self.load_lineshapes()
         self.load_convolves()
+        self.path = None
         self.db_path = None
-        self.data_path = ''
+        self.data_path = get_documents_dir()
+        self.l_data_select.setText(self.data_path)
 
         self.index_config = 0
         self.index_load = 0
@@ -45,7 +47,7 @@ class MainUi(QtWidgets.QMainWindow, Ui_main):
         self.spectra_fit = None
         self.thread = QtCore.QThread()
 
-        self.db_select(db_path)
+        self.db_select()
         self.connect()
         self.show()
 
@@ -53,7 +55,7 @@ class MainUi(QtWidgets.QMainWindow, Ui_main):
         """ Connect all the GUI elements. """
         # Files.
         self.b_db.clicked.connect(self.open_db)
-        self.c_db.currentTextChanged[str].connect(self.db_select)
+        self.c_db.currentTextChanged.connect(self.db_select)
         self.b_select_all.clicked.connect(
             lambda checked: self.select_from_list(self.get_items(subset='all'), selected=None))
         self.b_select_favorites.clicked.connect(
@@ -75,7 +77,7 @@ class MainUi(QtWidgets.QMainWindow, Ui_main):
         # Options
         self.c_preset.currentIndexChanged.connect(self.set_preset)
         self.b_preset_minus.clicked.connect(self.remove_preset)
-        self.b_preset_plus.clicked.connect(self.add_preset)
+        self.b_preset_plus.clicked.connect(self.add_preset_clicked)
 
         # Model
         self.c_lineshape.currentIndexChanged.connect(self.set_lineshape)
@@ -87,6 +89,9 @@ class MainUi(QtWidgets.QMainWindow, Ui_main):
         # self.check_hf_mixing.stateChanged.connect(self.toogle_hf_mixing)
         self.b_hf_mixing.clicked.connect(self.open_hf_mixing)
         self.b_racah.clicked.connect(self.set_racah)
+
+        # Data
+        self.b_data_select.clicked.connect(self.select_data)
 
         # Fit.
         self.c_routine.currentIndexChanged.connect(self.set_routine)
@@ -120,17 +125,19 @@ class MainUi(QtWidgets.QMainWindow, Ui_main):
         self.b_fit.clicked.connect(self.fit_threaded)
 
     def open_db(self):
-        if self.db_path is None:
+        if self.path is None:
             default_path = get_documents_dir()
         else:
-            default_path = os.path.dirname(self.db_path)
+            default_path = self.path
         folder = QtWidgets.QFileDialog.getExistingDirectory(
             self, 'Open database directory', default_path)
         if not folder:
             return
+        self.path = folder
+
         db_list = [os.path.splitext(db)[0] for db in os.listdir(folder) if '.sqlite' in db]
         if not db_list:
-            src = os.path.join(os.path.dirname(__file__), 'default.sqlite')
+            src = os.path.join(os.path.dirname(__file__), os.pardir, '_core', 'default.sqlite')
             dst = os.path.join(folder, f'{os.path.basename(folder)}.sqlite')
             shutil.copy(src, dst)
             db_list = [os.path.splitext(os.path.basename(dst))[0]]
@@ -140,28 +147,34 @@ class MainUi(QtWidgets.QMainWindow, Ui_main):
         self.c_db.setCurrentIndex(0)
         self.c_db.blockSignals(False)
 
-        self.db_select(os.path.join(folder, f'{self.c_db.currentText()}.sqlite'))
+        self.db_select()
 
-    def db_select(self, db_path):
-        self.db_path = db_path
-        if db_path is None:
+    def db_select(self):
+        db = self.c_db.currentText()
+        if db is None or not db:
+            self.enable_options_gui(False)
+            self.db_path = None
             return
 
-        self.load_presets()
-        self.load_files()
+        self.db_path = os.path.join(self.path, f'{db}.sqlite')
+        self.enable_options_gui(True)
 
         self.index_config = 0
         self.index_load = 0
         self.index_marked = 0
         self.fig = None
-        self.spectra_fit = self.gen_spectra_fit()
+
+        self.load_presets()
 
     """ Files """
 
     def load_presets(self):
         presets = select_from_db(self.db_path, 'Presets', 'preset')
         if not presets:
+            self.c_preset.clear()
             self.add_preset('preset 1')
+            self.load_files()
+            self.spectra_fit = self.gen_spectra_fit()
             return
 
         self.c_preset.blockSignals(True)
@@ -173,10 +186,34 @@ class MainUi(QtWidgets.QMainWindow, Ui_main):
         self.set_preset()
 
     def set_preset(self):
-        pass
+        preset = self.c_preset.currentText()
+        configs = select_from_db(self.db_path, 'Presets', 'config', [['preset'], [preset]])
+        if not configs:
+            return
+        config = ast.literal_eval(configs[0][0])
+        self.enable_gui(False)
+        self.set_model_gui(config.get('model', None))
+        self.set_data_gui(config.get('data', None))
+        self.set_fit_gui(config.get('fit', None))
+        self.set_plot_gui(config.get('plot', None))
+        self.enable_gui(True)
+        self.load_files()
+        self.spectra_fit = self.gen_spectra_fit()
 
     def remove_preset(self):
-        pass
+        if self.c_preset.count() == 1:
+            self.enable_gui(False)
+            self.c_preset.clear()
+            self.set_model_gui()
+            self.set_data_gui()
+            self.set_fit_gui()
+            self.set_plot_gui()
+            self.enable_gui(True)
+            self.add_preset('preset 1')
+            self.load_files()
+            self.spectra_fit = self.gen_spectra_fit()
+            return
+        self.c_preset.removeItem(self.c_preset.currentIndex())
 
     def add_preset(self, preset):
         self.c_preset.blockSignals(True)
@@ -184,15 +221,15 @@ class MainUi(QtWidgets.QMainWindow, Ui_main):
         self.c_preset.setCurrentText(preset)
         self.c_preset.blockSignals(False)
         qi_config = dict(qi=self.check_qi.isChecked(), qi_path=os.path.dirname(self.db_path))
-        hfs_config = dict(enabled_l=False, enabled_u=False, Jl=[0.5, ], Ju=[0.5, ],
-                          Tl=[[1.]], Tu=[[1.]], fl=[[0.]], fu=[[0.]], mu=0.)
+        hf_config = dict(enabled_l=False, enabled_u=False, Jl=[0.5, ], Ju=[0.5, ],
+                         Tl=[[1.]], Tu=[[1.]], fl=[[0.]], fu=[[0.]], mu=0.)
         model_config = dict(lineshape=self.c_lineshape.currentText(),
                             convolve=self.c_convolve.currentText(),
                             npeaks=self.s_npeaks.value(),
                             offset_per_track=self.check_offset_per_track.isChecked(),
                             offset_order=ast.literal_eval(self.edit_offset_order.text()),
                             qi_config=qi_config,
-                            hfs_config=hfs_config)
+                            hf_config=hf_config)
 
         data_config = dict(data_path=self.data_path)
 
@@ -205,7 +242,9 @@ class MainUi(QtWidgets.QMainWindow, Ui_main):
                           norm_scans=self.check_norm_scans.isChecked(),
                           summed=self.check_summed.isChecked(),
                           linked=self.check_linked.isChecked(),
-                          save_to_db=self.check_save_to_db.isChecked(),)
+                          save_to_db=self.check_save_to_db.isChecked(),
+                          save_to_disk=self.check_save_to_disk.isChecked(),
+                          save_figure=self.check_save_figure.isChecked())
 
         plot_config = dict(plot_auto=self.check_auto.isChecked(),
                            fig_save_format=self.c_fig.currentText(),
@@ -215,6 +254,16 @@ class MainUi(QtWidgets.QMainWindow, Ui_main):
 
         config = dict(model=model_config, data=data_config, fit=fit_config, plot=plot_config)
         write_to_db(self.db_path, 'Presets', ['preset', 'config'], [preset, str(config)])
+
+    def add_preset_clicked(self):
+        n = 1
+        preset_new = 'new preset'
+        while self.c_preset.findText(preset_new) != -1:
+            preset_new = f'new preset {n}'
+            n += 1
+        self.add_preset(preset_new)
+        self.c_preset.setFocus()
+        self.c_preset.lineEdit().selectAll()
 
     def load_lineshapes(self):
         for i, spec in enumerate(SPECTRA):
@@ -231,7 +280,7 @@ class MainUi(QtWidgets.QMainWindow, Ui_main):
         # files = select_from_db(self.db_path, 'file', 'Files', [['type'], [self.c_iso.currentText()]], 'ORDER BY date')
         # for f in files:
         #     self.list_files.addItem(f[0])
-        files = os.listdir(os.path.join(os.path.dirname(self.db_path), self.data_path))
+        files = os.listdir(self.data_path)
         for f in files:
             self.list_files.addItem(f)
         self.gen_item_lists()
@@ -408,6 +457,7 @@ class MainUi(QtWidgets.QMainWindow, Ui_main):
                       summed=self.check_summed.isChecked(),
                       linked=self.check_linked.isChecked(),
                       save_to_db=self.check_save_to_db.isChecked(),
+                      save_to_disk=self.check_save_to_disk.isChecked(),
                       fig_save_format=self.c_fig.currentText(),
                       zoom_data=self.check_zoom_data.isChecked(),
                       fmt=self.edit_fmt.text(),
@@ -548,7 +598,9 @@ class MainUi(QtWidgets.QMainWindow, Ui_main):
 
     """ Model """
 
-    def set_model_gui(self, config):
+    def set_model_gui(self, config=None):
+        if config is None:
+            return
         self.c_lineshape.setCurrentText(config['lineshape'])
         self.c_convolve.setCurrentText(config['convolve'])
         self.s_npeaks.setValue(config['npeaks'])
@@ -627,7 +679,46 @@ class MainUi(QtWidgets.QMainWindow, Ui_main):
             splitter_model.racah()
         self.update_pars()
 
+    """ Data """
+
+    def set_data_gui(self, config=None):
+        if config is None:
+            return
+        self.data_path = config.get('data_path', self.path)
+        self.l_data_select.setText(self.data_path)
+
+    def select_data(self):
+        if self.path is None:
+            default_path = get_documents_dir()
+        else:
+            default_path = self.path
+        folder = QtWidgets.QFileDialog.getExistingDirectory(
+            self, 'Open data directory', default_path)
+        if not folder:
+            return
+
+        self.data_path = folder
+        # self.l_data_select.setText(os.path.join('.', os.path.relpath(self.data_path, self.path)))
+        self.l_data_select.setText(self.data_path)
+        self.load_files()
+
     """ Fit """
+
+    def set_fit_gui(self, config=None):
+        if config is None:
+            return
+        self.c_routine.setCurrentText(config.get('routine', 'curve_fit'))
+        self.check_chi2.setChecked(not config.get('absolute_sigma', False))
+        self.check_delta_f.setChecked(config.get('unc_from_fit', False))
+        self.check_guess_offset.setChecked(config.get('guess_offset', True))
+        self.check_cov_mc.setChecked(config.get('cov_mc', False))
+        self.s_samples_mc.setValue(config.get('samples_mc', 100))
+        self.check_norm_scans.setChecked(config.get('norm_scans', False))
+        self.check_summed.setChecked(config.get('summed', False))
+        self.check_linked.setChecked(config.get('linked', False))
+        self.check_save_to_db.setChecked(config.get('save_to_db', False))
+        self.check_save_to_disk.setChecked(config.get('save_to_disk', False))
+        self.check_save_figure.setChecked(config.get('save_figure', False))
 
     def toggle_chi2(self):
         self.spectra_fit.absolute_sigma = not self.check_chi2.isChecked()
@@ -766,6 +857,15 @@ class MainUi(QtWidgets.QMainWindow, Ui_main):
 
     """ Plot """
 
+    def set_plot_gui(self, config=None):
+        if config is None:
+            return
+        self.check_auto.setChecked(config.get('plot_auto', True))
+        self.c_fig.setCurrentText(config.get('fig_save_format', '.png'))
+        self.check_zoom_data.setChecked(config.get('zoom_data', False))
+        self.edit_fmt.setText(config.get('fmt', '.k'))
+        self.s_fontsize.setValue(config.get('fontsize', 10))
+
     def toggle_xlabel(self, suppress_plot=False):
         self.spectra_fit.x_as_freq = self.check_x_as_freq.isChecked()
         self.plot_auto(suppress_plot)
@@ -849,11 +949,17 @@ class MainUi(QtWidgets.QMainWindow, Ui_main):
 
     def enable_gui(self, a0):
         self.vert_files.setEnabled(a0)
+        self.enable_options_gui(a0)
+
+    def enable_options_gui(self, a0):
         self.vert_parameters.setEnabled(a0)
+        self.hor_preset.setEnabled(a0)
         self.grid_model.setEnabled(a0)
+        self.hor_data_select.setEnabled(a0)
+        self.grid_data.setEnabled(a0)
         self.grid_fit.setEnabled(a0)
         self.grid_plot.setEnabled(a0)
         self.b_fit.setEnabled(a0)
         # self.b_abort.setEnabled(not a0)
         #  TODO: abort during fit. This may be difficult to implement cleanly
-        #   since curve_fit actually does not allow intervention.
+        #   since curve_fit does not allow intervention.
