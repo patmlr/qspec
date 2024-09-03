@@ -16,9 +16,6 @@ keywords = ['physics', 'laser spectroscopy', 'simulation', 'quantum mechanics', 
 authors = [
     {name = 'Patrick Mueller', email = 'pmueller@physics.ucla.edu'},
 ]
-maintainers = [
-  {name = 'Patrick Mueller', email = 'pmueller@physics.ucla.edu'}
-]
 classifiers = [
     'Development Status :: 4 - Beta',
     'Intended Audience :: Science/Research',
