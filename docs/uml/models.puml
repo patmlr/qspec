@@ -1,0 +1,67 @@
+@startuml
+'https://plantuml.com/class-diagram
+!theme reddress-lightblue
+skinparam groupInheritance 2
+skinparam classFontSize 14
+skinparam classFontName Arial
+skinparam classBackgroundColor %lighten("WhiteSmoke", 5)
+skinparam classHeaderBackgroundColor WhiteSmoke
+skinparam nodesep 40
+skinparam ranksep 12
+
+abstract class Model {
+    +<color:MediumPurple>Model</color> model
+    +<color:MediumPurple>int</color> size
+    ~<color:MediumPurple>None</color> __init__(<color:MediumPurple>Model</color> model)
+    ~<color:MediumPurple>ndarray</color> __call__(<color:MediumPurple>ndarray</color> x, *args)
+    #<color:MediumPurple>None</color> _add_arg(<color:MediumPurple>str</color> name, <color:MediumPurple>float</color> val, <color:MediumPurple>bool</color> fix, <color:MediumPurple>bool</color> link)
+    +<color:MediumPurple>float</color> dx()
+    +<color:MediumPurple>float</color> min()
+    +<color:MediumPurple>float</color> max()
+    +<color:MediumPurple>list[list[float]]</color> intervals()
+}
+
+class "Empty,\nNPeak,\nOffset,\n Amplifier,\nCustom,\nYPars" as c1
+abstract class Listed {
+    +<color:MediumPurple>list[Model]</color> models
+}
+
+abstract class Splitter {
+    +<color:MediumPurple>list[float]</color> racah_intensities
+    +<color:MediumPurple>None</color> racah()
+}
+class SplitterSummed {
+    +<color:MediumPurple>list[Splitter]</color> models
+}
+class "Hyperfine,\nHyperfineQI,\n HyperfineMixed" as Hyperfine
+
+abstract class Convolved {
+    +<color:MediumPurple>Model</color> model_1
+}
+class "GaussConvolved,\nLorentzConvolved,\n GaussChi2Convolved" as c3
+
+abstract class Spectrum {
+    +<color:MediumPurple>float</color> fwhm()
+}
+class "Lorentz,\nLorentzQI,\nGauss,\nVoigt,\n VoigtDerivative,\nVoigtAsy,\nVoigtCEC,\nGaussChi2" as c2
+
+Model <|-- Listed
+Model <|-- c1
+Listed <|-- Summed
+Listed <|-- Linked
+
+Model <|-- Spectrum
+Spectrum <|-- c2
+
+Model <|-- Splitter
+Summed <|-- SplitterSummed
+Splitter <|-- Hyperfine
+
+Splitter ..> SplitterSummed
+
+Model <|-- Convolved
+Convolved <|-- c3
+
+hide empty members
+
+@enduml

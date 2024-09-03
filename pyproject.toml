@@ -7,22 +7,27 @@ requires = [
 
 [project]
 name = 'qspec'
-version = '0.3.3'
-description = 'A python package for calculations surrounding laser spectroscopy.'
+version = '0.3.4'
+description = 'Physics toolbox for laser spectroscopy'
 readme = 'README.md'
 requires-python = '>=3.8'
 license = {file = 'LICENSE'}
 keywords = ['physics', 'laser spectroscopy', 'simulation', 'quantum mechanics', 'data analysis']
 authors = [
-    {name = 'Patrick Mueller', email = 'pamueller@ikp.tu-darmstadt.de'},
+    {name = 'Patrick Mueller', email = 'pmueller@physics.ucla.edu'},
 ]
 maintainers = [
-  {name = 'Patrick Mueller', email = 'pamueller@ikp.tu-darmstadt.de'}
+  {name = 'Patrick Mueller', email = 'pmueller@physics.ucla.edu'}
 ]
 classifiers = [
-    'Programming Language :: Python :: 3',
+    'Development Status :: 4 - Beta',
+    'Intended Audience :: Science/Research',
     'License :: OSI Approved :: MIT License',
-    'Operating System :: Microsoft :: Windows'
+    'Operating System :: Microsoft :: Windows',
+    'Programming Language :: C++',
+    'Programming Language :: Python :: 3',
+    'Programming Language :: Python :: 3 :: Only',
+    'Topic :: Scientific/Engineering :: Physics',
 ]
 dependencies = [
     'matplotlib',
@@ -32,10 +37,9 @@ dependencies = [
 ]
 
 [project.urls]
-homepage = 'https://www.ikp.tu-darmstadt.de/forschung_kernphysik/gruppen_kernphysik/experiment/ag_w_noertershaeuser/index.en.jsp'
-source = 'https://github.com/lasersphere/qspec'
+source = 'https://github.com/patmlr/qspec'
 download = 'https://pypi.org/project/qspec/#files'
-tracker = 'https://github.com/lasersphere/qspec/issues'
+tracker = 'https://github.com/patmlr/qspec/issues'
 
 [tool.setuptools.package-data]
 '*' = ['*.dll']
