@@ -14,7 +14,7 @@ requires-python = '>=3.8'
 license = {file = 'LICENSE'}
 keywords = ['physics', 'laser spectroscopy', 'simulation', 'quantum mechanics', 'data analysis']
 authors = [
-    {name = 'Patrick Mueller', email = 'pmueller@physics.ucla.edu'},
+    {name = 'Patrick Müller', email = 'pmueller@physics.ucla.edu'},
 ]
 classifiers = [
     'Development Status :: 4 - Beta',
@@ -34,8 +34,9 @@ dependencies = [
 ]
 
 [project.urls]
-source = 'https://github.com/patmlr/qspec'
+documentation = 'https://patmlr.github.io/qspec/'
 download = 'https://pypi.org/project/qspec/#files'
+source = 'https://github.com/patmlr/qspec'
 tracker = 'https://github.com/patmlr/qspec/issues'
 
 [tool.setuptools.package-data]
