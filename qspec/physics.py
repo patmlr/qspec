@@ -21,7 +21,7 @@ __all__ = ['L_LABEL', 'E_NORM', 'LEMNISCATE', 'mu_N', 'mu_B', 'g_s', 'me_u', 'me
            'v_e', 'v_e_d1', 'v_el', 'v_el_d1', 'p_v', 'p_e', 'p_el', 'doppler', 'doppler_d1', 'doppler_e_d1',
            'doppler_el_d1', 'inverse_doppler', 'inverse_doppler_d1', 'alpha_atom', 'v_rec', 'photon_recoil',
            'photon_recoil_v', 'get_f', 'get_m', 'hyperfine', 'lande_n', 'lande_j', 'lande_f', 'zeeman', 'hyper_zeeman',
-           'hyper_zeeman_12', 'a_hyper_mu', 'saturation_intensity', 'saturation', 'rabi', 'scattering_rate',
+           'hyper_zeeman_12', 'hyper_zeeman_12_d', 'a_hyper_mu', 'saturation_intensity', 'saturation', 'rabi', 'scattering_rate',
            'mass_factor', 'delta_r2', 'delta_r4', 'delta_r6', 'lambda_r', 'lambda_rn', 'schmidt_line', 'sellmeier',
            'gamma_3d', 'boost', 'doppler_3d', 'gaussian_beam_3d', 'gaussian_doppler_3d', 't_xi', 'thermal_v_pdf',
            'thermal_v_rvs', 'thermal_e_pdf', 'thermal_e_rvs', 'convolved_boltzmann_norm_pdf',
@@ -632,21 +632,57 @@ def hyper_zeeman(i: float, s: float, ll: float, j: float, f: float, m: float, g_
 
 
 def hyper_zeeman_12(s: float, ll: float, j: float, m: float, g_n: float,
-                    a_hyper: array_like, b: array_like,
+                    a_hyper: array_like, b: array_like, g_j: float = None,
                     g_n_as_gyro: bool = False, as_freq: bool = True):
-    i = 0.5
     g_i = lande_n(g_n) if g_n_as_gyro else g_n
-    g_j = lande_j(s, ll, j)
+    g_j = lande_j(s, ll, j) if g_j is None else g_j
 
     a_hyper_j = a_hyper * sc.h * 1e6 if as_freq else a_hyper * E_NORM
 
     x_b0 = a_hyper_j * (j + 0.5)
     _x = b * (mu_B * g_j - mu_N * g_i) / x_b0
 
-    x0 = (-x_b0 / (2 * (2 * j + 1)) - mu_B * g_j * m * b  # mu_N * g_i * m * b
-          - 0.5 * x_b0 * np.sqrt(1 + 2 * m * _x / (j + 0.5) + _x ** 2))
-    x1 = (-x_b0 / (2 * (2 * j + 1)) - mu_B * g_j * m * b
-          + 0.5 * x_b0 * np.sqrt(1 + 2 * m * _x / (j + 0.5) + _x ** 2))
+    x = -x_b0 / (2 * (2 * j + 1)) - mu_B * g_j * m * b
+
+    if m == j + 0.5:
+        x0 = x + 0.5 * x_b0 * (1 + _x)
+        x1 = x + 0.5 * x_b0 * (1 + _x)
+    elif m == -j - 0.5:
+        x0 = x + 0.5 * x_b0 * (1 - _x)
+        x1 = x + 0.5 * x_b0 * (1 - _x)
+    else:
+        x0 = x - 0.5 * x_b0 * np.sqrt(1 + 2 * m * _x / (j + 0.5) + _x ** 2)
+        x1 = x + 0.5 * x_b0 * np.sqrt(1 + 2 * m * _x / (j + 0.5) + _x ** 2)
+
+    if as_freq:
+        return x0 / sc.h * 1e-6, x1 / sc.h * 1e-6
+    return x0 / E_NORM, x1 / E_NORM
+
+
+def hyper_zeeman_12_d(s: float, ll: float, j: float, m: float, g_n: float,
+                      a_hyper: array_like, b: array_like, g_j: float = None,
+                      g_n_as_gyro: bool = False, as_freq: bool = True):
+    g_i = lande_n(g_n) if g_n_as_gyro else g_n
+    g_j = lande_j(s, ll, j) if g_j is None else g_j
+
+    a_hyper_j = a_hyper * sc.h * 1e6 if as_freq else a_hyper * E_NORM
+
+    x_b0 = a_hyper_j * (j + 0.5)
+
+    _x = b * (mu_B * g_j - mu_N * g_i) / x_b0
+    _dx = (mu_B * g_j - mu_N * g_i) / x_b0
+
+    dx = -mu_B * g_j * m
+
+    if m == j + 0.5:
+        x0 = dx + 0.5 * x_b0 * _dx
+        x1 = dx + 0.5 * x_b0 * _dx
+    elif m == -j - 0.5:
+        x0 = dx - 0.5 * x_b0 * _dx
+        x1 = dx - 0.5 * x_b0 * _dx
+    else:
+        x0 = dx - 0.25 * x_b0 / np.sqrt(1 + 2 * m * _x / (j + 0.5) + _x ** 2) * (2 * m / (j + 0.5) + 2 * _x) * _dx
+        x1 = dx + 0.25 * x_b0 / np.sqrt(1 + 2 * m * _x / (j + 0.5) + _x ** 2) * (2 * m / (j + 0.5) + 2 * _x) * _dx
 
     if as_freq:
         return x0 / sc.h * 1e-6, x1 / sc.h * 1e-6
