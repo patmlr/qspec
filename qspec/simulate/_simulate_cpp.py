@@ -823,7 +823,7 @@ class Atom:
                     rho = np.transpose(rho, axes=axes)
             axes = [ax for ax in range(axis)]
             if axes:
-                l0 = np.expand_dims(self.l0, axis=axes)
+                l0 = np.expand_dims(l0, axis=axes)
             axes = [axis + ax + 2 for ax in range(len(rho.shape) - axis - 1)]
             if axes:
                 l0 = np.expand_dims(l0, axis=axes)

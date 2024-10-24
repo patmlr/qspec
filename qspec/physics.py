@@ -20,7 +20,7 @@ __all__ = ['L_LABEL', 'E_NORM', 'LEMNISCATE', 'mu_N', 'mu_B', 'g_s', 'me_u', 'me
            'wavelength_to_inv_cm', 'beta', 'gamma', 'gamma_e', 'gamma_e_kin', 'e_rest', 'e_kin', 'e_total', 'e_el',
            'v_e', 'v_e_d1', 'v_el', 'v_el_d1', 'p_v', 'p_e', 'p_el', 'doppler', 'doppler_d1', 'doppler_e_d1',
            'doppler_el_d1', 'inverse_doppler', 'inverse_doppler_d1', 'alpha_atom', 'v_rec', 'photon_recoil',
-           'photon_recoil_v', 'get_f', 'get_m', 'hyperfine', 'lande_n', 'lande_j', 'lande_f', 'zeeman', 'hyper_zeeman',
+           'photon_recoil_v', 'get_f', 'get_m', 'hyperfine', 'lande_n', 'lande_j', 'lande_f', 'zeeman', 'hyper_zeeman', 'hyper_zeeman_num',
            'hyper_zeeman_12', 'hyper_zeeman_12_d', 'a_hyper_mu', 'saturation_intensity', 'saturation', 'rabi', 'scattering_rate',
            'mass_factor', 'delta_r2', 'delta_r4', 'delta_r6', 'lambda_r', 'lambda_rn', 'schmidt_line', 'sellmeier',
            'gamma_3d', 'boost', 'doppler_3d', 'gaussian_beam_3d', 'gaussian_doppler_3d', 't_xi', 'thermal_v_pdf',
@@ -629,6 +629,59 @@ def hyper_zeeman(i: float, s: float, ll: float, j: float, f: float, m: float, g_
     shift = hyperfine(i, j, f, a_hyper, b_hyper)
     shift += zeeman(m, b, g_f, as_freq=as_freq)
     return shift
+
+
+def _hyper_zeeman_ij(mi0, mj0, mi1, mj1, i, j, g_n: float, g_j: float, a_hyper: array_like, b_hyper: array_like,
+                     b: array_like):
+    if mi0 + mj0 != mi1 + mj1:
+        return np.zeros_like(b, dtype=float)
+
+    elif mi0 == mi1 and mj0 == mj1:
+        return a_hyper * mi0 * mj0 - (mi0 * g_n * mu_N + mj0 * g_j * mu_B) * b / sc.h * 1e-6
+
+    elif mi0 == mi1 + 1 and mj0 == mj1 - 1:
+        return np.full_like(b, 0.5 * a_hyper * np.sqrt((i - mi1) * (i + mi1 + 1)) * np.sqrt((j + mj1) * (j - mj1 + 1)))
+
+    elif mi0 == mi1 - 1 and mj0 == mj1 + 1:
+        return np.full_like(b, 0.5 * a_hyper * np.sqrt((i + mi1) * (i - mi1 + 1)) * np.sqrt((j - mj1) * (j + mj1 + 1)))
+
+    return np.zeros_like(b, dtype=float)
+
+
+def hyper_zeeman_num(i: float, j: float, f: float, m: float, g_n: float, g_j: float,
+                     a_hyper: array_like, b_hyper: array_like, b: array_like,
+                     g_n_as_gyro: bool = False, as_freq: bool = True):
+    b = np.array(b, dtype=float).flatten()
+
+    f_list = get_f(i, j)
+    mf_list = [get_m(_f) for _f in f_list]
+    mi_list = get_m(i)
+    mj_list = get_m(j)
+
+    m_list = [_m - max(f_list) for _m in range(int(2 * max(f_list) + 1))]
+    fm_list = [[_f for _f in f_list if abs(_m) <= _f] for _m in m_list]
+    mi_mj_list = [[(_mi, _m - _mi) for _mi in mi_list if _m - _mi in mj_list] for _m in m_list]
+    print(f_list)
+    print(mf_list)
+    print(m_list)
+    print(fm_list)
+    print(mi_mj_list)
+
+    n_list = [sum(int(abs(_m) <= _f) for _f in f_list) for _m in m_list]
+    h_list = [np.array([[_hyper_zeeman_ij(_mi0, _mj0, _mi1, _mj1, i, j, g_n, g_j, a_hyper, b_hyper, b)
+                         for (_mi1, _mj1) in _mi_mj_list] for (_mi0, _mj0) in _mi_mj_list], dtype=float)
+              for _m, _mi_mj_list in zip(m_list, mi_mj_list)]
+    h_list = [np.transpose(_h, axes=[2, 0, 1]) for _h in h_list]
+    print(n_list)
+
+    h_eig = [np.linalg.eigh(_h) for _h in h_list]
+
+    e_eig = [_h_eig[0] for _h_eig in h_eig]
+    v_eig = [_h_eig[1] for _h_eig in h_eig]
+    print([_e_eig.shape for _e_eig in e_eig])
+    return e_eig, m_list
+
+
 
 
 def hyper_zeeman_12(s: float, ll: float, j: float, m: float, g_n: float,
