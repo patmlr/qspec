@@ -203,18 +203,21 @@ def example(n=None):
         plt.show()
 
     if 5 in n:
-        i = 0.5
+        i = 4
         j = 4
         mu = -0.2310
         g_n = mu / i
         g_j = -1.25
         a_hyper = -1039.125
         b = np.linspace(0., 0.4, 401)
-        e_eig, m_list = qs.hyper_zeeman_num(i, j, None, None, g_n, g_j, a_hyper, 0., b)
+        e_eig, fm_list, m_list = qs.hyper_zeeman_num(i, j, None, None, g_n, g_j, a_hyper, 0., b)
 
-        for im, (_e_eig, _m) in enumerate(zip(e_eig, m_list)):
+        f_plotted = set()
+        for im, (_e_eig, _f_list, _m) in enumerate(zip(e_eig, fm_list, m_list)):
             for k in range(_e_eig.shape[1]):
-                plt.plot(b, _e_eig[:, k], f'-C{im}', label=rf'$m = {_m}$' if k == 0  else None)
+                c = int(_f_list[k] - abs(i - j))
+                plt.plot(b, _e_eig[:, k], f'-C{c}', label=rf'$(F, m) = {_f_list[k], _m}$' if c not in f_plotted else None)  #  if k == 0  else None
+                f_plotted.add(c)
 
         plt.xlabel('Magnetic field (T)')
         plt.ylabel('Frequency shift (MHz)')
