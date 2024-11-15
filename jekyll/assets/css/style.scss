@@ -1,0 +1,66 @@
+---
+---
+@import "{{ site.theme }}";
+
+.wrapper {
+    width: 1400px;
+    margin: auto auto;
+}
+
+header { width: 270px; float: left; position: fixed; -webkit-font-smoothing: subpixel-antialiased; padding-bottom: 80px;
+    padding-right: 40px; border-right: 1.5px solid darkgrey; }
+
+section { width: 1050px; float: right; padding-bottom: 50px; }
+
+footer { width: 270px; height: 200px; float: left; position: fixed; bottom: 50px; -webkit-font-smoothing: subpixel-antialiased; }
+
+/* Add a black background color to the top navigation */
+.topnav {
+    display: flex;
+    position: fixed;
+    justify-content: center;
+    align-items: center;
+    flex-basis: 1600px;
+    top: 0;
+    left: 0;
+    height: 56px;
+    width: 100%;
+    padding: 0;
+    overflow: hidden;
+    background-color: #281d42;
+}
+
+/* Style the links inside the navigation bar */
+.topnav a {
+    float: left;
+    text-align: center;
+    padding: 14px 16px;
+    text-decoration: none;
+    font-size: 17px;
+    color: #f2f2f2;
+    }
+
+/* Change the color of links on hover */
+.topnav a:hover {
+    font-weight: bold;
+    }
+
+/* Add a color to the active/current link */
+.topnav a.focus {
+    font-weight: bold;
+    }
+
+#topnav-main {
+    font-weight: bold !important;
+    color: #ff7f0e !important;
+    }
+
+#topnav-vert {
+    margin-bottom: 50px;
+    }
+
+.nologo {
+    font-size: 50px;
+    font-weight: bold !important;
+    color: #ff7f0e !important;
+    }
