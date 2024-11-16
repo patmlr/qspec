@@ -1,5 +1,26 @@
-<ul>
+<ul class="extern">
   <li>
-  <a href="{{ site.github.repository_url }}">
-  <img src="/assets/images/github-mark.svg"/>Source</a></li>
+    <a href="https://pypi.org/project/qspec/">
+      <div class="row">
+        <div class="column1"><img src="/assets/images/pypi-mark-black-white.svg" /></div>
+        <div class="column2"><p class="view">PyPi<small>qspec</small></p></div>
+      </div>
+    </a>
+  </li>
+  <li>
+    <a href="{{ site.github.repository_url | append: '/archive/refs/heads/main.zip' }}" download>
+      <div class="row">
+        <div class="column1"><img src="/assets/images/zip.svg" /></div>
+        <div class="column2"><p class="view">Source files<small>.zip</small></p></div>
+      </div>
+    </a>
+  </li>
+  <li>
+    <a href="{{ site.github.repository_url }}">
+      <div class="row">
+        <div class="column1"><img src="/assets/images/github-mark.svg" /></div>
+        <div class="column2"><p class="view">GitHub repository<small>{{ site.github.repository_nwo }}</small></p></div>
+      </div>
+    </a>
+  </li>
 </ul>

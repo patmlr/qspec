@@ -3,16 +3,21 @@
 @import "{{ site.theme }}";
 
 .wrapper {
-    width: 1400px;
+    width: 1280px;
     margin: auto auto;
 }
 
 header { width: 270px; float: left; position: fixed; -webkit-font-smoothing: subpixel-antialiased; padding-bottom: 80px;
     padding-right: 40px; border-right: 1.5px solid darkgrey; }
 
-section { width: 1050px; float: right; padding-bottom: 50px; }
+header.div {
+    display: flex;
+    align-items: center;
+    }
 
-footer { width: 270px; height: 200px; float: left; position: fixed; bottom: 50px; -webkit-font-smoothing: subpixel-antialiased; }
+section { width: 930px; float: right; padding-bottom: 50px; }
+
+footer { width: 270px; float: left; position: fixed; bottom: 20px; -webkit-font-smoothing: subpixel-antialiased; }
 
 /* Add a black background color to the top navigation */
 .topnav {
@@ -59,8 +64,38 @@ footer { width: 270px; height: 200px; float: left; position: fixed; bottom: 50px
     margin-bottom: 50px;
     }
 
+#topnav-hor {
+    margin-right: 50px;
+    }
+
 .nologo {
     font-size: 50px;
     font-weight: bold !important;
     color: #ff7f0e !important;
+    align-items: center;
     }
+
+.row {
+  display: flex;
+  align-items: center;
+  padding: 0 0 20px;
+}
+
+.column1 {
+  flex: 15%;
+  margin-right: 10px;
+}
+
+.column1 img {
+    height: 32px;
+    display: block;
+    margin: auto;
+    }
+
+.column2 {
+  flex: 85%;
+}
+
+.column2 p {margin: 0 0 0 0px; }
+
+ul.extern {list-style: none; padding: 0; width: 270px; }

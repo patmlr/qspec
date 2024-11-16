@@ -34,7 +34,8 @@ dependencies = [
 ]
 
 [project.urls]
-documentation = 'https://patmlr.github.io/qspec/'
+homepage = 'https://patmlr.github.io/qspec/'
+documentation = 'https://patmlr.github.io/qspec/doc/'
 download = 'https://pypi.org/project/qspec/#files'
 source = 'https://github.com/patmlr/qspec'
 tracker = 'https://github.com/patmlr/qspec/issues'

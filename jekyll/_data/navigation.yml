@@ -2,7 +2,7 @@
   link: /install.html
 - name: Tutorials
   link: /tutorials.html
-- name: API Docs
-  link: /api.html
+- name: API Doc
+  link: /doc.html
 - name: About
   link: /README.html
