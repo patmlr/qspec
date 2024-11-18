@@ -3,7 +3,7 @@
 @import "{{ site.theme }}";
 
 .wrapper {
-    width: 1280px;
+    width: 1080px;
     margin: auto auto;
 }
 
@@ -15,7 +15,7 @@ header.div {
     align-items: center;
     }
 
-section { width: 930px; float: right; padding-bottom: 50px; }
+section { width: 730px; float: right; padding-bottom: 50px; }
 
 footer { width: 270px; float: left; position: fixed; bottom: 20px; -webkit-font-smoothing: subpixel-antialiased; }
 
@@ -99,3 +99,5 @@ footer { width: 270px; float: left; position: fixed; bottom: 20px; -webkit-font-
 .column2 p {margin: 0 0 0 0px; }
 
 ul.extern {list-style: none; padding: 0; width: 270px; }
+
+span.sig-name {color: RoyalBlue; background-color: transparent; font-weight: bold; }

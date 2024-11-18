@@ -214,13 +214,13 @@ footer { width: 270px; float: left; position: fixed; bottom: 50px; -webkit-font-
   .downloads { width: 99%; }
   .downloads li, .downloads li + li + li { width: 33%; } }
 @media print { body { padding: 0.4in; font-size: 12pt; color: #444; } }
-.wrapper { width: 1280px; margin: auto auto; }
+.wrapper { width: 1080px; margin: auto auto; }
 
 header { width: 270px; float: left; position: fixed; -webkit-font-smoothing: subpixel-antialiased; padding-bottom: 80px; padding-right: 40px; border-right: 1.5px solid darkgrey; }
 
 header.div { display: flex; align-items: center; }
 
-section { width: 930px; float: right; padding-bottom: 50px; }
+section { width: 730px; float: right; padding-bottom: 50px; }
 
 footer { width: 270px; float: left; position: fixed; bottom: 20px; -webkit-font-smoothing: subpixel-antialiased; }
 
@@ -255,3 +255,5 @@ footer { width: 270px; float: left; position: fixed; bottom: 20px; -webkit-font-
 .column2 p { margin: 0 0 0 0px; }
 
 ul.extern { list-style: none; padding: 0; width: 270px; }
+
+span.sig-name { color: RoyalBlue; background-color: transparent; font-weight: bold; }

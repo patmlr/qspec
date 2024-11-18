@@ -10,19 +10,20 @@
 <meta name="generator" content="Jekyll v3.10.0" />
 <meta property="og:title" content="API Doc" />
 <meta property="og:locale" content="en_US" />
-<meta name="description" content="Physics toolbox for laser spectroscopy." />
-<meta property="og:description" content="Physics toolbox for laser spectroscopy." />
-<link rel="canonical" href="http://localhost:4000/doc.html" />
-<meta property="og:url" content="http://localhost:4000/doc.html" />
+<meta name="description" content="A physics toolbox for laser spectroscopy." />
+<meta property="og:description" content="A physics toolbox for laser spectroscopy." />
+<link rel="canonical" href="http://localhost:4000/doc/doc.html" />
+<meta property="og:url" content="http://localhost:4000/doc/doc.html" />
 <meta property="og:site_name" content="qspec" />
 <meta property="og:type" content="website" />
 <meta name="twitter:card" content="summary" />
 <meta property="twitter:title" content="API Doc" />
 <script type="application/ld+json">
-{"@context":"https://schema.org","@type":"WebPage","description":"Physics toolbox for laser spectroscopy.","headline":"API Doc","publisher":{"@type":"Organization","logo":{"@type":"ImageObject","url":"http://localhost:4000/assets/images/logo.svg"}},"url":"http://localhost:4000/doc.html"}</script>
+{"@context":"https://schema.org","@type":"WebPage","description":"A physics toolbox for laser spectroscopy.","headline":"API Doc","publisher":{"@type":"Organization","logo":{"@type":"ImageObject","url":"http://localhost:4000/assets/images/logo.svg"}},"url":"http://localhost:4000/doc/doc.html"}</script>
 <!-- End Jekyll SEO tag -->
 
-    <link rel="stylesheet" href="/assets/css/style.css?v=3be754de6352697226632841f8d3a8c82e882f34">
+    <link rel="icon" href="/assets/images/logo_small.svg">
+    <link rel="stylesheet" href="/assets/css/style.css?v=e44bec0f8d747a59939bb1ef496a07c9cdadb0ea">
     <!--[if lt IE 9]>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv.min.js"></script>
     <![endif]-->
@@ -51,7 +52,7 @@
         Tutorials
       </a>
     
-      <a href="/doc.html"class="focus" >
+      <a href="/doc/doc.html"class="focus" >
         API Doc
       </a>
     
@@ -70,7 +71,7 @@
           <h1><a href="http://localhost:4000/"><img src="/assets/images/logo.svg" alt="Logo" width="270px" /></a></h1>
         
         <!--h1><a href="http://localhost:4000/">qspec</a></h1-->
-        <p>Physics toolbox for laser spectroscopy.</p>
+        <p>A physics toolbox for laser spectroscopy.</p>
 
         <p><a href="https://www.microsoft.com"><img src="https://img.shields.io/badge/OS-Windows-yellow" alt="Static Badge" /></a>
 <a href="https://www.python.org/"><img src="https://img.shields.io/badge/Python_version-3.8%2B-blue?logo=python&amp;logoColor=white" alt="Static Badge" /></a>
@@ -112,7 +113,34 @@
       </header>
       <section>
 
-      
+      <h1 id="api-doc">API Doc</h1>
+
+<h2 id="qspecs-module-structure">qspec’s module structure</h2>
+
+<p>Currently, there are seven modules in qspec, divided by their purpose.</p>
+
+<ul>
+  <li><a href=""><em>algebra</em></a>   Angular momentum algebra and transition matrix elements.</li>
+  <li><a href=""><em>analyze</em></a>   Linear and nonlinear optimization routines.</li>
+  <li><a href=""><em>models</em></a>   System of modular fit models.</li>
+  <li><a href=""><em>physics</em></a>   Physical functions.</li>
+  <li><a href=""><em>simulate</em></a>   Simulation of laser-atom interactions</li>
+  <li><a href=""><em>stats</em></a>   Statistical functions.</li>
+  <li><a href="/doc/functions/tools/print_colored.html"><em>tools</em></a>   Mathematical and data management functions.</li>
+</ul>
+
+<h2 id="qspecs-namespaces">qspec’s namespaces</h2>
+
+<p>For the ease of access of most of the functions implemented in qspec,
+the seven modules are summarized in only three namespaces,</p>
+
+<ul>
+  <li><a href=""><em>qspec</em></a></li>
+  <li><a href=""><em>qspec.models</em></a></li>
+  <li><a href=""><em>qspec.simulate</em></a></li>
+</ul>
+
+<p>which allows most of the functions to be accessed by simply importing qspec.</p>
 
 
       </section>
