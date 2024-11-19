@@ -214,33 +214,51 @@ footer { width: 270px; float: left; position: fixed; bottom: 50px; -webkit-font-
   .downloads { width: 99%; }
   .downloads li, .downloads li + li + li { width: 33%; } }
 @media print { body { padding: 0.4in; font-size: 12pt; color: #444; } }
-.wrapper { width: 1080px; margin: auto auto; }
+.html-responsive { height: 100%; min-width: auto; overflow: auto; }
 
-header { width: 270px; float: left; position: fixed; -webkit-font-smoothing: subpixel-antialiased; padding-bottom: 80px; padding-right: 40px; border-right: 1.5px solid darkgrey; }
-
-header.div { display: flex; align-items: center; }
-
-section { width: 730px; float: right; padding-bottom: 50px; }
-
-footer { width: 270px; float: left; position: fixed; bottom: 20px; -webkit-font-smoothing: subpixel-antialiased; }
+body { display: flex; flex-direction: column; align-items: flex-start; height: 100%; background-color: #fff; font: 14px/1.5 "Noto Sans", "Helvetica Neue", Helvetica, Arial, sans-serif; color: #727272; font-weight: 400; padding: 0px; margin: auto auto; }
 
 /* Add a black background color to the top navigation */
-.topnav { display: flex; position: fixed; justify-content: center; align-items: center; flex-basis: 1600px; top: 0; left: 0; height: 56px; width: 100%; padding: 0; overflow: hidden; background-color: #281d42; }
+.topnav { display: flex; flex-direction: row; flex: 0 0; width: 100%; max-height: 64px; position: sticky; z-index: 1; top: 0; align-self: flex-start; align-items: center; justify-content: center; padding: 0; margin-bottom: 40px; background-color: #281d42; }
+
+.topnav-icon { flex: 0 0 64px; flex-direction: column; align-items: center; display: flex; flex-flow: wrap; }
+
+.topnav-icon img { height: 35px; display: block; margin: auto; }
+
+.topnav-items { display: flex; flex-direction: column; flex: 0 0 64px; max-height: 64px; align-items: center; padding-left: 0; }
+
+.topnav-content { display: flex; flex-direction: row; flex: 0 0 64px; max-height: 64px; position: sticky; justify-content: center; align-items: center; }
+
+ul.topnav-content-ul { display: flex; flex-direction: row; align-items: baseline; list-style: none; padding: 0; margin-bottom: 0; }
+
+ul.topnav-content-ul li { display: flex; flex-direction: column; flex: 0 0 100px; }
 
 /* Style the links inside the navigation bar */
-.topnav a { float: left; text-align: center; padding: 14px 16px; text-decoration: none; font-size: 17px; color: #f2f2f2; }
+.topnav-content a { float: left; text-align: center; padding: 14px 16px; text-decoration: none; font-size: 17px; color: #f2f2f2; }
 
 /* Change the color of links on hover */
-.topnav a:hover { font-weight: bold; }
+.topnav-content a:hover { font-weight: bold; }
 
 /* Add a color to the active/current link */
-.topnav a.focus { font-weight: bold; }
-
-#topnav-main { font-weight: bold !important; color: #ff7f0e !important; }
-
-#topnav-vert { margin-bottom: 50px; }
+.topnav-content a.focus { font-weight: bold; }
 
 #topnav-hor { margin-right: 50px; }
+
+header { display: flex; flex-direction: column; flex: 0 0 270px; align-items: center; position: sticky; top: 0; height: 600px; align-self: flex-start; padding-right: 39px; border-right: 1px solid darkgrey; margin-top: 0; margin-bottom: auto; margin-left: auto; margin-right: auto; }
+
+footer { display: flex; flex-direction: column; position: sticky; bottom: 20px; padding-right: 40px; margin: 0 auto; }
+
+.bd-container { display: flex; flex-direction: row; flex: 1; height: 100%; width: 100%; align-items: flex-start; justify-content: center; margin: 0 auto; }
+
+.bd-container-inner { display: flex; flex-direction: row; flex: 0 0 1340px; height: 100%; }
+
+.bd-container-left { display: flex; flex-direction: column; flex-grow: 1; height: 100%; width: 310px; }
+
+.bd-content { display: flex; flex-direction: row; flex: 0 0 991px; height: 100%; justify-content: left; align-items: flex-start; padding-left: 39px; margin: 0 auto; }
+
+.bd-content-main { display: flex; flex-direction: column; flex: 0 0 642px; height: 100%; padding-right: 39px; margin: 0 0; }
+
+.bd-content-table { display: flex; flex: 0 0 270px; position: sticky; padding-left: 39px; border-left: 1px solid darkgrey; margin: 0 0; }
 
 .nologo { font-size: 50px; font-weight: bold !important; color: #ff7f0e !important; align-items: center; }
 

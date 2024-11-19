@@ -1,13 +1,22 @@
-<nav>
-  <div class="topnav">
-    <!--a href="/" id="topnav-main" >qspec</a-->
-    {% for item in site.data.navigation %}
-      <a href="{{ item.link }}"{% if page.url == item.link %}class="focus"{% endif %} >
-        {{ item.name }}
-      </a>
-    {% endfor %}
-    <!--p id="topnav-hor"></p>
-    <input type="text" placeholder="Search..."-->
+<div class="topnav">
+  <div class="topnav-icon">
+    <a href="/" ><img src="/assets/images/logo_small.svg" alt="Icon" /></a>
   </div>
-  <p id="topnav-vert"></p>
-</nav>
+  <div class="topnav-items">
+    <div class="topnav-content">
+      <nav>
+        <ul class="topnav-content-ul">
+          {% for item in site.data.navigation %}
+          <li class="topnav-content-li">
+            <a href="{{ item.link }}"{% if page.url == item.link %}class="focus"{% endif %} >
+              {{ item.name }}
+            </a>
+          </li>
+          {% endfor %}
+          <!--p id="topnav-hor"></p>
+          <input type="text" placeholder="Search..."-->
+        </ul>
+      </nav>
+    </div>
+  </div>
+</div>
