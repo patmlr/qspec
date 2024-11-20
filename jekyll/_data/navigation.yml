@@ -1,8 +1,8 @@
 - name: Install
   link: /install.html
 - name: Tutorials
-  link: /tutorials.html
+  link: /tutorials/tutorials.html
 - name: API Doc
   link: /doc/doc.html
 - name: About
-  link: /README.html
+  link: /about.html
