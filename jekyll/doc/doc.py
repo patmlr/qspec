@@ -4,6 +4,21 @@ import os
 import inspect
 
 
+FILES = ['tools']  # , 'physics'
+
+
+def load_table_template():
+    with open('_template-table.html', 'r') as f:
+        ret = f.readlines()
+    return ret
+
+
+def load_table():
+    with open('table.html', 'r') as f:
+        ret = f.readlines()
+    return ret
+
+
 def load_functions_template():
     with open(os.path.join('functions', '_template.html'), 'r') as f:
         ret = f.readlines()
@@ -14,21 +29,46 @@ def get_pars(s):
     return [], []
 
 
-def gen_functions():
-    for file in ['tools']:  # , 'physics'
+def gen_table():
+    temp = [t.strip() for t in load_table_template()]
+    i = temp.index('<!--p>tab-module</p-->') + 1
+    html = '\n'.join(temp[:i-1])
+    for file in FILES:
         directory = os.path.join('functions', file)
         if not os.path.exists(directory):
             os.makedirs(directory)
 
         namespace = f'qspec{file if file in {"models", "simulate"} else ""}'
         mod = importlib.import_module(f'qspec.{file}')
-        func_str = [f for f in mod.__all__ if callable(eval(f'mod.{f}'))]
+        func_str = sorted(f for f in mod.__all__ if callable(eval(f'mod.{f}', {'mod': mod})))
+        j = temp.index('<!--p>tab-func</p-->') + 1
+        html += '\n'.join(temp[i:j-1]).replace('_file_', file)
+        for f in func_str:
+            html += '\n' + temp[j].replace('_file_', file).replace('_func_', f)
+        i = temp.index('<!--p>tab-func-end</p-->') + 1
+        html += '\n'.join(temp[i:-1])
+        i = temp.index('<!--p>tab-module</p-->') + 1
+    html += '\n' + temp[-1]
+
+    with open('table.html', 'w') as html_file:
+        html_file.write(html)
+
+
+def gen_functions():
+    for file in FILES:
+        directory = os.path.join('functions', file)
+        if not os.path.exists(directory):
+            os.makedirs(directory)
+
+        namespace = f'qspec{file if file in {"models", "simulate"} else ""}'
+        mod = importlib.import_module(f'qspec.{file}')
+        func_str = [f for f in mod.__all__ if callable(eval(f'mod.{f}', {'mod': mod}))]
         funcs = [eval(f'mod.{f}') for f in func_str]
         func_sig = {k: inspect.signature(f) for k, f in zip(func_str, funcs)}
         func_doc = {k: f.__doc__ for k, f in zip(func_str, funcs)}
 
         temp = [t.strip() for t in load_functions_template()]
-        for f in func_str[2:3]:
+        for f in func_str:
             i = temp.index('<!--p>sig</p-->')
             html = '\n'.join(temp[:i])
             html += '\n'.join(temp[i+1:i+5])
@@ -52,8 +92,11 @@ def gen_functions():
             # Description
             i = temp.index('<!--p>desc</p-->') + 1
             desc = func_doc[f]
-            j = desc.find(':param')
-            desc = desc[:j].strip().strip('\n')
+            if desc is None:
+                desc = ''
+            else:
+                j = desc.find(':param')
+                desc = desc[:j].strip().strip('\n')
             html += '\n' + temp[i].replace('_description_', desc)
 
             # Parameters
@@ -86,13 +129,15 @@ def gen_functions():
             i = temp.index('<!--p>rets</p-->') + 1
             html += '\n' + '\n'.join(temp[i:i+2])
             r_desc = func_doc[f]
-            k = r_desc.find(':return')
-            if k != -1:
-                k = j + r_desc[j:].find(':return') + 1
-                k += r_desc[k:].find(':') + 1
-                r_desc = r_desc[k:].strip().strip('\n')
-            else:
+            if r_desc is None:
                 r_desc = ''
+            else:
+                k = r_desc.find(':return')
+                if k != -1:
+                    k += r_desc[k+1:].find(':') + 2
+                    r_desc = r_desc[k:].strip().strip('\n')
+                else:
+                    r_desc = ''
             anno = func_sig[f].return_annotation
             html += ('\n' + '\n'.join(temp[i+2:i+4])
                      .replace('_ret_', 'out')
@@ -101,10 +146,18 @@ def gen_functions():
             html += '\n'.join(temp[i+4:i+7])
             html += '\n'.join(temp[i+8:])
 
+            # Content table
+            html_table = '\n'.join(load_table())
+            i = html_table.find(f)
+            i = html_table[:i].rfind('<li>')
+            html_table = html_table[:i] + '<li class="table-current">' + html_table[i + 4:]
+            html = html.replace('_table_', html_table)
+
             with open(os.path.join(directory, f'{f}.html'), 'w') as html_file:
                 html_file.write(html)
 
 
 
 if __name__ == '__main__':
+    gen_table()
     gen_functions()

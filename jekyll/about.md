@@ -1,5 +1,5 @@
 ---
-layout: default
+layout: article
 title: About
 ---
 About
@@ -35,7 +35,7 @@ and opportunity for the development.
 The developers and testers were financially supported in part by the following funding agencies:<br><br>
 
 <div style="display: flex;">
-<img style="display: block; height: 60px; margin: auto;" src="assets/images/logo_bmbf.svg"/>
-<img style="display: block; height: 60px; margin: auto;" src="assets/images/logo_dfg.svg"/>
-<img style="display: block; height: 60px; margin: auto;" src="assets/images/logo_sfb1245.svg"/>
+<a href="https://www.bmbf.de/bmbf/en/home/home_node.html" style="margin: auto"><img style="display: block; height: 64px;" src="assets/img/logo_bmbf.svg"/></a>
+<a href="https://www.dfg.de/en" style="margin: auto"><img style="display: block; height: 64px;" src="assets/img/logo_dfg.svg"/></a>
+<a href="https://www.ikp.tu-darmstadt.de/forschung_kernphysik/verbundprojekte/details/sfb1245/startseite_sfb_1245.en.jsp" style="margin: auto"><img style="display: block; height: 64px;" src="assets/img/logo_sfb1245.svg"/></a>
 </div>
