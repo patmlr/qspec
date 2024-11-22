@@ -870,7 +870,7 @@ def schmidt_line(ll, j, is_proton):
 
 def sellmeier(w: array_like, a: array_iter, b: array_iter):
     """
-    :param w: The wavelength in µm.
+    :param w: The wavelength in um.
     :param a: The a coefficients.
     :param b: The b coefficients.
     :return: The index of refraction for the wavelength w and the given material.
@@ -962,7 +962,7 @@ def gaussian_beam_3d(r: array_like, k: array_like, w0: array_like,
     :param r0: The position 3-vector of the beam waist. Is (0m, 0m, 0m) if r0 is not specified (m).
     :param p0: The total power propagated by the gaussian beam. Is 1W if p0 is not specified (W).
     :param axis: The axis along which the vector components are aligned.
-    :returns: The intensity of a gaussian beam with k-wave-vector k at the position r - r0 (W/m**2 == µW/mm**2).
+    :returns: The intensity of a gaussian beam with k-wave-vector k at the position r - r0 (W/m**2 == uW/mm**2).
     :raises ValueError: r, k and r0 must have 3 components along the specified axis.
      The shapes of r, k, w0, r0 and p0 must be compatible.
     """
