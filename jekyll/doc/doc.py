@@ -25,10 +25,6 @@ def load_functions_template():
     return ret
 
 
-def get_pars(s):
-    return [], []
-
-
 def gen_table():
     temp = [t.strip() for t in load_table_template()]
     i = temp.index('<!--p>tab-module</p-->') + 1

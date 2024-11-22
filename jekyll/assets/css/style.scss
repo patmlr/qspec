@@ -28,7 +28,6 @@ body {
     margin: auto auto;
     }
 
-/* Add a black background color to the top navigation */
 .topnav {
     position: fixed;
     top: 0;
@@ -184,7 +183,7 @@ footer {
 .bd-container-right {
     display: block;
     height: 100%;
-    width: calc(var(--total-width) - (var(--side-width) + 2 * var(--border-padding) + var(--border-width)));
+    width: calc(var(--total-width) - (var(--side-width) + var(--border-padding) + var(--border-width)));
     margin: 0;
     }
 
