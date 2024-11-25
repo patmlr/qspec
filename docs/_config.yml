@@ -1,4 +1,4 @@
-baseurl: "qspec"
+# baseurl: "qspec"
 title: qspec
 logo: /assets/img/logo.svg
 description: A physics toolbox for laser spectroscopy.
