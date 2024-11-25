@@ -6,7 +6,7 @@ from docutils.core import publish_parts
 
 
 FOLDER_FILES = {'models', 'simulate', 'analyze'}
-FILES = sorted(['simulate'])  # , 'analyze', 'algebra', 'physics', 'models', 'tools', 'stats'
+FILES = sorted(['simulate' , 'analyze', 'algebra', 'physics', 'models', 'tools', 'stats'])  # , 'analyze', 'algebra', 'physics', 'models', 'tools', 'stats'
 
 
 def type_to_str(_type):
@@ -247,7 +247,7 @@ def _gen_func(f, file, temp, namespace, funcs, func_sig, func_doc):
 
     # Content table
     html_table = ''.join(load_table())
-    i = html_table.find(f'{namespace}.{f}')
+    i = html_table.find(f'{namespace}.{f}<')
     i = html_table[:i].rfind('<li')
     j = i + html_table[i+1:].find('>') + 2
     html_table = (html_table[:i] + f'<li class="{'has-children ' if class_flag == 1 else ''}'
@@ -311,6 +311,6 @@ def gen_functions():
 
 
 if __name__ == '__main__':
-    # gen_table()
-    # gen_modules()
+    gen_table()
+    gen_modules()
     gen_functions()
