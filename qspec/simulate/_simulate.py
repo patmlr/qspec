@@ -793,7 +793,7 @@ class ScatteringRate:
     def generate_y(self, x: array_like, theta: array_like, phi: array_like, decimals: int = 8):
         """
         :param x: The frequency of light in an atoms rest frame (MHz).
-        :param theta: The angle between the emission direction of the fluorescence light and the x-axis + 90°.
+        :param theta: The angle between the emission direction of the fluorescence light and the x-axis + 90 deg.
         :param phi: The mixing angle between the y- and z-axis (sin(phi), cos(phi)).
         :param decimals: The precision of the vector calculus in considered decimal places.
         :returns: The fluorescence spectrum for incident light with frequency 'x'

@@ -96,6 +96,8 @@ def wavelength_to_inv_cm(lam: array_like):
 
 def beta(v: array_like) -> array_like:
     """
+    The relativistic velocity.
+
     :param v: The velocity of a body (m/s).
     :returns: The velocity v relative to light speed.
     """

@@ -233,10 +233,12 @@ class HyperfineQI(Splitter):
     A perturbative quantum interference (QI) hyperfine structure model
     based on https://doi.org/10.1103/PhysRevA.87.032504.
     """
-    def __init__(self, model, i, j_l, j_u, name, qi_path=None):
+    def __init__(self, _, i, j_l, j_u, name=None, qi_path=None):
         super().__init__(LorentzQI(), i, j_l, j_u, name)
         self.type = 'HyperfineQI'
         self.qi_path = qi_path
+        if name is None:
+            name = 'None'
         self.file = f'qi_{name}.txt'
 
         self.transitions = hf_trans(self.i, self.j_l, self.j_u)

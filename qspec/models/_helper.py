@@ -15,8 +15,8 @@ from qspec.models import _base, _convolved, _splitter, _spectrum
 __all__ = ['gen_model', 'find_model', 'find_models']
 
 
-def gen_model(ijj, shape: Union[str, type, _spectrum.Spectrum], qi: bool = False, hf_mixing: bool = False,
-              n_peaks: int = 1, offsets: Union[int, list] = None, x_cuts: Union[int, float, list] = None,
+def gen_model(ijj, shape: Union[str, type, _spectrum.Spectrum] = None, qi: bool = False, hf_mixing: bool = False,
+              n_peaks: int = None, offsets: Union[int, list] = None, x_cuts: Union[int, float, list] = None,
               convolve: Union[str, type, _spectrum.Spectrum] = None):
     """
     Create a lineshape model to fit arbitrary atomic fluorescence spectra.
@@ -43,8 +43,11 @@ def gen_model(ijj, shape: Union[str, type, _spectrum.Spectrum], qi: bool = False
         ijj = np.expand_dims(ijj, axis=0)
     elif len(ijj.shape) != 2:
         raise ValueError('\'ijj\' must have shape (3, ) or (., 3) but has shape {}.'.format(ijj.shape))
+    ijj = ijj.tolist()
 
-    if isinstance(shape, str):
+    if shape is None or not shape:
+        shape = _base.Empty
+    elif isinstance(shape, str):
         if shape[0].islower():
             shape = shape[0].upper() + shape[1:]
             if shape not in _spectrum.SPECTRA:
@@ -53,7 +56,7 @@ def gen_model(ijj, shape: Union[str, type, _spectrum.Spectrum], qi: bool = False
     elif isinstance(shape, type) and issubclass(shape, _spectrum.Spectrum):
         pass
     else:
-        raise ValueError('shape must be a str representation of or a Spectrum type.')
+        raise ValueError('shape must be None, a str representation of or a Spectrum type.')
 
     if convolve is not None:
         if isinstance(convolve, str):
@@ -69,10 +72,11 @@ def gen_model(ijj, shape: Union[str, type, _spectrum.Spectrum], qi: bool = False
             raise ValueError('convolve must be a str representation of or a Convolved type.')
 
     spl = _splitter.gen_splitter_model(qi=qi, hf_mixing=hf_mixing)
-    spl_model = _splitter.SplitterSummed([spl(shape(), i, j_l, j_u, 'HF{}'.format(n))
-                                         for n, (i, j_l, j_u) in enumerate(ijj)])
+    npeaks_model = _splitter.SplitterSummed([spl(shape(), i, j_l, j_u, 'HF{}'.format(n))
+                                             for n, (i, j_l, j_u) in enumerate(ijj)])
 
-    npeaks_model = _base.NPeak(model=spl_model, n_peaks=n_peaks)
+    if n_peaks is not None:
+        npeaks_model = _base.NPeak(model=npeaks_model, n_peaks=n_peaks)
     if convolve is not None:
         npeaks_model = convolve(model=npeaks_model)
 
