@@ -10,10 +10,10 @@ frequently used in laser spectroscopy and other experiments based on laser-atom 
 as well as more general methods for data processing. 
 Most functions are compatible with numpy arrays and are able to process *n*-dimensional arrays.
 This enables fast calculations with large samples of data, *e.g.*, facilitating Monte-Carlo simulations.
-See the [_installation instructions_](install.html), [_tutorials_](tutorials/tutorials.html)
-and the [_API documentation_](doc/doc.html) to get started and explore potential use cases.
-A comprehensive summary with highlights and some theoretical background can be found
-in the official [_publication_](https://doi.org/10.48550/arXiv.2409.01417).
+See the [_installation instructions_]({{ site.baseurl }}{% link install.html %}),
+[_tutorials_]({{ site.baseurl }}{% link tutorials/tutorials.html %})
+and the [_API documentation_]({{ site.baseurl }}{% link doc/doc.md %}) to get started and explore potential use cases.
+A comprehensive summary with highlights and some theoretical background can be found in the official [_publication_](https://doi.org/10.48550/arXiv.2409.01417).
 
 ## Developers and Maintainers
 

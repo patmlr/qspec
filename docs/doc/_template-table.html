@@ -1,23 +1,23 @@
 <ul class="extern">
   <!--p>tab-module</p-->
   <li class="has-children">
-    <a href="/doc/modules/_file_.html">_title_</a>
+    <a href="{{ '/doc/modules/_file_.html' | relative_url }}">_title_</a>
     <details>
       <summary>
-        <span class="toctree-toggle" role="presentation"><img src="/assets/img/chevron-down.svg" class="chevron"/></span>
+        <span class="toctree-toggle" role="presentation"><img src="{{ '/assets/img/chevron-down.svg' | relative_url }}" class="chevron"/></span>
       </summary>
       <ul class="extern-a">
         <!--p>tab-func</p-->
-        <li class="spaced"><a href="/doc/functions/_file_/_func_.html">_namespace-func_</a></li>
+        <li class="spaced"><a href="{{ '/doc/functions/_file_/_func_.html' | relative_url }}">_namespace-func_</a></li>
         <!--p>tab-class</p-->
-        <li class="has-children spaced"><a href="/doc/functions/_file_/_class_/_class_.html">_namespace-class_</a>
+        <li class="has-children spaced"><a href="{{ '/doc/functions/_file_/_class_/_class_.html' | relative_url }}">_namespace-class_</a>
           <details>
             <summary>
-              <span class="toctree-toggle" role="presentation"><img src="/assets/img/chevron-down.svg" class="chevron"/></span>
+              <span class="toctree-toggle" role="presentation"><img src="{{ '/assets/img/chevron-down.svg' | relative_url }}" class="chevron"/></span>
             </summary>
             <ul class="extern-a">
               <!--p>tab-class-func</p-->
-              <li><a href="/doc/functions/_file_/_class_/_class-func_.html">_namespace-class-func_</a></li>
+              <li><a href="{{ '/doc/functions/_file_/_class_/_class-func_.html' | relative_url }}">_namespace-class-func_</a></li>
             </ul>
           </details>
         </li>
