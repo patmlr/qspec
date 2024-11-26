@@ -211,19 +211,30 @@ def example(n=None):
         g_j = qs.lande_j(0.5, 2, 2.5)
         a_hyper = 2.1743
         b_hyper = 49.11
-        b = np.linspace(0., 4e-3, 1001)
-        e_eig, fm_list, m_list = qs.hyper_zeeman_num(i, j, g_n, g_j, a_hyper, 0., b)
+        b = np.linspace(0, 4e-3, 4000)
+        e_eig, fm_list, m_list, mi_mj_list = qs.hyper_zeeman_num(i, j, g_n, g_j, a_hyper, b_hyper, b)
+        e_th = [qs.hyperfine(i, j, f, a_hyper, b_hyper) for f in qs.get_f(i, j)]
 
         f_plotted = set()
-        cmap = plt.get_cmap('gnuplot')
-        for im, (_e_eig, _f_list, _m) in enumerate(zip(e_eig, fm_list, m_list)):
+        m_plotted = set()
+        cmap = plt.get_cmap('inferno')
+        for im, (_e_eig, _f_list, _m, mi_mj) in enumerate(zip(e_eig, fm_list, m_list, mi_mj_list)):
             for k in range(_e_eig.shape[1]):
-                c_val = (_f_list[k] - abs(i - j)) / (i + j - abs(i - j) + 1)
+                # c_val = (_f_list[k] - abs(i - j)) / (i + j - abs(i - j) + 1)
+                # c = cmap(c_val)
+                # plt.plot(b * 1e3, _e_eig[:, k], color=c, ls='-', lw=0.85, alpha=0.8,
+                #          label=rf'$F = {int(_f_list[k])}$' if c not in f_plotted else None,  #  if k == 0  else None
+                #          zorder=100 * c_val)
+                # f_plotted.add(c)
+
+                mj = mi_mj[k][1]
+                c_val = (mj + j) / (2 * j + 1)
                 c = cmap(c_val)
                 plt.plot(b * 1e3, _e_eig[:, k], color=c, ls='-', lw=0.85, alpha=0.8,
-                         label=rf'$F = {int(_f_list[k])}$' if c not in f_plotted else None,  #  if k == 0  else None
+                         label=rf'$m_J = {mj}$' if mj not in m_plotted else None,  #  if k == 0  else None
                          zorder=100 * c_val)
-                f_plotted.add(c)
+                m_plotted.add(mj)
+        # plt.hlines(e_th, 0., 4., colors='grey', ls='--')
 
         plt.xlabel('Magnetic field (mT)')
         plt.ylabel('Frequency shift (MHz)')
