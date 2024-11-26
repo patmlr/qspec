@@ -31,7 +31,7 @@ body {
     height: 100%;
     background-color: #fff;
     font: 14px/1.5 "Noto Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
-    color: #727272;
+    color: #666;
     font-weight: 400;
     padding: 0;
     margin: auto auto;
@@ -191,6 +191,7 @@ footer {
     }
 
 pre {
+    display: block;
     font-family: ui-monospace, SFMono-Regular, SF Mono, Menlo, Consolas, Liberation Mono, monospace !important;
     color: var(--bash-code-color) !important;
     }
@@ -213,6 +214,9 @@ pre.code-block {
     overflow: auto;
     padding: 12px;
     margin: 0;
+    }
+
+.py-source {
     }
 
 .bd-container-right {
@@ -421,6 +425,9 @@ pre.code-block {
     }
 
 .column2 p {margin: 0 0 0 0px; }
+
+ul.references { display: block; list-style: none; padding: 0; }
+ul.references > li { margin-bottom: 2px; }
 
 ul.extern-link { list-style: none; padding: 0; width: var(--header-width); }
 

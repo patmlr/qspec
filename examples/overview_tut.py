@@ -33,7 +33,7 @@ f0 = qs.inv_cm_to_freq(24516.65)  # 734990677 MHz
 # expected resonance frequency from NIST database
 
 v = qs.v_el(U, q, m)  # (m/s) relativistic velocity of 87Sr+
-f_laser = qs.doppler(f0, v, np.pi)
+f_laser = qs.doppler(f0, v, np.pi)  # 735507502.
 # (MHz) The required anti-collinear lab. frequency
 
 # data = np.load('data/87Sr+.npy')
