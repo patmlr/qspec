@@ -735,18 +735,20 @@ def hyper_zeeman_num(i: float, j: float, g_n: float, g_j: float, a_hyper: array_
 
     e_0 = [np.array([hyperfine(i, j, _f, a_hyper, b_hyper) for _f in _f_list], dtype=float) for _f_list in fm_list]
     inv_order_fm = [list(np.argsort(_e_0)) for _e_0 in e_0]
-    order_fm = [np.array([_inv_order.index(i) for i in range(len(_inv_order))], dtype=int)
+    order_fm = [np.array([_inv_order.index(k) for k in range(len(_inv_order))], dtype=int)
                 for _inv_order in inv_order_fm]
     e_eig = [_e_eig[:, _order] for _e_eig, _order in zip(e_eig, order_fm)]
 
-    e_b = [np.array([-(mi * g_n * mu_N + mj * g_j * mu_B) * 100. / sc.h * 1e-6
+    e_b = [np.array([-(mi * g_n * mu_N + mj * g_j * mu_B) * 100. / sc.h * 1e-6  # B = 100. can be any positive number.
                      for (mi, mj) in _mi_mj_list], dtype=float) for _mi_mj_list in mi_mj_list]
     inv_order_ij = [list(np.argsort(_e_b)) for _e_b in e_b]
-    mi_mj_list = [[_mi_mj_list[i] for i in _inv_order]
+    mi_mj_list = [[_mi_mj_list[k] for k in _inv_order]
                   for _inv_order, _mi_mj_list in zip(inv_order_ij, mi_mj_list)]
+    mi_mj_list = [[_mi_mj_list[k] for k in _order]
+                  for _order, _mi_mj_list in zip(order_fm, mi_mj_list)]
 
 
-    return e_eig, fm_list, m_list, mi_mj_list
+    return e_eig, m_list, fm_list, mi_mj_list
 
 
 def hyper_zeeman_12(s: float, ll: float, j: float, m: float, g_n: float,

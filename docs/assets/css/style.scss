@@ -426,6 +426,27 @@ pre.code-block {
 
 .column2 p {margin: 0 0 0 0px; }
 
+div.prev-next {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 300px;
+    margin: 40px auto 40px auto;
+    }
+
+div.prev-next-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 120px;
+    font-size: 1.2em;
+    background-color: var(--code-block-bg-color);
+    border: 1px solid darkgrey;
+    border-radius: 6px;
+    padding: 4px;
+    margin: 5px auto;
+    }
+
 ul.references { display: block; list-style: none; padding: 0; }
 ul.references > li { margin-bottom: 2px; }
 
@@ -460,6 +481,7 @@ em.sig-param { display: flex; }
 .sig-param .o, .sig-param .default_value {
     font-weight: normal;
     }
+
 span.sig-prename { background-color: transparent; font-weight: bold; }
 span.sig-classname {color: var(--py-class-color); background-color: transparent; font-weight: bold; font-size: 1.2em; }
 span.sig-name { color: var(--py-func-color); background-color: transparent; font-weight: bold; font-size: 1.2em; }

@@ -311,6 +311,6 @@ def gen_functions():
 
 
 if __name__ == '__main__':
-    gen_table()
+    # gen_table()
     gen_modules()
-    gen_functions()
+    # gen_functions()

@@ -1620,7 +1620,7 @@ class Interaction:
         :returns: The integrated MC-Schroedinger equation as a complex-valued array of shape (n, #states, #times).
         """
         if self.controlled:
-            raise ValueError('Controlled or Dense steppers are not supported for \'master_mc\'.'
+            raise ValueError('Controlled or Dense steppers are not supported for \'mc_master\'.'
                              ' Decrease the step size if necessary.')
         if dynamics and self.atom.mass <= 0:
             raise ValueError('To simulate mechanical dynamics, the mass of the atom must be specified.')

@@ -1,0 +1,53 @@
+---
+layout: article
+title: Tutorials.Start
+---
+
+<h1>Getting started</h1>
+
+<p>In this tutorial, a basic example is shown how qspec can assist planning an experiment.
+    The original intention for the development of qspec and probably the most regularly needed application is
+    the use of basic physical functions without needing to define them in every analysis script.</p>
+
+<p>For example, in a collinear laser spectroscopy (CLS) experiment, where ions are accelerated before they interact
+    with a laser, the resonant laser frequency is shifted from the rest-frame resonance frequency by the Doppler shift.
+    This calculation can be easily performed with qspec. In the following example, the laser frequency required for
+    resonant excitation of accelerated <sup>88</sup>Sr<sup>+</sup> ions in anticollinear geometry
+    (<code>alpha = &#x3C0;</code>) is determined.
+</p>
+
+<div class="py-source"><pre>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">qspec</span> <span class="k">as</span> <span class="nn">qs</span>
+<span class="c1"># This imports the analyze, algebra,</span>
+<span class="c1"># physics, stats, and tools modules</span>
+
+<span class="n">q</span> <span class="o">=</span> <span class="mi">1</span>  <span class="c1"># (e), Ion charge state</span>
+<span class="n">m</span> <span class="o">=</span> <span class="mf">87.905612253</span> <span class="o">-</span> <span class="n">q</span> <span class="o">*</span> <span class="n">qs</span><span class="o">.</span><span class="n">me_u</span>  <span class="c1"># (u) [1]</span>
+<span class="c1"># Mass of 87Sr+</span>
+
+<span class="n">U</span> <span class="o">=</span> <span class="mi">20000</span> <span class="c1"># (V), Acceleration voltage</span>
+
+<span class="c1"># Resonance frequency from NIST database</span>
+<span class="n">f0</span> <span class="o">=</span> <span class="n">qs</span><span class="o">.</span><span class="n">inv_cm_to_freq</span><span class="p">(</span><span class="mf">24516.65</span><span class="p">)</span>  <span class="c1"># (MHz) [2]</span>
+<span class="c1"># &gt;&gt;&gt; 734990676.5 MHz</span>
+
+<span class="c1"># Relativistic velocity of 88Sr+</span>
+<span class="n">v</span> <span class="o">=</span> <span class="n">qs</span><span class="o">.</span><span class="n">v_el</span><span class="p">(</span><span class="n">U</span><span class="p">,</span> <span class="n">q</span><span class="p">,</span> <span class="n">m</span><span class="p">)</span>  <span class="c1"># (m/s)</span>
+<span class="c1"># &gt;&gt;&gt; 209533.6 m/s</span>
+
+<span class="c1"># The anti-collinear lab. frequency</span>
+<span class="n">f_laser</span> <span class="o">=</span> <span class="n">qs</span><span class="o">.</span><span class="n">doppler</span><span class="p">(</span><span class="n">f0</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">)</span>  <span class="c1"># (MHz)</span>
+<span class="c1"># &gt;&gt;&gt; 735504562.3 MHz</span>
+</pre></div>
+
+<h2>References</h2>
+<ul class="references">
+    <li>[1] <a href="https://www-nds.iaea.org/amdc/">Atomic mass evaluation (2020)</a></li>
+    <li>[2] <a href="https://dx.doi.org/10.18434/T4W30F">A. Kramida <em>et al.</em> (2023), National Institute of Standards and Technology (NIST)</a></li>
+</ul>
+
+<div class="prev-next">
+    <a href="/tutorials/tutorials.html"><div class="prev-next-button">&larr;&nbsp;&nbsp;Previous</div></a>
+    <a href="/tutorials/hfs.html"><div class="prev-next-button">Next&nbsp;&nbsp;&rarr;</div></a>
+</div>

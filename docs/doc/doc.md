@@ -23,8 +23,8 @@ Currently, there are seven modules in qspec, divided by their purpose.
 For the ease of access of most of the functions implemented in qspec,
 the seven modules are summarized in only three namespaces,
 
-- qspec
-- qspec.models
-- qspec.simulate
+- <code>qspec</code>
+- <code>qspec.models</code>
+- <code>qspec.simulate</code>
 
 which allows most of the functions to be accessed by simply importing qspec.
