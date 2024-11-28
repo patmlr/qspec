@@ -17,6 +17,8 @@
     --navigation-chevron: 20px;
     --navigation-chevron-padding: 12px;
     --navigation-indent: 12px;
+    --topnav-bg-color: #281d42;
+    --infobox-bg-color: #624491;
     --code-prose-bg-color: hsl(210, 8%, 90%);
     --code-block-bg-color: hsl(0, 0%, 96.5%);
     --bash-code-color: hsl(258, 38.9%, 18.6%);
@@ -45,7 +47,7 @@ body {
     width: 100%;
     padding: 0;
     margin: 0;
-    background-color: #281d42;
+    background-color: var(--topnav-bg-color);
 }
 
 .topnav-container {
@@ -425,6 +427,48 @@ pre.code-block {
     }
 
 .column2 p {margin: 0 0 0 0px; }
+
+div.infobox-container-ver {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    width: calc(var(--total-width) - 2 * (var(--side-width) + 2 * var(--border-padding) + var(--border-width)));
+    margin: 0 auto 30px auto;
+    }
+
+div.infobox-container-hor {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    width: calc(var(--total-width) - 2 * (var(--side-width) + 2 * var(--border-padding) + var(--border-width)));
+    margin: 40px auto auto auto;
+    }
+
+div.infobox {
+    display: flex;
+    flex-direction: row;
+    align-items: stretch;
+    height: 100%;
+    width: 50%;
+    padding: 0 20px 0 20px;
+    margin: 0;
+    }
+
+div.infobox-body {
+    background-color: var(--code-block-bg-color);
+    min-height: 140px;
+    border: 1px solid darkgrey;
+    border-radius: 6px;
+    padding: 10px;
+    }
+
+div.infobox-title {
+    color: var(--infobox-bg-color);
+    font-weight: 700 !important;
+    font-size: 1.2em;
+    margin-bottom: 6px;
+    }
 
 div.prev-next {
     display: flex;

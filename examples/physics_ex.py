@@ -248,7 +248,7 @@ def example(n=None):
 
         plt.xlabel('Magnetic field (mT)')
         plt.ylabel('Frequency shift (MHz)')
-        plt.legend(handles, labels)
+        # plt.legend(handles, labels)
         plt.xlim(0., 4.)
         plt.subplots_adjust(left=0.11, bottom=0.1, right=0.98, top=0.99)
         plt.show()
