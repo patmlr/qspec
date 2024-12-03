@@ -60,35 +60,38 @@ title: qspec.simulate.State
 <span class="o"><span class="pre">=</span></span>
 <span class="default_value"><span class="pre">None</span></span>
 </em>
-<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/simulate\_simulate_cpp.py#L301-L464' }}"><span class="sig-source">[source]</span></a>
+<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/simulate\_simulate_cpp.py#L301-L463' }}"><span class="sig-source">[source]</span></a>
 </dt>
-<dd class="field-body"><p></p>
+<dd class="field-body"><p>Class representing an atomic quantum state :math:`|(\mathrm{label})SLJIFm\rangle`.</p>
 <dl class="field-list">
 <dt class="field-head">Parameters<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
 <dt>freq_j<span class="classifier"><em>Union[int, float]</em></span></dt>
-<dd class="field-desc"><p>presenting an atomic quantum state :math:`|(\mathrm{label})SLJIFm\rangle`.</p></dd>
+<dd class="field-desc"><p>The energetic position of the state without the hyperfine structure or the environment (MHz).</p></dd>
 <dt>s<span class="classifier"><em>Union[int, float]</em></span></dt>
-<dd class="field-desc"><p>ss representing an atomic quantum state :math:`|(\mathrm{label})SLJIFm\rangle`.</p></dd>
+<dd class="field-desc"><p>The electron spin quantum number S.</p></dd>
 <dt>l<span class="classifier"><em>Union[int, float]</em></span></dt>
-<dd class="field-desc"><p>ss representing an atomic quantum state :math:`|(\mathrm{label})SLJIFm\rangle`.</p></dd>
+<dd class="field-desc"><p>The electronic angular momentum quantum number L.</p></dd>
 <dt>j<span class="classifier"><em>Union[int, float]</em></span></dt>
-<dd class="field-desc"><p>ss representing an atomic quantum state :math:`|(\mathrm{label})SLJIFm\rangle`.</p></dd>
+<dd class="field-desc"><p>The electronic total angular momentum quantum number J.</p></dd>
 <dt>i<span class="classifier"><em>Union[int, float]</em></span></dt>
-<dd class="field-desc"><p>ss representing an atomic quantum state :math:`|(\mathrm{label})SLJIFm\rangle`.</p></dd>
+<dd class="field-desc"><p>The nuclear spin quantum number I.</p></dd>
 <dt>f<span class="classifier"><em>Union[int, float]</em></span></dt>
-<dd class="field-desc"><p>ss representing an atomic quantum state :math:`|(\mathrm{label})SLJIFm\rangle`.</p></dd>
+<dd class="field-desc"><p>The total angular momentum quantum number F.</p></dd>
 <dt>m<span class="classifier"><em>Union[int, float]</em></span></dt>
-<dd class="field-desc"><p>ss representing an atomic quantum state :math:`|(\mathrm{label})SLJIFm\rangle`.</p></dd>
+<dd class="field-desc"><p>The B-field-axis component quantum number m of the total angular momentum.</p></dd>
 <dt>hyper_const<span class="classifier"><em>Union[numpy.ndarray, Iterable, int, float]</em></span></dt>
-<dd class="field-desc"><p>nting an atomic quantum state :math:`|(\mathrm{label})SLJIFm\rangle`.</p></dd>
+<dd class="field-desc"><p>The hyperfine-structure constants. Currently, constants up to the electric quadrupole order
+         are supported (A, B). If 'hyper_const' is a scalar, it is assumed to be the constant A
+         and the other orders are 0 (MHz).</p></dd>
 <dt>g<span class="classifier"><em>Union[int, float]</em></span></dt>
-<dd class="field-desc"><p>ss representing an atomic quantum state :math:`|(\mathrm{label})SLJIFm\rangle`.</p></dd>
+<dd class="field-desc"><p>The nuclear g-factor.</p></dd>
 <dt>label<span class="classifier"><em>str</em></span></dt>
-<dd class="field-desc"><p>epresenting an atomic quantum state :math:`|(\mathrm{label})SLJIFm\rangle`.</p></dd>
+<dd class="field-desc"><p>The label of the state. The label is used to link states via decay maps.</p></dd>
 <dt>instance<span class="classifier"><em>None</em></span></dt>
-<dd class="field-desc"><p>esenting an atomic quantum state :math:`|(\mathrm{label})SLJIFm\rangle`.</p></dd></dl>
+<dd class="field-desc"><p>A pointer to an existing State instance.
+         If this is specified, the other parameters are omitted.</p></dd></dl>
 </dd>
 </dl></dd>
 </dl>
@@ -907,6 +910,9 @@ title: qspec.simulate.State
 <li class="spaced"><a href="{{ '/doc/functions/physics/get_f.html' | relative_url }}">qspec.get_f</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/physics/get_m.html' | relative_url }}">qspec.get_m</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/physics/hyper_zeeman.html' | relative_url }}">qspec.hyper_zeeman</a></li>
+<li class="spaced"><a href="{{ '/doc/functions/physics/hyper_zeeman_12.html' | relative_url }}">qspec.hyper_zeeman_12</a></li>
+<li class="spaced"><a href="{{ '/doc/functions/physics/hyper_zeeman_12_d.html' | relative_url }}">qspec.hyper_zeeman_12_d</a></li>
+<li class="spaced"><a href="{{ '/doc/functions/physics/hyper_zeeman_num.html' | relative_url }}">qspec.hyper_zeeman_num</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/physics/hyperfine.html' | relative_url }}">qspec.hyperfine</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/physics/inv_cm_to_freq.html' | relative_url }}">qspec.inv_cm_to_freq</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/physics/inv_cm_to_wavelength.html' | relative_url }}">qspec.inv_cm_to_wavelength</a></li>

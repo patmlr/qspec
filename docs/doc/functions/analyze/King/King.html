@@ -48,17 +48,22 @@ title: qspec.analyze.King
 <dd class="field-par">
 <dl>
 <dt>a<span class="classifier"><em>Union[numpy.ndarray, Iterable]</em></span></dt>
-<dd class="field-desc"><p></p></dd>
+<dd class="field-desc"><p>An iterable of the mass numbers of the considered isotopes with shape (k, ),
+         where k is the number of isotopes.</p></dd>
 <dt>m<span class="classifier"><em>Union[numpy.ndarray, Iterable]</em></span></dt>
-<dd class="field-desc"><p></p></dd>
+<dd class="field-desc"><p>The masses and their uncertainties of the isotopes 'a' (u). 'm' must have shape (k, 2).</p></dd>
 <dt>x_abs<span class="classifier"><em>Union[numpy.ndarray, Iterable]</em></span></dt>
-<dd class="field-desc"><p></p></dd>
+<dd class="field-desc"><p>The absolute values of the data vectors and their uncertainties
+         corresponding to the mass numbers 'a'. If given, the 'x' and 'y' parameters can be omitted when fitting
+         (in 'fit' and 'fit_nd') and is determined automatically as the difference between the mass numbers 'a'
+         and 'a_ref'. Must have shape (k, n, 2) where n is the number of dimensions of the king plot.</p></dd>
 <dt>subtract_electrons<span class="classifier"><em>Union[int, float]</em></span></dt>
-<dd class="field-desc"><p></p></dd>
+<dd class="field-desc"><p>The number of electron masses that should be subtracted from the specified isotope
+         masses. 'subtract_electrons' does not have to be an integer if the ionization energy must be considered.</p></dd>
 <dt>n_samples<span class="classifier"><em>int</em></span></dt>
-<dd class="field-desc"><p></p></dd>
+<dd class="field-desc"><p>The number of generated samples for the monte-carlo routines.</p></dd>
 <dt>element_label<span class="classifier"><em>str</em></span></dt>
-<dd class="field-desc"><p></p></dd></dl>
+<dd class="field-desc"><p>The label of the element to enhance the printed and plotted information.</p></dd></dl>
 </dd>
 </dl></dd>
 </dl>
@@ -877,6 +882,9 @@ title: qspec.analyze.King
 <li class="spaced"><a href="{{ '/doc/functions/physics/get_f.html' | relative_url }}">qspec.get_f</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/physics/get_m.html' | relative_url }}">qspec.get_m</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/physics/hyper_zeeman.html' | relative_url }}">qspec.hyper_zeeman</a></li>
+<li class="spaced"><a href="{{ '/doc/functions/physics/hyper_zeeman_12.html' | relative_url }}">qspec.hyper_zeeman_12</a></li>
+<li class="spaced"><a href="{{ '/doc/functions/physics/hyper_zeeman_12_d.html' | relative_url }}">qspec.hyper_zeeman_12_d</a></li>
+<li class="spaced"><a href="{{ '/doc/functions/physics/hyper_zeeman_num.html' | relative_url }}">qspec.hyper_zeeman_num</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/physics/hyperfine.html' | relative_url }}">qspec.hyperfine</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/physics/inv_cm_to_freq.html' | relative_url }}">qspec.inv_cm_to_freq</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/physics/inv_cm_to_wavelength.html' | relative_url }}">qspec.inv_cm_to_wavelength</a></li>

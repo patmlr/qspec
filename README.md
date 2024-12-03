@@ -1,5 +1,7 @@
-qspec
-=====
+<h1>
+<img src="https://raw.githubusercontent.com/patmlr/qspec/refs/heads/dev-jekyll/docs/assets/img/logo.svg" width="300">
+<img src="/docs/assets/img/logo.svg" width="300">
+</h1><br>
 
 [![Static Badge](https://img.shields.io/badge/OS-Windows-yellow)](https://www.microsoft.com)
 [![Static Badge](https://img.shields.io/badge/Python-3.8%2B-blue?logo=python&logoColor=white)](https://www.python.org/)

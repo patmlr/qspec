@@ -38,13 +38,15 @@ title: qspec.Observable
 <dd class="field-par">
 <dl>
 <dt>x<span class="classifier"><em>Union[SupportsFloat, SupportsIndex, str, bytes, bytearray]</em></span></dt>
-<dd class="field-desc"><p>loat object which has a 'label' and optionally both a left- and right-sided or a symmetric uncertainty.</p></dd>
+<dd class="field-desc"><p>The value of the observable.</p></dd>
 <dt>std<span class="classifier"><em>Union[int, float]</em></span></dt>
-<dd class="field-desc"><p>at object which has a 'label' and optionally both a left- and right-sided or a symmetric uncertainty.</p></dd>
+<dd class="field-desc"><p>The left-sided 1-sigma percentile relative to 'x' if 'std_2' is specified,
+         else the standard deviation of the observable.</p></dd>
 <dt>std_2<span class="classifier"><em>Union[int, float]</em></span></dt>
-<dd class="field-desc"><p>object which has a 'label' and optionally both a left- and right-sided or a symmetric uncertainty.</p></dd>
+<dd class="field-desc"><p>The right-sided 1-sigma percentile relative to 'x' if 'std' is specified,
+         else the standard deviation of the observable.</p></dd>
 <dt>label<span class="classifier"><em>str</em></span></dt>
-<dd class="field-desc"><p>object which has a 'label' and optionally both a left- and right-sided or a symmetric uncertainty.</p></dd></dl>
+<dd class="field-desc"><p>The label of the observable.</p></dd></dl>
 </dd>
 </dl></dd>
 </dl>
@@ -863,6 +865,9 @@ title: qspec.Observable
 <li class="spaced"><a href="{{ '/doc/functions/physics/get_f.html' | relative_url }}">qspec.get_f</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/physics/get_m.html' | relative_url }}">qspec.get_m</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/physics/hyper_zeeman.html' | relative_url }}">qspec.hyper_zeeman</a></li>
+<li class="spaced"><a href="{{ '/doc/functions/physics/hyper_zeeman_12.html' | relative_url }}">qspec.hyper_zeeman_12</a></li>
+<li class="spaced"><a href="{{ '/doc/functions/physics/hyper_zeeman_12_d.html' | relative_url }}">qspec.hyper_zeeman_12_d</a></li>
+<li class="spaced"><a href="{{ '/doc/functions/physics/hyper_zeeman_num.html' | relative_url }}">qspec.hyper_zeeman_num</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/physics/hyperfine.html' | relative_url }}">qspec.hyperfine</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/physics/inv_cm_to_freq.html' | relative_url }}">qspec.inv_cm_to_freq</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/physics/inv_cm_to_wavelength.html' | relative_url }}">qspec.inv_cm_to_wavelength</a></li>

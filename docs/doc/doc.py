@@ -6,7 +6,7 @@ from docutils.core import publish_parts
 
 
 FOLDER_FILES = {'models', 'simulate', 'analyze'}
-FILES = sorted(['simulate' , 'analyze', 'algebra', 'physics', 'models', 'tools', 'stats'])  # , 'analyze', 'algebra', 'physics', 'models', 'tools', 'stats'
+FILES = sorted(['analyze', 'simulate', 'algebra', 'physics', 'models', 'tools', 'stats'])
 
 
 def type_to_str(_type):
@@ -33,6 +33,12 @@ def load_table():
 
 def load_module(file):
     with open(os.path.join('modules', f'_{file}.html'), 'r') as f:
+        ret = f.readlines()
+    return ret
+
+
+def load_doc():
+    with open('_doc.html', 'r') as f:
         ret = f.readlines()
     return ret
 
@@ -111,6 +117,16 @@ def gen_modules():
 
         with open(os.path.join('modules', f'{file}.html'), 'w') as html_file:
             html_file.write(html)
+
+
+def gen_doc():
+    html_table = ''.join(load_table())
+    html = '\n'.join([t.strip() for t in load_doc()])
+    html = html.replace('_table_', html_table)
+    html = '\n'.join(['---', 'layout: default', f'title: API Doc', '---', '']) + html
+
+    with open('doc.html', 'w') as html_file:
+        html_file.write(html)
 
 
 def _gen_func(f, file, temp, namespace, funcs, func_sig, func_doc):
@@ -292,7 +308,7 @@ def gen_functions():
         func_str = sorted(f for f in mod.__all__ if callable(eval(f'mod.{f}', {'mod': mod})))
         funcs = {f: eval(f'mod.{f}') for f in func_str}
         func_sig = {f: inspect.signature(funcs[f]) for f in func_str}
-        func_doc = {f: funcs[f].__doc__ for f in func_str}
+        func_doc = {f: funcs[f].__init__.__doc__ if f[0].isupper() else funcs[f].__doc__ for f in func_str}
 
         temp = [t.strip() for t in load_functions_template()]
         for f in func_str:
@@ -305,12 +321,13 @@ def gen_functions():
                 f_path = os.path.join(f, f)
             else:
                 f_path = f
-            with open(os.path.join(directory, f'{f_path}.html'), 'w') as html_file:
+            with open(os.path.join(directory, f'{f_path}.html'), 'w', encoding='utf-8') as html_file:
                 html_file.write(html)
 
 
 
 if __name__ == '__main__':
-    # gen_table()
+    gen_table()
+    gen_doc()
     gen_modules()
-    # gen_functions()
+    gen_functions()

@@ -478,6 +478,22 @@ div.prev-next {
     margin: 40px auto 40px auto;
     }
 
+div.o-next {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    width: 300px;
+    margin: 40px auto 40px auto;
+    }
+
+div.o-prev {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    width: 300px;
+    margin: 40px auto 40px auto;
+    }
+
 div.prev-next-button {
     display: flex;
     align-items: center;

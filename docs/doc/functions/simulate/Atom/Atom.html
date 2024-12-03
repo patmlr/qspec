@@ -32,21 +32,22 @@ title: qspec.simulate.Atom
 <span class="o"><span class="pre">=</span></span>
 <span class="default_value"><span class="pre">None</span></span>
 </em>
-<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/simulate\_simulate_cpp.py#L595-L932' }}"><span class="sig-source">[source]</span></a>
+<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/simulate\_simulate_cpp.py#L593-L929' }}"><span class="sig-source">[source]</span></a>
 </dt>
-<dd class="field-body"><p></p>
+<dd class="field-body"><p>Class representing an Atom and its inner structure.</p>
 <dl class="field-list">
 <dt class="field-head">Parameters<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
 <dt>states<span class="classifier"><em>Iterable[qspec.simulate._simulate_cpp.State]</em></span></dt>
-<dd class="field-desc"><p>presenting an Atom and its inner structure.</p></dd>
+<dd class="field-desc"><p>The states of the atom.</p></dd>
 <dt>decay_map<span class="classifier"><em>qspec.simulate._simulate_cpp.DecayMap</em></span></dt>
-<dd class="field-desc"><p>senting an Atom and its inner structure.</p></dd>
+<dd class="field-desc"><p>The decay map which connects the atomic states.</p></dd>
 <dt>mass<span class="classifier"><em>Union[int, float]</em></span></dt>
-<dd class="field-desc"><p>representing an Atom and its inner structure.</p></dd>
+<dd class="field-desc"><p>The mass of the atom (u).</p></dd>
 <dt>instance<span class="classifier"><em>None</em></span></dt>
-<dd class="field-desc"><p>esenting an Atom and its inner structure.</p></dd></dl>
+<dd class="field-desc"><p>A pointer to an existing Atom instance.
+         If this is specified, the other parameters are omitted.</p></dd></dl>
 </dd>
 </dl></dd>
 </dl>
@@ -865,6 +866,9 @@ title: qspec.simulate.Atom
 <li class="spaced"><a href="{{ '/doc/functions/physics/get_f.html' | relative_url }}">qspec.get_f</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/physics/get_m.html' | relative_url }}">qspec.get_m</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/physics/hyper_zeeman.html' | relative_url }}">qspec.hyper_zeeman</a></li>
+<li class="spaced"><a href="{{ '/doc/functions/physics/hyper_zeeman_12.html' | relative_url }}">qspec.hyper_zeeman_12</a></li>
+<li class="spaced"><a href="{{ '/doc/functions/physics/hyper_zeeman_12_d.html' | relative_url }}">qspec.hyper_zeeman_12_d</a></li>
+<li class="spaced"><a href="{{ '/doc/functions/physics/hyper_zeeman_num.html' | relative_url }}">qspec.hyper_zeeman_num</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/physics/hyperfine.html' | relative_url }}">qspec.hyperfine</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/physics/inv_cm_to_freq.html' | relative_url }}">qspec.inv_cm_to_freq</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/physics/inv_cm_to_wavelength.html' | relative_url }}">qspec.inv_cm_to_wavelength</a></li>

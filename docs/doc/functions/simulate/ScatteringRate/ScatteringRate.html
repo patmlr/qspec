@@ -44,25 +44,16 @@ title: qspec.simulate.ScatteringRate
 <dd class="field-par">
 <dl>
 <dt>atom<span class="classifier"><em>qspec.simulate._simulate_cpp.Atom</em></span></dt>
-<dd class="field-desc"><p>representing the perturbative scattering rate of a closed electronic transition.
-    The spectrum is excited by a laser with the specified 'polarization'
-    and recorded with a FDR defined by 'geometry'. An external magnetic field can be defined through 'b'.</p></dd>
+<dd class="field-desc"><p>The investigated atom.</p></dd>
 <dt>laser<span class="classifier"><em>qspec.simulate._simulate_cpp.Laser</em></span></dt>
-<dd class="field-desc"><p>epresenting the perturbative scattering rate of a closed electronic transition.
-    The spectrum is excited by a laser with the specified 'polarization'
-    and recorded with a FDR defined by 'geometry'. An external magnetic field can be defined through 'b'.</p></dd>
+<dd class="field-desc"><p>The incident laser beam.</p></dd>
 <dt>i_decay<span class="classifier"><em>int</em></span></dt>
-<dd class="field-desc"><p>resenting the perturbative scattering rate of a closed electronic transition.
-    The spectrum is excited by a laser with the specified 'polarization'
-    and recorded with a FDR defined by 'geometry'. An external magnetic field can be defined through 'b'.</p></dd>
+<dd class="field-desc"><p>The indexing of the transition in atom.decay_map.</p></dd>
 <dt>geometry<span class="classifier"><em>qspec.simulate._simulate.Geometry</em></span></dt>
-<dd class="field-desc"><p>esenting the perturbative scattering rate of a closed electronic transition.
-    The spectrum is excited by a laser with the specified 'polarization'
-    and recorded with a FDR defined by 'geometry'. An external magnetic field can be defined through 'b'.</p></dd>
+<dd class="field-desc"><p>The geometry of the FDR.</p></dd>
 <dt>b<span class="classifier"><em>Union[numpy.ndarray, Iterable, int, float]</em></span></dt>
-<dd class="field-desc"><p>ss representing the perturbative scattering rate of a closed electronic transition.
-    The spectrum is excited by a laser with the specified 'polarization'
-    and recorded with a FDR defined by 'geometry'. An external magnetic field can be defined through 'b'.</p></dd></dl>
+<dd class="field-desc"><p>The external magnetic field. Can be a vector or a scalar.
+         In the latter case, the magnetic field is aligned with the z-axis.</p></dd></dl>
 </dd>
 </dl></dd>
 </dl>
@@ -881,6 +872,9 @@ title: qspec.simulate.ScatteringRate
 <li class="spaced"><a href="{{ '/doc/functions/physics/get_f.html' | relative_url }}">qspec.get_f</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/physics/get_m.html' | relative_url }}">qspec.get_m</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/physics/hyper_zeeman.html' | relative_url }}">qspec.hyper_zeeman</a></li>
+<li class="spaced"><a href="{{ '/doc/functions/physics/hyper_zeeman_12.html' | relative_url }}">qspec.hyper_zeeman_12</a></li>
+<li class="spaced"><a href="{{ '/doc/functions/physics/hyper_zeeman_12_d.html' | relative_url }}">qspec.hyper_zeeman_12_d</a></li>
+<li class="spaced"><a href="{{ '/doc/functions/physics/hyper_zeeman_num.html' | relative_url }}">qspec.hyper_zeeman_num</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/physics/hyperfine.html' | relative_url }}">qspec.hyperfine</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/physics/inv_cm_to_freq.html' | relative_url }}">qspec.inv_cm_to_freq</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/physics/inv_cm_to_wavelength.html' | relative_url }}">qspec.inv_cm_to_wavelength</a></li>
