@@ -611,3 +611,21 @@ span.classifier::before {
     }
 
 }
+
+@media screen and (max-height: 620px) {
+
+    footer {
+        display: none;
+        visibility: hidden;
+        flex-direction: column;
+        flex: 0 0;
+        align-self: end;
+        position: sticky;
+        top: var(--header-height) + 100px;
+        bottom: 0px;
+        width: var(--header-width);
+        padding-right: calc(var(--border-padding) + var(--border-width));
+        margin: auto auto 20px auto;
+        }
+
+}

@@ -1,22 +1,22 @@
 <div class="bd-content-main">
 <article class="bd-article code-prose">
   <h1>qspec.simulate</h1>
-  <p>The main part of the simulate module consists of a class based framework to set up laser-atom interactions.
+  <p>The main part of <code>qspec.simulate</code> consists of a class based framework to set up laser-atom interactions.
     Using this system is comparable to drawing an energy level scheme. No mathematical knowledge is required.
     All mathematical objects, such as Hamiltonians or Rabi frequencies, are generated and used internally
     to calculate the rate equations, the Schr&ouml;dinger or master equation or a Monte-Carlo master equation.
     The class system is shown in the following sketch.
   </p>
   <p><img src="{{ '/assets/img/simulate-uml.svg' | relative_url }}"></p>
-  <p>A <a href="{{ '/doc/functions/simulate/State/State.html' | relative_url }}">State</a> is a single quantum mechanical state.
-    A <a href="{{ '/doc/functions/simulate/DecayMap/DecayMap.html' | relative_url }}">DecayMap</a> links multiple states
+  <p>A <a href="{{ '/doc/functions/simulate/State/State.html' | relative_url }}"><code>State</code></a> is a single quantum mechanical state.
+    A <a href="{{ '/doc/functions/simulate/DecayMap/DecayMap.html' | relative_url }}"><code>DecayMap</code></a> links multiple states
     with the same user-defined labels through spontaneous decay. A list of all states and the DecayMap object form
-    an <a href="{{ '/doc/functions/simulate/Atom/Atom.html' | relative_url }}">Atom</a>.
-    A <a href="{{ '/doc/functions/simulate/Laser/Laser.html' | relative_url }}">Laser</a> consists of a frequency,
-    an intensity, a <a href="{{ '/doc/functions/simulate/Polarization/Polarization.html' | relative_url }}">Polarization</a> and a directional vector.
-    The Atom and a list of lasers is combined in an <a href="{{ '/doc/functions/simulate/Interaction/Interaction.html' | relative_url }}">Interaction</a>.
+    an <a href="{{ '/doc/functions/simulate/Atom/Atom.html' | relative_url }}"><code>Atom</code></a>.
+    A <a href="{{ '/doc/functions/simulate/Laser/Laser.html' | relative_url }}"><code>Laser</code></a> consists of a frequency,
+    an intensity, a <a href="{{ '/doc/functions/simulate/Polarization/Polarization.html' | relative_url }}"><code>Polarization</code></a> and a directional vector.
+    The Atom and a list of lasers is combined in an <a href="{{ '/doc/functions/simulate/Interaction/Interaction.html' | relative_url }}"><code>Interaction</code></a>.
     The differential equation solvers can be accessed directly from the Interaction.
-    An <a href="{{ '/doc/functions/simulate/Environment/Environment.html' | relative_url }}">Environment</a>
+    An <a href="{{ '/doc/functions/simulate/Environment/Environment.html' | relative_url }}"><code>Environment</code></a>
     can be defined to alter the quantum state energies. At the moment, this only supports linear Zeeman shifts.
     The list of the here shown member functions is not complete for better clarity.
   </p>

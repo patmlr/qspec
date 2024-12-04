@@ -104,7 +104,7 @@ def gen_modules():
     for file in FILES:
         html = '\n'.join([t.strip() for t in load_module(file)])
         html = html.replace('_table_', html_table)
-        i = html.find(f'{file}.html')
+        i = html.find(f'/modules/{file}.html')
 
         i = html[:i].rfind('<li')
         j = i + html[i + 1:].find('>') + 2
@@ -327,7 +327,7 @@ def gen_functions():
 
 
 if __name__ == '__main__':
-    gen_table()
-    gen_doc()
+    # gen_table()
+    # gen_doc()
     gen_modules()
-    gen_functions()
+    # gen_functions()
