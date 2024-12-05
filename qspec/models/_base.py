@@ -329,9 +329,12 @@ class Model:
         try:
             with np.errstate(divide='ignore', invalid='ignore'):
                 ret = eval(expr, {}, {'self': self, 'args': args})
-            return 0. if np.isnan(ret) or np.isinf(ret) else ret
+            if isinstance(ret, float):
+                return 0. if np.isnan(ret) or np.isinf(ret) else ret
+            ret[np.isnan(ret) + np.isinf(ret)] = 0.
+            return ret
         except ZeroDivisionError:
-            return 0.
+            return np.zeros_like(args[0], dtype=float)
 
     def update_args(self, args):
         """
@@ -506,9 +509,15 @@ class Offset(Model):
         """
         if self.update_on_call:
             self.gen_offset_masks(x)
-        ret = np.zeros_like(x)
-        for i, mask in enumerate(self.offset_masks):
-            ret[mask] = _poly(x[mask], *_args_ordered(args, self.offset_map[i]))
+        if not isinstance(args[0], float) and len(args[0].shape) > 1:
+            ret = np.zeros((x.shape[0], args[0].shape[1]), dtype=float)
+            for i, mask in enumerate(self.offset_masks):
+                _mask = np.broadcast_to(mask, ret.shape)
+                ret[_mask] = _poly(x[mask][:, None], *_args_ordered(args, self.offset_map[i])).flatten()
+        else:
+            ret = np.zeros_like(x)
+            for i, mask in enumerate(self.offset_masks):
+                ret[mask] = _poly(x[mask], *_args_ordered(args, self.offset_map[i]))
         return ret
 
     def gen_offset_map(self):

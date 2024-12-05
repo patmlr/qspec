@@ -7,10 +7,89 @@ title: Tutorials.Models
 
 <p>
   In this tutorial, a basic example is shown how <code>qspec.models</code> can be used to construct lineshape models
-  for data fitting.
+    for data fitting.
 </p>
+<p>
+  First, we import all the required modules and generate our lineshape model. We can print all parameters of the model
+    and set them to new values. Additionally, we can fix certain parameters for fitting by changing the list
+    <code>model.fixes</code>. Here, we define <code>sigma</code> as a <a href="https://doi.org/10.1109/TSSC.1968.300117"><em>Prior</em></a>,
+    which is basically a known parameter with uncertainty.
+</p>
+
+<div class="py-source"><pre>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">qspec.models</span> <span class="k">as</span> <span class="nn">mod</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+
+<span class="c1"># Generate the model used in this tutorial</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">mod</span><span class="o">.</span><span class="n">Offset</span><span class="p">(</span>  <span class="c1"># Add a y-axis shift (off0e0)</span>
+
+    <span class="n">mod</span><span class="o">.</span><span class="n">NPeak</span><span class="p">(</span>  <span class="c1"># Add a single (n_peaks=1)</span>
+        <span class="c1"># x-axis shift (x0) and an intensity (p0)</span>
+
+        <span class="n">mod</span><span class="o">.</span><span class="n">Voigt</span><span class="p">(),</span> <span class="n">n_peaks</span><span class="o">=</span><span class="mi">1</span><span class="p">))</span> <span class="c1"># Add a Voigt lineshape</span>
+        <span class="c1"># with Lorentzian (Gamma) and Gaussian (sigma) widths</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">Parameter names: </span><span class="si">{</span><span class="n">model</span><span class="o">.</span><span class="n">names</span><span class="si">}</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="c1"># &gt;&gt;&gt; Parameter names: [&#39;Gamma&#39;, &#39;sigma&#39;, &#39;x0&#39;, &#39;p0&#39;, &#39;off0e0&#39;]</span>
+
+<span class="c1"># Change all parameter values and if they stay fixed during fitting at once</span>
+<span class="n">model</span><span class="o">.</span><span class="n">set_vals</span><span class="p">([</span><span class="mf">20.</span><span class="p">,</span> <span class="mf">6.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">10.</span><span class="p">,</span> <span class="mf">3.</span><span class="p">])</span>
+<span class="n">model</span><span class="o">.</span><span class="n">set_fixes</span><span class="p">([</span><span class="kc">False</span><span class="p">,</span> <span class="s1">&#39;5(0.7)&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">False</span><span class="p">])</span>
+</pre></div>
+
+<p>
+  Now, we generate some data for the fit. The data is normally distributed around the model with its current parameters.
+</p>
+
+<div class="py-source"><pre>
+<span class="c1"># Generate some random data for this tutorial</span>
+<span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-</span><span class="mf">80.</span><span class="p">,</span> <span class="mf">80.</span><span class="p">,</span> <span class="mi">81</span><span class="p">)</span>  <span class="c1"># x-values</span>
+<span class="n">sigma_y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full_like</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">)</span>  <span class="c1"># y-uncertainties</span>
+<span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">model</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="o">*</span><span class="n">model</span><span class="o">.</span><span class="n">vals</span><span class="p">),</span> <span class="n">sigma_y</span><span class="p">)</span>
+<span class="c1"># Random y-values around the model</span>
+</pre></div>
+
+<p>
+  We change the initial parameters of the peak position and intensity to later compare the model before
+    and after fitting. During the fit, <code>model.vals</code> is set to the optimized parameters.
+    Therefore, we save our initial values to <code>p_init</code>.
+    We set <code>report=True</code> to get a summary of the fit results.
+</p>
+
+<div class="py-source"><pre>
+<span class="c1"># Change the initial value of the peak position and intensity</span>
+<span class="n">model</span><span class="o">.</span><span class="n">set_val</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mf">15.</span><span class="p">)</span>  <span class="c1"># Parameter 2 (x0), the peak position</span>
+<span class="n">model</span><span class="o">.</span><span class="n">set_val</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mf">5.</span><span class="p">)</span>  <span class="c1"># Parameter 3 (p0), the peak intensity</span>
+<span class="n">p_init</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">vals</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>  <span class="c1"># Copy the initial values for the plot</span>
+
+<span class="c1"># Fit the constructed model to the data</span>
+<span class="n">popt</span><span class="p">,</span> <span class="n">pcov</span><span class="p">,</span> <span class="n">info</span> <span class="o">=</span> <span class="n">mod</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span>
+    <span class="n">model</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">sigma_y</span><span class="o">=</span><span class="n">sigma_y</span><span class="p">,</span> <span class="n">report</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+
+{% include tutorial-3-output-0.html %}
+
+<p>
+  Finally, we plot everything.
+</p>
+
+<div class="py-source"><pre>
+<span class="c1"># Plot the data, the initial model and the fitted model</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">errorbar</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">yerr</span><span class="o">=</span><span class="n">sigma_y</span><span class="p">,</span> <span class="n">fmt</span><span class="o">=</span><span class="s1">&#39;.k&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Data&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">model</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="o">*</span><span class="n">p_init</span><span class="p">),</span> <span class="s1">&#39;-C0&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Initial model&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">model</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="o">*</span><span class="n">popt</span><span class="p">),</span> <span class="s1">&#39;-C1&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Fitted model&#39;</span><span class="p">)</span>
+
+<span class="c1"># Improve the plot</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;x&#39;</span><span class="p">),</span> <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;y&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">subplots_adjust</span><span class="p">(</span><span class="n">left</span><span class="o">=</span><span class="mf">0.08</span><span class="p">,</span> <span class="n">bottom</span><span class="o">=</span><span class="mf">0.09</span><span class="p">,</span> <span class="n">top</span><span class="o">=</span><span class="mf">0.99</span><span class="p">,</span> <span class="n">right</span><span class="o">=</span><span class="mf">0.99</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+
+<p><img src="{{ '/assets/img/models-0.svg' | relative_url }}"></p>
 
 <div class="o-prev">
     <a href="{{ '/tutorials/hfs.html' | relative_url }}"><div class="prev-next-button">&larr;&nbsp;&nbsp;Previous</div></a>
-    <!--a href="{{ '/tutorials/models.html | relative_url }}"><div class="prev-next-button">Next&nbsp;&nbsp;&rarr;</div></a-->
+    <!--a href="{{ '/tutorials/models.html' | relative_url }}"><div class="prev-next-button">Next&nbsp;&nbsp;&rarr;</div></a-->
 </div>
