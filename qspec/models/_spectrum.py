@@ -76,10 +76,10 @@ class Spectrum(Model):
 
 
 class Lorentz(Spectrum):
-    """
-    A Lorentzian peak function.
-    """
     def __init__(self):
+        """
+        A Lorentzian peak function.
+        """
         super().__init__()
         self.type = 'Lorentz'
 
@@ -100,10 +100,10 @@ class Lorentz(Spectrum):
 
 
 class LorentzQI(Spectrum):
-    """
-    A Lorentzian peak function including a dispersive term for consideration of quantum interference (QI) effects.
-    """
     def __init__(self):
+        """
+        A Lorentzian peak function including a dispersive term for consideration of quantum interference (QI) effects.
+        """
         super().__init__()
         self.type = 'LorentzQI'
 
@@ -135,10 +135,10 @@ class LorentzQI(Spectrum):
 
 
 class Gauss(Spectrum):
-    """
-    A Gaussian peak function.
-    """
     def __init__(self):
+        """
+        A Gaussian peak function.
+        """
         super().__init__()
         self.type = 'Gauss'
 
@@ -158,10 +158,10 @@ class Gauss(Spectrum):
 
 
 class Voigt(Spectrum):
-    """
-    A Voigt peak function.
-    """
     def __init__(self):
+        """
+        A Voigt peak function.
+        """
         super().__init__()
         self.type = 'Voigt'
 
@@ -176,10 +176,10 @@ class Voigt(Spectrum):
 
 
 class VoigtDerivative(Spectrum):
-    """
-    A differential Voigt peak function.
-    """
     def __init__(self):
+        """
+        The first derivative of a Voigt peak function.
+        """
         super().__init__()
         self.type = 'VoigtDerivative'
 
@@ -196,10 +196,10 @@ class VoigtDerivative(Spectrum):
 
 
 class VoigtAsy(Spectrum):
-    """
-    An asymmetric Voigt peak function.
-    """
     def __init__(self):
+        """
+        An asymmetric Voigt peak function.
+        """
         super().__init__()
         self.type = 'VoigtAsy'
 
@@ -216,10 +216,10 @@ class VoigtAsy(Spectrum):
 
 
 class VoigtCEC(Spectrum):
-    """
-    A series of Voigt peak functions.
-    """
     def __init__(self):
+        """
+        A series of `n` Voigt peak functions shifted by `i * shift` and scaled by `i * ratio`, where `0 <= i <= n`.
+        """
         super().__init__()
         self.type = 'VoigtCEC'
 
@@ -263,6 +263,8 @@ def _gauss_chi2_fwhm(sigma, xi):
 class GaussChi2(Spectrum):  # TODO: The fwhm of GaussChi2 is fitting quite well now, but could be improved further.
     """
     An analytical convolution of a Gaussian with a Boltzmann distribution.
+    This could be the velocity distribution of a thermalized ion ensemble produced
+    on a linear or noisy voltage potential.
     """
     def __init__(self):
         super().__init__()

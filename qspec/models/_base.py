@@ -59,11 +59,12 @@ def _poly(x, *args):
 
 
 class Model:
-    """
-    Base class for all models.
-    """
-
     def __init__(self, model=None):
+        """
+        Base class for all models.
+
+        :param model: A submodel whose parameters are adopted by this model.
+        """
         self.model = model
         self.type = 'Model'
 
@@ -72,10 +73,12 @@ class Model:
 
     def evaluate(self, x, *args, **kwargs):  # Reimplement this function in subclasses.
         """
+        The main function of the model. This is executed when the model is called.
+
         :param x: The input values.
         :param args: The function parameters. Must have length self.size.
         :param kwargs: Additional keyword arguments.
-        :returns: The function results at the input values 'x'.
+        :returns: The function values at the input values `x`.
         """
         pass
 
@@ -106,6 +109,8 @@ class Model:
     def description(self):
         """
         A description of the model hierarchy.
+
+        :returns: A str representing the model hierarchy.
         """
         label = ''
         super_model = self
@@ -176,7 +181,7 @@ class Model:
         Set all vals, fixes and links with one nested list.
 
         :param pars: A nested list of shape (self.size, 3).
-        :param force: The 'force' parameter of the 'set_val', 'set_fix' and 'set_link' functions.
+        :param force: The `force` parameter of the `set_val`, `set_fix` and `set_link` functions.
         :returns: None.
         """
         for i, p in enumerate(pars):
@@ -188,8 +193,8 @@ class Model:
         """
         Set all vals with one list.
 
-        :param vals: A list of shape (self.size, ).
-        :param force: The 'force' parameter of the 'set_val' function.
+        :param vals: A list of shape (`self.size`, ).
+        :param force: The `force` parameter of the `set_val` function.
         :returns: None.
         """
         for i, val in enumerate(vals):
@@ -199,8 +204,8 @@ class Model:
         """
         Set all fixes with one list.
 
-        :param fixes: A list of shape (self.size, ).
-        :param force: The 'force' parameter of the 'set_fix' function.
+        :param fixes: A list of shape (`self.size`, ).
+        :param force: The `force` parameter of the `set_fix` function.
         :returns: None.
         """
         for i, fix in enumerate(fixes):
@@ -210,8 +215,8 @@ class Model:
         """
         Set all links with one list.
 
-        :param links: A list of shape (self.size, ).
-        :param force: The 'force' parameter of the 'set_link' function.
+        :param links: A list of shape (`self.size`, ).
+        :param force: The `force` parameter of the `set_link` function.
         :returns: None.
         """
         for i, link in enumerate(links):
@@ -231,8 +236,8 @@ class Model:
             if self.model is None:
                 self.vals[i] = val if force else float(val)
             else:
-                self.model.set_val(i, val, force=False)  # Set val for all sub-models
-                # to ensure set_val is called for a ListedModel if one is part of the sub-models.
+                self.model.set_val(i, val, force=False)  # Set val for all submodels
+                # to ensure set_val is called for a ListedModel if one is part of the submodels.
                 # This is only needed for the vals since these may be predicted by the specific model.
                 # Everything else is handled by the top-model.
         else:
@@ -339,13 +344,13 @@ class Model:
     def update_args(self, args):
         """
         :param args: The parameters.
-        :returns: the parameters updated with the parameter expressions.
+        :returns: The parameters updated with the parameter expressions.
         """
         return tuple(self._eval_zero_division(args, expr) for expr in self.expressions)
 
     def update(self):
         """
-        Updates self.vals with updated parameters, see self.update_args.
+        Updates `self.vals` with updated parameters, see self.update_args.
 
         :returns: None.
         """
@@ -378,7 +383,7 @@ class Model:
     def fit_prepare(self):
         """
         :returns: fixed, bounds. A list of bool values which parameters are not varied in a fit
-         and a list of bounds for the fit parameters. See parameters 'p0_fixed' and 'bounds' of 'qspec.curve_fit'.
+         and a list of bounds for the fit parameters. See parameters `p0_fixed` and `bounds` of `qspec.curve_fit`.
         """
         bounds = (-np.inf, np.inf)
         fixed = [fix for fix in self.fixes]
@@ -412,10 +417,10 @@ class Model:
 
 
 class Empty(Model):
-    """
-    An empty model, returning zeros with the same shape as x.
-    """
     def __init__(self):
+        """
+        An empty model, returning zeros with the same shape as x.
+        """
         super().__init__(model=None)
         self.type = 'Empty'
 
@@ -424,10 +429,13 @@ class Empty(Model):
 
 
 class NPeak(Model):
-    """
-    Evaluates the given 'model' at the positions x\ :sub:`i` with scalings p\ :sub:`i` where i < 'n_peaks'.
-    """
     def __init__(self, model, n_peaks=1):
+        """
+        Evaluates the given `model` at the positions x\ :sub:`i` with scalings p\ :sub:`i` where i < `n_peaks`.
+
+        :param model: A submodel whose parameters are adopted by this model.
+        :param n_peaks: The number of times the submodel is copied.
+        """
         super().__init__(model=model)
         self.type = 'NPeak'
         self.n_peaks = int(n_peaks)
@@ -455,12 +463,11 @@ class NPeak(Model):
 
 
 class Offset(Model):
-    """
-    Cuts the x-axis and adds y-axis offsets to every segment.
-    """
     def __init__(self, model=None, x_cuts=None, offsets=None):
         """
-        :param model: The model the offset will be added to. If None, the offset will be added to zero.
+        Cuts the x-axis and adds y-axis offsets to every segment.
+        
+        :param model: The submodel the offset will be added to. If None, the offset will be added to zero.
         :param x_cuts: x values where to cut the x-axis.
         :param offsets: A list of maximally considered polynomial orders for each slice.
          The list must have length len(x_cuts) + 1.
@@ -492,7 +499,7 @@ class Offset(Model):
         """
         Set the values where to cut the x-axis into intervals with individual offset parameters.
 
-        :param x_cuts: A list of x values.
+        :param x_cuts: A list of x values where to cut the x-axis.
         :returns: None.
         """
         x_cuts = list(x_cuts)
@@ -502,7 +509,6 @@ class Offset(Model):
 
     def _offset(self, x, *args):
         """
-
         :param x: The input values.
         :param args: The function parameters.
         :returns: The offset polynomial.
@@ -537,7 +543,7 @@ class Offset(Model):
 
     def gen_offset_masks(self, x):
         """
-        Generate the array masks corresponding to the 'x_cuts'.
+        Generate the array masks corresponding to the `x_cuts`.
 
         :param x: The input values.
         :returns: None.
@@ -549,7 +555,7 @@ class Offset(Model):
 
     def guess_offset(self, x, y):
         """
-        Guess the first two polynomial orders for a given data set.
+        Guess the first two polynomial orders for a given data set (const and linear).
 
         :param x: The input values.
         :param y: The y data.
@@ -564,10 +570,12 @@ class Offset(Model):
 
 
 class Amplifier(Model):
-    """
-    A polynomial of order 'order'.
-    """
     def __init__(self, order=None):
+        """
+        A polynomial of order `order`.
+
+        :param order: The maximum considered order of the polynomial.
+        """
         super().__init__(model=None)
         self.type = 'Amplifier'
         if order is None:
@@ -595,12 +603,15 @@ class Amplifier(Model):
 
 
 class Custom(Model):
-    """
-    A model with custom parameters. Without a submodel, Custom returns the user-specified parameters as an array
-    regardless of the input x. Otherwise, simply the submodel is called and the custom parameters
-    can be connected to other parameters by the user.
-    """
     def __init__(self, model=None, parameters=None):
+        """
+        A model with custom parameters. Without a submodel, Custom returns the user-specified parameters as an array
+        regardless of the input `x`. Otherwise, the submodel is called and the custom parameters
+        can be connected to other parameters by the user.
+
+        :param model: A submodel whose parameters are adopted by this model.
+        :param parameters: A list of str, representing the names of the custom parameters.
+        """
         super().__init__(model=model)
         self.type = 'Custom'
         if parameters is None:
@@ -617,11 +628,13 @@ class Custom(Model):
 
 
 class YPars(Model):
-    """
-    Concatenates the parameters of the submodel with uncertainties as fix states with the y-axis array resulting
-     from calling the submodel. This is used internally in 'qspec.models.fit'.
-    """
     def __init__(self, model):
+        """
+        Concatenates the *Prior* parameters of the submodel, that have uncertainties as `fix` states,
+        with the y-axis array resulting from calling the submodel. This is used internally in `qspec.models.fit`.
+
+        :param model: A submodel whose parameters are adopted by this model.
+        """
         super().__init__(model=model)
         self.type = 'YPars'
 
@@ -633,10 +646,14 @@ class YPars(Model):
 
 
 class Listed(Model):
-    """
-    An abstract class for models with multiple submodels.
-    """
     def __init__(self, models, labels=None):
+        """
+        An abstract class for models with multiple submodels.
+
+        :param models: A list of submodels whose parameters are adopted by this model.
+        :param labels: A list of labels with the same length as `models`.
+         The labels are appended to the parameter names of each submodel.
+        """
         super().__init__(model=None)
         self.type = 'Listed'
 
@@ -706,10 +723,14 @@ class Listed(Model):
 
 
 class Summed(Listed):
-    """
-    A model summing over all submodels.
-    """
     def __init__(self, models, labels=None):
+        """
+        A `Listed` model summing over all submodels with individual `center` and `int` parameters.
+
+        :param models: A list of submodels whose parameters are adopted by this model.
+        :param labels: A list of labels with the same length as `models`.
+         The labels are appended to the parameter names of each submodel.
+        """
         super().__init__(models, labels=labels)
         self.type = 'Summed'
 
@@ -739,10 +760,12 @@ class Summed(Listed):
 
 
 class Linked(Listed):
-    """
-    A model linking all "link=True" parameters of the submodels.
-    """
     def __init__(self, models):
+        """
+        A `Listed` model linking all `link=True` parameters of the submodels.
+
+        :param models: A list of submodels whose parameters are adopted by this model.
+        """
         super().__init__(models, labels=None)
         self.type = 'Linked'
 

@@ -414,7 +414,7 @@ def round_to_n(x: array_like, n: int) -> (scalar, int):
 
 def factorial(n: array_like):
     """
-    :param n: The integer number.
+    :param n: The integer numbers. Float types are cast to int types.
     :returns: n! (array compatible).
     """
     n = np.asarray(n, dtype=int)
@@ -431,8 +431,8 @@ def factorial(n: array_like):
 def asarray_optional(a: Optional[array_like], **kwargs):
     """
     :param a: Input data, see numpy docs.
-    :param kwargs: The keyword arguments are passed to numpy.asarray.
-    :returns: None if 'a' is None else 'numpy.asarray(a, \*\*kwargs)'.
+    :param kwargs: The keyword arguments are passed to `numpy.asarray`.
+    :returns: None if `a` is None else `numpy.asarray(a, **kwargs)`.
     """
     return None if a is None else np.asarray(a, **kwargs)
 
@@ -441,7 +441,7 @@ def in_nested(a, nested: Iterable) -> bool:
     """
     :param a: The element to look for.
     :param nested: The nested list.
-    :returns: Whether a is inside the 'nested' list.
+    :returns: Whether `a` is inside the `nested` list.
     """
     if not isinstance(nested, Iterable):
         return False
