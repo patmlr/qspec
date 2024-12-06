@@ -7,6 +7,7 @@
     height: 100%;
     min-width: auto;
     overflow: auto;
+    scroll-behavior: smooth;
     --topnav-height: 64px;
     --total-width: 1540px;
     --header-height: 500px;
@@ -220,6 +221,20 @@ pre.code-block {
 
 .py-source {
     }
+
+
+span.mod0 { color: #bcbec4; }
+span.mod-cov0 { color: #797704; }
+span.mod-cov11 { color: #01fe00; }
+span.mod-cov103 { color: #7c8300; }
+span.mod-cov031 { color: #a75800; }
+span.mod-cov132 { color: #57a800; }
+span.mod-cov034 { color: #ab5400; }
+span.mod-cov168 { color: #2ad500; }
+span.mod-cov072 { color: #db2400; }
+span.mod-suc { color: #4bbe13; }
+span.mod-num { color: #bcbec4;}  // #2aacb8
+
 
 .bd-container-right {
     display: block;

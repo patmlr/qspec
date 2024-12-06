@@ -1,3 +1,10 @@
+# -*- coding: utf-8 -*-
+"""
+examples.tutorial_1
+===================
+
+Tutorial 1 from the website: Getting started.
+"""
 
 import numpy as np
 import qspec as qs

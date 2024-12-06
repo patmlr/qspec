@@ -61,47 +61,50 @@ title: qspec.models.fit
 <span class="o"><span class="pre">**</span></span>
 <span class="n"><span class="pre">kwargs</span></span>
 </em>
-<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/models\_fit.py#L67-L239' }}"><span class="sig-source">[source]</span></a>
+<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/models\_fit.py#L67-L244' }}"><span class="sig-source">[source]</span></a>
 </dt>
-<dd class="field-body"><p></p>
+<dd class="field-body"><p>Fit a <code>Model</code> from <code>qspec.models</code> to data. This fit routine encapsulates the <code>qspec.curve_fit</code>
+    and the <code>qspec.odr_fit</code> routines to facilitate the use of all modular fit model features,
+    such as *Priors* and <code>Linked</code> fitting.</p>
 <dl class="field-list">
 <dt class="field-head">Parameters<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
 <dt>model<span class="classifier"><em>qspec.models._base.Model</em></span></dt>
-<dd class="field-desc"><p>The model to fit.</p></dd>
+<dd class="field-desc"><p>The <code>Model</code> to fit.</p></dd>
 <dt>x<span class="classifier"><em>Union[numpy.ndarray, Iterable]</em></span></dt>
-<dd class="field-desc"><p>The x data. Can be any object accepted by the model.
-     If model is a Linked model, x should be a list of objects compatible with the linked models.</p></dd>
+<dd class="field-desc"><p>The input data. Can be any object accepted by the model.
+     If model is a Linked model, <code>x</code> should be a list of objects compatible with the linked models.</p></dd>
 <dt>y<span class="classifier"><em>Union[numpy.ndarray, Iterable]</em></span></dt>
 <dd class="field-desc"><p>The y data. This has to be a 1-d array or a list of 1-d arrays if model is a Linked model.</p></dd>
 <dt>sigma_x<span class="classifier"><em>Union[numpy.ndarray, Iterable]</em></span></dt>
 <dd class="field-desc"><p>The uncertainties of the x-values. This is only compatible with Monte-Carlo sampling and the
-     odr_fit routine. If sigma_x is not None, no routine is specified and mc_sigma == 0, the routine is automatically
-     set to odr_fit.</p></dd>
+     odr_fit routine. If <code>sigma_x</code> is not <code>None</code>, no routine is specified and <code>mc_sigma == 0</code>,
+     the routine is automatically set to odr_fit.</p></dd>
 <dt>sigma_y<span class="classifier"><em>Union[numpy.ndarray, Iterable, Callable]</em></span></dt>
 <dd class="field-desc"><p>The uncertainties of the y-values.
-     This has to be a 1-d array or a list of 1-d arrays if model is a Linked model and have the same shape as 'y'.
-     If routine is 'curve_fit', sigma may be a function g such that 'g(x, y, model(x, \*params), \*params) -> sigma'.
-     g should accept the same x as the model and y and model(x, \*params) as 1-d arrays.</p></dd>
+     This has to be a 1-d array or a list of 1-d arrays if model is a Linked model and have the same shape as <code>y</code>.
+     If routine is <code>curve_fit</code>, sigma may be a function <code>g</code> such that <code>g(x, y, model(x, *params), *params) -> sigma</code>.
+     <code>g</code> should accept the same <code>x</code> as the <code>model</code> while <code>y</code> and <code>model(x, *params)</code> should be 1-d arrays.</p></dd>
 <dt>report<span class="classifier"><em>bool</em></span></dt>
 <dd class="field-desc"><p>Whether to print the fit results.</p></dd>
 <dt>routine<span class="classifier"><em>Union[Callable, str]</em></span></dt>
-<dd class="field-desc"><p>The routine to use for fitting. Currently supported are {curve_fit, odr_fit}.
-     If None, curve_fit is used. See 'sigma_x' for one exception.</p></dd>
+<dd class="field-desc"><p>The routine to use for fitting. Currently supported are {'curve_fit', 'odr_fit'}.
+     If <code>None</code>, <code>curve_fit</code> is used. See <code>sigma_x</code> for one exception.</p></dd>
 <dt>guess_offset<span class="classifier"><em>bool</em></span></dt>
 <dd class="field-desc"><p>Guess initial parameters for Offset models.
-     Currently, this is not working if x is not a 1d-array.</p></dd>
+     Currently, this is not working if <code>x</code> is not a 1d-array.</p></dd>
 <dt>mc_sigma<span class="classifier"><em>int</em></span></dt>
-<dd class="field-desc"><p>The number of samples to generate from the data. If it is 0, no Monte-Carlo sampling will be done.
+<dd class="field-desc"><p>The number of samples to generate. If 0, no Monte-Carlo sampling will be done.
      This is not available with linked fitting.</p></dd>
 <dt>kwargs<span class="classifier"><em>None</em></span></dt>
-<dd class="field-desc"><p>Additional kwargs to pass to the fit 'routine'.</p></dd></dl>
+<dd class="field-desc"><p>Additional kwargs to pass to the fit <code>routine</code>.</p></dd></dl>
 </dd><dt class="field-head">Returns<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>out<span class="classifier"><em>None</em></span></dt>
-<dd class="field-desc"><p>The optimized parameters their covariance matrix and a dictionary containing info about the fit.
+<dt>(popt, pcov, info)<span class="classifier"><em>None</em></span></dt>
+<dd class="field-desc"><p> The optimized parameters their covariance matrix
+     and a dictionary containing info about the fit.
     :raises (ValueError, TypeError):</p></dd></dl>
 </dd>
 </dl></dd>

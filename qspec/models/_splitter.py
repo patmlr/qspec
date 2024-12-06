@@ -152,7 +152,9 @@ class Splitter(Model):
 class SplitterSummed(Summed):
     def __init__(self, splitter_models):
         """
-        A `Summed` model of `Splitter` models.
+        A `Summed` model of `Splitter` submodels.
+
+        :param splitter_models: The `Splitter` submodels to sum over.
         """
         if any(not isinstance(model, Splitter) for model in splitter_models):
             raise TypeError('All models passed to \'SplitterSummed\' must have type \'Splitter\'.')

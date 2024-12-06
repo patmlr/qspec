@@ -12,15 +12,16 @@ title: qspec.models.YPars
 <em class="sig-param">
 <span class="n"><span class="pre">model</span></span>
 </em>
-<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/models\_base.py#L610-L623' }}"><span class="sig-source">[source]</span></a>
+<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/models\_base.py#L630-L645' }}"><span class="sig-source">[source]</span></a>
 </dt>
-<dd class="field-body"><p></p>
+<dd class="field-body"><p>Concatenates the *Prior* parameters of the submodel, that have uncertainties as <code>fix</code> states,
+        with the y-axis array resulting from calling the submodel. This is used internally in <code>qspec.models.fit</code>.</p>
 <dl class="field-list">
 <dt class="field-head">Parameters<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
 <dt>model<span class="classifier"><em>None</em></span></dt>
-<dd class="field-desc"><p></p></dd></dl>
+<dd class="field-desc"><p>A submodel whose parameters are adopted by this model.</p></dd></dl>
 </dd>
 </dl></dd>
 </dl>

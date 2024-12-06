@@ -742,25 +742,25 @@ extern "C"
 
     // @ScatteringRate
     __declspec(dllexport) void sr_generate_y(std::complex<double>* denominator, std::complex<double>* f_theta,
-        std::complex<double>* f_phi, int* counts, int* shape, double* y)
+        std::complex<double>* f_phi, size_t* counts, size_t* shape, double* y)
     {
-        int s0 = shape[0];
-        int s1 = shape[1];
-        int len_counts = shape[2];
-        int len_y = s0 * s1;
-        int sum_counts = 0;
+        size_t s0 = shape[0];
+        size_t s1 = shape[1];
+        size_t len_counts = shape[2];
+        size_t len_y = s0 * s1;
+        size_t sum_counts = 0;
         for (int i = 0; i < len_counts; ++i) {
             sum_counts += counts[i];
         }
-        int i = 0;
-        int ij = 0;
-        for (int x = 0; x < s0; ++x) {
-            for (int a = 0; a < s1; ++a) {
+        size_t i = 0;
+        size_t ij = 0;
+        for (size_t x = 0; x < s0; ++x) {
+            for (size_t a = 0; a < s1; ++a) {
                 i = 0;
-                for (int c = 0; c < len_counts; ++c) {
+                for (size_t c = 0; c < len_counts; ++c) {
                     std::complex<double> c_theta(0., 0.);
                     std::complex<double> c_phi(0., 0.);
-                    for (int j = 0; j < counts[c]; ++j) {
+                    for (size_t j = 0; j < counts[c]; ++j) {
                         ij = i + j;
                         c_theta += denominator[x * sum_counts + ij] * f_theta[a * sum_counts + ij];
                         c_phi += denominator[x * sum_counts + ij] * f_phi[a * sum_counts + ij];

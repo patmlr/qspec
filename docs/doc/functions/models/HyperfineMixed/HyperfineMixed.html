@@ -26,31 +26,36 @@ title: qspec.models.HyperfineMixed
 </em>
 ,&nbsp;
 <em class="sig-param">
-<span class="n"><span class="pre">name</span></span>
+<span class="n"><span class="pre">label</span></span>
 </em>
 ,&nbsp;
 <em class="sig-param">
 <span class="n"><span class="pre">config</span></span>
 </em>
-<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/models\_splitter.py#L325-L438' }}"><span class="sig-source">[source]</span></a>
+<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/models\_splitter.py#L352-L478' }}"><span class="sig-source">[source]</span></a>
 </dt>
-<dd class="field-body"><p></p>
+<dd class="field-body"><p>Hyperfine-mixing model based on https://doi.org/10.1103/PhysRevA.55.2728 [1].</p>
 <dl class="field-list">
 <dt class="field-head">Parameters<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
 <dt>model<span class="classifier"><em>None</em></span></dt>
-<dd class="field-desc"><p></p></dd>
+<dd class="field-desc"><p>A submodel whose parameters are adopted by this model.</p></dd>
 <dt>i<span class="classifier"><em>None</em></span></dt>
-<dd class="field-desc"><p></p></dd>
+<dd class="field-desc"><p>The nuclear spin.</p></dd>
 <dt>j_l<span class="classifier"><em>None</em></span></dt>
-<dd class="field-desc"><p></p></dd>
+<dd class="field-desc"><p>The total lower state electron angular momentum.</p></dd>
 <dt>j_u<span class="classifier"><em>None</em></span></dt>
-<dd class="field-desc"><p></p></dd>
-<dt>name<span class="classifier"><em>None</em></span></dt>
-<dd class="field-desc"><p></p></dd>
+<dd class="field-desc"><p>The total upper state electron angular momentum.</p></dd>
+<dt>label<span class="classifier"><em>None</em></span></dt>
+<dd class="field-desc"><p>A label for the <code>Splitter</code> (isotope / isomer / transition).</p></dd>
 <dt>config<span class="classifier"><em>None</em></span></dt>
-<dd class="field-desc"><p></p></dd></dl>
+<dd class="field-desc"><p>The configuration of the hyperfine-induced mixing. This is a dictionary such as
+         <code>{'enabled_l'=False, 'enabled_u'=False, 'Jl'=[0.5, ], 'Ju'=[0.5, ], 'Tl'=[[1.]], 'Tu'=[[1.]], 'fl'=[0., ], 'fu'=[0., ], 'mu'=0.}</code>,
+         where 'enabled_l'/'enabled_u' decide if the corresponding lower/upper J mix, 'Jl'/'Ju' are lists of lower/upper
+         state J, including <code>j_l</code> and <code>j_u</code>, 'Tl'/'Tu' are matrix representations of
+         the electronic magnetic dipole operator, see [1], 'fl'/'fu' are lists of initial fine-structure energies
+         (can be omitted) and 'mu' is the magnetic dipole moment of the nucleus.</p></dd></dl>
 </dd>
 </dl></dd>
 </dl>

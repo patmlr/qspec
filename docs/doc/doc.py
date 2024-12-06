@@ -6,7 +6,7 @@ from docutils.core import publish_parts
 
 
 FOLDER_FILES = {'models', 'simulate', 'analyze'}
-FILES = sorted(['analyze', 'simulate', 'algebra', 'physics', 'models', 'tools', 'stats'])
+FILES = sorted(['models', 'analyze', 'simulate', 'algebra', 'physics', 'tools', 'stats'])  # , 'analyze', 'simulate', 'algebra', 'physics', 'tools', 'stats'
 
 
 def type_to_str(_type):
@@ -16,6 +16,11 @@ def type_to_str(_type):
 
 def rest_to_html(rest):
     html = publish_parts(rest, writer_name='html')['html_body']
+    return html
+
+
+def docstring_to_html(rest):
+    html = rest.replace(' `', ' <code>').replace('`', '</code>')
     return html
 
 
@@ -186,6 +191,8 @@ def _gen_func(f, file, temp, namespace, funcs, func_sig, func_doc):
     # Description
     i = temp.index('<!--p>desc</p-->') + 1
     desc = func_doc[f]
+    if f == 'LorentzQI':
+        print()
     if desc is None:
         desc = ''
     else:
@@ -193,12 +200,9 @@ def _gen_func(f, file, temp, namespace, funcs, func_sig, func_doc):
         if j == -1:
             j = desc.find(':return')
             if j == -1:
-                desc = ''
-            else:
-                desc = desc[:j].strip().strip('\n')
-        else:
-            desc = desc[:j].strip().strip('\n')
-    html += '\n' + temp[i].replace('_description_', desc)
+                j = desc.find(':raise')
+        desc = desc[:j].strip().strip('\n')
+    html += '\n' + temp[i].replace('_description_', docstring_to_html(desc))
 
     # Parameters
     html += '\n' + temp[i + 1]
@@ -225,12 +229,12 @@ def _gen_func(f, file, temp, namespace, funcs, func_sig, func_doc):
                     k = p_desc[j:].find(':return')
                     if k != -1:
                         k += j
-            p_desc = p_desc[j:k].strip().strip('\n')
+                p_desc = p_desc[j:k].strip().strip('\n')
         anno = p_sig.annotation
         html += ('\n' + '\n'.join(temp[i+2:i+4])
                  .replace('_par_', p)
                  .replace('_par-type_', type_to_str(anno))
-                 .replace('_par-description_', p_desc))
+                 .replace('_par-description_', docstring_to_html(p_desc)))
     html += '\n'.join(temp[i+4:i+6])
 
     # Returns
@@ -251,11 +255,19 @@ def _gen_func(f, file, temp, namespace, funcs, func_sig, func_doc):
                 r_desc = r_desc[k:].strip().strip('\n')
             else:
                 r_desc = ''
+
+        if r_desc and r_desc[0] == '(':
+            j = r_desc.find(')') + 1
+            ret = r_desc[:j]
+            r_desc = r_desc[j:]
+        else:
+            ret = 'out'
+
         anno = func_sig[f].return_annotation
         html += ('\n' + '\n'.join(temp[i+2:i+4])
-                 .replace('_ret_', 'out')
+                 .replace('_ret_', ret)
                  .replace('_ret-type_', type_to_str(anno))
-                 .replace('_ret-description_', r_desc))
+                 .replace('_ret-description_', docstring_to_html(r_desc)))
         html += '\n'.join(temp[i+4:i+6])
 
     html += '\n' + temp[i+6]
@@ -327,7 +339,7 @@ def gen_functions():
 
 
 if __name__ == '__main__':
-    # gen_table()
-    # gen_doc()
+    gen_table()
+    gen_doc()
     gen_modules()
-    # gen_functions()
+    gen_functions()

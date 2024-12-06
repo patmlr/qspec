@@ -1,80 +1,53 @@
+# -*- coding: utf-8 -*-
+"""
+examples.tutorial_3
+===================
+
+Tutorial 3 from the website: Construction and fitting of modular lineshape models.
+"""
 
 import numpy as np
-import qspec as qs
 import qspec.models as mod
 import matplotlib.pyplot as plt
 
-model = mod.Offset(mod.NPeak(mod.Voigt(), n_peaks=1))
+# Generate the model used in this tutorial
+model = mod.Offset(  # Add a y-axis shift (off0e0)
+
+    mod.NPeak(  # Add a single (n_peaks=1)
+        # x-axis shift (x0) and an intensity (p0)
+
+        mod.Voigt(), n_peaks=1))  # Add a Voigt lineshape
+# with Lorentzian (Gamma) and Gaussian (sigma) widths
 
 print(f'\nParameter names: {model.names}\n')
+# >>> Parameter names: ['Gamma', 'sigma', 'x0', 'p0', 'off0e0']
+
+# Change all parameter values and if they stay fixed during fitting at once
 model.set_vals([20., 6., 0., 10., 3.])
-model.set_fixes([True, False, False, False, False])
+model.set_fixes([False, '5(0.7)', False, False, False])
 
-x = np.linspace(-80., 80., 81)
-sigma_y = np.full_like(x, 0.5)
+# Generate some random data for this tutorial
+x = np.linspace(-80., 80., 81)  # x-values
+sigma_y = np.full_like(x, 0.5)  # y-uncertainties
 y = np.random.normal(model(x, *model.vals), sigma_y)
-popt, pcov, info = mod.fit(model, x, y, sigma_y=sigma_y, report=True)
+# Random y-values around the model
 
-plt.errorbar(x, y, yerr=sigma_y, fmt='.k')
-plt.plot(x, model(x, *popt), '-C1')
-plt.xlabel('x')
-plt.xlabel('y')
-plt.show()
-quit()
+# Change the initial value of the peak position and intensity
+model.set_val(2, 15.)  # Parameter 2 (x0), the peak position
+model.set_val(3, 5.)  # Parameter 3 (p0), the peak intensity
+p_init = model.vals.copy()  # Copy the initial values for the plot
 
-I, J0, J1 = 9/2, 1/2, 3/2  # Angular momentum quantum numbers
-
-x, y = np.load('data/87Sr+_partial.npy')
-sigma_y = np.sqrt(y)  # uncertainty of the photon counts
-x_cont = np.linspace(x[0], x[-1], 1001)  # Generate a dense x array for plotting
-
-model_qi = mod.HyperfineQI(None, I, J0, J1, name='87Sr+')
-# generate a quantum interference model.
-# Note that the first argument has no effect
-# and is just there for compatibility reasons.
-# The 'name' keyword is optional for unique console outputs.
-
-model = mod.Offset(mod.NPeak(model_qi, n_peaks=1))
-# Add a single x-axis shift and amplitude parameter (NPeak)
-# as well as a y-axis shift parameter (Offset)
-
-# model = mod.gen_model((I, J0, J1), qi=True, n_peaks=None)
-# generate a quantum interference hyperfine structure model.
-print(f'\nParameter names: {model.names}\n')
-
-model.set_vals([20., -1000.5, -36., 86., 0., 0., 0.1, -20., 2000., 0.])
-model.set_fixes([False, True, False, '86(2.0)', True, 'Au / Al', False, False, False, False])
-
+# Fit the constructed model to the data
 popt, pcov, info = mod.fit(
-    model, x, y, sigma_y=sigma_y, report=True, guess_offset=True)
+    model, x, y, sigma_y=sigma_y, report=True)
 
-res = y - model(x, *popt)
-y_qi = model(x_cont, *popt)
-sigma_y_qi = qs.propagate_fit(model, x_cont, popt, pcov, sample_size=10000)
+# We plot the data, the initial model and the fitted model
+plt.errorbar(x, y, yerr=sigma_y, fmt='.k', label='Data')
+plt.plot(x, model(x, *p_init), '-C0', label='Initial model')
+plt.plot(x, model(x, *popt), '-C1', label='Fitted model')
 
-popt[6] = 0
-y_0 = model(x_cont, *popt)
-
-fig, (m, r) = plt.subplots(2, 1, sharex='all', height_ratios=[3, 1], figsize=(6, 5))
-
-m.errorbar(x, y, yerr=sigma_y, fmt='.k', label='Data')
-m.plot(x_cont, y_qi, '-C1', label='QI fit', lw=2)
-m.plot(x_cont, y_0, '--C0', label=r'$geo = 0$', lw=2)
-m.fill_between(x_cont, sigma_y_qi[1], sigma_y_qi[2], color='C1', alpha=0.3)
-
-r.errorbar(x, res, yerr=sigma_y, fmt='.k', label='Residuals', zorder=-100)
-r.plot(x_cont, y_0 -  y_qi, '-C0', lw=2)
-
-x_lim = x_cont[0], x_cont[-1]
-
-r.hlines(0, *x_lim, colors='C1', lw=2)
-
-m.set_xlim(x_lim)
-m.set_ylabel('Photon events (counts)')
-m.legend()
-
-r.set_xlabel('Relative frequency (GHz)')
-r.set_ylabel('Residuals (counts)')
-
-plt.subplots_adjust(left=0.13, bottom=0.11, top=0.99, right=0.98, hspace=0.04)
+# Improve the plot
+plt.legend()
+plt.xlabel('x'), plt.ylabel('y')
+plt.subplots_adjust(left=0.08, bottom=0.09, top=0.99, right=0.99)
 plt.show()

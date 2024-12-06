@@ -81,11 +81,11 @@ def fit(model: _base.Model, x: array_iter, y: array_iter, sigma_x: array_iter = 
      the routine is automatically set to odr_fit.
     :param sigma_y: The uncertainties of the y-values.
      This has to be a 1-d array or a list of 1-d arrays if model is a Linked model and have the same shape as `y`.
-     If routine is `curve_fit`, sigma may be a function g such that `g(x, y, model(x, *params), *params) -> sigma`.
-     g should accept the same `x` as the `model` and `y` and `model(x, *params)` as 1-d arrays.
+     If routine is `curve_fit`, sigma may be a function `g` such that `g(x, y, model(x, *params), *params) -> sigma`.
+     `g` should accept the same `x` as the `model` while `y` and `model(x, *params)` should be 1-d arrays.
     :param report: Whether to print the fit results.
-    :param routine: The routine to use for fitting. Currently supported are {`curve_fit`, `odr_fit`}.
-     If None, `curve_fit` is used. See `sigma_x` for one exception.
+    :param routine: The routine to use for fitting. Currently supported are {'curve_fit', 'odr_fit'}.
+     If `None`, `curve_fit` is used. See `sigma_x` for one exception.
     :param guess_offset: Guess initial parameters for Offset models.
      Currently, this is not working if `x` is not a 1d-array.
     :param mc_sigma: The number of samples to generate. If 0, no Monte-Carlo sampling will be done.

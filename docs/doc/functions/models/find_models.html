@@ -22,7 +22,7 @@ title: qspec.models.find_models
 <span class="o"><span class="pre">=</span></span>
 <span class="default_value"><span class="pre">None</span></span>
 </em>
-<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/models\_helper.py#L107-L129' }}"><span class="sig-source">[source]</span></a>
+<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/models\_helper.py#L107-L130' }}"><span class="sig-source">[source]</span></a>
 </dt>
 <dd class="field-body"><p></p>
 <dl class="field-list">
@@ -30,16 +30,17 @@ title: qspec.models.find_models
 <dd class="field-par">
 <dl>
 <dt>model<span class="classifier"><em>qspec.models._base.Model</em></span></dt>
-<dd class="field-desc"><p>The model to search.</p></dd>
+<dd class="field-desc"><p>The model to search in.</p></dd>
 <dt>sub_model<span class="classifier"><em>Union[qspec.models._base.Model, type]</em></span></dt>
-<dd class="field-desc"><p>The sub model to find.</p></dd>
+<dd class="field-desc"><p>The submodel to find.</p></dd>
 <dt>model_list<span class="classifier"><em>Iterable</em></span></dt>
-<dd class="field-desc"><p>The initial list of models to return.</p></dd></dl>
+<dd class="field-desc"><p>A list of models to append the found submodel to.</p></dd></dl>
 </dd><dt class="field-head">Returns<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
 <dt>out<span class="classifier"><em>None</em></span></dt>
-<dd class="field-desc"><p>This function returns a list of the first models of every branch in model.</p></dd></dl>
+<dd class="field-desc"><p>This function returns a list of the first models of type or with the same type as <code>sub_model</code>
+     for every branch in model.</p></dd></dl>
 </dd>
 </dl></dd>
 </dl>

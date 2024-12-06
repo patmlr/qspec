@@ -26,7 +26,7 @@ title: qspec.models.HyperfineQI
 </em>
 ,&nbsp;
 <em class="sig-param">
-<span class="n"><span class="pre">name</span></span>
+<span class="n"><span class="pre">label</span></span>
 <span class="o"><span class="pre">=</span></span>
 <span class="default_value"><span class="pre">None</span></span>
 </em>
@@ -36,25 +36,29 @@ title: qspec.models.HyperfineQI
 <span class="o"><span class="pre">=</span></span>
 <span class="default_value"><span class="pre">None</span></span>
 </em>
-<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/models\_splitter.py#L231-L322' }}"><span class="sig-source">[source]</span></a>
+<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/models\_splitter.py#L248-L349' }}"><span class="sig-source">[source]</span></a>
 </dt>
-<dd class="field-body"><p></p>
+<dd class="field-body"><p>A perturbative quantum interference (QI) hyperfine-structure model
+        based on https://doi.org/10.1103/PhysRevA.87.032504.</p>
 <dl class="field-list">
 <dt class="field-head">Parameters<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
 <dt>_<span class="classifier"><em>None</em></span></dt>
-<dd class="field-desc"><p></p></dd>
+<dd class="field-desc"><p>Empty <code>model</code> parameter. This hyperfine-structure model always uses <code>Lorentz</code> lineshapes.
+         To use other lineshapes, combine it with the <code>Convolve</code> model.</p></dd>
 <dt>i<span class="classifier"><em>None</em></span></dt>
-<dd class="field-desc"><p></p></dd>
+<dd class="field-desc"><p>The nuclear spin.</p></dd>
 <dt>j_l<span class="classifier"><em>None</em></span></dt>
-<dd class="field-desc"><p></p></dd>
+<dd class="field-desc"><p>The total lower state electron angular momentum.</p></dd>
 <dt>j_u<span class="classifier"><em>None</em></span></dt>
-<dd class="field-desc"><p></p></dd>
-<dt>name<span class="classifier"><em>None</em></span></dt>
-<dd class="field-desc"><p></p></dd>
+<dd class="field-desc"><p>The total upper state electron angular momentum.</p></dd>
+<dt>label<span class="classifier"><em>None</em></span></dt>
+<dd class="field-desc"><p>A label for the <code>Splitter</code> (isotope / isomer / transition).</p></dd>
 <dt>qi_path<span class="classifier"><em>None</em></span></dt>
-<dd class="field-desc"><p></p></dd></dl>
+<dd class="field-desc"><p>Specify a directory to save and load the calculated geometric parts of the
+         dipole matrix elements for faster repeated calculations.
+         These depend only on the quantum numbers <code>i</code>, <code>j_l</code> and <code>j_u</code>.</p></dd></dl>
 </dd>
 </dl></dd>
 </dl>

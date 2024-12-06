@@ -65,28 +65,28 @@ title: qspec.models.gen_model
 <dd class="field-desc"><p>The three or an Iterable of three quantum numbers I, J_l and J_u.
      Must have the format [I, J_l, J_u] or [[I0, J0_l, J0_u], [I1, J1_l, J1_u], ...].</p></dd>
 <dt>shape<span class="classifier"><em>Union[str, type, qspec.models._spectrum.Spectrum]</em></span></dt>
-<dd class="field-desc"><p>A str representation of or a Spectrum type.</p></dd>
+<dd class="field-desc"><p>A str representation of or a <code>Spectrum</code> type.</p></dd>
 <dt>qi<span class="classifier"><em>bool</em></span></dt>
-<dd class="field-desc"><p>Whether to use a quantum interference model. NOT IMPLEMENTED.</p></dd>
+<dd class="field-desc"><p>Whether to use a quantum interference model.</p></dd>
 <dt>hf_mixing<span class="classifier"><em>bool</em></span></dt>
-<dd class="field-desc"><p>Whether to use a hyperfine mixing model. NOT IMPLEMENTED.</p></dd>
+<dd class="field-desc"><p>Whether to use a hyperfine-induced mixing model. Not implemented for <code>qi=True</code>.</p></dd>
 <dt>n_peaks<span class="classifier"><em>int</em></span></dt>
-<dd class="field-desc"><p>The number of "peaks per resonance".</p></dd>
+<dd class="field-desc"><p>The number of "peaks per resonance" or "lineshape duplicates".</p></dd>
 <dt>offsets<span class="classifier"><em>Union[int, list]</em></span></dt>
 <dd class="field-desc"><p>The orders of the offset polynomials of the separate x-axis intervals.
-     Must be a list or a single value. In the former case len(offsets) == len(x_cuts) + 1 must hold.
-     If offsets is None, a single constant offset is assumed.</p></dd>
+     Must be a list or a single value. In the former case <code>len(offsets) == len(x_cuts) + 1</code> must hold.
+     If <code>offsets</code> is <code>None</code>, a single constant offset is assumed.</p></dd>
 <dt>x_cuts<span class="classifier"><em>Union[int, float, list]</em></span></dt>
 <dd class="field-desc"><p>The x values where to cut the x-axis. Must be a list or a single value.
-     In the former case len(offsets) == len(x_cuts) + 1 must hold.
-     If x_cuts is None, the x-axis will not be cut.</p></dd>
+     In the former case <code>len(offsets) == len(x_cuts) + 1</code> must hold.
+     If <code>x_cuts</code> is <code>None</code>, the x-axis will not be cut.</p></dd>
 <dt>convolve<span class="classifier"><em>Union[str, type, qspec.models._spectrum.Spectrum]</em></span></dt>
-<dd class="field-desc"><p>A str representation of or a Convolved type.</p></dd></dl>
+<dd class="field-desc"><p>A str representation of or a <code>Convolved</code> type.</p></dd></dl>
 </dd><dt class="field-head">Returns<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>out<span class="classifier"><em>None</em></span></dt>
-<dd class="field-desc"><p>The defined lineshape model.</p></dd></dl>
+<dt>out<span class="classifier"><em>qspec.models._base.Model</em></span></dt>
+<dd class="field-desc"><p>The constructed lineshape model.</p></dd></dl>
 </dd>
 </dl></dd>
 </dl>

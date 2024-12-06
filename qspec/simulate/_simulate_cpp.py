@@ -35,8 +35,8 @@ def sr_generate_y(denominator: np.ndarray, f_theta: np.ndarray, f_phi: np.ndarra
     denominator_p = denominator.ctypes.data_as(c_complex_p)  # Get all pointers to the first elements of the arrays.
     f_theta_p = f_theta.ctypes.data_as(c_complex_p)
     f_phi_p = f_phi.ctypes.data_as(c_complex_p)
-    counts_p = counts.ctypes.data_as(c_int_p)
-    shape_p = shape.ctypes.data_as(c_int_p)
+    counts_p = counts.ctypes.data_as(c_size_t_p)
+    shape_p = shape.ctypes.data_as(c_size_t_p)
     y_p = y.ctypes.data_as(c_double_p)
     dll.sr_generate_y(denominator_p, f_theta_p, f_phi_p, counts_p, shape_p, y_p)  # Modify y "in-place" with C++.
     return y

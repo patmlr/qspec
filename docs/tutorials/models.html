@@ -6,11 +6,11 @@ title: Tutorials.Models
 <h1>Construction and fitting of modular lineshape models</h1>
 
 <p>
-  In this tutorial, a basic example is shown how <code>qspec.models</code> can be used to construct lineshape models
+    In this tutorial, a basic example is shown how <a href="{{ '/doc/modules/models.html'| relative_url }}"><code>qspec.models</code></a> can be used to construct lineshape models
     for data fitting.
 </p>
 <p>
-  First, we import all the required modules and generate our lineshape model. We can print all parameters of the model
+    First, we import all the required modules and generate our lineshape model. We can print all parameters of the model
     and set them to new values. Additionally, we can fix certain parameters for fitting by changing the list
     <code>model.fixes</code>. Here, we define <code>sigma</code> as a <a href="https://doi.org/10.1109/TSSC.1968.300117"><em>Prior</em></a>,
     which is basically a known parameter with uncertainty.
@@ -39,7 +39,7 @@ title: Tutorials.Models
 </pre></div>
 
 <p>
-  Now, we generate some data for the fit. The data is normally distributed around the model with its current parameters.
+    Now, we generate some data for the fit. The data is normally distributed around the model with its current parameters.
 </p>
 
 <div class="py-source"><pre>
@@ -51,7 +51,7 @@ title: Tutorials.Models
 </pre></div>
 
 <p>
-  We change the initial parameters of the peak position and intensity to later compare the model before
+    We change the initial parameters of the peak position and intensity to later compare the model before
     and after fitting. During the fit, <code>model.vals</code> is set to the optimized parameters.
     Therefore, we save our initial values to <code>p_init</code>.
     We set <code>report=True</code> to get a summary of the fit results.
@@ -71,7 +71,7 @@ title: Tutorials.Models
 {% include tutorial-3-output-0.html %}
 
 <p>
-  Finally, we plot everything.
+    Finally, we plot everything.
 </p>
 
 <div class="py-source"><pre>
@@ -89,7 +89,7 @@ title: Tutorials.Models
 
 <p><img src="{{ '/assets/img/models-0.svg' | relative_url }}"></p>
 
-<div class="o-prev">
+<div class="prev-next">
     <a href="{{ '/tutorials/hfs.html' | relative_url }}"><div class="prev-next-button">&larr;&nbsp;&nbsp;Previous</div></a>
-    <!--a href="{{ '/tutorials/models.html' | relative_url }}"><div class="prev-next-button">Next&nbsp;&nbsp;&rarr;</div></a-->
+    <a href="{{ '/tutorials/simulate.html' | relative_url }}"><div class="prev-next-button">Next&nbsp;&nbsp;&rarr;</div></a>
 </div>

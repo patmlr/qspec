@@ -1,3 +1,10 @@
+# -*- coding: utf-8 -*-
+"""
+examples.tutorial_2
+===================
+
+Tutorial 2 from the website: Calculation of hyperfine structure and Zeeman shifts.
+"""
 
 import numpy as np
 import qspec as qs
