@@ -431,7 +431,7 @@ class Empty(Model):
 class NPeak(Model):
     def __init__(self, model, n_peaks=1):
         """
-        Evaluates the given `model` at the positions x\ :sub:`i` with scalings p\ :sub:`i` where i < `n_peaks`.
+        Evaluates the given `model` at the positions $x_i$ with scalings $p_i$ and `0 <= i < n_peaks`.
 
         :param model: A submodel whose parameters are adopted by this model.
         :param n_peaks: The number of times the submodel is copied.

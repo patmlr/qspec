@@ -301,8 +301,8 @@ class Environment:
 class State:
     def __init__(self, freq_j: scalar, s: scalar, l: scalar, j: scalar, i: scalar, f: scalar, m: scalar,
                  hyper_const: array_like = None, g: scalar = 0, label: str = None, instance=None):
-        """
-        Class representing an atomic quantum state :math:`|(\\mathrm{label})SLJIFm\\rangle`.
+        r"""
+        Class representing an atomic quantum state $|(\mathrm{label})SLJIFm\rangle$.
 
         :param freq_j: The energetic position of the state without the hyperfine structure or the environment (MHz).
         :param s: The electron spin quantum number S.
@@ -1145,11 +1145,9 @@ class Interaction:
         dll.interaction_update(self.instance)
 
     def resonance_info(self):
-        """
+        r"""
         Prints the detunings of the base frequencies of the lasers in the given atomic system.
-        In particular useful for systems with a hyperfine structure. Here
-
-        .. math:: \\Delta = \\nu_0 - \\nu_L.
+        In particular useful for systems with a hyperfine structure. Here $\Delta = \nu_0 - \nu_\mathrm{L}$.
 
         :returns: None.
         """

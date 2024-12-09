@@ -21,8 +21,8 @@ def gen_model(ijj, shape: Union[str, type, _spectrum.Spectrum] = None, qi: bool 
     """
     Create a lineshape model to fit arbitrary atomic fluorescence spectra.
 
-    :param ijj: The three or an Iterable of three quantum numbers I, J_l and J_u.
-     Must have the format [I, J_l, J_u] or [[I0, J0_l, J0_u], [I1, J1_l, J1_u], ...].
+    :param ijj: The three or an Iterable of three quantum numbers $I$, $J_l$ and $J_u$.
+     Must be a list with the format `[I, J_l, J_u]` or `[[I0, J0_l, J0_u], [I1, J1_l, J1_u], ...]`.
     :param shape: A str representation of or a `Spectrum` type.
     :param qi: Whether to use a quantum interference model.
     :param hf_mixing: Whether to use a hyperfine-induced mixing model. Not implemented for `qi=True`.

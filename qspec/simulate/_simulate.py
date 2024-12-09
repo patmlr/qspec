@@ -427,30 +427,26 @@ def lambda_ge_rec(t: array_like, n: array_like, delta: array_like, a_ge: array_l
 
 
 class Geometry:
-    """
-    Class representing a fluorescence detection geometry. The solid angle over which fluorescence light is detected
-    can be defined through intervals of the two angles 'theta' and 'phi'.
-    With these, every spacial direction can be addressed using an orthonormal system defined by
-
-    .. math::
-
-        \\hat{e}_r &:= \\begin{pmatrix}\\sin(\\theta) \\\\
-                       \\cos(\\theta)\\sin(\\phi) \\\\
-                       \\cos(\\theta)\\cos(\\phi)\\end{pmatrix}.
-
-    If the user specifies a rotation object with unitary matrix :math:`R`,
-    the new system is :math:`\\hat{e}_r^\\prime = R \\hat{e}_r`
-    The entire two-dimensional interval is defined through the cartesian product
-    :math:`\\bigcup_i \\theta_i \\times \\bigcup_i \\phi_i`.
-    For every disjoint interval a weight can be defined through a 'weights' matrix.
-    A probability distribution function (pdf) can be defined to have continuous angle weights.
-    A rotation matrix can be defined to rotate the entire coordinate systems/detection geometry.
-    A sample of angle pairs from the defined intervals can be generated using the 'integration_sample' method.
-    """
     def __init__(self):
-        """
-        Initializing the different attributes. The standard interval is
-        :math:`\\theta\\in [-\\pi/2, \\pi/2]` and \\phi\\in [0, 2\\pi].
+        r"""
+        Class representing a fluorescence detection geometry. The solid angle over which fluorescence light is detected
+        can be defined through intervals of the two angles $\theta$ and $\phi$.
+        With these, every spacial direction can be addressed using an orthonormal system defined by
+
+        $$
+        \hat{e}_r = \begin{pmatrix}\sin(\theta)\\
+                    \cos(\theta)\sin(\phi)\\
+                    \cos(\theta)\cos(\phi)\end{pmatrix}.
+        $$
+
+        If the user specifies a rotation object with unitary matrix $R$,
+        the new system is $\hat{e}_r^\prime = R \hat{e}_r$
+        The entire two-dimensional interval is defined through the cartesian product
+        $\bigcup_i \theta_i \times \bigcup_i \phi_i$.
+        For every disjoint interval a weight can be defined through a 'weights' matrix.
+        A probability distribution function (pdf) can be defined to have continuous angle weights.
+        A rotation matrix can be defined to rotate the entire coordinate systems/detection geometry.
+        A sample of angle pairs from the defined intervals can be generated using the 'integration_sample' method.
         """
         self.theta_intervals = np.array([[-np.pi / 2., np.pi / 2.]])
         self.phi_intervals = np.array([[0., 2. * np.pi]])

@@ -1,40 +1,43 @@
 ---
 layout: default
-title: qspec.models.Custom.set_links
+title: qspec.rgb_to_hex_color
 ---
 <div class="bd-content-main">
 <article class="bd-article code-prose">
-<!--h1>qspec.models.Custom.set_links</h1-->
+<!--h1>qspec.rgb_to_hex_color</h1-->
 <dl class="py function">
 <dt class="func-sig">
-<span class="sig-prename"><span class="pre">qspec.models.</span></span>
-<span class="sig-classname"><span class="pre">Custom</span></span><span class="sig-prename"><span class="pre">.</span></span><span class="sig-name"><span class="pre">set_links</span></span>
+<span class="sig-prename"><span class="pre">qspec.</span></span><span class="sig-name"><span class="pre">rgb_to_hex_color</span></span>
 <span class="sig-paren">&nbsp;(&nbsp;</span>
 <em class="sig-param">
-<span class="n"><span class="pre">links</span></span>
+<span class="n"><span class="pre">r</span></span>
 </em>
 ,&nbsp;
 <em class="sig-param">
-<span class="n"><span class="pre">force</span></span>
-<span class="o"><span class="pre">=</span></span>
-<span class="default_value"><span class="pre">False</span></span>
+<span class="n"><span class="pre">g</span></span>
 </em>
-<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/models\_base.py#L214-L223' }}"><span class="sig-source">[source]</span></a>
+,&nbsp;
+<em class="sig-param">
+<span class="n"><span class="pre">b</span></span>
+</em>
+<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/tools.py#L58-L65' }}"><span class="sig-source">[source]</span></a>
 </dt>
-<dd class="field-body"><p>Set all links with one list.</p>
+<dd class="field-body"><p></p>
 <dl class="field-list">
 <dt class="field-head">Parameters<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>links<span class="classifier"><em>None</em></span></dt>
-<dd class="field-desc"><p>A list of shape (</code>self.size</code>, ).</p></dd>
-<dt>force<span class="classifier"><em>None</em></span></dt>
-<dd class="field-desc"><p>The <code>force</code> parameter of the <code>set_link</code> function.</p></dd></dl>
+<dt>r<span class="classifier"><em>None</em></span></dt>
+<dd class="field-desc"><p>The fraction of red (0-255).</p></dd>
+<dt>g<span class="classifier"><em>None</em></span></dt>
+<dd class="field-desc"><p>The fraction of green (0-255).</p></dd>
+<dt>b<span class="classifier"><em>None</em></span></dt>
+<dd class="field-desc"><p>The fraction of blue (0-255).</p></dd></dl>
 </dd><dt class="field-head">Returns<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
 <dt>out<span class="classifier"><em>None</em></span></dt>
-<dd class="field-desc"><p>None.</p></dd></dl>
+<dd class="field-desc"><p>A hexadecimal str representation of the <code>rgb</code> tuple.</p></dd></dl>
 </dd>
 </dl></dd>
 </dl>
@@ -114,7 +117,7 @@ title: qspec.models.Custom.set_links
 </details>
 </li><li class="has-children">
 <a href="{{ '/doc/modules/models.html' | relative_url }}">qspec.models</a>
-<details open="">
+<details>
 <summary>
 <span class="toctree-toggle" role="presentation"><img src="{{ '/assets/img/chevron-down.svg' | relative_url }}" class="chevron"/></span>
 </summary>
@@ -166,7 +169,7 @@ title: qspec.models.Custom.set_links
 <li><a href="{{ '/doc/functions/models/Convolved/x.html' | relative_url }}">qspec.models.Convolved.x</a></li></ul>
 </details>
 </li><li class="has-children spaced"><a href="{{ '/doc/functions/models/Custom/Custom.html' | relative_url }}">qspec.models.Custom</a>
-<details open="">
+<details>
 <summary>
 <span class="toctree-toggle" role="presentation"><img src="{{ '/assets/img/chevron-down.svg' | relative_url }}" class="chevron"/></span>
 </summary>
@@ -180,7 +183,7 @@ title: qspec.models.Custom.set_links
 <li><a href="{{ '/doc/functions/models/Custom/set_fix.html' | relative_url }}">qspec.models.Custom.set_fix</a></li>
 <li><a href="{{ '/doc/functions/models/Custom/set_fixes.html' | relative_url }}">qspec.models.Custom.set_fixes</a></li>
 <li><a href="{{ '/doc/functions/models/Custom/set_link.html' | relative_url }}">qspec.models.Custom.set_link</a></li>
-<li class="table-current"><a href="{{ '/doc/functions/models/Custom/set_links.html' | relative_url }}">qspec.models.Custom.set_links</a></li>
+<li><a href="{{ '/doc/functions/models/Custom/set_links.html' | relative_url }}">qspec.models.Custom.set_links</a></li>
 <li><a href="{{ '/doc/functions/models/Custom/set_pars.html' | relative_url }}">qspec.models.Custom.set_pars</a></li>
 <li><a href="{{ '/doc/functions/models/Custom/set_val.html' | relative_url }}">qspec.models.Custom.set_val</a></li>
 <li><a href="{{ '/doc/functions/models/Custom/set_vals.html' | relative_url }}">qspec.models.Custom.set_vals</a></li>
@@ -1750,7 +1753,7 @@ title: qspec.models.Custom.set_links
 </details>
 </li><li class="has-children">
 <a href="{{ '/doc/modules/tools.html' | relative_url }}">qspec.tools</a>
-<details>
+<details open="">
 <summary>
 <span class="toctree-toggle" role="presentation"><img src="{{ '/assets/img/chevron-down.svg' | relative_url }}" class="chevron"/></span>
 </summary>
@@ -1817,7 +1820,7 @@ title: qspec.models.Custom.set_links
 <li class="spaced"><a href="{{ '/doc/functions/tools/printf.html' | relative_url }}">qspec.printf</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/tools/printh.html' | relative_url }}">qspec.printh</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/tools/printw.html' | relative_url }}">qspec.printw</a></li>
-<li class="spaced"><a href="{{ '/doc/functions/tools/rgb_to_hex_color.html' | relative_url }}">qspec.rgb_to_hex_color</a></li>
+<li class="spaced table-current"><a href="{{ '/doc/functions/tools/rgb_to_hex_color.html' | relative_url }}">qspec.rgb_to_hex_color</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/tools/roman_to_int.html' | relative_url }}">qspec.roman_to_int</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/tools/rotation_matrix.html' | relative_url }}">qspec.rotation_matrix</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/tools/rotation_to_vector.html' | relative_url }}">qspec.rotation_to_vector</a></li>

@@ -6,12 +6,20 @@ from docutils.core import publish_parts
 
 
 FOLDER_FILES = {'models', 'simulate', 'analyze'}
-FILES = sorted(['models', 'analyze', 'simulate', 'algebra', 'physics', 'tools', 'stats'])  # , 'analyze', 'simulate', 'algebra', 'physics', 'tools', 'stats'
+FILES = sorted(['models', 'algebra', 'models', 'analyze', 'simulate', 'physics', 'tools', 'stats'])  #
 
 
 def type_to_str(_type):
-    return (str('None' if _type is inspect._empty else _type).replace('typing.', '').replace('<class ', '').replace('>', '')
-            .replace("'", ""))
+    ret = str(_type)
+    while True:
+        i = ret.find('Union[')
+        if i == -1:
+            break
+        j = ret.find(']')
+        ret = ret[:i] + ret[i+6:j].replace(', ', ' | ') + ret[j+1:]
+
+    return (str('None' if _type is inspect._empty else ret).replace('typing.', '').replace('<class ', '')
+            .replace('>', '').replace("'", ""))
 
 
 def rest_to_html(rest):
@@ -20,6 +28,14 @@ def rest_to_html(rest):
 
 
 def docstring_to_html(rest):
+    # i = 0
+    # html = rest
+    # while True:
+    #     i = html.find(':math:`')
+    #     if i == -1:
+    #         break
+    #     j = i + 7 + html[i+7:].find('`')
+    #     html = html[:i] + '$' + html[i+7:j] + '$' + html[j+1:]
     html = rest.replace(' `', ' <code>').replace('`', '</code>')
     return html
 

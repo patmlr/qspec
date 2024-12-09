@@ -33,16 +33,14 @@ def cast_sympy(as_sympy: bool, *args: sympy_like, dtype: type = float):
 def clebsch_gordan(j_1: sympy_qn, j_2: sympy_qn, j_3: sympy_qn, m_1: sympy_qn, m_2: sympy_qn, m_3: sympy_qn,
                    as_sympy: bool = False):
     """
-    .. math::
+    Calculates the Clebsch-Gordan coefficient $\\langle J_1, m_1, J_2, m_2\\, |\\, J_3, m_3\\rangle$.
 
-        \\langle J_1, m_1, J_2, m_2\\, |\\, J_3, m_3\\rangle
-
-    :param j_1: :math:`J_1`
-    :param j_2: :math:`J_2`
-    :param j_3: :math:`J_3`
-    :param m_1: :math:`m_1`
-    :param m_2: :math:`m_2`
-    :param m_3: :math:`m_3`
+    :param j_1: $J_1$
+    :param j_2: $J_2$
+    :param j_3: $J_3$
+    :param m_1: $m_1$
+    :param m_2: $m_2$
+    :param m_3: $m_3$
     :param as_sympy: Whether to return the result as a sympy type.
     :returns: The Clebsch-Gordan coefficient.
     """
@@ -53,19 +51,18 @@ def clebsch_gordan(j_1: sympy_qn, j_2: sympy_qn, j_3: sympy_qn, m_1: sympy_qn, m
 def wigner_3j(j_1: sympy_qn, j_2: sympy_qn, j_3: sympy_qn, m_1: sympy_qn, m_2: sympy_qn, m_3: sympy_qn,
               as_sympy: bool = False):
     """
-    .. math::
-
+    Calculate the Wigner-3j symbol $
         \\begin{pmatrix}
         J_1 & J_2 & J_3 \\\\
         m_1 & m_2 & m_3
-        \\end{pmatrix}
+        \\end{pmatrix}$.
 
-    :param j_1: :math:`J_1`
-    :param j_2: :math:`J_2`
-    :param j_3: :math:`J_3`
-    :param m_1: :math:`m_1`
-    :param m_2: :math:`m_2`
-    :param m_3: :math:`m_3`
+    :param j_1: $J_1$
+    :param j_2: $J_2$
+    :param j_3: $J_3$
+    :param m_1: $m_1$
+    :param m_2: $m_2$
+    :param m_3: $m_3$
     :param as_sympy: Whether to return the result as a sympy type.
     :returns: The wigner-3j symbol.
 
@@ -77,19 +74,18 @@ def wigner_3j(j_1: sympy_qn, j_2: sympy_qn, j_3: sympy_qn, m_1: sympy_qn, m_2: s
 def wigner_6j(j_1: sympy_qn, j_2: sympy_qn, j_3: sympy_qn, j_4: sympy_qn, j_5: sympy_qn, j_6: sympy_qn,
               as_sympy: bool = False):
     """
-    .. math::
-
+    Calculate the Wigner-6j symbol $
         \\begin{Bmatrix}
         J_1 & J_2 & J_3 \\\\
         J_4 & J_5 & J_6
-        \\end{Bmatrix}
+        \\end{Bmatrix}$.
 
-    :param j_1: :math:`J_1`
-    :param j_2: :math:`J_2`
-    :param j_3: :math:`J_3`
-    :param j_4: :math:`J_4`
-    :param j_5: :math:`J_5`
-    :param j_6: :math:`J_6`
+    :param j_1: $J_1$
+    :param j_2: $J_2$
+    :param j_3: $J_3$
+    :param j_4: $J_4$
+    :param j_5: $J_5$
+    :param j_6: $J_6$
     :param as_sympy: Whether to return the result as a sympy type.
     :returns: The wigner-6j symbol.
     """
