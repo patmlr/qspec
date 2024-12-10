@@ -1,74 +1,91 @@
 ---
 layout: default
-title: qspec.delta_r6
+title: qspec.hyper_zeeman_ij
 ---
 <div class="bd-content-main">
 <article class="bd-article code-prose">
-<!--h1>qspec.delta_r6</h1-->
+<!--h1>qspec.hyper_zeeman_ij</h1-->
 <dl class="py function">
 <dt class="func-sig">
-<span class="sig-prename"><span class="pre">qspec.</span></span><span class="sig-name"><span class="pre">delta_r6</span></span>
+<span class="sig-prename"><span class="pre">qspec.</span></span><span class="sig-name"><span class="pre">hyper_zeeman_ij</span></span>
 <span class="sig-paren">&nbsp;(&nbsp;</span>
 <em class="sig-param">
-<span class="n"><span class="pre">r</span></span>
+<span class="n"><span class="pre">mi0</span></span>
 </em>
 ,&nbsp;
 <em class="sig-param">
-<span class="n"><span class="pre">r_d</span></span>
+<span class="n"><span class="pre">mj0</span></span>
 </em>
 ,&nbsp;
 <em class="sig-param">
-<span class="n"><span class="pre">r_ref</span></span>
+<span class="n"><span class="pre">mi1</span></span>
 </em>
 ,&nbsp;
 <em class="sig-param">
-<span class="n"><span class="pre">r_ref_d</span></span>
+<span class="n"><span class="pre">mj1</span></span>
 </em>
 ,&nbsp;
 <em class="sig-param">
-<span class="n"><span class="pre">delta_r</span></span>
+<span class="n"><span class="pre">i</span></span>
 </em>
 ,&nbsp;
 <em class="sig-param">
-<span class="n"><span class="pre">delta_r_d</span></span>
+<span class="n"><span class="pre">j</span></span>
 </em>
 ,&nbsp;
 <em class="sig-param">
-<span class="n"><span class="pre">v6</span></span>
+<span class="n"><span class="pre">g_n</span></span>
 </em>
 ,&nbsp;
 <em class="sig-param">
-<span class="n"><span class="pre">v6_ref</span></span>
+<span class="n"><span class="pre">g_j</span></span>
 </em>
-<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/physics.py#L969-L999' }}"><span class="sig-source">[source]</span></a>
+,&nbsp;
+<em class="sig-param">
+<span class="n"><span class="pre">a_hyper</span></span>
+</em>
+,&nbsp;
+<em class="sig-param">
+<span class="n"><span class="pre">b_hyper</span></span>
+</em>
+,&nbsp;
+<em class="sig-param">
+<span class="n"><span class="pre">b_field</span></span>
+</em>
+<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/physics.py#L641-L689' }}"><span class="sig-source">[source]</span></a>
 </dt>
-<dd class="field-body"><p></p>
+<dd class="field-body"><p>Calculate the matrix element $\langle m_{i, 0} m_{j, 0}| H_\mathrm{hfs} + H_\mathrm{Zeeman} |m_{i, 1} m_{j, 1}\rangle$.</p>
 <dl class="field-list">
 <dt class="field-head">Parameters<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>r<span class="classifier"><em>numpy.ndarray | Iterable | int | float</em></span></dt>
-<dd class="field-desc"><p>The Barrett radius of an isotope.</p></dd>
-<dt>r_d<span class="classifier"><em>numpy.ndarray | Iterable | int | float</em></span></dt>
-<dd class="field-desc"><p>The uncertainty of the Barrett radius.</p></dd>
-<dt>r_ref<span class="classifier"><em>numpy.ndarray | Iterable | int | float</em></span></dt>
-<dd class="field-desc"><p>The Barrett radius of a reference isotope.</p></dd>
-<dt>r_ref_d<span class="classifier"><em>numpy.ndarray | Iterable | int | float</em></span></dt>
-<dd class="field-desc"><p>The uncertainty of the Barrett radius of the reference isotope.</p></dd>
-<dt>delta_r<span class="classifier"><em>numpy.ndarray | Iterable | int | float</em></span></dt>
-<dd class="field-desc"><p>The difference between the Barrett radius of the isotope and the reference isotope.</p></dd>
-<dt>delta_r_d<span class="classifier"><em>numpy.ndarray | Iterable | int | float</em></span></dt>
-<dd class="field-desc"><p>The uncertainty of the difference between
-     the Barrett radius of the isotope and the reference isotope.</p></dd>
-<dt>v6<span class="classifier"><em>numpy.ndarray | Iterable | int | float</em></span></dt>
-<dd class="field-desc"><p>The V6 factor of the isotope.</p></dd>
-<dt>v6_ref<span class="classifier"><em>numpy.ndarray | Iterable | int | float</em></span></dt>
-<dd class="field-desc"><p>The V6 factor of the reference isotope.</p></dd></dl>
+<dt>mi0<span class="classifier"><em>None</em></span></dt>
+<dd class="field-desc"><p>The first magnetic quantum number $m_{i, 0}$ of the nuclear spin $I$.</p></dd>
+<dt>mj0<span class="classifier"><em>None</em></span></dt>
+<dd class="field-desc"><p>The first magnetic quantum number $m_{j, 0}$.</p></dd>
+<dt>mi1<span class="classifier"><em>None</em></span></dt>
+<dd class="field-desc"><p>The second magnetic quantum number $m_{i, 1}$.</p></dd>
+<dt>mj1<span class="classifier"><em>None</em></span></dt>
+<dd class="field-desc"><p>The second magnetic quantum number $m_{j, 1}$.</p></dd>
+<dt>i<span class="classifier"><em>None</em></span></dt>
+<dd class="field-desc"><p>The nuclear spin quantum number $I$.</p></dd>
+<dt>j<span class="classifier"><em>None</em></span></dt>
+<dd class="field-desc"><p>The electronic total angular momentum quantum number $J$.</p></dd>
+<dt>g_n<span class="classifier"><em>float</em></span></dt>
+<dd class="field-desc"><p>The nuclear g-factor or the gyromagnetic ratio if <code>g_n_as_gyro == True</code>.</p></dd>
+<dt>g_j<span class="classifier"><em>float</em></span></dt>
+<dd class="field-desc"><p>The electronic g-factor.</p></dd>
+<dt>a_hyper<span class="classifier"><em>numpy.ndarray | Iterable | int | float</em></span></dt>
+<dd class="field-desc"><p>The magnetic dipole hyperfine constant $A$ (MHz if <code>as_freq</code> else eV).</p></dd>
+<dt>b_hyper<span class="classifier"><em>numpy.ndarray | Iterable | int | float</em></span></dt>
+<dd class="field-desc"><p>The electric quadrupole hyperfine constant $B$ ([</code>a_hyper</code>]).</p></dd>
+<dt>b_field<span class="classifier"><em>numpy.ndarray | Iterable | int | float</em></span></dt>
+<dd class="field-desc"><p>The $B$-field (T).</p></dd></dl>
 </dd><dt class="field-head">Returns<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>out<span class="classifier"><em>None</em></span></dt>
-<dd class="field-desc"><p>The difference of the mean sextic nuclear charge radius between two isotopes and its uncertainty.</p></dd></dl>
+<dt>out<span class="classifier"><em>numpy.ndarray</em></span></dt>
+<dd class="field-desc"><p>One matrix element of the hyperfine-structure + Zeeman-effect hamiltonian.</p></dd></dl>
 </dd>
 </dl></dd>
 </dl>
@@ -98,7 +115,7 @@ title: qspec.delta_r6
 <li class="spaced"><a href="{{ '/doc/functions/physics/convolved_thermal_norm_v_pdf.html' | relative_url }}">qspec.convolved_thermal_norm_v_pdf</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/physics/delta_r2.html' | relative_url }}">qspec.delta_r2</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/physics/delta_r4.html' | relative_url }}">qspec.delta_r4</a></li>
-<li class="spaced table-current"><a href="{{ '/doc/functions/physics/delta_r6.html' | relative_url }}">qspec.delta_r6</a></li>
+<li class="spaced"><a href="{{ '/doc/functions/physics/delta_r6.html' | relative_url }}">qspec.delta_r6</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/physics/doppler.html' | relative_url }}">qspec.doppler</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/physics/doppler_3d.html' | relative_url }}">qspec.doppler_3d</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/physics/doppler_d1.html' | relative_url }}">qspec.doppler_d1</a></li>
@@ -121,7 +138,7 @@ title: qspec.delta_r6
 <li class="spaced"><a href="{{ '/doc/functions/physics/hyper_zeeman.html' | relative_url }}">qspec.hyper_zeeman</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/physics/hyper_zeeman_12.html' | relative_url }}">qspec.hyper_zeeman_12</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/physics/hyper_zeeman_12_d.html' | relative_url }}">qspec.hyper_zeeman_12_d</a></li>
-<li class="spaced"><a href="{{ '/doc/functions/physics/hyper_zeeman_ij.html' | relative_url }}">qspec.hyper_zeeman_ij</a></li>
+<li class="spaced table-current"><a href="{{ '/doc/functions/physics/hyper_zeeman_ij.html' | relative_url }}">qspec.hyper_zeeman_ij</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/physics/hyper_zeeman_num.html' | relative_url }}">qspec.hyper_zeeman_num</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/physics/hyperfine.html' | relative_url }}">qspec.hyperfine</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/physics/inv_cm_to_freq.html' | relative_url }}">qspec.inv_cm_to_freq</a></li>

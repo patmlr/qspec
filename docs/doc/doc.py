@@ -6,7 +6,7 @@ from docutils.core import publish_parts
 
 
 FOLDER_FILES = {'models', 'simulate', 'analyze'}
-FILES = sorted(['models', 'algebra', 'models', 'analyze', 'simulate', 'physics', 'tools', 'stats'])  #
+FILES = sorted(['physics'])  # 'physics', 'models', 'algebra', 'models', 'analyze', 'simulate', 'tools', 'stats'
 
 
 def type_to_str(_type):
@@ -275,6 +275,8 @@ def _gen_func(f, file, temp, namespace, funcs, func_sig, func_doc):
         if r_desc and r_desc[0] == '(':
             j = r_desc.find(')') + 1
             ret = r_desc[:j]
+            if ',' not in ret:
+                ret = ret[1:-1]
             r_desc = r_desc[j:]
         else:
             ret = 'out'
