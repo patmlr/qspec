@@ -42,33 +42,36 @@ title: qspec.doppler_e_d1
 <span class="o"><span class="pre">=</span></span>
 <span class="default_value"><span class="pre">True</span></span>
 </em>
-<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/physics.py#L323-L337' }}"><span class="sig-source">[source]</span></a>
+<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/physics.py#L403-L422' }}"><span class="sig-source">[source]</span></a>
 </dt>
-<dd class="field-body"><p></p>
+<dd class="field-body"><p>The first derivative $\frac{\partial f^\prime}{\partial E} =
+ \frac{\partial f^\prime}{\partial v}\frac{\partial v}{\partial E}$</p>
 <dl class="field-list">
 <dt class="field-head">Parameters<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>f<span class="classifier"><em>numpy.ndarray | Iterable | int | float</em></span></dt>
-<dd class="field-desc"><p>The frequency of light (arb. units).</p></dd>
-<dt>alpha<span class="classifier"><em>numpy.ndarray | Iterable | int | float</em></span></dt>
-<dd class="field-desc"><p>The angle between the velocity- and the wave-vector in the laboratory frame (rad).</p></dd>
-<dt>e<span class="classifier"><em>numpy.ndarray | Iterable | int | float</em></span></dt>
-<dd class="field-desc"><p>Energy which is added to the kinetic energy of a body with velocity v0 (eV).</p></dd>
-<dt>m<span class="classifier"><em>numpy.ndarray | Iterable | int | float</em></span></dt>
-<dd class="field-desc"><p>The mass of the body (amu).</p></dd>
-<dt>v0<span class="classifier"><em>numpy.ndarray | Iterable | int | float</em></span></dt>
-<dd class="field-desc"><p>The initial velocity of the body (m/s).</p></dd>
-<dt>return_frame<span class="classifier"><em>None</em></span></dt>
-<dd class="field-desc"><p>The coordinate system in which the frequency is returned. Can be either 'atom' or 'lab'.</p></dd>
-<dt>relativistic<span class="classifier"><em>None</em></span></dt>
-<dd class="field-desc"><p>The calculation is performed either relativistically or classically.</p></dd></dl>
+<dt>f<span class="classifier"><em>array_like</em></span></dt>
+<dd class="field-desc"><p>The frequency $f$ of light (arb. units).</p></dd>
+<dt>alpha<span class="classifier"><em>array_like</em></span></dt>
+<dd class="field-desc"><p>The angle $\alpha$ between the velocity- and the light-vector in the laboratory frame (rad).</p></dd>
+<dt>e<span class="classifier"><em>array_like</em></span></dt>
+<dd class="field-desc"><p>The energy $E$ added to the kinetic energy of a body with velocity <code>v0</code> (eV).</p></dd>
+<dt>m<span class="classifier"><em>array_like</em></span></dt>
+<dd class="field-desc"><p>The mass $m$ of the body (u).</p></dd>
+<dt>v0<span class="classifier"><em>array_like</em></span></dt>
+<dd class="field-desc"><p>The initial velocity $v_0$ of the body (m/s).</p></dd>
+<dt>return_frame<span class="classifier"><em>str</em></span></dt>
+<dd class="field-desc"><p>The coordinate system for which the frequency is returned. Can be either <code>'atom'</code> or <code>'lab'</code>.</p></dd>
+<dt>relativistic<span class="classifier"><em>bool</em></span></dt>
+<dd class="field-desc"><p>The calculation is performed either relativistically (<code>True</code>) or classically (<code>False</code>).
+ The default is <code>True</code>.</p></dd></dl>
 </dd><dt class="field-head">Returns<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>out<span class="classifier"><em>numpy.ndarray | Iterable | int | float</em></span></dt>
-<dd class="field-desc"><p>the first derivative of the 'doppler' formula regarding 'e' ([f]/eV).
-    :raises ValueError: rest_frame must be either 'atom' or 'lab'.</p></dd></dl>
+<dt>out<span class="classifier"><em>ndarray</em></span></dt>
+<dd class="field-desc"><p>the first derivative $\partial f^\prime / \partial E$ of the Doppler-shifted frequency
+ $f^\prime$ with respect to <code>e</code> in either the rest frame of the atom or the laboratory frame ((<code>f</code>] / eV).
+:raises ValueError: return_frame must be either <code>'atom'</code> or <code>'lab'</code>.</p></dd></dl>
 </dd>
 </dl></dd>
 </dl>

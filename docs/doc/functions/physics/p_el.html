@@ -32,29 +32,30 @@ title: qspec.p_el
 <span class="o"><span class="pre">=</span></span>
 <span class="default_value"><span class="pre">True</span></span>
 </em>
-<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/physics.py#L269-L279' }}"><span class="sig-source">[source]</span></a>
+<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/physics.py#L331-L344' }}"><span class="sig-source">[source]</span></a>
 </dt>
-<dd class="field-body"><p></p>
+<dd class="field-body"><p>The momentum $p = \frac{1}{c}\sqrt{(qU)^2 + (p_0 c)^2 + 2qU\sqrt{(p_0 c)^2 + (mc^2)^2}}$.</p>
 <dl class="field-list">
 <dt class="field-head">Parameters<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>u<span class="classifier"><em>numpy.ndarray | Iterable | int | float</em></span></dt>
-<dd class="field-desc"><p>The electric potential difference added to the kinetic energy of a body with velocity v0 (V).</p></dd>
-<dt>q<span class="classifier"><em>numpy.ndarray | Iterable | int | float</em></span></dt>
-<dd class="field-desc"><p>The charge of a body (e).</p></dd>
-<dt>m<span class="classifier"><em>numpy.ndarray | Iterable | int | float</em></span></dt>
-<dd class="field-desc"><p>The mass of the body (amu).</p></dd>
-<dt>p0<span class="classifier"><em>numpy.ndarray | Iterable | int | float</em></span></dt>
-<dd class="field-desc"><p>The initial momentum of the body (amu m/s).</p></dd>
-<dt>relativistic<span class="classifier"><em>None</em></span></dt>
-<dd class="field-desc"><p>The calculation is performed either relativistically or classically.</p></dd></dl>
+<dt>u<span class="classifier"><em>array_like</em></span></dt>
+<dd class="field-desc"><p>The electric potential difference $U$ added to the kinetic energy of a body with momentum <code>p0</code> (V).</p></dd>
+<dt>q<span class="classifier"><em>array_like</em></span></dt>
+<dd class="field-desc"><p>The electric charge $q$ of the body (e).</p></dd>
+<dt>m<span class="classifier"><em>array_like</em></span></dt>
+<dd class="field-desc"><p>The mass $m$ of the body (u).</p></dd>
+<dt>p0<span class="classifier"><em>array_like</em></span></dt>
+<dd class="field-desc"><p>The initial momentum of the body (u m/s).</p></dd>
+<dt>relativistic<span class="classifier"><em>bool</em></span></dt>
+<dd class="field-desc"><p>The calculation is performed either relativistically (<code>True</code>) or classically (<code>False</code>).
+ The default is <code>True</code>.</p></dd></dl>
 </dd><dt class="field-head">Returns<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>out<span class="classifier"><em>numpy.ndarray | Iterable | int | float</em></span></dt>
-<dd class="field-desc"><p>The momentum of a body with starting momentum p0, charge q and mass m
-     after electrostatic acceleration with voltage u.</p></dd></dl>
+<dt>out<span class="classifier"><em>ndarray</em></span></dt>
+<dd class="field-desc"><p>The momentum $p$ of a body with electric charge <code>q</code>, mass <code>m</code> and starting momentum <code>p0</code>
+ after the addition of the energy <code>e</code> (u m/s).</p></dd></dl>
 </dd>
 </dl></dd>
 </dl>

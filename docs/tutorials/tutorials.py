@@ -106,6 +106,9 @@ def example_3():
     import numpy as np
     import qspec.simulate as sim
 
+    print(type(np.sqrt([5.])))
+    quit()
+
     f_sp = 446810183.163  # Transition frequency (MHz)
     a_sp = 36.891  # Einstein coefficient (rad MHz)
 
@@ -207,5 +210,5 @@ def gen_example(n):
 if __name__ == '__main__':
     # gen_pycode_css()
     # gen_example(0)
-    gen_example(3)
+    # gen_example(3)
     example_3()

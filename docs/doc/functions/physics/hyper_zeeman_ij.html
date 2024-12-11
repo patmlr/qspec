@@ -52,7 +52,7 @@ title: qspec.hyper_zeeman_ij
 <em class="sig-param">
 <span class="n"><span class="pre">b_field</span></span>
 </em>
-<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/physics.py#L641-L689' }}"><span class="sig-source">[source]</span></a>
+<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/physics.py#L727-L775' }}"><span class="sig-source">[source]</span></a>
 </dt>
 <dd class="field-body"><p>Calculate the matrix element $\langle m_{i, 0} m_{j, 0}| H_\mathrm{hfs} + H_\mathrm{Zeeman} |m_{i, 1} m_{j, 1}\rangle$.</p>
 <dl class="field-list">
@@ -75,16 +75,16 @@ title: qspec.hyper_zeeman_ij
 <dd class="field-desc"><p>The nuclear g-factor or the gyromagnetic ratio if <code>g_n_as_gyro == True</code>.</p></dd>
 <dt>g_j<span class="classifier"><em>float</em></span></dt>
 <dd class="field-desc"><p>The electronic g-factor.</p></dd>
-<dt>a_hyper<span class="classifier"><em>numpy.ndarray | Iterable | int | float</em></span></dt>
+<dt>a_hyper<span class="classifier"><em>array_like</em></span></dt>
 <dd class="field-desc"><p>The magnetic dipole hyperfine constant $A$ (MHz if <code>as_freq</code> else eV).</p></dd>
-<dt>b_hyper<span class="classifier"><em>numpy.ndarray | Iterable | int | float</em></span></dt>
-<dd class="field-desc"><p>The electric quadrupole hyperfine constant $B$ ([</code>a_hyper</code>]).</p></dd>
-<dt>b_field<span class="classifier"><em>numpy.ndarray | Iterable | int | float</em></span></dt>
+<dt>b_hyper<span class="classifier"><em>array_like</em></span></dt>
+<dd class="field-desc"><p>The electric quadrupole hyperfine constant $B$ ((<code>a_hyper</code>]).</p></dd>
+<dt>b_field<span class="classifier"><em>array_like</em></span></dt>
 <dd class="field-desc"><p>The $B$-field (T).</p></dd></dl>
 </dd><dt class="field-head">Returns<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>out<span class="classifier"><em>numpy.ndarray</em></span></dt>
+<dt>out<span class="classifier"><em>ndarray</em></span></dt>
 <dd class="field-desc"><p>One matrix element of the hyperfine-structure + Zeeman-effect hamiltonian.</p></dd></dl>
 </dd>
 </dl></dd>

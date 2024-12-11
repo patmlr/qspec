@@ -28,26 +28,29 @@ title: qspec.v_e_d1
 <span class="o"><span class="pre">=</span></span>
 <span class="default_value"><span class="pre">True</span></span>
 </em>
-<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/physics.py#L197-L209' }}"><span class="sig-source">[source]</span></a>
+<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/physics.py#L235-L252' }}"><span class="sig-source">[source]</span></a>
 </dt>
-<dd class="field-body"><p></p>
+<dd class="field-body"><p>The first derivative $\frac{\partial v}{\partial E} = \frac{1}{amv(E)}$ with
+ $a = \begin{cases}(\gamma(v_0) + E / (mc^2))^3, & \mathrm{True}\\1, & \mathrm{False}\end{cases}$</p>
 <dl class="field-list">
 <dt class="field-head">Parameters<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>e<span class="classifier"><em>numpy.ndarray | Iterable | int | float</em></span></dt>
-<dd class="field-desc"><p>Energy which is added to the kinetic energy of a body with velocity v0 (eV).</p></dd>
-<dt>m<span class="classifier"><em>numpy.ndarray | Iterable | int | float</em></span></dt>
-<dd class="field-desc"><p>The mass of the body (amu).</p></dd>
-<dt>v0<span class="classifier"><em>numpy.ndarray | Iterable | int | float</em></span></dt>
-<dd class="field-desc"><p>The initial velocity of the body (m/s).</p></dd>
-<dt>relativistic<span class="classifier"><em>None</em></span></dt>
-<dd class="field-desc"><p>The calculation is performed either relativistically or classically.</p></dd></dl>
+<dt>e<span class="classifier"><em>array_like</em></span></dt>
+<dd class="field-desc"><p>The energy $E$ added to the kinetic energy of a body with velocity <code>v0</code> (eV).</p></dd>
+<dt>m<span class="classifier"><em>array_like</em></span></dt>
+<dd class="field-desc"><p>The mass $m$ of the body (u).</p></dd>
+<dt>v0<span class="classifier"><em>array_like</em></span></dt>
+<dd class="field-desc"><p>The initial velocity $v_0$ of the body (m/s).</p></dd>
+<dt>relativistic<span class="classifier"><em>bool</em></span></dt>
+<dd class="field-desc"><p>The calculation is performed either relativistically (<code>True</code>) or classically (<code>False</code>).
+ The default is <code>True</code>.</p></dd></dl>
 </dd><dt class="field-head">Returns<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>out<span class="classifier"><em>numpy.ndarray | Iterable | int | float</em></span></dt>
-<dd class="field-desc"><p>The first derivative of 'v_e' regarding 'e' (m/(s eV)).</p></dd></dl>
+<dt>out<span class="classifier"><em>ndarray</em></span></dt>
+<dd class="field-desc"><p>The first derivative $\partial v / \partial E$ of the velocity $v(E)$ of a body with mass <code>m</code>
+ and velocity <code>v0</code> with respect to the added energy <code>e</code> (m/(s eV)).</p></dd></dl>
 </dd>
 </dl></dd>
 </dl>

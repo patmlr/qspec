@@ -26,27 +26,27 @@ title: qspec.convolved_boltzmann_norm_pdf
 <span class="o"><span class="pre">=</span></span>
 <span class="default_value"><span class="pre">0</span></span>
 </em>
-<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/physics.py#L1288-L1314' }}"><span class="sig-source">[source]</span></a>
+<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/physics.py#L1374-L1400' }}"><span class="sig-source">[source]</span></a>
 </dt>
 <dd class="field-body"><p></p>
 <dl class="field-list">
 <dt class="field-head">Parameters<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>e<span class="classifier"><em>numpy.ndarray | Iterable | int | float</em></span></dt>
+<dt>e<span class="classifier"><em>array_like</em></span></dt>
 <dd class="field-desc"><p>energy quantiles (eV).</p></dd>
-<dt>t<span class="classifier"><em>numpy.ndarray | Iterable | int | float</em></span></dt>
+<dt>t<span class="classifier"><em>array_like</em></span></dt>
 <dd class="field-desc"><p>The temperature of the ensemble (K).</p></dd>
-<dt>scale_e<span class="classifier"><em>numpy.ndarray | Iterable | int | float</em></span></dt>
+<dt>scale_e<span class="classifier"><em>array_like</em></span></dt>
 <dd class="field-desc"><p>The standard deviation of the normal distribution (eV).</p></dd>
-<dt>e0<span class="classifier"><em>numpy.ndarray | Iterable | int | float</em></span></dt>
+<dt>e0<span class="classifier"><em>array_like</em></span></dt>
 <dd class="field-desc"><p>The mean energy of the normal distribution (eV).</p></dd></dl>
 </dd><dt class="field-head">Returns<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>out<span class="classifier"><em>numpy.ndarray | Iterable | int | float</em></span></dt>
+<dt>out<span class="classifier"><em>array_like</em></span></dt>
 <dd class="field-desc"><p>The probability density at the energy e, distributed according
-     to a convolution of the boltzmann and a normal distribution (1/eV).</p></dd></dl>
+ to a convolution of the boltzmann and a normal distribution (1/eV).</p></dd></dl>
 </dd>
 </dl></dd>
 </dl>

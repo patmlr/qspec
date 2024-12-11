@@ -16,22 +16,22 @@ title: qspec.gamma_e_kin
 <em class="sig-param">
 <span class="n"><span class="pre">m</span></span>
 </em>
-<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/physics.py#L132-L138' }}"><span class="sig-source">[source]</span></a>
+<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/physics.py#L152-L160' }}"><span class="sig-source">[source]</span></a>
 </dt>
-<dd class="field-body"><p></p>
+<dd class="field-body"><p>The time-dilation/Lorentz factor $\gamma = 1 + E_\mathrm{kin} / (mc^2)$.</p>
 <dl class="field-list">
 <dt class="field-head">Parameters<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>e<span class="classifier"><em>numpy.ndarray | Iterable | int | float</em></span></dt>
-<dd class="field-desc"><p>The kinetic energy of a body (eV).</p></dd>
-<dt>m<span class="classifier"><em>numpy.ndarray | Iterable | int | float</em></span></dt>
-<dd class="field-desc"><p>The mass of the body (amu).</p></dd></dl>
+<dt>e<span class="classifier"><em>array_like</em></span></dt>
+<dd class="field-desc"><p>The kinetic energy $E_\mathrm{kin}$ of a body (eV).</p></dd>
+<dt>m<span class="classifier"><em>array_like</em></span></dt>
+<dd class="field-desc"><p>The mass $m$ of the body (u).</p></dd></dl>
 </dd><dt class="field-head">Returns<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>out<span class="classifier"><em>numpy.ndarray | Iterable | int | float</em></span></dt>
-<dd class="field-desc"><p>The time-dilation/Lorentz factor corresponding to the kinetic energy e of a body with mass m.</p></dd></dl>
+<dt>out<span class="classifier"><em>ndarray</em></span></dt>
+<dd class="field-desc"><p>The time-dilation/Lorentz factor $\gamma$ corresponding to the kinetic energy <code>e</code> of a body with mass <code>m</code>.</p></dd></dl>
 </dd>
 </dl></dd>
 </dl>

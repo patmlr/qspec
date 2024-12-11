@@ -10,22 +10,22 @@ title: qspec.freq_to_wavelength
 <span class="sig-prename"><span class="pre">qspec.</span></span><span class="sig-name"><span class="pre">freq_to_wavelength</span></span>
 <span class="sig-paren">&nbsp;(&nbsp;</span>
 <em class="sig-param">
-<span class="n"><span class="pre">freq</span></span>
+<span class="n"><span class="pre">f</span></span>
 </em>
-<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/physics.py#L76-L81' }}"><span class="sig-source">[source]</span></a>
+<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/physics.py#L78-L85' }}"><span class="sig-source">[source]</span></a>
 </dt>
-<dd class="field-body"><p></p>
+<dd class="field-body"><p>Convert MHz into &mu;m using $\lambda = c / f$.</p>
 <dl class="field-list">
 <dt class="field-head">Parameters<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>freq<span class="classifier"><em>numpy.ndarray | Iterable | int | float</em></span></dt>
-<dd class="field-desc"><p>The frequency f of a transition (MHz)</p></dd></dl>
+<dt>f<span class="classifier"><em>array_like</em></span></dt>
+<dd class="field-desc"><p>The frequency $f$ of a transition (MHz).</p></dd></dl>
 </dd><dt class="field-head">Returns<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>out<span class="classifier"><em>None</em></span></dt>
-<dd class="field-desc"><p>The wavelength corresponding to the frequency freq (um).</p></dd></dl>
+<dt>out<span class="classifier"><em>ndarray</em></span></dt>
+<dd class="field-desc"><p>The wavelength corresponding to the frequency <code>f</code> (&mu;m).</p></dd></dl>
 </dd>
 </dl></dd>
 </dl>

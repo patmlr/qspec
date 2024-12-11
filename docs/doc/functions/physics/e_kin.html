@@ -22,24 +22,26 @@ title: qspec.e_kin
 <span class="o"><span class="pre">=</span></span>
 <span class="default_value"><span class="pre">True</span></span>
 </em>
-<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/physics.py#L150-L161' }}"><span class="sig-source">[source]</span></a>
+<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/physics.py#L173-L188' }}"><span class="sig-source">[source]</span></a>
 </dt>
-<dd class="field-body"><p></p>
+<dd class="field-body"><p>The kinetic energy $E_\mathrm{kin} = \begin{cases}(\gamma(v) - 1) mc^2, & \mathrm{True}\\
+\frac{1}{2}mv^2 & \mathrm{False}\end{cases}$.</p>
 <dl class="field-list">
 <dt class="field-head">Parameters<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>v<span class="classifier"><em>numpy.ndarray | Iterable | int | float</em></span></dt>
-<dd class="field-desc"><p>The velocity of a body (m/s).</p></dd>
-<dt>m<span class="classifier"><em>numpy.ndarray | Iterable | int | float</em></span></dt>
-<dd class="field-desc"><p>The mass of the body (amu).</p></dd>
-<dt>relativistic<span class="classifier"><em>None</em></span></dt>
-<dd class="field-desc"><p>The calculation is performed either relativistically or classically.</p></dd></dl>
+<dt>v<span class="classifier"><em>array_like</em></span></dt>
+<dd class="field-desc"><p>The velocity $v$ of a body (m/s).</p></dd>
+<dt>m<span class="classifier"><em>array_like</em></span></dt>
+<dd class="field-desc"><p>The mass $m$ of the body (u).</p></dd>
+<dt>relativistic<span class="classifier"><em>bool</em></span></dt>
+<dd class="field-desc"><p>The calculation is performed either relativistically (<code>True</code>) or classically (<code>False</code>).
+ The default is <code>True</code>.</p></dd></dl>
 </dd><dt class="field-head">Returns<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>out<span class="classifier"><em>numpy.ndarray | Iterable | int | float</em></span></dt>
-<dd class="field-desc"><p>The kinetic energy of a body with velocity v and mass m (eV).</p></dd></dl>
+<dt>out<span class="classifier"><em>ndarray</em></span></dt>
+<dd class="field-desc"><p>The kinetic energy $E_\mathrm{kin}$ of a body with velocity <code>v</code> and mass <code>m</code> (eV).</p></dd></dl>
 </dd>
 </dl></dd>
 </dl>

@@ -36,31 +36,31 @@ title: qspec.convolved_thermal_norm_v_pdf
 <span class="o"><span class="pre">=</span></span>
 <span class="default_value"><span class="pre">True</span></span>
 </em>
-<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/physics.py#L1317-L1336' }}"><span class="sig-source">[source]</span></a>
+<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/physics.py#L1403-L1422' }}"><span class="sig-source">[source]</span></a>
 </dt>
 <dd class="field-body"><p></p>
 <dl class="field-list">
 <dt class="field-head">Parameters<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>v<span class="classifier"><em>numpy.ndarray | Iterable | int | float</em></span></dt>
+<dt>v<span class="classifier"><em>array_like</em></span></dt>
 <dd class="field-desc"><p>velocity quantiles. All values must have the same sign (m/s).</p></dd>
-<dt>m<span class="classifier"><em>numpy.ndarray | Iterable | int | float</em></span></dt>
+<dt>m<span class="classifier"><em>array_like</em></span></dt>
 <dd class="field-desc"><p>The mass of the ensembles bodies (amu).</p></dd>
-<dt>t<span class="classifier"><em>numpy.ndarray | Iterable | int | float</em></span></dt>
+<dt>t<span class="classifier"><em>array_like</em></span></dt>
 <dd class="field-desc"><p>The temperature of the ensemble (K).</p></dd>
-<dt>scale_e<span class="classifier"><em>numpy.ndarray | Iterable | int | float</em></span></dt>
+<dt>scale_e<span class="classifier"><em>array_like</em></span></dt>
 <dd class="field-desc"><p>The standard deviation of the normal distribution (eV).</p></dd>
-<dt>e0<span class="classifier"><em>numpy.ndarray | Iterable | int | float</em></span></dt>
+<dt>e0<span class="classifier"><em>array_like</em></span></dt>
 <dd class="field-desc"><p>The mean energy of the normal distribution (eV).</p></dd>
 <dt>relativistic<span class="classifier"><em>None</em></span></dt>
 <dd class="field-desc"><p>The calculation is performed either relativistically or classically.</p></dd></dl>
 </dd><dt class="field-head">Returns<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>out<span class="classifier"><em>numpy.ndarray | Iterable | int | float</em></span></dt>
+<dt>out<span class="classifier"><em>array_like</em></span></dt>
 <dd class="field-desc"><p>The probability density at the velocity v, corresponding to the kinetic energy, distributed according
-     to a convolution of the boltzmann and a normal distribution (s/m).</p></dd></dl>
+ to a convolution of the boltzmann and a normal distribution (s/m).</p></dd></dl>
 </dd>
 </dl></dd>
 </dl>

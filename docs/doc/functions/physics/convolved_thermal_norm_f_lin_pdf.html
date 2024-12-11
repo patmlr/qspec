@@ -26,28 +26,28 @@ title: qspec.convolved_thermal_norm_f_lin_pdf
 <span class="o"><span class="pre">=</span></span>
 <span class="default_value"><span class="pre">True</span></span>
 </em>
-<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/physics.py#L1365-L1399' }}"><span class="sig-source">[source]</span></a>
+<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/physics.py#L1451-L1485' }}"><span class="sig-source">[source]</span></a>
 </dt>
 <dd class="field-body"><p></p>
 <dl class="field-list">
 <dt class="field-head">Parameters<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>f<span class="classifier"><em>numpy.ndarray | Iterable | int | float</em></span></dt>
+<dt>f<span class="classifier"><em>array_like</em></span></dt>
 <dd class="field-desc"><p>Frequency quantiles (arb. units).</p></dd>
-<dt>xi<span class="classifier"><em>numpy.ndarray | Iterable | int | float</em></span></dt>
+<dt>xi<span class="classifier"><em>array_like</em></span></dt>
 <dd class="field-desc"><p>The proportionality constant between kinetic energy differences and frequency differences ([f]).</p></dd>
-<dt>sigma<span class="classifier"><em>numpy.ndarray | Iterable | int | float</em></span></dt>
+<dt>sigma<span class="classifier"><em>array_like</em></span></dt>
 <dd class="field-desc"><p>The standard deviation of the underlying normal distribution in frequency units ([f]).</p></dd>
 <dt>col<span class="classifier"><em>None</em></span></dt>
 <dd class="field-desc"><p>Col/Acol alignment of the laser relative to the atom beam.</p></dd></dl>
 </dd><dt class="field-head">Returns<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>out<span class="classifier"><em>numpy.ndarray | Iterable | int | float</em></span></dt>
+<dt>out<span class="classifier"><em>array_like</em></span></dt>
 <dd class="field-desc"><p>The probability density at the frequency 'f' in the atoms rest frame,
-     related to differences in kinetic energy via the proportionality constant 'xi'.
-     The kinetic energies are distributed according to a convolution of the boltzmann and a normal distribution (1/[f]).</p></dd></dl>
+ related to differences in kinetic energy via the proportionality constant 'xi'.
+ The kinetic energies are distributed according to a convolution of the boltzmann and a normal distribution (1/[f]).</p></dd></dl>
 </dd>
 </dl></dd>
 </dl>

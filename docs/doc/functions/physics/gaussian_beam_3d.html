@@ -38,32 +38,32 @@ title: qspec.gaussian_beam_3d
 <span class="o"><span class="pre">=</span></span>
 <span class="default_value"><span class="pre">-1</span></span>
 </em>
-<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/physics.py#L1164-L1190' }}"><span class="sig-source">[source]</span></a>
+<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/physics.py#L1250-L1276' }}"><span class="sig-source">[source]</span></a>
 </dt>
 <dd class="field-body"><p></p>
 <dl class="field-list">
 <dt class="field-head">Parameters<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>r<span class="classifier"><em>numpy.ndarray | Iterable | int | float</em></span></dt>
+<dt>r<span class="classifier"><em>array_like</em></span></dt>
 <dd class="field-desc"><p>The position 3-vector where to calculate the beam intensity (m).</p></dd>
-<dt>k<span class="classifier"><em>numpy.ndarray | Iterable | int | float</em></span></dt>
+<dt>k<span class="classifier"><em>array_like</em></span></dt>
 <dd class="field-desc"><p>The k-wave-3-vector of light (rad / m).</p></dd>
-<dt>w0<span class="classifier"><em>numpy.ndarray | Iterable | int | float</em></span></dt>
+<dt>w0<span class="classifier"><em>array_like</em></span></dt>
 <dd class="field-desc"><p>The beam waist (m).</p></dd>
-<dt>r0<span class="classifier"><em>numpy.ndarray | Iterable | int | float</em></span></dt>
+<dt>r0<span class="classifier"><em>array_like</em></span></dt>
 <dd class="field-desc"><p>The position 3-vector of the beam waist. Is (0m, 0m, 0m) if r0 is not specified (m).</p></dd>
-<dt>p0<span class="classifier"><em>numpy.ndarray | Iterable | int | float</em></span></dt>
+<dt>p0<span class="classifier"><em>array_like</em></span></dt>
 <dd class="field-desc"><p>The total power propagated by the gaussian beam. Is 1W if p0 is not specified (W).</p></dd>
 <dt>axis<span class="classifier"><em>int</em></span></dt>
 <dd class="field-desc"><p>The axis along which the vector components are aligned.</p></dd></dl>
 </dd><dt class="field-head">Returns<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>out<span class="classifier"><em>numpy.ndarray | Iterable | int | float</em></span></dt>
+<dt>out<span class="classifier"><em>array_like</em></span></dt>
 <dd class="field-desc"><p>The intensity of a gaussian beam with k-wave-vector k at the position r - r0 (W/m**2 == uW/mm**2).
-    :raises ValueError: r, k and r0 must have 3 components along the specified axis.
-     The shapes of r, k, w0, r0 and p0 must be compatible.</p></dd></dl>
+:raises ValueError: r, k and r0 must have 3 components along the specified axis.
+ The shapes of r, k, w0, r0 and p0 must be compatible.</p></dd></dl>
 </dd>
 </dl></dd>
 </dl>

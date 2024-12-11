@@ -22,24 +22,24 @@ title: qspec.thermal_v_rvs
 <span class="o"><span class="pre">=</span></span>
 <span class="default_value"><span class="pre">1</span></span>
 </em>
-<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/physics.py#L1252-L1262' }}"><span class="sig-source">[source]</span></a>
+<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/physics.py#L1338-L1348' }}"><span class="sig-source">[source]</span></a>
 </dt>
 <dd class="field-body"><p></p>
 <dl class="field-list">
 <dt class="field-head">Parameters<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>m<span class="classifier"><em>numpy.ndarray | Iterable | int | float</em></span></dt>
+<dt>m<span class="classifier"><em>array_like</em></span></dt>
 <dd class="field-desc"><p>The mass of the ensembles bodies (u).</p></dd>
-<dt>t<span class="classifier"><em>numpy.ndarray | Iterable | int | float</em></span></dt>
+<dt>t<span class="classifier"><em>array_like</em></span></dt>
 <dd class="field-desc"><p>The temperature of the ensemble (K).</p></dd>
 <dt>size<span class="classifier"><em>int | tuple</em></span></dt>
 <dd class="field-desc"><p>Either the size (int) or shape (tuple) of the returned velocity array.
-     If 'm' or 't' is an iterable/array, their common shape must be appended to the desired shape of the random samples.</p></dd></dl>
+ If 'm' or 't' is an iterable/array, their common shape must be appended to the desired shape of the random samples.</p></dd></dl>
 </dd><dt class="field-head">Returns<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>out<span class="classifier"><em>numpy.ndarray | Iterable | int | float</em></span></dt>
+<dt>out<span class="classifier"><em>array_like</em></span></dt>
 <dd class="field-desc"><p>Random velocities according to the thermal equilibrium distribution (m/s).</p></dd></dl>
 </dd>
 </dl></dd>

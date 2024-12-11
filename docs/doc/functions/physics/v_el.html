@@ -32,29 +32,31 @@ title: qspec.v_el
 <span class="o"><span class="pre">=</span></span>
 <span class="default_value"><span class="pre">True</span></span>
 </em>
-<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/physics.py#L212-L222' }}"><span class="sig-source">[source]</span></a>
+<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/physics.py#L255-L269' }}"><span class="sig-source">[source]</span></a>
 </dt>
-<dd class="field-body"><p></p>
+<dd class="field-body"><p>The velocity $v = \begin{cases}c\sqrt{1 - \left[\gamma(v_0) + qU / (mc^2)\right]^{-2}}, & \mathrm{True}\\
+\sqrt{v_0^2 + 2qU / m}, & \mathrm{False}\end{cases}$</p>
 <dl class="field-list">
 <dt class="field-head">Parameters<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>u<span class="classifier"><em>numpy.ndarray | Iterable | int | float</em></span></dt>
-<dd class="field-desc"><p>The electric potential difference added to the kinetic energy of a body with velocity v0 (V).</p></dd>
-<dt>q<span class="classifier"><em>numpy.ndarray | Iterable | int | float</em></span></dt>
-<dd class="field-desc"><p>The charge of a body (e).</p></dd>
-<dt>m<span class="classifier"><em>numpy.ndarray | Iterable | int | float</em></span></dt>
-<dd class="field-desc"><p>The mass of the body (amu).</p></dd>
-<dt>v0<span class="classifier"><em>numpy.ndarray | Iterable | int | float</em></span></dt>
-<dd class="field-desc"><p>The initial velocity of the body (m/s).</p></dd>
-<dt>relativistic<span class="classifier"><em>None</em></span></dt>
-<dd class="field-desc"><p>The calculation is performed either relativistically or classically.</p></dd></dl>
+<dt>u<span class="classifier"><em>array_like</em></span></dt>
+<dd class="field-desc"><p>The electric potential difference $U$ added to the kinetic energy of a body with velocity <code>v0</code> (V).</p></dd>
+<dt>q<span class="classifier"><em>array_like</em></span></dt>
+<dd class="field-desc"><p>The electric charge $q$ of the body (e).</p></dd>
+<dt>m<span class="classifier"><em>array_like</em></span></dt>
+<dd class="field-desc"><p>The mass $m$ of the body (u).</p></dd>
+<dt>v0<span class="classifier"><em>array_like</em></span></dt>
+<dd class="field-desc"><p>The initial velocity $v_0$ of the body (m/s).</p></dd>
+<dt>relativistic<span class="classifier"><em>bool</em></span></dt>
+<dd class="field-desc"><p>The calculation is performed either relativistically (<code>True</code>) or classically (<code>False</code>).
+ The default is <code>True</code>.</p></dd></dl>
 </dd><dt class="field-head">Returns<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>out<span class="classifier"><em>numpy.ndarray | Iterable | int | float</em></span></dt>
-<dd class="field-desc"><p>The velocity of a body with starting velocity v0, charge q and mass m
-     after electrostatic acceleration with voltage u (m/s).</p></dd></dl>
+<dt>out<span class="classifier"><em>ndarray</em></span></dt>
+<dd class="field-desc"><p>The velocity $v$ of the body with starting velocity <code>v0</code>, electric charge <code>q</code> and mass <code>m</code>
+ after electrostatic acceleration with the voltage <code>u</code> (m/s).</p></dd></dl>
 </dd>
 </dl></dd>
 </dl>

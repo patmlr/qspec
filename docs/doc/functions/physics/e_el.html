@@ -16,22 +16,23 @@ title: qspec.e_el
 <em class="sig-param">
 <span class="n"><span class="pre">q</span></span>
 </em>
-<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/physics.py#L172-L179' }}"><span class="sig-source">[source]</span></a>
+<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/physics.py#L202-L212' }}"><span class="sig-source">[source]</span></a>
 </dt>
-<dd class="field-body"><p></p>
+<dd class="field-body"><p>The potential energy difference $E_\mathrm{pot} = qU$.</p>
 <dl class="field-list">
 <dt class="field-head">Parameters<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>u<span class="classifier"><em>numpy.ndarray | Iterable | int | float</em></span></dt>
-<dd class="field-desc"><p>The electric potential difference (V).</p></dd>
-<dt>q<span class="classifier"><em>numpy.ndarray | Iterable | int | float</em></span></dt>
-<dd class="field-desc"><p>The charge of a body (e).</p></dd></dl>
+<dt>u<span class="classifier"><em>array_like</em></span></dt>
+<dd class="field-desc"><p>An electric potential difference $U$ (V).</p></dd>
+<dt>q<span class="classifier"><em>array_like</em></span></dt>
+<dd class="field-desc"><p>The electric charge $q$ of a body (e).</p></dd></dl>
 </dd><dt class="field-head">Returns<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>out<span class="classifier"><em>numpy.ndarray | Iterable | int | float</em></span></dt>
-<dd class="field-desc"><p>The potential energy difference of a body with charge q inside an electric potential with voltage u (eV).</p></dd></dl>
+<dt>out<span class="classifier"><em>ndarray</em></span></dt>
+<dd class="field-desc"><p>The potential energy difference $E_\mathrm{pot}$ of a body with electric charge <code>q</code>
+ inside an electric potential with voltage <code>u</code> (eV).</p></dd></dl>
 </dd>
 </dl></dd>
 </dl>

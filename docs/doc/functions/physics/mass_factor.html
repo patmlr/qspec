@@ -34,30 +34,30 @@ title: qspec.mass_factor
 <span class="o"><span class="pre">=</span></span>
 <span class="default_value"><span class="pre">True</span></span>
 </em>
-<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/physics.py#L880-L908' }}"><span class="sig-source">[source]</span></a>
+<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/physics.py#L966-L994' }}"><span class="sig-source">[source]</span></a>
 </dt>
 <dd class="field-body"><p></p>
 <dl class="field-list">
 <dt class="field-head">Parameters<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>m<span class="classifier"><em>numpy.ndarray | Iterable | int | float</em></span></dt>
+<dt>m<span class="classifier"><em>array_like</em></span></dt>
 <dd class="field-desc"><p>The mass of the isotope (amu).</p></dd>
-<dt>m_ref<span class="classifier"><em>numpy.ndarray | Iterable | int | float</em></span></dt>
+<dt>m_ref<span class="classifier"><em>array_like</em></span></dt>
 <dd class="field-desc"><p>The mass of the reference isotope (amu). Must be a scalar or have the same shape as 'm'.</p></dd>
-<dt>m_d<span class="classifier"><em>numpy.ndarray | Iterable | int | float</em></span></dt>
+<dt>m_d<span class="classifier"><em>array_like</em></span></dt>
 <dd class="field-desc"><p>The uncertainty of the mass of the isotope (amu). Must be a scalar or have the same shape as 'm'.</p></dd>
-<dt>m_ref_d<span class="classifier"><em>numpy.ndarray | Iterable | int | float</em></span></dt>
+<dt>m_ref_d<span class="classifier"><em>array_like</em></span></dt>
 <dd class="field-desc"><p>The uncertainty of the mass of the reference isotope (amu).
-     Must be a scalar or have the same shape as 'm'.</p></dd>
+ Must be a scalar or have the same shape as 'm'.</p></dd>
 <dt>k_inf<span class="classifier"><em>bool</em></span></dt>
 <dd class="field-desc"><p>Whether the normal mass-shift factor K(NMS) is defined mass independently
-     as m_e * T(inf) (= True) or as m_e * T(A_ref) (= False). Compare (6.4) with (3.17)
-     in [W. H. King, Isotope shifts in atomic spectra (1984)].</p></dd></dl>
+ as m_e * T(inf) (= True) or as m_e * T(A_ref) (= False). Compare (6.4) with (3.17)
+ in [W. H. King, Isotope shifts in atomic spectra (1984)].</p></dd></dl>
 </dd><dt class="field-head">Returns<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>out<span class="classifier"><em>(numpy.ndarray, numpy.ndarray)</em></span></dt>
+<dt>out<span class="classifier"><em>(ndarray, ndarray)</em></span></dt>
 <dd class="field-desc"><p>the mass factor and its uncertainty needed to calculate modified isotope shifts or charge radii.</p></dd></dl>
 </dd>
 </dl></dd>

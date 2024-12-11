@@ -60,7 +60,7 @@ title: qspec.hyper_zeeman
 <span class="o"><span class="pre">=</span></span>
 <span class="default_value"><span class="pre">True</span></span>
 </em>
-<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/physics.py#L614-L638' }}"><span class="sig-source">[source]</span></a>
+<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/physics.py#L700-L724' }}"><span class="sig-source">[source]</span></a>
 </dt>
 <dd class="field-body"><p></p>
 <dl class="field-list">
@@ -81,11 +81,11 @@ title: qspec.hyper_zeeman
 <dd class="field-desc"><p>The B-field-axis component quantum number m of the total angular momentum.</p></dd>
 <dt>g_n<span class="classifier"><em>float</em></span></dt>
 <dd class="field-desc"><p>The nuclear g-factor or the gyromagnetic ratio if g_n_as_gyro == True.</p></dd>
-<dt>a_hyper<span class="classifier"><em>numpy.ndarray | Iterable | int | float</em></span></dt>
+<dt>a_hyper<span class="classifier"><em>array_like</em></span></dt>
 <dd class="field-desc"><p>The magnetic dipole hyperfine constant A (MHz if 'as_freq' else eV).</p></dd>
-<dt>b_hyper<span class="classifier"><em>numpy.ndarray | Iterable | int | float</em></span></dt>
+<dt>b_hyper<span class="classifier"><em>array_like</em></span></dt>
 <dd class="field-desc"><p>The electric quadrupole hyperfine constant B ([a_hyper]).</p></dd>
-<dt>b<span class="classifier"><em>numpy.ndarray | Iterable | int | float</em></span></dt>
+<dt>b<span class="classifier"><em>array_like</em></span></dt>
 <dd class="field-desc"><p>The B-field (T).</p></dd>
 <dt>g_n_as_gyro<span class="classifier"><em>bool</em></span></dt>
 <dd class="field-desc"><p>Whether g_n is the nuclear g-factor or the gyromagnetic ratio.</p></dd>
@@ -94,9 +94,9 @@ title: qspec.hyper_zeeman
 </dd><dt class="field-head">Returns<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>out<span class="classifier"><em>numpy.ndarray | Iterable | int | float</em></span></dt>
+<dt>out<span class="classifier"><em>array_like</em></span></dt>
 <dd class="field-desc"><p>The total energy shift of an atomic state due to the hyperfine splitting
-     and the zeeman effect in energy or frequency units (eV or MHz).</p></dd></dl>
+ and the zeeman effect in energy or frequency units (eV or MHz).</p></dd></dl>
 </dd>
 </dl></dd>
 </dl>

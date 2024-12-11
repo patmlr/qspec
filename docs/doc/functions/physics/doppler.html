@@ -26,27 +26,29 @@ title: qspec.doppler
 <span class="o"><span class="pre">=</span></span>
 <span class="default_value"><span class="pre">atom</span></span>
 </em>
-<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/physics.py#L282-L299' }}"><span class="sig-source">[source]</span></a>
+<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/physics.py#L347-L371' }}"><span class="sig-source">[source]</span></a>
 </dt>
-<dd class="field-body"><p></p>
+<dd class="field-body"><p>The Doppler-shifted frequency $f^\prime = \begin{cases}f\gamma(v)(1 - \frac{v}{c}\cos(\alpha)), & \mathrm{atom}\\
+f[\gamma(v)(1 - \frac{v}{c}\cos(\alpha))]^{-1}, & \mathrm{lab}\end{cases}$</p>
 <dl class="field-list">
 <dt class="field-head">Parameters<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>f<span class="classifier"><em>numpy.ndarray | Iterable | int | float</em></span></dt>
-<dd class="field-desc"><p>The frequency of light (arb. units).</p></dd>
-<dt>v<span class="classifier"><em>numpy.ndarray | Iterable | int | float</em></span></dt>
-<dd class="field-desc"><p>The velocity of a body (m/s).</p></dd>
-<dt>alpha<span class="classifier"><em>numpy.ndarray | Iterable | int | float</em></span></dt>
-<dd class="field-desc"><p>The angle between the velocity- and the wave-vector in the laboratory frame (rad).</p></dd>
-<dt>return_frame<span class="classifier"><em>None</em></span></dt>
-<dd class="field-desc"><p>The coordinate system in which the frequency is returned. Can be either 'atom' or 'lab'.</p></dd></dl>
+<dt>f<span class="classifier"><em>array_like</em></span></dt>
+<dd class="field-desc"><p>The frequency $f$ of light (arb. units).</p></dd>
+<dt>v<span class="classifier"><em>array_like</em></span></dt>
+<dd class="field-desc"><p>The velocity $v$ of a body (m/s).</p></dd>
+<dt>alpha<span class="classifier"><em>array_like</em></span></dt>
+<dd class="field-desc"><p>The angle $\alpha$ between the velocity- and the light-vector in the laboratory frame (rad).</p></dd>
+<dt>return_frame<span class="classifier"><em>str</em></span></dt>
+<dd class="field-desc"><p>The coordinate system for which the frequency is returned. Can be either <code>'atom'</code> or <code>'lab'</code>.</p></dd></dl>
 </dd><dt class="field-head">Returns<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>out<span class="classifier"><em>numpy.ndarray | Iterable | int | float</em></span></dt>
-<dd class="field-desc"><p>the Doppler-shifted frequency in either the rest frame of the atom or the laboratory frame ([f]).
-    :raises ValueError: rest_frame must be either 'atom' or 'lab'.</p></dd></dl>
+<dt>out<span class="classifier"><em>ndarray</em></span></dt>
+<dd class="field-desc"><p>the Doppler-shifted frequency $f^\prime$ in either the rest frame of the atom
+ or the laboratory frame ((<code>f</code>]).
+:raises ValueError: <code>return_frame</code> must be either <code>'atom'</code> or <code>'lab'</code>.</p></dd></dl>
 </dd>
 </dl></dd>
 </dl>

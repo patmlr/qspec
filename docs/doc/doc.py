@@ -3,7 +3,7 @@ import importlib
 import os
 import inspect
 from docutils.core import publish_parts
-
+from numpy.typing import ArrayLike, NDArray
 
 FOLDER_FILES = {'models', 'simulate', 'analyze'}
 FILES = sorted(['physics'])  # 'physics', 'models', 'algebra', 'models', 'analyze', 'simulate', 'tools', 'stats'
@@ -11,15 +11,17 @@ FILES = sorted(['physics'])  # 'physics', 'models', 'algebra', 'models', 'analyz
 
 def type_to_str(_type):
     ret = str(_type)
+    ret = ret.replace(str(ArrayLike), 'array_like')
+    ret = ret.replace(str(NDArray), 'ndarray')
     while True:
         i = ret.find('Union[')
         if i == -1:
             break
         j = ret.find(']')
         ret = ret[:i] + ret[i+6:j].replace(', ', ' | ') + ret[j+1:]
-
-    return (str('None' if _type is inspect._empty else ret).replace('typing.', '').replace('<class ', '')
-            .replace('>', '').replace("'", ""))
+    ret = (str('None' if _type is inspect._empty else ret).replace('typing.', '').replace('<class ', '')
+           .replace('>', '').replace("'", ""))
+    return ret
 
 
 def rest_to_html(rest):
@@ -36,7 +38,7 @@ def docstring_to_html(rest):
     #         break
     #     j = i + 7 + html[i+7:].find('`')
     #     html = html[:i] + '$' + html[i+7:j] + '$' + html[j+1:]
-    html = rest.replace(' `', ' <code>').replace('`', '</code>')
+    html = rest.replace(' `', ' <code>').replace('(`', '(<code>').replace('[`', '(<code>').replace('`', '</code>')
     return html
 
 
@@ -358,6 +360,6 @@ def gen_functions():
 
 if __name__ == '__main__':
     gen_table()
-    gen_doc()
-    gen_modules()
+    # gen_doc()
+    # gen_modules()
     gen_functions()

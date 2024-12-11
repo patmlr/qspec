@@ -12,20 +12,20 @@ title: qspec.inv_cm_to_wavelength
 <em class="sig-param">
 <span class="n"><span class="pre">k</span></span>
 </em>
-<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/physics.py#L84-L89' }}"><span class="sig-source">[source]</span></a>
+<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/physics.py#L88-L95' }}"><span class="sig-source">[source]</span></a>
 </dt>
-<dd class="field-body"><p></p>
+<dd class="field-body"><p>Convert cm<sup>-1</sup> into &mu;m using $\lambda = 10^4 / k$.</p>
 <dl class="field-list">
 <dt class="field-head">Parameters<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>k<span class="classifier"><em>numpy.ndarray | Iterable | int | float</em></span></dt>
-<dd class="field-desc"><p>The wavenumber k of a transition (1/cm)</p></dd></dl>
+<dt>k<span class="classifier"><em>array_like</em></span></dt>
+<dd class="field-desc"><p>The wavenumber $k$ of a transition (cm<sup>-1</sup>).</p></dd></dl>
 </dd><dt class="field-head">Returns<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>out<span class="classifier"><em>None</em></span></dt>
-<dd class="field-desc"><p>The wavelength corresponding to the wavenumber k (um).</p></dd></dl>
+<dt>out<span class="classifier"><em>ndarray</em></span></dt>
+<dd class="field-desc"><p>The wavelength corresponding to the wavenumber <code>k</code> (um).</p></dd></dl>
 </dd>
 </dl></dd>
 </dl>

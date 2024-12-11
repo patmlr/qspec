@@ -46,35 +46,36 @@ title: qspec.doppler_el_d1
 <span class="o"><span class="pre">=</span></span>
 <span class="default_value"><span class="pre">True</span></span>
 </em>
-<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/physics.py#L340-L355' }}"><span class="sig-source">[source]</span></a>
+<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/physics.py#L425-L441' }}"><span class="sig-source">[source]</span></a>
 </dt>
 <dd class="field-body"><p></p>
 <dl class="field-list">
 <dt class="field-head">Parameters<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>f<span class="classifier"><em>numpy.ndarray | Iterable | int | float</em></span></dt>
+<dt>f<span class="classifier"><em>array_like</em></span></dt>
 <dd class="field-desc"><p>The frequency of light (arb. units).</p></dd>
-<dt>alpha<span class="classifier"><em>numpy.ndarray | Iterable | int | float</em></span></dt>
+<dt>alpha<span class="classifier"><em>array_like</em></span></dt>
 <dd class="field-desc"><p>The angle between the velocity- and the wave-vector in the laboratory frame (rad).</p></dd>
-<dt>u<span class="classifier"><em>numpy.ndarray | Iterable | int | float</em></span></dt>
+<dt>u<span class="classifier"><em>array_like</em></span></dt>
 <dd class="field-desc"><p>The electric potential difference added to the kinetic energy of a body with velocity v0 (V).</p></dd>
-<dt>q<span class="classifier"><em>numpy.ndarray | Iterable | int | float</em></span></dt>
+<dt>q<span class="classifier"><em>array_like</em></span></dt>
 <dd class="field-desc"><p>The charge of a body (e).</p></dd>
-<dt>m<span class="classifier"><em>numpy.ndarray | Iterable | int | float</em></span></dt>
+<dt>m<span class="classifier"><em>array_like</em></span></dt>
 <dd class="field-desc"><p>The mass of the body (amu).</p></dd>
-<dt>v0<span class="classifier"><em>numpy.ndarray | Iterable | int | float</em></span></dt>
+<dt>v0<span class="classifier"><em>array_like</em></span></dt>
 <dd class="field-desc"><p>The initial velocity of the body (m/s).</p></dd>
 <dt>return_frame<span class="classifier"><em>None</em></span></dt>
 <dd class="field-desc"><p>The coordinate system in which the frequency is returned. Can be either 'atom' or 'lab'.</p></dd>
-<dt>relativistic<span class="classifier"><em>None</em></span></dt>
-<dd class="field-desc"><p>The calculation is performed either relativistically or classically.</p></dd></dl>
+<dt>relativistic<span class="classifier"><em>bool</em></span></dt>
+<dd class="field-desc"><p>The calculation is performed either relativistically (<code>True</code>) or classically (<code>False</code>).
+ The default is <code>True</code>.</p></dd></dl>
 </dd><dt class="field-head">Returns<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>out<span class="classifier"><em>numpy.ndarray | Iterable | int | float</em></span></dt>
+<dt>out<span class="classifier"><em>array_like</em></span></dt>
 <dd class="field-desc"><p>the first derivative of the 'doppler' formula regarding 'u' ([f]/V).
-    :raises ValueError: rest_frame must be either 'atom' or 'lab'.</p></dd></dl>
+:raises ValueError: rest_frame must be either 'atom' or 'lab'.</p></dd></dl>
 </dd>
 </dl></dd>
 </dl>

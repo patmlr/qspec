@@ -32,35 +32,35 @@ title: qspec.inverse_doppler
 <span class="o"><span class="pre">=</span></span>
 <span class="default_value"><span class="pre">False</span></span>
 </em>
-<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/physics.py#L358-L419' }}"><span class="sig-source">[source]</span></a>
+<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/physics.py#L444-L505' }}"><span class="sig-source">[source]</span></a>
 </dt>
 <dd class="field-body"><p></p>
 <dl class="field-list">
 <dt class="field-head">Parameters<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>f_atom<span class="classifier"><em>numpy.ndarray | Iterable | int | float</em></span></dt>
+<dt>f_atom<span class="classifier"><em>array_like</em></span></dt>
 <dd class="field-desc"><p>The frequency of light in the atoms rest frame ([f_lab]).</p></dd>
-<dt>f_lab<span class="classifier"><em>numpy.ndarray | Iterable | int | float</em></span></dt>
+<dt>f_lab<span class="classifier"><em>array_like</em></span></dt>
 <dd class="field-desc"><p>The frequency of light in the laboratory frame (arb. units).</p></dd>
-<dt>alpha<span class="classifier"><em>numpy.ndarray | Iterable | int | float</em></span></dt>
+<dt>alpha<span class="classifier"><em>array_like</em></span></dt>
 <dd class="field-desc"><p>The angle between the velocity- and the wave-vector in the laboratory frame (rad).</p></dd>
 <dt>mode<span class="classifier"><em>None</em></span></dt>
 <dd class="field-desc"><p>The mode how to handle numpy.nans and ambiguous velocities. Available options are:
-        * 'raise-raise': Raise an error if there are numpy.nans and if the velocity is ambiguous.
-        * 'raise-small': Raise an error if there are numpy.nans and return the smaller velocity.
-        * 'raise-large': Raise an error if there are numpy.nans and return the larger velocity.
-        * 'isnan-raise': Ignore numpy.nans and raise an error if the velocity is ambiguous.
-        * 'isnan-small': Ignore numpy.nans and return the smaller velocity.
-        * 'isnan-large': Ignore numpy.nans and return the larger velocity.</p></dd>
+    * 'raise-raise': Raise an error if there are numpy.nans and if the velocity is ambiguous.
+    * 'raise-small': Raise an error if there are numpy.nans and return the smaller velocity.
+    * 'raise-large': Raise an error if there are numpy.nans and return the larger velocity.
+    * 'isnan-raise': Ignore numpy.nans and raise an error if the velocity is ambiguous.
+    * 'isnan-small': Ignore numpy.nans and return the smaller velocity.
+    * 'isnan-large': Ignore numpy.nans and return the larger velocity.</p></dd>
 <dt>return_mask<span class="classifier"><em>None</em></span></dt>
 <dd class="field-desc"><p>Whether the mask where the velocity is ambiguous is returned as a second argument.</p></dd></dl>
 </dd><dt class="field-head">Returns<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>out<span class="classifier"><em>numpy.ndarray | Iterable | int | float</em></span></dt>
+<dt>out<span class="classifier"><em>array_like</em></span></dt>
 <dd class="field-desc"><p>the velocity required to shift f_lab to f_atom (m/s)
-     and optionally the mask where the velocity is ambiguous.</p></dd></dl>
+ and optionally the mask where the velocity is ambiguous.</p></dd></dl>
 </dd>
 </dl></dd>
 </dl>

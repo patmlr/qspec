@@ -22,26 +22,26 @@ title: qspec.boost
 <span class="o"><span class="pre">=</span></span>
 <span class="default_value"><span class="pre">-1</span></span>
 </em>
-<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/physics.py#L1106-L1138' }}"><span class="sig-source">[source]</span></a>
+<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/physics.py#L1192-L1224' }}"><span class="sig-source">[source]</span></a>
 </dt>
 <dd class="field-body"><p></p>
 <dl class="field-list">
 <dt class="field-head">Parameters<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>x<span class="classifier"><em>numpy.ndarray | Iterable | int | float</em></span></dt>
+<dt>x<span class="classifier"><em>array_like</em></span></dt>
 <dd class="field-desc"><p>The 4-vector x in the current rest frame (arb. units).</p></dd>
-<dt>v<span class="classifier"><em>numpy.ndarray | Iterable | int | float</em></span></dt>
+<dt>v<span class="classifier"><em>array_like</em></span></dt>
 <dd class="field-desc"><p>The velocity 3-vector (m/s).</p></dd>
 <dt>axis<span class="classifier"><em>None</em></span></dt>
 <dd class="field-desc"><p>The axis along which the vector components are aligned.</p></dd></dl>
 </dd><dt class="field-head">Returns<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>out<span class="classifier"><em>numpy.ndarray | Iterable | int | float</em></span></dt>
+<dt>out<span class="classifier"><em>array_like</em></span></dt>
 <dd class="field-desc"><p>The 4-vector x in the coordinate system moving with velocity v relative to the current rest frame ([x]).
-    :raises ValueError: x and v must have 4 and 3 components along the specified axis, respectively.
-     The shapes of x and v must be compatible.</p></dd></dl>
+:raises ValueError: x and v must have 4 and 3 components along the specified axis, respectively.
+ The shapes of x and v must be compatible.</p></dd></dl>
 </dd>
 </dl></dd>
 </dl>
