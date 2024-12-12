@@ -20,3 +20,6 @@ class TestPhysics(ut.TestCase):
 
     def test_gamma(self):
         self.assertAlmostEqual(ph.gamma(299792458. / 4.), 1.0327955589886444, places=15)
+
+    # def test_inverse_doppler(self):
+    #     print(ph.inverse_doppler(1e7, 1e7, 0.3))

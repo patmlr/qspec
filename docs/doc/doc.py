@@ -38,7 +38,7 @@ def docstring_to_html(rest):
     #         break
     #     j = i + 7 + html[i+7:].find('`')
     #     html = html[:i] + '$' + html[i+7:j] + '$' + html[j+1:]
-    html = rest.replace(' `', ' <code>').replace('(`', '(<code>').replace('[`', '(<code>').replace('`', '</code>')
+    html = rest.replace(' `', ' <code>').replace('(`', '(<code>').replace('[`', '[<code>').replace('`', '</code>')
     return html
 
 
@@ -193,6 +193,8 @@ def _gen_func(f, file, temp, namespace, funcs, func_sig, func_doc):
             default = p_sig.default
             if callable(default):
                 default = default.__name__
+            if isinstance(default, str):
+                default = f"'{default}'"
             html += '\n' + temp[i + 8] + '\n' + temp[i + 10].replace('_default_', str(default))
         html += f'\n{temp[i + 11]}\n,&nbsp;'
     lines, i_start = inspect.getsourcelines(funcs[f])
@@ -359,7 +361,7 @@ def gen_functions():
 
 
 if __name__ == '__main__':
-    gen_table()
+    # gen_table()
     # gen_doc()
     # gen_modules()
     gen_functions()

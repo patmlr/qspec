@@ -12,7 +12,7 @@ import scipy.integrate as si
 from scipy.optimize import root, minimize
 import matplotlib.pyplot as plt
 
-from qspec._types import *
+from qspec.types import *
 from qspec import tools
 from qspec.analyze import curve_fit
 

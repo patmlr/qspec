@@ -106,9 +106,6 @@ def example_3():
     import numpy as np
     import qspec.simulate as sim
 
-    print(type(np.sqrt([5.])))
-    quit()
-
     f_sp = 446810183.163  # Transition frequency (MHz)
     a_sp = 36.891  # Einstein coefficient (rad MHz)
 
@@ -163,7 +160,6 @@ def example_3():
     m.plot(delta, y4_master[:, -1] * scale, '--C3',
            label=r'master, $t = 0.4\,\mu$s', linewidth=1.5, zorder=30)
 
-
     r.plot(delta, (y_brown - y_rates[:, -1]) * scale,
            '-k', zorder=20)
     r.plot(delta, (y_master[:, -1] - y_rates[:, -1]) * scale,
@@ -206,6 +202,7 @@ def gen_example(n):
     #     code = py_file.read()
     code = inspect.getsource(eval(f'example_{n}'))
     pycode_to_html(code)
+
 
 if __name__ == '__main__':
     # gen_pycode_css()

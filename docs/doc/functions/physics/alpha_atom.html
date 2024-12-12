@@ -16,9 +16,10 @@ title: qspec.alpha_atom
 <em class="sig-param">
 <span class="n"><span class="pre">v</span></span>
 </em>
-<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/physics.py#L546-L555' }}"><span class="sig-source">[source]</span></a>
+<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/physics.py#L586-L598' }}"><span class="sig-source">[source]</span></a>
 </dt>
-<dd class="field-body"><p></p>
+<dd class="field-body"><p>The angle in the rest frame of the atom
+ $\alpha^\prime = \arccos\left[\frac{(v/c) + \cos(\alpha)}{1 + (v/c)\cos(\alpha)}\right]$.</p>
 <dl class="field-list">
 <dt class="field-head">Parameters<span class="colon">:</span></dt>
 <dd class="field-par">
@@ -26,12 +27,12 @@ title: qspec.alpha_atom
 <dt>alpha<span class="classifier"><em>array_like</em></span></dt>
 <dd class="field-desc"><p>The angle between a velocity- and a wave-vector in the laboratory frame (rad).</p></dd>
 <dt>v<span class="classifier"><em>array_like</em></span></dt>
-<dd class="field-desc"><p>The velocity of a body (m/s).</p></dd></dl>
+<dd class="field-desc"><p>The velocity $v$ of a body (m/s).</p></dd></dl>
 </dd><dt class="field-head">Returns<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
 <dt>out<span class="classifier"><em>array_like</em></span></dt>
-<dd class="field-desc"><p>The angle between the velocity- and the wave-vector in the atoms rest frame (rad).</p></dd></dl>
+<dd class="field-desc"><p>The angle $\alpha^\prime$ between the velocity- and the wave-vector in the atom's rest frame (rad).</p></dd></dl>
 </dd>
 </dl></dd>
 </dl>

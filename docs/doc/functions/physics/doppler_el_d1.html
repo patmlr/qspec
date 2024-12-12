@@ -38,7 +38,7 @@ title: qspec.doppler_el_d1
 <em class="sig-param">
 <span class="n"><span class="pre">return_frame</span></span>
 <span class="o"><span class="pre">=</span></span>
-<span class="default_value"><span class="pre">atom</span></span>
+<span class="default_value"><span class="pre">'atom'</span></span>
 </em>
 ,&nbsp;
 <em class="sig-param">
@@ -46,36 +46,39 @@ title: qspec.doppler_el_d1
 <span class="o"><span class="pre">=</span></span>
 <span class="default_value"><span class="pre">True</span></span>
 </em>
-<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/physics.py#L425-L441' }}"><span class="sig-source">[source]</span></a>
+<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/physics.py#L426-L447' }}"><span class="sig-source">[source]</span></a>
 </dt>
-<dd class="field-body"><p></p>
+<dd class="field-body"><p>The first derivative $\frac{\partial f^\prime}{\partial U} =
+ \frac{\partial f^\prime}{\partial v}\frac{\partial v}{\partial U}$
+Implemented as <code>doppler_d1(f, v, alpha, return_frame) * v_el_d1(u, q, m, v0, relativistic)</code>.</p>
 <dl class="field-list">
 <dt class="field-head">Parameters<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
 <dt>f<span class="classifier"><em>array_like</em></span></dt>
-<dd class="field-desc"><p>The frequency of light (arb. units).</p></dd>
+<dd class="field-desc"><p>The frequency $f$ of light (arb. units).</p></dd>
 <dt>alpha<span class="classifier"><em>array_like</em></span></dt>
-<dd class="field-desc"><p>The angle between the velocity- and the wave-vector in the laboratory frame (rad).</p></dd>
+<dd class="field-desc"><p>The angle $\alpha$ between the velocity- and the light-vector in the laboratory frame (rad).</p></dd>
 <dt>u<span class="classifier"><em>array_like</em></span></dt>
-<dd class="field-desc"><p>The electric potential difference added to the kinetic energy of a body with velocity v0 (V).</p></dd>
+<dd class="field-desc"><p>The electric potential difference $U$ added to the kinetic energy of a body with velocity <code>v0</code> (V).</p></dd>
 <dt>q<span class="classifier"><em>array_like</em></span></dt>
-<dd class="field-desc"><p>The charge of a body (e).</p></dd>
+<dd class="field-desc"><p>The electric charge $q$ of the body (e).</p></dd>
 <dt>m<span class="classifier"><em>array_like</em></span></dt>
-<dd class="field-desc"><p>The mass of the body (amu).</p></dd>
+<dd class="field-desc"><p>The mass $m$ of the body (u).</p></dd>
 <dt>v0<span class="classifier"><em>array_like</em></span></dt>
-<dd class="field-desc"><p>The initial velocity of the body (m/s).</p></dd>
-<dt>return_frame<span class="classifier"><em>None</em></span></dt>
-<dd class="field-desc"><p>The coordinate system in which the frequency is returned. Can be either 'atom' or 'lab'.</p></dd>
+<dd class="field-desc"><p>The initial velocity $v_0$ of the body (m/s).</p></dd>
+<dt>return_frame<span class="classifier"><em>str</em></span></dt>
+<dd class="field-desc"><p>The coordinate system for which the frequency is returned. Can be either <code>'atom'</code> or <code>'lab'</code>.</p></dd>
 <dt>relativistic<span class="classifier"><em>bool</em></span></dt>
 <dd class="field-desc"><p>The calculation is performed either relativistically (<code>True</code>) or classically (<code>False</code>).
  The default is <code>True</code>.</p></dd></dl>
 </dd><dt class="field-head">Returns<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>out<span class="classifier"><em>array_like</em></span></dt>
-<dd class="field-desc"><p>the first derivative of the 'doppler' formula regarding 'u' ([f]/V).
-:raises ValueError: rest_frame must be either 'atom' or 'lab'.</p></dd></dl>
+<dt>out<span class="classifier"><em>ndarray</em></span></dt>
+<dd class="field-desc"><p>the first derivative $\partial f^\prime / \partial U$ of the Doppler-shifted frequency
+ $f^\prime$ with respect to <code>u</code> in either the rest frame of the atom or the laboratory frame ([<code>f</code>] / V).
+:raises ValueError: return_frame must be either <code>'atom'</code> or <code>'lab'</code>.</p></dd></dl>
 </dd>
 </dl></dd>
 </dl>

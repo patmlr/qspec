@@ -15,7 +15,7 @@ import shutil
 import sqlite3
 import numpy as np
 
-from qspec._types import *
+from qspec.types import *
 
 __all__ = ['ROMAN_NUMERALS', 'COLORS', 'get_rgb_print_command', 'rgb_to_hex_color', 'print_colored', 'printh', 'printw',
            'printf', 'map_corr_coeff_to_color', 'print_cov', 'get_default_path', 'create_doc_link', 'create_data_dir',
@@ -792,7 +792,7 @@ def get_subarray(a, i, axis):
 """ Vector math """
 
 
-def absolute(x: array_like, axis=-1) -> array_like:
+def absolute(x: array_like, axis=-1) -> ndarray:
     """
     :param x: A real vector or an array of real vectors.
     :param axis: The axis along which the vector components are aligned.
@@ -812,7 +812,7 @@ def absolute_complex(x: array_like, axis=-1):
     return np.sqrt(np.sum(np.abs(x) ** 2, axis=axis))
 
 
-def angle(x: array_like, y: array_like, axis=-1) -> array_like:
+def angle(x: array_like, y: array_like, axis=-1) -> ndarray:
     """
     :param x: The first vectors (arb. units).
     :param y: The second vectors ([x]).
@@ -843,7 +843,7 @@ def angle_d(x: array_like, x_d: array_like, y: array_like, y_d: array_like, axis
     return np.sqrt((dx + dy) / (1 - arg ** 2))
 
 
-def transform(t: array_like, vec: array_like, axis=-1) -> array_like:
+def transform(t: array_like, vec: array_like, axis=-1) -> ndarray:
     """
     :param t: The transformation matrix which must hold t.shape[axis+1] == vec.shape[axis].
     :param vec: The vector to be transformed.
@@ -889,7 +889,7 @@ def vector_to_diag_matrix(a, axis: int = -1):
     return b * ident
 
 
-def e_r(theta: array_like, phi: array_like, axis=-1) -> array_like:
+def e_r(theta: array_like, phi: array_like, axis=-1) -> ndarray:
     """
     :param theta: The angle theta.
     :param phi: The angle phi.
@@ -905,7 +905,7 @@ def e_r(theta: array_like, phi: array_like, axis=-1) -> array_like:
     return np.concatenate([x, y, z], axis=axis)
 
 
-def e_theta(theta: array_like, phi: array_like, axis=-1) -> array_like:
+def e_theta(theta: array_like, phi: array_like, axis=-1) -> ndarray:
     """
     :param theta: The angle theta.
     :param phi: The angle phi.
@@ -921,7 +921,7 @@ def e_theta(theta: array_like, phi: array_like, axis=-1) -> array_like:
     return np.concatenate([x, y, z], axis=axis)
 
 
-def e_phi(theta: array_like, phi: array_like, axis=-1) -> array_like:
+def e_phi(theta: array_like, phi: array_like, axis=-1) -> ndarray:
     """
     :param theta: The angle theta.
     :param phi: The angle phi.

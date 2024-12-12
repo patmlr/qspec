@@ -8,7 +8,7 @@ Module to fit the models to data.
 
 import numpy as np
 
-from qspec._types import *
+from qspec.types import *
 from qspec.tools import asarray_optional, print_colored, print_cov
 from qspec.analyze import curve_fit, odr_fit
 from qspec.models import _base, _helper

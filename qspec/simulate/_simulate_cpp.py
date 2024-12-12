@@ -10,7 +10,7 @@ import numpy as np
 from matplotlib import cm
 import matplotlib.pyplot as plt
 
-from qspec._types import *
+from qspec.types import *
 from qspec._cpp import *
 from qspec import tools
 from qspec import get_f, get_m

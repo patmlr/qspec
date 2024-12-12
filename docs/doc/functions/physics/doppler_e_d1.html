@@ -34,7 +34,7 @@ title: qspec.doppler_e_d1
 <em class="sig-param">
 <span class="n"><span class="pre">return_frame</span></span>
 <span class="o"><span class="pre">=</span></span>
-<span class="default_value"><span class="pre">atom</span></span>
+<span class="default_value"><span class="pre">'atom'</span></span>
 </em>
 ,&nbsp;
 <em class="sig-param">
@@ -42,10 +42,11 @@ title: qspec.doppler_e_d1
 <span class="o"><span class="pre">=</span></span>
 <span class="default_value"><span class="pre">True</span></span>
 </em>
-<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/physics.py#L403-L422' }}"><span class="sig-source">[source]</span></a>
+<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/physics.py#L403-L423' }}"><span class="sig-source">[source]</span></a>
 </dt>
 <dd class="field-body"><p>The first derivative $\frac{\partial f^\prime}{\partial E} =
- \frac{\partial f^\prime}{\partial v}\frac{\partial v}{\partial E}$</p>
+ \frac{\partial f^\prime}{\partial v}\frac{\partial v}{\partial E}$
+Implemented as <code>doppler_d1(f, v, alpha, return_frame) * v_e_d1(e, m, v0, relativistic)</code>.</p>
 <dl class="field-list">
 <dt class="field-head">Parameters<span class="colon">:</span></dt>
 <dd class="field-par">
@@ -70,7 +71,7 @@ title: qspec.doppler_e_d1
 <dl>
 <dt>out<span class="classifier"><em>ndarray</em></span></dt>
 <dd class="field-desc"><p>the first derivative $\partial f^\prime / \partial E$ of the Doppler-shifted frequency
- $f^\prime$ with respect to <code>e</code> in either the rest frame of the atom or the laboratory frame ((<code>f</code>] / eV).
+ $f^\prime$ with respect to <code>e</code> in either the rest frame of the atom or the laboratory frame ([<code>f</code>] / eV).
 :raises ValueError: return_frame must be either <code>'atom'</code> or <code>'lab'</code>.</p></dd></dl>
 </dd>
 </dl></dd>

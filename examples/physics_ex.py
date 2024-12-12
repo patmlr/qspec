@@ -253,5 +253,6 @@ def example(n=None):
         plt.subplots_adjust(left=0.11, bottom=0.1, right=0.98, top=0.99)
         plt.show()
 
+
 if __name__ == '__main__':
     example({5})
