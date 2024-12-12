@@ -15,7 +15,7 @@ from mpl_toolkits.axes_grid1 import make_axes_locatable
 # noinspection PyUnresolvedReferences
 from mpl_toolkits.mplot3d.axes3d import Axes3D
 
-from qspec.types import *
+from qspec.qtypes import *
 from qspec import tools
 import qspec.algebra as al
 from qspec.physics import f_recoil, saturation

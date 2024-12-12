@@ -8,7 +8,7 @@ Helper functions for the models.
 
 import numpy as np
 
-from qspec.types import *
+from qspec.qtypes import *
 from qspec.models import _base, _convolved, _splitter, _spectrum
 
 

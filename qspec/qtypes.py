@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-qspec.types
+qspec.qtypes
 ===========
 
 Module including types for the docstrings.

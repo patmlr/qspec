@@ -3,16 +3,29 @@ import importlib
 import os
 import inspect
 from docutils.core import publish_parts
-from numpy.typing import ArrayLike, NDArray
+from qspec.qtypes import *
 
 FOLDER_FILES = {'models', 'simulate', 'analyze'}
-FILES = sorted(['physics'])  # 'physics', 'models', 'algebra', 'models', 'analyze', 'simulate', 'tools', 'stats'
+FILES = sorted(['physics', 'algebra', 'models', 'models', 'analyze', 'simulate', 'tools', 'stats'])  # 'algebra', 'physics', 'models', 'models', 'analyze', 'simulate', 'tools', 'stats'
+
+
+def is_num(val):
+    return isinstance(val, int) or isinstance(val, float)
 
 
 def type_to_str(_type):
     ret = str(_type)
-    ret = ret.replace(str(ArrayLike), 'array_like')
-    ret = ret.replace(str(NDArray), 'ndarray')
+    ret = ret.replace(str(sympy_like), 'sympy_like')
+    ret = ret.replace(str(sympy_quant), 'sympy_quant')
+    ret = ret.replace(str(Union[sympy_core, float]), 'Union[sympy_core, float]')
+    ret = ret.replace(str(sympy_core), 'sympy_core')
+    ret = ret.replace(str(Union[array_like, object]), 'Union[array_like, object]')
+    ret = ret.replace(str(array_like), 'array_like')
+    ret = ret.replace(str(quant_like), 'quant_like')
+    ret = ret.replace(f'{quant.__module__}.{quant.__name__}', 'quant')
+    ret = ret.replace(str(scalar_like), 'scalar_like')
+    ret = ret.replace(str(scalar), 'scalar')
+    ret = ret.replace(str(ndarray), 'ndarray')
     while True:
         i = ret.find('Union[')
         if i == -1:
@@ -184,18 +197,32 @@ def _gen_func(f, file, temp, namespace, funcs, func_sig, func_doc):
             continue
         p_str = p_sig.__str__()
         html += '\n' + temp[i]
+
         if '**' in p_str:
             html += '\n' + temp[i + 4]
+
         elif '*' in p_str:
             html += '\n' + temp[i + 2]
         html += '\n' + temp[i + 6].replace('_par_', p)
+
         if '=' in p_str:
             default = p_sig.default
             if callable(default):
                 default = default.__name__
             if isinstance(default, str):
                 default = f"'{default}'"
-            html += '\n' + temp[i + 8] + '\n' + temp[i + 10].replace('_default_', str(default))
+
+            color_class = ''
+            if isinstance(default, bool):
+                color_class = ' bool'
+            elif isinstance(default, str):
+                color_class = ' string'
+            elif is_num(default) or isinstance(default, tuple):
+                color_class = ' num'
+
+            html += ('\n' + temp[i + 8] + '\n' + temp[i + 10].replace('_default_', str(default))
+                     .replace('_colorclass_', color_class))
+
         html += f'\n{temp[i + 11]}\n,&nbsp;'
     lines, i_start = inspect.getsourcelines(funcs[f])
     i_stop = i_start + len(lines) - 1
@@ -361,7 +388,7 @@ def gen_functions():
 
 
 if __name__ == '__main__':
-    # gen_table()
-    # gen_doc()
-    # gen_modules()
+    gen_table()
+    gen_doc()
+    gen_modules()
     gen_functions()

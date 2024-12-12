@@ -38,7 +38,7 @@ from scipy import odr
 import matplotlib
 import matplotlib.pyplot as plt
 
-from qspec.types import *
+from qspec.qtypes import *
 from qspec import tools
 from qspec.physics import me_u, me_u_d
 from qspec.analyze._analyze_cpp import generate_collinear_points_cpp

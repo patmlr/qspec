@@ -12,7 +12,7 @@ import scipy.constants as sc
 import scipy.stats as st
 import scipy.special as sp
 
-from qspec.types import *
+from qspec.qtypes import *
 from qspec import tools
 
 __all__ = ['L_LABEL', 'E_NORM', 'LEMNISCATE', 'mu_N', 'mu_B', 'g_s', 'me_u', 'me_u_d', 'gp_s', 'gn_s',
@@ -404,7 +404,7 @@ def doppler_e_d1(f: array_like, alpha: array_like, e: array_like, m: array_like,
                  v0: array_like = 0, return_frame: str = 'atom', relativistic: bool = True) -> ndarray:
     r"""
     The first derivative $\frac{\partial f^\prime}{\partial E} =
-     \frac{\partial f^\prime}{\partial v}\frac{\partial v}{\partial E}$
+     \frac{\partial f^\prime}{\partial v}\frac{\partial v}{\partial E}$.
     Implemented as `doppler_d1(f, v, alpha, return_frame) * v_e_d1(e, m, v0, relativistic)`.
 
     :param f: The frequency $f$ of light (arb. units).
@@ -427,7 +427,7 @@ def doppler_el_d1(f: array_like, alpha: array_like, u: array_like, q: array_like
                   v0: array_like = 0., return_frame: str = 'atom', relativistic: bool = True) -> ndarray:
     r"""
     The first derivative $\frac{\partial f^\prime}{\partial U} =
-     \frac{\partial f^\prime}{\partial v}\frac{\partial v}{\partial U}$
+     \frac{\partial f^\prime}{\partial v}\frac{\partial v}{\partial U}$.
     Implemented as `doppler_d1(f, v, alpha, return_frame) * v_el_d1(u, q, m, v0, relativistic)`.
 
     :param f: The frequency $f$ of light (arb. units).
@@ -588,7 +588,7 @@ def alpha_atom(alpha: array_like, v: array_like) -> array_like:
     The angle in the rest frame of the atom
      $\alpha^\prime = \arccos\left[\frac{(v/c) + \cos(\alpha)}{1 + (v/c)\cos(\alpha)}\right]$.
 
-    :param alpha: The angle between a velocity- and a wave-vector in the laboratory frame (rad).
+    :param alpha: The angle $\alpha$ between a velocity- and a wave-vector in the laboratory frame (rad).
     :param v: The velocity $v$ of a body (m/s).
     :returns: The angle $\alpha^\prime$ between the velocity- and the wave-vector in the atom's rest frame (rad).
     """

@@ -23,8 +23,11 @@
     --code-prose-bg-color: hsl(210, 8%, 90%);
     --code-block-bg-color: hsl(0, 0%, 96.5%);
     --bash-code-color: hsl(258, 38.9%, 18.6%);
-    --py-func-color: #ff7f0e;
-    --py-class-color: RoyalBlue;
+    --py-class-color: #b200b2;
+    --py-func-color: #4169e1;
+    --py-num-color: #05967c;
+    --py-str-color: #197a01;
+    --py-bool-color: #ff7f0e;
     }
 
 body {
@@ -555,6 +558,18 @@ dt.func-sig {
 em.sig-param { display: flex; }
 .sig-param .o, .sig-param .default_value {
     font-weight: normal;
+    }
+
+.default_value span.string {
+    color: var(--py-str-color);
+    }
+
+.default_value span.bool {
+    color: var(--py-bool-color);
+    }
+
+.default_value span.num {
+    color: var(--py-num-color);
     }
 
 span.sig-prename { background-color: transparent; font-weight: bold; }

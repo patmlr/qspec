@@ -12,7 +12,7 @@ import scipy.integrate as si
 from scipy.optimize import root, minimize
 import matplotlib.pyplot as plt
 
-from qspec.types import *
+from qspec.qtypes import *
 from qspec import tools
 from qspec.analyze import curve_fit
 
@@ -278,7 +278,7 @@ def mode_lognormal(x, bins=100):
     return mode
 
 
-def propagate(f: Callable, x: Union[array_like, Observable], x_d: array_like = None, cov: array_iter = None,
+def propagate(f: Callable, x: array_like, x_d: array_like = None, cov: array_iter = None,
               unc_places: int = None, sample_size: int = 1000000, rtol: float = 1e-3, atol: float = None,
               force_sym: bool = False, full_output: bool = False, show: bool = False) -> (Observable, list, ndarray):
     """

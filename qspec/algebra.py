@@ -11,7 +11,7 @@ from sympy import nsimplify, sqrt, sin, cos, pi
 from sympy.vector import CoordSys3D
 import sympy.physics.wigner as spw
 
-from qspec.types import *
+from qspec.qtypes import *
 
 __all__ = ['quant', 'cast_sympy', 'clebsch_gordan', 'wigner_3j', 'wigner_6j', 'a', 'b', 'ab', 'c', 'abc', 'f_0', 'g_0',
            'c_dipole', 'a_dipole', 'a_dipole_cart', 'reduced_f_root', 'reduced_f', 'a_tilda', 'a_m_tilda']

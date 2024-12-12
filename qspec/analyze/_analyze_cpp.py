@@ -8,7 +8,7 @@ Classes and methods for the 'analyze' module using the Python/C++ interface.
 
 import numpy as np
 
-from qspec.types import *
+from qspec.qtypes import *
 from qspec._cpp import *
 
 __all__ = ['generate_collinear_points_cpp']

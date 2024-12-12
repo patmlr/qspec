@@ -15,7 +15,7 @@ import shutil
 import sqlite3
 import numpy as np
 
-from qspec.types import *
+from qspec.qtypes import *
 
 __all__ = ['ROMAN_NUMERALS', 'COLORS', 'get_rgb_print_command', 'rgb_to_hex_color', 'print_colored', 'printh', 'printw',
            'printf', 'map_corr_coeff_to_color', 'print_cov', 'get_default_path', 'create_doc_link', 'create_data_dir',
@@ -995,10 +995,10 @@ def rotation_matrix(alpha: array_like, dr: array_iter):
 class Rotation:
     """
     An object specifying a rotation in 3d-space. The rotation is defined
-    through an angle 'alpha' and an rotational axis 'dr' by the user.
+    through an angle 'alpha' and a rotational axis 'dr' by the user.
     Additional instance attributes are the angle in degree 'alpha_deg' and the rotational matrix 'R'.
     """
-    def __init__(self, alpha: scalar = 0., dr: array_iter = None):
+    def __init__(self, alpha: scalar_like = 0., dr: array_iter = None):
         """
         :param alpha: The angle of the rotation (rad).
         :param dr: The rotational axis of the rotation.
