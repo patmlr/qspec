@@ -18,7 +18,7 @@ title: Tutorials.HFS
 
 <span class="n">I</span> <span class="o">=</span> <span class="mf">4.5</span>  <span class="c1"># Total nuclear spin quantum number of 87Sr+</span>
 <span class="n">J</span> <span class="o">=</span> <span class="mf">2.5</span>  <span class="c1"># Total angular momentum quantum number of the 2D5/2 state</span>
-<span class="n">g_n</span> <span class="o">=</span> <span class="o">-</span><span class="mf">1.09316</span> <span class="o">/</span> <span class="n">I</span>  <span class="c1"># The nuclear g-factor [1]</span>
+<span class="n">g_i</span> <span class="o">=</span> <span class="o">-</span><span class="mf">1.09316</span> <span class="o">/</span> <span class="n">I</span>  <span class="c1"># The nuclear g-factor [1]</span>
 <span class="n">g_j</span> <span class="o">=</span> <span class="n">qs</span><span class="o">.</span><span class="n">lande_j</span><span class="p">(</span><span class="n">s</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">l</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">j</span><span class="o">=</span><span class="mf">2.5</span><span class="p">)</span>
 <span class="c1"># The nuclear g-factor, calculated from the nuclear magnetic moment</span>
 
@@ -26,7 +26,7 @@ title: Tutorials.HFS
 <span class="n">b_field</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mf">0.</span><span class="p">,</span> <span class="mf">4e-3</span><span class="p">,</span> <span class="mi">4000</span><span class="p">)</span>  <span class="c1"># (T), The magnetic flux density</span>
 
 <span class="n">e_eig</span><span class="p">,</span> <span class="n">m_list</span><span class="p">,</span> <span class="n">fm_list</span><span class="p">,</span> <span class="n">mi_mj_list</span> \
-    <span class="o">=</span> <span class="n">qs</span><span class="o">.</span><span class="n">hyper_zeeman_num</span><span class="p">(</span><span class="n">I</span><span class="p">,</span> <span class="n">J</span><span class="p">,</span> <span class="n">g_n</span><span class="p">,</span> <span class="n">g_j</span><span class="p">,</span> <span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="n">b_field</span><span class="p">)</span>
+    <span class="o">=</span> <span class="n">qs</span><span class="o">.</span><span class="n">hyper_zeeman_num</span><span class="p">(</span><span class="n">I</span><span class="p">,</span> <span class="n">J</span><span class="p">,</span> <span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="n">g_i</span><span class="p">,</span> <span class="n">g_j</span><span class="p">,</span> <span class="n">b_field</span><span class="p">)</span>
 <span class="c1"># The eigenvalues of the HFS + Zeeman-effect Hamiltonian</span>
 <span class="c1"># and the lists of m_F, F and (m_I, m_J) quantum numbers.</span>
 </pre></div>

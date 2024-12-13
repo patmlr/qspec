@@ -124,8 +124,7 @@ def gen_table():
             else:
                 html += ('\n' + temp[j].replace('_file_', file).replace('_func_', f)
                          .replace('_namespace-func_', f'{namespace}.{f}'))
-
-
+                
         i = temp.index('<!--p>tab-func-end</p-->') + 1
         html += '\n'.join(temp[i:-1])
         i = temp.index('<!--p>tab-module</p-->') + 1
@@ -339,8 +338,6 @@ def _gen_func(f, file, temp, namespace, funcs, func_sig, func_doc):
     j = html_table[:j].rfind(f'{file}.html')
     j += html_table[j:].find('<details')
     html_table = html_table[:j + 8] + ' open=""' + html_table[j + 8:]
-
-
     html = html.replace('_table_', html_table)
     return html
 
@@ -357,6 +354,7 @@ def _gen_class_functions(directory, file, f, class_funcs, namespace):
         html = _gen_func(cf, file, temp, f'{namespace}.{f}', funcs, func_sig, func_doc)
         with open(os.path.join(directory, f'{os.path.join(f, cf)}.html'), 'w') as html_file:
             html_file.write(html)
+
 
 def gen_functions():
     for file in FILES:
@@ -384,7 +382,6 @@ def gen_functions():
                 f_path = f
             with open(os.path.join(directory, f'{f_path}.html'), 'w', encoding='utf-8') as html_file:
                 html_file.write(html)
-
 
 
 if __name__ == '__main__':
