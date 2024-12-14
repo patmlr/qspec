@@ -6,5 +6,3 @@ window.addEventListener("beforeunload", () => {
 window.addEventListener("load", () => {
   document.querySelector(".bd-content-table-content").scrollTop = localStorage.getItem("scrollPositon") || 0;
 });
-
-

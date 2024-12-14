@@ -12,20 +12,20 @@ title: qspec.get_m
 <em class="sig-param">
 <span class="n"><span class="pre">f</span></span>
 </em>
-<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/physics.py#L655-L660' }}"><span class="sig-source">[source]</span></a>
+<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/physics.py#L659-L666' }}"><span class="sig-source">[source]</span></a>
 </dt>
-<dd class="field-body"><p></p>
+<dd class="field-body"><p>All quantum numbers fulfilling $-F \leq m \leq F$, where $m\in\mathbb{Z}$.</p>
 <dl class="field-list">
 <dt class="field-head">Parameters<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
 <dt>f<span class="classifier"><em>quant_like</em></span></dt>
-<dd class="field-desc"><p>The total angular momentum quantum number F (= J if I == 0).</p></dd></dl>
+<dd class="field-desc"><p>The total angular momentum quantum number $F$.</p></dd></dl>
 </dd><dt class="field-head">Returns<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
 <dt>out<span class="classifier"><em>list[quant]</em></span></dt>
-<dd class="field-desc"><p>All possible zeeman substates of the specified quantum number.</p></dd></dl>
+<dd class="field-desc"><p>All possible magnetic quantum numbers $m$ of the specified quantum number $F$.</p></dd></dl>
 </dd>
 </dl></dd>
 </dl>
@@ -846,10 +846,10 @@ title: qspec.get_m
 <li class="spaced"><a href="{{ '/doc/functions/physics/gaussian_doppler_3d.html' | relative_url }}">qspec.gaussian_doppler_3d</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/physics/get_f.html' | relative_url }}">qspec.get_f</a></li>
 <li class="spaced table-current"><a href="{{ '/doc/functions/physics/get_m.html' | relative_url }}">qspec.get_m</a></li>
-<li class="spaced"><a href="{{ '/doc/functions/physics/hyper_zeeman.html' | relative_url }}">qspec.hyper_zeeman</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/physics/hyper_zeeman_12.html' | relative_url }}">qspec.hyper_zeeman_12</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/physics/hyper_zeeman_12_d.html' | relative_url }}">qspec.hyper_zeeman_12_d</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/physics/hyper_zeeman_ij.html' | relative_url }}">qspec.hyper_zeeman_ij</a></li>
+<li class="spaced"><a href="{{ '/doc/functions/physics/hyper_zeeman_linear.html' | relative_url }}">qspec.hyper_zeeman_linear</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/physics/hyper_zeeman_num.html' | relative_url }}">qspec.hyper_zeeman_num</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/physics/hyperfine.html' | relative_url }}">qspec.hyperfine</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/physics/inv_cm_to_freq.html' | relative_url }}">qspec.inv_cm_to_freq</a></li>
@@ -884,7 +884,7 @@ title: qspec.get_m
 <li class="spaced"><a href="{{ '/doc/functions/physics/v_recoil.html' | relative_url }}">qspec.v_recoil</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/physics/wavelength_to_freq.html' | relative_url }}">qspec.wavelength_to_freq</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/physics/wavelength_to_inv_cm.html' | relative_url }}">qspec.wavelength_to_inv_cm</a></li>
-<li class="spaced"><a href="{{ '/doc/functions/physics/zeeman.html' | relative_url }}">qspec.zeeman</a></li></ul>
+<li class="spaced"><a href="{{ '/doc/functions/physics/zeeman_linear.html' | relative_url }}">qspec.zeeman_linear</a></li></ul>
 </details>
 </li><li class="has-children">
 <a href="{{ '/doc/modules/simulate.html' | relative_url }}">qspec.simulate</a>

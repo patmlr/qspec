@@ -10,14 +10,6 @@ title: qspec.hyper_zeeman_12_d
 <span class="sig-prename"><span class="pre">qspec.</span></span><span class="sig-name"><span class="pre">hyper_zeeman_12_d</span></span>
 <span class="sig-paren">&nbsp;(&nbsp;</span>
 <em class="sig-param">
-<span class="n"><span class="pre">s</span></span>
-</em>
-,&nbsp;
-<em class="sig-param">
-<span class="n"><span class="pre">ll</span></span>
-</em>
-,&nbsp;
-<em class="sig-param">
 <span class="n"><span class="pre">j</span></span>
 </em>
 ,&nbsp;
@@ -26,21 +18,27 @@ title: qspec.hyper_zeeman_12_d
 </em>
 ,&nbsp;
 <em class="sig-param">
-<span class="n"><span class="pre">g_n</span></span>
-</em>
-,&nbsp;
-<em class="sig-param">
 <span class="n"><span class="pre">a_hyper</span></span>
+<span class="o"><span class="pre">=</span></span>
+<span class="default_value"><span class="pre num">0.0</span></span>
 </em>
 ,&nbsp;
 <em class="sig-param">
-<span class="n"><span class="pre">b</span></span>
+<span class="n"><span class="pre">g_i</span></span>
+<span class="o"><span class="pre">=</span></span>
+<span class="default_value"><span class="pre num">0.0</span></span>
 </em>
 ,&nbsp;
 <em class="sig-param">
 <span class="n"><span class="pre">g_j</span></span>
 <span class="o"><span class="pre">=</span></span>
-<span class="default_value"><span class="pre">None</span></span>
+<span class="default_value"><span class="pre num">0.0</span></span>
+</em>
+,&nbsp;
+<em class="sig-param">
+<span class="n"><span class="pre">b_field</span></span>
+<span class="o"><span class="pre">=</span></span>
+<span class="default_value"><span class="pre num">0.0</span></span>
 </em>
 ,&nbsp;
 <em class="sig-param">
@@ -54,38 +52,38 @@ title: qspec.hyper_zeeman_12_d
 <span class="o"><span class="pre">=</span></span>
 <span class="default_value"><span class="pre bool">True</span></span>
 </em>
-<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/physics.py#L927-L954' }}"><span class="sig-source">[source]</span></a>
+<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/physics.py#L1007-L1052' }}"><span class="sig-source">[source]</span></a>
 </dt>
-<dd class="field-body"><p></p>
+<dd class="field-body"><p>The first derivative of the two eigenvalues of the hyperfine structure + Zeeman effect hamailtonian,
+    with respect to the <code>b-field</code>, for a nuclear spin of $I=1/2$ and the magnetic quantum number <code>m</code>,
+    calculated analytically using the Breit-Rabi equation.</p>
 <dl class="field-list">
 <dt class="field-head">Parameters<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>s<span class="classifier"><em>float</em></span></dt>
-<dd class="field-desc"><p></p></dd>
-<dt>ll<span class="classifier"><em>float</em></span></dt>
-<dd class="field-desc"><p></p></dd>
-<dt>j<span class="classifier"><em>float</em></span></dt>
-<dd class="field-desc"><p></p></dd>
-<dt>m<span class="classifier"><em>float</em></span></dt>
-<dd class="field-desc"><p></p></dd>
-<dt>g_n<span class="classifier"><em>float</em></span></dt>
-<dd class="field-desc"><p></p></dd>
+<dt>j<span class="classifier"><em>quant_like</em></span></dt>
+<dd class="field-desc"><p>The electronic total angular momentum quantum number $J$.</p></dd>
+<dt>m<span class="classifier"><em>quant_like</em></span></dt>
+<dd class="field-desc"><p>The magnetic quantum number $m_F$.</p></dd>
 <dt>a_hyper<span class="classifier"><em>array_like</em></span></dt>
-<dd class="field-desc"><p></p></dd>
-<dt>b<span class="classifier"><em>array_like</em></span></dt>
-<dd class="field-desc"><p></p></dd>
-<dt>g_j<span class="classifier"><em>float</em></span></dt>
-<dd class="field-desc"><p></p></dd>
+<dd class="field-desc"><p>The magnetic dipole hyperfine constant $A = \mu_I \mathcal{B}_J / (IJ)$ (eV if <code>as_freq</code> else MHz).</p></dd>
+<dt>g_i<span class="classifier"><em>array_like</em></span></dt>
+<dd class="field-desc"><p>The nuclear g-factor $g_I$ or the gyromagnetic ratio $\gamma_I$ if <code>g_n_as_gyro == True</code>.</p></dd>
+<dt>g_j<span class="classifier"><em>array_like</em></span></dt>
+<dd class="field-desc"><p>The electronic g-factor $g_J$.</p></dd>
+<dt>b_field<span class="classifier"><em>array_like</em></span></dt>
+<dd class="field-desc"><p>The B-field $\mathcal{B}$ (T).</p></dd>
 <dt>g_n_as_gyro<span class="classifier"><em>bool</em></span></dt>
-<dd class="field-desc"><p></p></dd>
+<dd class="field-desc"><p>Whether <code>g_i</code> is the nuclear g-factor or the gyromagnetic ratio $\gamma_I$ (MHz).</p></dd>
 <dt>as_freq<span class="classifier"><em>bool</em></span></dt>
-<dd class="field-desc"><p></p></dd></dl>
+<dd class="field-desc"><p>The shift can be returned in energy (<code>False</code>, eV) or frequency units (<code>True</code>, MHz).
+     The default is <code>True</code></p></dd></dl>
 </dd><dt class="field-head">Returns<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>out<span class="classifier"><em>None</em></span></dt>
-<dd class="field-desc"><p></p></dd></dl>
+<dt>(x0, x1)<span class="classifier"><em>(ndarray, ndarray)</em></span></dt>
+<dd class="field-desc"><p> The first derivatives of the two solutions of the Breit-Rabi equation,
+     where <code>x0</code> and <code>x1</code> correspond to $F = J \mp 1/2$, respectively.</p></dd></dl>
 </dd>
 </dl></dd>
 </dl>
@@ -906,10 +904,10 @@ title: qspec.hyper_zeeman_12_d
 <li class="spaced"><a href="{{ '/doc/functions/physics/gaussian_doppler_3d.html' | relative_url }}">qspec.gaussian_doppler_3d</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/physics/get_f.html' | relative_url }}">qspec.get_f</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/physics/get_m.html' | relative_url }}">qspec.get_m</a></li>
-<li class="spaced"><a href="{{ '/doc/functions/physics/hyper_zeeman.html' | relative_url }}">qspec.hyper_zeeman</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/physics/hyper_zeeman_12.html' | relative_url }}">qspec.hyper_zeeman_12</a></li>
 <li class="spaced table-current"><a href="{{ '/doc/functions/physics/hyper_zeeman_12_d.html' | relative_url }}">qspec.hyper_zeeman_12_d</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/physics/hyper_zeeman_ij.html' | relative_url }}">qspec.hyper_zeeman_ij</a></li>
+<li class="spaced"><a href="{{ '/doc/functions/physics/hyper_zeeman_linear.html' | relative_url }}">qspec.hyper_zeeman_linear</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/physics/hyper_zeeman_num.html' | relative_url }}">qspec.hyper_zeeman_num</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/physics/hyperfine.html' | relative_url }}">qspec.hyperfine</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/physics/inv_cm_to_freq.html' | relative_url }}">qspec.inv_cm_to_freq</a></li>
@@ -944,7 +942,7 @@ title: qspec.hyper_zeeman_12_d
 <li class="spaced"><a href="{{ '/doc/functions/physics/v_recoil.html' | relative_url }}">qspec.v_recoil</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/physics/wavelength_to_freq.html' | relative_url }}">qspec.wavelength_to_freq</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/physics/wavelength_to_inv_cm.html' | relative_url }}">qspec.wavelength_to_inv_cm</a></li>
-<li class="spaced"><a href="{{ '/doc/functions/physics/zeeman.html' | relative_url }}">qspec.zeeman</a></li></ul>
+<li class="spaced"><a href="{{ '/doc/functions/physics/zeeman_linear.html' | relative_url }}">qspec.zeeman_linear</a></li></ul>
 </details>
 </li><li class="has-children">
 <a href="{{ '/doc/modules/simulate.html' | relative_url }}">qspec.simulate</a>

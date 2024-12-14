@@ -22,36 +22,53 @@ title: qspec.hyperfine
 </em>
 ,&nbsp;
 <em class="sig-param">
-<span class="n"><span class="pre">a</span></span>
+<span class="n"><span class="pre">a_hyper</span></span>
+<span class="o"><span class="pre">=</span></span>
+<span class="default_value"><span class="pre num">0.0</span></span>
 </em>
 ,&nbsp;
 <em class="sig-param">
-<span class="n"><span class="pre">b</span></span>
+<span class="n"><span class="pre">b_hyper</span></span>
 <span class="o"><span class="pre">=</span></span>
-<span class="default_value"><span class="pre">None</span></span>
+<span class="default_value"><span class="pre num">0.0</span></span>
 </em>
-<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/physics.py#L663-L689' }}"><span class="sig-source">[source]</span></a>
+,&nbsp;
+<em class="sig-param">
+<span class="n"><span class="pre">c_hyper</span></span>
+<span class="o"><span class="pre">=</span></span>
+<span class="default_value"><span class="pre num">0.0</span></span>
+</em>
+<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/physics.py#L736-L782' }}"><span class="sig-source">[source]</span></a>
 </dt>
-<dd class="field-body"><p></p>
+<dd class="field-body"><p>The hyperfine structure shift of an atomic state <code>(i, j, f)</code> with the hyperfine constants <code>a</code> and <code>b</code> and <code>c</code>
+
+    $$\begin{aligned}
+    \Delta_\mathrm{hfs} &= A\frac{K}{2} + B\frac{\frac{3}{4}K(K + 1) - I(I + 1)J(J + 1)}{2I(2I - 1)J(2J - 1)}\\[1ex]
+    &\quad + C\frac{\left[\splitdfrac{\frac{5}{4}K^3 + 5K^2 - 5I(I + 1)J(J + 1)}
+    {+ K(I(I + 1) + J(J + 1) - 3I(I + 1)J(J + 1) + 3)}\right]}{I(I - 1)(2I - 1)J(J - 1)(2J - 1)}\\[3ex]
+    K &= F(F + 1) - I(I + 1) - J(J + 1)
+    \end{aligned}$$</p>
 <dl class="field-list">
 <dt class="field-head">Parameters<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>i<span class="classifier"><em>float</em></span></dt>
-<dd class="field-desc"><p>The nuclear spin quantum number I.</p></dd>
-<dt>j<span class="classifier"><em>float</em></span></dt>
-<dd class="field-desc"><p>The electronic total angular momentum quantum number J.</p></dd>
-<dt>f<span class="classifier"><em>float</em></span></dt>
-<dd class="field-desc"><p>The total angular momentum quantum number F.</p></dd>
-<dt>a<span class="classifier"><em>array_like</em></span></dt>
-<dd class="field-desc"><p>The magnetic dipole hyperfine constant A (arb. units).</p></dd>
-<dt>b<span class="classifier"><em>array_like</em></span></dt>
-<dd class="field-desc"><p>The electric quadrupole hyperfine constant B ([a]).</p></dd></dl>
+<dt>i<span class="classifier"><em>quant_like</em></span></dt>
+<dd class="field-desc"><p>The nuclear spin quantum number $I$.</p></dd>
+<dt>j<span class="classifier"><em>quant_like</em></span></dt>
+<dd class="field-desc"><p>The electronic total angular momentum quantum number $J$.</p></dd>
+<dt>f<span class="classifier"><em>quant_like</em></span></dt>
+<dd class="field-desc"><p>The total angular momentum quantum number $F$.</p></dd>
+<dt>a_hyper<span class="classifier"><em>array_like</em></span></dt>
+<dd class="field-desc"><p>The magnetic dipole hyperfine constant $A = \mu_I \mathcal{B}_J / (IJ)$ (arb. units).</p></dd>
+<dt>b_hyper<span class="classifier"><em>array_like</em></span></dt>
+<dd class="field-desc"><p>The electric quadrupole hyperfine constant $B = eQ_I (\partial^2 V_J / \partial z^2)$ ([<code>a_hyper</code>]).</p></dd>
+<dt>c_hyper<span class="classifier"><em>array_like</em></span></dt>
+<dd class="field-desc"><p>The magnetic octupole hyperfine constant $C = \Omega_I T_J^{(3)}$ ([<code>a_hyper</code>])</p></dd></dl>
 </dd><dt class="field-head">Returns<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>out<span class="classifier"><em>array_like</em></span></dt>
-<dd class="field-desc"><p>The hyperfine shift of an atomic state (i, j, f) with hyperfine constants a and b ([a]).</p></dd></dl>
+<dt>out<span class="classifier"><em>ndarray</em></span></dt>
+<dd class="field-desc"><p>The hyperfine structure shift $\Delta_\mathrm{hfs}$ ([<code>a_hyper</code>]).</p></dd></dl>
 </dd>
 </dl></dd>
 </dl>
@@ -872,10 +889,10 @@ title: qspec.hyperfine
 <li class="spaced"><a href="{{ '/doc/functions/physics/gaussian_doppler_3d.html' | relative_url }}">qspec.gaussian_doppler_3d</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/physics/get_f.html' | relative_url }}">qspec.get_f</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/physics/get_m.html' | relative_url }}">qspec.get_m</a></li>
-<li class="spaced"><a href="{{ '/doc/functions/physics/hyper_zeeman.html' | relative_url }}">qspec.hyper_zeeman</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/physics/hyper_zeeman_12.html' | relative_url }}">qspec.hyper_zeeman_12</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/physics/hyper_zeeman_12_d.html' | relative_url }}">qspec.hyper_zeeman_12_d</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/physics/hyper_zeeman_ij.html' | relative_url }}">qspec.hyper_zeeman_ij</a></li>
+<li class="spaced"><a href="{{ '/doc/functions/physics/hyper_zeeman_linear.html' | relative_url }}">qspec.hyper_zeeman_linear</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/physics/hyper_zeeman_num.html' | relative_url }}">qspec.hyper_zeeman_num</a></li>
 <li class="spaced table-current"><a href="{{ '/doc/functions/physics/hyperfine.html' | relative_url }}">qspec.hyperfine</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/physics/inv_cm_to_freq.html' | relative_url }}">qspec.inv_cm_to_freq</a></li>
@@ -910,7 +927,7 @@ title: qspec.hyperfine
 <li class="spaced"><a href="{{ '/doc/functions/physics/v_recoil.html' | relative_url }}">qspec.v_recoil</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/physics/wavelength_to_freq.html' | relative_url }}">qspec.wavelength_to_freq</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/physics/wavelength_to_inv_cm.html' | relative_url }}">qspec.wavelength_to_inv_cm</a></li>
-<li class="spaced"><a href="{{ '/doc/functions/physics/zeeman.html' | relative_url }}">qspec.zeeman</a></li></ul>
+<li class="spaced"><a href="{{ '/doc/functions/physics/zeeman_linear.html' | relative_url }}">qspec.zeeman_linear</a></li></ul>
 </details>
 </li><li class="has-children">
 <a href="{{ '/doc/modules/simulate.html' | relative_url }}">qspec.simulate</a>

@@ -12,15 +12,8 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv.min.js"></script>
     <![endif]-->
     <script src="{{ '/assets/js/script.js' | relative_url }}"></script>
-    <script>
-      MathJax = {
-        tex: {
-          inlineMath: [['$', '$']],
-          displayMath: [['$$', '$$']]
-        }
-      };
-    </script>
-    <script type="text/javascript" id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="{{ '/assets/js/mathjax-config.js' | relative_url }}" defer></script>
+    <script type="text/javascript" id="MathJax-script" defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 <!--    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css">-->
 <!--    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>-->
 <!--    <script>hljs.initHighlightingOnLoad();</script>-->

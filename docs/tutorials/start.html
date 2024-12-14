@@ -41,8 +41,12 @@ title: Tutorials.Start
 <span class="c1"># &gt;&gt;&gt; 209533.6 m/s</span>
 
 <span class="c1"># The anti-collinear lab. frequency</span>
-<span class="n">f_laser</span> <span class="o">=</span> <span class="n">qs</span><span class="o">.</span><span class="n">doppler</span><span class="p">(</span><span class="n">f0</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">)</span>  <span class="c1"># (MHz)</span>
-<span class="c1"># &gt;&gt;&gt; 735504562.3 MHz</span>
+<span class="n">f_laser</span> <span class="o">=</span> <span class="n">qs</span><span class="o">.</span><span class="n">doppler</span><span class="p">(</span><span class="n">f0</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="n">qs</span><span class="o">.</span><span class="n">pi</span><span class="p">,</span> <span class="n">return_frame</span><span class="o">=</span><span class="s1">&#39;lab&#39;</span><span class="p">)</span>  <span class="c1"># (MHz)</span>
+<span class="c1"># &gt;&gt;&gt; 734477149.8 MHz</span>
+
+<span class="c1"># The differential Doppler shift</span>
+<span class="n">df_atom</span> <span class="o">=</span> <span class="n">qs</span><span class="o">.</span><span class="n">doppler_el_d1</span><span class="p">(</span><span class="n">f_laser</span><span class="p">,</span> <span class="n">qs</span><span class="o">.</span><span class="n">pi</span><span class="p">,</span> <span class="n">U</span><span class="p">,</span> <span class="n">q</span><span class="p">,</span> <span class="n">m</span><span class="p">)</span>  <span class="c1"># (MHz / V)</span>
+<span class="c1"># &gt;&gt;&gt; +12.84 MHz / V</span>
 </pre></div>
 
 <h2>References</h2>

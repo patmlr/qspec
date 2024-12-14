@@ -26,26 +26,34 @@ title: qspec.lande_j
 <span class="o"><span class="pre">=</span></span>
 <span class="default_value"><span class="pre bool">False</span></span>
 </em>
-<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/physics.py#L701-L716' }}"><span class="sig-source">[source]</span></a>
+<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/physics.py#L680-L705' }}"><span class="sig-source">[source]</span></a>
 </dt>
-<dd class="field-body"><p></p>
+<dd class="field-body"><p>The electronic g-factor in the LS-coupling scheme
+
+    $$
+    g_J = -\frac{J(J + 1) + L(L + 1) - S(S + 1)}{2J(J + 1)} + g_s\,\frac{J(J + 1) - L(L + 1) + S(S + 1)}{2J(J + 1)}.
+    $$
+
+    Note that in this definition the negative charge of the electron is included in the g-factor,
+    such that $g_s$ is negative.</p>
 <dl class="field-list">
 <dt class="field-head">Parameters<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>s<span class="classifier"><em>float</em></span></dt>
-<dd class="field-desc"><p>The electron spin quantum number S.</p></dd>
-<dt>l<span class="classifier"><em>float</em></span></dt>
-<dd class="field-desc"><p>The electronic angular momentum quantum number L.</p></dd>
-<dt>j<span class="classifier"><em>float</em></span></dt>
-<dd class="field-desc"><p>The electronic total angular momentum quantum number J.</p></dd>
+<dt>s<span class="classifier"><em>quant_like</em></span></dt>
+<dd class="field-desc"><p>The electron spin quantum number $S$.</p></dd>
+<dt>l<span class="classifier"><em>quant_like</em></span></dt>
+<dd class="field-desc"><p>The electronic angular momentum quantum number $L$.</p></dd>
+<dt>j<span class="classifier"><em>quant_like</em></span></dt>
+<dd class="field-desc"><p>The electronic total angular momentum quantum number $J$.</p></dd>
 <dt>approx_g_s<span class="classifier"><em>bool</em></span></dt>
-<dd class="field-desc"><p>Whether to use g_s = -2 or the QED result g_s = -2.0023... .</p></dd></dl>
+<dd class="field-desc"><p>Whether to use g_s = -2 (<code>True</code>) or the QED result g_s = -2.0023... (<code>False</code>).
+     The default is <code>False</code>.</p></dd></dl>
 </dd><dt class="field-head">Returns<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
 <dt>out<span class="classifier"><em>float</em></span></dt>
-<dd class="field-desc"><p>The electronic g-factor.</p></dd></dl>
+<dd class="field-desc"><p>The electronic g-factor $g_J$.</p></dd></dl>
 </dd>
 </dl></dd>
 </dl>
@@ -866,10 +874,10 @@ title: qspec.lande_j
 <li class="spaced"><a href="{{ '/doc/functions/physics/gaussian_doppler_3d.html' | relative_url }}">qspec.gaussian_doppler_3d</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/physics/get_f.html' | relative_url }}">qspec.get_f</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/physics/get_m.html' | relative_url }}">qspec.get_m</a></li>
-<li class="spaced"><a href="{{ '/doc/functions/physics/hyper_zeeman.html' | relative_url }}">qspec.hyper_zeeman</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/physics/hyper_zeeman_12.html' | relative_url }}">qspec.hyper_zeeman_12</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/physics/hyper_zeeman_12_d.html' | relative_url }}">qspec.hyper_zeeman_12_d</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/physics/hyper_zeeman_ij.html' | relative_url }}">qspec.hyper_zeeman_ij</a></li>
+<li class="spaced"><a href="{{ '/doc/functions/physics/hyper_zeeman_linear.html' | relative_url }}">qspec.hyper_zeeman_linear</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/physics/hyper_zeeman_num.html' | relative_url }}">qspec.hyper_zeeman_num</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/physics/hyperfine.html' | relative_url }}">qspec.hyperfine</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/physics/inv_cm_to_freq.html' | relative_url }}">qspec.inv_cm_to_freq</a></li>
@@ -904,7 +912,7 @@ title: qspec.lande_j
 <li class="spaced"><a href="{{ '/doc/functions/physics/v_recoil.html' | relative_url }}">qspec.v_recoil</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/physics/wavelength_to_freq.html' | relative_url }}">qspec.wavelength_to_freq</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/physics/wavelength_to_inv_cm.html' | relative_url }}">qspec.wavelength_to_inv_cm</a></li>
-<li class="spaced"><a href="{{ '/doc/functions/physics/zeeman.html' | relative_url }}">qspec.zeeman</a></li></ul>
+<li class="spaced"><a href="{{ '/doc/functions/physics/zeeman_linear.html' | relative_url }}">qspec.zeeman_linear</a></li></ul>
 </details>
 </li><li class="has-children">
 <a href="{{ '/doc/modules/simulate.html' | relative_url }}">qspec.simulate</a>

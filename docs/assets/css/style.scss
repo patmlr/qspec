@@ -208,9 +208,9 @@ code {
     }
 
 .code-prose :not(.code-block) > code {
-  padding: 2px 4px;
   background-color: var(--code-prose-bg-color);
-  border-radius: 4px;
+  padding: 1px 2px;
+  border-radius: 3px;
 }
 
 pre.code-block {

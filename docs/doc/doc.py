@@ -6,7 +6,7 @@ from docutils.core import publish_parts
 from qspec.qtypes import *
 
 FOLDER_FILES = {'models', 'simulate', 'analyze'}
-FILES = sorted(['physics', 'algebra', 'models', 'models', 'analyze', 'simulate', 'tools', 'stats'])  # 'algebra', 'physics', 'models', 'models', 'analyze', 'simulate', 'tools', 'stats'
+FILES = sorted(['physics', 'algebra', 'models', 'analyze', 'simulate', 'tools', 'stats'])  # 'physics', 'algebra', 'models', 'analyze', 'simulate', 'tools', 'stats'
 
 
 def is_num(val):

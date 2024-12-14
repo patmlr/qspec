@@ -739,9 +739,9 @@ def hyperfine(i: quant_like, j: quant_like, f: quant_like,
     The hyperfine structure shift of an atomic state `(i, j, f)` with the hyperfine constants `a` and `b` and `c`
 
     $$\begin{aligned}
-    \Delta_\mathrm{hfs} &= A\frac{K}{2} + B\frac{\frac{3}{4}K(K + 1) - I(I + 1)J(J + 1)}{2I(2I - 1)J(2J - 1)}\\
-    &\quad + C\frac{\frac{5}{4}K^3 + 5K^2 + K(I(I + 1) + J(J + 1) - 3I(I + 1)J(J + 1) + 3)
-     - 5I(I + 1)J(J + 1)}{I(I - 1)(2I - 1)J(J - 1)(2J - 1)}\\
+    \Delta_\mathrm{hfs} &= A\frac{K}{2} + B\frac{\frac{3}{4}K(K + 1) - I(I + 1)J(J + 1)}{2I(2I - 1)J(2J - 1)}\\[1ex]
+    &\quad + C\frac{\left[\splitdfrac{\frac{5}{4}K^3 + 5K^2 - 5I(I + 1)J(J + 1)}
+    {+ K(I(I + 1) + J(J + 1) - 3I(I + 1)J(J + 1) + 3)}\right]}{I(I - 1)(2I - 1)J(J - 1)(2J - 1)}\\[3ex]
     K &= F(F + 1) - I(I + 1) - J(J + 1)
     \end{aligned}$$
 

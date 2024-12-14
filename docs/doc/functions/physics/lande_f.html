@@ -22,34 +22,43 @@ title: qspec.lande_f
 </em>
 ,&nbsp;
 <em class="sig-param">
-<span class="n"><span class="pre">g_n</span></span>
+<span class="n"><span class="pre">g_i</span></span>
 </em>
 ,&nbsp;
 <em class="sig-param">
 <span class="n"><span class="pre">g_j</span></span>
 </em>
-<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/physics.py#L719-L732' }}"><span class="sig-source">[source]</span></a>
+<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/physics.py#L708-L733' }}"><span class="sig-source">[source]</span></a>
 </dt>
-<dd class="field-body"><p></p>
+<dd class="field-body"><p>The total atomic g-factor in the IJ-coupling scheme
+
+    $$
+    g_F = g_J\,\frac{F(F + 1) + J(J + 1) - I(I + 1)}{2F(F + 1)}
+     + g_I\,\frac{\mu_\mathrm{N}}{\mu_\mathrm{B}} \frac{F(F + 1) - J(J + 1) + I(I + 1)}{2F(F + 1)}.
+    $$
+
+    Note that in this definition the electric charges are included in the g-factors,
+    such that $g_s$, the g-factor of the electron, must be negative
+    and $g_\mathrm{p}$, the g-factor of the proton, must be positive.</p>
 <dl class="field-list">
 <dt class="field-head">Parameters<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>i<span class="classifier"><em>float</em></span></dt>
-<dd class="field-desc"><p>The nuclear spin quantum number I.</p></dd>
-<dt>j<span class="classifier"><em>float</em></span></dt>
-<dd class="field-desc"><p>The electronic total angular momentum quantum number J.</p></dd>
-<dt>f<span class="classifier"><em>float</em></span></dt>
-<dd class="field-desc"><p>The total angular momentum quantum number F.</p></dd>
-<dt>g_n<span class="classifier"><em>float</em></span></dt>
-<dd class="field-desc"><p>The nuclear g-factor.</p></dd>
-<dt>g_j<span class="classifier"><em>float</em></span></dt>
-<dd class="field-desc"><p>The electronic g-factor.</p></dd></dl>
+<dt>i<span class="classifier"><em>quant_like</em></span></dt>
+<dd class="field-desc"><p>The nuclear spin quantum number $I$.</p></dd>
+<dt>j<span class="classifier"><em>quant_like</em></span></dt>
+<dd class="field-desc"><p>The electronic total angular momentum quantum number $J$.</p></dd>
+<dt>f<span class="classifier"><em>quant_like</em></span></dt>
+<dd class="field-desc"><p>The total angular momentum quantum number $F$.</p></dd>
+<dt>g_i<span class="classifier"><em>array_like</em></span></dt>
+<dd class="field-desc"><p>The nuclear g-factor $g_I$.</p></dd>
+<dt>g_j<span class="classifier"><em>array_like</em></span></dt>
+<dd class="field-desc"><p>The electronic g-factor $g_J$.</p></dd></dl>
 </dd><dt class="field-head">Returns<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>out<span class="classifier"><em>float</em></span></dt>
-<dd class="field-desc"><p>The hyperfine structure g-factor.</p></dd></dl>
+<dt>out<span class="classifier"><em>ndarray</em></span></dt>
+<dd class="field-desc"><p>The total atomic g-factor $g_F$.</p></dd></dl>
 </dd>
 </dl></dd>
 </dl>
@@ -870,10 +879,10 @@ title: qspec.lande_f
 <li class="spaced"><a href="{{ '/doc/functions/physics/gaussian_doppler_3d.html' | relative_url }}">qspec.gaussian_doppler_3d</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/physics/get_f.html' | relative_url }}">qspec.get_f</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/physics/get_m.html' | relative_url }}">qspec.get_m</a></li>
-<li class="spaced"><a href="{{ '/doc/functions/physics/hyper_zeeman.html' | relative_url }}">qspec.hyper_zeeman</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/physics/hyper_zeeman_12.html' | relative_url }}">qspec.hyper_zeeman_12</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/physics/hyper_zeeman_12_d.html' | relative_url }}">qspec.hyper_zeeman_12_d</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/physics/hyper_zeeman_ij.html' | relative_url }}">qspec.hyper_zeeman_ij</a></li>
+<li class="spaced"><a href="{{ '/doc/functions/physics/hyper_zeeman_linear.html' | relative_url }}">qspec.hyper_zeeman_linear</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/physics/hyper_zeeman_num.html' | relative_url }}">qspec.hyper_zeeman_num</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/physics/hyperfine.html' | relative_url }}">qspec.hyperfine</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/physics/inv_cm_to_freq.html' | relative_url }}">qspec.inv_cm_to_freq</a></li>
@@ -908,7 +917,7 @@ title: qspec.lande_f
 <li class="spaced"><a href="{{ '/doc/functions/physics/v_recoil.html' | relative_url }}">qspec.v_recoil</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/physics/wavelength_to_freq.html' | relative_url }}">qspec.wavelength_to_freq</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/physics/wavelength_to_inv_cm.html' | relative_url }}">qspec.wavelength_to_inv_cm</a></li>
-<li class="spaced"><a href="{{ '/doc/functions/physics/zeeman.html' | relative_url }}">qspec.zeeman</a></li></ul>
+<li class="spaced"><a href="{{ '/doc/functions/physics/zeeman_linear.html' | relative_url }}">qspec.zeeman_linear</a></li></ul>
 </details>
 </li><li class="has-children">
 <a href="{{ '/doc/modules/simulate.html' | relative_url }}">qspec.simulate</a>
