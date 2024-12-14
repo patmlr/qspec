@@ -8,6 +8,7 @@ Base classes for lineshape models.
 
 import numpy as np
 
+from qspec.qtypes import *
 from qspec.tools import merge_intervals
 
 __all__ = ['Model', 'Empty', 'NPeak', 'Offset', 'Amplifier', 'Custom', 'YPars', 'Listed', 'Summed', 'Linked']
@@ -59,7 +60,7 @@ def _poly(x, *args):
 
 
 class Model:
-    def __init__(self, model=None):
+    def __init__(self, model: 'Model' = None):
         """
         Base class for all models.
 
@@ -68,17 +69,18 @@ class Model:
         self.model = model
         self.type = 'Model'
 
-    def __call__(self, x, *args, **kwargs):
+    def __call__(self, x: array_like, *args, **kwargs):
         return self.evaluate(x, *self.update_args(args), **kwargs)
 
-    def evaluate(self, x, *args, **kwargs):  # Reimplement this function in subclasses.
+    def evaluate(self, x: array_like, *args: array_iter, **kwargs: dict) -> ndarray:
         """
         The main function of the model. This is executed when the model is called.
+        Reimplement this function in subclasses.
 
-        :param x: The input values.
-        :param args: The function parameters. Must have length self.size.
+        :param x: The input values $x$.
+        :param args: The function parameters. Must have length `Model.size`.
         :param kwargs: Additional keyword arguments.
-        :returns: The function values at the input values `x`.
+        :returns: The function values $y$ at the input values `x`.
         """
         pass
 
@@ -90,7 +92,6 @@ class Model:
         :param val: The parameter value.
         :param fix: Whether the parameter is fixed.
         :param link: Whether the parameter is linked.
-        :returns: None.
         """
         if name in self.names:
             raise ValueError('Parameter {} already exists.'.format(name))
@@ -110,7 +111,7 @@ class Model:
         """
         A description of the model hierarchy.
 
-        :returns: A str representing the model hierarchy.
+        :returns: A `str` representing the model hierarchy.
         """
         label = ''
         super_model = self
@@ -419,12 +420,20 @@ class Model:
 class Empty(Model):
     def __init__(self):
         """
-        An empty model, returning zeros with the same shape as x.
+        An empty model, returning `numpy.zeros_like(x)`
         """
         super().__init__(model=None)
         self.type = 'Empty'
 
-    def evaluate(self, x, *args, **kwargs):
+    def evaluate(self, x: array_like, *args: array_iter, **kwargs: dict):
+        """
+        An empty model, returning `numpy.zeros_like(x)`.
+
+        :param x: The input values $x$.
+        :param args: [].
+        :param kwargs: Additional keyword arguments.
+        :returns: The function values $y$ at the input values `x`.
+        """
         return np.zeros_like(x)
 
 
@@ -443,7 +452,7 @@ class NPeak(Model):
             self._add_arg('x{}'.format(n), 0., n == 0, False)
             self._add_arg('p{}'.format(n), 1., n == 0, False)
 
-    def evaluate(self, x, *args, **kwargs):
+    def evaluate(self, x: array_like, *args: array_iter, **kwargs: dict):
         return np.sum([args[self.model.size + 2 * n + 1]
                        * self.model.evaluate(x - args[self.model.size + 2 * n], *args[:self.model.size])
                        for n in range(self.n_peaks)], axis=0)
@@ -490,7 +499,14 @@ class Offset(Model):
 
         self.gen_offset_map()
 
-    def evaluate(self, x, *args, **kwargs):
+    def evaluate(self, x: array_like, *args: array_iter, **kwargs: dict):
+        """
+
+        :param x:
+        :param args:
+        :param kwargs:
+        :return:
+        """
         if self._model is None:
             return self._offset(x, *args)
         return self.model.evaluate(x, *args[:self.model.size]) + self._offset(x, *args)
@@ -586,7 +602,7 @@ class Amplifier(Model):
         self._min = -10
         self._max = 10
 
-    def evaluate(self, x, *args, **kwargs):
+    def evaluate(self, x: array_like, *args: array_iter, **kwargs: dict):
         self._min = np.min(x)
         self._max = np.max(x)
         return _poly(x, *args)
@@ -621,7 +637,7 @@ class Custom(Model):
         for p in self.parameters:
             self._add_arg(p, 0., False, False)
 
-    def evaluate(self, x, *args, **kwargs):
+    def evaluate(self, x: array_like, *args: array_iter, **kwargs: dict):
         if self.model is None:
             return np.array(args, dtype=float)
         return self.model.evaluate(x, *args[:self.model.size], **kwargs)
@@ -640,7 +656,7 @@ class YPars(Model):
 
         self.p_y = [i for i, fix in enumerate(self.model.fixes) if _is_unc(fix)]
 
-    def evaluate(self, x, *args, **kwargs):
+    def evaluate(self, x: array_like, *args: array_iter, **kwargs: dict):
         return np.concatenate([self.model.evaluate(x, *args, **kwargs),
                                np.array([args[p_y] for p_y in self.p_y], dtype=float)], axis=0)
 
@@ -740,7 +756,7 @@ class Summed(Listed):
             self._add_arg('center{}'.format(label), 0., False, False)
             self._add_arg('int{}'.format(label), 1., False, False)
 
-    def evaluate(self, x, *args, **kwargs):
+    def evaluate(self, x: array_like, *args: array_iter, **kwargs: dict):
         return np.sum([args[i[1]] * model.evaluate(x - args[i[0]], *args[_slice], **kwargs)
                        for model, _slice, i in zip(self.models, self.slices, self.indices_add)], axis=0)
 
@@ -777,7 +793,7 @@ class Linked(Listed):
                         self.set_fix(i, '{}__{}'.format(_name, j))
                         break
 
-    def evaluate(self, x, *args, **kwargs):
+    def evaluate(self, x: array_like, *args: array_iter, **kwargs: dict):
         return np.concatenate(tuple(model.evaluate(_x, *args[_slice], **kwargs)
                                     for model, _slice, _x in zip(self.models, self.slices, x)), axis=0)
 
