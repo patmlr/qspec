@@ -1,0 +1,39 @@
+---
+layout: article
+title: Tutorials
+---
+
+<h1>Tutorials</h1>
+<p>In this section tutorials for different parts of qspec are put together to facilitate the access to the code base.
+    The tutorials assume you have already installed qspec.
+    For a guide to install qspec, see <a href="{{ '/install.html'| relative_url }}">Install</a>.
+    All of qspec's content can be accessed using</p>
+
+<div class="py-source"><pre>
+<span class="kn">import</span> <span class="nn">qspec</span> <span class="k">as</span> <span class="nn">qs</span>
+<span class="kn">import</span> <span class="nn">qspec.models</span> <span class="k">as</span> <span class="nn">mod</span>
+<span class="kn">import</span> <span class="nn">qspec.simulate</span> <span class="k">as</span> <span class="nn">sim</span>
+</pre></div>
+
+<p>Physical, statistical and general mathematical functions as well as data processing routines can be accessed directly
+    from the <code>qspec</code> namespace. The two submodules <a href="{{ '/doc/modules/models.html'| relative_url }}"><code>qspec.models</code></a>
+    and <a href="{{ '/doc/modules/simulate.html'| relative_url }}"><code>qspec.simulate</code></a> feature object-oriented
+    frameworks to construct fit models and to simulate laser-atom interactions, respectively.
+    For a detailed introduction of these, please refer to the API documentation or the tutorials below.</p>
+
+<p>The following tutorials guide you though different applications of qspec.
+    The code from the tutorials and additional examples can be downloaded from the
+    <a href="{{ site.github.repository_url | append: '/tree/main/examples' }}">GitHub repository</a>.</p>
+
+<ol>
+  <li><a href="{{ '/tutorials/start.html' | relative_url }}"><em>Getting started</em></a> (from publication)</li>
+  <li><a href="{{ '/tutorials/hfs.html' | relative_url }}"><em>Calculation of hyperfine structure and Zeeman shifts</em></a></li>
+  <li><a href="{{ '/tutorials/models.html' | relative_url }}"><em>Construction and fitting of modular lineshape models</em></a></li>
+  <li><a href="{{ '/tutorials/simulate.html' | relative_url }}"><em>Time evolution of quantum interference in fluorescence spectra</em></a> (from publication)</li>
+  <li><a href="{{ '/tutorials/king-2d.html' | relative_url }}"><em>2d King-plot analyses</em></a> (from publication)</li>
+</ol>
+
+<div class="o-next">
+    <!--a href="{{ '/tutorials/start.html' | relative_url }}"><div class="prev-next-button">&larr;&nbsp;&nbsp;Previous</div></a-->
+    <a href="{{ '/tutorials/start.html' | relative_url }}"><div class="prev-next-button">Next&nbsp;&nbsp;&rarr;</div></a>
+</div>

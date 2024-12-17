@@ -15,10 +15,10 @@ from mpl_toolkits.axes_grid1 import make_axes_locatable
 # noinspection PyUnresolvedReferences
 from mpl_toolkits.mplot3d.axes3d import Axes3D
 
-from qspec._types import *
+from qspec.qtypes import *
 from qspec import tools
 import qspec.algebra as al
-from qspec.physics import photon_recoil, saturation
+from qspec.physics import f_recoil, saturation
 from qspec.simulate._simulate_cpp import sr_generate_y, Polarization, Environment, Atom, Laser
 
 __all__ = ['ct_markov_analytic', 'ct_markov_dgl', 'lambda_states', 'lambda_ge_rec', 'Geometry', 'ScatteringRate']
@@ -336,15 +336,15 @@ def lambda_ge_rec(t: array_like, n: array_like, delta: array_like, a_ge: array_l
 
     _delta = 2 * np.pi * delta
     rabi = a_ge * np.sqrt(s / 2.)
-    f_rec = 2 * np.pi * photon_recoil(f, m)
+    f_rec = 2 * np.pi * f_recoil(f, m)
 
-    def hamiltonian(_t, n1, n2):  # without hbar
+    def hamiltonian(_t, n1, n2) -> ndarray:  # without hbar
         gg, mm, ee = 0. + 0.j, 0. + 0.j, 0. + 0.j
         gm, eg, me = 0. + 0.j, 0. + 0.j, 0. + 0.j
         mg, ge, em = 0. + 0.j, 0. + 0.j, 0. + 0.j
         if n1 == n2:
             _e_kin = n1 ** 2 * f_rec
-            # _delta includes one recoil, _delta := (w_eg - w_L +- k*v + k*v_rec)
+            # _delta includes one recoil, _delta := (w_eg - w_L +- k*v + k*v_recoil)
             gg = -(_delta + 2 * n1 * f_rec) + _e_kin
             mm, ee = _e_kin, _e_kin
         elif n1 == n2 - 1:
@@ -367,14 +367,14 @@ def lambda_ge_rec(t: array_like, n: array_like, delta: array_like, a_ge: array_l
 
     def _f(_t, _y):
         _rho = rho(_y)
-        h = np.block([[hamiltonian(_t, n1, n2) for n2 in range(n + 1)] for n1 in range(n + 1)])
+        h = np.block(np.array([[hamiltonian(_t, n1, n2) for n2 in range(n + 1)] for n1 in range(n + 1)]))
         ret = -1.j * (h @ _rho - _rho @ h)
 
         zero = np.zeros((3, 3))
         sigma = np.array([[0., 0., 0.], [0., 0., 0.], [1., 0., 0.]])
-        sigma_eg = np.block([[sigma if _i == _j else zero for _j in range(n + 1)] for _i in range(n + 1)])
+        sigma_eg = np.block(np.array([[sigma if _i == _j else zero for _j in range(n + 1)] for _i in range(n + 1)]))
         sigma = np.array([[0., 0., 0.], [0., 0., 0.], [0., 1., 0.]])
-        sigma_em = np.block([[sigma if _i == _j else zero for _j in range(n + 1)] for _i in range(n + 1)])
+        sigma_em = np.block(np.array([[sigma if _i == _j else zero for _j in range(n + 1)] for _i in range(n + 1)]))
         lindbladian_ge = sigma_eg.T @ _rho @ sigma_eg \
             - 0.5 * (sigma_eg @ sigma_eg.T @ _rho + _rho @ sigma_eg @ sigma_eg.T)
         lindbladian_me = sigma_em.T @ _rho @ sigma_em \
@@ -427,30 +427,26 @@ def lambda_ge_rec(t: array_like, n: array_like, delta: array_like, a_ge: array_l
 
 
 class Geometry:
-    """
-    Class representing a fluorescence detection geometry. The solid angle over which fluorescence light is detected
-    can be defined through intervals of the two angles 'theta' and 'phi'.
-    With these, every spacial direction can be addressed using an orthonormal system defined by
-
-    .. math::
-
-        \\hat{e}_r &:= \\begin{pmatrix}\\sin(\\theta) \\\\
-                       \\cos(\\theta)\\sin(\\phi) \\\\
-                       \\cos(\\theta)\\cos(\\phi)\\end{pmatrix}.
-
-    If the user specifies a rotation object with unitary matrix :math:`R`,
-    the new system is :math:`\\hat{e}_r^\\prime = R \\hat{e}_r`
-    The entire two-dimensional interval is defined through the cartesian product
-    :math:`\\bigcup_i \\theta_i \\times \\bigcup_i \\phi_i`.
-    For every disjoint interval a weight can be defined through a 'weights' matrix.
-    A probability distribution function (pdf) can be defined to have continuous angle weights.
-    A rotation matrix can be defined to rotate the entire coordinate systems/detection geometry.
-    A sample of angle pairs from the defined intervals can be generated using the 'integration_sample' method.
-    """
     def __init__(self):
-        """
-        Initializing the different attributes. The standard interval is
-        :math:`\\theta\\in [-\\pi/2, \\pi/2]` and \\phi\\in [0, 2\\pi].
+        r"""
+        Class representing a fluorescence detection geometry. The solid angle over which fluorescence light is detected
+        can be defined through intervals of the two angles $\theta$ and $\phi$.
+        With these, every spacial direction can be addressed using an orthonormal system defined by
+
+        $$
+        \hat{e}_r = \begin{pmatrix}\sin(\theta)\\
+                    \cos(\theta)\sin(\phi)\\
+                    \cos(\theta)\cos(\phi)\end{pmatrix}.
+        $$
+
+        If the user specifies a rotation object with unitary matrix $R$,
+        the new system is $\hat{e}_r^\prime = R \hat{e}_r$
+        The entire two-dimensional interval is defined through the cartesian product
+        $\bigcup_i \theta_i \times \bigcup_i \phi_i$.
+        For every disjoint interval a weight can be defined through a 'weights' matrix.
+        A probability distribution function (pdf) can be defined to have continuous angle weights.
+        A rotation matrix can be defined to rotate the entire coordinate systems/detection geometry.
+        A sample of angle pairs from the defined intervals can be generated using the 'integration_sample' method.
         """
         self.theta_intervals = np.array([[-np.pi / 2., np.pi / 2.]])
         self.phi_intervals = np.array([[0., 2. * np.pi]])
@@ -480,7 +476,7 @@ class Geometry:
         theta_int, phi_int = self.integration_sample()
         for t in theta_int:
             y = np.cos(t)
-            y_int += si.simps(y, t)
+            y_int += si.simpson(y, x=t)
         y_int *= np.sum([p[-1] - p[0] for p in phi_int])
         self.solid_angle = y_int
 
@@ -793,7 +789,7 @@ class ScatteringRate:
     def generate_y(self, x: array_like, theta: array_like, phi: array_like, decimals: int = 8):
         """
         :param x: The frequency of light in an atoms rest frame (MHz).
-        :param theta: The angle between the emission direction of the fluorescence light and the x-axis + 90°.
+        :param theta: The angle between the emission direction of the fluorescence light and the x-axis + 90 deg.
         :param phi: The mixing angle between the y- and z-axis (sin(phi), cos(phi)).
         :param decimals: The precision of the vector calculus in considered decimal places.
         :returns: The fluorescence spectrum for incident light with frequency 'x'
@@ -828,7 +824,7 @@ class ScatteringRate:
         t0 = time()
         ret = sr_generate_y(denominator, f_theta, f_phi, self.counts, shape).reshape((x.size, theta.size, phi.size))
         t0 = time() - t0
-        print('Time: {}s'.format(t0))
+        # print('Time: {}s'.format(t0))
         return ret * norm
 
     def integrate_y(self, x: array_like, step: scalar = None):
@@ -846,8 +842,8 @@ class ScatteringRate:
                 y = self.generate_y(x, t, p) * np.expand_dims(np.expand_dims(np.cos(t), axis=0), axis=-1)
                 if self.geometry.pdf is not None:
                     y *= np.expand_dims(self.geometry.pdf(t, p), axis=0)
-                y = si.simps(y, x=t, axis=1)
-                y = si.simps(y, x=p)
+                y = si.simpson(y, x=t, axis=1)
+                y = si.simpson(y, x=p)
                 if self.geometry.weights is not None:
                     y *= self.geometry.weights[i, j]
                 y_int += y

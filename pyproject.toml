@@ -7,7 +7,7 @@ requires = [
 
 [project]
 name = 'qspec'
-version = '0.3.5'
+version = '0.3.6'
 description = 'Physics toolbox for laser spectroscopy'
 readme = 'README.md'
 requires-python = '>=3.8'
@@ -28,13 +28,14 @@ classifiers = [
 ]
 dependencies = [
     'matplotlib',
-    'numpy >= 1.20.3',
-    'scipy >= 1.10.1',
+    'numpy >= 2.0.2',
+    'scipy >= 1.13.1',
     'sympy'
 ]
 
 [project.urls]
-documentation = 'https://patmlr.github.io/qspec/'
+homepage = 'https://patmlr.github.io/qspec/'
+documentation = 'https://patmlr.github.io/qspec/doc/doc.html'
 download = 'https://pypi.org/project/qspec/#files'
 source = 'https://github.com/patmlr/qspec'
 tracker = 'https://github.com/patmlr/qspec/issues'

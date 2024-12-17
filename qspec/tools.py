@@ -15,10 +15,10 @@ import shutil
 import sqlite3
 import numpy as np
 
-from qspec._types import *
+from qspec.qtypes import *
 
-__all__ = ['ROMAN_NUMERALS', 'COLORS', 'get_rgb_print_command', 'print_colored', 'printh', 'printw', 'printf',
-           'map_corr_coeff_to_color', 'print_cov', 'get_default_path', 'create_doc_link', 'create_data_dir',
+__all__ = ['ROMAN_NUMERALS', 'COLORS', 'get_rgb_print_command', 'rgb_to_hex_color', 'print_colored', 'printh', 'printw',
+           'printf', 'map_corr_coeff_to_color', 'print_cov', 'get_default_path', 'create_doc_link', 'create_data_dir',
            'get_config_dict', 'fraction', 'check_half_integer', 'half_integer_to_fraction', 'half_integer_to_str',
            'get_val_with_unc', 'roman_to_int', 'odd', 'even', 'get_decimals', 'floor_log2', 'floor_log10', 'round_to_n',
            'factorial', 'asarray_optional', 'in_nested', 'check_iterable', 'make_str_iterable_unique',
@@ -53,6 +53,16 @@ def get_rgb_print_command(r, g, b):
     :returns: The command str to print rgb colors in the console.
     """
     return '\033[38;2;{};{};{}m'.format(r, g, b)
+
+
+def rgb_to_hex_color(r, g, b):
+    """
+    :param r: The fraction of red (0-255).
+    :param g: The fraction of green (0-255).
+    :param b: The fraction of blue (0-255).
+    :returns: A hexadecimal str representation of the `rgb` tuple.
+    """
+    return '#%02x%02x%02x' % (r, g, b)
 
 
 def print_colored(specifier, *values, returned=False, **kwargs):
@@ -129,7 +139,6 @@ def map_corr_coeff_to_color(val, clip=True):
         raise ValueError('The correlation coefficient must be in [-1, 1].')
     g = int(round(val * 127 + 127, 0))
     return 255 - g, g, 0
-
 
 def print_cov(cov, normalize=False, decimals=2):
     """
@@ -414,7 +423,7 @@ def round_to_n(x: array_like, n: int) -> (scalar, int):
 
 def factorial(n: array_like):
     """
-    :param n: The integer number.
+    :param n: The integer numbers. Float types are cast to int types.
     :returns: n! (array compatible).
     """
     n = np.asarray(n, dtype=int)
@@ -431,8 +440,8 @@ def factorial(n: array_like):
 def asarray_optional(a: Optional[array_like], **kwargs):
     """
     :param a: Input data, see numpy docs.
-    :param kwargs: The keyword arguments are passed to numpy.asarray.
-    :returns: None if 'a' is None else 'numpy.asarray(a, \*\*kwargs)'.
+    :param kwargs: The keyword arguments are passed to `numpy.asarray`.
+    :returns: None if `a` is None else `numpy.asarray(a, **kwargs)`.
     """
     return None if a is None else np.asarray(a, **kwargs)
 
@@ -441,7 +450,7 @@ def in_nested(a, nested: Iterable) -> bool:
     """
     :param a: The element to look for.
     :param nested: The nested list.
-    :returns: Whether a is inside the 'nested' list.
+    :returns: Whether `a` is inside the `nested` list.
     """
     if not isinstance(nested, Iterable):
         return False
@@ -783,7 +792,7 @@ def get_subarray(a, i, axis):
 """ Vector math """
 
 
-def absolute(x: array_like, axis=-1) -> array_like:
+def absolute(x: array_like, axis=-1) -> ndarray:
     """
     :param x: A real vector or an array of real vectors.
     :param axis: The axis along which the vector components are aligned.
@@ -803,7 +812,7 @@ def absolute_complex(x: array_like, axis=-1):
     return np.sqrt(np.sum(np.abs(x) ** 2, axis=axis))
 
 
-def angle(x: array_like, y: array_like, axis=-1) -> array_like:
+def angle(x: array_like, y: array_like, axis=-1) -> ndarray:
     """
     :param x: The first vectors (arb. units).
     :param y: The second vectors ([x]).
@@ -834,7 +843,7 @@ def angle_d(x: array_like, x_d: array_like, y: array_like, y_d: array_like, axis
     return np.sqrt((dx + dy) / (1 - arg ** 2))
 
 
-def transform(t: array_like, vec: array_like, axis=-1) -> array_like:
+def transform(t: array_like, vec: array_like, axis=-1) -> ndarray:
     """
     :param t: The transformation matrix which must hold t.shape[axis+1] == vec.shape[axis].
     :param vec: The vector to be transformed.
@@ -880,7 +889,7 @@ def vector_to_diag_matrix(a, axis: int = -1):
     return b * ident
 
 
-def e_r(theta: array_like, phi: array_like, axis=-1) -> array_like:
+def e_r(theta: array_like, phi: array_like, axis=-1) -> ndarray:
     """
     :param theta: The angle theta.
     :param phi: The angle phi.
@@ -896,7 +905,7 @@ def e_r(theta: array_like, phi: array_like, axis=-1) -> array_like:
     return np.concatenate([x, y, z], axis=axis)
 
 
-def e_theta(theta: array_like, phi: array_like, axis=-1) -> array_like:
+def e_theta(theta: array_like, phi: array_like, axis=-1) -> ndarray:
     """
     :param theta: The angle theta.
     :param phi: The angle phi.
@@ -912,7 +921,7 @@ def e_theta(theta: array_like, phi: array_like, axis=-1) -> array_like:
     return np.concatenate([x, y, z], axis=axis)
 
 
-def e_phi(theta: array_like, phi: array_like, axis=-1) -> array_like:
+def e_phi(theta: array_like, phi: array_like, axis=-1) -> ndarray:
     """
     :param theta: The angle theta.
     :param phi: The angle phi.
@@ -986,10 +995,10 @@ def rotation_matrix(alpha: array_like, dr: array_iter):
 class Rotation:
     """
     An object specifying a rotation in 3d-space. The rotation is defined
-    through an angle 'alpha' and an rotational axis 'dr' by the user.
+    through an angle 'alpha' and a rotational axis 'dr' by the user.
     Additional instance attributes are the angle in degree 'alpha_deg' and the rotational matrix 'R'.
     """
-    def __init__(self, alpha: scalar = 0., dr: array_iter = None):
+    def __init__(self, alpha: scalar_like = 0., dr: array_iter = None):
         """
         :param alpha: The angle of the rotation (rad).
         :param dr: The rotational axis of the rotation.

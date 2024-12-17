@@ -8,7 +8,7 @@ Module to fit the models to data.
 
 import numpy as np
 
-from qspec._types import *
+from qspec.qtypes import *
 from qspec.tools import asarray_optional, print_colored, print_cov
 from qspec.analyze import curve_fit, odr_fit
 from qspec.models import _base, _helper
@@ -68,26 +68,31 @@ def fit(model: _base.Model, x: array_iter, y: array_iter, sigma_x: array_iter = 
         sigma_y: Union[array_iter, Callable] = None, report: bool = False, routine: Union[Callable, str] = None,
         guess_offset: bool = False, mc_sigma: int = 0, **kwargs):
     """
-    :param model: The model to fit.
-    :param x: The x data. Can be any object accepted by the model.
-     If model is a Linked model, x should be a list of objects compatible with the linked models.
+    Fit a `Model` from `qspec.models` to data. This fit routine encapsulates the `qspec.curve_fit`
+    and the `qspec.odr_fit` routines to facilitate the use of all modular fit model features,
+    such as *Priors* and `Linked` fitting.
+
+    :param model: The `Model` to fit.
+    :param x: The input data. Can be any object accepted by the model.
+     If model is a Linked model, `x` should be a list of objects compatible with the linked models.
     :param y: The y data. This has to be a 1-d array or a list of 1-d arrays if model is a Linked model.
     :param sigma_x: The uncertainties of the x-values. This is only compatible with Monte-Carlo sampling and the
-     odr_fit routine. If sigma_x is not None, no routine is specified and mc_sigma == 0, the routine is automatically
-     set to odr_fit.
+     odr_fit routine. If `sigma_x` is not `None`, no routine is specified and `mc_sigma == 0`,
+     the routine is automatically set to odr_fit.
     :param sigma_y: The uncertainties of the y-values.
-     This has to be a 1-d array or a list of 1-d arrays if model is a Linked model and have the same shape as 'y'.
-     If routine is 'curve_fit', sigma may be a function g such that 'g(x, y, model(x, \*params), \*params) -> sigma'.
-     g should accept the same x as the model and y and model(x, \*params) as 1-d arrays.
+     This has to be a 1-d array or a list of 1-d arrays if model is a Linked model and have the same shape as `y`.
+     If routine is `curve_fit`, sigma may be a function `g` such that `g(x, y, model(x, *params), *params) -> sigma`.
+     `g` should accept the same `x` as the `model` while `y` and `model(x, *params)` should be 1-d arrays.
     :param report: Whether to print the fit results.
-    :param routine: The routine to use for fitting. Currently supported are {curve_fit, odr_fit}.
-     If None, curve_fit is used. See 'sigma_x' for one exception.
+    :param routine: The routine to use for fitting. Currently supported are {'curve_fit', 'odr_fit'}.
+     If `None`, `curve_fit` is used. See `sigma_x` for one exception.
     :param guess_offset: Guess initial parameters for Offset models.
-     Currently, this is not working if x is not a 1d-array.
-    :param mc_sigma: The number of samples to generate from the data. If it is 0, no Monte-Carlo sampling will be done.
+     Currently, this is not working if `x` is not a 1d-array.
+    :param mc_sigma: The number of samples to generate. If 0, no Monte-Carlo sampling will be done.
      This is not available with linked fitting.
-    :param kwargs: Additional kwargs to pass to the fit 'routine'.
-    :returns: The optimized parameters their covariance matrix and a dictionary containing info about the fit.
+    :param kwargs: Additional kwargs to pass to the fit `routine`.
+    :returns: (popt, pcov, info) The optimized parameters their covariance matrix
+     and a dictionary containing info about the fit.
     :raises (ValueError, TypeError):
     """
 

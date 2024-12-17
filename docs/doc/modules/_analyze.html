@@ -1,0 +1,29 @@
+<div class="bd-content-main">
+<article class="bd-article code-prose">
+  <h1>qspec.analyze</h1>
+  <p>
+    The <code>qspec.analyze</code> module contains general purpose routines for (non)linear data fitting as well as
+    a convenience class for multidimensional King plots. Wrappers for the
+    <a href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.curve_fit.html"><code>scipy.optimize.curve_fit</code></a>
+    and the <a href="https://docs.scipy.org/doc/scipy-1.14.1/reference/generated/odr-function.html"><code>scipy.odr.odr</code></a> routine,
+    which use least-square optimization and orthogonal distance regression, respectively,
+    extend their functionality and standardize their syntax. For fitting of a straight line, as needed in King-plots,
+    the <a href="https://doi.org/10.1119/1.1632486">York algorithm</a>
+    and a <a href="https://doi.org/10.1103/PhysRevLett.115.053003">Monte-Carlo (MC) method</a> are implemented.
+    In both cases, also a generalized version is implemented for fitting a straight line to data points
+    in multiple dimensions, which are distributed according to independent multivariate normal distributions.
+  </p>
+</article>
+</div>
+
+<div class="bd-content-table">
+  <div class="bd-content-table-container">
+    <div class="bd-content-table-header row">
+      <div class="table-column1"><img src="{{ '/assets/img/list-unordered.svg' | relative_url }}"/></div>
+      <div class="column2"><h3 style="margin: auto auto auto 0; "><strong>API navigation</strong></h3></div>
+    </div>
+    <div class="bd-content-table-content">
+      _table_
+    </div>
+  </div>
+</div>

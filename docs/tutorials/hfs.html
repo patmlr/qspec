@@ -1,0 +1,55 @@
+---
+layout: article
+title: Tutorials.HFS
+---
+
+<h1>Calculation of hyperfine structure and Zeeman shifts</h1>
+
+<p>
+    Most functions are compatible with the <code>numpy.ndarray</code> class and utilize their performance advantage.
+    In the following example, the non-perturbative (full diagonalization) hyperfine-structure (HFS) and Zeeman-shifts
+    of the <em>5d</em>&thinsp;<sup>2</sup>D<sub>5/2</sub> state in <sup>87</sup>Sr<sup>+</sup>
+    are calculated for 4000 different magnetic fields.
+</p>
+
+<div class="py-source"><pre>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">qspec</span> <span class="k">as</span> <span class="nn">qs</span>
+
+<span class="n">I</span> <span class="o">=</span> <span class="mf">4.5</span>  <span class="c1"># Total nuclear spin quantum number of 87Sr+</span>
+<span class="n">J</span> <span class="o">=</span> <span class="mf">2.5</span>  <span class="c1"># Total angular momentum quantum number of the 2D5/2 state</span>
+<span class="n">g_i</span> <span class="o">=</span> <span class="o">-</span><span class="mf">1.09316</span> <span class="o">/</span> <span class="n">I</span>  <span class="c1"># The nuclear g-factor [1]</span>
+<span class="n">g_j</span> <span class="o">=</span> <span class="n">qs</span><span class="o">.</span><span class="n">lande_j</span><span class="p">(</span><span class="n">s</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">l</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">j</span><span class="o">=</span><span class="mf">2.5</span><span class="p">)</span>
+<span class="c1"># The nuclear g-factor, calculated from the nuclear magnetic moment</span>
+
+<span class="n">A</span><span class="p">,</span> <span class="n">B</span> <span class="o">=</span> <span class="mf">2.1743</span><span class="p">,</span> <span class="mf">49.11</span>  <span class="c1"># (MHz), The hyperfine-structure constants [2]</span>
+<span class="n">b_field</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mf">0.</span><span class="p">,</span> <span class="mf">4e-3</span><span class="p">,</span> <span class="mi">4000</span><span class="p">)</span>  <span class="c1"># (T), The magnetic flux density</span>
+
+<span class="n">e_eig</span><span class="p">,</span> <span class="n">m_list</span><span class="p">,</span> <span class="n">fm_list</span><span class="p">,</span> <span class="n">mi_mj_list</span> \
+    <span class="o">=</span> <span class="n">qs</span><span class="o">.</span><span class="n">hyper_zeeman_num</span><span class="p">(</span><span class="n">I</span><span class="p">,</span> <span class="n">J</span><span class="p">,</span> <span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="n">g_i</span><span class="p">,</span> <span class="n">g_j</span><span class="p">,</span> <span class="n">b_field</span><span class="p">)</span>
+<span class="c1"># The eigenvalues of the HFS + Zeeman-effect Hamiltonian</span>
+<span class="c1"># and the lists of m_F, F and (m_I, m_J) quantum numbers.</span>
+</pre></div>
+
+<p><img src="{{ '/assets/img/hfs-zeeman-m.svg' | relative_url }}"></p>
+<p>
+    Due to the weak hyperfine interaction, the linear Zeeman effect only holds for very small field strengths
+    such that the Paschen-Back effect already dominates at 3-4&thinsp;mT.
+</p>
+
+<p><img src="{{ '/assets/img/hfs-zeeman-m-zoomed.svg' | relative_url }}"></p>
+<p>
+    Zooming into the plot reveals the highly nonlinear behavior of the intermediate Zeeman effect and shows the
+    forbidden level-crossing of the mixing <i>F</i> states.
+</p>
+
+<h2 style="margin-top: 40px;">References</h2>
+<ul class="references">
+    <li>[1] <a href="https://inis.iaea.org/search/search.aspx?orig_q=RN:51052833">N. J. Stone (2019), International Atomic Energy Agency (IAEA)</a></li>
+    <li>[2] <a href="https://doi.org/10.1103/PhysRevA.67.013402">G. P. Barwood <em>et al.</em>, Phys. Rev. A <b>67</b>, 013402 (2003)</a></li>
+</ul>
+
+<div class="prev-next">
+    <a href="{{ '/tutorials/start.html' | relative_url }}"><div class="prev-next-button">&larr;&nbsp;&nbsp;Previous</div></a>
+    <a href="{{ '/tutorials/models.html' | relative_url }}"><div class="prev-next-button">Next&nbsp;&nbsp;&rarr;</div></a>
+</div>

@@ -20,10 +20,13 @@ CONVOLVE = ['None', 'Gauss', 'Lorentz', 'GaussChi2']
 
 
 class Convolved(Model):
-    """
-    A general numerical convolution model.
-    """
     def __init__(self, model_0, model_1):
+        """
+        A generic numerical convolution model.
+
+        :param model_0: The first model to convolve.
+        :param model_0: The second model to convolve.
+        """
         super().__init__(model=model_0)
         self.type = 'Convolved'
 
@@ -85,10 +88,12 @@ class Convolved(Model):
 
 
 class GaussConvolved(Convolved):
-    """
-    A Gaussian convolution kernel.
-    """
     def __init__(self, model):
+        """
+        A convolution with a `Gauss` kernel.
+
+        :param model: The model to convolve with a `Gauss` kernel.
+        """
         super().__init__(model_0=model, model_1=Gauss())
         self.type = 'GaussConvolved'
 
@@ -97,10 +102,12 @@ class GaussConvolved(Convolved):
 
 
 class LorentzConvolved(Convolved):
-    """
-    A Lorentzian convolution kernel.
-    """
     def __init__(self, model):
+        """
+        A convolution with a `Lorentz` kernel.
+
+        :param model: The model to convolve with a `Lorentz` kernel.
+        """
         super().__init__(model_0=model, model_1=Lorentz())
         self.type = 'LorentzConvolved'
 
@@ -109,10 +116,12 @@ class LorentzConvolved(Convolved):
 
 
 class GaussChi2Convolved(Convolved):
-    """
-    A GaussChi2 convolution kernel.
-    """
     def __init__(self, model):
+        """
+        A convolution with a `GaussChi2` kernel.
+
+        :param model: The model to convolve with a `GaussChi2` kernel.
+        """
         super().__init__(model_0=model, model_1=GaussChi2())
         self.type = 'GaussChi2Convolved'
 

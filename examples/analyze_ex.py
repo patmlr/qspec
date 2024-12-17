@@ -101,9 +101,9 @@ def example(n=None):
         corr = np.array([np.identity(dim) for _ in range(size)], dtype=float)
         cov = sigma[:, :, None] * sigma[:, None, :] * corr
 
-        popt, pcov = qs.linear_nd_fit(mean, cov=cov, p0=None, axis=0, optimize_cov=optimize_cov)
-        # popt, pcov = qs.linear_nd_monte_carlo(mean, cov=cov, n_samples=100000, method='py',
-        #                                       axis=0, report=True, optimize_sampling=False, optimize_cov=optimize_cov)
+        # popt, pcov = qs.linear_nd_fit(mean, cov=cov, p0=None, axis=0, optimize_cov=optimize_cov)
+        popt, pcov = qs.linear_nd_monte_carlo(mean, cov=cov, n_samples=100000, method='cpp',
+                                              axis=0, report=True, optimize_sampling=False, optimize_cov=optimize_cov)
 
         x_min, x_max = np.min(mean[:, 0]), np.max(mean[:, 0])
         x_lim = x_min - 0.2 * (x_max - x_min), x_max + 0.2 * (x_max - x_min)
@@ -200,4 +200,4 @@ def example(n=None):
 
 
 if __name__ == '__main__':
-    example({0})
+    example({1})

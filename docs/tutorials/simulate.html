@@ -1,0 +1,112 @@
+---
+layout: article
+title: Tutorials.Simulate
+---
+
+<h1>Time evolution of quantum interference in fluorescence spectra</h1>
+
+<p>
+    In this tutorial, the photon scattering rate of <sup>7</sup>Li is calculated using different coherent and perturbative
+    solvers included in <a href="{{ '/doc/modules/simulate.html'| relative_url }}"><code>qspec.simulate</code></a>.
+    The resulting scattering rates reproduce the simulated fluorescence spectra shown in Fig.&thinsp;2
+    by Brown <em>et al.</em> [<a href="#ref-1"><em>1</em></a>].
+    This tutorial is also part of <a href="https://doi.org/10.48550/arXiv.2409.01417"><em>qspec's publication</em></a>.
+</p>
+
+<div class="py-source"><pre>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">qspec.simulate</span> <span class="k">as</span> <span class="nn">sim</span>
+
+<span class="n">f_sp</span> <span class="o">=</span> <span class="mf">446810183.163</span>  <span class="c1"># Transition frequency (MHz)</span>
+<span class="n">a_sp</span> <span class="o">=</span> <span class="mf">36.891</span>  <span class="c1"># Einstein coefficient (rad MHz)</span>
+
+<span class="n">s_hyper</span> <span class="o">=</span> <span class="p">[</span><span class="mf">401.75825</span><span class="p">]</span>  <span class="c1"># HFS constants (MHz)</span>
+<span class="n">p_hyper</span> <span class="o">=</span> <span class="p">[</span><span class="o">-</span><span class="mf">3.055038</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.29670</span><span class="p">]</span>
+
+<span class="n">s</span> <span class="o">=</span> <span class="n">sim</span><span class="o">.</span><span class="n">construct_electronic_state</span><span class="p">(</span>
+    <span class="mf">0.</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">l</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">j</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">i</span><span class="o">=</span><span class="mf">1.5</span><span class="p">,</span> <span class="n">hyper_const</span><span class="o">=</span><span class="n">s_hyper</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;s&#39;</span><span class="p">)</span>
+<span class="n">p</span> <span class="o">=</span> <span class="n">sim</span><span class="o">.</span><span class="n">construct_electronic_state</span><span class="p">(</span>
+    <span class="n">f_sp</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">l</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">j</span><span class="o">=</span><span class="mf">1.5</span><span class="p">,</span> <span class="n">i</span><span class="o">=</span><span class="mf">1.5</span><span class="p">,</span> <span class="n">hyper_const</span><span class="o">=</span><span class="n">p_hyper</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;p&#39;</span><span class="p">)</span>
+
+<span class="n">decay</span> <span class="o">=</span> <span class="n">sim</span><span class="o">.</span><span class="n">DecayMap</span><span class="p">(</span><span class="n">labels</span><span class="o">=</span><span class="p">[(</span><span class="s1">&#39;s&#39;</span><span class="p">,</span> <span class="s1">&#39;p&#39;</span><span class="p">)],</span> <span class="n">a</span><span class="o">=</span><span class="p">[</span><span class="n">a_sp</span><span class="p">])</span>
+<span class="n">li7</span> <span class="o">=</span> <span class="n">sim</span><span class="o">.</span><span class="n">Atom</span><span class="p">(</span><span class="n">s</span> <span class="o">+</span> <span class="n">p</span><span class="p">,</span> <span class="n">decay</span><span class="p">)</span>
+
+<span class="n">intensity</span> <span class="o">=</span> <span class="mf">1.</span>  <span class="c1"># uW /mm**2</span>
+<span class="n">polarization</span> <span class="o">=</span> <span class="n">sim</span><span class="o">.</span><span class="n">Polarization</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>  <span class="c1"># Linear polarization</span>
+<span class="n">laser</span> <span class="o">=</span> <span class="n">sim</span><span class="o">.</span><span class="n">Laser</span><span class="p">(</span><span class="n">f_sp</span><span class="p">,</span> <span class="n">intensity</span><span class="p">,</span> <span class="n">polarization</span><span class="p">)</span>
+
+<span class="n">inter</span> <span class="o">=</span> <span class="n">sim</span><span class="o">.</span><span class="n">Interaction</span><span class="p">(</span><span class="n">li7</span><span class="p">,</span> <span class="p">[</span><span class="n">laser</span><span class="p">])</span>
+<span class="n">inter</span><span class="o">.</span><span class="n">controlled</span> <span class="o">=</span> <span class="kc">True</span>  <span class="c1"># Error controlled integrator</span>
+
+<span class="n">t</span> <span class="o">=</span> <span class="mf">0.2</span>  <span class="c1"># Integration time (us)</span>
+<span class="n">delta</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-</span><span class="mi">325</span><span class="p">,</span> <span class="o">-</span><span class="mi">275</span><span class="p">,</span> <span class="mi">201</span><span class="p">)</span>  <span class="c1"># Frequency detunings (MHz)</span>
+<span class="n">theta</span><span class="p">,</span> <span class="n">phi</span> <span class="o">=</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span>  <span class="c1"># Angles from z-axis in x- and y-direction (rad)</span>
+
+<span class="n">n</span> <span class="o">=</span> <span class="n">inter</span><span class="o">.</span><span class="n">rates</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">delta</span><span class="p">)</span>  <span class="c1"># Rate equations, 0.2 us</span>
+<span class="n">y_rates</span> <span class="o">=</span> <span class="n">li7</span><span class="o">.</span><span class="n">scattering_rate</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">theta</span><span class="p">,</span> <span class="n">phi</span><span class="p">,</span> <span class="n">as_density_matrix</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+<span class="n">rho</span> <span class="o">=</span> <span class="n">inter</span><span class="o">.</span><span class="n">master</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">delta</span><span class="p">)</span>  <span class="c1"># Master equation, 0.2 us</span>
+<span class="n">y_master</span> <span class="o">=</span> <span class="n">li7</span><span class="o">.</span><span class="n">scattering_rate</span><span class="p">(</span><span class="n">rho</span><span class="p">,</span> <span class="n">theta</span><span class="p">,</span> <span class="n">phi</span><span class="p">)</span>
+
+<span class="n">rho</span> <span class="o">=</span> <span class="n">inter</span><span class="o">.</span><span class="n">master</span><span class="p">(</span><span class="mf">0.4</span><span class="p">,</span> <span class="n">delta</span><span class="p">)</span>  <span class="c1"># Master equation, 0.4 us</span>
+<span class="n">y4_master</span> <span class="o">=</span> <span class="n">li7</span><span class="o">.</span><span class="n">scattering_rate</span><span class="p">(</span><span class="n">rho</span><span class="p">,</span> <span class="n">theta</span><span class="p">,</span> <span class="n">phi</span><span class="p">)</span>
+
+<span class="n">sr</span> <span class="o">=</span> <span class="n">sim</span><span class="o">.</span><span class="n">ScatteringRate</span><span class="p">(</span><span class="n">li7</span><span class="p">,</span> <span class="n">laser</span><span class="o">=</span><span class="n">laser</span><span class="p">)</span>
+<span class="n">y_brown</span> <span class="o">=</span> <span class="n">sr</span><span class="o">.</span><span class="n">generate_y</span><span class="p">(</span><span class="n">delta</span><span class="p">,</span> <span class="n">theta</span><span class="p">,</span> <span class="n">phi</span><span class="p">)[:,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>  <span class="c1"># Brown et al.</span>
+</pre></div>
+
+<p>
+    Using <code>matplotlib</code>, we can generate the plot from the publication.
+</p>
+
+<div class="py-source"><pre>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+
+<span class="n">scale</span> <span class="o">=</span> <span class="mf">1e3</span>
+<span class="n">x_lim</span> <span class="o">=</span> <span class="n">delta</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">delta</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+
+<span class="n">fig</span><span class="p">,</span> <span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">r</span><span class="p">)</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span>
+    <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">sharex</span><span class="o">=</span><span class="s1">&#39;all&#39;</span><span class="p">,</span> <span class="n">height_ratios</span><span class="o">=</span><span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
+
+<span class="n">m</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">delta</span><span class="p">,</span> <span class="n">y_brown</span> <span class="o">*</span> <span class="n">scale</span><span class="p">,</span> <span class="s1">&#39;-k&#39;</span><span class="p">,</span>
+       <span class="n">label</span><span class="o">=</span><span class="sa">r</span><span class="s1">&#39;Brown $et\,al.$&#39;</span><span class="p">,</span> <span class="n">zorder</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
+<span class="n">m</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">delta</span><span class="p">,</span> <span class="n">y_rates</span><span class="p">[:,</span> <span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">scale</span><span class="p">,</span> <span class="s1">&#39;-C0&#39;</span><span class="p">,</span>
+       <span class="n">label</span><span class="o">=</span><span class="sa">r</span><span class="s1">&#39;rates, $t = 0.2\,\mu$s&#39;</span><span class="p">,</span> <span class="n">zorder</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">m</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">delta</span><span class="p">,</span> <span class="n">y_master</span><span class="p">[:,</span> <span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">scale</span><span class="p">,</span> <span class="s1">&#39;-C1&#39;</span><span class="p">,</span>
+       <span class="n">label</span><span class="o">=</span><span class="sa">r</span><span class="s1">&#39;master, $t = 0.2\,\mu$s&#39;</span><span class="p">,</span> <span class="n">zorder</span><span class="o">=</span><span class="mi">60</span><span class="p">)</span>
+<span class="n">m</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">delta</span><span class="p">,</span> <span class="n">y4_master</span><span class="p">[:,</span> <span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">scale</span><span class="p">,</span> <span class="s1">&#39;--C3&#39;</span><span class="p">,</span>
+       <span class="n">label</span><span class="o">=</span><span class="sa">r</span><span class="s1">&#39;master, $t = 0.4\,\mu$s&#39;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mf">1.5</span><span class="p">,</span> <span class="n">zorder</span><span class="o">=</span><span class="mi">30</span><span class="p">)</span>
+
+
+<span class="n">r</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">delta</span><span class="p">,</span> <span class="p">(</span><span class="n">y_brown</span> <span class="o">-</span> <span class="n">y_rates</span><span class="p">[:,</span> <span class="o">-</span><span class="mi">1</span><span class="p">])</span> <span class="o">*</span> <span class="n">scale</span><span class="p">,</span>
+       <span class="s1">&#39;-k&#39;</span><span class="p">,</span> <span class="n">zorder</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
+<span class="n">r</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">delta</span><span class="p">,</span> <span class="p">(</span><span class="n">y_master</span><span class="p">[:,</span> <span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">y_rates</span><span class="p">[:,</span> <span class="o">-</span><span class="mi">1</span><span class="p">])</span> <span class="o">*</span> <span class="n">scale</span><span class="p">,</span>
+       <span class="s1">&#39;-C1&#39;</span><span class="p">,</span> <span class="n">zorder</span><span class="o">=</span><span class="mi">60</span><span class="p">)</span>
+<span class="n">r</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">delta</span><span class="p">,</span> <span class="p">(</span><span class="n">y4_master</span><span class="p">[:,</span> <span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">y_rates</span><span class="p">[:,</span> <span class="o">-</span><span class="mi">1</span><span class="p">])</span> <span class="o">*</span> <span class="n">scale</span><span class="p">,</span>
+       <span class="s1">&#39;--C3&#39;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mf">1.5</span><span class="p">,</span> <span class="n">zorder</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+<span class="n">r</span><span class="o">.</span><span class="n">hlines</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="o">*</span><span class="n">x_lim</span><span class="p">,</span> <span class="s1">&#39;C0&#39;</span><span class="p">,</span> <span class="s1">&#39;-&#39;</span><span class="p">,</span> <span class="n">zorder</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+<span class="n">m</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+<span class="n">m</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;$\mathrm</span><span class="si">{d}</span><span class="s1">\Gamma / \mathrm</span><span class="si">{d}</span><span class="s1">\Omega$ (kHz)&#39;</span><span class="p">)</span>
+<span class="n">m</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">(</span><span class="o">*</span><span class="n">x_lim</span><span class="p">)</span>
+<span class="n">r</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;Relative frequency (MHz)&#39;</span><span class="p">)</span>
+<span class="n">r</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;Residuals (kHz)&#39;</span><span class="p">)</span>
+
+<span class="n">y_lim</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">get_ylim</span><span class="p">()</span>
+<span class="n">r</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="o">-</span><span class="p">(</span><span class="n">y_lim</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">y_lim</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">/</span> <span class="mi">6</span><span class="p">,</span> <span class="p">(</span><span class="n">y_lim</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">y_lim</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">/</span> <span class="mi">6</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">subplots_adjust</span><span class="p">(</span><span class="n">left</span><span class="o">=</span><span class="mf">0.09</span><span class="p">,</span> <span class="n">bottom</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">right</span><span class="o">=</span><span class="mf">0.99</span><span class="p">,</span> <span class="n">top</span><span class="o">=</span><span class="mf">0.99</span><span class="p">,</span> <span class="n">hspace</span><span class="o">=</span><span class="mf">0.05</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+
+<p><img src="{{ '/assets/img/simulate-0.svg' | relative_url }}"></p>
+
+<h2 style="margin-top: 40px;">References</h2>
+<ul class="references">
+    <li id="ref-1">[1] <a href="https://doi.org/10.1103/PhysRevA.87.032504">R. C. Brown <em>et al.</em>, Phys. Rev. A <b>87</b>, 032504 (2013)</a></li>
+</ul>
+
+<div class="prev-next">
+    <a href="{{ '/tutorials/models.html' | relative_url }}"><div class="prev-next-button">&larr;&nbsp;&nbsp;Previous</div></a>
+    <a href="{{ '/tutorials/king-2d.html' | relative_url }}"><div class="prev-next-button">Next&nbsp;&nbsp;&rarr;</div></a>
+</div>

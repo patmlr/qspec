@@ -38,7 +38,7 @@ from scipy import odr
 import matplotlib
 import matplotlib.pyplot as plt
 
-from qspec._types import *
+from qspec.qtypes import *
 from qspec import tools
 from qspec.physics import me_u, me_u_d
 from qspec.analyze._analyze_cpp import generate_collinear_points_cpp
@@ -940,7 +940,7 @@ def curve_fit(f: Callable, x: Union[array_like, object], y: array_like, p0: arra
               p0_fixed: array_iter = None, sigma: Union[array_iter, Callable] = None, absolute_sigma: bool = False,
               check_finite: bool = True, bounds: (ndarray, ndarray) = (-np.inf, np.inf), method: str = None,
               jac: Union[Callable, str] = None, full_output: bool = False, report: bool = False, **kwargs):
-    """
+    r"""
     :param f: The model function to fit to the data.
     :param x: The x data.
     :param y: The y data.
@@ -950,7 +950,7 @@ def curve_fit(f: Callable, x: Union[array_like, object], y: array_like, p0: arra
     :param p0_fixed: A numpy array or an Iterable of bool values specifying, whether to fix a parameter.
      Must have the same length as p0.
     :param sigma: The 1-sigma uncertainty of the y data.
-     This can also be a function g such that 'g(x, y, f(x, \*params), \*params) -> sigma'.
+     This can also be a function g such that 'g(x, y, f(x, *params), *params) -> sigma'.
     :param absolute_sigma: See scipy.optimize.curve_fit.
     :param check_finite: See scipy.optimize.curve_fit.
     :param bounds: See scipy.optimize.curve_fit.

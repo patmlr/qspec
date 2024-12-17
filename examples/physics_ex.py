@@ -9,6 +9,7 @@ Example script / Guide for the qspec.physics module.
 import numpy as np
 import scipy.constants as sc
 import matplotlib.pyplot as plt
+from sympy.abc import alpha
 
 import qspec as qs
 
@@ -29,10 +30,12 @@ def example(n=None):
 
     Example 4: Calculation of the velocity distribution of accelerated thermal ions.
 
+    Example 5: Full solution for hyperfine-structure + Zeeman splitting.
+
     :returns: None.
     """
     if n is None:
-        n = {0, 1, 2, 3}
+        n = {0, 1, 2, 3, 4, 5}
     if isinstance(n, int):
         n = {n, }
 
@@ -202,6 +205,54 @@ def example(n=None):
         plt.plot(v, y)
         plt.show()
 
+    if 5 in n:
+        """
+        Example 5: Full solution for hyperfine-structure + Zeeman splitting.
+        """
+
+        i = 4.5
+        j = 2.5
+        mu = -1.09316
+        g_n = mu / i
+        g_j = qs.lande_j(0.5, 2, 2.5)
+        a_hyper = 2.1743
+        b_hyper = 49.11
+        b = np.linspace(0., 4e-3, 4000)
+        e_eig, m_list, fm_list, mi_mj_list = qs.hyper_zeeman_num(i, j, a_hyper, b_hyper, g_n, g_j, b)
+        e_th = [qs.hyperfine(i, j, f, a_hyper, b_hyper) for f in qs.get_f(i, j)]
+
+        f_plotted = set()
+        m_plotted = set()
+        cmap = plt.get_cmap('inferno')
+        f_colored = False
+        for im, (_e_eig, _f_list, _m, mi_mj) in enumerate(zip(e_eig, fm_list, m_list, mi_mj_list)):
+            for k in range(_e_eig.shape[1]):
+                if f_colored:
+                    c_val = (_f_list[k] - abs(i - j)) / (i + j - abs(i - j) + 1)
+                    c = cmap(c_val)
+                    plt.plot(b * 1e3, _e_eig[:, k], color=c, ls='-', lw=0.85, alpha=0.8,
+                             label=rf'$F = {int(_f_list[k])}$' if c not in f_plotted else None, zorder=10 * c_val)
+                    f_plotted.add(c)
+                    handles, labels = plt.gca().get_legend_handles_labels()
+                else:
+                    mj = mi_mj[k][1]
+                    c_val = (mj + j) / (2 * j + 1)
+                    c = cmap(c_val)
+                    plt.plot(b * 1e3, _e_eig[:, k], color=c, ls='-', lw=0.85, alpha=0.8,
+                             label=rf'$m_J = {mj}$' if mj not in m_plotted else None, zorder=10 * c_val)
+                    handles, labels = plt.gca().get_legend_handles_labels()
+                    handles, labels = handles[::-1], labels[::-1]
+                    m_plotted.add(mj)
+
+        # plt.hlines(e_th, 0., 4., colors='grey', ls='--')
+
+        plt.xlabel('Magnetic field (mT)')
+        plt.ylabel('Frequency shift (MHz)')
+        # plt.legend(handles, labels)
+        plt.xlim(0., 4.)
+        plt.subplots_adjust(left=0.11, bottom=0.1, right=0.98, top=0.99)
+        plt.show()
+
 
 if __name__ == '__main__':
-    example({0})
+    example(None)

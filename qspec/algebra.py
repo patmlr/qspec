@@ -11,9 +11,9 @@ from sympy import nsimplify, sqrt, sin, cos, pi
 from sympy.vector import CoordSys3D
 import sympy.physics.wigner as spw
 
-from qspec._types import *
+from qspec.qtypes import *
 
-__all__ = ['cast_sympy', 'clebsch_gordan', 'wigner_3j', 'wigner_6j', 'a', 'b', 'ab', 'c', 'abc', 'f_0', 'g_0',
+__all__ = ['quant', 'cast_sympy', 'clebsch_gordan', 'wigner_3j', 'wigner_6j', 'a', 'b', 'ab', 'c', 'abc', 'f_0', 'g_0',
            'c_dipole', 'a_dipole', 'a_dipole_cart', 'reduced_f_root', 'reduced_f', 'a_tilda', 'a_m_tilda']
 
 
@@ -30,19 +30,17 @@ def cast_sympy(as_sympy: bool, *args: sympy_like, dtype: type = float):
     return ret
 
 
-def clebsch_gordan(j_1: sympy_qn, j_2: sympy_qn, j_3: sympy_qn, m_1: sympy_qn, m_2: sympy_qn, m_3: sympy_qn,
-                   as_sympy: bool = False):
+def clebsch_gordan(j_1: sympy_quant, j_2: sympy_quant, j_3: sympy_quant,
+                   m_1: sympy_quant, m_2: sympy_quant, m_3: sympy_quant, as_sympy: bool = False):
     """
-    .. math::
+    Calculates the Clebsch-Gordan coefficient $\\langle J_1, m_1, J_2, m_2\\, |\\, J_3, m_3\\rangle$.
 
-        \\langle J_1, m_1, J_2, m_2\\, |\\, J_3, m_3\\rangle
-
-    :param j_1: :math:`J_1`
-    :param j_2: :math:`J_2`
-    :param j_3: :math:`J_3`
-    :param m_1: :math:`m_1`
-    :param m_2: :math:`m_2`
-    :param m_3: :math:`m_3`
+    :param j_1: $J_1$
+    :param j_2: $J_2$
+    :param j_3: $J_3$
+    :param m_1: $m_1$
+    :param m_2: $m_2$
+    :param m_3: $m_3$
     :param as_sympy: Whether to return the result as a sympy type.
     :returns: The Clebsch-Gordan coefficient.
     """
@@ -50,22 +48,21 @@ def clebsch_gordan(j_1: sympy_qn, j_2: sympy_qn, j_3: sympy_qn, m_1: sympy_qn, m
     return cast_sympy(as_sympy, ret)
 
 
-def wigner_3j(j_1: sympy_qn, j_2: sympy_qn, j_3: sympy_qn, m_1: sympy_qn, m_2: sympy_qn, m_3: sympy_qn,
-              as_sympy: bool = False):
+def wigner_3j(j_1: sympy_quant, j_2: sympy_quant, j_3: sympy_quant,
+              m_1: sympy_quant, m_2: sympy_quant, m_3: sympy_quant, as_sympy: bool = False):
     """
-    .. math::
-
+    Calculate the Wigner-3j symbol $
         \\begin{pmatrix}
         J_1 & J_2 & J_3 \\\\
         m_1 & m_2 & m_3
-        \\end{pmatrix}
+        \\end{pmatrix}$.
 
-    :param j_1: :math:`J_1`
-    :param j_2: :math:`J_2`
-    :param j_3: :math:`J_3`
-    :param m_1: :math:`m_1`
-    :param m_2: :math:`m_2`
-    :param m_3: :math:`m_3`
+    :param j_1: $J_1$
+    :param j_2: $J_2$
+    :param j_3: $J_3$
+    :param m_1: $m_1$
+    :param m_2: $m_2$
+    :param m_3: $m_3$
     :param as_sympy: Whether to return the result as a sympy type.
     :returns: The wigner-3j symbol.
 
@@ -74,22 +71,21 @@ def wigner_3j(j_1: sympy_qn, j_2: sympy_qn, j_3: sympy_qn, m_1: sympy_qn, m_2: s
     return cast_sympy(as_sympy, ret)
 
 
-def wigner_6j(j_1: sympy_qn, j_2: sympy_qn, j_3: sympy_qn, j_4: sympy_qn, j_5: sympy_qn, j_6: sympy_qn,
-              as_sympy: bool = False):
+def wigner_6j(j_1: sympy_quant, j_2: sympy_quant, j_3: sympy_quant,
+              j_4: sympy_quant, j_5: sympy_quant, j_6: sympy_quant, as_sympy: bool = False):
     """
-    .. math::
-
+    Calculate the Wigner-6j symbol $
         \\begin{Bmatrix}
         J_1 & J_2 & J_3 \\\\
         J_4 & J_5 & J_6
-        \\end{Bmatrix}
+        \\end{Bmatrix}$.
 
-    :param j_1: :math:`J_1`
-    :param j_2: :math:`J_2`
-    :param j_3: :math:`J_3`
-    :param j_4: :math:`J_4`
-    :param j_5: :math:`J_5`
-    :param j_6: :math:`J_6`
+    :param j_1: $J_1$
+    :param j_2: $J_2$
+    :param j_3: $J_3$
+    :param j_4: $J_4$
+    :param j_5: $J_5$
+    :param j_6: $J_6$
     :param as_sympy: Whether to return the result as a sympy type.
     :returns: The wigner-6j symbol.
     """
@@ -101,7 +97,7 @@ def wigner_6j(j_1: sympy_qn, j_2: sympy_qn, j_3: sympy_qn, j_4: sympy_qn, j_5: s
     Refer to [Brown et al., Phys. Rev. A 87, 032504 (2013)]. """
 
 
-def a(i: sympy_qn, j_l: sympy_qn, f_l: sympy_qn, j_u: sympy_qn, f_u: sympy_qn, as_sympy: bool = False) \
+def a(i: sympy_quant, j_l: sympy_quant, f_l: sympy_quant, j_u: sympy_quant, f_u: sympy_quant, as_sympy: bool = False) \
         -> Union[sympy_core, float]:
     """
     :param i: The nuclear spin quantum number I.
@@ -119,7 +115,7 @@ def a(i: sympy_qn, j_l: sympy_qn, f_l: sympy_qn, j_u: sympy_qn, f_u: sympy_qn, a
     # return f_0(i, j_l, f_l, j_u, f_u, 0, as_sympy=as_sympy) - b(i, j_l, f_l, j_u, f_u, as_sympy=as_sympy)  # (slower)
 
 
-def b(i: sympy_qn, j_l: sympy_qn, f_l: sympy_qn, j_u: sympy_qn, f_u: sympy_qn, as_sympy: bool = False) \
+def b(i: sympy_quant, j_l: sympy_quant, f_l: sympy_quant, j_u: sympy_quant, f_u: sympy_quant, as_sympy: bool = False) \
         -> Union[sympy_core, float]:
     """
     :param i: The nuclear spin quantum number I.
@@ -134,7 +130,7 @@ def b(i: sympy_qn, j_l: sympy_qn, f_l: sympy_qn, j_u: sympy_qn, f_u: sympy_qn, a
     return (two / 3) * (f_0(i, j_l, f_l, j_u, f_u, 0, as_sympy) - f_0(i, j_l, f_l, j_u, f_u, p / 2, as_sympy))
 
 
-def ab(i: sympy_qn, j_l: sympy_qn, f_l: sympy_qn, j_u: sympy_qn, f_u: sympy_qn, as_sympy: bool = False) \
+def ab(i: sympy_quant, j_l: sympy_quant, f_l: sympy_quant, j_u: sympy_quant, f_u: sympy_quant, as_sympy: bool = False) \
         -> (Union[sympy_core, float], Union[sympy_core, float]):
     """
     :param i: The nuclear spin quantum number I.
@@ -148,7 +144,7 @@ def ab(i: sympy_qn, j_l: sympy_qn, f_l: sympy_qn, j_u: sympy_qn, f_u: sympy_qn, 
     return a(i, j_l, f_l, j_u, f_u, as_sympy), b(i, j_l, f_l, j_u, f_u, as_sympy)
 
 
-def c(i: sympy_qn, j_l: sympy_qn, f_l: sympy_qn, j_u: sympy_qn, f1_u: sympy_qn, f2_u: sympy_qn,
+def c(i: sympy_quant, j_l: sympy_quant, f_l: sympy_quant, j_u: sympy_quant, f1_u: sympy_quant, f2_u: sympy_quant,
       as_sympy: bool = False) -> Union[sympy_core, float]:
     """
     :param i: The nuclear spin quantum number I.
@@ -164,7 +160,7 @@ def c(i: sympy_qn, j_l: sympy_qn, f_l: sympy_qn, j_u: sympy_qn, f1_u: sympy_qn, 
     return g_0(i, j_l, f_l, j_u, f1_u, f2_u, 0, as_sympy)
 
 
-def abc(i: sympy_qn, j_l: sympy_qn, f_l: sympy_qn, j_u: sympy_qn, f1_u: sympy_qn, f2_u: sympy_qn,
+def abc(i: sympy_quant, j_l: sympy_quant, f_l: sympy_quant, j_u: sympy_quant, f1_u: sympy_quant, f2_u: sympy_quant,
         as_sympy: bool = False) -> (Union[sympy_core, float], Union[sympy_core, float], Union[sympy_core, float]):
     """
     :param i: The nuclear spin quantum number I.
@@ -180,7 +176,7 @@ def abc(i: sympy_qn, j_l: sympy_qn, f_l: sympy_qn, j_u: sympy_qn, f1_u: sympy_qn
         c(i, j_l, f_l, j_u, f1_u, f2_u, as_sympy)
 
 
-def f_0(i: sympy_qn, j_l: sympy_qn, f_l: sympy_qn, j_u: sympy_qn, f_u: sympy_qn, theta_l: sympy_like,
+def f_0(i: sympy_quant, j_l: sympy_quant, f_l: sympy_quant, j_u: sympy_quant, f_u: sympy_quant, theta_l: sympy_like,
         as_sympy: bool = False) -> Union[sympy_core, float]:
     """
     :param i: The nuclear spin quantum number I.
@@ -215,8 +211,8 @@ def f_0(i: sympy_qn, j_l: sympy_qn, f_l: sympy_qn, j_u: sympy_qn, f_u: sympy_qn,
     return 3 * c_sum / (2 * sum([2 * f + 1 for f in f_f_list]))
 
 
-def g_0(i: sympy_qn, j_l: sympy_qn, f_l: sympy_qn, j_u: sympy_qn, f1_u: sympy_qn, f2_u: sympy_qn, theta_l: sympy_like,
-        as_sympy: bool = False) -> Union[sympy_core, float]:
+def g_0(i: sympy_quant, j_l: sympy_quant, f_l: sympy_quant, j_u: sympy_quant,
+        f1_u: sympy_quant, f2_u: sympy_quant, theta_l: sympy_like, as_sympy: bool = False) -> Union[sympy_core, float]:
     """
     :param i: The nuclear spin quantum number I.
     :param j_l: The electronic total angular momentum quantum number J of the lower state.
@@ -251,8 +247,8 @@ def g_0(i: sympy_qn, j_l: sympy_qn, f_l: sympy_qn, j_u: sympy_qn, f1_u: sympy_qn
     return 3 * c_sum / (2 * sum([2 * f + 1 for f in f_f_list]))
 
 
-def c_dipole(i: sympy_qn, j_i: sympy_qn, f_i: sympy_qn, m_i: sympy_qn, j_u: sympy_qn, f_u: sympy_qn,
-             j_f: sympy_qn, f_f: sympy_qn, m_f: sympy_qn,
+def c_dipole(i: sympy_quant, j_i: sympy_quant, f_i: sympy_quant, m_i: sympy_quant, j_u: sympy_quant, f_u: sympy_quant,
+             j_f: sympy_quant, f_f: sympy_quant, m_f: sympy_quant,
              theta_l: sympy_like, scatter_pol: str, as_sympy: bool = False) -> Union[sympy_core, float]:
     """
     :param i: The nuclear spin quantum number I.
@@ -294,8 +290,8 @@ def c_dipole(i: sympy_qn, j_i: sympy_qn, f_i: sympy_qn, m_i: sympy_qn, j_u: symp
     return c_element
 
 
-def a_dipole(i: sympy_qn, j_l: sympy_qn, f_l: sympy_qn, m_l: sympy_qn,
-             j_u: sympy_qn, f_u: sympy_qn, m_u: sympy_qn, q: sympy_qn, as_sympy: bool = False) \
+def a_dipole(i: sympy_quant, j_l: sympy_quant, f_l: sympy_quant, m_l: sympy_quant,
+             j_u: sympy_quant, f_u: sympy_quant, m_u: sympy_quant, q: sympy_quant, as_sympy: bool = False) \
         -> Union[sympy_core, float]:
     """
     :param i: The nuclear spin quantum number I.
@@ -321,8 +317,8 @@ def a_dipole(i: sympy_qn, j_l: sympy_qn, f_l: sympy_qn, m_l: sympy_qn,
         * clebsch_gordan(f_l, 1, f_u, m_l, q, m_u, as_sympy)
 
 
-def a_dipole_cart(i: sympy_qn, j_l: sympy_qn, f_l: sympy_qn, m_l: sympy_qn,
-                  j_u: sympy_qn, f_u: sympy_qn, m_u: sympy_qn, as_sympy: bool = False) -> ndarray:
+def a_dipole_cart(i: sympy_quant, j_l: sympy_quant, f_l: sympy_quant, m_l: sympy_quant,
+                  j_u: sympy_quant, f_u: sympy_quant, m_u: sympy_quant, as_sympy: bool = False) -> ndarray:
     """
     :param i: The nuclear spin quantum number I.
     :param j_l: The electronic total angular momentum quantum number J of the lower state.
@@ -347,7 +343,8 @@ def a_dipole_cart(i: sympy_qn, j_l: sympy_qn, f_l: sympy_qn, m_l: sympy_qn,
     return np.array([x, y, z], dtype=complex)
 
 
-def reduced_f_root(i: sympy_qn, j_l: sympy_qn, f_l: sympy_qn, j_u: sympy_qn, f_u: sympy_qn, as_sympy: bool = False):
+def reduced_f_root(i: sympy_quant, j_l: sympy_quant, f_l: sympy_quant,
+                   j_u: sympy_quant, f_u: sympy_quant, as_sympy: bool = False):
     """
     :param i: The nuclear spin quantum number I.
     :param j_l: The electronic total angular momentum quantum number J of the lower state.
@@ -365,7 +362,8 @@ def reduced_f_root(i: sympy_qn, j_l: sympy_qn, f_l: sympy_qn, j_u: sympy_qn, f_u
     return (-1) ** exp * sqrt_fl * sqrt_fu * wigner_6j(j_u, j_l, 1, f_l, f_u, i, as_sympy)
 
 
-def reduced_f(i: sympy_qn, j_l: sympy_qn, f_l: sympy_qn, j_u: sympy_qn, f_u: sympy_qn, as_sympy: bool = False):
+def reduced_f(i: sympy_quant, j_l: sympy_quant, f_l: sympy_quant,
+              j_u: sympy_quant, f_u: sympy_quant, as_sympy: bool = False):
     """
     :param i: The nuclear spin quantum number I.
     :param j_l: The electronic total angular momentum quantum number J of the lower state.
@@ -379,7 +377,8 @@ def reduced_f(i: sympy_qn, j_l: sympy_qn, f_l: sympy_qn, j_u: sympy_qn, f_u: sym
     return (2 * f_l + 1) * (2 * f_u + 1) * wigner_6j(j_u, j_l, 1, f_l, f_u, i, as_sympy) ** 2
 
 
-def a_tilda(i: sympy_qn, j_l: sympy_qn, f_l: sympy_qn, j_u: sympy_qn, f_u: sympy_qn, as_sympy: bool = False):
+def a_tilda(i: sympy_quant, j_l: sympy_quant, f_l: sympy_quant,
+            j_u: sympy_quant, f_u: sympy_quant, as_sympy: bool = False):
     """
     :param i: The nuclear spin quantum number I.
     :param j_l: The electronic total angular momentum quantum number J of the lower state.
@@ -393,8 +392,8 @@ def a_tilda(i: sympy_qn, j_l: sympy_qn, f_l: sympy_qn, j_u: sympy_qn, f_u: sympy
     return (2 * f_l + 1) * (2 * f_u + 1) * wigner_6j(j_u, j_l, 1, f_l, f_u, i, as_sympy) ** 2
 
 
-def a_m_tilda(i: sympy_qn, j_l: sympy_qn, f_l: sympy_qn, m_l: sympy_qn,
-              j_u: sympy_qn, f_u: sympy_qn, m_u: sympy_qn, as_sympy: bool = False):
+def a_m_tilda(i: sympy_quant, j_l: sympy_quant, f_l: sympy_quant, m_l: sympy_quant,
+              j_u: sympy_quant, f_u: sympy_quant, m_u: sympy_quant, as_sympy: bool = False):
     """
     :param i: The nuclear spin quantum number I.
     :param j_l: The electronic total angular momentum quantum number J of the lower state.

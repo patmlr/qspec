@@ -1,0 +1,22 @@
+<div class="topnav">
+  <nav>
+    <div class="topnav-container">
+      <div class="topnav-icon">
+        <a href="{{ '/' | absolute_url }}" ><img src=" {{ '/assets/img/logo_small.svg' | relative_url }}" alt="Icon" /></a>
+      </div>
+      <div class="topnav-content">
+        <ul class="topnav-content-ul">
+          {% for item in site.data.navigation %}
+          <li class="topnav-content-li">
+            <a href="{{ item.link | relative_url }}" {% if page.url contains item.identifier %} class="focus" {% endif %} >
+              {{ item.name }}
+            </a>
+          </li>
+          {% endfor %}
+          <!--p id="topnav-hor"></p>
+          <input type="text" placeholder="Search..."-->
+        </ul>
+      </div>
+    </div>
+  </nav>
+</div>

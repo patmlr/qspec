@@ -1,0 +1,8 @@
+title: qspec
+logo: /assets/img/logo.svg
+description: A physics toolbox for laser spectroscopy.
+show_downloads: true
+theme: jekyll-theme-minimal
+exclude:
+  - /doc/doc.py
+  - /tutorials/tutorials.py

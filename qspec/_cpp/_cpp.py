@@ -324,7 +324,7 @@ dll.interaction_mc_master.restype = ctypes.c_void_p
 
 
 # ScatteringRate
-dll.sr_generate_y.argtypes = (c_complex_p, c_complex_p, c_complex_p, c_int_p, c_int_p, c_double_p)
+dll.sr_generate_y.argtypes = (c_complex_p, c_complex_p, c_complex_p, c_size_t_p, c_size_t_p, c_double_p)
 dll.sr_generate_y.restype = ctypes.c_void_p
 
 

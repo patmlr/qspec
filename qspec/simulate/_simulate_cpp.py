@@ -10,7 +10,7 @@ import numpy as np
 from matplotlib import cm
 import matplotlib.pyplot as plt
 
-from qspec._types import *
+from qspec.qtypes import *
 from qspec._cpp import *
 from qspec import tools
 from qspec import get_f, get_m
@@ -35,8 +35,8 @@ def sr_generate_y(denominator: np.ndarray, f_theta: np.ndarray, f_phi: np.ndarra
     denominator_p = denominator.ctypes.data_as(c_complex_p)  # Get all pointers to the first elements of the arrays.
     f_theta_p = f_theta.ctypes.data_as(c_complex_p)
     f_phi_p = f_phi.ctypes.data_as(c_complex_p)
-    counts_p = counts.ctypes.data_as(c_int_p)
-    shape_p = shape.ctypes.data_as(c_int_p)
+    counts_p = counts.ctypes.data_as(c_size_t_p)
+    shape_p = shape.ctypes.data_as(c_size_t_p)
     y_p = y.ctypes.data_as(c_double_p)
     dll.sr_generate_y(denominator_p, f_theta_p, f_phi_p, counts_p, shape_p, y_p)  # Modify y "in-place" with C++.
     return y
@@ -63,14 +63,12 @@ def _process_q_axis(q_axis: array_like) -> ndarray:
 
 
 class Polarization:
-    """
-    Class representing a polarization state of light. The property 'x' holds the polarization in cartesian coordinates.
-    The property 'q' holds the polarization in spherical coordinates ( sigma-, pi, sigma+ )
-    with respect to the chosen quantization axis.
-    """
-
     def __init__(self, vec: array_iter = None, q_axis: array_like = 2, vec_as_q: bool = True, instance=None):
         """
+        Class representing a polarization state of light. The property 'x' holds the polarization in cartesian coordinates.
+        The property 'q' holds the polarization in spherical coordinates ( sigma-, pi, sigma+ )
+        with respect to the chosen quantization axis.
+
         :param vec: The polarization vector. I.e. the amplitude of the electromagnetic wave. So to specify, e.g.,
          1/3 of pi and 2/3 sigma+ light for a given 'q_axis', vec must be ( 0, sqrt(1/3), sqrt(2/3) ).
          The default is linear polarization in z-direction, such that x = (0, 0, 1) and q = (0, 1, 0).
@@ -128,13 +126,11 @@ class Polarization:
 
 
 class Laser:
-    """
-    Class representing a laser.
-    """
-
     def __init__(self, freq: scalar, intensity: scalar = 1., polarization: Polarization = None,
                  k: array_like = None, instance=None):
         """
+        Class representing a laser.
+
         :param freq: The frequency of the laser (MHz).
         :param intensity: The intensity of the laser (uW / mm**2 = W / m**2).
         :param polarization: The polarization of the laser.
@@ -247,11 +243,15 @@ def _process_hyper_const(hyper_const: array_like) -> ndarray:
 
 # noinspection PyPep8Naming
 class Environment:
-    """
-    Class representing an electromagnetic environment.
-    """
-
     def __init__(self, E: array_like = None, B: array_like = None, instance=None):
+        """
+        Class representing an electromagnetic environment.
+
+        :param E: A static electric field (not implemented).
+        :param B: A static magnetic field (linear Zeeman effect).
+        :param instance: A pointer to an existing Environment instance.
+         If this is specified, the other parameters are omitted.
+        """
         self.instance = instance
         if self.instance is None:
             self.instance = dll.environment_construct()
@@ -299,12 +299,11 @@ class Environment:
 
 
 class State:
-    """
-    Class representing an atomic quantum state :math:`|(\\mathrm{label})SLJIFm\\rangle`.
-    """
     def __init__(self, freq_j: scalar, s: scalar, l: scalar, j: scalar, i: scalar, f: scalar, m: scalar,
                  hyper_const: array_like = None, g: scalar = 0, label: str = None, instance=None):
-        """
+        r"""
+        Class representing an atomic quantum state $|(\mathrm{label})SLJIFm\rangle$.
+
         :param freq_j: The energetic position of the state without the hyperfine structure or the environment (MHz).
         :param s: The electron spin quantum number S.
         :param l: The electronic angular momentum quantum number L.
@@ -509,11 +508,10 @@ def construct_hyperfine_state(freq_0: scalar, s: scalar, l: scalar, j: scalar, i
 
 
 class DecayMap:
-    """
-    Class linking sets of atomic states via Einstein-A coefficients.
-    """
     def __init__(self, labels: Iterable[tuple] = None, a: Iterable[scalar] = None, instance=None):
         """
+        Class linking sets of atomic states via Einstein-A coefficients.
+
         :param labels: An iterable of label pairs, corresponding to atomic states which get connected.
         :param a: An Iterable of Einstein-A coefficients (MHz).
         :param instance: A pointer to an existing DecayMap instance.
@@ -593,11 +591,10 @@ def _gen_label_map(atom):
 
 
 class Atom:
-    """
-    Class representing an Atom and its inner structure.
-    """
     def __init__(self, states: Iterable[State] = None, decay_map: DecayMap = None, mass: scalar = 0, instance=None):
         """
+        Class representing an Atom and its inner structure.
+
         :param states: The states of the atom.
         :param decay_map: The decay map which connects the atomic states.
         :param mass: The mass of the atom (u).
@@ -823,7 +820,7 @@ class Atom:
                     rho = np.transpose(rho, axes=axes)
             axes = [ax for ax in range(axis)]
             if axes:
-                l0 = np.expand_dims(self.l0, axis=axes)
+                l0 = np.expand_dims(l0, axis=axes)
             axes = [axis + ax + 2 for ax in range(len(rho.shape) - axis - 1)]
             if axes:
                 l0 = np.expand_dims(l0, axis=axes)
@@ -1083,12 +1080,11 @@ def _cast_v(v: Optional[array_like]):
     
 
 class Interaction:
-    """
-    Class representing an Interaction between lasers and an atom.
-    """
     def __init__(self, atom: Atom = None, lasers: Iterable[Laser] = None, delta_max: scalar = 1e3,
                  controlled: bool = True, instance=None):
         """
+        Class representing an Interaction between lasers and an atom.
+
         :param atom: The atom.
         :param lasers: The lasers.
         :param delta_max: The maximum absolute difference between a laser and a transition frequency
@@ -1149,11 +1145,9 @@ class Interaction:
         dll.interaction_update(self.instance)
 
     def resonance_info(self):
-        """
+        r"""
         Prints the detunings of the base frequencies of the lasers in the given atomic system.
-        In particular useful for systems with a hyperfine structure. Here
-
-        .. math:: \\Delta = \\nu_0 - \\nu_L.
+        In particular useful for systems with a hyperfine structure. Here $\Delta = \nu_0 - \nu_\mathrm{L}$.
 
         :returns: None.
         """
@@ -1620,7 +1614,7 @@ class Interaction:
         :returns: The integrated MC-Schroedinger equation as a complex-valued array of shape (n, #states, #times).
         """
         if self.controlled:
-            raise ValueError('Controlled or Dense steppers are not supported for \'master_mc\'.'
+            raise ValueError('Controlled or Dense steppers are not supported for \'mc_master\'.'
                              ' Decrease the step size if necessary.')
         if dynamics and self.atom.mass <= 0:
             raise ValueError('To simulate mechanical dynamics, the mass of the atom must be specified.')

@@ -108,7 +108,7 @@ def hf_int(i, j_l, j_u, transitions):
     """
     :param i: The nuclear spin.
     :param j_l: The total lower state electron angular momentum.
-    :param j_u:  The total upper state electron angular momentum.
+    :param j_u: The total upper state electron angular momentum.
     :param transitions: A list of electronic transition properties. The first two properties of each entry should be
      f_l and f_u the total angular momenta of lower and upper state.
     :returns: The relative line intensities.
@@ -118,10 +118,16 @@ def hf_int(i, j_l, j_u, transitions):
 
 
 class Splitter(Model):
-    """
-    The abstract base class for Hyperfine structure models.
-    """
     def __init__(self, model, i, j_l, j_u, label=None):
+        """
+        The abstract base class for Hyperfine structure models.
+        
+        :param model: A submodel whose parameters are adopted by this model.
+        :param i: The nuclear spin.
+        :param j_l: The total lower state electron angular momentum.
+        :param j_u: The total upper state electron angular momentum.
+        :param label: A label for the `Splitter` (isotope / isomer / transition).
+        """
         super().__init__(model=model)
         self.type = 'Splitter'
 
@@ -144,10 +150,12 @@ class Splitter(Model):
 
 
 class SplitterSummed(Summed):
-    """
-    A sum of 'Splitter' models.
-    """
     def __init__(self, splitter_models):
+        """
+        A `Summed` model of `Splitter` submodels.
+
+        :param splitter_models: The `Splitter` submodels to sum over.
+        """
         if any(not isinstance(model, Splitter) for model in splitter_models):
             raise TypeError('All models passed to \'SplitterSummed\' must have type \'Splitter\'.')
         super().__init__(splitter_models, labels=['({})'.format(i if model.label is None else model.label)
@@ -155,6 +163,11 @@ class SplitterSummed(Summed):
                          if len(splitter_models) > 1 else None)
 
     def racah(self):
+        """
+        Set the intensity values of all submodels to the Racah intensities.
+
+        :returns: None.
+        """
         i0 = 0
         for model in self.models:
             for i, intensity in zip(model.racah_indices, model.racah_intensities):
@@ -164,10 +177,14 @@ class SplitterSummed(Summed):
 
 
 class Hyperfine(Splitter):
-    """
-    A standard hyperfine structure model.
-    """
     def __init__(self, model, i, j_l, j_u, label=None):
+        """
+        :param model: A submodel whose parameters are adopted by this model.
+        :param i: The nuclear spin.
+        :param j_l: The total lower state electron angular momentum.
+        :param j_u: The total upper state electron angular momentum.
+        :param label: A label for the `Splitter` (isotope / isomer / transition).
+        """
         super().__init__(model, i, j_l, j_u, label=label)
         self.type = 'Hyperfine'
 
@@ -229,30 +246,42 @@ def load_qi(filepath):
 
 
 class HyperfineQI(Splitter):
-    """
-    A perturbative quantum interference (QI) hyperfine structure model
-    based on https://doi.org/10.1103/PhysRevA.87.032504.
-    """
-    def __init__(self, model, i, j_l, j_u, name, qi_path=None):
-        super().__init__(LorentzQI(), i, j_l, j_u, name)
+    def __init__(self, _, i, j_l, j_u, label=None, qi_path=None):
+        """
+        A perturbative quantum interference (QI) hyperfine-structure model
+        based on https://doi.org/10.1103/PhysRevA.87.032504.
+        
+        :param _: Empty `model` parameter. This hyperfine-structure model always uses `Lorentz` lineshapes.
+         To use other lineshapes, combine it with the `Convolve` model.
+        :param i: The nuclear spin.
+        :param j_l: The total lower state electron angular momentum.
+        :param j_u: The total upper state electron angular momentum.
+        :param label: A label for the `Splitter` (isotope / isomer / transition).
+        :param qi_path: Specify a directory to save and load the calculated geometric parts of the
+         dipole matrix elements for faster repeated calculations.
+         These depend only on the quantum numbers `i`, `j_l` and `j_u`.
+        """
+        super().__init__(LorentzQI(), i, j_l, j_u, label)
         self.type = 'HyperfineQI'
         self.qi_path = qi_path
-        self.file = f'qi_{name}.txt'
+        if label is None:
+            label = 'None'
+        self.file = f'qi_{label}.txt'
 
         self.transitions = hf_trans(self.i, self.j_l, self.j_u)
         self.racah_intensities = [0., ]
 
         save = False
         if self.qi_path is None or not os.path.isfile(os.path.join(self.qi_path, self.file)):
-            print(f'Calculating QI A-matrix of isotope {name} ... ')
+            print(f'Calculating QI A-matrix of isotope {label} ... ')
             self.a_qi = [a(self.i, self.j_l, f_l, self.j_u, f_u, as_sympy=False)
                          for f_l in get_f(self.i, self.j_l) for f_u in get_f(self.i, self.j_u)
                          if abs(f_u - f_l) < 1.1 and not f_u == f_l == 0]
-            print(f'Calculating QI B-matrix of isotope {name} ... ')
+            print(f'Calculating QI B-matrix of isotope {label} ... ')
             self.b_qi = [b(self.i, self.j_l, f_l, self.j_u, f_u, as_sympy=False)
                          for f_l in get_f(self.i, self.j_l) for f_u in get_f(self.i, self.j_u)
                          if abs(f_u - f_l) < 1.1 and not f_u == f_l == 0]
-            print(f'Calculating QI C-matrix of isotope {name} ... ')
+            print(f'Calculating QI C-matrix of isotope {label} ... ')
             self.c_qi = [[c(self.i, self.j_l, f_l, self.j_u, f1_u, f2_u, as_sympy=False)
                           for i2, f2_u in enumerate(get_f(self.i, self.j_u)) if i2 > i1
                           if abs(f1_u - f_l) < 1.1 and abs(f2_u - f_l) < 1.1
@@ -321,11 +350,23 @@ class HyperfineQI(Splitter):
 
 
 class HyperfineMixed(Splitter):
-    """
-    Hyperfine-mixing model based on https://doi.org/10.1103/PhysRevA.55.2728.
-    """
-    def __init__(self, model, i, j_l, j_u, name, config):
-        super().__init__(model, i, j_l, j_u, name)
+    def __init__(self, model, i, j_l, j_u, label, config):
+        """
+        Hyperfine-mixing model based on https://doi.org/10.1103/PhysRevA.55.2728 [1].
+        
+        :param model: A submodel whose parameters are adopted by this model.
+        :param i: The nuclear spin.
+        :param j_l: The total lower state electron angular momentum.
+        :param j_u: The total upper state electron angular momentum.
+        :param label: A label for the `Splitter` (isotope / isomer / transition).
+        :param config: The configuration of the hyperfine-induced mixing. This is a dictionary such as
+         `{'enabled_l'=False, 'enabled_u'=False, 'Jl'=[0.5, ], 'Ju'=[0.5, ], 'Tl'=[[1.]], 'Tu'=[[1.]], 'fl'=[0., ], 'fu'=[0., ], 'mu'=0.}`,
+         where 'enabled_l'/'enabled_u' decide if the corresponding lower/upper J mix, 'Jl'/'Ju' are lists of lower/upper
+         state J, including `j_l` and `j_u`, 'Tl'/'Tu' are matrix representations of
+         the electronic magnetic dipole operator, see [1], 'fl'/'fu' are lists of initial fine-structure energies
+         (can be omitted) and 'mu' is the magnetic dipole moment of the nucleus.
+        """
+        super().__init__(model, i, j_l, j_u, label)
         self.type = 'HyperfineMixed'
         self.config = config
         self.states = ['l', 'u']
@@ -341,7 +382,8 @@ class HyperfineMixed(Splitter):
 
         self.M = 0. if self.i == 0 else np.sqrt((2 * self.i + 1) * (self.i + 1) / self.i) * self.config['mu']
 
-        self.fs = {s: np.array(self.config['f{}'.format(s)]).flatten() for s in self.states}
+        self.fs = {s: np.array(self.config.get('f{}'.format(s), np.zeros(self.J[s].shape)))
+                   for s in self.states}
 
         self.mask_J = {s: [np.array([i for i, j in enumerate(self.config['J{}'.format(s)])
                                      if abs(self.i - j) - 0.1 < f < self.i + j + 0.1], dtype=int) for f in self.F[s]]
@@ -400,7 +442,7 @@ class HyperfineMixed(Splitter):
                     np.diag([args[self.p['FS_{}{}({})'.format(s, _m, self.J[s][_m])]] for _m in m]) + w)
                        for m, w in zip(self.mask_J[s], self.W[s])]
                 # Eigenvalues are returned in ascending order! Sort based on eigenvectors.
-                # Invert order
+                # Invert order, e.g.,
                 # a =               [a, b, c]
                 # order =           [2, 0, 1]
                 # desired a =       [b, c, a]

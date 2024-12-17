@@ -1,0 +1,41 @@
+<div class="bd-content-main">
+<article class="bd-article code-prose">
+  <h1>qspec.models</h1>
+  <p>
+    The <code>qspec.models</code> module features a class-based framework to construct mathematical functions to be used for fitting.
+    While its main focus lies on lineshape/resonance-peak models, any custom function can be added to the framework.
+    All models can be used with popular fitting routines such as
+    <a href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.curve_fit.html"><code>scipy.optimize.curve_fit</code></a>.
+    However, to use the full set of features, the built-in wrapper
+    <a href="{{ '/doc/functions/models/fit.html' | relative_url }}"><code>qspec.models.fit</code></a> should be used.
+    A class inheritance diagram of the available models is shown in the following sketch.
+  </p>
+  <p><img src="{{ '/assets/img/models-uml.svg' | relative_url }}"></p>
+  <p>
+    All models inherit from the <a href="{{ '/doc/functions/models/Model/Model.html' | relative_url }}"><code>Model</code></a> class.
+    The abstract <a href="{{ '/doc/functions/models/Listed/Listed.html' | relative_url }}"><code>Listed</code></a> class
+    enables the combination of models to link parameters or sum models.
+    The <a href="{{ '/doc/functions/models/Splitter/Splitter.html' | relative_url }}"><code>Splitter</code></a> class
+    is an abstract class for hyperfine structure models.
+    <a href="{{ '/doc/functions/models/Convolved/Convolved.html' | relative_url }}"><code>Convolved</code></a> allows numerical convolution of two models and
+    <a href="{{ '/doc/functions/models/Spectrum/Spectrum.html' | relative_url }}"><code>Spectrum</code></a> is a generic lineshape/peak model.
+  </p>
+  <p>
+    For a tutorial on how to use <code>qspec.models</code>, see
+    <a href="{{ '/tutorials/models.html' | relative_url }}"><em>Construction and fitting of modular lineshape models</em></a>.
+  </p>
+
+</article>
+</div>
+
+<div class="bd-content-table">
+  <div class="bd-content-table-container">
+    <div class="bd-content-table-header row">
+      <div class="table-column1"><img src="{{ '/assets/img/list-unordered.svg' | relative_url }}"/></div>
+      <div class="column2"><h3 style="margin: auto auto auto 0; "><strong>API navigation</strong></h3></div>
+    </div>
+    <div class="bd-content-table-content">
+      _table_
+    </div>
+  </div>
+</div>
