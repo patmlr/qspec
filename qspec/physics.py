@@ -1052,122 +1052,177 @@ def hyper_zeeman_12_d(j: quant_like, m: quant_like, a_hyper: array_like = 0.,
     return x0, x1
 
 
-def a_hyper_mu(i: scalar, j: scalar, mu: array_like, b: array_like):
+def a_hyper_mu(i: quant_like, j: quant_like, mu: array_like, b_field: array_like) -> ndarray:
+    r"""
+    The magnetic dipole hyperfine structure constant as a function of the nuclear magnetic moment `mu`
+    and the magnetic field of the electrons at the nucleus `b_field` $A = \mu\mathcal{B} / (IJ)$.
+
+    :param i: The nuclear spin quantum number $I$.
+    :param j: The electronic total angular momentum quantum number $J$.
+    :param mu: The magnetic moment of the nucleus in units of the nuclear magneton ($\mu_\mathrm{N}$).
+    :param b_field: The B-field $\mathcal{B}$ of the atomic electrons at the nucleus (T).
+    :returns: The hyperfine structure constant $A$ (MHz).
     """
-    :param i: The nuclear spin quantum number I.
-    :param j: The electronic total angular momentum quantum number J.
-    :param mu: The magnetic moment of the nucleus in units of the nuclear magneton (mu_N).
-    :param b: The B-field of the atomic electrons at the nucleus (T).
-    :returns: The hyperfine structure constant A (MHz).
-    """
-    mu, b = np.asarray(mu), np.asarray(b)
+    mu, b = np.asarray(mu, dtype=float), np.asarray(b_field, dtype=float)
     if i == 0 or j == 0:
         return np.zeros_like(mu * b)
-    return mu * b / np.sqrt(i * (i + 1) * j * (j + 1)) / sc.h
+    return mu * mu_N * b / (i * j * sc.h) * 1e-6
 
 
-def saturation_intensity(f: array_like, a: array_like, a_dipole: array_like):
+def saturation_intensity(f: array_like, a: array_like, a_dipole: array_like = 1.) -> ndarray:
+    r"""
+    The saturation intensity of an electronic dipole transition $I_0 = \pi f^3hA_{ki} / (3c^2a_\mathrm{dipole})$.
+
+    :param f: The frequency $f$ of the transition $|i\rangle\rightarrow|k\rangle$ (MHz).
+    :param a: The Einstein $A_{ki}$ coefficient (MHz).
+    :param a_dipole: The reduced dipole coefficient of the transition (see `qspec.a_dipole`).
+    :returns: The saturation intensity $I_0$.
     """
-    :param f: The frequency of the transition (MHz).
-    :param a: The Einstein A coefficient (MHz).
-    :param a_dipole: The reduced dipole coefficient of the transition (see algebra.a_dipole).
-    :returns: The saturation intensity.
-    """
-    f, a, a_dipole = np.asarray(f), np.asarray(a), np.asarray(a_dipole)
+    f, a, a_dipole = np.asarray(f, dtype=float), np.asarray(a, dtype=float), np.asarray(a_dipole, dtype=float)
     return np.pi * (f * 1e6) ** 3 * sc.h * a * 1e6 / (3 * sc.c ** 2 * a_dipole)
 
 
-def saturation(i: array_like, f: array_like, a: array_like, a_dipole: array_like):
+def saturation(intensity: array_like, f: array_like, a: array_like, a_dipole: array_like) -> ndarray:
+    r"""
+    The saturation parameter $s = I / I_0$, with the `saturation_intensity` $I_0$.
+
+    :param intensity: The intensity of the laser ($\mu$W/mm<sup>2</sup> = W/m<sup>2</sup>).
+    :param f: The frequency $f$ of the transition $|i\rangle\rightarrow|k\rangle$ (MHz).
+    :param a: The Einstein $A_{ki}$ coefficient (MHz).
+    :param a_dipole: The reduced dipole coefficient of the transition (see `qspec.a_dipole`).
+    :returns: The saturation parameter $s$.
     """
-    :param i: The intensity of the laser (MHz).
-    :param f: The frequency of the transition (MHz).
-    :param a: The Einstein A coefficient (MHz).
-    :param a_dipole: The reduced dipole coefficient of the transition (see algebra.a_dipole).
-    :returns: The saturation parameter.
-    """
-    i = np.asarray(i)
-    return i / saturation_intensity(f, a, a_dipole)
+    intensity = np.asarray(intensity, dtype=float)
+    return intensity / saturation_intensity(f, a, a_dipole)
 
 
-def rabi(a: array_like, s: array_like):
-    """
-    :param a: The Einstein A coefficient (MHz).
-    :param s: The saturation parameter.
-    :returns: The rabi frequency.
+def rabi(a: array_like, s: array_like) -> ndarray:
+    r"""
+    The Rabi frequency $\Omega = A_{ki}\sqrt{s/2}$.
+
+    :param a: The Einstein $A_{ki}$ coefficient (MHz).
+    :param s: The saturation parameter $s$.
+    :returns: The Rabi frequency $\Omega$.
     """
     a, s = np.asarray(a), np.asarray(s)
     return a * np.sqrt(s / 2.)
 
 
 def scattering_rate(df: array_like, a: array_like, s: array_like):
-    """
-    :param df: The detuning of to be scattered light from the transition.
+    r"""
+    The two-state-equilibrium scattering-rate of an electronic dipole transition
+
+    $$\begin{aligned}
+    &\Gamma_\mathrm{sc} = \frac{s}{2}\frac{A_{ki}^3}{(4/pi\Delta f)^2 + (1 + s)A_{ki}^2}\\
+    \lim\limits_{s\rightarrow\inf}&\Gamma_\mathrm{sc}\big|_{\Delta f = 0} = A_{ki} / 2.
+    \end{aligned}$$
+
+    :param df: The frequency detuning $\Delta f$ of the absorbed light.
      This must be differences of real frequencies, such that w = 2 pi * df (MHz).
-    :param a: The Einstein A coefficient (MHz).
-    :param s: The saturation parameter.
-    :returns: The 2-state-equilibrium scattering-rate of an electronic transition.
+    :param a: The Einstein $A_{ki}$ coefficient (MHz).
+    :param s: The saturation parameter $s$.
+    :returns: The two-state-equilibrium scattering-rate $\Gamma_\mathrm{sc}$ of an electronic dipole transition (MHz).
     """
     df, a, s = np.asarray(df), np.asarray(a), np.asarray(s)
     return 0.125 * s * a ** 3 / (0.25 * (1 + s) * a ** 2 + (2 * np.pi * df) ** 2)
 
 
-def mass_factor(m: array_like, m_ref: array_like, m_d: array_like = 0, m_ref_d: array_like = 0, k_inf: bool = True) \
-        -> (ndarray, ndarray):
+def mass_factor(m0: array_like, m1: array_like, m0_d: array_like, m1_d: array_like) -> (ndarray, ndarray):
+    m0, m1, m0_d, m1_d = (np.asarray(m0, dtype=float), np.asarray(m1, dtype=float),
+                          np.asarray(m0_d, dtype=float), np.asarray(m1_d, dtype=float))
+    r"""
+    The specific mass factor required to calculate modified isotope shifts or charge radii and its uncertainty
+    
+    $$\begin{aligned}
+    \mu &= \frac{m_0 m_1}{m_0 - m_1}\\
+    \Delta\mu &= \mu\sqrt{\left(\frac{\Delta m_0}{m_0} - \frac{\Delta m_0}{m_0 - m_1}\right)^2 
+    + \left(\frac{\Delta m_1}{m_1} + \frac{\Delta m_1}{m_0 - m_1}\right)^2}.
+    \end{aligned}$$
+    
+    Use $m0 = M_0 + m_\mathrm{e}$ and/or $m1 = M_1 + m_\mathrm{e}$ with the nuclear masses $M_0$ and $M_1$
+    and the electron mass $m_\mathrm{e}$ for King-plots.
+    Compare (6.4) with (3.17) in [W. H. King, Isotope shifts in atomic spectra (1984)].
+    
+    :param m0: The mass $m_0$ of the first isotope (u).
+    :param m1: The mass $m_1$ of the second isotope (u).
+    :param m0_d: The mass uncertainty $\Delta m_0$ of the first isotope (u).
+    :param m1_d: The mass uncertainty $\Delta m_1$ of the second isotope (u).
+    :returns: (mu, mu_d) The mass factor $\mu$ and its uncertainty $\Delta\mu$
+     required to calculate modified isotope shifts or charge radii.
     """
-    :param m: The mass of the isotope (amu).
-    :param m_ref: The mass of the reference isotope (amu). Must be a scalar or have the same shape as 'm'.
-    :param m_d: The uncertainty of the mass of the isotope (amu). Must be a scalar or have the same shape as 'm'.
-    :param m_ref_d: The uncertainty of the mass of the reference isotope (amu).
-     Must be a scalar or have the same shape as 'm'.
-    :param k_inf: Whether the normal mass-shift factor K(NMS) is defined mass independently
-     as m_e * T(inf) (= True) or as m_e * T(A_ref) (= False). Compare (6.4) with (3.17)
-     in [W. H. King, Isotope shifts in atomic spectra (1984)].
-    :returns: the mass factor and its uncertainty needed to calculate modified isotope shifts or charge radii.
-    """
-    m, m_d, m_ref, m_ref_d = np.asarray(m), np.asarray(m_d), np.asarray(m_ref), np.asarray(m_ref_d)
-    if k_inf:
-        mu = (m + me_u) * (m_ref + me_u) / (m - m_ref)
-        if np.all(m_d) == 0 and np.all(m_ref_d) == 0:
-            return mu, np.zeros_like(mu)
-        mu_d = ((mu / (m + me_u) - mu / (m - m_ref)) * m_d) ** 2
-        mu_d += ((mu / (m_ref + me_u) + mu / (m - m_ref)) * m_ref_d) ** 2
-        mu_d += ((mu / (m + me_u) + mu / (m_ref + me_u)) * me_u_d) ** 2
-    else:
-        mu = (m + me_u) * m_ref / (m - m_ref)
-        if np.all(m_d) == 0 and np.all(m_ref_d) == 0:
-            return mu, np.zeros_like(mu)
-        mu_d = (-m_ref * (m_ref + me_u) / ((m - m_ref) ** 2) * m_d) ** 2
-        mu_d += (m * (m + me_u) / ((m - m_ref) ** 2) * m_ref_d) ** 2
-        mu_d += (m_ref / (m - m_ref) * me_u_d) ** 2
-    return mu, np.sqrt(mu_d)
+    scalar_true = tools.check_shape((), m0, m1, return_mode=True)
+    if scalar_true:
+        m0 = np.array([m0])
+
+    m_rel = m0 - m1
+    mask = m_rel == 0
+    m_rel[mask] = 1
+
+    mu = m0 * m1 / m_rel
+    mu_d = ((mu / m0 - mu / m_rel) * m0_d) ** 2
+    mu_d += ((mu / m1 + mu / m_rel) * m1_d) ** 2
+    mu_d = np.sqrt(mu_d)
+
+    mu[mask] = np.inf
+    mu_d[mask] = 0
+
+    if scalar_true:
+        return mu[0], mu_d[0]
+    return mu, mu_d
 
 
 def delta_r2(r: array_like, r_d: array_like, r_ref: array_like, r_ref_d: array_like,
-             delta_r: array_like, delta_r_d: array_like, v2: array_like, v2_ref: array_like):
-    """
-    :param r: The Barrett radius of an isotope.
-    :param r_d: The uncertainty of the Barrett radius.
-    :param r_ref: The Barrett radius of a reference isotope.
-    :param r_ref_d: The uncertainty of the Barrett radius of the reference isotope.
-    :param delta_r: The difference between the Barrett radius of the isotope and the reference isotope.
-    :param delta_r_d: The uncertainty of the difference between
-     the Barrett radius of the isotope and the reference isotope.
+             delta_r: array_like = None, delta_r_d: array_like = None, v2: array_like = 1., v2_ref: array_like = 1.):
+    r"""
+    The difference of the mean square nuclear charge radius between two isotopes and its uncertainty
+    calculated from the Barrett radii and elastic electron scattering form factors
+
+    $$\begin{aligned}
+    \delta\!\langle r^2\rangle &= \left(\frac{R}{V_2}\right)^2
+    - \left(\frac{R_\mathrm{ref}}{V_{2,\mathrm{ref}}}\right)^2\\
+    \Delta\delta\!\langle r^2\rangle &=
+    \sqrt{\left(\frac{2 R\Delta R}{V_2^2}\right)^2
+    + \left(\frac{2 R_\mathrm{ref}\Delta R_\mathrm{ref}}{V_{2,\mathrm{ref}}^2}\right)^2}.
+    \end{aligned}$$
+
+    Specify the uncertainty `delta_r_d`, which is often much lower than `r_d` and `r_ref_d`,
+     to use an improved formula that gives lower uncertainties
+
+    $$\begin{aligned}
+    \delta\!\langle r^2\rangle &= \left(\frac{R}{}\right).
+    \end{aligned}$$
+
+    :param r: The Barrett radius $R$ of the first isotope.
+    :param r_d: The uncertainty of the Barrett radius $\Delta R$ of the first isotope.
+    :param r_ref: The Barrett radius $R_\mathrm{ref}$ of the second isotope.
+    :param r_ref_d: The uncertainty of the Barrett radius $\Delta R_\mathrm{ref}$ of the second isotope.
+    :param delta_r: The difference between the Barrett radii of the first and second isotope.
+    :param delta_r_d: The uncertainty of the difference between the Barrett radii of the first and second isotope.
     :param v2: The V2 factor of the isotope.
     :param v2_ref: The V2 factor of the reference isotope.
-    :returns: The difference of the mean square nuclear charge radius between two isotopes and its uncertainty.
+    :returns: The difference of the mean square nuclear charge radius between two isotopes $\delta\!\langle r^2\rangle$
+     and its uncertainty $\Delta\delta\!\langle r^2\rangle$.
     """
     r, r_d = np.asarray(r, dtype=float), np.asarray(r_d, dtype=float)
     r_ref, r_ref_d = np.asarray(r_ref, dtype=float), np.asarray(r_ref_d, dtype=float)
-    delta_r, delta_r_d = np.asarray(delta_r, dtype=float), np.asarray(delta_r_d, dtype=float)
+    delta_r, delta_r_d = tools.asarray_optional(delta_r, dtype=float), tools.asarray_optional(delta_r_d, dtype=float)
     v2, v2_ref = np.asarray(v2, dtype=float), np.asarray(v2_ref, dtype=float)
 
-    sum_term = (r / v2 + r_ref / v2_ref) / v2
-    delta_term = delta_r + r_ref * (1. - v2 / v2_ref)
-    val = sum_term * delta_term  # (r/v2)**2 - (r_ref/v2_ref)**2
+    if delta_r is None and delta_r_d is not None:
+        delta_r = r - r_ref
 
-    err = (sum_term * delta_r_d) ** 2
-    err += (delta_term * r_d / (v2 ** 2)) ** 2
-    err += ((delta_term / (v2 * v2_ref) + sum_term * (1. - v2 / v2_ref)) * r_ref_d) ** 2
+    if delta_r_d is None:
+        val = (r / v2) ** 2 - (r_ref / v2_ref) ** 2
+        err = np.sqrt((2 * r * r_d / v2 ** 2) ** 2 + (2 * r_ref * r_ref_d / v2_ref ** 2) ** 2)
+    else:
+        sum_term = (r / v2 + r_ref / v2_ref) / v2
+        delta_term = delta_r + r_ref * (1. - v2 / v2_ref)
+        val = sum_term * delta_term
+
+        err = (sum_term * delta_r_d) ** 2
+        err += (delta_term * r_d / (v2 ** 2)) ** 2
+        err += ((delta_term / (v2 * v2_ref) + sum_term * (1. - v2 / v2_ref)) * r_ref_d) ** 2
+
     return val, np.sqrt(err)
 
 

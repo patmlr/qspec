@@ -40,7 +40,7 @@ import matplotlib.pyplot as plt
 
 from qspec.qtypes import *
 from qspec import tools
-from qspec.physics import me_u, me_u_d
+from qspec.physics import me_u, me_u_d, mass_factor
 from qspec.analyze._analyze_cpp import generate_collinear_points_cpp
 
 __all__ = ['poly', 'const', 'straight', 'straight_direction', 'straight_std', 'straight_x_std',
@@ -1176,8 +1176,8 @@ class King:
         self.m_sub[:, 0] -= (self.subtract_electrons - 1) * me_u
         self.m_sub[:, 1] = np.sqrt(self.m[:, 1] ** 2 + ((self.subtract_electrons - 1) * me_u_d) ** 2)
 
-        self.m_mod = _mass_factor_array(self.m_sub[None, :, 0], self.m_sub[:, None, 0],
-                                        self.m_sub[None, :, 1], self.m_sub[:, None, 1])
+        self.m_mod = mass_factor(self.m_sub[None, :, 0], self.m_sub[:, None, 0],
+                                 self.m_sub[None, :, 1], self.m_sub[:, None, 1])
         self.m_mod = np.transpose(self.m_mod, axes=[1, 2, 0])
         
         self.nd = False
@@ -1203,7 +1203,7 @@ class King:
                      size=(self.n_samples, self.x.shape[0], self.x.shape[1]))
         x = np.transpose(x, axes=[1, 2, 0])
 
-        m_mod = _mass_factor_array(m[i], m[i_ref], 0., 0.)[0]
+        m_mod = mass_factor(m[i], m[i_ref], 0., 0.)[0]
         x_mod = m_mod[:, None, :] * x
         return x_mod
 
