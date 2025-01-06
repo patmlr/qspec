@@ -6,8 +6,9 @@ qspec.qtypes
 Module including types for the docstrings.
 """
 
+from types import CodeType
 # noinspection PyUnresolvedReferences
-from typing import Union, Iterable, Callable, Any, SupportsFloat, SupportsIndex, Optional
+from typing import Union, Iterable, Callable, Any, SupportsFloat, SupportsIndex, Optional, Generator, Sized
 from numpy import number, integer, floating, complexfloating
 from numpy.typing import ArrayLike, NDArray
 from sympy.core.numbers import Integer, Float, Rational
@@ -15,7 +16,8 @@ from sympy.core.add import Add
 from sympy.core.mul import Mul
 
 
-__all__ = ['Union', 'Iterable', 'Callable', 'Any', 'SupportsFloat', 'SupportsIndex', 'Optional',
+__all__ = ['CodeType',
+           'Union', 'Iterable', 'Callable', 'Any', 'SupportsFloat', 'SupportsIndex', 'Optional', 'Generator', 'Sized',
            'Integer', 'Float', 'Rational', 'Add', 'Mul',
            'quant',
            'int_like', 'float_like', 'complex_like',
@@ -84,7 +86,7 @@ scalar = Union[integer, floating, int, float]
 complexscalar = Union[number, int, float, complex]
 scalar_like = Union[NDArray[Union[integer, floating]], scalar]
 complexscalar_like = Union[NDArray[number], complexscalar]
-quant_like = Union[quant, scalar]
+quant_like = Union[quant, scalar_like]
 
 ndarray = NDArray
 array_like = ArrayLike

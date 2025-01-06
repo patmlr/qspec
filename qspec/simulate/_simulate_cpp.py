@@ -126,7 +126,7 @@ class Polarization:
 
 
 class Laser:
-    def __init__(self, freq: scalar, intensity: scalar = 1., polarization: Polarization = None,
+    def __init__(self, freq: array_like, intensity: array_like = 1., polarization: Polarization = None,
                  k: array_like = None, instance=None):
         """
         Class representing a laser.
@@ -168,7 +168,7 @@ class Laser:
     def freq(self, value: scalar):
         """
         :param value: The new frequency of the laser.
-        :returns: None.
+        :returns:
         """
         dll.laser_set_freq(self.instance, c_double(value))
 
@@ -183,7 +183,7 @@ class Laser:
     def intensity(self, value: scalar):
         """
         :param value: The new intensity of the laser.
-        :returns: None.
+        :returns:
         """
         dll.laser_set_intensity(self.instance, c_double(value))
 
@@ -340,7 +340,7 @@ class State:
         """
         Update the shifted frequency of the state.
 
-        :returns: None.
+        :returns:
         """
         if environment is None:
             dll.state_update(self.instance)
@@ -427,7 +427,7 @@ class State:
         :param value: The new hyperfine-structure constants. Currently, constants up to the electric quadrupole order
          are supported (A, B). If 'hyper_const' is a scalar, it is assumed to be the constant A
          and the other orders are 0 (MHz).
-        :returns: None.
+        :returns:
         """
         value = _process_hyper_const(value)
         dll.state_get_hyper_const(self.instance, value)
@@ -443,7 +443,7 @@ class State:
     def g(self, value: scalar):
         """
         :param value: The new nuclear g-factor.
-        :returns: None.
+        :returns:
         """
         dll.state_set_g(self.instance, c_double(value))
 
@@ -458,13 +458,14 @@ class State:
     def label(self, value: str):
         """
         :param value: The label of the state. The label is used to link states via decay maps.
-        :returns: None.
+        :returns:
         """
         dll.state_set_label(self.instance, c_char_p(bytes(value, 'utf-8')))
 
 
-def construct_electronic_state(freq_0: scalar, s: scalar, l: scalar, j: scalar, i: scalar = 0,
-                               hyper_const: Iterable[scalar] = None, g: scalar = 0, label: str = None):
+def construct_electronic_state(freq_0: quant_like, s: quant_like, l: quant_like, j: quant_like, i: quant_like = 0,
+                               hyper_const: Iterable[array_like] = None, g: array_like = 0, label: str = None) \
+        -> list[State]:
     """
     Creates all substates of a fine-structure state using a common label.
 
@@ -474,7 +475,7 @@ def construct_electronic_state(freq_0: scalar, s: scalar, l: scalar, j: scalar, 
     :param j: The electronic total angular momentum quantum number J.
     :param i: The nuclear spin quantum number I.
     :param hyper_const: The hyperfine-structure constants. Currently, constants up to the electric quadrupole order are
-     supported (A, B). If 'hyper_const' is a scalar,
+     supported (A, B). If 'hyper_const' is a quant_like,
      it is assumed to be the constant A and the other orders are 0 (MHz).
     :param g: The nuclear g-factor.
     :param label: The label of the states. The labels are used to link states via decay maps.
@@ -486,8 +487,9 @@ def construct_electronic_state(freq_0: scalar, s: scalar, l: scalar, j: scalar, 
     return [State(freq_0, s, l, j, i, _f, _m, hyper_const=hyper_const, g=g, label=label) for (_f, _m) in fm]
 
 
-def construct_hyperfine_state(freq_0: scalar, s: scalar, l: scalar, j: scalar, i: scalar, f: scalar,
-                              hyper_const: Iterable[scalar] = None, g: scalar = 0, label: str = None):
+def construct_hyperfine_state(freq_0: quant_like, s: quant_like, l: quant_like, j: quant_like, i: quant_like,
+                              f: quant_like, hyper_const: Iterable[scalar] = None, g: scalar = 0, label: str = None) \
+        -> list[State]:
     """
     Creates all substates of a fine-structure state using a common label.
 
@@ -620,18 +622,18 @@ class Atom:
     def __del__(self):
         dll.atom_destruct(self.instance)
 
-    def __iter__(self):
+    def __iter__(self) -> Generator[State, None, None]:
         for state in self.states:
             yield state
 
-    def __getitem__(self, key: int):
+    def __getitem__(self, key: int) -> State:
         return self.states[key]
 
     def update(self):
         """
         Update the atom.
 
-        :returns: None.
+        :returns:
         """
         dll.atom_update(self.instance)
         self.label_map = _gen_label_map(self)
@@ -647,7 +649,7 @@ class Atom:
     def states(self, value: Iterable[State]):
         """
         :param value: The new states of the atom.
-        :returns: None.
+        :returns:
         """
         dll.atom_clear_states(self.instance)
         self._states = list(value)
@@ -665,7 +667,7 @@ class Atom:
     def decay_map(self, value: DecayMap):
         """
         :param value: The new decay map which connects the atomic states.
-        :returns: None.
+        :returns:
         """
         self._decay_map = value
         if self._decay_map is None:
@@ -683,7 +685,7 @@ class Atom:
     def mass(self, value: scalar):
         """
         :param value: The new mass of the atom (u).
-        :returns: None.
+        :returns:
         """
         dll.atom_set_mass(self.instance, c_double(value))
 
@@ -1140,7 +1142,7 @@ class Interaction:
         """
         Updates the Interaction.
 
-        :returns: None.
+        :returns:
         """
         dll.interaction_update(self.instance)
 
@@ -1149,7 +1151,7 @@ class Interaction:
         Prints the detunings of the base frequencies of the lasers in the given atomic system.
         In particular useful for systems with a hyperfine structure. Here $\Delta = \nu_0 - \nu_\mathrm{L}$.
 
-        :returns: None.
+        :returns:
         """
         print('Resonance info:')  # \n<label>(S, L, J, I, F, m) -> <label\'>(S\', L\', J\', I\', F\', m\')')
         for k, (laser, laser_m) in enumerate(zip(self.lasers, self.get_rabi())):
@@ -1180,7 +1182,7 @@ class Interaction:
     def environment(self, value: Environment):
         """
         :param value: The new environment of the interaction.
-        :returns: None.
+        :returns:
         """
         self._environment = value
         dll.interaction_set_environment(self.instance, value.instance)
@@ -1196,7 +1198,7 @@ class Interaction:
     def atom(self, value: Atom):
         """
         :param value: The new atom of the interaction.
-        :returns: None.
+        :returns:
         """
         self._atom = value
         dll.interaction_set_atom(self.instance, value.instance)
@@ -1212,7 +1214,7 @@ class Interaction:
     def lasers(self, value: Iterable[Laser]):
         """
         :param value: The new lasers of the interaction.
-        :returns: None.
+        :returns:
         """
         if value is None:
             value = []
@@ -1234,7 +1236,7 @@ class Interaction:
         """
         :param value: The new maximum absolute difference between a laser and a transition frequency
          for that transition to be considered laser-driven (MHz). The default value is 1 GHz.
-        :returns: None.
+        :returns:
         """
         dll.interaction_set_delta_max(self.instance, c_double(value))
 
@@ -1253,7 +1255,7 @@ class Interaction:
         :param value: Whether the ODE solver uses an error controlled stepper or a fixed step size.
          Setting this to True is particularly useful for dynamics where a changing resolution is required.
          However, this comes at the cost of computing time.
-        :returns: None.
+        :returns:
         """
         dll.interaction_set_controlled(self.instance, c_bool(value))
 
@@ -1274,7 +1276,7 @@ class Interaction:
          If True, this overrides the controlled flag.
          Setting this to True is particularly useful for dynamics where a changing resolution is required.
          However, this comes at the cost of computing time.
-        :returns: None.
+        :returns:
         """
         dll.interaction_set_dense(self.instance, c_bool(value))
 
@@ -1289,7 +1291,7 @@ class Interaction:
     def dt(self, value: scalar):
         """
         :param value: The (initial) step size of (controlled) solvers.
-        :returns: None.
+        :returns:
         """
         dll.interaction_set_dt(self.instance, c_double(value))
 
@@ -1304,7 +1306,7 @@ class Interaction:
     def dt_max(self, value: scalar):
         """
         :param value: The maximum step size of controlled solvers.
-        :returns: None.
+        :returns:
         """
         dll.interaction_set_dt_max(self.instance, c_double(value))
 
@@ -1319,7 +1321,7 @@ class Interaction:
     def atol(self, value: scalar):
         """
         :param value: The absolute error tolerance of controlled solver.
-        :returns: None.
+        :returns:
         """
         dll.interaction_set_atol(self.instance, c_double(value))
 
@@ -1334,7 +1336,7 @@ class Interaction:
     def rtol(self, value: scalar):
         """
         :param value: The relative error tolerance of controlled solver.
-        :returns: None.
+        :returns:
         """
         dll.interaction_set_rtol(self.instance, c_double(value))
 
@@ -1356,7 +1358,7 @@ class Interaction:
     def time_dependent(self, value: bool):
         """
         :param value: Set whether the system hamiltonian is allowed to be time dependent.
-        :returns: None.
+        :returns:
         """
         dll.interaction_set_time_dependent(self.instance, c_bool(value))
 

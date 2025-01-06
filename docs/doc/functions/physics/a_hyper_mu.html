@@ -22,28 +22,29 @@ title: qspec.a_hyper_mu
 </em>
 ,&nbsp;
 <em class="sig-param">
-<span class="n"><span class="pre">b</span></span>
+<span class="n"><span class="pre">b_field</span></span>
 </em>
-<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/physics.py#L1055-L1066' }}"><span class="sig-source">[source]</span></a>
+<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/dev-jekyll/qspec/physics.py#L1057-L1071' }}"><span class="sig-source">[source]</span></a>
 </dt>
-<dd class="field-body"><p></p>
+<dd class="field-body"><p>The magnetic dipole hyperfine structure constant as a function of the nuclear magnetic moment <code>mu</code>
+    and the magnetic field of the electrons at the nucleus <code>b_field</code> $A = \mu\mathcal{B} / (IJ)$.</p>
 <dl class="field-list">
 <dt class="field-head">Parameters<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>i<span class="classifier"><em>scalar</em></span></dt>
-<dd class="field-desc"><p>The nuclear spin quantum number I.</p></dd>
-<dt>j<span class="classifier"><em>scalar</em></span></dt>
-<dd class="field-desc"><p>The electronic total angular momentum quantum number J.</p></dd>
+<dt>i<span class="classifier"><em>quant_like</em></span></dt>
+<dd class="field-desc"><p>The nuclear spin quantum number $I$.</p></dd>
+<dt>j<span class="classifier"><em>quant_like</em></span></dt>
+<dd class="field-desc"><p>The electronic total angular momentum quantum number $J$.</p></dd>
 <dt>mu<span class="classifier"><em>array_like</em></span></dt>
-<dd class="field-desc"><p>The magnetic moment of the nucleus in units of the nuclear magneton (mu_N).</p></dd>
-<dt>b<span class="classifier"><em>array_like</em></span></dt>
-<dd class="field-desc"><p>The B-field of the atomic electrons at the nucleus (T).</p></dd></dl>
+<dd class="field-desc"><p>The magnetic moment of the nucleus in units of the nuclear magneton ($\mu_\mathrm{N}$).</p></dd>
+<dt>b_field<span class="classifier"><em>array_like</em></span></dt>
+<dd class="field-desc"><p>The B-field $\mathcal{B}$ of the atomic electrons at the nucleus (T).</p></dd></dl>
 </dd><dt class="field-head">Returns<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>out<span class="classifier"><em>None</em></span></dt>
-<dd class="field-desc"><p>The hyperfine structure constant A (MHz).</p></dd></dl>
+<dt>a_hyper<span class="classifier"><em>ndarray</em></span></dt>
+<dd class="field-desc"><p> The hyperfine structure constant $A$ (MHz)</p></dd></dl>
 </dd>
 </dl></dd>
 </dl>

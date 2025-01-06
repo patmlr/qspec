@@ -25,7 +25,7 @@ def example(n=None):
 
     Example 2: Calculation of the mode of a lognormal distribution.
 
-    :returns: None.
+    :returns:
     """
     if n is None:
         n = {0, }

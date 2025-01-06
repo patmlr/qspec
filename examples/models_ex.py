@@ -67,4 +67,4 @@ def example(n=None):
 
 
 if __name__ == '__main__':
-    example({0})
+    example({2})

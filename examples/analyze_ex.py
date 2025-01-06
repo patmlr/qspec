@@ -24,7 +24,7 @@ def example(n=None):
 
     Example 2: King-fit with different algorithms.
 
-    :returns: None.
+    :returns:
     """
     if n is None:
         n = {0, 1, }

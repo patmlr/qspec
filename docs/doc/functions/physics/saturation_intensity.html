@@ -19,25 +19,27 @@ title: qspec.saturation_intensity
 ,&nbsp;
 <em class="sig-param">
 <span class="n"><span class="pre">a_dipole</span></span>
+<span class="o"><span class="pre">=</span></span>
+<span class="default_value"><span class="pre num">1.0</span></span>
 </em>
-<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/physics.py#L1069-L1077' }}"><span class="sig-source">[source]</span></a>
+<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/dev-jekyll/qspec/physics.py#L1074-L1084' }}"><span class="sig-source">[source]</span></a>
 </dt>
-<dd class="field-body"><p></p>
+<dd class="field-body"><p>The saturation intensity of an electronic dipole transition $I_0 = \pi f^3hA_{ki} / (3c^2a_\mathrm{dipole})$.</p>
 <dl class="field-list">
 <dt class="field-head">Parameters<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
 <dt>f<span class="classifier"><em>array_like</em></span></dt>
-<dd class="field-desc"><p>The frequency of the transition (MHz).</p></dd>
+<dd class="field-desc"><p>The frequency $f$ of the transition $|i\rangle\rightarrow|k\rangle$ (MHz).</p></dd>
 <dt>a<span class="classifier"><em>array_like</em></span></dt>
-<dd class="field-desc"><p>The Einstein A coefficient (MHz).</p></dd>
+<dd class="field-desc"><p>The Einstein $A_{ki}$ coefficient (MHz).</p></dd>
 <dt>a_dipole<span class="classifier"><em>array_like</em></span></dt>
-<dd class="field-desc"><p>The reduced dipole coefficient of the transition (see algebra.a_dipole).</p></dd></dl>
+<dd class="field-desc"><p>The reduced dipole coefficient of the transition (see <code>qspec.a_dipole</code>).</p></dd></dl>
 </dd><dt class="field-head">Returns<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>out<span class="classifier"><em>None</em></span></dt>
-<dd class="field-desc"><p>The saturation intensity.</p></dd></dl>
+<dt>sat_intensity<span class="classifier"><em>ndarray</em></span></dt>
+<dd class="field-desc"><p> The saturation intensity $I_0$</p></dd></dl>
 </dd>
 </dl></dd>
 </dl>

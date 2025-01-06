@@ -73,7 +73,7 @@ def print_colored(specifier, *values, returned=False, **kwargs):
     :param values: The values to print.
     :param returned: Return the str instead of printing it.
     :param kwargs: See print().
-    :returns: None.
+    :returns:
     """
     if isinstance(specifier, str):
         _c = eval('COLORS.{}'.format(specifier.upper()))
@@ -91,7 +91,7 @@ def printh(*values, **kwargs):
 
     :param values: The values to print.
     :param kwargs: See print().
-    :returns: None.
+    :returns:
     """
     _values = (COLORS.HEADER, ) + values + (COLORS.ENDC, )
     print('{}{}{}'.format(*_values), **kwargs)
@@ -103,7 +103,7 @@ def printw(*values, **kwargs):
 
     :param values: The values to print.
     :param kwargs: See print().
-    :returns: None.
+    :returns:
     """
     _values = (COLORS.WARNING, ) + values + (COLORS.ENDC, )
     print('{}{}{}'.format(*_values), **kwargs)
@@ -115,18 +115,19 @@ def printf(*values, **kwargs):
 
     :param values: The values to print.
     :param kwargs: See print().
-    :returns: None.
+    :returns:
     """
     _values = (COLORS.FAIL, ) + values + (COLORS.ENDC, )
     print('{}{}{}'.format(*_values), **kwargs)
 
 
-def map_corr_coeff_to_color(val, clip=True):
+def map_corr_coeff_to_color(val, clip=True) -> tuple[int, int, int]:
     """
+    Maps a value between -1 and 1 to a red-to-green colormap.
 
     :param val: A value between -1 and 1.
     :param clip: Whether to clip vals outside -1 and 1. If False, raise ValueError.
-    :returns: The RGB values in the range 0-255.
+    :returns: (r, g, b) A tuple of RGB values in the range 0-255.
     """
     if clip:
         if np.isnan(val):
@@ -147,7 +148,7 @@ def print_cov(cov, normalize=False, decimals=2):
     :param cov: A covariance matrix.
     :param normalize: Whether to normalize the covariance to be the Pearson correlation coefficient.
     :param decimals: The number of decimal places to be printed.
-    :returns: None.
+    :returns:
     """
     cov = np.array(cov, dtype=float)
     if normalize:
@@ -181,7 +182,7 @@ def create_doc_link(env_path: str = None):
     """
     :param env_path: The path to the virtual environment where the 'Lib' folder resides in.
      If None, the path is inherited from the currently running Python-executable.
-    :returns: None. Creates an html document redirecting to the API-Documentation inside the PyCLS installation.
+    :returns: Creates an html document redirecting to the API-Documentation inside the PyCLS installation.
     """
     if env_path is None:
         env_path = os.path.dirname(sys.executable)
@@ -201,7 +202,7 @@ def create_data_dir(path: str = None, overwrite: bool = False):
     :param path: The path were to create the user folder "PyCLS" (do not include "PyCLS" in 'path').
      If None, the user folder is created in the "Documents" Windows library.
     :param overwrite: Whether to overwrite the current "PyCLS" user folder if it exists.
-    :returns: None. Creates the user folder "PyCLS" at the specified 'path'
+    :returns: Creates the user folder "PyCLS" at the specified 'path'
      or in the "Documents" Windows library if no 'path' is specified.
     """
     path = get_default_path() if path is None else os.path.join(path, 'PyCLS')
@@ -266,7 +267,7 @@ def fraction(r: Union[Rational, str]) -> (int, int):
 def check_half_integer(*args: scalar):
     """
     :param args: Scalar arguments.
-    :returns: None. Checks whether the given arguments are multiples of 1/2.
+    :returns: Checks whether the given arguments are multiples of 1/2.
     :raises ValueError: If any argument is not a multiple of 1/2.
     """
     if sum([abs(arg % 0.5) for arg in args]) > 0:
@@ -622,7 +623,7 @@ def list_to_excel(*args: array_iter, save: str = None, delimiter: str = '\t', he
     :param header: Add a header above the content to the output.
     :param align: How to align the columns that are smaller than the largest column.
      Supported alignments are {"top", "bottom", else == "top"}.
-    :returns: None. Prints or saves the 'args' in an excel-compatible way.
+    :returns: Prints or saves the 'args' in an excel-compatible way.
     """
     columns = []
     s = ''
@@ -750,7 +751,7 @@ def combine_dicts(dicts: list, key_lists: Iterable, operator: str = '+', short_k
 def merge_intervals(intervals: array_iter) -> ndarray:
     """
     :param intervals: An iterable of intervals.
-     An interval i is itself an iterable of two scalar values. If i[1] < i[0], the interval is reversed.
+     An interval i is itself an iterable of two scalar values. If `i[1] < i[0]`, the interval is reversed.
     :returns: An iterable of non-overlapping intervals.
     """
     inter = np.asarray(intervals)
@@ -1042,7 +1043,7 @@ def import_iso_shifts_tilda(db: str, iso_shifts: dict):
     :param db: Location of a Tilda-compatible database.
     :param iso_shifts: A dictionary of isotope shifts
      with the structure {iso_str: {line_str: [val, stat_err, syst_err]}}.
-    :returns: None. Writes the entries of the given dict to the specified Tilda-compatible database.
+    :returns: Writes the entries of the given dict to the specified Tilda-compatible database.
     """
     con = sqlite3.connect(db)
     cur = con.cursor()

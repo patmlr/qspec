@@ -20,24 +20,29 @@ title: qspec.sellmeier
 <em class="sig-param">
 <span class="n"><span class="pre">b</span></span>
 </em>
-<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/physics.py#L1313-L1323' }}"><span class="sig-source">[source]</span></a>
+<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/dev-jekyll/qspec/physics.py#L1496-L1513' }}"><span class="sig-source">[source]</span></a>
 </dt>
-<dd class="field-body"><p></p>
+<dd class="field-body"><p>The Sellmeier equation for calculating the refractive index of a material with the lists of coefficients
+    <code>a</code> and <code>b</code> for the wavelength <code>w</code>
+
+    $$
+    n = \sqrt{1 + \sum_i \frac{A_i\lambda^2}{\lambda^2 - B_i}}.
+    $$</p>
 <dl class="field-list">
 <dt class="field-head">Parameters<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
 <dt>w<span class="classifier"><em>array_like</em></span></dt>
-<dd class="field-desc"><p>The wavelength in &mu;m.</p></dd>
+<dd class="field-desc"><p>The wavelength $\lambda$ (&mu;m).</p></dd>
 <dt>a<span class="classifier"><em>ndarray | Iterable</em></span></dt>
-<dd class="field-desc"><p>The $a$ coefficients.</p></dd>
+<dd class="field-desc"><p>A list of coefficients $A_i$.</p></dd>
 <dt>b<span class="classifier"><em>ndarray | Iterable</em></span></dt>
-<dd class="field-desc"><p>The $b$ coefficients.</p></dd></dl>
+<dd class="field-desc"><p>A list of coefficients $B_i$ (&mu;m).</p></dd></dl>
 </dd><dt class="field-head">Returns<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>out<span class="classifier"><em>None</em></span></dt>
-<dd class="field-desc"><p>The index of refraction for the wavelength w and the given material.</p></dd></dl>
+<dt>n<span class="classifier"><em>ndarray</em></span></dt>
+<dd class="field-desc"><p> The refractive index $n$</p></dd></dl>
 </dd>
 </dl></dd>
 </dl>

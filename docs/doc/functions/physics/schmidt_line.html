@@ -20,7 +20,7 @@ title: qspec.schmidt_line
 <em class="sig-param">
 <span class="n"><span class="pre">is_proton</span></span>
 </em>
-<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/physics.py#L1289-L1307' }}"><span class="sig-source">[source]</span></a>
+<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/dev-jekyll/qspec/physics.py#L1468-L1490' }}"><span class="sig-source">[source]</span></a>
 </dt>
 <dd class="field-body"><p>Calculate the single-particle Schmidt value of the nuclear magnetic moment
 
@@ -32,17 +32,17 @@ title: qspec.schmidt_line
 <dt class="field-head">Parameters<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>l<span class="classifier"><em>None</em></span></dt>
-<dd class="field-desc"><p>The orbital nuclear angular momentum quantum number $L$.</p></dd>
-<dt>i<span class="classifier"><em>None</em></span></dt>
-<dd class="field-desc"><p>The nuclear spin $I$.</p></dd>
-<dt>is_proton<span class="classifier"><em>None</em></span></dt>
-<dd class="field-desc"><p>Whether the contributing nucleon is a proton or a neutron.</p></dd></dl>
+<dt>l<span class="classifier"><em>quant_like</em></span></dt>
+<dd class="field-desc"><p>The orbital angular momentum quantum number of the nucleon $L$.</p></dd>
+<dt>i<span class="classifier"><em>quant_like</em></span></dt>
+<dd class="field-desc"><p>The nuclear spin quantum number $I$.</p></dd>
+<dt>is_proton<span class="classifier"><em>bool</em></span></dt>
+<dd class="field-desc"><p>Whether the contributing nucleon is a proton (<code>True</code>) or a neutron (<code>False</code>).</p></dd></dl>
 </dd><dt class="field-head">Returns<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>out<span class="classifier"><em>None</em></span></dt>
-<dd class="field-desc"><p>The Schmidt value of the nuclear magnetic moment.</p></dd></dl>
+<dt>out<span class="classifier"><em>ndarray</em></span></dt>
+<dd class="field-desc"><p>The Schmidt value of the nuclear magnetic moment $\mu$ ($\mu_\mathrm{N}$)</p></dd></dl>
 </dd>
 </dl></dd>
 </dl>

@@ -41,7 +41,7 @@ def example(n=None):
 
     Example 6: Monte-Carlo simulation of 40Ca+ interacting with two lasers, including photon recoils.
 
-    :returns: None.
+    :returns:
     """
     if n is None:
         n = {0, 1, 2, 3, 4, 5, 6}

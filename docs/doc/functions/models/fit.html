@@ -61,7 +61,7 @@ title: qspec.models.fit
 <span class="o"><span class="pre">**</span></span>
 <span class="n"><span class="pre">kwargs</span></span>
 </em>
-<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/models\_fit.py#L67-L244' }}"><span class="sig-source">[source]</span></a>
+<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/dev-jekyll/qspec/models\_fit.py#L67-L245' }}"><span class="sig-source">[source]</span></a>
 </dt>
 <dd class="field-body"><p>Fit a <code>Model</code> from <code>qspec.models</code> to data. This fit routine encapsulates the <code>qspec.curve_fit</code>
     and the <code>qspec.odr_fit</code> routines to facilitate the use of all modular fit model features,
@@ -72,7 +72,7 @@ title: qspec.models.fit
 <dl>
 <dt>model<span class="classifier"><em>qspec.models._base.Model</em></span></dt>
 <dd class="field-desc"><p>The <code>Model</code> to fit.</p></dd>
-<dt>x<span class="classifier"><em>ndarray | Iterable</em></span></dt>
+<dt>x<span class="classifier"><em>Any</em></span></dt>
 <dd class="field-desc"><p>The input data. Can be any object accepted by the model.
      If model is a Linked model, <code>x</code> should be a list of objects compatible with the linked models.</p></dd>
 <dt>y<span class="classifier"><em>ndarray | Iterable</em></span></dt>
@@ -102,10 +102,16 @@ title: qspec.models.fit
 </dd><dt class="field-head">Returns<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>(popt, pcov, info)<span class="classifier"><em>None</em></span></dt>
+<dt>(popt, pcov, info)<span class="classifier"><em>(ndarray, ndarray, dict)</em></span></dt>
 <dd class="field-desc"><p> The optimized parameters their covariance matrix
      and a dictionary containing info about the fit.
-    :raises (ValueError, TypeError):</p></dd></dl>
+    </p></dd></dl>
+</dd><dt class="field-head">Raises<span class="colon">:</span></dt>
+<dd class="field-par">
+<dl>
+<dt>(ValueError, TypeError)</dt>
+<dd class="field-desc"><p>If the specified routine is not supported (<code>ValueError</code>) or
+     the specified <code>model</code> is not a <code>qspec.models.Model</code> (<code>TypeError</code>).</p></dd></dl>
 </dd>
 </dl></dd>
 </dl>

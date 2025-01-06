@@ -24,26 +24,26 @@ title: qspec.models.hf_shift
 <em class="sig-param">
 <span class="n"><span class="pre">coeff_u</span></span>
 </em>
-<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/models\_splitter.py#L95-L104' }}"><span class="sig-source">[source]</span></a>
+<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/dev-jekyll/qspec/models\_splitter.py#L97-L107' }}"><span class="sig-source">[source]</span></a>
 </dt>
 <dd class="field-body"><p></p>
 <dl class="field-list">
 <dt class="field-head">Parameters<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>hyper_l<span class="classifier"><em>None</em></span></dt>
+<dt>hyper_l<span class="classifier"><em>Iterable[scalar_like]</em></span></dt>
 <dd class="field-desc"><p>The hyperfine structure constants of the lower state (Al, Bl, Cl, ...).</p></dd>
-<dt>hyper_u<span class="classifier"><em>None</em></span></dt>
+<dt>hyper_u<span class="classifier"><em>Iterable[scalar_like]</em></span></dt>
 <dd class="field-desc"><p>The hyperfine structure constants of the upper state (Au, Bu, Cu, ...).</p></dd>
-<dt>coeff_l<span class="classifier"><em>None</em></span></dt>
+<dt>coeff_l<span class="classifier"><em>Iterable[scalar_like]</em></span></dt>
 <dd class="field-desc"><p>The coefficients of the lower state to be multiplied by the constants (coAl, coBl, coCl, ...).</p></dd>
-<dt>coeff_u<span class="classifier"><em>None</em></span></dt>
+<dt>coeff_u<span class="classifier"><em>Iterable[scalar_like]</em></span></dt>
 <dd class="field-desc"><p>The coefficients of the lower state to be multiplied by the constants (coAu, coBu, coCu, ...).</p></dd></dl>
 </dd><dt class="field-head">Returns<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>out<span class="classifier"><em>None</em></span></dt>
-<dd class="field-desc"><p>The hyperfine structure shift of an optical transition.</p></dd></dl>
+<dt>out<span class="classifier"><em>float</em></span></dt>
+<dd class="field-desc"><p>The hyperfine structure shift of an optical transition</p></dd></dl>
 </dd>
 </dl></dd>
 </dl>

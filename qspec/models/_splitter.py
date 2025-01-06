@@ -10,6 +10,7 @@ import os
 from string import ascii_uppercase
 import numpy as np
 
+from qspec.qtypes import *
 from qspec.tools import merge_intervals
 from qspec.physics import get_f
 from qspec.algebra import wigner_6j, a, b, c
@@ -20,7 +21,7 @@ __all__ = ['gen_splitter_model', 'get_all_f', 'hf_coeff', 'hf_trans', 'hf_shift'
            'SplitterSummed', 'Hyperfine', 'HyperfineQI', 'HyperfineMixed']
 
 
-def gen_splitter_model(qi: bool = False, hf_mixing: bool = False):
+def gen_splitter_model(qi: bool = False, hf_mixing: bool = False) -> type['Splitter']:
     """
     :param qi: Whether to consider QI effects.
     :param hf_mixing: Whether to consider HF mixing.
@@ -37,25 +38,23 @@ def gen_splitter_model(qi: bool = False, hf_mixing: bool = False):
     raise ValueError('Specified splitter model not available.')
 
 
-def get_all_f(i, j):
+def get_all_f(i: quant_like, j: quant_like) -> list[quant]:
     """
-    :param i: The nuclear spin.
-    :param j: The total electron angular momentum.
+    :param i: The nuclear spin $I$.
+    :param j: The total electron angular momentum $J$.
     :returns: All possible F quantum numbers of an electronic finestructure state.
     """
     i, j = np.array(i, float).flatten(), np.array(j, float).flatten()
-    return sorted(set(f + abs(_i - _j) for _i in i for _j in j for f in range(int(_i + _j - abs(_i - _j) + 1))))
+    return sorted(set(quant(f + abs(_i - _j)) for _i in i for _j in j for f in range(int(_i + _j - abs(_i - _j) + 1))))
 
 
-def hf_coeff(i, j, f):
+def hf_coeff(i: quant_like, j: quant_like, f: quant_like):
     """
-    :param i: The nuclear spin.
-    :param j: The total electron angular momentum.
-    :param f: The total angular momentum.
-    :returns: The tuple of hyperfine coefficients for A and B-factors of a given quantum state
+    :param i: The nuclear spin $I$.
+    :param j: The total electron angular momentum $J$.
+    :param f: The total angular momentum $F$.
+    :returns: The tuple of hyperfine coefficients for A and B-factors of a given quantum state.
     """
-    # First and third order are taken from https://journals.aps.org/pra/abstract/10.1103/PhysRevA.103.032826.
-    # Second order from https://link.springer.com/referencework/10.1007/978-0-387-26308-3.
     if i < 0.5 or j < 0.5:
         return tuple()
 
@@ -81,18 +80,22 @@ def hf_coeff(i, j, f):
     return co_a, co_b, co_c  # Highest implemented order.
 
 
-def hf_trans(i, j_l, j_u):
-    """
+def hf_trans(i: quant_like, j_l: quant_like, j_u: quant_like) -> list[list[tuple]]:
+    r"""
     Calculate all allowed hyperfine transitions and their hyperfine coefficients.
 
-    :returns: (f_l, f_u, coAl, coBl, coAu, coBu)
+    :param i: The nuclear spin $I$.
+    :param j_l: The total lower state electron angular momentum $J$.
+    :param j_u: The total upper state electron angular momentum $J^\prime$.
+    :returns: (transitions)
     """
     return [[(f_l, f_u), hf_coeff(i, j_l, f_l), hf_coeff(i, j_u, f_u)]
             for f_l in get_f(i, j_l) for f_u in get_f(i, j_u)
             if abs(f_u - f_l) < 1.1 and not f_u == f_l == 0]
 
 
-def hf_shift(hyper_l, hyper_u, coeff_l, coeff_u):
+def hf_shift(hyper_l: Iterable[scalar_like], hyper_u: Iterable[scalar_like],
+             coeff_l: Iterable[scalar_like], coeff_u: Iterable[scalar_like]) -> float:
     """
     :param hyper_l: The hyperfine structure constants of the lower state (Al, Bl, Cl, ...).
     :param hyper_u: The hyperfine structure constants of the upper state (Au, Bu, Cu, ...).
@@ -100,15 +103,15 @@ def hf_shift(hyper_l, hyper_u, coeff_l, coeff_u):
     :param coeff_u: The coefficients of the lower state to be multiplied by the constants (coAu, coBu, coCu, ...).
     :returns: The hyperfine structure shift of an optical transition.
     """
-    return sum(const * coeff for const, coeff in zip(hyper_u, coeff_u)) \
-        - sum(const * coeff for const, coeff in zip(hyper_l, coeff_l))
+    return float(sum(const * coeff for const, coeff in zip(hyper_u, coeff_u))
+                 - sum(const * coeff for const, coeff in zip(hyper_l, coeff_l)))
 
 
-def hf_int(i, j_l, j_u, transitions):
-    """
-    :param i: The nuclear spin.
-    :param j_l: The total lower state electron angular momentum.
-    :param j_u: The total upper state electron angular momentum.
+def hf_int(i: quant_like, j_l: quant_like, j_u: quant_like, transitions: Iterable) -> list[float_like]:
+    r"""
+    :param i: The nuclear spin $I$.
+    :param j_l: The total lower state electron angular momentum $J$.
+    :param j_u: The total upper state electron angular momentum $J^\prime$.
     :param transitions: A list of electronic transition properties. The first two properties of each entry should be
      f_l and f_u the total angular momenta of lower and upper state.
     :returns: The relative line intensities.
@@ -118,14 +121,14 @@ def hf_int(i, j_l, j_u, transitions):
 
 
 class Splitter(Model):
-    def __init__(self, model, i, j_l, j_u, label=None):
-        """
+    def __init__(self, model: Model, i: quant_like, j_l: quant_like, j_u: quant_like, label: str = None):
+        r"""
         The abstract base class for Hyperfine structure models.
         
         :param model: A submodel whose parameters are adopted by this model.
-        :param i: The nuclear spin.
-        :param j_l: The total lower state electron angular momentum.
-        :param j_u: The total upper state electron angular momentum.
+        :param i: The nuclear spin $I$.
+        :param j_l: The total lower state electron angular momentum $J$.
+        :param j_u: The total upper state electron angular momentum $J^\prime$.
         :param label: A label for the `Splitter` (isotope / isomer / transition).
         """
         super().__init__(model=model)
@@ -134,6 +137,8 @@ class Splitter(Model):
         self.i = i
         self.j_l = j_l
         self.j_u = j_u
+        if label is None:
+            label = 'None'
         self.label = label
 
         self.racah_indices = []
@@ -143,14 +148,14 @@ class Splitter(Model):
         """
         Set the intensity values to the Racah intensities.
 
-        :returns: None.
+        :returns:
         """
         for i, intensity in zip(self.racah_indices, self.racah_intensities):
             self.vals[i] = intensity
 
 
 class SplitterSummed(Summed):
-    def __init__(self, splitter_models):
+    def __init__(self, splitter_models: list[Splitter]):
         """
         A `Summed` model of `Splitter` submodels.
 
@@ -166,7 +171,7 @@ class SplitterSummed(Summed):
         """
         Set the intensity values of all submodels to the Racah intensities.
 
-        :returns: None.
+        :returns:
         """
         i0 = 0
         for model in self.models:
@@ -177,12 +182,12 @@ class SplitterSummed(Summed):
 
 
 class Hyperfine(Splitter):
-    def __init__(self, model, i, j_l, j_u, label=None):
-        """
+    def __init__(self, model: Model, i: quant_like, j_l: quant_like, j_u: quant_like, label: str = None):
+        r"""
         :param model: A submodel whose parameters are adopted by this model.
-        :param i: The nuclear spin.
-        :param j_l: The total lower state electron angular momentum.
-        :param j_u: The total upper state electron angular momentum.
+        :param i: The nuclear spin $I$.
+        :param j_l: The total lower state electron angular momentum $J$.
+        :param j_u: The total upper state electron angular momentum $J^\prime$.
         :param label: A label for the `Splitter` (isotope / isomer / transition).
         """
         super().__init__(model, i, j_l, j_u, label=label)
@@ -206,29 +211,43 @@ class Hyperfine(Splitter):
             self.racah_indices.append(self._index)
             self._add_arg('int({}, {})'.format(t[0][0], t[0][1]), intensity, i == 0, False)
 
-    def evaluate(self, x, *args, **kwargs):
+    def evaluate(self, x: array_like, *args: array_iter, **kwargs: dict) -> ndarray:
         const_l = tuple(args[self.model.size + i] for i in range(self.n_l))
         const_u = tuple(args[self.model.size + self.n_l + i] for i in range(self.n_u))
         return np.sum([args[i] * self.model.evaluate(x - hf_shift(const_l, const_u, t[1], t[2]), *args, **kwargs)
                        for i, t in zip(self.racah_indices, self.transitions)], axis=0)
 
-    def min(self):
+    def min(self) -> float:
+        """
+        :returns: A hint for an x-axis minimum for a complete display of the model.
+        """
         const_l = tuple(self.vals[self.model.size + i] for i in range(self.n_l))
         const_u = tuple(self.vals[self.model.size + self.n_l + i] for i in range(self.n_u))
         return self.model.min() + min(hf_shift(const_l, const_u, t[1], t[2]) for t in self.transitions)
 
-    def max(self):
+    def max(self) -> float:
+        """
+        :returns: A hint for an x-axis maximum for a complete display of the model.
+        """
         const_l = tuple(self.vals[self.model.size + i] for i in range(self.n_l))
         const_u = tuple(self.vals[self.model.size + self.n_l + i] for i in range(self.n_u))
         return self.model.max() + max(hf_shift(const_l, const_u, t[1], t[2]) for t in self.transitions)
 
-    def intervals(self):
+    def intervals(self) -> list[list[float]]:
+        """
+        :returns: A list of x-axis intervals for a complete display of the model.
+        """
         const_l = tuple(self.vals[self.model.size + i] for i in range(self.n_l))
         const_u = tuple(self.vals[self.model.size + self.n_l + i] for i in range(self.n_u))
         shifts = [hf_shift(const_l, const_u, t[1], t[2]) for t in self.transitions]
-        return merge_intervals([[self.model.min() + shift, self.model.max() + shift] for shift in shifts])
+        return merge_intervals([[self.model.min() + shift, self.model.max() + shift] for shift in shifts]).tolist()
 
     def racah(self):
+        """
+        Set the intensity values to the Racah intensities.
+
+        :returns:
+        """
         for i, intensity in zip(self.racah_indices, self.racah_intensities):
             self.vals[i] = intensity
 
@@ -246,16 +265,17 @@ def load_qi(filepath):
 
 
 class HyperfineQI(Splitter):
-    def __init__(self, _, i, j_l, j_u, label=None, qi_path=None):
-        """
+    def __init__(self, _: Model, i: quant_like, j_l: quant_like, j_u: quant_like, label: str = None, qi_path: str = None):
+        r"""
         A perturbative quantum interference (QI) hyperfine-structure model
-        based on https://doi.org/10.1103/PhysRevA.87.032504.
+        based on [<a href="https://doi.org/10.1103/PhysRevA.87.032504">
+        R. C. Brown <i>et al.</i>, Phys. Rev. A <b>87</b>, 032504 (2013)</a>].
         
         :param _: Empty `model` parameter. This hyperfine-structure model always uses `Lorentz` lineshapes.
          To use other lineshapes, combine it with the `Convolve` model.
-        :param i: The nuclear spin.
-        :param j_l: The total lower state electron angular momentum.
-        :param j_u: The total upper state electron angular momentum.
+        :param i: The nuclear spin $I$.
+        :param j_l: The total lower state electron angular momentum $J$.
+        :param j_u: The total upper state electron angular momentum $J^\prime$.
         :param label: A label for the `Splitter` (isotope / isomer / transition).
         :param qi_path: Specify a directory to save and load the calculated geometric parts of the
          dipole matrix elements for faster repeated calculations.
@@ -264,8 +284,6 @@ class HyperfineQI(Splitter):
         super().__init__(LorentzQI(), i, j_l, j_u, label)
         self.type = 'HyperfineQI'
         self.qi_path = qi_path
-        if label is None:
-            label = 'None'
         self.file = f'qi_{label}.txt'
 
         self.transitions = hf_trans(self.i, self.j_l, self.j_u)
@@ -273,15 +291,15 @@ class HyperfineQI(Splitter):
 
         save = False
         if self.qi_path is None or not os.path.isfile(os.path.join(self.qi_path, self.file)):
-            print(f'Calculating QI A-matrix of isotope {label} ... ')
+            print(f'Calculating QI A-matrix of isotope {self.label} ... ')
             self.a_qi = [a(self.i, self.j_l, f_l, self.j_u, f_u, as_sympy=False)
                          for f_l in get_f(self.i, self.j_l) for f_u in get_f(self.i, self.j_u)
                          if abs(f_u - f_l) < 1.1 and not f_u == f_l == 0]
-            print(f'Calculating QI B-matrix of isotope {label} ... ')
+            print(f'Calculating QI B-matrix of isotope {self.label} ... ')
             self.b_qi = [b(self.i, self.j_l, f_l, self.j_u, f_u, as_sympy=False)
                          for f_l in get_f(self.i, self.j_l) for f_u in get_f(self.i, self.j_u)
                          if abs(f_u - f_l) < 1.1 and not f_u == f_l == 0]
-            print(f'Calculating QI C-matrix of isotope {label} ... ')
+            print(f'Calculating QI C-matrix of isotope {self.label} ... ')
             self.c_qi = [[c(self.i, self.j_l, f_l, self.j_u, f1_u, f2_u, as_sympy=False)
                           for i2, f2_u in enumerate(get_f(self.i, self.j_u)) if i2 > i1
                           if abs(f1_u - f_l) < 1.1 and abs(f2_u - f_l) < 1.1
@@ -316,7 +334,7 @@ class HyperfineQI(Splitter):
         self.racah_indices.append(self._index)
         self._add_arg('geo', 0., False, False)
 
-    def evaluate(self, x, *args, **kwargs):
+    def evaluate(self, x: array_like, *args: array_iter, **kwargs: dict) -> ndarray:
         const_l = tuple(args[self.model.size + i] for i in range(self.n_l))
         const_u = tuple(args[self.model.size + self.n_l + i] for i in range(self.n_u))
         return np.sum([(_a + _b * args[self.racah_indices[0]])
@@ -329,35 +347,51 @@ class HyperfineQI(Splitter):
                        for t, _a, _b, t_list, c_list in zip(
                 self.transitions, self.a_qi, self.b_qi, self.transitions_qi, self.c_qi)], axis=0) / np.max(self.a_qi)
 
-    def min(self):
+    def min(self) -> float:
+        """
+        :returns: A hint for an x-axis minimum for a complete display of the model.
+        """
         const_l = tuple(self.vals[self.model.size + i] for i in range(self.n_l))
         const_u = tuple(self.vals[self.model.size + self.n_l + i] for i in range(self.n_u))
         return self.model.min() + min(hf_shift(const_l, const_u, t[1], t[2]) for t in self.transitions)
 
-    def max(self):
+    def max(self) -> float:
+        """
+        :returns: A hint for an x-axis maximum for a complete display of the model.
+        """
         const_l = tuple(self.vals[self.model.size + i] for i in range(self.n_l))
         const_u = tuple(self.vals[self.model.size + self.n_l + i] for i in range(self.n_u))
         return self.model.max() + max(hf_shift(const_l, const_u, t[1], t[2]) for t in self.transitions)
 
-    def intervals(self):
+    def intervals(self) -> list[list[float]]:
+        """
+        :returns: A list of x-axis intervals for a complete display of the model.
+        """
         const_l = tuple(self.vals[self.model.size + i] for i in range(self.n_l))
         const_u = tuple(self.vals[self.model.size + self.n_l + i] for i in range(self.n_u))
         shifts = [hf_shift(const_l, const_u, t[1], t[2]) for t in self.transitions]
-        return merge_intervals([[self.model.min() + shift, self.model.max() + shift] for shift in shifts])
+        return merge_intervals([[self.model.min() + shift, self.model.max() + shift] for shift in shifts]).tolist()
 
     def racah(self):
+        """
+        Set the intensity values to the Racah intensities.
+
+        :returns:
+        """
         self.vals[self.racah_indices[0]] = 0.
 
 
 class HyperfineMixed(Splitter):
-    def __init__(self, model, i, j_l, j_u, label, config):
-        """
-        Hyperfine-mixing model based on https://doi.org/10.1103/PhysRevA.55.2728 [1].
+    def __init__(self, model: Model, i: quant_like, j_l: quant_like, j_u: quant_like,
+                 label: str = None, config: dict = None):
+        r"""
+        Hyperfine-mixing model based on [<a href="https://doi.org/10.1103/PhysRevA.55.2728">
+        W. R. Johnson <i>et al.</i>, Phys. Rev. A <b>55</b>, 2728 (1997)</a>].
         
         :param model: A submodel whose parameters are adopted by this model.
-        :param i: The nuclear spin.
-        :param j_l: The total lower state electron angular momentum.
-        :param j_u: The total upper state electron angular momentum.
+        :param i: The nuclear spin $I$.
+        :param j_l: The total lower state electron angular momentum $J$.
+        :param j_u: The total upper state electron angular momentum $J^\prime$.
         :param label: A label for the `Splitter` (isotope / isomer / transition).
         :param config: The configuration of the hyperfine-induced mixing. This is a dictionary such as
          `{'enabled_l'=False, 'enabled_u'=False, 'Jl'=[0.5, ], 'Ju'=[0.5, ], 'Tl'=[[1.]], 'Tu'=[[1.]], 'fl'=[0., ], 'fu'=[0., ], 'mu'=0.}`,
@@ -368,6 +402,9 @@ class HyperfineMixed(Splitter):
         """
         super().__init__(model, i, j_l, j_u, label)
         self.type = 'HyperfineMixed'
+        if config is None:
+            config = {'enabled_l':False, 'enabled_u':False, 'Jl':[self.j_l, ], 'Ju':[self.j_u, ],
+                      'Tl':[[1.]], 'Tu':[[1.]], 'fl':[0., ], 'fu':[0., ], 'mu':0.}
         self.config = config
         self.states = ['l', 'u']
         to_mhz = 13074.70
@@ -430,7 +467,7 @@ class HyperfineMixed(Splitter):
             self._add_arg('int{}([{}, {}] -> [{}, {}])'.format(i, t[1][0], t[2][0], t[1][1], t[2][1]),
                           intensity, i == 0, False)
 
-    def x0(self, *args):
+    def x0(self, *args: array_iter):
         """
         :param args: The function parameters.
         :returns: The peak positions.
@@ -460,19 +497,34 @@ class HyperfineMixed(Splitter):
         # print(f'[{", ".join([str(_x0) for _x0 in x0])}]')
         return x0
 
-    def evaluate(self, x, *args, **kwargs):
+    def evaluate(self, x: array_like, *args: array_iter, **kwargs: dict) -> ndarray:
         return np.sum([args[i] * self.model.evaluate(x - _x0, *args, **kwargs)
                        for i, _x0 in zip(self.racah_indices, self.x0(*args))], axis=0)
 
-    def min(self):
+    def min(self) -> float:
+        """
+        :returns: A hint for an x-axis minimum for a complete display of the model.
+        """
         return self.model.min() + np.min(self.x0(*self.vals))
 
-    def max(self):
+    def max(self) -> float:
+        """
+        :returns: A hint for an x-axis maximum for a complete display of the model.
+        """
         return self.model.max() + np.max(self.x0(*self.vals))
 
-    def intervals(self):
-        return merge_intervals([[self.model.min() + _x0, self.model.max() + _x0] for _x0 in self.x0(*self.vals)])
+    def intervals(self) -> list[list[float]]:
+        """
+        :returns: A list of x-axis intervals for a complete display of the model.
+        """
+        return merge_intervals([[self.model.min() + _x0, self.model.max() + _x0]
+                                for _x0 in self.x0(*self.vals)]).tolist()
 
     def racah(self):
+        """
+        Set the intensity values to the Racah intensities.
+
+        :returns:
+        """
         for i, intensity in zip(self.racah_indices, self.racah_intensities):
             self.vals[i] = intensity

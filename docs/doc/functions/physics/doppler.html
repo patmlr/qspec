@@ -26,7 +26,7 @@ title: qspec.doppler
 <span class="o"><span class="pre">=</span></span>
 <span class="default_value"><span class="pre string">'atom'</span></span>
 </em>
-<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/physics.py#L349-L373' }}"><span class="sig-source">[source]</span></a>
+<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/dev-jekyll/qspec/physics.py#L349-L373' }}"><span class="sig-source">[source]</span></a>
 </dt>
 <dd class="field-body"><p>The Doppler-shifted frequency $f^\prime = \begin{cases}f\gamma(v)(1 - \frac{v}{c}\cos(\alpha)), & \mathrm{atom}\\
     f[\gamma(v)(1 - \frac{v}{c}\cos(\alpha))]^{-1}, & \mathrm{lab}\end{cases}$</p>
@@ -48,7 +48,12 @@ title: qspec.doppler
 <dt>out<span class="classifier"><em>ndarray</em></span></dt>
 <dd class="field-desc"><p>the Doppler-shifted frequency $f^\prime$ in either the rest frame of the atom
      or the laboratory frame ([<code>f</code>]).
-    :raises ValueError: <code>return_frame</code> must be either <code>'atom'</code> or <code>'lab'</code>.</p></dd></dl>
+    </p></dd></dl>
+</dd><dt class="field-head">Raises<span class="colon">:</span></dt>
+<dd class="field-par">
+<dl>
+<dt>ValueError</dt>
+<dd class="field-desc"><p><code>return_frame</code> must be either <code>'atom'</code> or <code>'lab'</code>.</p></dd></dl>
 </dd>
 </dl></dd>
 </dl>

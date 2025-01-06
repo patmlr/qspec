@@ -385,7 +385,7 @@ def doppler_d1(f: array_like, v: array_like, alpha: array_like, return_frame: st
     :param return_frame: The coordinate system for which the frequency is returned. Can be either `'atom'` or `'lab'`.
     :returns: the first derivative $\partial f^\prime / \partial v$ of the Doppler-shifted frequency
      $f^\prime$ with respect to `v` in either the rest frame of the atom or the laboratory frame ([`f`] s/m).
-    :raises ValueError: return_frame must be either `'atom'` or `'lab'`.
+    :raises ValueError: `return_frame` must be either `'atom'` or `'lab'`.
     """
     f = np.asarray(f, dtype=float)
 
@@ -419,7 +419,7 @@ def doppler_e_d1(f: array_like, alpha: array_like, e: array_like, m: array_like,
      The default is `True`.
     :returns: the first derivative $\partial f^\prime / \partial E$ of the Doppler-shifted frequency
      $f^\prime$ with respect to `e` in either the rest frame of the atom or the laboratory frame ([`f`] / eV).
-    :raises ValueError: return_frame must be either `'atom'` or `'lab'`.
+    :raises ValueError: `return_frame` must be either `'atom'` or `'lab'`.
     """
     v = v_e(e, m, v0=v0, relativistic=relativistic)
     return doppler_d1(f, v, alpha, return_frame=return_frame) * v_e_d1(e, m, v0=v0, relativistic=relativistic)
@@ -443,7 +443,7 @@ def doppler_el_d1(f: array_like, alpha: array_like, u: array_like, q: array_like
      The default is `True`.
     :returns: the first derivative $\partial f^\prime / \partial U$ of the Doppler-shifted frequency
      $f^\prime$ with respect to `u` in either the rest frame of the atom or the laboratory frame ([`f`] / V).
-    :raises ValueError: return_frame must be either `'atom'` or `'lab'`.
+    :raises ValueError: `return_frame` must be either `'atom'` or `'lab'`.
     """
     v = v_el(u, q, m, v0=v0, relativistic=relativistic)
     return doppler_d1(f, v, alpha, return_frame=return_frame) * v_el_d1(u, q, m, v0=v0, relativistic=relativistic)
@@ -464,18 +464,20 @@ def inverse_doppler(f_atom: array_like, f_lab: array_like, alpha: array_like,
     :param alpha: The angle $\alpha$ between the velocity- and the light-vector in the laboratory frame (rad).
     :param mode: The mode how to handle `nan` values and ambiguous velocities. Available options are:
     <ul>
-    <li>`'raise-raise'`: Raise an error if there are `nan` values or if the velocity is ambiguous.</li>
-    <li>`'raise-small'`: Raise an error if there are `nan` values and return the smaller velocity.</li>
-    <li>`'raise-large'`: Raise an error if there are `nan` values and return the larger velocity.</li>
-    <li>`'isnan-raise'`: Ignore `nan` values and raise an error if the velocity is ambiguous.</li>
-    <li>`'isnan-small'`: Ignore `nan` values and return the smaller velocity.</li>
-    <li>`'isnan-large'`: Ignore `nan` values and return the larger velocity.</li>
+    <li> `'raise-raise'`: Raise an error if there are `nan` values or if the velocity is ambiguous.</li>
+    <li> `'raise-small'`: Raise an error if there are `nan` values and return the smaller velocity.</li>
+    <li> `'raise-large'`: Raise an error if there are `nan` values and return the larger velocity.</li>
+    <li> `'isnan-raise'`: Ignore `nan` values and raise an error if the velocity is ambiguous.</li>
+    <li> `'isnan-small'`: Ignore `nan` values and return the smaller velocity.</li>
+    <li> `'isnan-large'`: Ignore `nan` values and return the larger velocity.</li>
     </ul>
     :param return_mask: Whether the mask where the velocity is ambiguous is returned as a second argument.
     :returns: the velocity $v$ required to shift `f_lab` to `f_atom`.
      Optionally returns the mask where the velocity is ambiguous (m/s).
+    :raises ValueError: `mode` must be `'raise-raise'`, `'raise-small'`, `'raise-large'`, `'isnan-raise'`,
+     `'isnan-small'`, or `'isnan-large'`. For additionally raised errors, see the description of the `mode` parameter.
     """
-    modes = ['raise-raise', 'raise-small', 'raise-large', 'isnan-raise', 'isnan-small', 'isnan-large']
+    modes = {'raise-raise', 'raise-small', 'raise-large', 'isnan-raise', 'isnan-small', 'isnan-large'}
     if mode not in modes:
         raise ValueError('mode must be in {}.'.format(modes))
 
@@ -792,7 +794,7 @@ def zeeman_linear(m: quant_like, g: array_like, b_field: array_like = 0., as_fre
     :param b_field: The B-field $\mathcal{B}$ (T).
     :param as_freq: The shift can be returned in energy (`False`, eV) or frequency units (`True`, MHz).
      The default is `True`
-    :returns: The linear Zeeman shift $\Delta_\mathrm{Zeeman}$ in energy or frequency units (eV if `as_freq` else MHz).
+    :returns: The linear Zeeman shift $\Delta_\mathrm{Zeeman}$ in energy or frequency units (MHz if `as_freq` else eV).
     """
     g, b_field = np.asarray(g, dtype=float), np.asarray(b_field, dtype=float)
 
@@ -811,14 +813,14 @@ def hyper_zeeman_linear(i: quant_like, j: quant_like, f: quant_like, m: quant_li
     :param j: The electronic total angular momentum quantum number $J$.
     :param f: The total angular momentum quantum number $F$.
     :param m: The magnetic quantum number $m_F$.
-    :param a_hyper: The magnetic dipole hyperfine constant $A = \mu_I \mathcal{B}_J / (IJ)$ (eV if `as_freq` else MHz).
+    :param a_hyper: The magnetic dipole hyperfine constant $A = \mu_I \mathcal{B}_J / (IJ)$ (MHz if `as_freq` else eV).
     :param b_hyper: The electric quadrupole hyperfine constant $B = eQ_I (\partial^2 V_J / \partial z^2)$ ([`a_hyper`]).
     :param c_hyper: The magnetic octupole hyperfine constant $C = \Omega_I T_J^{(3)}$ ([`a_hyper`]).
     :param g_f: The atomic g-factor $g_F$.
     :param b_field: The B-field $\mathcal{B}$ (T).
     :param as_freq: The shift can be returned in energy (`False`, eV) or frequency units (`True`, MHz).
      The default is `True`
-    :returns: The hyperfine structure + linear Zeeman shift $\Delta$ (eV if `as_freq` else MHz)
+    :returns: The hyperfine structure + linear Zeeman shift $\Delta$ (MHz if `as_freq` else eV)
     """
     return hyperfine(i, j, f, a_hyper, b_hyper, c_hyper) + zeeman_linear(m, g_f, b_field, as_freq=as_freq)
 
@@ -836,7 +838,7 @@ def hyper_zeeman_ij(mi0: quant_like, mj0: quant_like, mi1: quant_like, mj1: quan
     :param mj1: The second magnetic quantum number $m_{j, 1}$ of the total electronic angular momentum $J$.
     :param i: The nuclear spin quantum number $I$.
     :param j: The electronic total angular momentum quantum number $J$.
-    :param a_hyper: The magnetic dipole hyperfine constant $A = \mu_I \mathcal{B}_J / (IJ)$ (eV if `as_freq` else MHz).
+    :param a_hyper: The magnetic dipole hyperfine constant $A = \mu_I \mathcal{B}_J / (IJ)$ (MHz if `as_freq` else eV).
     :param b_hyper: The electric quadrupole hyperfine constant $B = eQ_I (\partial^2 V_J / \partial z^2)$ ([`a_hyper`]).
     :param g_i: The nuclear g-factor $g_I$ or the gyromagnetic ratio $\gamma_I$ if `g_n_as_gyro == True`.
     :param g_j: The electronic g-factor $g_J$.
@@ -901,7 +903,7 @@ def hyper_zeeman_num(i: quant_like, j: quant_like, a_hyper: array_like = 0., b_h
     :param j: The electronic total angular momentum quantum number $J$.
     :param g_i: The nuclear g-factor $g_I$ or the gyromagnetic ratio $\gamma_I$ if `g_n_as_gyro == True`.
     :param g_j: The electronic g-factor $g_J$.
-    :param a_hyper: The magnetic dipole hyperfine constant $A = \mu_I \mathcal{B}_J / (IJ)$ (eV if `as_freq` else MHz).
+    :param a_hyper: The magnetic dipole hyperfine constant $A = \mu_I \mathcal{B}_J / (IJ)$ (MHz if `as_freq` else eV).
     :param b_hyper: The electric quadrupole hyperfine constant $B = eQ_I (\partial^2 V_J / \partial z^2)$ ([`a_hyper`]).
     :param b_field: The B-field $\mathcal{B}$ (T).
     :param g_n_as_gyro: Whether `g_i` is the nuclear g-factor or the gyromagnetic ratio $\gamma_I$ (MHz).
@@ -968,7 +970,7 @@ def hyper_zeeman_12(j: quant_like, m: quant_like, a_hyper: array_like = 0.,
 
     :param j: The electronic total angular momentum quantum number $J$.
     :param m: The magnetic quantum number $m_F$.
-    :param a_hyper: The magnetic dipole hyperfine constant $A = \mu_I \mathcal{B}_J / (IJ)$ (eV if `as_freq` else MHz).
+    :param a_hyper: The magnetic dipole hyperfine constant $A = \mu_I \mathcal{B}_J / (IJ)$ (MHz if `as_freq` else eV).
     :param g_i: The nuclear g-factor $g_I$ or the gyromagnetic ratio $\gamma_I$ if `g_n_as_gyro == True`.
     :param g_j: The electronic g-factor $g_J$.
     :param b_field: The B-field $\mathcal{B}$ (T).
@@ -1014,7 +1016,7 @@ def hyper_zeeman_12_d(j: quant_like, m: quant_like, a_hyper: array_like = 0.,
 
     :param j: The electronic total angular momentum quantum number $J$.
     :param m: The magnetic quantum number $m_F$.
-    :param a_hyper: The magnetic dipole hyperfine constant $A = \mu_I \mathcal{B}_J / (IJ)$ (eV if `as_freq` else MHz).
+    :param a_hyper: The magnetic dipole hyperfine constant $A = \mu_I \mathcal{B}_J / (IJ)$ (MHz if `as_freq` else eV).
     :param g_i: The nuclear g-factor $g_I$ or the gyromagnetic ratio $\gamma_I$ if `g_n_as_gyro == True`.
     :param g_j: The electronic g-factor $g_J$.
     :param b_field: The B-field $\mathcal{B}$ (T).
@@ -1061,7 +1063,7 @@ def a_hyper_mu(i: quant_like, j: quant_like, mu: array_like, b_field: array_like
     :param j: The electronic total angular momentum quantum number $J$.
     :param mu: The magnetic moment of the nucleus in units of the nuclear magneton ($\mu_\mathrm{N}$).
     :param b_field: The B-field $\mathcal{B}$ of the atomic electrons at the nucleus (T).
-    :returns: The hyperfine structure constant $A$ (MHz).
+    :returns: (a_hyper) The hyperfine structure constant $A$ (MHz).
     """
     mu, b = np.asarray(mu, dtype=float), np.asarray(b_field, dtype=float)
     if i == 0 or j == 0:
@@ -1076,7 +1078,7 @@ def saturation_intensity(f: array_like, a: array_like, a_dipole: array_like = 1.
     :param f: The frequency $f$ of the transition $|i\rangle\rightarrow|k\rangle$ (MHz).
     :param a: The Einstein $A_{ki}$ coefficient (MHz).
     :param a_dipole: The reduced dipole coefficient of the transition (see `qspec.a_dipole`).
-    :returns: The saturation intensity $I_0$.
+    :returns: (sat_intensity) The saturation intensity $I_0$.
     """
     f, a, a_dipole = np.asarray(f, dtype=float), np.asarray(a, dtype=float), np.asarray(a_dipole, dtype=float)
     return np.pi * (f * 1e6) ** 3 * sc.h * a * 1e6 / (3 * sc.c ** 2 * a_dipole)
@@ -1090,7 +1092,7 @@ def saturation(intensity: array_like, f: array_like, a: array_like, a_dipole: ar
     :param f: The frequency $f$ of the transition $|i\rangle\rightarrow|k\rangle$ (MHz).
     :param a: The Einstein $A_{ki}$ coefficient (MHz).
     :param a_dipole: The reduced dipole coefficient of the transition (see `qspec.a_dipole`).
-    :returns: The saturation parameter $s$.
+    :returns: (s) The saturation parameter $s$.
     """
     intensity = np.asarray(intensity, dtype=float)
     return intensity / saturation_intensity(f, a, a_dipole)
@@ -1102,47 +1104,46 @@ def rabi(a: array_like, s: array_like) -> ndarray:
 
     :param a: The Einstein $A_{ki}$ coefficient (MHz).
     :param s: The saturation parameter $s$.
-    :returns: The Rabi frequency $\Omega$.
+    :returns: (omega) The Rabi frequency $\Omega$.
     """
     a, s = np.asarray(a), np.asarray(s)
     return a * np.sqrt(s / 2.)
 
 
-def scattering_rate(df: array_like, a: array_like, s: array_like):
+def scattering_rate(df: array_like, a: array_like, s: array_like) -> ndarray:
     r"""
     The two-state-equilibrium scattering-rate of an electronic dipole transition
 
     $$\begin{aligned}
-    &\Gamma_\mathrm{sc} = \frac{s}{2}\frac{A_{ki}^3}{(4/pi\Delta f)^2 + (1 + s)A_{ki}^2}\\
-    \lim\limits_{s\rightarrow\inf}&\Gamma_\mathrm{sc}\big|_{\Delta f = 0} = A_{ki} / 2.
+    \Gamma_\mathrm{sc} &= \frac{s}{2}\frac{A_{ki}^3}{(4\pi\Delta f)^2 + (1 + s)A_{ki}^2}\\[2ex]
+    \lim\limits_{s\rightarrow\inf}\Gamma_\mathrm{sc}\big|_{\Delta f = 0} &= A_{ki} / 2.
     \end{aligned}$$
 
     :param df: The frequency detuning $\Delta f$ of the absorbed light.
-     This must be differences of real frequencies, such that w = 2 pi * df (MHz).
+     This must be differences of real frequencies, such that $\Delta\omega = 2\pi\Delta f$ (MHz).
     :param a: The Einstein $A_{ki}$ coefficient (MHz).
     :param s: The saturation parameter $s$.
-    :returns: The two-state-equilibrium scattering-rate $\Gamma_\mathrm{sc}$ of an electronic dipole transition (MHz).
+    :returns: (gamma) The two-state-equilibrium scattering-rate $\Gamma_\mathrm{sc}$
+     of an electronic dipole transition (MHz).
     """
     df, a, s = np.asarray(df), np.asarray(a), np.asarray(s)
     return 0.125 * s * a ** 3 / (0.25 * (1 + s) * a ** 2 + (2 * np.pi * df) ** 2)
 
 
 def mass_factor(m0: array_like, m1: array_like, m0_d: array_like, m1_d: array_like) -> (ndarray, ndarray):
-    m0, m1, m0_d, m1_d = (np.asarray(m0, dtype=float), np.asarray(m1, dtype=float),
-                          np.asarray(m0_d, dtype=float), np.asarray(m1_d, dtype=float))
     r"""
     The specific mass factor required to calculate modified isotope shifts or charge radii and its uncertainty
-    
+
     $$\begin{aligned}
     \mu &= \frac{m_0 m_1}{m_0 - m_1}\\
-    \Delta\mu &= \mu\sqrt{\left(\frac{\Delta m_0}{m_0} - \frac{\Delta m_0}{m_0 - m_1}\right)^2 
+    \Delta\mu &= \mu\sqrt{\left(\frac{\Delta m_0}{m_0} - \frac{\Delta m_0}{m_0 - m_1}\right)^2
     + \left(\frac{\Delta m_1}{m_1} + \frac{\Delta m_1}{m_0 - m_1}\right)^2}.
     \end{aligned}$$
-    
-    Use $m0 = M_0 + m_\mathrm{e}$ and/or $m1 = M_1 + m_\mathrm{e}$ with the nuclear masses $M_0$ and $M_1$
+
+    Use $m_0 = M_0 + m_\mathrm{e}$ and/or $m_1 = M_1 + m_\mathrm{e}$ with the nuclear masses $M_0$ and $M_1$
     and the electron mass $m_\mathrm{e}$ for King-plots.
     Compare (6.4) with (3.17) in [W. H. King, Isotope shifts in atomic spectra (1984)].
-    
+
     :param m0: The mass $m_0$ of the first isotope (u).
     :param m1: The mass $m_1$ of the second isotope (u).
     :param m0_d: The mass uncertainty $\Delta m_0$ of the first isotope (u).
@@ -1150,6 +1151,8 @@ def mass_factor(m0: array_like, m1: array_like, m0_d: array_like, m1_d: array_li
     :returns: (mu, mu_d) The mass factor $\mu$ and its uncertainty $\Delta\mu$
      required to calculate modified isotope shifts or charge radii.
     """
+    m0, m1, m0_d, m1_d = (np.asarray(m0, dtype=float), np.asarray(m1, dtype=float),
+                          np.asarray(m0_d, dtype=float), np.asarray(m1_d, dtype=float))
     scalar_true = tools.check_shape((), m0, m1, return_mode=True)
     if scalar_true:
         m0 = np.array([m0])
@@ -1172,54 +1175,63 @@ def mass_factor(m0: array_like, m1: array_like, m0_d: array_like, m1_d: array_li
 
 
 def delta_r2(r: array_like, r_d: array_like, r_ref: array_like, r_ref_d: array_like,
-             delta_r: array_like = None, delta_r_d: array_like = None, v2: array_like = 1., v2_ref: array_like = 1.):
+             dr: array_like = None, dr_d: array_like = None, v2: array_like = 1., v2_ref: array_like = 1.) \
+        -> (ndarray, ndarray):
     r"""
     The difference of the mean square nuclear charge radius between two isotopes and its uncertainty
     calculated from the Barrett radii and elastic electron scattering form factors
 
     $$\begin{aligned}
     \delta\!\langle r^2\rangle &= \left(\frac{R}{V_2}\right)^2
-    - \left(\frac{R_\mathrm{ref}}{V_{2,\mathrm{ref}}}\right)^2\\
+    - \left(\frac{R_\mathrm{ref}}{V_{2,\mathrm{ref}}}\right)^2\\[2ex]
     \Delta\delta\!\langle r^2\rangle &=
     \sqrt{\left(\frac{2 R\Delta R}{V_2^2}\right)^2
     + \left(\frac{2 R_\mathrm{ref}\Delta R_\mathrm{ref}}{V_{2,\mathrm{ref}}^2}\right)^2}.
     \end{aligned}$$
 
-    Specify the uncertainty `delta_r_d`, which is often much lower than `r_d` and `r_ref_d`,
-     to use an improved formula that gives lower uncertainties
+    If the uncertainty `dr_d` is specified, which is often much lower than `r_d` and `r_ref_d`,
+    an improved formula is used that gives smaller uncertainties
 
     $$\begin{aligned}
-    \delta\!\langle r^2\rangle &= \left(\frac{R}{}\right).
+    \delta\!\langle r^2\rangle &= sd,
+    \quad s \coloneqq \frac{1}{V_2}\left(\frac{R}{V_2} + \frac{R_\mathrm{ref}}{V_{2,\mathrm{ref}}}\right),
+    \quad d \coloneqq \delta R + R_\mathrm{ref}\left(1 - \frac{V_2}{V_{2,\mathrm{ref}}}\right)\\[2ex]
+    \Delta\delta\!\langle r^2\rangle &= \sqrt{\left(s\Delta\delta R\right)^2
+    + \left(\frac{d}{V_2^2}\Delta R\right)^2
+    + \left(\left[\frac{d}{V_2V_{2,\mathrm{ref}}}
+    + s\left(1 - \frac{V_2}{V_{2,\mathrm{ref}}}\right)\right]\Delta R_\mathrm{ref}\right)^2}.
     \end{aligned}$$
 
-    :param r: The Barrett radius $R$ of the first isotope.
-    :param r_d: The uncertainty of the Barrett radius $\Delta R$ of the first isotope.
-    :param r_ref: The Barrett radius $R_\mathrm{ref}$ of the second isotope.
-    :param r_ref_d: The uncertainty of the Barrett radius $\Delta R_\mathrm{ref}$ of the second isotope.
-    :param delta_r: The difference between the Barrett radii of the first and second isotope.
-    :param delta_r_d: The uncertainty of the difference between the Barrett radii of the first and second isotope.
-    :param v2: The V2 factor of the isotope.
-    :param v2_ref: The V2 factor of the reference isotope.
-    :returns: The difference of the mean square nuclear charge radius between two isotopes $\delta\!\langle r^2\rangle$
-     and its uncertainty $\Delta\delta\!\langle r^2\rangle$.
+    :param r: The Barrett radius $R$ of the first isotope (arb. units).
+    :param r_d: The uncertainty of the Barrett radius $\Delta R$ of the first isotope ([`r`]).
+    :param r_ref: The Barrett radius $R_\mathrm{ref}$ of the second isotope ([`r`]).
+    :param r_ref_d: The uncertainty of the Barrett radius $\Delta R_\mathrm{ref}$ of the second isotope ([`r`]).
+    :param dr: The difference between the Barrett radii $\delta R = R - R_\mathrm{ref}$
+     of the first and second isotope ([`r`]).
+    :param dr_d: The uncertainty of the difference between the Barrett radii $\Delta\delta R$
+     of the first and second isotope ([`r`]).
+    :param v2: The shape factor $V_2$ of the first isotope.
+    :param v2_ref: The shape factor $V_{2,\mathrm{ref}}$ of the second isotope.
+    :returns: (dr2, dr2_d) The difference of the mean-square nuclear charge radius between two isotopes
+     $\delta\!\langle r^2\rangle$ and its uncertainty $\Delta\delta\!\langle r^2\rangle$ ([`r ** 2`]).
     """
     r, r_d = np.asarray(r, dtype=float), np.asarray(r_d, dtype=float)
     r_ref, r_ref_d = np.asarray(r_ref, dtype=float), np.asarray(r_ref_d, dtype=float)
-    delta_r, delta_r_d = tools.asarray_optional(delta_r, dtype=float), tools.asarray_optional(delta_r_d, dtype=float)
+    dr, dr_d = tools.asarray_optional(dr, dtype=float), tools.asarray_optional(dr_d, dtype=float)
     v2, v2_ref = np.asarray(v2, dtype=float), np.asarray(v2_ref, dtype=float)
 
-    if delta_r is None and delta_r_d is not None:
-        delta_r = r - r_ref
+    if dr is None and dr_d is not None:
+        dr = r - r_ref
 
-    if delta_r_d is None:
+    if dr_d is None:
         val = (r / v2) ** 2 - (r_ref / v2_ref) ** 2
         err = np.sqrt((2 * r * r_d / v2 ** 2) ** 2 + (2 * r_ref * r_ref_d / v2_ref ** 2) ** 2)
     else:
         sum_term = (r / v2 + r_ref / v2_ref) / v2
-        delta_term = delta_r + r_ref * (1. - v2 / v2_ref)
+        delta_term = dr + r_ref * (1. - v2 / v2_ref)
         val = sum_term * delta_term
 
-        err = (sum_term * delta_r_d) ** 2
+        err = (sum_term * dr_d) ** 2
         err += (delta_term * r_d / (v2 ** 2)) ** 2
         err += ((delta_term / (v2 * v2_ref) + sum_term * (1. - v2 / v2_ref)) * r_ref_d) ** 2
 
@@ -1227,121 +1239,233 @@ def delta_r2(r: array_like, r_d: array_like, r_ref: array_like, r_ref_d: array_l
 
 
 def delta_r4(r: array_like, r_d: array_like, r_ref: array_like, r_ref_d: array_like,
-             delta_r: array_like, delta_r_d: array_like, v4: array_like, v4_ref: array_like):
-    """
-    :param r: The Barrett radius of an isotope.
-    :param r_d: The uncertainty of the Barrett radius.
-    :param r_ref: The Barrett radius of a reference isotope.
-    :param r_ref_d: The uncertainty of the Barrett radius of the reference isotope.
-    :param delta_r: The difference between the Barrett radius of the isotope and the reference isotope.
-    :param delta_r_d: The uncertainty of the difference between
-     the Barrett radius of the isotope and the reference isotope.
-    :param v4: The V4 factor of the isotope.
-    :param v4_ref: The V4 factor of the reference isotope.
-    :returns: The difference of the mean quartic nuclear charge radius between two isotopes and its uncertainty.
+             dr: array_like = None, dr_d: array_like = None, v4: array_like = 1., v4_ref: array_like = 1.) \
+        -> (ndarray, ndarray):
+    r"""
+    The difference of the mean square nuclear charge radius between two isotopes and its uncertainty
+    calculated from the Barrett radii and elastic electron scattering form factors
+
+    $$\begin{aligned}
+    \delta\!\langle r^4\rangle &= \left(\frac{R}{V_4}\right)^4
+    - \left(\frac{R_\mathrm{ref}}{V_{4,\mathrm{ref}}}\right)^4\\[2ex]
+    \Delta\delta\!\langle r^4\rangle &=
+    \sqrt{\left(\frac{4 R^3\Delta R}{V_4^4}\right)^2
+    + \left(\frac{4 R_\mathrm{ref}^3\Delta R_\mathrm{ref}}{V_{4,\mathrm{ref}}^4}\right)^2}.
+    \end{aligned}$$
+
+    If the uncertainty `dr_d` is specified, which is often much lower than `r_d` and `r_ref_d`,
+    an improved formula is used that gives smaller uncertainties
+
+    $$\begin{aligned}
+    \delta\!\langle r^4\rangle &= sd,
+    \quad s \coloneqq \left(\frac{R}{V_4}\right)^2 + \left(\frac{R_\mathrm{ref}}{V_{4,\mathrm{ref}}}\right)^2,
+    \quad d \coloneqq \left(\frac{R}{V_4}\right)^2 - \left(\frac{R_\mathrm{ref}}{V_{4,\mathrm{ref}}}\right)^2\\[2ex]
+    \Delta\delta\!\langle r^4\rangle &= \sqrt{\left(s\Delta d\right)^2
+    + \left(\frac{2dR}{V_4^2}\Delta R\right)^2
+    + \left(\frac{2dR_\mathrm{ref}}{V_{4,\mathrm{ref}}^2}\Delta R_\mathrm{ref}\right)^2}.
+    \end{aligned}$$
+
+    Here $d$ and $\Delta d$ are calculated using the small-uncertainty version of the `delta_r2` function
+    for the mean-square nuclear charge radius.
+
+    :param r: The Barrett radius $R$ of the first isotope (arb. units).
+    :param r_d: The uncertainty of the Barrett radius $\Delta R$ of the first isotope ([`r`]).
+    :param r_ref: The Barrett radius $R_\mathrm{ref}$ of the second isotope ([`r`]).
+    :param r_ref_d: The uncertainty of the Barrett radius $\Delta R_\mathrm{ref}$ of the second isotope ([`r`]).
+    :param dr: The difference between the Barrett radii $\delta R = R - R_\mathrm{ref}$
+     of the first and second isotope ([`r`]).
+    :param dr_d: The uncertainty of the difference between the Barrett radii $\Delta\delta R$
+     of the first and second isotope ([`r`]).
+    :param v4: The shape factor $V_4$ of the first isotope.
+    :param v4_ref: The shape factor $V_{4,\mathrm{ref}}$ of the second isotope.
+    :returns: (dr4, dr4_d) The difference of the mean-quartic nuclear charge radius between two isotopes
+     $\delta\!\langle r^4\rangle$ and its uncertainty $\Delta\delta\!\langle r^4\rangle$ ([`r ** 4`]).
     """
     r, r_d = np.asarray(r, dtype=float), np.asarray(r_d, dtype=float)
     r_ref, r_ref_d = np.asarray(r_ref, dtype=float), np.asarray(r_ref_d, dtype=float)
-    delta_r, delta_r_d = np.asarray(delta_r, dtype=float), np.asarray(delta_r_d, dtype=float)
+    dr, dr_d = tools.asarray_optional(dr, dtype=float), tools.asarray_optional(dr_d, dtype=float)
     v4, v4_ref = np.asarray(v4, dtype=float), np.asarray(v4_ref, dtype=float)
 
-    sum_term = (r / v4) ** 2 + (r_ref / v4_ref) ** 2
-    delta_term = delta_r2(r, r_d, r_ref, r_ref_d, delta_r, delta_r_d, v4, v4_ref)
-    val = sum_term * delta_term[0]  # (r/v4)**4 - (r_ref/v4_ref)**4
+    if dr is None and dr_d is not None:
+        dr = r - r_ref
 
-    err = (sum_term * delta_term[1]) ** 2
-    err += (2. * delta_term[0] * r * r_d / (v4 ** 2)) ** 2
-    err += (2. * delta_term[0] * r_ref * r_ref_d / (v4_ref ** 2)) ** 2
+    if dr_d is None:
+        val = (r / v4) ** 4 - (r_ref / v4_ref) ** 4
+        err = np.sqrt((4 * r ** 3 * r_d / v4 ** 4) ** 2 + (4 * r_ref ** 3 * r_ref_d / v4_ref ** 4) ** 2)
+    else:
+        sum_term = (r / v4) ** 2 + (r_ref / v4_ref) ** 2
+        delta_term = delta_r2(r, r_d, r_ref, r_ref_d, dr, dr_d, v4, v4_ref)
+        val = sum_term * delta_term[0]
+
+        err = (sum_term * delta_term[1]) ** 2
+        err += (2. * delta_term[0] * r * r_d / (v4 ** 2)) ** 2
+        err += (2. * delta_term[0] * r_ref * r_ref_d / (v4_ref ** 2)) ** 2
+
     return val, np.sqrt(err)
 
 
 def delta_r6(r: array_like, r_d: array_like, r_ref: array_like, r_ref_d: array_like,
-             delta_r: array_like, delta_r_d: array_like, v6: array_like, v6_ref: array_like):
-    """
-    :param r: The Barrett radius of an isotope.
-    :param r_d: The uncertainty of the Barrett radius.
-    :param r_ref: The Barrett radius of a reference isotope.
-    :param r_ref_d: The uncertainty of the Barrett radius of the reference isotope.
-    :param delta_r: The difference between the Barrett radius of the isotope and the reference isotope.
-    :param delta_r_d: The uncertainty of the difference between
-     the Barrett radius of the isotope and the reference isotope.
-    :param v6: The V6 factor of the isotope.
-    :param v6_ref: The V6 factor of the reference isotope.
-    :returns: The difference of the mean sextic nuclear charge radius between two isotopes and its uncertainty.
+             dr: array_like = None, dr_d: array_like = None, v6: array_like = 1., v6_ref: array_like = 1.) \
+        -> (ndarray, ndarray):
+    r"""
+    The difference of the mean square nuclear charge radius between two isotopes and its uncertainty
+    calculated from the Barrett radii and elastic electron scattering form factors
+
+    $$\begin{aligned}
+    \delta\!\langle r^6\rangle &= \left(\frac{R}{V_6}\right)^6
+    - \left(\frac{R_\mathrm{ref}}{V_{6,\mathrm{ref}}}\right)^6\\[2ex]
+    \Delta\delta\!\langle r^6\rangle &=
+    \sqrt{\left(\frac{6 R^5\Delta R}{V_6^6}\right)^2
+    + \left(\frac{6 R_\mathrm{ref}^5\Delta R_\mathrm{ref}}{V_{6,\mathrm{ref}}^6}\right)^2}.
+    \end{aligned}$$
+
+    If the uncertainty `dr_d` is specified, which is often much lower than `r_d` and `r_ref_d`,
+    an improved formula is used that gives smaller uncertainties
+
+    $$\begin{aligned}
+    \delta\!\langle r^6\rangle &= s(d + t),
+    \quad s \coloneqq \frac{V_6}{R}\left[\left(\frac{R}{V_6}\right)^3
+    + \left(\frac{R_\mathrm{ref}}{V_{6,\mathrm{ref}}}\right)^3\right],\\
+    \quad d &\coloneqq \left(\frac{R}{V_6}\right)^4 - \left(\frac{R_\mathrm{ref}}{V_{6,\mathrm{ref}}}\right)^4
+    \quad t \coloneqq \left(\frac{R_\mathrm{ref}}{V_{6,\mathrm{ref}}}\right)^4
+    \left(1 - \frac{R}{R_\mathrm{ref}}\frac{V_{6,\mathrm{ref}}}{V_6}\right)\\[2ex]
+    \Delta\delta\!\langle r^6\rangle &= \sqrt{\splitfrac{\left(s\Delta d\right)^2
+    + \left(\left[\left(-\frac{R_\mathrm{ref}}{V_{6,\mathrm{ref}}}\right)^3\frac{s}{V_6}
+    + (d + t)\left(-\frac{s}{R} + 3\frac{R}{V_6^2}\right)\right]\Delta R\right)^2}
+    {+ \left(\left[s\left(\frac{4t}{R_\mathrm{ref}} + \frac{R}{V_6}\frac{R_\mathrm{ref}^2}{V_{6,\mathrm{ref}}^3}\right)
+    + 3(d + t)\frac{V_6}{R}\frac{R_\mathrm{ref}^2}{V_{6,\mathrm{ref}}^3}\right]\Delta R_\mathrm{ref}\right)^2}}.
+    \end{aligned}$$
+
+    Here $d$ and $\Delta d$ are calculated using the small-uncertainty version of the `delta_r4` function
+    for the mean-quartic nuclear charge radius.
+
+    :param r: The Barrett radius $R$ of the first isotope (arb. units).
+    :param r_d: The uncertainty of the Barrett radius $\Delta R$ of the first isotope ([`r`]).
+    :param r_ref: The Barrett radius $R_\mathrm{ref}$ of the second isotope ([`r`]).
+    :param r_ref_d: The uncertainty of the Barrett radius $\Delta R_\mathrm{ref}$ of the second isotope ([`r`]).
+    :param dr: The difference between the Barrett radii $\delta R = R - R_\mathrm{ref}$
+     of the first and second isotope ([`r`]).
+    :param dr_d: The uncertainty of the difference between the Barrett radii $\Delta\delta R$
+     of the first and second isotope ([`r`]).
+    :param v6: The shape factor $V_6$ of the first isotope.
+    :param v6_ref: The shape factor $V_{6,\mathrm{ref}}$ of the second isotope.
+    :returns: (dr6, dr6_d) The difference of the mean-sextic nuclear charge radius between two isotopes
+     $\delta\!\langle r^6\rangle$ and its uncertainty $\Delta\delta\!\langle r^6\rangle$ ([`r**6`]).
     """
     r, r_d = np.asarray(r, dtype=float), np.asarray(r_d, dtype=float)
     r_ref, r_ref_d = np.asarray(r_ref, dtype=float), np.asarray(r_ref_d, dtype=float)
-    delta_r, delta_r_d = np.asarray(delta_r, dtype=float), np.asarray(delta_r_d, dtype=float)
+    dr, dr_d = tools.asarray_optional(dr, dtype=float), tools.asarray_optional(dr_d, dtype=float)
     v6, v6_ref = np.asarray(v6, dtype=float), np.asarray(v6_ref, dtype=float)
 
-    sum_term = (v6 / r) * ((r / v6) ** 3 + (r_ref / v6_ref) ** 3)
-    delta = delta_r4(r, r_d, r_ref, r_ref_d, delta_r, delta_r_d, v6, v6_ref)
-    delta_term = delta[0] + (r_ref / v6_ref) ** 4 * (1. - (r / v6) * (v6_ref / r_ref))
-    val = sum_term * delta_term  # (r/v6)**6 - (r_ref/v6_ref)**6
+    if dr is None and dr_d is not None:
+        dr = r - r_ref
 
-    err = (sum_term * delta[1]) ** 2
-    err += ((-(r_ref / v6_ref) ** 3 * sum_term / v6
-             + delta_term * (-sum_term / r + 3. * r / (v6 ** 2))) * r_d) ** 2
-    err += (((4 * r_ref ** 3 / (v6_ref ** 4) * (1. - (r / v6) * (v6_ref / r_ref))
-              + (r / v6) * r_ref ** 2 / (v6_ref ** 3)) * sum_term
-             + delta_term * 3. * (v6 / r) * r_ref ** 2 / (v6_ref ** 3)) * r_ref_d) ** 2
+    if dr_d is None:
+        val = (r / v6) ** 6 - (r_ref / v6_ref) ** 6
+        err = np.sqrt((6 * r ** 5 * r_d / v6 ** 6) ** 2 + (6 * r_ref ** 5 * r_ref_d / v6_ref ** 6) ** 2)
+    else:
+        sum_term = (v6 / r) * ((r / v6) ** 3 + (r_ref / v6_ref) ** 3)
+        delta = delta_r4(r, r_d, r_ref, r_ref_d, dr, dr_d, v6, v6_ref)
+        delta_term = delta[0] + (r_ref / v6_ref) ** 4 * (1. - (r / v6) * (v6_ref / r_ref))
+        val = sum_term * delta_term
+
+        err = (sum_term * delta[1]) ** 2
+        err += ((-(r_ref / v6_ref) ** 3 * sum_term / v6
+                 + delta_term * (-sum_term / r + 3. * r / (v6 ** 2))) * r_d) ** 2
+        err += (((4 * r_ref ** 3 / (v6_ref ** 4) * (1. - (r / v6) * (v6_ref / r_ref))
+                  + (r / v6) * r_ref ** 2 / (v6_ref ** 3)) * sum_term
+                 + delta_term * 3. * (v6 / r) * r_ref ** 2 / (v6_ref ** 3)) * r_ref_d) ** 2
+
     return val, np.sqrt(err)
 
 
 def lambda_r(r: array_like, r_d: array_like, r_ref: array_like, r_ref_d: array_like,
-             delta_r: array_like, delta_r_d: array_like, v2: array_like, v2_ref: array_like,
-             v4: array_like, v4_ref: array_like, v6: array_like, v6_ref: array_like,
-             c2c1: array_like, c3c1: array_like):
+             dr: array_like = None, dr_d: array_like = None, v2: array_like = 1., v2_ref: array_like = 1.,
+             v4: array_like = 1., v4_ref: array_like = 1., v6: array_like = 1., v6_ref: array_like = 1.,
+             c2c1: array_like = 1., c3c1: array_like = 1.) -> (ndarray, ndarray):
+    r"""
+    The differential nuclear charge radius series up to $\mathcal{O}(r^6)$ between two isotopes and its uncertainty
+    calculated from the Barrett radii, elastic electron scattering form factors and the Seltzer coefficients
+
+    $$\begin{aligned}
+    \Lambda &= \delta\!\langle r^2\rangle + \frac{C_2}{C_1}\delta\!\langle r^4\rangle
+    + \frac{C_3}{C_1}\delta\!\langle r^6\rangle\\[2ex]
+    \Delta\Lambda &= \sqrt{\Delta\delta\!\langle r^2\rangle^2
+    + \left(\frac{C_2}{C_1}\Delta\delta\!\langle r^4\rangle\right)^2
+    + \left(\frac{C_3}{C_1}\Delta\delta\!\langle r^6\rangle\right)^2}
+    \end{aligned}$$
+    
+    The moments of the differential nuclear charge radii and their uncertainties are calculated with the functions
+    `delta_r2`, `delta_r4` and `delta_r6`.
+
+    :param r: The Barrett radius $R$ of the first isotope (arb. units).
+    :param r_d: The uncertainty of the Barrett radius $\Delta R$ of the first isotope ([`r`]).
+    :param r_ref: The Barrett radius $R_\mathrm{ref}$ of the second isotope ([`r`]).
+    :param r_ref_d: The uncertainty of the Barrett radius $\Delta R_\mathrm{ref}$ of the second isotope ([`r`]).
+    :param dr: The difference between the Barrett radii $\delta R = R - R_\mathrm{ref}$
+     of the first and second isotope ([`r`]).
+    :param dr_d: The uncertainty of the difference between the Barrett radii $\Delta\delta R$
+     of the first and second isotope ([`r`]).
+    :param v2: The shape factor $V_2$ of the first isotope.
+    :param v2_ref: The shape factor $V_{2,\mathrm{ref}}$ of the second isotope.
+    :param v4: The shape factor $V_4$ of the first isotope.
+    :param v4_ref: The shape factor $V_{4,\mathrm{ref}}$ of the second isotope.
+    :param v6: The shape factor $V_6$ of the first isotope.
+    :param v6_ref: The shape factor $V_{6,\mathrm{ref}}$ of the second isotope.
+    :param c2c1: Seltzer's coefficient for the quartic moment $C_2 / C_1$ ([`1 / r**2`]).
+    :param c3c1: Seltzer's coefficient for the sextic moment $C_3 / C_1$ ([`1 / r**4`]).
+    :returns: The difference of the nuclear charge radius series between two isotopes $\Lambda$
+     and its uncertainty $\Delta\Lambda$ ([`r**2`]).
     """
-    :param r: The Barrett radius of an isotope.
-    :param r_d: The uncertainty of the Barrett radius.
-    :param r_ref: The Barrett radius of a reference isotope.
-    :param r_ref_d: The uncertainty of the Barrett radius of the reference isotope.
-    :param delta_r: The difference between the Barrett radius of the isotope and the reference isotope.
-    :param delta_r_d: The uncertainty of the difference between
-     the Barrett radius of the isotope and the reference isotope.
-    :param v2: The V2 factor of the isotope.
-    :param v2_ref: The V2 factor of the reference isotope.
-    :param v4: The V4 factor of the isotope.
-    :param v4_ref: The V4 factor of the reference isotope.
-    :param v6: The V6 factor of the isotope.
-    :param v6_ref: The V6 factor of the reference isotope.
-    :param c2c1: Seltzer's coefficient for the quartic moment.
-    :param c3c1: Seltzer's coefficient for the sextic moment.
-    :returns: The difference of the mean sextic nuclear charge radius between two isotopes and its uncertainty.
-    """
-    r2 = delta_r2(r, r_d, r_ref, r_ref_d, delta_r, delta_r_d, v2, v2_ref)
-    r4 = delta_r4(r, r_d, r_ref, r_ref_d, delta_r, delta_r_d, v4, v4_ref)
-    r6 = delta_r6(r, r_d, r_ref, r_ref_d, delta_r, delta_r_d, v6, v6_ref)
+    r2 = delta_r2(r, r_d, r_ref, r_ref_d, dr, dr_d, v2, v2_ref)
+    r4 = delta_r4(r, r_d, r_ref, r_ref_d, dr, dr_d, v4, v4_ref)
+    r6 = delta_r6(r, r_d, r_ref, r_ref_d, dr, dr_d, v6, v6_ref)
     return lambda_rn(r2[0], r2[1], r4[0], r4[1], r6[0], r6[1], c2c1, c3c1)
 
 
-def lambda_rn(r_2: array_like, r_2_d: array_like, r_4: array_like, r_4_d: array_like,
-              r_6: array_like, r_6_d: array_like, c2c1: array_like, c3c1: array_like):
+def lambda_rn(r2: array_like, r2_d: array_like, r4: array_like, r4_d: array_like,
+              r6: array_like, r6_d: array_like, c2c1: array_like = 1., c3c1: array_like = 1.) -> (ndarray, ndarray):
+    r"""
+    The differential nuclear charge radius series up to $\mathcal{O}(r^6)$ between two isotopes and its uncertainty
+    calculated from the moments of the nuclear charge radii and the Seltzer coefficients
+
+    $$\begin{aligned}
+    \Lambda &= \delta\!\langle r^2\rangle + \frac{C_2}{C_1}\delta\!\langle r^4\rangle
+    + \frac{C_3}{C_1}\delta\!\langle r^6\rangle\\[2ex]
+    \Delta\Lambda &= \sqrt{\Delta\delta\!\langle r^2\rangle^2
+    + \left(\frac{C_2}{C_1}\Delta\delta\!\langle r^4\rangle\right)^2
+    + \left(\frac{C_3}{C_1}\Delta\delta\!\langle r^6\rangle\right)^2}
+    \end{aligned}$$
+    
+    :param r2: The difference of the mean-square nuclear charge radius between two isotopes
+    $\delta\!\langle r^2\rangle$.
+    :param r2_d: The uncertainty of the difference of the mean-square nuclear charge radius
+    $\Delta\delta\!\langle r^2\rangle$.
+    :param r4: The difference of the mean-quartic nuclear charge radius between two isotopes
+    $\delta\!\langle r^4\rangle$.
+    :param r4_d: The uncertainty of the difference of the mean-quartic nuclear charge radius
+    $\Delta\delta\!\langle r^4\rangle$.
+    :param r6: The difference of the mean-sextic nuclear charge radius between two isotopes
+    $\delta\!\langle r^6\rangle$.
+    :param r6_d: The uncertainty of the difference of the mean-sextic nuclear charge radius
+    $\Delta\delta\!\langle r^6\rangle$.
+    :param c2c1: Seltzer's coefficient for the quartic moment $C_2 / C_1$ ([`1 / r**2`]).
+    :param c3c1: Seltzer's coefficient for the sextic moment $C_3 / C_1$ ([`1 / r**4`]).
+    :returns: The difference of the nuclear charge radius series between two isotopes $\Lambda$
+     and its uncertainty $\Delta\Lambda$ ([`r**2`]).
     """
-    :param r_2: The difference of the mean square nuclear charge radius between two isotopes.
-    :param r_2_d: The uncertainty of the difference of the mean square nuclear charge radius.
-    :param r_4: The difference of the mean quartic nuclear charge radius between two isotopes.
-    :param r_4_d: The uncertainty of the difference of the mean quartic nuclear charge radius.
-    :param r_6: The difference of the mean sextic nuclear charge radius between two isotopes.
-    :param r_6_d: The uncertainty of the difference of the mean sextic nuclear charge radius.
-    :param c2c1: Seltzer's coefficient for the quartic moment.
-    :param c3c1: Seltzer's coefficient for the sextic moment.
-    :returns: the Lambda observable for the given differences in mean square, quartic and sextic nuclear charge radii
-     and its uncertainty.
-    """
-    r2, r_2_d = np.asarray(r_2, dtype=float), np.asarray(r_2_d, dtype=float)
-    r4, r_4_d = np.asarray(r_4, dtype=float), np.asarray(r_4_d, dtype=float)
-    r6, r_6_d = np.asarray(r_6, dtype=float), np.asarray(r_6_d, dtype=float)
+    r2, r2_d = np.asarray(r2, dtype=float), np.asarray(r2_d, dtype=float)
+    r4, r4_d = np.asarray(r4, dtype=float), np.asarray(r4_d, dtype=float)
+    r6, r6_d = np.asarray(r6, dtype=float), np.asarray(r6_d, dtype=float)
     c2c1, c3c1 = np.asarray(c2c1, dtype=float), np.asarray(c3c1, dtype=float)
-    val = r_2 + c2c1 * r_4 + c3c1 * r_6
-    err = r_2_d ** 2
-    err += (c2c1 * r_4_d) ** 2
-    err += (c3c1 * r_6_d) ** 2
+    val = r2 + c2c1 * r4 + c3c1 * r6
+    err = r2_d ** 2
+    err += (c2c1 * r4_d) ** 2
+    err += (c3c1 * r6_d) ** 2
     return val, np.sqrt(err)
 
 
-def schmidt_line(l, i, is_proton):
+def schmidt_line(l: quant_like, i: quant_like, is_proton: bool) -> ndarray:
     r"""
     Calculate the single-particle Schmidt value of the nuclear magnetic moment
 
@@ -1350,29 +1474,40 @@ def schmidt_line(l, i, is_proton):
     Lg_L + \frac{1}{2}g_s & else\end{cases}.
     $$
     
-    :param l: The orbital nuclear angular momentum quantum number $L$.
-    :param i: The nuclear spin $I$.
-    :param is_proton: Whether the contributing nucleon is a proton or a neutron.
-    :returns: The Schmidt value of the nuclear magnetic moment.
+    :param l: The orbital angular momentum quantum number of the nucleon $L$.
+    :param i: The nuclear spin quantum number $I$.
+    :param is_proton: Whether the contributing nucleon is a proton (`True`) or a neutron (`False`).
+    :returns: The Schmidt value of the nuclear magnetic moment $\mu$ ($\mu_\mathrm{N}$).
     """
     _g_s = gp_s if is_proton else gn_s
     _g_l = 1 if is_proton else 0
+
     if i < l:
-        return i / (i + 1) * ((l + 1) * _g_l - 0.5 * _g_s)
-    return l * _g_l + 0.5 * _g_s
+        ret = i / (i + 1) * ((l + 1) * _g_l - 0.5 * _g_s)
+    else:
+        ret = l * _g_l + 0.5 * _g_s
+
+    return np.array(ret, dtype=float)
 
 
 """ Optics """
 
 
-def sellmeier(w: array_like, a: array_iter, b: array_iter):
+def sellmeier(w: array_like, a: array_iter, b: array_iter) -> ndarray:
+    r"""
+    The Sellmeier equation for calculating the refractive index of a material with the lists of coefficients
+    `a` and `b` for the wavelength `w`
+
+    $$
+    n = \sqrt{1 + \sum_i \frac{A_i\lambda^2}{\lambda^2 - B_i}}.
+    $$
+
+    :param w: The wavelength $\lambda$ (&mu;m).
+    :param a: A list of coefficients $A_i$.
+    :param b: A list of coefficients $B_i$ (&mu;m).
+    :return: (n) The refractive index $n$.
     """
-    :param w: The wavelength in &mu;m.
-    :param a: The $a$ coefficients.
-    :param b: The $b$ coefficients.
-    :return: The index of refraction for the wavelength w and the given material.
-    """
-    a, b = np.asarray(a), np.asarray(b)
+    w, a, b = np.asarray(w, dtype=float), np.asarray(a, dtype=float), np.asarray(b, dtype=float)
     tools.check_dimension(a.shape[0], 0, b)
     sum_term = np.sum([a_i * w ** 2 / (w ** 2 - b_i) for a_i, b_i in zip(a, b)], axis=0)
     return np.sqrt(1 + sum_term)

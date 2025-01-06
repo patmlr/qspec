@@ -26,49 +26,83 @@ title: qspec.delta_r4
 </em>
 ,&nbsp;
 <em class="sig-param">
-<span class="n"><span class="pre">delta_r</span></span>
+<span class="n"><span class="pre">dr</span></span>
+<span class="o"><span class="pre">=</span></span>
+<span class="default_value"><span class="pre">None</span></span>
 </em>
 ,&nbsp;
 <em class="sig-param">
-<span class="n"><span class="pre">delta_r_d</span></span>
+<span class="n"><span class="pre">dr_d</span></span>
+<span class="o"><span class="pre">=</span></span>
+<span class="default_value"><span class="pre">None</span></span>
 </em>
 ,&nbsp;
 <em class="sig-param">
 <span class="n"><span class="pre">v4</span></span>
+<span class="o"><span class="pre">=</span></span>
+<span class="default_value"><span class="pre num">1.0</span></span>
 </em>
 ,&nbsp;
 <em class="sig-param">
 <span class="n"><span class="pre">v4_ref</span></span>
+<span class="o"><span class="pre">=</span></span>
+<span class="default_value"><span class="pre num">1.0</span></span>
 </em>
-<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/physics.py#L1174-L1200' }}"><span class="sig-source">[source]</span></a>
+<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/dev-jekyll/qspec/physics.py#L1241-L1304' }}"><span class="sig-source">[source]</span></a>
 </dt>
-<dd class="field-body"><p></p>
+<dd class="field-body"><p>The difference of the mean square nuclear charge radius between two isotopes and its uncertainty
+    calculated from the Barrett radii and elastic electron scattering form factors
+
+    $$\begin{aligned}
+    \delta\!\langle r^4\rangle &= \left(\frac{R}{V_4}\right)^4
+    - \left(\frac{R_\mathrm{ref}}{V_{4,\mathrm{ref}}}\right)^4\\[2ex]
+    \Delta\delta\!\langle r^4\rangle &=
+    \sqrt{\left(\frac{4 R^3\Delta R}{V_4^4}\right)^2
+    + \left(\frac{4 R_\mathrm{ref}^3\Delta R_\mathrm{ref}}{V_{4,\mathrm{ref}}^4}\right)^2}.
+    \end{aligned}$$
+
+    If the uncertainty <code>dr_d</code> is specified, which is often much lower than <code>r_d</code> and <code>r_ref_d</code>,
+    an improved formula is used that gives smaller uncertainties
+
+    $$\begin{aligned}
+    \delta\!\langle r^4\rangle &= sd,
+    \quad s \coloneqq \left(\frac{R}{V_4}\right)^2 + \left(\frac{R_\mathrm{ref}}{V_{4,\mathrm{ref}}}\right)^2,
+    \quad d \coloneqq \left(\frac{R}{V_4}\right)^2 - \left(\frac{R_\mathrm{ref}}{V_{4,\mathrm{ref}}}\right)^2\\[2ex]
+    \Delta\delta\!\langle r^4\rangle &= \sqrt{\left(s\Delta d\right)^2
+    + \left(\frac{2dR}{V_4^2}\Delta R\right)^2
+    + \left(\frac{2dR_\mathrm{ref}}{V_{4,\mathrm{ref}}^2}\Delta R_\mathrm{ref}\right)^2}.
+    \end{aligned}$$
+
+    Here $d$ and $\Delta d$ are calculated using the small-uncertainty version of the <code>delta_r2</code> function
+    for the mean-square nuclear charge radius.</p>
 <dl class="field-list">
 <dt class="field-head">Parameters<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
 <dt>r<span class="classifier"><em>array_like</em></span></dt>
-<dd class="field-desc"><p>The Barrett radius of an isotope.</p></dd>
+<dd class="field-desc"><p>The Barrett radius $R$ of the first isotope (arb. units).</p></dd>
 <dt>r_d<span class="classifier"><em>array_like</em></span></dt>
-<dd class="field-desc"><p>The uncertainty of the Barrett radius.</p></dd>
+<dd class="field-desc"><p>The uncertainty of the Barrett radius $\Delta R$ of the first isotope ([<code>r</code>]).</p></dd>
 <dt>r_ref<span class="classifier"><em>array_like</em></span></dt>
-<dd class="field-desc"><p>The Barrett radius of a reference isotope.</p></dd>
+<dd class="field-desc"><p>The Barrett radius $R_\mathrm{ref}$ of the second isotope ([<code>r</code>]).</p></dd>
 <dt>r_ref_d<span class="classifier"><em>array_like</em></span></dt>
-<dd class="field-desc"><p>The uncertainty of the Barrett radius of the reference isotope.</p></dd>
-<dt>delta_r<span class="classifier"><em>array_like</em></span></dt>
-<dd class="field-desc"><p>The difference between the Barrett radius of the isotope and the reference isotope.</p></dd>
-<dt>delta_r_d<span class="classifier"><em>array_like</em></span></dt>
-<dd class="field-desc"><p>The uncertainty of the difference between
-     the Barrett radius of the isotope and the reference isotope.</p></dd>
+<dd class="field-desc"><p>The uncertainty of the Barrett radius $\Delta R_\mathrm{ref}$ of the second isotope ([<code>r</code>]).</p></dd>
+<dt>dr<span class="classifier"><em>array_like</em></span></dt>
+<dd class="field-desc"><p>The difference between the Barrett radii $\delta R = R - R_\mathrm{ref}$
+     of the first and second isotope ([<code>r</code>]).</p></dd>
+<dt>dr_d<span class="classifier"><em>array_like</em></span></dt>
+<dd class="field-desc"><p>The uncertainty of the difference between the Barrett radii $\Delta\delta R$
+     of the first and second isotope ([<code>r</code>]).</p></dd>
 <dt>v4<span class="classifier"><em>array_like</em></span></dt>
-<dd class="field-desc"><p>The V4 factor of the isotope.</p></dd>
+<dd class="field-desc"><p>The shape factor $V_4$ of the first isotope.</p></dd>
 <dt>v4_ref<span class="classifier"><em>array_like</em></span></dt>
-<dd class="field-desc"><p>The V4 factor of the reference isotope.</p></dd></dl>
+<dd class="field-desc"><p>The shape factor $V_{4,\mathrm{ref}}$ of the second isotope.</p></dd></dl>
 </dd><dt class="field-head">Returns<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>out<span class="classifier"><em>None</em></span></dt>
-<dd class="field-desc"><p>The difference of the mean quartic nuclear charge radius between two isotopes and its uncertainty.</p></dd></dl>
+<dt>(dr4, dr4_d)<span class="classifier"><em>(ndarray, ndarray)</em></span></dt>
+<dd class="field-desc"><p> The difference of the mean-quartic nuclear charge radius between two isotopes
+     $\delta\!\langle r^4\rangle$ and its uncertainty $\Delta\delta\!\langle r^4\rangle$ ([<code>r ** 4</code>])</p></dd></dl>
 </dd>
 </dl></dd>
 </dl>

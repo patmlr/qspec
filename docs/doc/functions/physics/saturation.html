@@ -10,7 +10,7 @@ title: qspec.saturation
 <span class="sig-prename"><span class="pre">qspec.</span></span><span class="sig-name"><span class="pre">saturation</span></span>
 <span class="sig-paren">&nbsp;(&nbsp;</span>
 <em class="sig-param">
-<span class="n"><span class="pre">i</span></span>
+<span class="n"><span class="pre">intensity</span></span>
 </em>
 ,&nbsp;
 <em class="sig-param">
@@ -24,26 +24,26 @@ title: qspec.saturation
 <em class="sig-param">
 <span class="n"><span class="pre">a_dipole</span></span>
 </em>
-<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/physics.py#L1080-L1089' }}"><span class="sig-source">[source]</span></a>
+<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/dev-jekyll/qspec/physics.py#L1087-L1098' }}"><span class="sig-source">[source]</span></a>
 </dt>
-<dd class="field-body"><p></p>
+<dd class="field-body"><p>The saturation parameter $s = I / I_0$, with the <code>saturation_intensity</code> $I_0$.</p>
 <dl class="field-list">
 <dt class="field-head">Parameters<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>i<span class="classifier"><em>array_like</em></span></dt>
-<dd class="field-desc"><p>The intensity of the laser (MHz).</p></dd>
+<dt>intensity<span class="classifier"><em>array_like</em></span></dt>
+<dd class="field-desc"><p>The intensity of the laser ($\mu$W/mm<sup>2</sup> = W/m<sup>2</sup>).</p></dd>
 <dt>f<span class="classifier"><em>array_like</em></span></dt>
-<dd class="field-desc"><p>The frequency of the transition (MHz).</p></dd>
+<dd class="field-desc"><p>The frequency $f$ of the transition $|i\rangle\rightarrow|k\rangle$ (MHz).</p></dd>
 <dt>a<span class="classifier"><em>array_like</em></span></dt>
-<dd class="field-desc"><p>The Einstein A coefficient (MHz).</p></dd>
+<dd class="field-desc"><p>The Einstein $A_{ki}$ coefficient (MHz).</p></dd>
 <dt>a_dipole<span class="classifier"><em>array_like</em></span></dt>
-<dd class="field-desc"><p>The reduced dipole coefficient of the transition (see algebra.a_dipole).</p></dd></dl>
+<dd class="field-desc"><p>The reduced dipole coefficient of the transition (see <code>qspec.a_dipole</code>).</p></dd></dl>
 </dd><dt class="field-head">Returns<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>out<span class="classifier"><em>None</em></span></dt>
-<dd class="field-desc"><p>The saturation parameter.</p></dd></dl>
+<dt>s<span class="classifier"><em>ndarray</em></span></dt>
+<dd class="field-desc"><p> The saturation parameter $s$</p></dd></dl>
 </dd>
 </dl></dd>
 </dl>

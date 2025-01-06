@@ -23,19 +23,20 @@ title: qspec.models.Convolved.set_val
 <span class="o"><span class="pre">=</span></span>
 <span class="default_value"><span class="pre bool">False</span></span>
 </em>
-<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/models\_convolved.py#L51-L58' }}"><span class="sig-source">[source]</span></a>
+<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/dev-jekyll/qspec/models\_convolved.py#L52-L68' }}"><span class="sig-source">[source]</span></a>
 </dt>
-<dd class="field-body"><p></p>
+<dd class="field-body"><p>Set a specific parameter value.</p>
 <dl class="field-list">
 <dt class="field-head">Parameters<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>i<span class="classifier"><em>None</em></span></dt>
-<dd class="field-desc"><p></p></dd>
-<dt>val<span class="classifier"><em>None</em></span></dt>
-<dd class="field-desc"><p></p></dd>
-<dt>force<span class="classifier"><em>None</em></span></dt>
-<dd class="field-desc"><p></p></dd></dl>
+<dt>i<span class="classifier"><em>numpy.ndarray[Any | numpy.dtype[numpy.integer], numpy.integer, int, str]</em></span></dt>
+<dd class="field-desc"><p>The index (<code>int</code>) or the name (<code>str</code>) of the parameter.</p></dd>
+<dt>val<span class="classifier"><em>array_like</em></span></dt>
+<dd class="field-desc"><p>The new parameter value.</p></dd>
+<dt>force<span class="classifier"><em>bool</em></span></dt>
+<dd class="field-desc"><p>Force the parameter to take exactly the new value.
+         If <code>False</code>, the parameter is converted to the correct format.</p></dd></dl>
 </dd><dt class="field-head">Returns<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>

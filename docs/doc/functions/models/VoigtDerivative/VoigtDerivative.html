@@ -8,13 +8,19 @@ title: qspec.models.VoigtDerivative
 <dl class="py function">
 <dt class="func-sig">
 <span class="sig-prename"><span class="pre">qspec.models.</span></span><span class="sig-classname"><span class="pre">VoigtDerivative</span></span>
-<span class="sig-paren">&nbsp;(&nbsp;</span><span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/models\_spectrum.py#L178-L195' }}"><span class="sig-source">[source]</span></a>
+<span class="sig-paren">&nbsp;(&nbsp;</span><span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/dev-jekyll/qspec/models\_spectrum.py#L261-L290' }}"><span class="sig-source">[source]</span></a>
 </dt>
-<dd class="field-body"><p>The first derivative of a Voigt peak function.</p>
+<dd class="field-body"><p>The first derivative of a Voigt peak function of the form
+
+        $$\begin{aligned}
+        f(x, \Gamma, \sigma) &= -\frac{\sqrt{2}\delta\nu}{\sigma}\frac{\mathrm{Re}[z w(z)]}
+        {\mathrm{Re}[w(i\Gamma/(\sqrt{8}\sigma))]},
+        \quad z = \frac{2x + i\Gamma}{\sqrt{8}\sigma},\\[2ex]
+        \delta\nu &= 0.5346\Gamma + \sqrt{0.2166\Gamma^2 + 8\log(2)\sigma^2},
+        \end{aligned}$$
+
+        with the complex Faddeeva function $w$.</p>
 <dl class="field-list">
-<dd class="field-par">
-<dl></dl>
-</dd>
 </dl></dd>
 </dl>
 </article>

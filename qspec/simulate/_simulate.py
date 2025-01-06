@@ -460,7 +460,7 @@ class Geometry:
         """
         :param theta: An interval or a list of intervals for the angle 'theta'.
         :param phi: An interval or a list of intervals for the angle 'phi'.
-        :returns: None. Merges overlapping intervals and calculates the solid angle
+        :returns: Merges overlapping intervals and calculates the solid angle
          corresponding to the defined intervals.
         """
         theta, phi = np.asarray(theta), np.asarray(phi)
@@ -484,7 +484,7 @@ class Geometry:
         """
         :param weights: None or a matrix of weights for the defined disjoint intervals.
          The shape of the weights must fulfill weights.shape == (len(self.theta_intervals), len(self.phi_intervals)).
-        :returns: None. Sets the 'weights' attribute of the geometry object.
+        :returns: Sets the 'weights' attribute of the geometry object.
         """
         if weights is not None:
             weights = np.asarray(weights)
@@ -496,7 +496,7 @@ class Geometry:
     def set_pdf(self, pdf: Union[Callable, None]):
         """
         :param pdf: None or a callable which accepts two arguments (theta, phi).
-        :returns: None. Sets the 'pdf' attribute of the Geometry object.
+        :returns: Sets the 'pdf' attribute of the Geometry object.
         """
         if pdf is not None:
             try:
@@ -509,7 +509,7 @@ class Geometry:
         """
         :param r: None or a 3x3 matrix defining a rotation.Therefore, dot(r, r.T) = I and Det(r) = 1 must be fulfilled.
          If r == None, the Identity matrix is used.
-        :returns: None. Sets the 'R' attribute of the Geometry object.
+        :returns: Sets the 'R' attribute of the Geometry object.
         """
         if r is None:
             r = tools.Rotation()
@@ -625,7 +625,6 @@ class ScatteringRate:
 
         :raises ValueError: The atom has to consist of a single closed transition between two fine-structure states.
          Their common nucleus can have an arbitrary spin.
-        :returns: None.
         """
         s, l, j, i = self.state_l[0].s, self.state_l[0].l, self.state_l[0].j, self.state_l[0].i
         if any(state_l.s != s or state_l.l != l or state_l.j != j or state_l.i != i for state_l in self.state_l):
@@ -649,7 +648,7 @@ class ScatteringRate:
     def set_polarization(self, polarization: Polarization = None):
         """
         :param polarization: The polarization object. If None, the light is linearly polarized along the z-axis.
-        :returns: None. Sets the polarization object and the local polarization vector 'e_l'.
+        :returns: Sets the polarization object and the local polarization vector 'e_l'.
         """
         self.polarization = polarization
         if self.polarization is None:
@@ -668,7 +667,7 @@ class ScatteringRate:
         """
         Define lower and upper states.
 
-        :returns: None.
+        :returns:
         """
         state_l = np.array([state for state in self.atom if state.label == self.atom.decay_map.labels[self.i_decay][0]])
         state_u = np.array([state for state in self.atom if state.label == self.atom.decay_map.labels[self.i_decay][1]])
@@ -683,7 +682,7 @@ class ScatteringRate:
 
     def set_x0(self):
         """
-        :returns: None. Updates the resonance positions.
+        :returns: Updates the resonance positions.
         """
         self.x0 = [[state_u.freq - state_l.freq - self.laser.freq
                     for state_u in self.state_u] for state_l in self.state_l]
@@ -691,7 +690,7 @@ class ScatteringRate:
 
     def generate_dipoles(self):
         """
-        :returns: None. Generates an array of frequencies which cover the entire spectrum
+        :returns: Generates an array of frequencies which cover the entire spectrum
          and saves it to the x attribute of the Spectrum object.
         """
         i = self.state_l[0].i
@@ -720,7 +719,7 @@ class ScatteringRate:
     def set_b(self, b: array_like):
         """
         :param b: The magnetic field vector.
-        :returns: None. Sets the new magnetic field for all states
+        :returns: Sets the new magnetic field for all states
          and updates the quantization axis and the resonance positions.
         """
         if b is None:
@@ -856,7 +855,7 @@ class ScatteringRate:
          as the spectrum for the detection with the complete solid angle 4 pi.
          If True, the difference between the two spectra is plotted as well. Default is False.
         :param step: The step size for the integration of the scattering rate.
-        :returns: None. Plots the spectrum for the given geometry
+        :returns: Plots the spectrum for the given geometry
          and that for the detection with the complete solid angle 4 pi.
         """
         plt.figure(figsize=(8, 4))
@@ -970,7 +969,7 @@ class ScatteringRate:
         :param mode: Either '3d' for a surface plot or anything else for a color-mesh plot.
         :param save: The path where to save the plot. If None, the plot will not be saved.
         :param show: Whether to show the plot.
-        :returns: None. Optionally, two plots are drawn for theta and phi as the y-axes and saved.
+        :returns: Optionally, two plots are drawn for theta and phi as the y-axes and saved.
         """
         x = self.generate_x()
         theta = np.linspace(-np.pi / 2., np.pi / 2., 2 ** n + 1)
@@ -1033,7 +1032,7 @@ class ScatteringRate:
 
     def plot_setup(self):
         """
-        :returns: None. Creates a 3D-plot of the physical situation, including the axis
+        :returns: Creates a 3D-plot of the physical situation, including the axis
          of the magnetic field (quantization axis), the real and imaginary axis of the polarization
          and the are which is covered by the detector geometry.
         """

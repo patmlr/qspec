@@ -30,22 +30,22 @@ title: qspec.models.Splitter
 <span class="o"><span class="pre">=</span></span>
 <span class="default_value"><span class="pre">None</span></span>
 </em>
-<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/models\_splitter.py#L120-L149' }}"><span class="sig-source">[source]</span></a>
+<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/dev-jekyll/qspec/models\_splitter.py#L123-L154' }}"><span class="sig-source">[source]</span></a>
 </dt>
 <dd class="field-body"><p>The abstract base class for Hyperfine structure models.</p>
 <dl class="field-list">
 <dt class="field-head">Parameters<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>model<span class="classifier"><em>None</em></span></dt>
+<dt>model<span class="classifier"><em>qspec.models._base.Model</em></span></dt>
 <dd class="field-desc"><p>A submodel whose parameters are adopted by this model.</p></dd>
-<dt>i<span class="classifier"><em>None</em></span></dt>
-<dd class="field-desc"><p>The nuclear spin.</p></dd>
-<dt>j_l<span class="classifier"><em>None</em></span></dt>
-<dd class="field-desc"><p>The total lower state electron angular momentum.</p></dd>
-<dt>j_u<span class="classifier"><em>None</em></span></dt>
-<dd class="field-desc"><p>The total upper state electron angular momentum.</p></dd>
-<dt>label<span class="classifier"><em>None</em></span></dt>
+<dt>i<span class="classifier"><em>quant_like</em></span></dt>
+<dd class="field-desc"><p>The nuclear spin $I$.</p></dd>
+<dt>j_l<span class="classifier"><em>quant_like</em></span></dt>
+<dd class="field-desc"><p>The total lower state electron angular momentum $J$.</p></dd>
+<dt>j_u<span class="classifier"><em>quant_like</em></span></dt>
+<dd class="field-desc"><p>The total upper state electron angular momentum $J^\prime$.</p></dd>
+<dt>label<span class="classifier"><em>str</em></span></dt>
 <dd class="field-desc"><p>A label for the <code>Splitter</code> (isotope / isomer / transition).</p></dd></dl>
 </dd>
 </dl></dd>

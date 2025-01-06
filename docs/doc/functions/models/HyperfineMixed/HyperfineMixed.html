@@ -27,29 +27,34 @@ title: qspec.models.HyperfineMixed
 ,&nbsp;
 <em class="sig-param">
 <span class="n"><span class="pre">label</span></span>
+<span class="o"><span class="pre">=</span></span>
+<span class="default_value"><span class="pre">None</span></span>
 </em>
 ,&nbsp;
 <em class="sig-param">
 <span class="n"><span class="pre">config</span></span>
+<span class="o"><span class="pre">=</span></span>
+<span class="default_value"><span class="pre">None</span></span>
 </em>
-<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/models\_splitter.py#L352-L478' }}"><span class="sig-source">[source]</span></a>
+<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/dev-jekyll/qspec/models\_splitter.py#L384-L530' }}"><span class="sig-source">[source]</span></a>
 </dt>
-<dd class="field-body"><p>Hyperfine-mixing model based on https://doi.org/10.1103/PhysRevA.55.2728 [1].</p>
+<dd class="field-body"><p>Hyperfine-mixing model based on [<a href="https://doi.org/10.1103/PhysRevA.55.2728">
+        W. R. Johnson <i>et al.</i>, Phys. Rev. A <b>55</b>, 2728 (1997)</a>].</p>
 <dl class="field-list">
 <dt class="field-head">Parameters<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>model<span class="classifier"><em>None</em></span></dt>
+<dt>model<span class="classifier"><em>qspec.models._base.Model</em></span></dt>
 <dd class="field-desc"><p>A submodel whose parameters are adopted by this model.</p></dd>
-<dt>i<span class="classifier"><em>None</em></span></dt>
-<dd class="field-desc"><p>The nuclear spin.</p></dd>
-<dt>j_l<span class="classifier"><em>None</em></span></dt>
-<dd class="field-desc"><p>The total lower state electron angular momentum.</p></dd>
-<dt>j_u<span class="classifier"><em>None</em></span></dt>
-<dd class="field-desc"><p>The total upper state electron angular momentum.</p></dd>
-<dt>label<span class="classifier"><em>None</em></span></dt>
+<dt>i<span class="classifier"><em>quant_like</em></span></dt>
+<dd class="field-desc"><p>The nuclear spin $I$.</p></dd>
+<dt>j_l<span class="classifier"><em>quant_like</em></span></dt>
+<dd class="field-desc"><p>The total lower state electron angular momentum $J$.</p></dd>
+<dt>j_u<span class="classifier"><em>quant_like</em></span></dt>
+<dd class="field-desc"><p>The total upper state electron angular momentum $J^\prime$.</p></dd>
+<dt>label<span class="classifier"><em>str</em></span></dt>
 <dd class="field-desc"><p>A label for the <code>Splitter</code> (isotope / isomer / transition).</p></dd>
-<dt>config<span class="classifier"><em>None</em></span></dt>
+<dt>config<span class="classifier"><em>dict</em></span></dt>
 <dd class="field-desc"><p>The configuration of the hyperfine-induced mixing. This is a dictionary such as
          <code>{'enabled_l'=False, 'enabled_u'=False, 'Jl'=[0.5, ], 'Ju'=[0.5, ], 'Tl'=[[1.]], 'Tu'=[[1.]], 'fl'=[0., ], 'fu'=[0., ], 'mu'=0.}</code>,
          where 'enabled_l'/'enabled_u' decide if the corresponding lower/upper J mix, 'Jl'/'Ju' are lists of lower/upper

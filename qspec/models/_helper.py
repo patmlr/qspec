@@ -15,7 +15,8 @@ from qspec.models import _base, _convolved, _splitter, _spectrum
 __all__ = ['gen_model', 'find_model', 'find_models']
 
 
-def gen_model(ijj, shape: Union[str, type, _spectrum.Spectrum] = None, qi: bool = False, hf_mixing: bool = False,
+def gen_model(ijj, shape: Union[str, type, _spectrum.Spectrum] = None,
+              qi: bool = False, hf_mixing: bool = False, hf_config: dict = None,
               n_peaks: int = None, offsets: Union[int, list] = None, x_cuts: Union[int, float, list] = None,
               convolve: Union[str, type, _spectrum.Spectrum] = None) -> _base.Model:
     """
@@ -26,6 +27,7 @@ def gen_model(ijj, shape: Union[str, type, _spectrum.Spectrum] = None, qi: bool 
     :param shape: A str representation of or a `Spectrum` type.
     :param qi: Whether to use a quantum interference model.
     :param hf_mixing: Whether to use a hyperfine-induced mixing model. Not implemented for `qi=True`.
+    :param hf_config: A `dict` containing the configuration for the hf mixing. Only used if `hf_mixing=True`.
     :param n_peaks: The number of "peaks per resonance" or "lineshape duplicates".
     :param offsets: The orders of the offset polynomials of the separate x-axis intervals.
      Must be a list or a single value. In the former case `len(offsets) == len(x_cuts) + 1` must hold.
@@ -72,8 +74,12 @@ def gen_model(ijj, shape: Union[str, type, _spectrum.Spectrum] = None, qi: bool 
             raise ValueError('convolve must be a str representation of or a Convolved type.')
 
     spl = _splitter.gen_splitter_model(qi=qi, hf_mixing=hf_mixing)
-    npeaks_model = _splitter.SplitterSummed([spl(shape(), i, j_l, j_u, 'HF{}'.format(n))
-                                             for n, (i, j_l, j_u) in enumerate(ijj)])
+    if hf_mixing:
+        npeaks_model = _splitter.SplitterSummed([spl(shape(), i, j_l, j_u, 'HF{}'.format(n), hf_config)
+                                                 for n, (i, j_l, j_u) in enumerate(ijj)])
+    else:
+        npeaks_model = _splitter.SplitterSummed([spl(shape(), i, j_l, j_u, 'HF{}'.format(n))
+                                                 for n, (i, j_l, j_u) in enumerate(ijj)])
 
     if n_peaks is not None:
         npeaks_model = _base.NPeak(model=npeaks_model, n_peaks=n_peaks)
@@ -84,7 +90,7 @@ def gen_model(ijj, shape: Union[str, type, _spectrum.Spectrum] = None, qi: bool 
     return offset_model
     
 
-def find_model(model: _base.Model, sub_model: Union[_base.Model, type]):
+def find_model(model: _base.Model, sub_model: Union[_base.Model, type]) -> Optional[_base.Model]:
     """
     :param model: The model to search in.
     :param sub_model: The submodel to find.
@@ -104,7 +110,8 @@ def find_model(model: _base.Model, sub_model: Union[_base.Model, type]):
     return find_model(_model, sub_model)
 
 
-def find_models(model: _base.Model, sub_model: Union[_base.Model, type], model_list: Iterable = None):
+def find_models(model: _base.Model, sub_model: Union[_base.Model, type], model_list: Iterable = None) \
+        -> list[_base.Model]:
     """
     :param model: The model to search in.
     :param sub_model: The submodel to find.

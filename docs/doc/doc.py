@@ -6,7 +6,7 @@ from docutils.core import publish_parts
 from qspec.qtypes import *
 
 FOLDER_FILES = {'models', 'simulate', 'analyze'}
-FILES = sorted(['physics', 'algebra', 'models', 'analyze', 'simulate', 'tools', 'stats'])  # 'physics', 'algebra', 'models', 'analyze', 'simulate', 'tools', 'stats'
+FILES = sorted(['models', 'physics'])  # 'physics', 'algebra', 'models', 'analyze', 'simulate', 'tools', 'stats'
 
 
 def is_num(val):
@@ -51,6 +51,8 @@ def docstring_to_html(rest):
     #         break
     #     j = i + 7 + html[i+7:].find('`')
     #     html = html[:i] + '$' + html[i+7:j] + '$' + html[j+1:]
+    if rest and rest[0] == '`':
+        rest = '<code>' + rest[1:]
     html = rest.replace(' `', ' <code>').replace('(`', '(<code>').replace('[`', '[<code>').replace('`', '</code>')
     return html
 
@@ -250,43 +252,47 @@ def _gen_func(f, file, temp, namespace, funcs, func_sig, func_doc):
         desc = desc[:j].strip().strip('\n')
     html += '\n' + temp[i].replace('_description_', docstring_to_html(desc))
 
-    # Parameters
     html += '\n' + temp[i + 1]
-    i = temp.index('<!--p>pars-h</p-->') + 1
-    if func_sig[f].parameters:
-        html += '\n' + temp[i]
-    i = temp.index('<!--p>pars</p-->') + 1
-    html += '\n' + '\n'.join(temp[i:i+2])
-    for p, p_sig in func_sig[f].parameters.items():
-        if p == 'self':
-            continue
-        p_desc = func_doc[f]
-        if p_desc is None:
-            p_desc = ''
-        else:
-            j = p_desc.find(f':param {p}:') + len(f':param {p}:')
-            if j == -1:
+
+    # Parameters
+    if len([k for k in func_sig[f].parameters.keys() if k != 'self']):
+        i = temp.index('<!--p>pars-h</p-->') + 1
+        if func_sig[f].parameters:
+            html += '\n' + temp[i]
+        i = temp.index('<!--p>pars</p-->') + 1
+        html += '\n' + '\n'.join(temp[i:i+2])
+        for p, p_sig in func_sig[f].parameters.items():
+            if p == 'self':
+                continue
+            p_desc = func_doc[f]
+            if p_desc is None:
                 p_desc = ''
             else:
-                k = p_desc[j:].find(':param')
-                if k != -1:
-                    k += j
+                j = p_desc.find(f':param {p}:') + len(f':param {p}:')
+                if j == -1:
+                    p_desc = ''
                 else:
-                    k = p_desc[j:].find(':return')
+                    k = p_desc[j:].find(':param')
                     if k != -1:
                         k += j
-                p_desc = p_desc[j:k].strip().strip('\n')
-        anno = p_sig.annotation
-        html += ('\n' + '\n'.join(temp[i+2:i+4])
-                 .replace('_par_', p)
-                 .replace('_par-type_', type_to_str(anno))
-                 .replace('_par-description_', docstring_to_html(p_desc)))
-    html += '\n'.join(temp[i+4:i+6])
+                    else:
+                        k = p_desc[j:].find(':return')
+                        if k != -1:
+                            k += j
+                        else:
+                            k = p_desc[j:].find(':raise')
+                            if k != -1:
+                                k += j
+                    p_desc = p_desc[j:k].strip().strip('\n')
+            anno = p_sig.annotation
+            html += ('\n' + '\n'.join(temp[i+2:i+4])
+                     .replace('_par_', p)
+                     .replace('_par-type_', type_to_str(anno))
+                     .replace('_par-description_', docstring_to_html(p_desc)))
+        html += '\n'.join(temp[i+4:i+6])
 
     # Returns
-    if class_flag == 1:
-        i = temp.index('<!--p>rets</p-->') + 1
-    else:
+    if class_flag != 1:
         i = temp.index('<!--p>rets-h</p-->') + 1
         html += temp[i]
         i = temp.index('<!--p>rets</p-->') + 1
@@ -311,12 +317,36 @@ def _gen_func(f, file, temp, namespace, funcs, func_sig, func_doc):
         else:
             ret = 'out'
 
+        r_desc = r_desc[:r_desc.find(':raise')]
+
         anno = func_sig[f].return_annotation
         html += ('\n' + '\n'.join(temp[i+2:i+4])
                  .replace('_ret_', ret)
                  .replace('_ret-type_', type_to_str(anno))
                  .replace('_ret-description_', docstring_to_html(r_desc)))
         html += '\n'.join(temp[i+4:i+6])
+
+    # Raises
+    if func_doc[f] is None or ':raise' not in func_doc[f]:
+        i = temp.index('<!--p>raises</p-->') + 1
+    else:
+        i = temp.index('<!--p>raises-h</p-->') + 1
+        html += temp[i]
+        i = temp.index('<!--p>raises</p-->') + 1
+        html += '\n' + '\n'.join(temp[i:i+2])
+
+        r_desc = func_doc[f]
+        k = r_desc.find(':raise')
+        l = k + r_desc[k+1:].find(':') + 2
+        k += r_desc[k:].find(' ')
+        err = r_desc[k:l-1].strip()
+        r_desc = r_desc[l:].strip().strip('\n')
+
+        html += ('\n' + '\n'.join(temp[i+2:i+4])
+                 .replace('_err_', err)
+                 .replace('_raise-description_', docstring_to_html(r_desc)))
+        html += '\n'.join(temp[i+4:i+6])
+
 
     html += '\n' + temp[i+6]
     html += '\n'.join(temp[i+8:])
@@ -385,7 +415,7 @@ def gen_functions():
 
 
 if __name__ == '__main__':
-    gen_table()
-    gen_doc()
-    gen_modules()
+    # gen_table()
+    # gen_doc()
+    # gen_modules()
     gen_functions()

@@ -16,22 +16,26 @@ title: qspec.models.fwhm_voigt
 <em class="sig-param">
 <span class="n"><span class="pre">sigma</span></span>
 </em>
-<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/models\_spectrum.py#L25-L33' }}"><span class="sig-source">[source]</span></a>
+<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/dev-jekyll/qspec/models\_spectrum.py#L26-L41' }}"><span class="sig-source">[source]</span></a>
 </dt>
-<dd class="field-body"><p></p>
+<dd class="field-body"><p>The full width at half maximum (FWHM) of a Voigt profile
+
+    $$
+    \delta\nu = 0.5346\Gamma + \sqrt{0.2166\Gamma^2 + 8\log(2)\sigma^2}
+    $$</p>
 <dl class="field-list">
 <dt class="field-head">Parameters<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>gamma<span class="classifier"><em>None</em></span></dt>
-<dd class="field-desc"><p>The FWHM of the Lorentzian.</p></dd>
-<dt>sigma<span class="classifier"><em>None</em></span></dt>
-<dd class="field-desc"><p>The standard deviation of the Gaussian.</p></dd></dl>
+<dt>gamma<span class="classifier"><em>array_like</em></span></dt>
+<dd class="field-desc"><p>The FWHM of the Lorentzian $\Gamma$ (arb. unit).</p></dd>
+<dt>sigma<span class="classifier"><em>array_like</em></span></dt>
+<dd class="field-desc"><p>The standard deviation of the Gaussian $\sigma$ ([<code>gamma</code>]).</p></dd></dl>
 </dd><dt class="field-head">Returns<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>out<span class="classifier"><em>None</em></span></dt>
-<dd class="field-desc"><p>The FWHM of a Voigt profile.</p></dd></dl>
+<dt>out<span class="classifier"><em>ndarray</em></span></dt>
+<dd class="field-desc"><p>The FWHM $\delta\nu$ of a Voigt profile</p></dd></dl>
 </dd>
 </dl></dd>
 </dl>

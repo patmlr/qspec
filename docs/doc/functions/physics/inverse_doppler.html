@@ -32,7 +32,7 @@ title: qspec.inverse_doppler
 <span class="o"><span class="pre">=</span></span>
 <span class="default_value"><span class="pre bool">False</span></span>
 </em>
-<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/physics.py#L452-L526' }}"><span class="sig-source">[source]</span></a>
+<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/dev-jekyll/qspec/physics.py#L452-L528' }}"><span class="sig-source">[source]</span></a>
 </dt>
 <dd class="field-body"><p>The velocity
     $$\begin{aligned}v &= \frac{c}{s}\left[\cos(\alpha) \pm (f_\mathrm{atom}/f_\mathrm{lab})\sqrt{s - 1}\right]\\[2ex]
@@ -53,12 +53,12 @@ title: qspec.inverse_doppler
 <dt>mode<span class="classifier"><em>str</em></span></dt>
 <dd class="field-desc"><p>The mode how to handle <code>nan</code> values and ambiguous velocities. Available options are:
     <ul>
-    <li></code>'raise-raise'</code>: Raise an error if there are <code>nan</code> values or if the velocity is ambiguous.</li>
-    <li></code>'raise-small'</code>: Raise an error if there are <code>nan</code> values and return the smaller velocity.</li>
-    <li></code>'raise-large'</code>: Raise an error if there are <code>nan</code> values and return the larger velocity.</li>
-    <li></code>'isnan-raise'</code>: Ignore <code>nan</code> values and raise an error if the velocity is ambiguous.</li>
-    <li></code>'isnan-small'</code>: Ignore <code>nan</code> values and return the smaller velocity.</li>
-    <li></code>'isnan-large'</code>: Ignore <code>nan</code> values and return the larger velocity.</li>
+    <li> <code>'raise-raise'</code>: Raise an error if there are <code>nan</code> values or if the velocity is ambiguous.</li>
+    <li> <code>'raise-small'</code>: Raise an error if there are <code>nan</code> values and return the smaller velocity.</li>
+    <li> <code>'raise-large'</code>: Raise an error if there are <code>nan</code> values and return the larger velocity.</li>
+    <li> <code>'isnan-raise'</code>: Ignore <code>nan</code> values and raise an error if the velocity is ambiguous.</li>
+    <li> <code>'isnan-small'</code>: Ignore <code>nan</code> values and return the smaller velocity.</li>
+    <li> <code>'isnan-large'</code>: Ignore <code>nan</code> values and return the larger velocity.</li>
     </ul></p></dd>
 <dt>return_mask<span class="classifier"><em>bool</em></span></dt>
 <dd class="field-desc"><p>Whether the mask where the velocity is ambiguous is returned as a second argument.</p></dd></dl>
@@ -67,7 +67,14 @@ title: qspec.inverse_doppler
 <dl>
 <dt>out<span class="classifier"><em>(ndarray, Optional[ndarray])</em></span></dt>
 <dd class="field-desc"><p>the velocity $v$ required to shift <code>f_lab</code> to <code>f_atom</code>.
-     Optionally returns the mask where the velocity is ambiguous (m/s).</p></dd></dl>
+     Optionally returns the mask where the velocity is ambiguous (m/s).
+    </p></dd></dl>
+</dd><dt class="field-head">Raises<span class="colon">:</span></dt>
+<dd class="field-par">
+<dl>
+<dt>ValueError</dt>
+<dd class="field-desc"><p><code>mode</code> must be <code>'raise-raise'</code>, <code>'raise-small'</code>, <code>'raise-large'</code>, <code>'isnan-raise'</code>,
+     <code>'isnan-small'</code>, or <code>'isnan-large'</code>. For additionally raised errors, see the description of the <code>mode</code> parameter.</p></dd></dl>
 </dd>
 </dl></dd>
 </dl>

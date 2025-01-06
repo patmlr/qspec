@@ -24,27 +24,27 @@ title: qspec.models.hf_int
 <em class="sig-param">
 <span class="n"><span class="pre">transitions</span></span>
 </em>
-<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/models\_splitter.py#L107-L117' }}"><span class="sig-source">[source]</span></a>
+<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/dev-jekyll/qspec/models\_splitter.py#L110-L120' }}"><span class="sig-source">[source]</span></a>
 </dt>
 <dd class="field-body"><p></p>
 <dl class="field-list">
 <dt class="field-head">Parameters<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>i<span class="classifier"><em>None</em></span></dt>
-<dd class="field-desc"><p>The nuclear spin.</p></dd>
-<dt>j_l<span class="classifier"><em>None</em></span></dt>
-<dd class="field-desc"><p>The total lower state electron angular momentum.</p></dd>
-<dt>j_u<span class="classifier"><em>None</em></span></dt>
-<dd class="field-desc"><p>The total upper state electron angular momentum.</p></dd>
-<dt>transitions<span class="classifier"><em>None</em></span></dt>
+<dt>i<span class="classifier"><em>quant_like</em></span></dt>
+<dd class="field-desc"><p>The nuclear spin $I$.</p></dd>
+<dt>j_l<span class="classifier"><em>quant_like</em></span></dt>
+<dd class="field-desc"><p>The total lower state electron angular momentum $J$.</p></dd>
+<dt>j_u<span class="classifier"><em>quant_like</em></span></dt>
+<dd class="field-desc"><p>The total upper state electron angular momentum $J^\prime$.</p></dd>
+<dt>transitions<span class="classifier"><em>Iterable</em></span></dt>
 <dd class="field-desc"><p>A list of electronic transition properties. The first two properties of each entry should be
      f_l and f_u the total angular momenta of lower and upper state.</p></dd></dl>
 </dd><dt class="field-head">Returns<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>out<span class="classifier"><em>None</em></span></dt>
-<dd class="field-desc"><p>The relative line intensities.</p></dd></dl>
+<dt>out<span class="classifier"><em>list[numpy.ndarray[Any | numpy.dtype[numpy.floating], numpy.floating, float]]</em></span></dt>
+<dd class="field-desc"><p>The relative line intensities</p></dd></dl>
 </dd>
 </dl></dd>
 </dl>

@@ -8,13 +8,15 @@ title: qspec.models.VoigtCEC
 <dl class="py function">
 <dt class="func-sig">
 <span class="sig-prename"><span class="pre">qspec.models.</span></span><span class="sig-classname"><span class="pre">VoigtCEC</span></span>
-<span class="sig-paren">&nbsp;(&nbsp;</span><span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/models\_spectrum.py#L218-L237' }}"><span class="sig-source">[source]</span></a>
+<span class="sig-paren">&nbsp;(&nbsp;</span><span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/dev-jekyll/qspec/models\_spectrum.py#L323-L350' }}"><span class="sig-source">[source]</span></a>
 </dt>
-<dd class="field-body"><p>A series of <code>n</code> Voigt peak functions shifted by <code>i * shift</code> and scaled by <code>i * ratio</code>, where <code>0 <= i <= n</code>.</p>
+<dd class="field-body"><p>A series of <code>n + 1</code> <code>Voigt</code> peak functions of the form
+
+        $$
+        f[n](x, \Gamma, \sigma, x_\mathrm{cec}, p_\mathrm{cec}) = \sum\limits_{k = 0}^n p_\mathrm{cec}^k\mathrm{Voigt}
+        (x - k x_\mathrm{cec}, \Gamma, \sigma).
+        $$</p>
 <dl class="field-list">
-<dd class="field-par">
-<dl></dl>
-</dd>
 </dl></dd>
 </dl>
 </article>

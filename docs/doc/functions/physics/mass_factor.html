@@ -10,55 +10,51 @@ title: qspec.mass_factor
 <span class="sig-prename"><span class="pre">qspec.</span></span><span class="sig-name"><span class="pre">mass_factor</span></span>
 <span class="sig-paren">&nbsp;(&nbsp;</span>
 <em class="sig-param">
-<span class="n"><span class="pre">m</span></span>
+<span class="n"><span class="pre">m0</span></span>
 </em>
 ,&nbsp;
 <em class="sig-param">
-<span class="n"><span class="pre">m_ref</span></span>
+<span class="n"><span class="pre">m1</span></span>
 </em>
 ,&nbsp;
 <em class="sig-param">
-<span class="n"><span class="pre">m_d</span></span>
-<span class="o"><span class="pre">=</span></span>
-<span class="default_value"><span class="pre num">0</span></span>
+<span class="n"><span class="pre">m0_d</span></span>
 </em>
 ,&nbsp;
 <em class="sig-param">
-<span class="n"><span class="pre">m_ref_d</span></span>
-<span class="o"><span class="pre">=</span></span>
-<span class="default_value"><span class="pre num">0</span></span>
+<span class="n"><span class="pre">m1_d</span></span>
 </em>
-,&nbsp;
-<em class="sig-param">
-<span class="n"><span class="pre">k_inf</span></span>
-<span class="o"><span class="pre">=</span></span>
-<span class="default_value"><span class="pre bool">True</span></span>
-</em>
-<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/physics.py#L1114-L1142' }}"><span class="sig-source">[source]</span></a>
+<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/dev-jekyll/qspec/physics.py#L1133-L1174' }}"><span class="sig-source">[source]</span></a>
 </dt>
-<dd class="field-body"><p></p>
+<dd class="field-body"><p>The specific mass factor required to calculate modified isotope shifts or charge radii and its uncertainty
+
+    $$\begin{aligned}
+    \mu &= \frac{m_0 m_1}{m_0 - m_1}\\
+    \Delta\mu &= \mu\sqrt{\left(\frac{\Delta m_0}{m_0} - \frac{\Delta m_0}{m_0 - m_1}\right)^2
+    + \left(\frac{\Delta m_1}{m_1} + \frac{\Delta m_1}{m_0 - m_1}\right)^2}.
+    \end{aligned}$$
+
+    Use $m_0 = M_0 + m_\mathrm{e}$ and/or $m_1 = M_1 + m_\mathrm{e}$ with the nuclear masses $M_0$ and $M_1$
+    and the electron mass $m_\mathrm{e}$ for King-plots.
+    Compare (6.4) with (3.17) in [W. H. King, Isotope shifts in atomic spectra (1984)].</p>
 <dl class="field-list">
 <dt class="field-head">Parameters<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>m<span class="classifier"><em>array_like</em></span></dt>
-<dd class="field-desc"><p>The mass of the isotope (amu).</p></dd>
-<dt>m_ref<span class="classifier"><em>array_like</em></span></dt>
-<dd class="field-desc"><p>The mass of the reference isotope (amu). Must be a scalar or have the same shape as 'm'.</p></dd>
-<dt>m_d<span class="classifier"><em>array_like</em></span></dt>
-<dd class="field-desc"><p>The uncertainty of the mass of the isotope (amu). Must be a scalar or have the same shape as 'm'.</p></dd>
-<dt>m_ref_d<span class="classifier"><em>array_like</em></span></dt>
-<dd class="field-desc"><p>The uncertainty of the mass of the reference isotope (amu).
-     Must be a scalar or have the same shape as 'm'.</p></dd>
-<dt>k_inf<span class="classifier"><em>bool</em></span></dt>
-<dd class="field-desc"><p>Whether the normal mass-shift factor K(NMS) is defined mass independently
-     as m_e * T(inf) (= True) or as m_e * T(A_ref) (= False). Compare (6.4) with (3.17)
-     in [W. H. King, Isotope shifts in atomic spectra (1984)].</p></dd></dl>
+<dt>m0<span class="classifier"><em>array_like</em></span></dt>
+<dd class="field-desc"><p>The mass $m_0$ of the first isotope (u).</p></dd>
+<dt>m1<span class="classifier"><em>array_like</em></span></dt>
+<dd class="field-desc"><p>The mass $m_1$ of the second isotope (u).</p></dd>
+<dt>m0_d<span class="classifier"><em>array_like</em></span></dt>
+<dd class="field-desc"><p>The mass uncertainty $\Delta m_0$ of the first isotope (u).</p></dd>
+<dt>m1_d<span class="classifier"><em>array_like</em></span></dt>
+<dd class="field-desc"><p>The mass uncertainty $\Delta m_1$ of the second isotope (u).</p></dd></dl>
 </dd><dt class="field-head">Returns<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>out<span class="classifier"><em>(ndarray, ndarray)</em></span></dt>
-<dd class="field-desc"><p>the mass factor and its uncertainty needed to calculate modified isotope shifts or charge radii.</p></dd></dl>
+<dt>(mu, mu_d)<span class="classifier"><em>(ndarray, ndarray)</em></span></dt>
+<dd class="field-desc"><p> The mass factor $\mu$ and its uncertainty $\Delta\mu$
+     required to calculate modified isotope shifts or charge radii</p></dd></dl>
 </dd>
 </dl></dd>
 </dl>

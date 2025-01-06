@@ -20,25 +20,31 @@ title: qspec.scattering_rate
 <em class="sig-param">
 <span class="n"><span class="pre">s</span></span>
 </em>
-<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/physics.py#L1102-L1111' }}"><span class="sig-source">[source]</span></a>
+<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/dev-jekyll/qspec/physics.py#L1113-L1130' }}"><span class="sig-source">[source]</span></a>
 </dt>
-<dd class="field-body"><p></p>
+<dd class="field-body"><p>The two-state-equilibrium scattering-rate of an electronic dipole transition
+
+    $$\begin{aligned}
+    \Gamma_\mathrm{sc} &= \frac{s}{2}\frac{A_{ki}^3}{(4\pi\Delta f)^2 + (1 + s)A_{ki}^2}\\[2ex]
+    \lim\limits_{s\rightarrow\inf}\Gamma_\mathrm{sc}\big|_{\Delta f = 0} &= A_{ki} / 2.
+    \end{aligned}$$</p>
 <dl class="field-list">
 <dt class="field-head">Parameters<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
 <dt>df<span class="classifier"><em>array_like</em></span></dt>
-<dd class="field-desc"><p>The detuning of to be scattered light from the transition.
-     This must be differences of real frequencies, such that w = 2 pi * df (MHz).</p></dd>
+<dd class="field-desc"><p>The frequency detuning $\Delta f$ of the absorbed light.
+     This must be differences of real frequencies, such that $\Delta\omega = 2\pi\Delta f$ (MHz).</p></dd>
 <dt>a<span class="classifier"><em>array_like</em></span></dt>
-<dd class="field-desc"><p>The Einstein A coefficient (MHz).</p></dd>
+<dd class="field-desc"><p>The Einstein $A_{ki}$ coefficient (MHz).</p></dd>
 <dt>s<span class="classifier"><em>array_like</em></span></dt>
-<dd class="field-desc"><p>The saturation parameter.</p></dd></dl>
+<dd class="field-desc"><p>The saturation parameter $s$.</p></dd></dl>
 </dd><dt class="field-head">Returns<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>out<span class="classifier"><em>None</em></span></dt>
-<dd class="field-desc"><p>The 2-state-equilibrium scattering-rate of an electronic transition.</p></dd></dl>
+<dt>gamma<span class="classifier"><em>ndarray</em></span></dt>
+<dd class="field-desc"><p> The two-state-equilibrium scattering-rate $\Gamma_\mathrm{sc}$
+     of an electronic dipole transition (MHz)</p></dd></dl>
 </dd>
 </dl></dd>
 </dl>

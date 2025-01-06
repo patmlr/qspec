@@ -69,7 +69,7 @@ class Model:
         self.model = model
         self.type = 'Model'
 
-    def __call__(self, x: array_like, *args, **kwargs):
+    def __call__(self, x: array_like, *args: array_iter, **kwargs: dict) -> ndarray:
         return self.evaluate(x, *self.update_args(args), **kwargs)
 
     def evaluate(self, x: array_like, *args: array_iter, **kwargs: dict) -> ndarray:
@@ -84,7 +84,7 @@ class Model:
         """
         pass
 
-    def _add_arg(self, name, val, fix, link):
+    def _add_arg(self, name: str, val: array_like, fix: Union[array_iter, bool, str], link: bool):
         """
         Add a new parameter to the model.
 
@@ -107,7 +107,7 @@ class Model:
         self._size += 1
 
     @property
-    def description(self):
+    def description(self) -> str:
         """
         A description of the model hierarchy.
 
@@ -125,7 +125,7 @@ class Model:
         return label[:-1]
 
     @property
-    def size(self):
+    def size(self) -> int:
         """
         The number of parameters required by the model.
         """
@@ -139,21 +139,21 @@ class Model:
         return 0.1 if self.model is None else self.model.dx
 
     @property
-    def error(self):
+    def error(self) -> str:
         """
         An error message if there is an issue with the model parameters (not implemented).
         """
         return self._error
 
     @property
-    def model(self):
+    def model(self) -> 'Model':
         """
         The submodel.
         """
         return self._model
 
     @model.setter
-    def model(self, value):
+    def model(self, value: 'Model'):
         self._model = value
         if self._model is None:
             self.names, self.vals, self.fixes, self.links = [], [], [], []
@@ -171,68 +171,71 @@ class Model:
             self._size = len(self._model.names)
             self._error = self._model.error
 
-    def get_pars(self):
+    def get_pars(self) -> zip:
         """
-        :returns: A zip-iterator over (names, vals, fixes, links).
+        :returns: A zip-iterator over `(names, vals, fixes, links)`.
         """
         return zip(self.names, self.vals, self.fixes, self.links)
 
-    def set_pars(self, pars, force=False):
+    def set_pars(self, pars: array_iter, force: bool = False):
         """
-        Set all vals, fixes and links with one nested list.
+        Set all `vals`, `fixes` and `links` with one nested list.
 
-        :param pars: A nested list of shape (self.size, 3).
+        :param pars: A nested list of shape `(self.size, 3)`.
         :param force: The `force` parameter of the `set_val`, `set_fix` and `set_link` functions.
-        :returns: None.
+        :returns:
         """
         for i, p in enumerate(pars):
             self.set_val(i, p[0], force=force)
             self.set_fix(i, p[1], force=force)
             self.set_link(i, p[2], force=force)
 
-    def set_vals(self, vals, force=False):
+    def set_vals(self, vals: Iterable[array_like], force: bool = False):
         """
-        Set all vals with one list.
+        Set all `vals` with one list.
 
         :param vals: A list of shape (`self.size`, ).
         :param force: The `force` parameter of the `set_val` function.
-        :returns: None.
+        :returns:
         """
         for i, val in enumerate(vals):
             self.set_val(i, val, force=force)
 
-    def set_fixes(self, fixes, force=False):
+    def set_fixes(self, fixes: Iterable[Union[array_iter, bool, str]], force: bool = False):
         """
-        Set all fixes with one list.
+        Set all `fixes` with one list.
 
         :param fixes: A list of shape (`self.size`, ).
         :param force: The `force` parameter of the `set_fix` function.
-        :returns: None.
+        :returns:
         """
         for i, fix in enumerate(fixes):
             self.set_fix(i, fix, force=force)
 
-    def set_links(self, links, force=False):
+    def set_links(self, links: Iterable[bool], force: bool = False):
         """
-        Set all links with one list.
+        Set all `links` with one `list`.
 
         :param links: A list of shape (`self.size`, ).
         :param force: The `force` parameter of the `set_link` function.
-        :returns: None.
+        :returns:
         """
         for i, link in enumerate(links):
             self.set_link(i, link, force=force)
 
-    def set_val(self, i, val, force=False):
+    def set_val(self, i: Union[int_like, str], val: array_like, force: bool = False):
         """
         Set a specific parameter value.
 
-        :param i: The index of the parameter.
+        :param i: The index (`int`) or the name (`str`) of the parameter.
         :param val: The new parameter value.
         :param force: Force the parameter to take exactly the new value.
-         If False, the parameter is converted to the correct format.
-        :returns: None.
+         If `False`, the parameter is converted to the correct format.
+        :returns:
         """
+        if isinstance(i, str):
+            i = self.p[i]
+
         if force or _is_scalar(val):
             if self.model is None:
                 self.vals[i] = val if force else float(val)
@@ -244,16 +247,19 @@ class Model:
         else:
             raise ValueError(f'The parameter value {val} has the wrong format. Must be a floating.')
 
-    def set_fix(self, i, fix, force=False):
+    def set_fix(self, i: Union[int_like, str], fix: Union[array_iter, bool, str], force: bool = False):
         """
         Set a specific parameter fix state.
 
-        :param i: The index of the parameter.
+        :param i: The index (`int`) or the name (`str`) of the parameter.
         :param fix: The new parameter value.
         :param force: Force the parameter to take exactly the new fix state.
-         If False, the parameter is converted to the correct format.
-        :returns: None.
+         If `False`, the parameter is converted to the correct format.
+        :returns:
         """
+        if isinstance(i, str):
+            i = self.p[i]
+
         if force:
             self.fixes[i] = fix
             return
@@ -305,16 +311,19 @@ class Model:
             self.expressions[i] = temp_expr
             self.fixes[i] = temp_fix
 
-    def set_link(self, i, link, force=False):
+    def set_link(self, i: Union[int_like, str], link: bool, force: bool = False):
         """
         Set a specific parameter link state.
 
-        :param i: The index of the parameter.
+        :param i: The index (`int`) or the name (`str`) of the parameter.
         :param link: The new parameter link state.
         :param force: Force the parameter to take exactly the new link state.
-         If False, the parameter is converted to the correct format.
-        :returns: None.
+         If `False`, the parameter is converted to the correct format.
+        :returns:
         """
+        if isinstance(i, str):
+            i = self.p[i]
+
         if force:
             self.links[i] = link
             return
@@ -324,25 +333,25 @@ class Model:
         else:
             raise ValueError(f'The parameter link state {link} has the wrong format. Must be a scalar or bool.')
 
-    def _eval_zero_division(self, args, expr):
+    def _eval_zero_division(self, args: array_iter, expr: Union[str, CodeType]) -> float_like:
         """
-        Safely calculate parameter expressions including nans, infs and zero divisions.
+        Safely calculate parameter expressions including `nan`, `inf` and zero divisions.
 
         :param args: The parameters.
         :param expr: The parameter expression.
-        :returns: The processed parameter or 0 in case of a nan, inf or zero division.
+        :returns: The processed parameter or 0 in case of a `nan`, `inf` or zero division.
         """
         try:
             with np.errstate(divide='ignore', invalid='ignore'):
                 ret = eval(expr, {}, {'self': self, 'args': args})
-            if isinstance(ret, float):
-                return 0. if np.isnan(ret) or np.isinf(ret) else ret
-            ret[np.isnan(ret) + np.isinf(ret)] = 0.
-            return ret
+            if isinstance(ret, np.ndarray):
+                ret[np.isnan(ret) + np.isinf(ret)] = 0.
+                return ret
+            return 0. if np.isnan(ret) or np.isinf(ret) else ret
         except ZeroDivisionError:
             return np.zeros_like(args[0], dtype=float)
 
-    def update_args(self, args):
+    def update_args(self, args: array_iter) -> tuple[Union[float_like], ...]:
         """
         :param args: The parameters.
         :returns: The parameters updated with the parameter expressions.
@@ -353,37 +362,37 @@ class Model:
         """
         Updates `self.vals` with updated parameters, see self.update_args.
 
-        :returns: None.
+        :returns:
         """
         self.set_vals(self.update_args(self.vals), force=False)
 
-    def min(self):
+    def min(self) -> float:
         """
         :returns: A hint for an x-axis minimum for a complete display of the model.
         """
         return -1. if self.model is None else self.model.min()
 
-    def max(self):
+    def max(self) -> float:
         """
         :returns: A hint for an x-axis maximum for a complete display of the model.
         """
         return 1. if self.model is None else self.model.max()
 
-    def intervals(self):
+    def intervals(self) -> list[list[float]]:
         """
         :returns: A list of x-axis intervals for a complete display of the model.
         """
         return [[self.min(), self.max()]] if self.model is None else self.model.intervals()
 
-    def x(self):
+    def x(self) -> ndarray:
         """
         :returns: An array of x values for a complete and smooth display of the model.
         """
         return np.concatenate([np.arange(i[0], i[1], self.dx, dtype=float) for i in self.intervals()], axis=0)
 
-    def fit_prepare(self):
+    def fit_prepare(self) -> (list[bool], tuple[array_like, array_like]):
         """
-        :returns: fixed, bounds. A list of bool values which parameters are not varied in a fit
+        :returns: (fixed, bounds) A list of `bool` values specifying which parameters are not varied in a fit
          and a list of bounds for the fit parameters. See parameters `p0_fixed` and `bounds` of `qspec.curve_fit`.
         """
         bounds = (-np.inf, np.inf)
@@ -425,7 +434,7 @@ class Empty(Model):
         super().__init__(model=None)
         self.type = 'Empty'
 
-    def evaluate(self, x: array_like, *args: array_iter, **kwargs: dict):
+    def evaluate(self, x: array_like, *args: array_iter, **kwargs: dict) -> ndarray:
         """
         An empty model, returning `numpy.zeros_like(x)`.
 
@@ -438,9 +447,9 @@ class Empty(Model):
 
 
 class NPeak(Model):
-    def __init__(self, model, n_peaks=1):
+    def __init__(self, model: 'Model', n_peaks: int_like = 1):
         """
-        Evaluates the given `model` at the positions $x_i$ with scalings $p_i$ and `0 <= i < n_peaks`.
+        Evaluates the given `model` at the positions $x_i$ with intensities $p_i$ and `0 <= i < n_peaks`.
 
         :param model: A submodel whose parameters are adopted by this model.
         :param n_peaks: The number of times the submodel is copied.
@@ -452,27 +461,37 @@ class NPeak(Model):
             self._add_arg('x{}'.format(n), 0., n == 0, False)
             self._add_arg('p{}'.format(n), 1., n == 0, False)
 
-    def evaluate(self, x: array_like, *args: array_iter, **kwargs: dict):
+    def evaluate(self, x: array_like, *args: array_iter, **kwargs: dict) -> ndarray:
         return np.sum([args[self.model.size + 2 * n + 1]
                        * self.model.evaluate(x - args[self.model.size + 2 * n], *args[:self.model.size])
                        for n in range(self.n_peaks)], axis=0)
 
-    def min(self):
+    def min(self) -> float:
+        """
+        :returns: A hint for an x-axis minimum for a complete display of the model.
+        """
         min_center = min(self.vals[self.p['x{}'.format(n)]] for n in range(self.n_peaks))
         return min_center + self.model.min()
 
-    def max(self):
+    def max(self) -> float:
+        """
+        :returns: A hint for an x-axis maximum for a complete display of the model.
+        """
         max_center = max(self.vals[self.p['x{}'.format(n)]] for n in range(self.n_peaks))
         return max_center + self.model.max()
 
-    def intervals(self):
+    def intervals(self) -> list[list[float]]:
+        """
+        :returns: A list of x-axis intervals for a complete display of the model.
+        """
         return merge_intervals([[i[0] + self.vals[self.model.size + 2 * n],
                                  i[1] + self.vals[self.model.size + 2 * n]]
-                                for i in self.model.intervals() for n in range(self.n_peaks)])
+                                for i in self.model.intervals() for n in range(self.n_peaks)]).tolist()
 
 
 class Offset(Model):
-    def __init__(self, model=None, x_cuts=None, offsets=None):
+    def __init__(self, model: Model = None, x_cuts: Iterable[scalar_like] = None,
+                 offsets: Iterable[scalar_like] = None):
         """
         Cuts the x-axis and adds y-axis offsets to every segment.
         
@@ -486,9 +505,9 @@ class Offset(Model):
         if x_cuts is None:
             x_cuts = []
         self.x_cuts = sorted(list(x_cuts))
-        self.offsets = offsets
-        if self.offsets is None:
-            self.offsets = [0]
+        if offsets is None:
+            offsets = [0]
+        self.offsets = list(offsets)
         if len(self.offsets) != len(self.x_cuts) + 1:
             raise ValueError('The parameter offset must be a list of size \'len(x_cuts) + 1\''
                              ' and contain the maximally considered polynomial order for each slice.')
@@ -499,14 +518,7 @@ class Offset(Model):
 
         self.gen_offset_map()
 
-    def evaluate(self, x: array_like, *args: array_iter, **kwargs: dict):
-        """
-
-        :param x:
-        :param args:
-        :param kwargs:
-        :return:
-        """
+    def evaluate(self, x: array_like, *args: array_iter, **kwargs: dict) -> ndarray:
         if self._model is None:
             return self._offset(x, *args)
         return self.model.evaluate(x, *args[:self.model.size]) + self._offset(x, *args)
@@ -516,7 +528,7 @@ class Offset(Model):
         Set the values where to cut the x-axis into intervals with individual offset parameters.
 
         :param x_cuts: A list of x values where to cut the x-axis.
-        :returns: None.
+        :returns:
         """
         x_cuts = list(x_cuts)
         if len(x_cuts) != len(self.x_cuts):
@@ -546,7 +558,7 @@ class Offset(Model):
         """
         Generate the offset parameters and a map of the interval and polynomial order to the parameter index space.
 
-        :returns: None.
+        :returns:
         """
         self.offset_map = []
         for i, n in enumerate(self.offsets):
@@ -562,7 +574,7 @@ class Offset(Model):
         Generate the array masks corresponding to the `x_cuts`.
 
         :param x: The input values.
-        :returns: None.
+        :returns:
         """
         self.offset_masks = []
         for x0, x1 in zip([np.min(x) - 1., ] + self.x_cuts, self.x_cuts + [np.max(x) + 1., ]):
@@ -575,7 +587,7 @@ class Offset(Model):
 
         :param x: The input values.
         :param y: The y data.
-        :returns: None.
+        :returns:
         """
         for i, mask in enumerate(self.offset_masks):
             self.vals[self.p['off{}e0'.format(i)]] = 0.5 * (y[mask][0] + y[mask][-1])
@@ -602,19 +614,28 @@ class Amplifier(Model):
         self._min = -10
         self._max = 10
 
-    def evaluate(self, x: array_like, *args: array_iter, **kwargs: dict):
+    def evaluate(self, x: array_like, *args: array_iter, **kwargs: dict) -> ndarray:
         self._min = np.min(x)
         self._max = np.max(x)
         return _poly(x, *args)
 
     @property
     def dx(self):
+        """
+        A hint for an x-axis step size for a smooth display of the model.
+        """
         return 1e-2
 
-    def min(self):
+    def min(self) -> float:
+        """
+        :returns: A hint for an x-axis minimum for a complete display of the model.
+        """
         return self._min
 
-    def max(self):
+    def max(self) -> float:
+        """
+        :returns: A hint for an x-axis maximum for a complete display of the model.
+        """
         return self._max
 
 
@@ -637,14 +658,14 @@ class Custom(Model):
         for p in self.parameters:
             self._add_arg(p, 0., False, False)
 
-    def evaluate(self, x: array_like, *args: array_iter, **kwargs: dict):
+    def evaluate(self, x: array_like, *args: array_iter, **kwargs: dict) -> ndarray:
         if self.model is None:
             return np.array(args, dtype=float)
         return self.model.evaluate(x, *args[:self.model.size], **kwargs)
 
 
 class YPars(Model):
-    def __init__(self, model):
+    def __init__(self, model: Model):
         """
         Concatenates the *Prior* parameters of the submodel, that have uncertainties as `fix` states,
         with the y-axis array resulting from calling the submodel. This is used internally in `qspec.models.fit`.
@@ -656,13 +677,13 @@ class YPars(Model):
 
         self.p_y = [i for i, fix in enumerate(self.model.fixes) if _is_unc(fix)]
 
-    def evaluate(self, x: array_like, *args: array_iter, **kwargs: dict):
+    def evaluate(self, x: array_like, *args: array_iter, **kwargs: dict) -> ndarray:
         return np.concatenate([self.model.evaluate(x, *args, **kwargs),
                                np.array([args[p_y] for p_y in self.p_y], dtype=float)], axis=0)
 
 
 class Listed(Model):
-    def __init__(self, models, labels=None):
+    def __init__(self, models: list[Model], labels=None):
         """
         An abstract class for models with multiple submodels.
 
@@ -695,51 +716,87 @@ class Listed(Model):
                 self._add_arg('{}{}'.format(name, label), val, fix, link)
         self.set_fixes(list(self.fixes))
 
-    def set_val(self, i, val, force=False):
+    def set_val(self, i: Union[int_like, str], val: array_like, force: bool = False):
+        """
+        Set a specific parameter value.
+
+        :param i: The index (`int`) or the name (`str`) of the parameter.
+        :param val: The new parameter value.
+        :param force: Force the parameter to take exactly the new value.
+         If `False`, the parameter is converted to the correct format.
+        :returns:
+        """
+        if isinstance(i, str):
+            i = self.p[i]
+
         super().set_val(i, val, force=force)
         if i < len(self.model_map):
             self.models[self.model_map[i]].set_val(self.index_map[i], self.vals[i], force=True)
 
-    def set_fix(self, i, fix, force=False):
+    def set_fix(self, i: Union[int_like, str], fix: Union[array_iter, bool, str], force: bool = False):
+        """
+        Set a specific parameter fix state. Also sets the fix state for the respective submodel.
+
+        :param i: The index (`int`) or the name (`str`) of the parameter.
+        :param fix: The new parameter value.
+        :param force: Force the parameter to take exactly the new fix state.
+         If `False`, the parameter is converted to the correct format.
+        :returns:
+        """
+        if isinstance(i, str):
+            i = self.p[i]
+
         super().set_fix(i, fix, force=force)
         if i < len(self.model_map):
             self.models[self.model_map[i]].set_fix(self.index_map[i], self.fixes[i], force=True)
 
-    def set_link(self, i, link, force=False):
+    def set_link(self, i: Union[int_like, str], link: bool, force: bool = False):
+        """
+        Set a specific parameter link state. Also sets the link state for the respective submodel.
+
+        :param i: The index (`int`) or the name (`str`) of the parameter.
+        :param link: The new parameter link state.
+        :param force: Force the parameter to take exactly the new link state.
+         If `False`, the parameter is converted to the correct format.
+        :returns:
+        """
+        if isinstance(i, str):
+            i = self.p[i]
+
         super().set_link(i, link, force=force)
         if i < len(self.model_map):
             self.models[self.model_map[i]].set_link(self.index_map[i], self.links[i], force=True)
 
-    def inherit_vals(self, force=False):
+    def inherit_vals(self, force: bool = False):
         """
         Inherit the parameter values of the submodels.
 
-        :param force: The 'force' parameter of 'self.set_val'.
+        :param force: The `force` parameter of `self.set_val`.
         :returns: None
         """
         self.set_vals([val for model in self.models for val in model.vals], force=force)
 
-    def inherit_fixes(self, force=False):
+    def inherit_fixes(self, force: bool = False):
         """
         Inherit the parameter fixes of the submodels.
 
-        :param force: The 'force' parameter of 'self.set_fix'.
+        :param force: The `force` parameter of `self.set_fix`.
         :returns: None
         """
         self.set_fixes([fix for model in self.models for fix in model.fixes], force=force)
 
-    def inherit_links(self, force=False):
+    def inherit_links(self, force: bool = False):
         """
         Inherit the parameter links of the submodels.
 
-        :param force: The 'force' parameter of 'self.set_link'.
+        :param force: The `force` parameter of `self.set_link`.
         :returns: None
         """
         self.set_links([link for model in self.models for link in model.links], force=force)
 
 
 class Summed(Listed):
-    def __init__(self, models, labels=None):
+    def __init__(self, models: list[Model], labels=None):
         """
         A `Listed` model summing over all submodels with individual `center` and `int` parameters.
 
@@ -756,27 +813,39 @@ class Summed(Listed):
             self._add_arg('center{}'.format(label), 0., False, False)
             self._add_arg('int{}'.format(label), 1., False, False)
 
-    def evaluate(self, x: array_like, *args: array_iter, **kwargs: dict):
+    def evaluate(self, x: array_like, *args: array_iter, **kwargs: dict) -> ndarray:
         return np.sum([args[i[1]] * model.evaluate(x - args[i[0]], *args[_slice], **kwargs)
                        for model, _slice, i in zip(self.models, self.slices, self.indices_add)], axis=0)
 
     @property
     def dx(self):
+        """
+        A hint for an x-axis step size for a smooth display of the model.
+        """
         return min(model.dx for model in self.models)
 
-    def min(self):
+    def min(self) -> float:
+        """
+        :returns: A hint for an x-axis minimum for a complete display of the model.
+        """
         return min(model.min() for model in self.models)
 
-    def max(self):
+    def max(self) -> float:
+        """
+        :returns: A hint for an x-axis maximum for a complete display of the model.
+        """
         return max(model.max() for model in self.models)
 
-    def intervals(self):
+    def intervals(self) -> list[list[float]]:
+        """
+        :returns: A list of x-axis intervals for a complete display of the model.
+        """
         return merge_intervals([[i[0] + self.vals[j[0]], i[1] + self.vals[j[0]]]
-                                for model, j in zip(self.models, self.indices_add) for i in model.intervals()])
+                                for model, j in zip(self.models, self.indices_add) for i in model.intervals()]).tolist()
 
 
 class Linked(Listed):
-    def __init__(self, models):
+    def __init__(self, models: list[Model]):
         """
         A `Listed` model linking all `link=True` parameters of the submodels.
 
@@ -793,12 +862,6 @@ class Linked(Listed):
                         self.set_fix(i, '{}__{}'.format(_name, j))
                         break
 
-    def evaluate(self, x: array_like, *args: array_iter, **kwargs: dict):
+    def evaluate(self, x: array_like, *args: array_iter, **kwargs: dict) -> ndarray:
         return np.concatenate(tuple(model.evaluate(_x, *args[_slice], **kwargs)
                                     for model, _slice, _x in zip(self.models, self.slices, x)), axis=0)
-
-    def set_fix(self, i, fix, force=False):
-        super(Listed, self).set_fix(i, fix, force=force)
-
-    def set_link(self, i, link, force=False):
-        super(Listed, self).set_link(i, link, force=force)

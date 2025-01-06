@@ -197,7 +197,7 @@ def draw_sigma2d(x: array_iter, y: array_iter, sigma_x: array_iter, sigma_y: arr
     :param n: The maximum sigma region to draw
     :param kwargs: Additional keyword arguments are passed to plt.plot().
      Use key 'fmt' to specify the third argument of plt.plot().
-    :returns: None. Draws the sigma-bounds of the given data points (x, y) until the n-sigma region.
+    :returns: Draws the sigma-bounds of the given data points (x, y) until the n-sigma region.
     """
     fmt = '-k'
     if 'fmt' in list(kwargs.keys()):
@@ -1548,7 +1548,7 @@ class King:
         :param font_dict: The font_dict passed to matplotlib.rc('font', font_dict).
         :param show: Whether to show the plot.
         :param kwargs: Additional keyword arguments.
-        :returns: None. Generates a King-Plot based on the modified axes 'self.x_mod' and 'self.y_mod'
+        :returns: Generates a King-Plot based on the modified axes 'self.x_mod' and 'self.y_mod'
          as well as the fit results 'self.results'.
         """
         a, b = self.popt
@@ -1639,7 +1639,7 @@ class King:
          where each row is a tuple [A, A_ref].
         :param font_dict: The font_dict passed to matplotlib.rc('font', font_dict).
         :param show: Whether to show the plot.
-        :returns: None. Generates a King-Plot based on the modified axes 'self.x_mod_nd' and 'self.y_mod_nd'
+        :returns: Generates a King-Plot based on the modified axes 'self.x_mod_nd' and 'self.y_mod_nd'
          as well as the fit results 'self.results_nd'.
         """
         if font_dict is None:

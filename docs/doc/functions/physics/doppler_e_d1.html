@@ -42,7 +42,7 @@ title: qspec.doppler_e_d1
 <span class="o"><span class="pre">=</span></span>
 <span class="default_value"><span class="pre bool">True</span></span>
 </em>
-<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/physics.py#L405-L425' }}"><span class="sig-source">[source]</span></a>
+<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/dev-jekyll/qspec/physics.py#L405-L425' }}"><span class="sig-source">[source]</span></a>
 </dt>
 <dd class="field-body"><p>The first derivative $\frac{\partial f^\prime}{\partial E} =
      \frac{\partial f^\prime}{\partial v}\frac{\partial v}{\partial E}$.
@@ -72,7 +72,12 @@ title: qspec.doppler_e_d1
 <dt>out<span class="classifier"><em>ndarray</em></span></dt>
 <dd class="field-desc"><p>the first derivative $\partial f^\prime / \partial E$ of the Doppler-shifted frequency
      $f^\prime$ with respect to <code>e</code> in either the rest frame of the atom or the laboratory frame ([<code>f</code>] / eV).
-    :raises ValueError: return_frame must be either <code>'atom'</code> or <code>'lab'</code>.</p></dd></dl>
+    </p></dd></dl>
+</dd><dt class="field-head">Raises<span class="colon">:</span></dt>
+<dd class="field-par">
+<dl>
+<dt>ValueError</dt>
+<dd class="field-desc"><p><code>return_frame</code> must be either <code>'atom'</code> or <code>'lab'</code>.</p></dd></dl>
 </dd>
 </dl></dd>
 </dl>

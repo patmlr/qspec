@@ -32,7 +32,7 @@ def example(n=None):
 
     Example 5: Full solution for hyperfine-structure + Zeeman splitting.
 
-    :returns: None.
+    :returns:
     """
     if n is None:
         n = {0, 1, 2, 3, 4, 5}
@@ -255,4 +255,4 @@ def example(n=None):
 
 
 if __name__ == '__main__':
-    example(None)
+    example(3)

@@ -32,6 +32,12 @@ title: qspec.models.gen_model
 </em>
 ,&nbsp;
 <em class="sig-param">
+<span class="n"><span class="pre">hf_config</span></span>
+<span class="o"><span class="pre">=</span></span>
+<span class="default_value"><span class="pre">None</span></span>
+</em>
+,&nbsp;
+<em class="sig-param">
 <span class="n"><span class="pre">n_peaks</span></span>
 <span class="o"><span class="pre">=</span></span>
 <span class="default_value"><span class="pre">None</span></span>
@@ -54,7 +60,7 @@ title: qspec.models.gen_model
 <span class="o"><span class="pre">=</span></span>
 <span class="default_value"><span class="pre">None</span></span>
 </em>
-<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/models\_helper.py#L18-L84' }}"><span class="sig-source">[source]</span></a>
+<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/dev-jekyll/qspec/models\_helper.py#L18-L90' }}"><span class="sig-source">[source]</span></a>
 </dt>
 <dd class="field-body"><p>Create a lineshape model to fit arbitrary atomic fluorescence spectra.</p>
 <dl class="field-list">
@@ -70,6 +76,8 @@ title: qspec.models.gen_model
 <dd class="field-desc"><p>Whether to use a quantum interference model.</p></dd>
 <dt>hf_mixing<span class="classifier"><em>bool</em></span></dt>
 <dd class="field-desc"><p>Whether to use a hyperfine-induced mixing model. Not implemented for <code>qi=True</code>.</p></dd>
+<dt>hf_config<span class="classifier"><em>dict</em></span></dt>
+<dd class="field-desc"><p>A <code>dict</code> containing the configuration for the hf mixing. Only used if <code>hf_mixing=True</code>.</p></dd>
 <dt>n_peaks<span class="classifier"><em>int</em></span></dt>
 <dd class="field-desc"><p>The number of "peaks per resonance" or "lineshape duplicates".</p></dd>
 <dt>offsets<span class="classifier"><em>int | list</em></span></dt>
@@ -86,7 +94,7 @@ title: qspec.models.gen_model
 <dd class="field-par">
 <dl>
 <dt>out<span class="classifier"><em>qspec.models._base.Model</em></span></dt>
-<dd class="field-desc"><p>The constructed lineshape model.</p></dd></dl>
+<dd class="field-desc"><p>The constructed lineshape model</p></dd></dl>
 </dd>
 </dl></dd>
 </dl>

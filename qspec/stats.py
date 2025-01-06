@@ -83,7 +83,7 @@ class Observable(float):
     def set_popt(self, popt: array_like = None):
         """
         :param popt: The new value of 'popt'.
-        :returns: None. Sets the 'popt' attribute.
+        :returns: Sets the 'popt' attribute.
         """
         if popt is None:
             self.popt = popt
@@ -123,7 +123,7 @@ class Observable(float):
         """
         :param size: The defining number of random variates (default is 1,000,000).
         :param n_bins: The number of bins.
-        :returns: None. Plots a histogram of the observable.
+        :returns: Plots a histogram of the observable.
         """
         y = self.rvs(size)
         n, bins, _ = plt.hist(y, bins=n_bins, density=True, label='Sample data', facecolor='lightgray')
@@ -538,7 +538,7 @@ def info():
     for different values of the parameter alpha.
     The plot shows that the ratio between the two 1-sigma percentiles cannot exceed 1.5.
 
-    :returns: None.
+    :returns:
     """
     neg = []
     pos = []

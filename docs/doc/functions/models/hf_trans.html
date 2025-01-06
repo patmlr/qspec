@@ -20,23 +20,23 @@ title: qspec.models.hf_trans
 <em class="sig-param">
 <span class="n"><span class="pre">j_u</span></span>
 </em>
-<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/models\_splitter.py#L84-L92' }}"><span class="sig-source">[source]</span></a>
+<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/dev-jekyll/qspec/models\_splitter.py#L83-L94' }}"><span class="sig-source">[source]</span></a>
 </dt>
 <dd class="field-body"><p>Calculate all allowed hyperfine transitions and their hyperfine coefficients.</p>
 <dl class="field-list">
 <dt class="field-head">Parameters<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>i<span class="classifier"><em>None</em></span></dt>
-<dd class="field-desc"><p>culate all allowed hyperfine transitions and their hyperfine coefficients.</p></dd>
-<dt>j_l<span class="classifier"><em>None</em></span></dt>
-<dd class="field-desc"><p>late all allowed hyperfine transitions and their hyperfine coefficients.</p></dd>
-<dt>j_u<span class="classifier"><em>None</em></span></dt>
-<dd class="field-desc"><p>late all allowed hyperfine transitions and their hyperfine coefficients.</p></dd></dl>
+<dt>i<span class="classifier"><em>quant_like</em></span></dt>
+<dd class="field-desc"><p>The nuclear spin $I$.</p></dd>
+<dt>j_l<span class="classifier"><em>quant_like</em></span></dt>
+<dd class="field-desc"><p>The total lower state electron angular momentum $J$.</p></dd>
+<dt>j_u<span class="classifier"><em>quant_like</em></span></dt>
+<dd class="field-desc"><p>The total upper state electron angular momentum $J^\prime$.</p></dd></dl>
 </dd><dt class="field-head">Returns<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>(f_l, f_u, coAl, coBl, coAu, coBu)<span class="classifier"><em>None</em></span></dt>
+<dt>transitions<span class="classifier"><em>list[list[tuple]]</em></span></dt>
 <dd class="field-desc"><p></p></dd></dl>
 </dd>
 </dl></dd>

@@ -50,23 +50,23 @@ def _sqrt_zero_free(x: array_like):
 
 
 # noinspection PyUnusedLocal
-def sigma_poisson(x: array_like, y: array_like, y_model: array_like, *params):
+def sigma_poisson(x: array_like, y: array_like, y_model: array_like, *params: array_iter) -> ndarray:
     return _sqrt_zero_free(y_model)
 
 
-def residuals(model, x, y):
+def residuals(model: _base.Model, x: ndarray, y: ndarray):
     return y - model(x, *model.vals)
 
 
-def reduced_chi2(model, x, y, sigma_y):
+def reduced_chi2(model: _base.Model, x: ndarray, y: ndarray, sigma_y: ndarray):
     fixed, bounds = model.fit_prepare()
     n_free = sum(int(not f) for f in fixed)
     return np.sum(residuals(model, x, y) ** 2 / sigma_y ** 2) / (y.size - n_free)
 
 
-def fit(model: _base.Model, x: array_iter, y: array_iter, sigma_x: array_iter = None,
+def fit(model: _base.Model, x: Any, y: array_iter, sigma_x: array_iter = None,
         sigma_y: Union[array_iter, Callable] = None, report: bool = False, routine: Union[Callable, str] = None,
-        guess_offset: bool = False, mc_sigma: int = 0, **kwargs):
+        guess_offset: bool = False, mc_sigma: int = 0, **kwargs) -> (ndarray, ndarray, dict):
     """
     Fit a `Model` from `qspec.models` to data. This fit routine encapsulates the `qspec.curve_fit`
     and the `qspec.odr_fit` routines to facilitate the use of all modular fit model features,
@@ -93,7 +93,8 @@ def fit(model: _base.Model, x: array_iter, y: array_iter, sigma_x: array_iter = 
     :param kwargs: Additional kwargs to pass to the fit `routine`.
     :returns: (popt, pcov, info) The optimized parameters their covariance matrix
      and a dictionary containing info about the fit.
-    :raises (ValueError, TypeError):
+    :raises (ValueError, TypeError): If the specified routine is not supported (`ValueError`) or
+     the specified `model` is not a `qspec.models.Model` (`TypeError`).
     """
 
     if routine is None:

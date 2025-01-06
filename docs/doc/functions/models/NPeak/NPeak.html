@@ -18,16 +18,16 @@ title: qspec.models.NPeak
 <span class="o"><span class="pre">=</span></span>
 <span class="default_value"><span class="pre num">1</span></span>
 </em>
-<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/models\_base.py#L440-L471' }}"><span class="sig-source">[source]</span></a>
+<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/dev-jekyll/qspec/models\_base.py#L449-L489' }}"><span class="sig-source">[source]</span></a>
 </dt>
-<dd class="field-body"><p>Evaluates the given <code>model</code> at the positions $x_i$ with scalings $p_i$ and <code>0 <= i < n_peaks</code>.</p>
+<dd class="field-body"><p>Evaluates the given <code>model</code> at the positions $x_i$ with intensities $p_i$ and <code>0 <= i < n_peaks</code>.</p>
 <dl class="field-list">
 <dt class="field-head">Parameters<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>model<span class="classifier"><em>None</em></span></dt>
+<dt>model<span class="classifier"><em>Model</em></span></dt>
 <dd class="field-desc"><p>A submodel whose parameters are adopted by this model.</p></dd>
-<dt>n_peaks<span class="classifier"><em>None</em></span></dt>
+<dt>n_peaks<span class="classifier"><em>numpy.ndarray[Any | numpy.dtype[numpy.integer], numpy.integer, int]</em></span></dt>
 <dd class="field-desc"><p>The number of times the submodel is copied.</p></dd></dl>
 </dd>
 </dl></dd>

@@ -11,6 +11,7 @@ from scipy.stats import norm, cauchy
 from scipy.special import voigt_profile
 from scipy.special import wofz
 
+from qspec.qtypes import *
 from qspec.physics import source_energy_pdf
 from qspec.models._base import Model
 
@@ -22,24 +23,38 @@ __all__ = ['SPECTRA', 'fwhm_voigt', 'fwhm_voigt_d', 'Spectrum', 'Gauss', 'Lorent
 SPECTRA = ['Gauss', 'Lorentz', 'Voigt', 'VoigtDerivative', 'VoigtAsy', 'VoigtCEC', 'GaussChi2']
 
 
-def fwhm_voigt(gamma, sigma):
+def fwhm_voigt(gamma: array_like, sigma: array_like) -> ndarray:
+    r"""
+    The full width at half maximum (FWHM) of a Voigt profile
+
+    $$
+    \delta\nu = 0.5346\Gamma + \sqrt{0.2166\Gamma^2 + 8\log(2)\sigma^2}
+    $$
+
+    :param gamma: The FWHM of the Lorentzian $\Gamma$ (arb. unit).
+    :param sigma: The standard deviation of the Gaussian $\sigma$ ([`gamma`]).
+    :returns: The FWHM $\delta\nu$ of a Voigt profile.
     """
-    :param gamma: The FWHM of the Lorentzian.
-    :param sigma: The standard deviation of the Gaussian.
-    :returns: The FWHM of a Voigt profile.
-    """
-    f_l = abs(gamma)
-    f_g = abs(np.sqrt(8 * np.log(2)) * sigma)
+    gamma, sigma = np.asarray(gamma, dtype=float), np.asarray(sigma, dtype=float)
+    f_l = np.abs(gamma)
+    f_g = np.abs(np.sqrt(8 * np.log(2)) * sigma)
     return 0.5346 * f_l + np.sqrt(0.2166 * f_l ** 2 + f_g ** 2)
 
 
-def fwhm_voigt_d(gamma, gamma_d, sigma, sigma_d):
-    """
-    :param gamma: The FWHM of the Lorentzian.
-    :param gamma_d: The uncertainty of 'gamma'.
-    :param sigma: The standard deviation of the Gaussian.
-    :param sigma_d: The uncertainty of 'sigma'.
-    :returns: The uncertainty of the FWHM of a Voigt profile.
+def fwhm_voigt_d(gamma: array_like, gamma_d: array_like, sigma: array_like, sigma_d: array_like) -> ndarray:
+    r"""
+    The uncertainty of the full width at half maximum (FWHM) of a Voigt profile
+
+    $$
+    \Delta\delta\nu = \sqrt{\left(\frac{8\log(2)\sigma\Delta\sigma}{\sqrt{0.2166\Gamma^2 + 8\log(2)\sigma^2}}\right)^2
+    + \left(\left(0.5346 + \frac{0.2166\Gamma}{\sqrt{0.2166\Gamma^2 + 8\log(2)\sigma^2}}\right)\Gamma_d\right)^2}
+    $$
+
+    :param gamma: The FWHM of the Lorentzian $\Gamma$ (arb. unit).
+    :param gamma_d: The uncertainty of `gamma` $\Delta\Gamma$.
+    :param sigma: The standard deviation of the Gaussian $\sigma$ ([`gamma`]).
+    :param sigma_d: The uncertainty of `sigma` $\Delta\sigma$.
+    :returns: The uncertainty of the FWHM of a Voigt profile $\Delta\delta\nu$.
     """
     f_l = abs(gamma)
     f_l_d = abs(gamma_d)
@@ -55,11 +70,14 @@ class Spectrum(Model):
         super().__init__(model=None)
         self.type = 'Spectrum'
 
-    def evaluate(self, x, *args, **kwargs):
+    def evaluate(self, x: array_like, *args: array_iter, **kwargs: dict) -> ndarray:
         return np.zeros_like(x)
 
     @property
     def dx(self):
+        """
+        A hint for an x-axis step size for a smooth display of the model.
+        """
         return self.fwhm() * 0.02
 
     def fwhm(self):
@@ -68,48 +86,81 @@ class Spectrum(Model):
         """
         return 1.
 
-    def min(self):
+    def min(self) -> float:
+        """
+        :returns: A hint for an x-axis minimum for a complete display of the model.
+        """
         return -5 * self.fwhm()
 
-    def max(self):
+    def max(self) -> float:
+        """
+        :returns: A hint for an x-axis maximum for a complete display of the model.
+        """
         return 5 * self.fwhm()
 
 
 class Lorentz(Spectrum):
     def __init__(self):
-        """
-        A Lorentzian peak function.
+        r"""
+        A Lorentzian peak function of the form
+
+        $$
+        f(x, \Gamma) = \frac{\Gamma^2}{(2x)^2 + \Gamma^2}.
+        $$
         """
         super().__init__()
         self.type = 'Lorentz'
 
         self._add_arg('Gamma', 1., False, False)
 
-    def evaluate(self, x, *args, **kwargs):  # Normalize to the maximum.
+    def evaluate(self, x: array_like, *args: array_iter, **kwargs: dict) -> ndarray:  # Normalize to the maximum.
         scale = 0.5 * args[0]
         return np.pi * scale * cauchy.pdf(x, loc=0, scale=scale)
 
     def fwhm(self):
+        """
+        :returns: The full width at half maximum (FWHM) of a spectrum.
+        """
         return abs(self.vals[self.p['Gamma']])
 
-    def min(self):
+    def min(self) -> float:
+        """
+        :returns: A hint for an x-axis minimum for a complete display of the model.
+        """
         return -10 * self.fwhm()
 
-    def max(self):
+    def max(self) -> float:
+        """
+        :returns: A hint for an x-axis maximum for a complete display of the model.
+        """
         return 10 * self.fwhm()
 
 
 class LorentzQI(Spectrum):
     def __init__(self):
-        """
-        A Lorentzian peak function including a dispersive term for consideration of quantum interference (QI) effects.
+        r"""
+        A Lorentzian peak function of the form
+
+        $$
+        f(x, \Gamma) = \frac{\Gamma^2}{(2x)^2 + \Gamma^2}.
+        $$
+
+        A dispersive term for consideration of quantum interference (QI) effects is available through `evaluate_qi`
+
+        $$
+        f(x, x_\mathrm{qi}, \Gamma) = \mathrm{Re}\left[\frac{\Gamma^2}
+        {(2x + i\Gamma)(2(x - x_\mathrm{qi}) - i\Gamma)}\right].
+        $$
+
+        This model needs to be implemented in another model that combines `evaluate` with `evaluate_qi`,
+        see `HyperfineQI`.
         """
         super().__init__()
         self.type = 'LorentzQI'
 
         self._add_arg('Gamma', 1., False, False)
 
-    def evaluate_qi(self, x, x_qi, *args, **kwargs):
+    def evaluate_qi(self, x: array_like, x_qi: array_like, *args: array_iter, **kwargs: dict):
         """
         :param x: The input values.
         :param x_qi: The x value of the interfering Lorentzian.
@@ -120,47 +171,76 @@ class LorentzQI(Spectrum):
         scale = 0.5 * args[0]
         return 2 * scale ** 2 * np.real(1 / ((x + 1j * scale) * (x - x_qi - 1j * scale)))
 
-    def evaluate(self, x, *args, **kwargs):  # Normalize to the maximum.
+    def evaluate(self, x: array_like, *args: array_iter, **kwargs: dict) -> ndarray:  # Normalize to the maximum.
         scale = 0.5 * args[0]
         return scale * np.pi * cauchy.pdf(x, loc=0, scale=scale)
 
     def fwhm(self):
+        """
+        :returns: The full width at half maximum (FWHM) of a spectrum.
+        """
         return abs(self.vals[self.p['Gamma']])
 
-    def min(self):
+    def min(self) -> float:
+        """
+        :returns: A hint for an x-axis minimum for a complete display of the model.
+        """
         return -10 * self.fwhm()
 
-    def max(self):
+    def max(self) -> float:
+        """
+        :returns: A hint for an x-axis maximum for a complete display of the model.
+        """
         return 10 * self.fwhm()
 
 
 class Gauss(Spectrum):
     def __init__(self):
-        """
-        A Gaussian peak function.
+        r"""
+        A Gaussian peak function of the form
+
+        $$
+        f(x, \sigma) = \exp\left(-\frac{x^2}{2\sigma^2}\right).
+        $$
         """
         super().__init__()
         self.type = 'Gauss'
 
         self._add_arg('sigma', 1., False, False)
 
-    def evaluate(self, x, *args, **kwargs):  # Normalize to the maximum.
+    def evaluate(self, x: array_like, *args: array_iter, **kwargs: dict) -> ndarray:  # Normalize to the maximum.
         return np.sqrt(2 * np.pi) * args[0] * norm.pdf(x, loc=0, scale=args[0])
 
     def fwhm(self):
+        """
+        :returns: The full width at half maximum (FWHM) of a spectrum.
+        """
         return abs(np.sqrt(8 * np.log(2)) * self.vals[self.p['sigma']])
 
-    def min(self):
+    def min(self) -> float:
+        """
+        :returns: A hint for an x-axis minimum for a complete display of the model.
+        """
         return -2.5 * self.fwhm()
 
-    def max(self):
+    def max(self) -> float:
+        """
+        :returns: A hint for an x-axis maximum for a complete display of the model.
+        """
         return 2.5 * self.fwhm()
 
 
 class Voigt(Spectrum):
     def __init__(self):
-        """
-        A Voigt peak function.
+        r"""
+        A Voigt peak function of the form
+
+        $$
+        f(x, \Gamma, \sigma) = \frac{\mathrm{Re}[w(z)]}{\mathrm{Re}[w(i\Gamma/(\sqrt{8}\sigma))]},
+        \quad z = \frac{2x + i\Gamma}{\sqrt{8}\sigma},
+        $$
+
+        with the complex Faddeeva function $w$.
         """
         super().__init__()
         self.type = 'Voigt'
@@ -168,17 +248,29 @@ class Voigt(Spectrum):
         self._add_arg('Gamma', 1., False, False)
         self._add_arg('sigma', 1., False, False)
 
-    def evaluate(self, x, *args, **kwargs):  # Normalize to the maximum.
+    def evaluate(self, x: array_like, *args: array_iter, **kwargs: dict) -> ndarray:  # Normalize to the maximum.
         return voigt_profile(x, args[1], 0.5 * args[0]) / voigt_profile(0, args[1], 0.5 * args[0])
 
     def fwhm(self):
+        """
+        :returns: The full width at half maximum (FWHM) of a spectrum.
+        """
         return fwhm_voigt(self.vals[self.p['Gamma']], self.vals[self.p['sigma']])
 
 
 class VoigtDerivative(Spectrum):
     def __init__(self):
-        """
-        The first derivative of a Voigt peak function.
+        r"""
+        The first derivative of a Voigt peak function of the form
+
+        $$\begin{aligned}
+        f(x, \Gamma, \sigma) &= -\frac{\sqrt{2}\delta\nu}{\sigma}\frac{\mathrm{Re}[z w(z)]}
+        {\mathrm{Re}[w(i\Gamma/(\sqrt{8}\sigma))]},
+        \quad z = \frac{2x + i\Gamma}{\sqrt{8}\sigma},\\[2ex]
+        \delta\nu &= 0.5346\Gamma + \sqrt{0.2166\Gamma^2 + 8\log(2)\sigma^2},
+        \end{aligned}$$
+
+        with the complex Faddeeva function $w$.
         """
         super().__init__()
         self.type = 'VoigtDerivative'
@@ -186,19 +278,29 @@ class VoigtDerivative(Spectrum):
         self._add_arg('Gamma', 1., False, False)
         self._add_arg('sigma', 1., False, False)
 
-    def evaluate(self, x, *args, **kwargs):  # Normalize to the maximum. (Pos of min/max to be determined).
+    def evaluate(self, x: array_like, *args: array_iter, **kwargs: dict) -> ndarray:  # Normalize to the maximum. (Pos of min/max to be determined).
         z = (x + 1j * 0.5 * args[0]) / (np.sqrt(2) * args[1])
         fwhm = abs(0.5346 * args[0] + np.sqrt(0.2166 * args[0] ** 2 + args[1] ** 2))  # for normalization
         return -(z * wofz(z)).real / (np.sqrt(np.pi) * args[1] ** 2) / voigt_profile(0, args[1], 0.5 * args[0]) * fwhm
 
     def fwhm(self):
+        """
+        :returns: The full width at half maximum (FWHM) of a spectrum.
+        """
         return fwhm_voigt(self.vals[self.p['Gamma']], self.vals[self.p['sigma']])
 
 
 class VoigtAsy(Spectrum):
     def __init__(self):
-        """
-        An asymmetric Voigt peak function.
+        r"""
+        An asymmetric Voigt peak function of the form
+
+        $$
+        f(x, \Gamma, \sigma, \alpha) = \frac{\mathrm{Re}[w(z)]}{\mathrm{Re}[w(i\Gamma/(\sqrt{8}\sigma))]},
+        \quad z = \frac{2x + i[\Gamma/(1 + \exp(\alpha x))]}{\sqrt{8}\sigma},
+        $$
+
+        with the complex Faddeeva function $w$.
         """
         super().__init__()
         self.type = 'VoigtAsy'
@@ -207,18 +309,26 @@ class VoigtAsy(Spectrum):
         self._add_arg('sigma', 1., False, False)
         self._add_arg('asyPar', 1., False, False)
 
-    def evaluate(self, x, *args, **kwargs):  # Normalize to the maximum.
+    def evaluate(self, x: array_like, *args: array_iter, **kwargs: dict) -> ndarray:  # Normalize to the maximum.
         gamma = args[0] / (1 + np.exp(args[2] * x))
         return voigt_profile(x, args[1], gamma) / voigt_profile(0, args[1], 0.5 * args[0])
 
     def fwhm(self):
+        """
+        :returns: The full width at half maximum (FWHM) of a spectrum.
+        """
         return fwhm_voigt(self.vals[self.p['Gamma']], self.vals[self.p['sigma']])
 
 
 class VoigtCEC(Spectrum):
     def __init__(self):
-        """
-        A series of `n` Voigt peak functions shifted by `i * shift` and scaled by `i * ratio`, where `0 <= i <= n`.
+        r"""
+        A series of `n + 1` `Voigt` peak functions of the form
+
+        $$
+        f[n](x, \Gamma, \sigma, x_\mathrm{cec}, p_\mathrm{cec}) = \sum\limits_{k = 0}^n p_\mathrm{cec}^k\mathrm{Voigt}
+        (x - k x_\mathrm{cec}, \Gamma, \sigma).
+        $$
         """
         super().__init__()
         self.type = 'VoigtCEC'
@@ -229,11 +339,14 @@ class VoigtCEC(Spectrum):
         self._add_arg('ratio', 0., False, False)
         self._add_arg('n', 0, True, False)
 
-    def evaluate(self, x, *args, **kwargs):  # Normalize to the maximum.
+    def evaluate(self, x: array_like, *args: array_iter, **kwargs: dict) -> ndarray:  # Normalize to the maximum.
         return np.sum([args[3] ** i * voigt_profile(x - i * args[2], args[1], 0.5 * args[0])
                        for i in range(int(args[4]) + 1)], axis=0) / voigt_profile(0, args[1], 0.5 * args[0])
 
     def fwhm(self):
+        """
+        :returns: The full width at half maximum (FWHM) of a spectrum.
+        """
         return fwhm_voigt(self.vals[self.p['Gamma']], self.vals[self.p['sigma']])
 
 
@@ -273,11 +386,14 @@ class GaussChi2(Spectrum):  # TODO: The fwhm of GaussChi2 is fitting quite well 
         self._add_arg('sigma', 1., False, False)
         self._add_arg('xi', 1., False, False)
 
-    def evaluate(self, x, *args, **kwargs):  # Maximum unknown, normalize to 0 position, f(0) ~> 0.8 * max(f(x)).
+    def evaluate(self, x: array_like, *args: array_iter, **kwargs: dict) -> ndarray:  # Maximum unknown, normalize to 0 position, f(0) ~> 0.8 * max(f(x)).
         return source_energy_pdf(x, 0, args[0], args[1], collinear=True) \
             / source_energy_pdf(0, 0, args[0], args[1], collinear=True)
 
     def fwhm(self):
+        """
+        :returns: The (approximate) full width at half maximum (FWHM) of a spectrum.
+        """
         sigma = np.abs(self.vals[self.p['sigma']])
         xi = np.abs(self.vals[self.p['xi']])
         if xi == 0:
@@ -285,14 +401,20 @@ class GaussChi2(Spectrum):  # TODO: The fwhm of GaussChi2 is fitting quite well 
         return _gauss_chi2_fwhm(sigma, xi)
         # return _gauss_chi2_taylor_fwhm(sigma, xi)
 
-    def min(self):
+    def min(self) -> float:
+        """
+        :returns: A hint for an x-axis minimum for a complete display of the model.
+        """
         sigma = np.abs(self.vals[self.p['sigma']])
         xi = self.vals[self.p['xi']]
         if xi < 0:
             return -5 * np.sqrt(2 * np.log(2)) * sigma
         return -5 * (np.sqrt(2 * np.log(2)) * sigma + xi)
 
-    def max(self):
+    def max(self) -> float:
+        """
+        :returns: A hint for an x-axis maximum for a complete display of the model.
+        """
         sigma = np.abs(self.vals[self.p['sigma']])
         xi = self.vals[self.p['xi']]
         if xi > 0:
