@@ -1,0 +1,20 @@
+- name: start
+  link: /tutorials/start.html
+  title: Getting started
+  identifier: /start
+- name: hfs
+  link: /tutorials/hfs.html
+  title: Calculation of hyperfine structure and Zeeman shifts
+  identifier: /hfs
+- name: models
+  link: /tutorials/models.html
+  title: Construction and fitting of modular lineshape models
+  identifier: /models
+- name: simulate
+  link: /tutorials/simulate.html
+  title: Time evolution of quantum interference in fluorescence spectra
+  identifier: /simulate
+- name: king-2d
+  link: /tutorials/king-2d.html
+  title: 2d King-plot analysis
+  identifier: /king-2d

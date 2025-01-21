@@ -18,9 +18,9 @@ title: qspec.map_corr_coeff_to_color
 <span class="o"><span class="pre">=</span></span>
 <span class="default_value"><span class="pre bool">True</span></span>
 </em>
-<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/tools.py#L124-L141' }}"><span class="sig-source">[source]</span></a>
+<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/dev-jekyll/qspec/tools.py#L124-L142' }}"><span class="sig-source">[source]</span></a>
 </dt>
-<dd class="field-body"><p></p>
+<dd class="field-body"><p>Maps a value between -1 and 1 to a red-to-green colormap.</p>
 <dl class="field-list">
 <dt class="field-head">Parameters<span class="colon">:</span></dt>
 <dd class="field-par">
@@ -32,8 +32,8 @@ title: qspec.map_corr_coeff_to_color
 </dd><dt class="field-head">Returns<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>out<span class="classifier"><em>None</em></span></dt>
-<dd class="field-desc"><p>The RGB values in the range 0-255.</p></dd></dl>
+<dt>(r, g, b)<span class="classifier"><em>tuple[int, int, int]</em></span></dt>
+<dd class="field-desc"><p> A tuple of RGB values in the range 0-255</p></dd></dl>
 </dd>
 </dl></dd>
 </dl>
@@ -41,10 +41,12 @@ title: qspec.map_corr_coeff_to_color
 </div>
 <div class="bd-content-table">
 <div class="bd-content-table-container">
+<a href="{{ '/doc/doc.html' | relative_url }}">
 <div class="bd-content-table-header row">
 <div class="table-column1"><img src="{{ '/assets/img/list-unordered.svg' | relative_url }}"/></div>
 <div class="column2"><h3 style="margin: auto auto auto 0; "><strong>API navigation</strong></h3></div>
 </div>
+</a>
 <div class="bd-content-table-content">
 <ul class="extern"><li class="has-children">
 <a href="{{ '/doc/modules/algebra.html' | relative_url }}">qspec.algebra</a>

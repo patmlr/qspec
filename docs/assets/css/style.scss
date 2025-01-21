@@ -535,6 +535,11 @@ ul.extern > li > details {
     margin-top: 2px;
     }
 
+ol.extern-ol { list-style: decimal inside none; padding: 0; width: var(--side-width); }
+ol.extern-ol > li > details {
+    margin-top: 2px;
+    }
+
 ul.extern-a {
     list-style: none;
     padding: 0 0 0 var(--navigation-indent);

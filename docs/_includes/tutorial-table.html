@@ -1,0 +1,20 @@
+
+<div class="bd-content-table">
+  <div class="bd-content-table-container">
+    <div class="bd-content-table-header row">
+      <div class="table-column1"><img src="{{ '/assets/img/list-unordered.svg' | relative_url }}"/></div>
+      <div class="column2"><h3 style="margin: auto auto auto 0; "><a href="{{ '/tutorials/tutorials.html' | relative_url }}"><strong>Tutorials</strong></a></h3></div>
+    </div>
+    <div class="bd-content-table-content">
+      <ol class="extern-ol">
+        {% for item in site.data.tutorials %}
+        <li class="spaced">
+          <a href="{{ item.link | relative_url }}" {% if page.url contains item.identifier %} class="table-current" {% endif %}>
+            {{ item.title }}
+          </a>
+        </li>
+        {% endfor %}
+      </ol>
+    </div>
+  </div>
+</div>

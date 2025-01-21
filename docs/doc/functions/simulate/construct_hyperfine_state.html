@@ -50,24 +50,24 @@ title: qspec.simulate.construct_hyperfine_state
 <span class="o"><span class="pre">=</span></span>
 <span class="default_value"><span class="pre">None</span></span>
 </em>
-<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/simulate\_simulate_cpp.py#L489-L507' }}"><span class="sig-source">[source]</span></a>
+<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/dev-jekyll/qspec/simulate\_simulate_cpp.py#L490-L509' }}"><span class="sig-source">[source]</span></a>
 </dt>
 <dd class="field-body"><p>Creates all substates of a fine-structure state using a common label.</p>
 <dl class="field-list">
 <dt class="field-head">Parameters<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>freq_0<span class="classifier"><em>scalar</em></span></dt>
+<dt>freq_0<span class="classifier"><em>quant_like</em></span></dt>
 <dd class="field-desc"><p>The energetic position of the state without the hyperfine structure or the magnetic field (MHz).</p></dd>
-<dt>s<span class="classifier"><em>scalar</em></span></dt>
+<dt>s<span class="classifier"><em>quant_like</em></span></dt>
 <dd class="field-desc"><p>The electron spin quantum number S.</p></dd>
-<dt>l<span class="classifier"><em>scalar</em></span></dt>
+<dt>l<span class="classifier"><em>quant_like</em></span></dt>
 <dd class="field-desc"><p>The electronic angular momentum quantum number L.</p></dd>
-<dt>j<span class="classifier"><em>scalar</em></span></dt>
+<dt>j<span class="classifier"><em>quant_like</em></span></dt>
 <dd class="field-desc"><p>The electronic total angular momentum quantum number J.</p></dd>
-<dt>i<span class="classifier"><em>scalar</em></span></dt>
+<dt>i<span class="classifier"><em>quant_like</em></span></dt>
 <dd class="field-desc"><p>The nuclear spin quantum number I.</p></dd>
-<dt>f<span class="classifier"><em>scalar</em></span></dt>
+<dt>f<span class="classifier"><em>quant_like</em></span></dt>
 <dd class="field-desc"><p>The hyperfine structure total angular momentum quantum number F.</p></dd>
 <dt>hyper_const<span class="classifier"><em>Iterable[scalar]</em></span></dt>
 <dd class="field-desc"><p>The hyperfine-structure constants. Currently, constants up to the electric quadrupole order are
@@ -80,8 +80,8 @@ title: qspec.simulate.construct_hyperfine_state
 </dd><dt class="field-head">Returns<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>out<span class="classifier"><em>None</em></span></dt>
-<dd class="field-desc"><p>A list of the created states.</p></dd></dl>
+<dt>out<span class="classifier"><em>list[qspec.simulate._simulate_cpp.State]</em></span></dt>
+<dd class="field-desc"><p>A list of the created states</p></dd></dl>
 </dd>
 </dl></dd>
 </dl>
@@ -89,10 +89,12 @@ title: qspec.simulate.construct_hyperfine_state
 </div>
 <div class="bd-content-table">
 <div class="bd-content-table-container">
+<a href="{{ '/doc/doc.html' | relative_url }}">
 <div class="bd-content-table-header row">
 <div class="table-column1"><img src="{{ '/assets/img/list-unordered.svg' | relative_url }}"/></div>
 <div class="column2"><h3 style="margin: auto auto auto 0; "><strong>API navigation</strong></h3></div>
 </div>
+</a>
 <div class="bd-content-table-content">
 <ul class="extern"><li class="has-children">
 <a href="{{ '/doc/modules/algebra.html' | relative_url }}">qspec.algebra</a>

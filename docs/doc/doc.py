@@ -6,7 +6,8 @@ from docutils.core import publish_parts
 from qspec.qtypes import *
 
 FOLDER_FILES = {'models', 'simulate', 'analyze'}
-FILES = sorted(['models', 'physics'])  # 'physics', 'algebra', 'models', 'analyze', 'simulate', 'tools', 'stats'
+FILES = sorted(['physics', 'algebra', 'models', 'analyze', 'simulate', 'tools', 'stats'])
+# 'physics', 'algebra', 'models', 'analyze', 'simulate', 'tools', 'stats'
 
 
 def is_num(val):
@@ -365,7 +366,7 @@ def _gen_func(f, file, temp, namespace, funcs, func_sig, func_doc):
         j = i + html_table[i:].find('<details')
         html_table = html_table[:j+8] + ' open=""' + html_table[j+8:]
 
-    j = html_table[:j].rfind(f'{file}.html')
+    j = html_table[:j].rfind(f'modules/{file}.html')
     j += html_table[j:].find('<details')
     html_table = html_table[:j + 8] + ' open=""' + html_table[j + 8:]
     html = html.replace('_table_', html_table)
@@ -415,7 +416,7 @@ def gen_functions():
 
 
 if __name__ == '__main__':
-    # gen_table()
-    # gen_doc()
-    # gen_modules()
+    gen_table()
+    gen_doc()
+    gen_modules()
     gen_functions()
