@@ -130,6 +130,11 @@ double State::get_shift()
 	return freq - freq_j;
 }
 
+void State::set_shift(double _shift)
+{
+	freq = freq_j + _shift;
+}
+
 double State::get_freq_j()
 {
 	return freq_j;
@@ -401,36 +406,26 @@ void Atom::gen_frequencies(Environment* env)
 		}
 
 		std::vector<double> freqs = hyper_zeeman_num(s.get_i(), s.get_j(), s.get_m(), s.get_gj(), s.get_gi(), s.get_hyper_const(), env->get_B());
-		printf("\ns2");
 
-		size_t i = static_cast<size_t>(s.get_f() - abs(s.get_m()));
-		printf("\n%zi, %zi", i, freqs.size());
-		s.set_freq(freqs.at(i));
+		double f_min = max(abs(s.get_m()), abs(s.get_i() - s.get_j()));
+		size_t i = static_cast<size_t>(s.get_f() - f_min);
+		s.set_shift(freqs.at(i));
 		done.insert(k);
 
-		/*size_t err = 0;
+		// The below section can be omitted. But it should increase the execution speed by using the already found eigenvalues for the other states.
 		for (size_t l = 0; l < size; ++l)
 		{
 			if (done.count(l)) continue;
 
 			State& s_mix = *states.at(l);
-			if (s_mix.get_i() == s.get_i() && s_mix.get_j() == s.get_j() && s_mix.get_m() == s.get_m() && s_mix.get_label() == s.get_label() && s_mix.get_label() == s.get_label())
+			if (s_mix.get_i() == s.get_i() && s_mix.get_j() == s.get_j() && s_mix.get_m() == s.get_m() && s_mix.get_freq_j() == s.get_freq_j())
 			{
-				++err;
-				if (err == freqs.size()) throw std::runtime_error("Too many F states mixing.");
-				
-				size_t i = static_cast<size_t>(s_mix.get_f() - abs(s.get_i() - s.get_j()));
-				s_mix.set_freq(freqs.at(i));
+				size_t i = static_cast<size_t>(s_mix.get_f() - f_min);
+				s_mix.set_shift(freqs.at(i));
 				done.insert(l);
 			}
-		}*/
+		}
 	}
-
-	/*for (size_t k = 0; k < size; ++k)
-	{
-		if (done.count(k) == 0) throw std::runtime_error("Not all states addressed.");
-	}*/
-	
 }
 
 void Atom::update()

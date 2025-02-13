@@ -275,7 +275,9 @@ double hyper_zeeman_ij(double mi0, double mj0, double mi1, double mj1, double i,
 
 std::vector<double> hyper_zeeman_num(double i, double j, double m, double g_j, double g_n, double* hyper_const, double b)
 {
-    size_t n = static_cast<size_t>(i + j - abs(m) + 1);
+    double f_min = max(abs(m), abs(i - j));
+    double f_max = i + j;
+    size_t n = static_cast<size_t>(f_max - f_min + 1);
     std::vector<double> ret(n);
 
     MatrixXd h = MatrixXd::Zero(n, n);
@@ -300,20 +302,21 @@ std::vector<double> hyper_zeeman_num(double i, double j, double m, double g_j, d
     SelfAdjointEigenSolver<MatrixXd> eigen_solver(h);
     VectorXd e_eig = eigen_solver.eigenvalues();
 
+    // Find indexes to sort eigenvalues in ascending order regarding F quantum number.
     std::vector<double> e_ref(n);
     size_t k = 0;
-    for (double f = abs(m); f <= i + j; ++f)
+    for (double f = f_min; f <= f_max; ++f)
     {
         e_ref.at(k) = hyperfine(i, j, f, hyper_const);
         ++k;
     }
-
-    printf("\nret: ");
     std::vector<size_t> indexes = invert_order(argsort(e_ref));
+
+    double f = f_min;
     for (size_t k = 0; k < n; ++k)
     {
         ret.at(k) = e_eig(indexes.at(k));
-        printf("%1.3f, ", e_eig(indexes.at(k)));
+        ++f;
     }
     return ret;
     

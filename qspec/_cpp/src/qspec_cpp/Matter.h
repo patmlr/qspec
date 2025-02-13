@@ -59,6 +59,7 @@ public:
 	void reset();
 
 	double get_shift();
+	void set_shift(double _shift);
 
 	double get_freq_j();
 	void set_freq_j(double _freq_j);
