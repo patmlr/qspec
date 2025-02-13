@@ -1,6 +1,8 @@
 #pragma once
 
 #include <complex>
+#include <numeric>
+#include <algorithm>
 #include <vector>
 #include <random>
 #include <Eigen/Dense>
@@ -23,3 +25,6 @@ std::vector<MatrixXcd> cast_samples_MatrixXcd(std::complex<double>* x, size_t sa
 
 size_t gen_index(VectorXd p, std::uniform_real_distribution<double>& d, std::mt19937& gen);
 bool check_loop(size_t i, size_t j, size_t m, int pm, std::vector<MatrixXd>& shifts);
+
+std::vector<size_t> argsort(const std::vector<double>& array);
+std::vector<size_t> invert_order(const std::vector<size_t>& indexes);

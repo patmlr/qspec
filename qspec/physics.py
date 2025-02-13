@@ -20,8 +20,8 @@ __all__ = ['L_LABEL', 'E_NORM', 'pi', 'LEMNISCATE', 'mu_N', 'mu_B', 'g_s', 'me_u
            'wavelength_to_inv_cm', 'beta', 'gamma', 'gamma_e', 'gamma_e_kin', 'e_rest', 'e_kin', 'e_total', 'e_el',
            'v_e', 'v_e_d1', 'v_el', 'v_el_d1', 'p_v', 'p_e', 'p_el', 'doppler', 'doppler_d1', 'doppler_e_d1',
            'doppler_el_d1', 'inverse_doppler', 'inverse_doppler_d1', 'alpha_atom', 'v_recoil', 'f_recoil',
-           'f_recoil_v', 'get_f', 'get_m', 'hyperfine', 'lande_n', 'lande_j', 'lande_f', 'zeeman_linear',
-           'hyper_zeeman_linear',
+           'f_recoil_v', 'get_f', 'get_m', 'hyperfine', 'lande_n', 'lande_j', 'lande_jj', 'lande_g', 'lande_f',
+           'zeeman_linear', 'hyper_zeeman_linear',
            'hyper_zeeman_ij', 'hyper_zeeman_num', 'hyper_zeeman_12', 'hyper_zeeman_12_d', 'a_hyper_mu',
            'saturation_intensity', 'saturation', 'rabi', 'scattering_rate', 'mass_factor',
            'delta_r2', 'delta_r4', 'delta_r6', 'lambda_r', 'lambda_rn', 'schmidt_line', 'sellmeier',
@@ -707,6 +707,57 @@ def lande_j(s: quant_like, l: quant_like, j: quant_like, approx_g_s: bool = Fals
     return val
 
 
+def lande_jj(j0, j1, j, g0, g1):
+    r"""
+    The electronic g-factor of a state with angular momentum $\vec{J} = \vec{J}_0 + \vec{J}_1$
+
+    $$
+    g_J = g_0\frac{J(J + 1) + J_0(J_0 + 1) - J_1(J_1 + 1)}{2J(J + 1)} + g_1\frac{J(J + 1) - J_0(J_0 + 1) + J_1(J_1 + 1)}{2J(J + 1)}.
+    $$
+
+    :param j0: The angular momentum quantum number $J_0$.
+    :param j1: The angular momentum quantum number $J_1$.
+    :param j: The angular momentum quantum number $J$.
+    :param g0: The g-factor $g_{J_0}$.
+    :param g1: The g-factor $g_{J_1}$.
+    :returns: The g-factor $g_J$.
+    """
+    jj = j * (j + 1)
+    jj01 = j0 * (j0 + 1) - j1 * (j1 + 1)
+    return 0.5 * g0 * (jj + jj01) / jj + 0.5 * g1 * (jj - jj01) / jj
+
+
+def lande_g(j: quant_like = 0, ls: Union[tuple[quant_like, quant_like], quant_like] = (0, 0), jj: quant_like = None, gj: array_like = None):
+    r"""
+    The electronic g-factor of a state with angular momentum $\vec{J} in the LS- or jj coupling scheme.
+    See `lande_j` and `lande_jj`.
+
+    :param j: The angular momentum quantum number $J$.
+    :param ls: A list or a single pair of electronic angular momentum and spin quantum numbers $(l_i, s_i)$
+     used to calculate the electronic g-factor in the LS-coupling scheme. If this is a list of LS-pairs,
+     A list of $j_i$ quantum numbers needs to specified for the parameter `jj`. It is overwritten if `gj` is specified.
+    :param jj: A list of two electronic total angular momentum quantum numbers $(j_0, j_1)$
+     used to calculate the electronic g-factor in the jj-coupling scheme.
+     Either a list of two $(l_i, s_i)$ pairs needs to be specified for the parameter `ls`
+     or a list of g-factors $g_{j_i}$ for the parameter `gj`. The parameter `gj` overwrites `ls`.
+     If `gj` is a single scalar value, it also overwrites `jj`.
+    :param gj: A list of two $g_{j_i}$ or a single electronic g-factor $g_J$. If `gj` is a list, `jj` is required
+     and `ls` is overwritten. If `gj` is a scalar, both `ls` and `jj` are overwritten.
+    :returns: The g-factor $g_J$.
+    """
+    if gj is None:
+        if jj is None:
+            gj = lande_j(ls[1], ls[0], j)
+        else:
+            g0 = lande_j(ls[0][1], ls[0][0], j)
+            g1 = lande_j(ls[1][1], ls[1][0], j)
+            gj = lande_jj(jj[0], jj[1], j, g0, g1)
+    elif hasattr(gj, '__getitem__'):
+            gj = lande_jj(jj[0], jj[1], j, gj[0], gj[1])
+    return gj
+
+
+
 def lande_f(i: quant_like, j: quant_like, f: quant_like, g_i: array_like, g_j: array_like) -> ndarray:
     r"""
     The total atomic g-factor in the IJ-coupling scheme
@@ -733,6 +784,7 @@ def lande_f(i: quant_like, j: quant_like, f: quant_like, g_i: array_like, g_j: a
     val = (ff + ji) / (2 * ff) * g_j
     val += (ff - ji) / (2 * ff) * g_i * mu_N / mu_B
     return val
+
 
 
 def hyperfine(i: quant_like, j: quant_like, f: quant_like,

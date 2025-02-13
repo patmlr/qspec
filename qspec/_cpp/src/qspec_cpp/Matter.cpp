@@ -12,6 +12,11 @@ Environment::Environment()
 	e_B << 0, 0, 1;
 }
 
+Environment::~Environment()
+{
+
+}
+
 double Environment::get_E()
 {
 	return E;
@@ -74,15 +79,15 @@ State::State()
 	freq_j = 0.;
 	freq = 0.;
 
-	s = 0.;
-	l = 0.;
 	j = 0.;
 	i = 0.;
 	f = 0.;
 	m = 0.;
 
 	hyper_const = new double[HYPER_SIZE]{0., 0., 0.};
-	g = 0.;
+
+	gj = 0.;
+	gi = 0.;
 
 	label = std::string ("<State>");
 }
@@ -92,14 +97,12 @@ State::~State()
 	delete[] hyper_const;
 }
 
-void State::init(double _freq_j, double _s, double _l, double _j, double _i, double _f, double _m,
-	double* _hyper_const, double _g, std::string _label)
+void State::init(double _freq_j, double _j, double _i, double _f, double _m,
+	double* _hyper_const, double _gj, double _gi, std::string _label)
 {
 	freq_j = _freq_j;
 	freq = _freq_j;
 
-	s = _s;
-	l = _l;
 	j = _j;
 	i = _i;
 	f = _f;
@@ -109,21 +112,17 @@ void State::init(double _freq_j, double _s, double _l, double _j, double _i, dou
 	{
 		hyper_const[i] = _hyper_const[i];
 	}
-	g = _g;
+	gj = _gj;
+	gi = _gi;
 
 	label = _label;
 
-	update();
+	reset();
 }
 
-void State::update()
+void State::reset()
 {
-	freq = freq_j + hyper_zeeman(i, s, l, j, f, m, g, hyper_const, 0, false);
-}
-
-void State::update(Environment* env)
-{
-	freq = freq_j + hyper_zeeman(i, s, l, j, f, m, g, hyper_const, env->get_B(), false);
+	freq = freq_j + hyperfine(i, j, f, hyper_const);
 }
 
 double State::get_shift()
@@ -146,24 +145,9 @@ double State::get_freq()
 	return freq;
 }
 
-double State::get_s()
+void State::set_freq(double _freq)
 {
-	return s;
-}
-
-void State::set_s(double _s)
-{
-	s = _s;
-}
-
-double State::get_l()
-{
-	return l;
-}
-
-void State::set_l(double _l)
-{
-	l = _l;
+	freq = _freq;
 }
 
 double State::get_j()
@@ -219,14 +203,24 @@ void State::set_hyper_const(double* _hyper_const)
 	}
 }
 
-double State::get_g()
+double State::get_gj()
 {
-	return g;
+	return gj;
 }
 
-void State::set_g(double _g)
+void State::set_gj(double _gj)
 {
-	g = _g;
+	gj = _gj;
+}
+
+double State::get_gi()
+{
+	return gi;
+}
+
+void State::set_gi(double _gi)
+{
+	gi = _gi;
 }
 
 std::string State::get_label()
@@ -335,7 +329,7 @@ void Atom::init(std::vector<State*> _states, DecayMap* _decays)
 	update();
 }
 
-void Atom::update()
+void Atom::gen_dipole()
 {
 	L0 = MatrixXd::Zero(size, size);
 	L1 = MatrixXd::Zero(size, size);
@@ -389,7 +383,66 @@ void Atom::update()
 		L1.col(i) += Lsum;
 	}
 	L1 *= -0.5;
+}
+
+void Atom::gen_frequencies(Environment* env)
+{
+	std::set<size_t> done;
+	for (size_t k = 0; k < size; ++k)
+	{
+		if (done.count(k)) continue;
+
+		State& s = *states.at(k);
+		if (env->get_B() == 0)
+		{
+			s.reset();
+			done.insert(k);
+			continue;
+		}
+
+		std::vector<double> freqs = hyper_zeeman_num(s.get_i(), s.get_j(), s.get_m(), s.get_gj(), s.get_gi(), s.get_hyper_const(), env->get_B());
+		printf("\ns2");
+
+		size_t i = static_cast<size_t>(s.get_f() - abs(s.get_m()));
+		printf("\n%zi, %zi", i, freqs.size());
+		s.set_freq(freqs.at(i));
+		done.insert(k);
+
+		/*size_t err = 0;
+		for (size_t l = 0; l < size; ++l)
+		{
+			if (done.count(l)) continue;
+
+			State& s_mix = *states.at(l);
+			if (s_mix.get_i() == s.get_i() && s_mix.get_j() == s.get_j() && s_mix.get_m() == s.get_m() && s_mix.get_label() == s.get_label() && s_mix.get_label() == s.get_label())
+			{
+				++err;
+				if (err == freqs.size()) throw std::runtime_error("Too many F states mixing.");
+				
+				size_t i = static_cast<size_t>(s_mix.get_f() - abs(s.get_i() - s.get_j()));
+				s_mix.set_freq(freqs.at(i));
+				done.insert(l);
+			}
+		}*/
+	}
+
+	/*for (size_t k = 0; k < size; ++k)
+	{
+		if (done.count(k) == 0) throw std::runtime_error("Not all states addressed.");
+	}*/
+	
+}
+
+void Atom::update()
+{
+	gen_dipole();
+}
+
+void Atom::update(Environment* env)
+{
+	gen_frequencies(env);
 	gen_w0();
+	gen_dipole();
 }
 
 size_t Atom::get_size()

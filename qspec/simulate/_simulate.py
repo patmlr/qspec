@@ -626,11 +626,11 @@ class ScatteringRate:
         :raises ValueError: The atom has to consist of a single closed transition between two fine-structure states.
          Their common nucleus can have an arbitrary spin.
         """
-        s, l, j, i = self.state_l[0].s, self.state_l[0].l, self.state_l[0].j, self.state_l[0].i
-        if any(state_l.s != s or state_l.l != l or state_l.j != j or state_l.i != i for state_l in self.state_l):
+        j, i = self.state_l[0].j, self.state_l[0].i
+        if any(state_l.j != j or state_l.i != i for state_l in self.state_l):
             raise ValueError('All lower states must be part of the same fine-structure state.')
-        s, l, j, i = self.state_u[0].s, self.state_u[0].l, self.state_u[0].j, self.state_u[0].i
-        if any(state_u.s != s or state_u.l != l or state_u.j != j or state_u.i != i for state_u in self.state_u):
+        j, i = self.state_u[0].j, self.state_u[0].i
+        if any(state_u.j != j or state_u.i != i for state_u in self.state_u):
             raise ValueError('All upper states must be part of the same fine-structure state.')
         if self.state_l[0].i != self.state_u[0].i:
             raise ValueError('The lower and upper states must be part of the same nuclear state.')
@@ -740,8 +740,7 @@ class ScatteringRate:
         self.e_l = np.dot(self.R_b, self.polarization.x)
         self.polarization.def_q_axis(self.e_r_b)
         self.environment = Environment(B=self.b)
-        for state in self.atom:
-            state.update(self.environment)
+        self.atom.update(self.environment)
         self.set_x0()
 
     def generate_x(self, width: scalar = 20., step: scalar = None):

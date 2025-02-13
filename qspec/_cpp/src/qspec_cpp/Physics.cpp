@@ -215,10 +215,8 @@ double zeeman(double m, double b, double g)
     return -g * m * sc::mu_B * b / sc::h * 1e-6;
 }
 
-double hyper_zeeman(double i, double s, double l, double j,
-    double f, double m, double g_n, double* hyper_const, double b, bool g_n_as_gyro)
+double hyper_zeeman_linear(double i, double j, double f, double m, double g_j, double g_n, double* hyper_const, double b, bool g_n_as_gyro)
 {
-    double g_j = lande_j(s, l, j);
     double _g_n = g_n;
     if (g_n_as_gyro) _g_n = lande_n(g_n);
     double g_f = 0.;
@@ -226,6 +224,99 @@ double hyper_zeeman(double i, double s, double l, double j,
     double ret = hyperfine(i, j, f, hyper_const);
     ret += zeeman(m, b, g_f);
     return ret;
+}
+
+double hyper_zeeman_ij(double mi0, double mj0, double mi1, double mj1, double i, double j, double g_j, double g_n, double* hyper_const, double b)
+{   
+    double b_field = b * 1e-6 / sc::h;
+    double b_hyper_n = 0.;
+    if (i > 0.5 && j > 0.5)
+    {
+        b_hyper_n = hyper_const[1] / (2 * i * (2 * i - 1) * j * (2 * j - 1));
+    }
+
+    if (mi0 + mj0 != mi1 + mj1) return 0;
+
+    else if (mi0 == mi1 && mj0 == mj1)
+    {
+        double ret = hyper_const[0] * mi0 * mj0 - (mi0 * g_n * sc::mu_N + mj0 * g_j * sc::mu_B) * b_field;
+        ret += b_hyper_n * (3 * pow(mi0 * mj0, 2) - i * (i + 1) * j * (j + 1) + 1.5 * mi0 * mj0
+            + 0.75 * (j - mj0) * (j + mj0 + 1) * (i + mi0) * (i - mi0 + 1)
+            + 0.75 * (i - mi0) * (i + mi0 + 1) * (j + mj0) * (j - mj0 + 1));
+        return ret;
+    }
+
+    else if (mi0 == mi1 + 1 && mj0 == mj1 - 1)
+    {
+        return (0.5 * hyper_const[0] + 1.5 * b_hyper_n * (0.5 + mi0 * mj0 + mi1 * mj1))
+            * sqrt((i - mi1) * (i + mi1 + 1) * (j + mj1) * (j - mj1 + 1));
+    }
+
+    else if (mi0 == mi1 - 1 && mj0 == mj1 + 1)
+    {
+        return (0.5 * hyper_const[0] + 1.5 * b_hyper_n * (0.5 + mi0 * mj0 + mi1 * mj1))
+            * sqrt((i + mi1) * (i - mi1 + 1) * (j - mj1) * (j + mj1 + 1));
+    }
+
+    else if (mi0 == mi1 + 2 && mj0 == mj1 - 2)
+    {
+        return 0.75 * b_hyper_n * sqrt((j + mj1) * (j - mj1 + 1) * (j + mj1 - 1) * (j - mj1 + 2)
+                * (i - mi1) * (i + mi1 + 1) * (i - mi1 - 1) * (i + mi1 + 2));
+    }
+
+    else if (mi0 == mi1 - 2 && mj0 == mj1 + 2)
+    {
+        return 0.75 * b_hyper_n * sqrt((i + mi1) * (i - mi1 + 1) * (i + mi1 - 1) * (i - mi1 + 2)
+                * (j - mj1) * (j + mj1 + 1) * (j - mj1 - 1) * (j + mj1 + 2));
+    }
+
+    return 0;
+}
+
+std::vector<double> hyper_zeeman_num(double i, double j, double m, double g_j, double g_n, double* hyper_const, double b)
+{
+    size_t n = static_cast<size_t>(i + j - abs(m) + 1);
+    std::vector<double> ret(n);
+
+    MatrixXd h = MatrixXd::Zero(n, n);
+    size_t k0 = 0;
+    for (double mi0 = -i; mi0 <= i; ++mi0)
+    {
+        if (abs(m - mi0) <= j)
+        {
+            size_t k1 = 0;
+            for (double mi1 = -i; mi1 <= i; ++mi1)
+            {
+                if (abs(m - mi1) <= j)
+                {
+                    h(k0, k1) = hyper_zeeman_ij(mi0, m - mi0, mi1, m - mi1, i, j, g_j, g_n, hyper_const, b);
+                    ++k1;
+                }
+            }
+            ++k0;
+        }
+    }
+
+    SelfAdjointEigenSolver<MatrixXd> eigen_solver(h);
+    VectorXd e_eig = eigen_solver.eigenvalues();
+
+    std::vector<double> e_ref(n);
+    size_t k = 0;
+    for (double f = abs(m); f <= i + j; ++f)
+    {
+        e_ref.at(k) = hyperfine(i, j, f, hyper_const);
+        ++k;
+    }
+
+    printf("\nret: ");
+    std::vector<size_t> indexes = invert_order(argsort(e_ref));
+    for (size_t k = 0; k < n; ++k)
+    {
+        ret.at(k) = e_eig(indexes.at(k));
+        printf("%1.3f, ", e_eig(indexes.at(k)));
+    }
+    return ret;
+    
 }
 
 double lorentz(double w, double w0, double a, double rabi_square)

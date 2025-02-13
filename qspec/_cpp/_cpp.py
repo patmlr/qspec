@@ -141,11 +141,10 @@ dll.environment_set_B_double.argtypes = (EnvironmentHandler, c_double)
 dll.state_construct.restype = StateHandler
 dll.state_destruct.argtypes = (StateHandler, )
 
-dll.state_init.argtypes = (StateHandler, c_double, c_double, c_double, c_double, c_double, c_double,
-                           c_double, vector3d_p, c_double, c_char_p)
+dll.state_init.argtypes = (StateHandler, c_double, c_double, c_double, c_double,
+                           c_double, vector3d_p, c_double, c_double, c_char_p)
 
-dll.state_update.argtypes = (StateHandler, )
-dll.state_update_env.argtypes = (StateHandler, EnvironmentHandler)
+dll.state_reset.argtypes = (StateHandler, )
 
 dll.state_get_freq_j.argtypes = (StateHandler, )
 dll.state_get_freq_j.restype = c_double
@@ -153,12 +152,7 @@ dll.state_set_freq_j.argtypes = (StateHandler, c_double)
 
 dll.state_get_freq.argtypes = (StateHandler, )
 dll.state_get_freq.restype = c_double
-
-dll.state_get_s.argtypes = (StateHandler, )
-dll.state_get_s.restype = c_double
-
-dll.state_get_l.argtypes = (StateHandler, )
-dll.state_get_l.restype = c_double
+dll.state_set_freq.argtypes = (StateHandler, c_double)
 
 dll.state_get_j.argtypes = (StateHandler, )
 dll.state_get_j.restype = c_double
@@ -176,9 +170,13 @@ dll.state_get_hyper_const.argtypes = (StateHandler, )
 dll.state_get_hyper_const.restype = vector3d_p
 dll.state_set_hyper_const.argtypes = (StateHandler, vector3d_p)
 
-dll.state_get_g.argtypes = (StateHandler, )
-dll.state_get_g.restype = c_double
-dll.state_set_g.argtypes = (StateHandler, c_double)
+dll.state_get_gj.argtypes = (StateHandler, )
+dll.state_get_gj.restype = c_double
+dll.state_set_gj.argtypes = (StateHandler, c_double)
+
+dll.state_get_gi.argtypes = (StateHandler, )
+dll.state_get_gi.restype = c_double
+dll.state_set_gi.argtypes = (StateHandler, c_double)
 
 dll.state_get_label.argtypes = (StateHandler, )
 dll.state_get_label.restype = c_char_p
@@ -208,6 +206,7 @@ dll.atom_construct.restype = AtomHandler
 dll.atom_destruct.argtypes = (AtomHandler, )
 
 dll.atom_update.argtypes = (AtomHandler, )
+dll.atom_update_env.argtypes = (AtomHandler, EnvironmentHandler)
 
 dll.atom_add_state.argtypes = (AtomHandler, StateHandler)
 dll.atom_clear_states.argtypes = (AtomHandler, )

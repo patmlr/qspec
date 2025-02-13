@@ -395,7 +395,7 @@ def example(n=None):
         inter.time_dependent = True
         # inter.resonance_info()
 
-        times = np.linspace(0, 10., 10001)
+        times = np.linspace(0., 10., 10001)
 
         y = inter.rates(times)
         plt.plot(times, np.sum(y[0, he.get_state_indexes('s')], axis=0), '--C0')

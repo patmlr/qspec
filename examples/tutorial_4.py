@@ -28,7 +28,8 @@ intensity = 1.  # uW /mm**2
 polarization = sim.Polarization([0, 1, 0])  # Linear polarization
 laser = sim.Laser(f_sp, intensity, polarization)
 
-inter = sim.Interaction(li7, [laser])
+env = sim.Environment(B=1e-2)
+inter = sim.Interaction(li7, [laser], environment=env)
 inter.controlled = True  # Error controlled integrator
 
 t = 0.2  # Integration time (us)

@@ -136,3 +136,26 @@ bool check_loop(size_t i, size_t j, size_t m, int pm, std::vector<MatrixXd>& shi
     }
     return false;
 }
+
+std::vector<size_t> argsort(const std::vector<double>& array)
+{
+    std::vector<size_t> indexes(array.size());
+    std::iota(indexes.begin(), indexes.end(), 0);
+    std::sort(indexes.begin(), indexes.end(),
+        [&](size_t left, size_t right) -> bool {
+            return array[left] < array[right];
+        });
+    return indexes;
+}
+
+std::vector<size_t> invert_order(const std::vector<size_t>& indexes)
+{
+    std::vector<size_t> inverted;
+    for (size_t k = 0; k < indexes.size(); ++k)
+    {
+        auto it = std::find(indexes.begin(), indexes.end(), k);
+        size_t index = std::distance(indexes.begin(), it);
+        inverted.push_back(index);
+    }
+    return inverted;
+}

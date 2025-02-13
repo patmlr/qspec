@@ -196,20 +196,15 @@ extern "C"
         delete state;
     }
 
-    __declspec(dllexport) void state_init(State* state, double _freq_0, double _s, double _l, double _j, double _i, double _f,
-        double _m, double* _hyper_const, double _g, char* _label)
+    __declspec(dllexport) void state_init(State* state, double _freq_0, double _j, double _i, double _f,
+        double _m, double* _hyper_const, double _gj, double _gi, char* _label)
     {
-        state->init(_freq_0, _s, _l, _j, _i, _f, _m, _hyper_const, _g, std::string(_label));
+        state->init(_freq_0, _j, _i, _f, _m, _hyper_const, _gj, _gi, std::string(_label));
     }
 
-    __declspec(dllexport) void state_update(State* state)
+    __declspec(dllexport) void state_reset(State* state)
     {
-        return state->update();
-    }
-
-    __declspec(dllexport) void state_update_env(State* state, Environment* env)
-    {
-        return state->update(env);
+        return state->reset();
     }
 
     __declspec(dllexport) double state_get_shift(State* state)
@@ -232,24 +227,9 @@ extern "C"
         return state->get_freq();
     }
 
-    __declspec(dllexport) double state_get_s(State* state)
+    __declspec(dllexport) void state_set_freq(State* state, double freq)
     {
-        return state->get_s();
-    }
-
-    __declspec(dllexport) void state_set_s(State* state, double s)
-    {
-        state->set_s(s);
-    }
-
-    __declspec(dllexport) double state_get_l(State* state)
-    {
-        return state->get_l();
-    }
-
-    __declspec(dllexport) void state_set_l(State* state, double l)
-    {
-        state->set_l(l);
+        state->set_freq(freq);
     }
 
     __declspec(dllexport) double state_get_j(State* state)
@@ -302,14 +282,24 @@ extern "C"
         state->set_hyper_const(hyper_const);
     }
 
-    __declspec(dllexport) double state_get_g(State* state)
+    __declspec(dllexport) double state_get_gj(State* state)
     {
-        return state->get_g();
+        return state->get_gj();
     }
 
-    __declspec(dllexport) void state_set_g(State* state, double g)
+    __declspec(dllexport) void state_set_gj(State* state, double gj)
     {
-        state->set_g(g);
+        state->set_gj(gj);
+    }
+
+    __declspec(dllexport) double state_get_gi(State* state)
+    {
+        return state->get_gi();
+    }
+
+    __declspec(dllexport) void state_set_gi(State* state, double gi)
+    {
+        state->set_gi(gi);
     }
 
     __declspec(dllexport) const char* state_get_label(State* state)
@@ -390,6 +380,11 @@ extern "C"
     __declspec(dllexport) void atom_update(Atom* atom)
     {
         atom->update();
+    }
+
+    __declspec(dllexport) void atom_update_env(Atom* atom, Environment* env)
+    {
+        atom->update(env);
     }
 
     __declspec(dllexport) void atom_add_state(Atom* atom, State* state)

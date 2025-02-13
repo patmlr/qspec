@@ -13,7 +13,7 @@ import matplotlib.pyplot as plt
 from qspec.qtypes import *
 from qspec._cpp import *
 from qspec import tools
-from qspec import get_f, get_m
+from qspec import get_f, get_m, lande_g
 import qspec.algebra as al
 
 
@@ -299,53 +299,51 @@ class Environment:
 
 
 class State:
-    def __init__(self, freq_j: scalar, s: scalar, l: scalar, j: scalar, i: scalar, f: scalar, m: scalar,
-                 hyper_const: array_like = None, g: scalar = 0, label: str = None, instance=None):
+    def __init__(self, freq_j: quant_like, j: quant_like, i: quant_like, f: quant_like, m: quant_like,
+                 hyper_const: array_like = None, gj: quant_like = 0, gi: quant_like = 0,
+                 label: str = None, instance=None):
         r"""
-        Class representing an atomic quantum state $|(\mathrm{label})SLJIFm\rangle$.
+        Class representing an atomic quantum state $|(\mathrm{label})IJFm\rangle$.
 
         :param freq_j: The energetic position of the state without the hyperfine structure or the environment (MHz).
-        :param s: The electron spin quantum number S.
-        :param l: The electronic angular momentum quantum number L.
-        :param j: The electronic total angular momentum quantum number J.
-        :param i: The nuclear spin quantum number I.
-        :param f: The total angular momentum quantum number F.
-        :param m: The B-field-axis component quantum number m of the total angular momentum.
-        :param hyper_const: The hyperfine-structure constants. Currently, constants up to the electric quadrupole order
-         are supported (A, B). If 'hyper_const' is a scalar, it is assumed to be the constant A
-         and the other orders are 0 (MHz).
-        :param g: The nuclear g-factor.
-        :param label: The label of the state. The label is used to link states via decay maps.
+        :param j: The electronic total angular momentum quantum number $J$.
+        :param i: The nuclear spin quantum number $I$.
+        :param f: The total angular momentum quantum number $F$.
+        :param m: The z-projection quantum number $m$ of the total angular momentum `f`.
+        :param hyper_const: A list of the hyperfine-structure constants.
+         Currently, constants up to the electric quadrupole order are supported ($A$, $B$).
+         If 'hyper_const' is a scalar, it is assumed to be the constant $A$ and the other orders are 0 (MHz).
+        :param gi: The nuclear g-factor $g_I$.
+        :param gj: The nuclear g-factor $g_J$.
+        :param label: The label of the state. The label is used to link states via a `DecayMap`.
         :param instance: A pointer to an existing State instance.
          If this is specified, the other parameters are omitted.
         """
         self.instance = instance
         if self.instance is None:
-            tools.check_half_integer(s, l, j, i, f, m)
+            tools.check_half_integer(j, i, f, m)
             hyper_const = _process_hyper_const(hyper_const)
             if label is None:
-                label = '{}({}, {}, {})'.format(int(np.around(freq_j, decimals=0)), s, l, j)
+                label = '{}({})'.format(int(np.around(freq_j, decimals=0)), j)
             self.instance = dll.state_construct()
-            dll.state_init(self.instance, c_double(freq_j), c_double(s), c_double(l), c_double(j), c_double(i),
-                           c_double(f), c_double(m), hyper_const, c_double(g), c_char_p(bytes(label, 'utf-8')))
+            dll.state_init(self.instance, c_double(freq_j), c_double(j), c_double(i),
+                           c_double(f), c_double(m), hyper_const, c_double(gj), c_double(gi),
+                           c_char_p(bytes(label, 'utf-8')))
 
     def __del__(self):
         dll.state_destruct(self.instance)
 
     def __repr__(self):
-        return '{}({})'.format(self.label, ('{}, ' * 6)[:-2]) \
-            .format(*[tools.half_integer_to_str(qn, '/') for qn in [self.s, self.l, self.j, self.i, self.f, self.m]])
+        return '{}({})'.format(self.label, ('{}, ' * 4)[:-2]) \
+            .format(*[tools.half_integer_to_str(qn, '/') for qn in [self.j, self.i, self.f, self.m]])
 
-    def update(self, environment: Environment = None):
+    def reset(self):
         """
-        Update the shifted frequency of the state.
+        Reset the shifted frequency of the state to a vacuum environment.
 
         :returns:
         """
-        if environment is None:
-            dll.state_update(self.instance)
-        else:
-            dll.state_update_env(self.instance, environment.instance)
+        dll.state_update(self.instance)
 
     def get_shift(self):
         """
@@ -372,19 +370,9 @@ class State:
         """
         return dll.state_get_freq(self.instance)
 
-    @property
-    def s(self):
-        """
-        :returns: The electron spin quantum number S.
-        """
-        return dll.state_get_s(self.instance)
-
-    @property
-    def l(self):
-        """
-        :returns: The electronic angular momentum quantum number L.
-        """
-        return dll.state_get_l(self.instance)
+    @freq.setter
+    def freq(self, value: scalar):
+        dll.state_set_freq(self.instance, c_double(value))
 
     @property
     def j(self):
@@ -433,19 +421,34 @@ class State:
         dll.state_get_hyper_const(self.instance, value)
 
     @property
-    def g(self):
+    def gj(self):
+        """
+        :returns: The electronic g-factor.
+        """
+        return dll.state_get_gj(self.instance)
+
+    @gj.setter
+    def gj(self, value: scalar):
+        """
+        :param value: The new electronic g-factor.
+        :returns:
+        """
+        dll.state_set_gj(self.instance, c_double(value))
+
+    @property
+    def gi(self):
         """
         :returns: The nuclear g-factor.
         """
-        return dll.state_get_g(self.instance)
+        return dll.state_get_gi(self.instance)
 
-    @g.setter
-    def g(self, value: scalar):
+    @gi.setter
+    def gi(self, value: scalar):
         """
         :param value: The new nuclear g-factor.
         :returns:
         """
-        dll.state_set_g(self.instance, c_double(value))
+        dll.state_set_gi(self.instance, c_double(value))
 
     @property
     def label(self):
@@ -484,21 +487,22 @@ def construct_electronic_state(freq_0: quant_like, s: quant_like, l: quant_like,
     f = get_f(i, j)
     m = [get_m(_f) for _f in f]
     fm = [(_f, _m) for _f, m_f in zip(f, m) for _m in m_f]
-    return [State(freq_0, s, l, j, i, _f, _m, hyper_const=hyper_const, g=g, label=label) for (_f, _m) in fm]
+    gj = lande_g(j, (l, s), None, None)
+    return [State(freq_0, j, i, _f, _m, hyper_const=hyper_const, gj=gj, gi=g, label=label) for (_f, _m) in fm]
 
 
 def construct_hyperfine_state(freq_0: quant_like, s: quant_like, l: quant_like, j: quant_like, i: quant_like,
                               f: quant_like, hyper_const: Iterable[scalar] = None, g: scalar = 0, label: str = None) \
         -> list[State]:
     """
-    Creates all substates of a fine-structure state using a common label.
+    Creates all substates of a hyperfine-structure state using a common label.
 
     :param freq_0: The energetic position of the state without the hyperfine structure or the magnetic field (MHz).
     :param s: The electron spin quantum number S.
     :param l: The electronic angular momentum quantum number L.
     :param j: The electronic total angular momentum quantum number J.
     :param i: The nuclear spin quantum number I.
-    :param f: The hyperfine structure total angular momentum quantum number F.
+    :param f: The total angular momentum quantum number $F$.
     :param hyper_const: The hyperfine-structure constants. Currently, constants up to the electric quadrupole order are
      supported (A, B). If 'hyper_const' is a scalar,
      it is assumed to be the constant A and the other orders are 0 (MHz).
@@ -506,7 +510,75 @@ def construct_hyperfine_state(freq_0: quant_like, s: quant_like, l: quant_like, 
     :param label: The label of the states. The labels are used to link states via decay maps.
     :returns: A list of the created states.
     """
-    return [State(freq_0, s, l, j, i, f, _m, hyper_const=hyper_const, g=g, label=label) for _m in get_m(f)]
+    gj = lande_g(j, (l, s), None, None)
+    return [State(freq_0, j, i, f, _m, hyper_const=hyper_const, gj=gj, gi=g, label=label) for _m in get_m(f)]
+
+
+def gen_electronic_state(
+        freq_0: quant_like = 0., j: quant_like = 0, i: quant_like = 0, hyper_const: Iterable[array_like] = None,
+        ls: quant_like = (0, 0), jj: quant_like = None, gj: array_like = None, gi: array_like = 0,
+        label: str = None) -> list[State]:
+    """
+    Creates all substates of a fine-structure state using a common label.
+
+    :param freq_0: The energetic position of the state without the hyperfine structure or the magnetic field (MHz).
+    :param j: The electronic total angular momentum quantum number $J$.
+    :param i: The nuclear spin quantum number $I$.
+    :param hyper_const: A list of the hyperfine-structure constants.
+     Currently, constants up to the electric quadrupole order are supported ($A$, $B$). If 'hyper_const' is a scalar,
+     it is assumed to be the constant $A$ and the other orders are 0 (MHz).
+    :param ls: A list or a single pair of electronic angular momentum and spin quantum numbers $(l_i, s_i)$
+     used to calculate the electronic g-factor in the LS-coupling scheme. If this is a list of LS-pairs,
+     A list of $j_i$ quantum numbers needs to specified for the parameter `jj`. It is overwritten if `gj` is specified.
+    :param jj: A list of two electronic total angular momentum quantum numbers $(j_0, j_1)$
+     used to calculate the electronic g-factor in the jj-coupling scheme.
+     Either a list of two $(l_i, s_i)$ pairs needs to be specified for the parameter `ls`
+     or a list of g-factors $g_{j_i}$ for the parameter `gj`. The parameter `gj` overwrites `ls`.
+     If `gj` is a single scalar value, it also overwrites `jj`.
+    :param gj: A list of two $g_{j_i}$ or a single electronic g-factor $g_J$. If `gj` is a list, `jj` is required
+     and `ls` is overwritten. If `gj` is a scalar, both `ls` and `jj` are overwritten.
+    :param gi: The nuclear g-factor $g_I$.
+    :param label: The label of the states. The labels are used to link states via a `DecayMap`.
+    :returns: (list[State], ) A list of the created states.
+    """
+    f = get_f(i, j)
+    m = [get_m(_f) for _f in f]
+    fm = [(_f, _m) for _f, m_f in zip(f, m) for _m in m_f]
+    gj = lande_g(j, ls, jj, gj)
+    return [State(freq_0, j, i, _f, _m, hyper_const=hyper_const, gj=gj, gi=gi, label=label) for (_f, _m) in fm]
+
+
+def gen_hyperfine_state(
+        freq_0: quant_like = 0., j: quant_like = 0, i: quant_like = 0,
+        f: quant_like = 0, hyper_const: Iterable[array_like] = None,
+        ls: quant_like = (0, 0), jj: quant_like = None, gj: array_like = None, gi: array_like = 0,
+        label: str = None) -> list[State]:
+    """
+    Creates all substates of a hyperfine-structure state using a common label.
+
+    :param freq_0: The energetic position of the state without the hyperfine structure or the magnetic field (MHz).
+    :param j: The electronic total angular momentum quantum number $J$.
+    :param i: The nuclear spin quantum number $I$.
+    :param f: The total angular momentum quantum number $F$.
+    :param hyper_const: A list of the hyperfine-structure constants.
+     Currently, constants up to the electric quadrupole order are supported ($A$, $B$). If 'hyper_const' is a scalar,
+     it is assumed to be the constant $A$ and the other orders are 0 (MHz).
+    :param ls: A list or a single pair of electronic angular momentum and spin quantum numbers $(l_i, s_i)$
+     used to calculate the electronic g-factor in the LS-coupling scheme. If this is a list of LS-pairs,
+     A list of $j_i$ quantum numbers needs to specified for the parameter `jj`. It is overwritten if `gj` is specified.
+    :param jj: A list of two electronic total angular momentum quantum numbers $(j_0, j_1)$
+     used to calculate the electronic g-factor in the jj-coupling scheme.
+     Either a list of two $(l_i, s_i)$ pairs needs to be specified for the parameter `ls`
+     or a list of g-factors $g_{j_i}$ for the parameter `gj`. The parameter `gj` overwrites `ls`.
+     If `gj` is a single scalar value, it also overwrites `jj`.
+    :param gj: A list of two $g_{j_i}$ or a single electronic g-factor $g_J$. If `gj` is a list, `jj` is required
+     and `ls` is overwritten. If `gj` is a scalar, both `ls` and `jj` are overwritten.
+    :param gi: The nuclear g-factor $g_I$.
+    :param label: The label of the states. The labels are used to link states via a `DecayMap`.
+    :returns: (list[State], ) A list of the created states.
+    """
+    gj = lande_g(j, ls, jj, gj)
+    return [State(freq_0, j, i, f, _m, hyper_const=hyper_const, gj=gj, gi=gi, label=label) for _m in get_m(f)]
 
 
 class DecayMap:
@@ -629,13 +701,14 @@ class Atom:
     def __getitem__(self, key: int) -> State:
         return self.states[key]
 
-    def update(self):
+    def update(self, env: Environment = None):
         """
         Update the atom.
-
-        :returns:
         """
-        dll.atom_update(self.instance)
+        if env is None:
+            dll.atom_update(self.instance)
+        else:
+            dll.atom_update_env(self.instance, env.instance)
         self.label_map = _gen_label_map(self)
 
     @property
@@ -1082,13 +1155,14 @@ def _cast_v(v: Optional[array_like]):
     
 
 class Interaction:
-    def __init__(self, atom: Atom = None, lasers: Iterable[Laser] = None, delta_max: scalar = 1e3,
-                 controlled: bool = True, instance=None):
+    def __init__(self, atom: Atom = None, lasers: Iterable[Laser] = None, environment: Environment = None,
+                 delta_max: scalar = 1e3, controlled: bool = True, instance=None):
         """
         Class representing an Interaction between lasers and an atom.
 
-        :param atom: The atom.
-        :param lasers: The lasers.
+        :param atom: The atom interacting with the lasers.
+        :param lasers: The lasers interacting with the atom.
+        :param environment: The electromagnetic environment of the interaction.
         :param delta_max: The maximum absolute difference between a laser and a transition frequency
          for that transition to be considered laser-driven (MHz). The default value is 1 GHz.
         :param controlled: Whether the ODE solver uses an error controlled stepper or a fixed step size.
@@ -1107,6 +1181,7 @@ class Interaction:
                 lasers = []
             self.atom = atom
             self.lasers = list(lasers)
+            self.environment = environment
             self.delta_max = delta_max
             self.controlled = controlled
             self.update()
@@ -1184,8 +1259,10 @@ class Interaction:
         :param value: The new environment of the interaction.
         :returns:
         """
+        if value is None:
+            value = Environment()
         self._environment = value
-        dll.interaction_set_environment(self.instance, value.instance)
+        dll.interaction_set_environment(self.instance, self._environment.instance)
 
     @property
     def atom(self):

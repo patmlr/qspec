@@ -208,7 +208,6 @@ void Interaction::set_atom(Atom* _atom)
 {
 	atom = _atom;
 	summap = MatrixXi::Zero(atom->get_size(), atom->get_size());
-	set_env(env);
 }
 
 void Interaction::clear_lasers()
@@ -239,9 +238,6 @@ Environment* Interaction::get_env()
 void Interaction::set_env(Environment* _env)
 {
 	env = _env;
-	for (State* state : *atom->get_states()) state->update(env);
-	atom->gen_w0();
-	update();
 }
 
 double Interaction::get_delta_max()
@@ -361,6 +357,7 @@ MatrixXcd Interaction::get_hamiltonian(const double t, const VectorXd& delta, co
 void Interaction::update()
 {
 	gen_coordinates();
+	atom->update(env);
 	gen_rabi();
 	gen_trees();
 	gen_conlist();
