@@ -13,12 +13,12 @@ import matplotlib.pyplot as plt
 from qspec.qtypes import *
 from qspec._cpp import *
 from qspec import tools
-from qspec import get_f, get_m, lande_g
+from qspec import get_f, get_m, g_j
 import qspec.algebra as al
 
 
-__all__ = ['Polarization', 'Laser', 'Environment', 'construct_electronic_state', 'construct_hyperfine_state', 'State',
-           'DecayMap', 'Atom', 'Interaction']
+__all__ = ['Polarization', 'Laser', 'Environment', 'construct_electronic_state', 'construct_hyperfine_state',
+           'gen_electronic_state', 'gen_hyperfine_state', 'State', 'DecayMap', 'Atom', 'Interaction']
 
 
 def sr_generate_y(denominator: np.ndarray, f_theta: np.ndarray, f_phi: np.ndarray,
@@ -300,7 +300,7 @@ class Environment:
 
 class State:
     def __init__(self, freq_j: quant_like, j: quant_like, i: quant_like, f: quant_like, m: quant_like,
-                 hyper_const: array_like = None, gj: quant_like = 0, gi: quant_like = 0,
+                 parity: Union[str, bool], hyper_const: array_like = None, gj: quant_like = 0, gi: quant_like = 0,
                  label: str = None, instance=None):
         r"""
         Class representing an atomic quantum state $|(\mathrm{label})IJFm\rangle$.
@@ -310,6 +310,7 @@ class State:
         :param i: The nuclear spin quantum number $I$.
         :param f: The total angular momentum quantum number $F$.
         :param m: The z-projection quantum number $m$ of the total angular momentum `f`.
+        :param parity: The parity $\pi$ of the state. Can be either `'even'` (`False`) or `'odd'` (`True`).
         :param hyper_const: A list of the hyperfine-structure constants.
          Currently, constants up to the electric quadrupole order are supported ($A$, $B$).
          If 'hyper_const' is a scalar, it is assumed to be the constant $A$ and the other orders are 0 (MHz).
@@ -326,8 +327,14 @@ class State:
             if label is None:
                 label = '{}({})'.format(int(np.around(freq_j, decimals=0)), j)
             self.instance = dll.state_construct()
+            if isinstance(parity, str):
+                if parity not in {'even', 'odd'}:
+                    raise ValueError('Parameter \'parity\' must be either \'even\' (False) or \'odd\' (True).')
+                parity = True if parity == 'odd' else False
+            else:
+                parity = bool(parity)
             dll.state_init(self.instance, c_double(freq_j), c_double(j), c_double(i),
-                           c_double(f), c_double(m), hyper_const, c_double(gj), c_double(gi),
+                           c_double(f), c_double(m), c_bool(parity), hyper_const, c_double(gj), c_double(gi),
                            c_char_p(bytes(label, 'utf-8')))
 
     def __del__(self):
@@ -487,8 +494,9 @@ def construct_electronic_state(freq_0: quant_like, s: quant_like, l: quant_like,
     f = get_f(i, j)
     m = [get_m(_f) for _f in f]
     fm = [(_f, _m) for _f, m_f in zip(f, m) for _m in m_f]
-    gj = lande_g(j, (l, s), None, None)
-    return [State(freq_0, j, i, _f, _m, hyper_const=hyper_const, gj=gj, gi=g, label=label) for (_f, _m) in fm]
+    gj = g_j(j, (l, s), None, None)
+    parity = bool(l % 2)
+    return [State(freq_0, j, i, _f, _m, parity, hyper_const=hyper_const, gj=gj, gi=g, label=label) for (_f, _m) in fm]
 
 
 def construct_hyperfine_state(freq_0: quant_like, s: quant_like, l: quant_like, j: quant_like, i: quant_like,
@@ -510,20 +518,22 @@ def construct_hyperfine_state(freq_0: quant_like, s: quant_like, l: quant_like, 
     :param label: The label of the states. The labels are used to link states via decay maps.
     :returns: A list of the created states.
     """
-    gj = lande_g(j, (l, s), None, None)
-    return [State(freq_0, j, i, f, _m, hyper_const=hyper_const, gj=gj, gi=g, label=label) for _m in get_m(f)]
+    gj = g_j(j, (l, s), None, None)
+    parity = bool(l % 2)
+    return [State(freq_0, j, i, f, _m, parity, hyper_const=hyper_const, gj=gj, gi=g, label=label) for _m in get_m(f)]
 
 
 def gen_electronic_state(
-        freq_0: quant_like = 0., j: quant_like = 0, i: quant_like = 0, hyper_const: Iterable[array_like] = None,
-        ls: quant_like = (0, 0), jj: quant_like = None, gj: array_like = None, gi: array_like = 0,
+        freq_0: quant_like = 0., j: quant_like = 0, i: quant_like = 0, parity: bool = None,
+        hyper_const: Iterable[array_like] = None, ls: quant_like = (0, 0), jj: quant_like = None, gj: array_like = None, gi: array_like = 0,
         label: str = None) -> list[State]:
-    """
+    r"""
     Creates all substates of a fine-structure state using a common label.
 
     :param freq_0: The energetic position of the state without the hyperfine structure or the magnetic field (MHz).
     :param j: The electronic total angular momentum quantum number $J$.
     :param i: The nuclear spin quantum number $I$.
+    :param parity: The parity $\pi$ of the state. Can be either `'even'` (`False`) or `'odd'` (`True`).
     :param hyper_const: A list of the hyperfine-structure constants.
      Currently, constants up to the electric quadrupole order are supported ($A$, $B$). If 'hyper_const' is a scalar,
      it is assumed to be the constant $A$ and the other orders are 0 (MHz).
@@ -544,22 +554,23 @@ def gen_electronic_state(
     f = get_f(i, j)
     m = [get_m(_f) for _f in f]
     fm = [(_f, _m) for _f, m_f in zip(f, m) for _m in m_f]
-    gj = lande_g(j, ls, jj, gj)
-    return [State(freq_0, j, i, _f, _m, hyper_const=hyper_const, gj=gj, gi=gi, label=label) for (_f, _m) in fm]
+    gj = g_j(j, ls, jj, gj)
+    return [State(freq_0, j, i, _f, _m, parity, hyper_const=hyper_const, gj=gj, gi=gi, label=label) for (_f, _m) in fm]
 
 
 def gen_hyperfine_state(
         freq_0: quant_like = 0., j: quant_like = 0, i: quant_like = 0,
-        f: quant_like = 0, hyper_const: Iterable[array_like] = None,
+        f: quant_like = 0, parity: bool = None, hyper_const: Iterable[array_like] = None,
         ls: quant_like = (0, 0), jj: quant_like = None, gj: array_like = None, gi: array_like = 0,
         label: str = None) -> list[State]:
-    """
+    r"""
     Creates all substates of a hyperfine-structure state using a common label.
 
     :param freq_0: The energetic position of the state without the hyperfine structure or the magnetic field (MHz).
     :param j: The electronic total angular momentum quantum number $J$.
     :param i: The nuclear spin quantum number $I$.
     :param f: The total angular momentum quantum number $F$.
+    :param parity: The parity $\pi$ of the state. Can be either `'even'` (`False`) or `'odd'` (`True`).
     :param hyper_const: A list of the hyperfine-structure constants.
      Currently, constants up to the electric quadrupole order are supported ($A$, $B$). If 'hyper_const' is a scalar,
      it is assumed to be the constant $A$ and the other orders are 0 (MHz).
@@ -577,8 +588,10 @@ def gen_hyperfine_state(
     :param label: The label of the states. The labels are used to link states via a `DecayMap`.
     :returns: (list[State], ) A list of the created states.
     """
-    gj = lande_g(j, ls, jj, gj)
-    return [State(freq_0, j, i, f, _m, hyper_const=hyper_const, gj=gj, gi=gi, label=label) for _m in get_m(f)]
+    # if parity is None and gj is None:
+    #     if hasattr(ls[], '__getitem__'):
+    gj = g_j(j, ls, jj, gj)
+    return [State(freq_0, j, i, f, _m, parity, hyper_const=hyper_const, gj=gj, gi=gi, label=label) for _m in get_m(f)]
 
 
 class DecayMap:
@@ -786,7 +799,7 @@ class Atom:
          multiplying it with the square-root of a laser intensity in the corresponding polarization.
          The resulting array has shape (3, size, size).
         """
-        return np.array([np.ctypeslib.as_array(dll.atom_get_m_dipole(self.instance, c_size_t(i)),
+        return np.array([np.ctypeslib.as_array(dll.atom_get_m_e1(self.instance, c_size_t(i)),
                                                (self.size, self.size)).T for i in range(3)])
 
     @property
@@ -975,7 +988,7 @@ class Atom:
         ret_y = {}
         for i in indices:
             s = self.states[i]
-            key = (s.label, s.s, s.l, s.j, s.i, s.f)
+            key = (s.label, s.j, s.i, s.f)
             if key not in y_dict.keys():
                 if key[:-1] not in [key_1[:-1] for key_1 in y_dict.keys()]:
                     y_i += 3

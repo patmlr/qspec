@@ -142,7 +142,7 @@ dll.state_construct.restype = StateHandler
 dll.state_destruct.argtypes = (StateHandler, )
 
 dll.state_init.argtypes = (StateHandler, c_double, c_double, c_double, c_double,
-                           c_double, vector3d_p, c_double, c_double, c_char_p)
+                           c_double, c_bool, vector3d_p, c_double, c_double, c_char_p)
 
 dll.state_reset.argtypes = (StateHandler, )
 
@@ -227,8 +227,8 @@ dll.atom_get_gs.restype = c_size_t
 dll.atom_get_gs.argtypes = (AtomHandler, )
 dll.atom_get_gs.restype = c_size_t_p
 
-dll.atom_get_m_dipole.argtypes = (AtomHandler, c_size_t)
-dll.atom_get_m_dipole.restype = c_double_p
+dll.atom_get_m_e1.argtypes = (AtomHandler, c_size_t)
+dll.atom_get_m_e1.restype = c_double_p
 
 dll.atom_get_L0.argtypes = (AtomHandler, )
 dll.atom_get_L0.restype = c_double_p

@@ -150,9 +150,14 @@ extern double sc::mu_N = 5.0507837461e-27;
 //    return nineJ;
 //}
 
-double j_dipole(double a, double freq_0, double freq_1)
+double d_e1(double a, double freq_0, double freq_1)
 {
     return sqrt(3 * a * pow(sc::c, 2) / (2 * sc::pi * sc::h * pow( abs(freq_0 - freq_1), 3))) * 1e-12;
+}
+
+double d_m1(double a, double freq_0, double freq_1)
+{
+    return 0.;
 }
 
 double a_dipole(double i, double j_l, double f_l, double m_l, double j_u, double f_u, double m_u, double q)

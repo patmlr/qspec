@@ -34,7 +34,8 @@ double ThreeJSymbol(double J1, double m1, double J2, double m2, double J3, doubl
 double SixJSymbol(double J1, double J2, double J3, double J4, double J5, double J6);
 double NineJSymbol(double J1, double J2, double J3, double J4, double J5, double J6, double J7, double J8, double J9);
 
-double j_dipole(double a, double freq_0, double freq_1);
+double d_e1(double a, double freq_0, double freq_1);
+double d_m1(double a, double freq_0, double freq_1);
 double a_dipole(double i, double j_l, double f_l, double m_l, double j_u, double f_u, double m_u, double q);
 
 double lande_n(double g_n);

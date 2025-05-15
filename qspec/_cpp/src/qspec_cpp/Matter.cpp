@@ -97,7 +97,7 @@ State::~State()
 	delete[] hyper_const;
 }
 
-void State::init(double _freq_j, double _j, double _i, double _f, double _m,
+void State::init(double _freq_j, double _j, double _i, double _f, double _m, bool _parity,
 	double* _hyper_const, double _gj, double _gi, std::string _label)
 {
 	freq_j = _freq_j;
@@ -107,6 +107,7 @@ void State::init(double _freq_j, double _j, double _i, double _f, double _m,
 	i = _i;
 	f = _f;
 	m = _m;
+	parity = _parity;
 
 	for (int i = 0; i < HYPER_SIZE; ++i)
 	{
@@ -193,6 +194,16 @@ double State::get_m()
 void State::set_m(double _m)
 {
 	m = _m;
+}
+
+bool State::get_parity()
+{
+	return parity;
+}
+
+void State::set_parity(bool _parity)
+{
+	parity = _parity;
 }
 
 double* State::get_hyper_const()
@@ -322,7 +333,8 @@ Atom::~Atom()
 	std::vector<State*>().swap(states);
 	for (size_t q = 0; q < 3; ++q)
 	{
-		m_dipole.at(q).resize(0, 0);
+		m_e1.at(q).resize(0, 0);
+		m_m1.at(q).resize(0, 0);
 	}
 }
 
@@ -341,7 +353,8 @@ void Atom::gen_dipole()
 	Lsum = VectorXd::Zero(size);
 	for (size_t q = 0; q < 3; ++q)
 	{
-		m_dipole.at(q) = MatrixXd::Zero(size, size);
+		m_e1.at(q) = MatrixXd::Zero(size, size);
+		m_m1.at(q) = MatrixXd::Zero(size, size);
 	}
 
 	size_t _i = 0;
@@ -358,27 +371,38 @@ void Atom::gen_dipole()
 				_j = i;
 			}
 
-			size_t q = 1;
-			if (states[_j]->get_m() - states[_i]->get_m() < 0) q = 0;
-			else if (states[_j]->get_m() - states[_i]->get_m() > 0) q = 2;
-
+			// Calculate (F, m) reduction of dipole (e1 and m1) moments.
 			double a = decays->get_item(states[i]->get_label(), states[j]->get_label());
-			double a_dip = 0.;
+			double a1 = 0.;
 			if (abs(states[_i]->get_j() - states[_j]->get_j()) < 1.1 
 				&& abs(states[_i]->get_f() - states[_j]->get_f()) < 1.1
 				&& abs(states[_i]->get_m() - states[_j]->get_m()) < 1.1)  // Check dipole condition before calling a_dipole.
 			{
-				a_dip = a_dipole(states[_i]->get_i(), states[_i]->get_j(), states[_i]->get_f(), states[_i]->get_m(),
+				a1 = a_dipole(states[_i]->get_i(), states[_i]->get_j(), states[_i]->get_f(), states[_i]->get_m(),
 					states[_j]->get_j(), states[_j]->get_f(), states[_j]->get_m(), states[_j]->get_m() - states[_i]->get_m());  // This takes the time.
 			}
 
-			L0(_i, _j) = a * a_dip * a_dip;
+			L0(_i, _j) = a * a1 * a1;
 			L0(_j, _i) = 0.;
 
 			if (states[i]->get_freq() == states[j]->get_freq()) continue;
-			double norm = j_dipole(a, states[i]->get_freq(), states[j]->get_freq());
-			m_dipole.at(q)(i, j) = norm * a_dip;
-			m_dipole.at(q)(j, i) = m_dipole.at(q)(i, j);
+
+			size_t q = 1;
+			if (states[_j]->get_m() - states[_i]->get_m() < 0) q = 0;
+			else if (states[_j]->get_m() - states[_i]->get_m() > 0) q = 2;
+			
+			if (states[i]->get_parity() != states[j]->get_parity())
+			{
+				double norm = d_e1(a, states[i]->get_freq(), states[j]->get_freq());
+				m_e1.at(q)(i, j) = norm * a1;
+				m_e1.at(q)(j, i) = m_e1.at(q)(i, j);
+			}
+			else
+			{
+				double norm = d_m1(a, states[i]->get_freq(), states[j]->get_freq());
+				m_m1.at(q)(i, j) = norm * a1;
+				m_m1.at(q)(j, i) = m_m1.at(q)(i, j);
+			}
 		}
 	}
 	Lsum = L0.colwise().sum();
@@ -495,9 +519,14 @@ std::vector<size_t>* Atom::get_gs()
 	return &gs;
 }
 
-std::array<MatrixXd, 3>* Atom::get_m_dipole()
+std::array<MatrixXd, 3>* Atom::get_m_e1()
 {
-	return &m_dipole;
+	return &m_e1;
+}
+
+std::array<MatrixXd, 3>* Atom::get_m_m1()
+{
+	return &m_m1;
 }
 
 VectorXd* Atom::get_w0()

@@ -197,9 +197,9 @@ extern "C"
     }
 
     __declspec(dllexport) void state_init(State* state, double _freq_0, double _j, double _i, double _f,
-        double _m, double* _hyper_const, double _gj, double _gi, char* _label)
+        double _m, bool _parity, double* _hyper_const, double _gj, double _gi, char* _label)
     {
-        state->init(_freq_0, _j, _i, _f, _m, _hyper_const, _gj, _gi, std::string(_label));
+        state->init(_freq_0, _j, _i, _f, _m, _parity, _hyper_const, _gj, _gi, std::string(_label));
     }
 
     __declspec(dllexport) void state_reset(State* state)
@@ -432,9 +432,9 @@ extern "C"
         return atom->get_gs()->data();
     }
 
-    __declspec(dllexport) double* atom_get_m_dipole(Atom* atom, size_t i)
+    __declspec(dllexport) double* atom_get_m_e1(Atom* atom, size_t i)
     {
-        return atom->get_m_dipole()->at(i).data();
+        return atom->get_m_e1()->at(i).data();
     }
 
     __declspec(dllexport) double* atom_get_L0(Atom* atom)

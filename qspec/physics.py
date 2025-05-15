@@ -20,7 +20,7 @@ __all__ = ['L_LABEL', 'E_NORM', 'pi', 'LEMNISCATE', 'mu_N', 'mu_B', 'g_s', 'me_u
            'wavelength_to_inv_cm', 'beta', 'gamma', 'gamma_e', 'gamma_e_kin', 'e_rest', 'e_kin', 'e_total', 'e_el',
            'v_e', 'v_e_d1', 'v_el', 'v_el_d1', 'p_v', 'p_e', 'p_el', 'doppler', 'doppler_d1', 'doppler_e_d1',
            'doppler_el_d1', 'inverse_doppler', 'inverse_doppler_d1', 'alpha_atom', 'v_recoil', 'f_recoil',
-           'f_recoil_v', 'get_f', 'get_m', 'hyperfine', 'lande_n', 'lande_j', 'lande_jj', 'lande_g', 'lande_f',
+           'f_recoil_v', 'get_f', 'get_m', 'hyperfine', 'lande_n', 'lande_j', 'lande_jj', 'g_j', 'lande_f',
            'zeeman_linear', 'hyper_zeeman_linear',
            'hyper_zeeman_ij', 'hyper_zeeman_num', 'hyper_zeeman_12', 'hyper_zeeman_12_d', 'a_hyper_mu',
            'saturation_intensity', 'saturation', 'rabi', 'scattering_rate', 'mass_factor',
@@ -727,7 +727,8 @@ def lande_jj(j0, j1, j, g0, g1):
     return 0.5 * g0 * (jj + jj01) / jj + 0.5 * g1 * (jj - jj01) / jj
 
 
-def lande_g(j: quant_like = 0, ls: Union[tuple[quant_like, quant_like], quant_like] = (0, 0), jj: quant_like = None, gj: array_like = None):
+def g_j(j: quant_like = 0, ls: Union[tuple[quant_like, quant_like], quant_like] = (0, 0), jj: quant_like = None,
+        gj: array_like = None):
     r"""
     The electronic g-factor of a state with angular momentum $\vec{J} in the LS- or jj coupling scheme.
     See `lande_j` and `lande_jj`.
@@ -753,9 +754,8 @@ def lande_g(j: quant_like = 0, ls: Union[tuple[quant_like, quant_like], quant_li
             g1 = lande_j(ls[1][1], ls[1][0], j)
             gj = lande_jj(jj[0], jj[1], j, g0, g1)
     elif hasattr(gj, '__getitem__'):
-            gj = lande_jj(jj[0], jj[1], j, gj[0], gj[1])
+        gj = lande_jj(jj[0], jj[1], j, gj[0], gj[1])
     return gj
-
 
 
 def lande_f(i: quant_like, j: quant_like, f: quant_like, g_i: array_like, g_j: array_like) -> ndarray:

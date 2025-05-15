@@ -44,6 +44,7 @@ protected:
 	double i;
 	double f;
 	double m;
+	bool parity;
 	double* hyper_const;
 	double gj;
 	double gi;
@@ -53,7 +54,7 @@ public:
 
 	State();
 	~State();
-	void init(double _freq_j, double _j, double _i, double _f, double _m,
+	void init(double _freq_j, double _j, double _i, double _f, double _m, bool _parity,
 		double* _hyper_const, double _gj, double _gi, std::string _label);
 
 	void reset();
@@ -78,6 +79,9 @@ public:
 
 	double get_m();
 	void set_m(double _m);
+
+	bool get_parity();
+	void set_parity(bool _parity);
 
 	double* get_hyper_const();
 	void set_hyper_const(double* _hyper_const);
@@ -123,7 +127,8 @@ protected:
 	size_t size = 0;
 
 	std::vector<size_t> gs;
-	std::array<MatrixXd, 3> m_dipole;  // -1, 0, +1
+	std::array<MatrixXd, 3> m_e1;  // -1, 0, +1
+	std::array<MatrixXd, 3> m_m1;  // -1, 0, +1
 	VectorXd w0;
 	VectorXd Lsum;
 	MatrixXd L0;
@@ -153,7 +158,8 @@ public:
 
 	State* get(size_t index);
 	std::vector<size_t>* get_gs();
-	std::array<MatrixXd, 3>* get_m_dipole();
+	std::array<MatrixXd, 3>* get_m_e1();
+	std::array<MatrixXd, 3>* get_m_m1();
 	VectorXd* get_Lsum();
 	MatrixXd* get_L0();
 	MatrixXd* get_L1();

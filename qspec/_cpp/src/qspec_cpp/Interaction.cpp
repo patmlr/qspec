@@ -402,14 +402,14 @@ void Interaction::gen_rabi()
 					if (abs(lasers.at(m)->get_freq() - (upper->get_freq() - lower->get_freq())) > delta_max) continue;  // In detuning range?
 
 					std::complex<double> q_i = lasers.at(m)->get_polarization()->get_q()->array()[q];
-					if (atom->get_m_dipole()->at(q)(row, col) * abs(q_i)  // q_i.real() * q_i.imag()  // (pow(q_i.real(), 2) + pow(q_i.imag(), 2))
+					if (atom->get_m_e1()->at(q)(row, col) * abs(q_i)  // q_i.real() * q_i.imag()  // (pow(q_i.real(), 2) + pow(q_i.imag(), 2))
 						* lasers.at(m)->get_intensity() == 0) continue;  // Transition allowed/active?
 					lasermap.at(q).at(m)(row, col) = 1;
 					lasermap.at(q).at(m)(col, row) = 1;
 					summap(row, col) = 1;
 					summap(col, row) = 1;
 
-					rabimap.at(m)(row, col) += 0.5 * atom->get_m_dipole()->at(q)(row, col)
+					rabimap.at(m)(row, col) += 0.5 * atom->get_m_e1()->at(q)(row, col)
 					* sqrt(lasers[m]->get_intensity()) * q_i * pow(-1, q_val);  // Calc. Omega/2 for all transitions.
 					rabimap.at(m)(col, row) = std::conj(rabimap.at(m)(row, col));
 				}
