@@ -14,6 +14,7 @@ import scipy.special as sp
 
 from qspec.qtypes import *
 from qspec import tools
+from qspec.algebra import mu_j_m1, mu_jj_m1
 
 __all__ = ['L_LABEL', 'E_NORM', 'pi', 'LEMNISCATE', 'mu_N', 'mu_B', 'g_s', 'me_u', 'me_u_d', 'gp_s', 'gn_s',
            'inv_cm_to_freq', 'freq_to_inv_cm', 'wavelength_to_freq', 'freq_to_wavelength', 'inv_cm_to_wavelength',
@@ -22,7 +23,7 @@ __all__ = ['L_LABEL', 'E_NORM', 'pi', 'LEMNISCATE', 'mu_N', 'mu_B', 'g_s', 'me_u
            'doppler_el_d1', 'inverse_doppler', 'inverse_doppler_d1', 'alpha_atom', 'v_recoil', 'f_recoil',
            'f_recoil_v', 'get_f', 'get_m', 'hyperfine', 'lande_n', 'lande_j', 'lande_jj', 'g_j', 'lande_f',
            'zeeman_linear', 'hyper_zeeman_linear',
-           'hyper_zeeman_ij', 'hyper_zeeman_num', 'hyper_zeeman_12', 'hyper_zeeman_12_d', 'a_hyper_mu',
+           'hyper_zeeman_ij', 'hyper_zeeman_num', 'hyper_zeeman_12', 'hyper_zeeman_12_d', 'a_hyper_mu', 'a_einstein_m1',
            'saturation_intensity', 'saturation', 'rabi', 'scattering_rate', 'mass_factor',
            'delta_r2', 'delta_r4', 'delta_r6', 'lambda_r', 'lambda_rn', 'schmidt_line', 'sellmeier',
            'gamma_3d', 'boost', 'doppler_3d', 'gaussian_beam_3d', 'gaussian_doppler_3d', 't_xi', 'thermal_v_pdf',
@@ -727,8 +728,9 @@ def lande_jj(j0, j1, j, g0, g1):
     return 0.5 * g0 * (jj + jj01) / jj + 0.5 * g1 * (jj - jj01) / jj
 
 
-def g_j(j: quant_like = 0, ls: Union[tuple[quant_like, quant_like], quant_like] = (0, 0), jj: quant_like = None,
-        gj: array_like = None):
+def g_j(j: quant_like = 0,
+        ls: Union[list[tuple[quant_like, quant_like]], tuple[quant_like, quant_like], quant_like] = (0, 0),
+        jj: quant_like = None, gj: array_like = None):
     r"""
     The electronic g-factor of a state with angular momentum $\vec{J} in the LS- or jj coupling scheme.
     See `lande_j` and `lande_jj`.
@@ -1121,6 +1123,48 @@ def a_hyper_mu(i: quant_like, j: quant_like, mu: array_like, b_field: array_like
     if i == 0 or j == 0:
         return np.zeros_like(mu * b)
     return mu * mu_N * b / (i * j * sc.h) * 1e-6
+
+
+def a_einstein_m1(f, j_l: quant_like = 0, j_u: quant_like = 0,
+                  ls: Union[list[tuple[quant_like, quant_like]], tuple[quant_like, quant_like], quant_like] = (0, 0),
+                  jj_l: Union[tuple[quant_like, quant_like], quant_like] = None,
+                  jj_u: Union[tuple[quant_like, quant_like], quant_like] = None):
+    r"""
+    The Einstein coefficient of an M1 transition
+
+    $$
+    A_\mathrm{m1} = \frac{16\pi^3\mu_0f^3}{3hc^3}
+    \frac{|\langle J_\mathrm{l}|\vec{\mu}|J_\mathrm{u}\rangle|^2}{2J_\mathrm{u} + 1},
+    $$
+
+    where $\mu_0$ is the vacuum permeability, \vec{\mu} is the electronic magnetic moment operator
+    in units of the Bohr magneton, $h$ is the Planck constant, and $c$ is the speed of light.
+    This calculation neglects spin-orbit couplings, as $\Delta S = \Delta L = 0$ holds strictly.
+    Consequently, M1 transition rates of transition such as $^3\mathrm{S}_1\rightarrow ^1\mathrm{S}_0$
+    cannot be calculated with this function.
+
+    :param f: The frequency $f$ of a transition (MHz).
+    :param j_l: The electronic total angular momentum quantum number $J_\mathrm{l}$ of the lower state.
+    :param j_u: The electronic total angular momentum quantum number $J_\mathrm{u}$ of the upper state.
+    :param ls: A list `[(l_c, s_c), (l_o, l_c)]` or a single pair `(L, S)`
+     of electronic angular momentum and spin quantum numbers $(l, s)$ valid for both the lower and upper state.
+     If this is a list of ls-pairs, the first pair specifies $l$ and $s$ of the core electron(s)
+     and the second pair those of the outer electron(s). In this case, also a tuple of $(j_\mathrm{c}, j_\mathrm{o})$
+     quantum numbers needs to specified for the parameters `jj_l` and `jj_u`.
+    :param jj_l: A tuple of electronic total angular momentum quantum numbers $(j_\mathrm{c}, j_\mathrm{o})$
+     of the lower state. Only needs to be specified if `ls` is a list of ls-pairs.
+    :param jj_u: A tuple of electronic total angular momentum quantum numbers $(j_\mathrm{c}, j_\mathrm{o})$
+     of the upper state. Only needs to be specified if `ls` is a list of ls-pairs.
+    :returns: The Einstein coefficient $A_\mathrm{m1}$ of an M1 transition, neglecting spin-orbit couplings (MHz).
+    """
+
+    if jj_l is None or jj_u is None:
+        mu = mu_j_m1(ls[1], ls[0], j_l, j_u)
+    else:
+        mu = mu_jj_m1(ls[0][1], ls[0][0], jj_l[0], jj_l[1], j_l, ls[1][1], ls[1][0], jj_u[0], jj_u[1], j_u)
+
+    d_m1_2 = (mu * mu_B) ** 2 / (2 * j_u + 1)
+    return 8 * d_m1_2 * np.pi ** 2 * sc.mu_0 * f ** 3 / (3 * sc.hbar * sc.c ** 3) * 1e12
 
 
 def saturation_intensity(f: array_like, a: array_like, a_dipole: array_like = 1.) -> ndarray:

@@ -437,6 +437,11 @@ extern "C"
         return atom->get_m_e1()->at(i).data();
     }
 
+    __declspec(dllexport) double* atom_get_m_m1(Atom* atom, size_t i)
+    {
+        return atom->get_m_m1()->at(i).data();
+    }
+
     __declspec(dllexport) double* atom_get_L0(Atom* atom)
     {
         return atom->get_L0()->data();

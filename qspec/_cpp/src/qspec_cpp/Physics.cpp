@@ -157,7 +157,7 @@ double d_e1(double a, double freq_0, double freq_1)
 
 double d_m1(double a, double freq_0, double freq_1)
 {
-    return 0.;
+    return d_e1(a, freq_0, freq_1);  // d_m1 = d_e1 * c, but c cancels in calculation of Rabi frequency.
 }
 
 double a_dipole(double i, double j_l, double f_l, double m_l, double j_u, double f_u, double m_u, double q)

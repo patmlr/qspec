@@ -474,6 +474,52 @@ def example(n=None):
         plt.hist(v[:, 1], bins=40)
         plt.show()
 
+    if 7 in n:
+        """
+        Example 7: m1 decay in C4+.
+        
+        In example 7, The 3S1 ground state of ortho-heliumlike C4+ is decaying
+        into the global para-heliumlike 1S0 ground state through an m1 transition.
+        """
+
+        f31 = qs.inv_cm_to_freq(2411292.798)
+        a31 = 4.857e-5
+        print(f'tau: {1e-3 / a31} ms')
+
+        s1 = sim.gen_electronic_state(0., 0, 0, parity='even', ls=(0, 0), label='s1')
+        s3 = sim.gen_electronic_state(f31, 1, 0, parity='even', ls=(0, 1), label='s3')
+
+        decay_map = sim.DecayMap(labels=[('s1', 's3')], a=[a31])
+
+        atom = sim.Atom(s1 + s3, decay_map)
+
+        # laser = sim.Laser(f31, intensity=100)
+
+        inter = sim.Interaction(atom, [])
+        inter.controlled = True
+        inter.dt = 1.
+        inter.dt_max = 1.
+
+        y0 = np.zeros(atom.size, dtype=float)
+        y0[atom.get_state_indexes('s3')] = 1.
+
+        t = np.linspace(0., 100000., 101)
+        y = inter.rates(t, y0=y0)[0]
+
+        y1 = y[atom.get_state_indexes('s1')][0]
+        y3 = np.sum(y[atom.get_state_indexes('s3')], axis=0)
+
+        plt.plot(t * 1e-3, y1, label=r'$^1$S$_0$')
+        plt.plot(t * 1e-3, y3, label=r'$^3$S$_1$')
+        plt.plot([1e-3 / a31], [1 / np.e], 'oC3', label=r'$\tau_{31}$')
+        plt.vlines(1e-3 / a31, 0, 1 / np.e, colors='C3', ls='--')
+
+        plt.legend()
+        plt.xlabel('Time (ms)')
+        plt.ylabel('Population')
+        plt.show()
+
+
 
 if __name__ == '__main__':
-    example({5})
+    example({7})

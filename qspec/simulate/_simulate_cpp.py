@@ -149,7 +149,7 @@ class Laser:
             k = np.asarray(k, dtype=float)
             if k.shape != (3,):
                 raise ValueError('Interaction.k must be a 3d-vector, but has shape {}.'.format(k.shape))
-            dll.laser_init(self.instance, c_double(freq), c_double(intensity), polarization.instance,
+            dll.laser_init(self.instance, c_double(freq), c_double(intensity), self.polarization.instance,
                            k.ctypes.data_as(c_double_p))
         else:
             self._polarization = Polarization(instance=dll.laser_get_polarization(self.instance))
@@ -524,7 +524,7 @@ def construct_hyperfine_state(freq_0: quant_like, s: quant_like, l: quant_like, 
 
 
 def gen_electronic_state(
-        freq_0: quant_like = 0., j: quant_like = 0, i: quant_like = 0, parity: bool = None,
+        freq_0: quant_like = 0., j: quant_like = 0, i: quant_like = 0, parity: Union[bool, str] = None,
         hyper_const: Iterable[array_like] = None, ls: quant_like = (0, 0), jj: quant_like = None, gj: array_like = None, gi: array_like = 0,
         label: str = None) -> list[State]:
     r"""

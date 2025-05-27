@@ -7,6 +7,7 @@ Module including methods for calculating dipole coefficients.
 """
 
 import numpy as np
+from scipy.constants import physical_constants
 from sympy import nsimplify, sqrt, sin, cos, pi
 from sympy.vector import CoordSys3D
 import sympy.physics.wigner as spw
@@ -14,7 +15,8 @@ import sympy.physics.wigner as spw
 from qspec.qtypes import *
 
 __all__ = ['quant', 'cast_sympy', 'clebsch_gordan', 'wigner_3j', 'wigner_6j', 'a', 'b', 'ab', 'c', 'abc', 'f_0', 'g_0',
-           'c_dipole', 'a_dipole', 'a_dipole_cart', 'reduced_f_root', 'reduced_f', 'a_tilda', 'a_m_tilda']
+           'c_dipole', 'a_dipole', 'a_dipole_cart', 'reduced_f_root', 'reduced_f', 'a_tilda', 'a_m_tilda',
+           'mu_j_m1', 'mu_jj_m1']
 
 
 def cast_sympy(as_sympy: bool, *args: sympy_like, dtype: type = float):
@@ -377,6 +379,8 @@ def reduced_f(i: sympy_quant, j_l: sympy_quant, f_l: sympy_quant,
     return (2 * f_l + 1) * (2 * f_u + 1) * wigner_6j(j_u, j_l, 1, f_l, f_u, i, as_sympy) ** 2
 
 
+""" Relative hyperfine structure transition strengths used in TILDA (https://github.com/lasersphere/Tilda). """
+
 def a_tilda(i: sympy_quant, j_l: sympy_quant, f_l: sympy_quant,
             j_u: sympy_quant, f_u: sympy_quant, as_sympy: bool = False):
     """
@@ -406,3 +410,48 @@ def a_m_tilda(i: sympy_quant, j_l: sympy_quant, f_l: sympy_quant, m_l: sympy_qua
     :returns: The relative transition strengths between Zeeman substates normed as in tilda.
     """
     return a_tilda(i, j_l, f_l, j_u, f_u, as_sympy) * clebsch_gordan(f_l, 1, f_u, m_l, m_u - m_l, m_u, as_sympy) ** 2
+
+
+""" Off-diagonal magnetic dipole transition matrix elements for Delta S = Delta L = 0. """
+
+def mu_j_m1(s, l, j_l, j_u):
+    r"""
+
+    :param s: The spin quantum number $S$ of the lower and upper state.
+    :param l: The orbital angular momentum quantum number $L$ of the lower and upper state.
+    :param j_l: The total angular momentum quantum number $J_\mathrm{l}$ of the lower state.
+    :param j_u: The total angular momentum quantum number $J_\mathrm{u}$ of the upper state.
+    :returns: The magnetic dipole transition matrix element $\langle LS,J_\mathrm{l}|\vec{\mu}|LS,J_\mathrm{u}\rangle$
+     in units of the Bohr magneton ($\mu_\mathrm{B}$).
+    """
+    g_s = physical_constants['electron g factor'][0]
+    return ((-1) ** (s + l + 1) * np.sqrt((2 * j_l + 1) * (2 * j_u + 1)) * (
+            (-1) ** (j_u + 1) * np.sqrt(l * (l + 1) * (2 * l + 1)) * wigner_6j(l, j_l, s, j_u, l, 1)
+            + g_s * (-1) ** j_l * np.sqrt(s * (s + 1) * (2 * s + 1)) * wigner_6j(s, j_l, l, j_u, s, 1)))
+
+
+def mu_jj_m1(sc, lc, jc_l, jo_l, j_l, so, lo, jc_u, jo_u, j_u):
+    r"""
+
+    :param sc: The spin quantum number $s$ of the core electron(s) of the lower and upper state.
+    :param lc: The orbital angular momentum quantum number $l$ of the core electron(s) of the lower and upper state.
+    :param jc_l: The total angular momentum quantum number $j_\mathrm{l,c}$ of the core electron(s) of the lower state.
+    :param jo_l: The total angular momentum quantum number $j_\mathrm{l,o}$ of the outer electron(s) of the lower state.
+    :param j_l: The total angular momentum quantum number $j_\mathrm{l}$ of the lower state.
+    :param so: The spin quantum number $s$ of the outer electron(s) of the lower and upper state.
+    :param lo: The orbital angular momentum quantum number $l$ of the outer electron(s) of the lower and upper state.
+    :param jc_u: The total angular momentum quantum number $j_\mathrm{u,c}$ of the core electron(s) of the upper state.
+    :param jo_u: The total angular momentum quantum number $j_\mathrm{u,o}$ of the outer electron(s) of the upper state.
+    :param j_u: The total angular momentum quantum number $j_\mathrm{u}$ of the upper state.
+    :returns: The magnetic dipole transition matrix element
+     $\langle j_\mathrm{l,c}j_\mathrm{l,o},J_\mathrm{l}|\vec{\mu}|j_\mathrm{u,c}j_\mathrm{u,o},J_\mathrm{u}\rangle$
+     in units of the Bohr magneton ($\mu_\mathrm{B}$).
+    """
+    ret = 0.
+    if jo_l == jo_u:
+        ret += ((-1) ** (jc_l + jo_l + j_u + 1) * np.sqrt((2 * j_l + 1) * (2 * j_u + 1))
+                * wigner_6j(jc_l, j_l, jo_l, j_u, jc_u, 1) * mu_j_m1(sc, lc, jc_l, jc_u))
+    if jc_l == jc_u:
+        ret += ((-1) ** (jc_l + jo_u + j_l + 1) * np.sqrt((2 * j_l + 1) * (2 * j_u + 1))
+                * wigner_6j(jo_l, j_l, jc_l, j_u, jo_u, 1) * mu_j_m1(so, lo, jo_l, jo_u))
+    return ret.real
