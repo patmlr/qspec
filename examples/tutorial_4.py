@@ -28,10 +28,7 @@ intensity = 1.  # uW /mm**2
 polarization = sim.Polarization([0, 1, 0])  # Linear polarization
 laser = sim.Laser(f_sp, intensity, polarization)
 
-import qspec as qs
-print(qs.hyper_zeeman_num(1.5, 0.5, s_hyper[0], g_j=qs.lande_j(0.5, 0., 0.5), b_field=1e-3))
-env = sim.Environment(B=1e-3)
-inter = sim.Interaction(li7, [laser], environment=env)
+inter = sim.Interaction(li7, [laser])
 inter.controlled = True  # Error controlled integrator
 
 t = 0.2  # Integration time (us)

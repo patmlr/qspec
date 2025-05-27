@@ -708,7 +708,7 @@ def lande_j(s: quant_like, l: quant_like, j: quant_like, approx_g_s: bool = Fals
     return val
 
 
-def lande_jj(j0, j1, j, g0, g1):
+def lande_jj(j0: quant_like, j1: quant_like, j: quant_like, g0: array_like, g1: array_like) -> float:
     r"""
     The electronic g-factor of a state with angular momentum $\vec{J} = \vec{J}_0 + \vec{J}_1$
 
@@ -728,11 +728,9 @@ def lande_jj(j0, j1, j, g0, g1):
     return 0.5 * g0 * (jj + jj01) / jj + 0.5 * g1 * (jj - jj01) / jj
 
 
-def g_j(j: quant_like = 0,
-        ls: Union[list[tuple[quant_like, quant_like]], tuple[quant_like, quant_like], quant_like] = (0, 0),
-        jj: quant_like = None, gj: array_like = None):
+def g_j(j: quant_like = 0, ls: quant_iter = (0, 0), jj: quant_like = None, gj: array_like = None) -> float:
     r"""
-    The electronic g-factor of a state with angular momentum $\vec{J} in the LS- or jj coupling scheme.
+    The electronic g-factor of a state with angular momentum $\vec{J}$ in the LS- or jj-coupling scheme.
     See `lande_j` and `lande_jj`.
 
     :param j: The angular momentum quantum number $J$.
@@ -760,7 +758,7 @@ def g_j(j: quant_like = 0,
     return gj
 
 
-def lande_f(i: quant_like, j: quant_like, f: quant_like, g_i: array_like, g_j: array_like) -> ndarray:
+def lande_f(i: quant_like, j: quant_like, f: quant_like, gi: array_like, gj: array_like) -> ndarray:
     r"""
     The total atomic g-factor in the IJ-coupling scheme
 
@@ -776,15 +774,15 @@ def lande_f(i: quant_like, j: quant_like, f: quant_like, g_i: array_like, g_j: a
     :param i: The nuclear spin quantum number $I$.
     :param j: The electronic total angular momentum quantum number $J$.
     :param f: The total angular momentum quantum number $F$.
-    :param g_i: The nuclear g-factor $g_I$.
-    :param g_j: The electronic g-factor $g_J$.
+    :param gi: The nuclear g-factor $g_I$.
+    :param gj: The electronic g-factor $g_J$.
     :returns: The total atomic g-factor $g_F$.
     """
-    g_i, g_j = np.asarray(g_i, dtype=float), np.asarray(g_j, dtype=float)
+    gi, gj = np.asarray(gi, dtype=float), np.asarray(gj, dtype=float)
     ff = f * (f + 1.)
     ji = j * (j + 1.) - i * (i + 1.)
-    val = (ff + ji) / (2 * ff) * g_j
-    val += (ff - ji) / (2 * ff) * g_i * mu_N / mu_B
+    val = (ff + ji) / (2 * ff) * gj
+    val += (ff - ji) / (2 * ff) * gi * mu_N / mu_B
     return val
 
 
@@ -1125,22 +1123,20 @@ def a_hyper_mu(i: quant_like, j: quant_like, mu: array_like, b_field: array_like
     return mu * mu_N * b / (i * j * sc.h) * 1e-6
 
 
-def a_einstein_m1(f, j_l: quant_like = 0, j_u: quant_like = 0,
-                  ls: Union[list[tuple[quant_like, quant_like]], tuple[quant_like, quant_like], quant_like] = (0, 0),
-                  jj_l: Union[tuple[quant_like, quant_like], quant_like] = None,
-                  jj_u: Union[tuple[quant_like, quant_like], quant_like] = None):
+def a_einstein_m1(f: array_like, j_l: quant_like = 0, j_u: quant_like = 0, ls: quant_iter = (0, 0),
+                  jj_l: quant_iter = None, jj_u: quant_iter = None) -> ndarray:
     r"""
     The Einstein coefficient of an M1 transition
 
     $$
-    A_\mathrm{m1} = \frac{16\pi^3\mu_0f^3}{3hc^3}
+    A_\mathrm{ul} = \frac{2\mu_0(2\pi f)^3}{3hc^3}
     \frac{|\langle J_\mathrm{l}|\vec{\mu}|J_\mathrm{u}\rangle|^2}{2J_\mathrm{u} + 1},
     $$
 
-    where $\mu_0$ is the vacuum permeability, \vec{\mu} is the electronic magnetic moment operator
+    where $\mu_0$ is the vacuum permeability, $\vec{\mu}$ is the electronic magnetic moment operator
     in units of the Bohr magneton, $h$ is the Planck constant, and $c$ is the speed of light.
     This calculation neglects spin-orbit couplings, as $\Delta S = \Delta L = 0$ holds strictly.
-    Consequently, M1 transition rates of transition such as $^3\mathrm{S}_1\rightarrow ^1\mathrm{S}_0$
+    Consequently, M1 transition rates of transition such as $^3\mathrm{S}_1\rightarrow\, ^1\mathrm{S}_0$
     cannot be calculated with this function.
 
     :param f: The frequency $f$ of a transition (MHz).
@@ -1155,16 +1151,18 @@ def a_einstein_m1(f, j_l: quant_like = 0, j_u: quant_like = 0,
      of the lower state. Only needs to be specified if `ls` is a list of ls-pairs.
     :param jj_u: A tuple of electronic total angular momentum quantum numbers $(j_\mathrm{c}, j_\mathrm{o})$
      of the upper state. Only needs to be specified if `ls` is a list of ls-pairs.
-    :returns: The Einstein coefficient $A_\mathrm{m1}$ of an M1 transition, neglecting spin-orbit couplings (MHz).
+    :returns: (A_ul) The Einstein coefficient $A_\mathrm{ul}$ of an M1 transition,
+     neglecting spin-orbit couplings (MHz).
     """
+    f = np.asarray(f, dtype=float)
 
     if jj_l is None or jj_u is None:
         mu = mu_j_m1(ls[1], ls[0], j_l, j_u)
     else:
         mu = mu_jj_m1(ls[0][1], ls[0][0], jj_l[0], jj_l[1], j_l, ls[1][1], ls[1][0], jj_u[0], jj_u[1], j_u)
+    mu = (mu * mu_B) ** 2 / (2 * j_u + 1)
 
-    d_m1_2 = (mu * mu_B) ** 2 / (2 * j_u + 1)
-    return 8 * d_m1_2 * np.pi ** 2 * sc.mu_0 * f ** 3 / (3 * sc.hbar * sc.c ** 3) * 1e12
+    return 8 * mu * np.pi ** 2 * sc.mu_0 * f ** 3 / (3 * sc.hbar * sc.c ** 3) * 1e12
 
 
 def saturation_intensity(f: array_like, a: array_like, a_dipole: array_like = 1.) -> ndarray:

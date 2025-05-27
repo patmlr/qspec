@@ -21,8 +21,9 @@ def type_to_str(_type):
     ret = ret.replace(str(Union[sympy_core, float]), 'Union[sympy_core, float]')
     ret = ret.replace(str(sympy_core), 'sympy_core')
     ret = ret.replace(str(Union[array_like, object]), 'Union[array_like, object]')
-    ret = ret.replace(str(array_like), 'array_like')
+    ret = ret.replace(str(quant_iter), 'Union[quant_like, Iterable]')
     ret = ret.replace(str(quant_like), 'quant_like')
+    ret = ret.replace(str(array_like), 'array_like')
     ret = ret.replace(f'{quant.__module__}.{quant.__name__}', 'quant')
     ret = ret.replace(str(scalar_like), 'scalar_like')
     ret = ret.replace(str(scalar), 'scalar')
@@ -31,7 +32,18 @@ def type_to_str(_type):
         i = ret.find('Union[')
         if i == -1:
             break
-        j = ret.find(']')
+
+        j = -1
+        k = 1
+        for _j, s in enumerate(ret[i+6:]):
+            if s ==']':
+                k -= 1
+                if k == 0:
+                    j = i + 6 + _j
+                    break
+            elif s =='[':
+                k += 1
+
         ret = ret[:i] + ret[i+6:j].replace(', ', ' | ') + ret[j+1:]
     ret = (str('None' if _type is inspect._empty else ret).replace('typing.', '').replace('<class ', '')
            .replace('>', '').replace("'", ""))
@@ -318,7 +330,10 @@ def _gen_func(f, file, temp, namespace, funcs, func_sig, func_doc):
         else:
             ret = 'out'
 
-        r_desc = r_desc[:r_desc.find(':raise')]
+        i_raise = r_desc.find(':raise')
+        if i_raise == -1:
+            i_raise = None
+        r_desc = r_desc[:i_raise]
 
         anno = func_sig[f].return_annotation
         html += ('\n' + '\n'.join(temp[i+2:i+4])
@@ -401,6 +416,7 @@ def gen_functions():
         func_doc = {f: funcs[f].__init__.__doc__ if f[0].isupper() else funcs[f].__doc__ for f in func_str}
 
         temp = [t.strip() for t in load_functions_template()]
+        print(func_str)
         for f in func_str:
             html = _gen_func(f, file, temp, namespace, funcs, func_sig, func_doc)
             if f[0].isupper():
@@ -413,10 +429,11 @@ def gen_functions():
                 f_path = f
             with open(os.path.join(directory, f'{f_path}.html'), 'w', encoding='utf-8') as html_file:
                 html_file.write(html)
+            print(f'Function \'{f}\' done.')
 
 
 if __name__ == '__main__':
-    gen_table()
-    gen_doc()
-    gen_modules()
+    # gen_table()
+    # gen_doc()
+    # gen_modules()
     gen_functions()

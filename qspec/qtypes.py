@@ -22,7 +22,7 @@ __all__ = ['CodeType',
            'quant',
            'int_like', 'float_like', 'complex_like',
            'scalar', 'complexscalar', 'scalar_like', 'complexscalar_like', 'quant_like',
-           'ndarray', 'array_like', 'array_iter',
+           'ndarray', 'array_like', 'array_iter', 'quant_iter',
            'sympy_core', 'sympy_like', 'sympy_quant']
 
 
@@ -91,6 +91,7 @@ quant_like = Union[quant, scalar_like]
 ndarray = NDArray
 array_like = ArrayLike
 array_iter = Union[NDArray, Iterable]
+quant_iter = Union[quant_like, Iterable]
 
 sympy_core = Union[Integer, Float, Rational, Add, Mul]
 sympy_like = Union[Integer, Float, Rational, Add, Mul, complexscalar]

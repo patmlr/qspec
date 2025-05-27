@@ -414,7 +414,7 @@ def a_m_tilda(i: sympy_quant, j_l: sympy_quant, f_l: sympy_quant, m_l: sympy_qua
 
 """ Off-diagonal magnetic dipole transition matrix elements for Delta S = Delta L = 0. """
 
-def mu_j_m1(s, l, j_l, j_u):
+def mu_j_m1(s, l, j_l, j_u) -> float:
     r"""
 
     :param s: The spin quantum number $S$ of the lower and upper state.
@@ -430,7 +430,7 @@ def mu_j_m1(s, l, j_l, j_u):
             + g_s * (-1) ** j_l * np.sqrt(s * (s + 1) * (2 * s + 1)) * wigner_6j(s, j_l, l, j_u, s, 1)))
 
 
-def mu_jj_m1(sc, lc, jc_l, jo_l, j_l, so, lo, jc_u, jo_u, j_u):
+def mu_jj_m1(sc, lc, jc_l, jo_l, j_l, so, lo, jc_u, jo_u, j_u) -> float:
     r"""
 
     :param sc: The spin quantum number $s$ of the core electron(s) of the lower and upper state.
