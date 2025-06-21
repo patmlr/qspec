@@ -328,9 +328,10 @@ class State:
                 label = '{}({})'.format(int(np.around(freq_j, decimals=0)), j)
             self.instance = dll.state_construct()
             if isinstance(parity, str):
-                if parity not in {'even', 'odd'}:
-                    raise ValueError('Parameter \'parity\' must be either \'even\' (False) or \'odd\' (True).')
-                parity = True if parity == 'odd' else False
+                if parity not in {'even', 'e', 'odd', 'o'}:
+                    raise ValueError('Parameter \'parity\' must be either in {\'even\', \'e\', False}'
+                                     ' or in {\'odd\', \'o\', True}.')
+                parity = True if parity in {'odd', 'o'} else False
             else:
                 parity = bool(parity)
             dll.state_init(self.instance, c_double(freq_j), c_double(j), c_double(i),
@@ -1552,7 +1553,7 @@ class Interaction:
         return results
 
     def rates(self, t: array_like, delta: array_like = None, m: Optional[int] = 0, v: array_like = None,
-              y0: array_like = None):
+              y0: array_like = None, analytic: bool = False):
         """
         Solver for the rate equations. Solutions for n samples can be calculated in parallel.
 
@@ -1564,6 +1565,8 @@ class Interaction:
          the velocity vector(s) is(are) assumed to be aligned with the x-axis.
         :param y0: The initial state of the atom. This must be None or have shape (#states, ) or (n, #states).
          If None, the ground states are populated equally.
+        :param analytic: Calculate the rate equations analytically through a matrix exponential (True)
+         or numerically (False, default).
         :returns: The integrated rate equations as a real-valued array of shape (n, #states, #times).
         """
         t, t_size, ex = _cast_t(t)
@@ -1591,7 +1594,8 @@ class Interaction:
         results = np.zeros((sample_size, self.atom.size, t_size), dtype=float)
         dll.interaction_rates(self.instance, t.ctypes.data_as(c_double_p), delta.ctypes.data_as(c_double_p),
                               v.ctypes.data_as(c_double_p), y0.ctypes.data_as(c_double_p),
-                              results.ctypes.data_as(c_double_p), c_size_t(t_size), c_size_t(sample_size))
+                              results.ctypes.data_as(c_double_p), c_size_t(t_size), c_size_t(sample_size),
+                              c_bool(analytic))
         if ex:
             results = results[:, :, 1:]
         return results

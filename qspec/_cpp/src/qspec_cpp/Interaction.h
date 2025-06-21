@@ -11,6 +11,7 @@
 #include <iostream>
 #include <boost/numeric/odeint.hpp>
 #include <boost/numeric/odeint/external/eigen/eigen.hpp>
+#include <unsupported/Eigen/MatrixFunctions>
 
 using namespace boost::numeric::odeint;
 
@@ -37,6 +38,8 @@ typedef dense_output_runge_kutta< c_dopri5_mcd_type > d_dopri5_mcd_type;
 
 typedef Array<bool, Dynamic, Dynamic> ArrayXb;
 typedef Matrix<double, 3, Dynamic> Matrix3Xd;
+
+VectorXd rate_exponential(double t, VectorXd x0, MatrixXd R);
 
 
 class Interaction
@@ -154,7 +157,7 @@ public:
 	void update_hamiltonian_leaky_diag(MatrixXcd& H, VectorXd& w0, VectorXd& w);
 
 	std::vector<std::vector<VectorXd>> rates(
-		const std::vector<double>& t, const std::vector<VectorXd>& delta, const std::vector<Vector3d>& v, std::vector<VectorXd>& x0);
+		const std::vector<double>& t, const std::vector<VectorXd>& delta, const std::vector<Vector3d>& v, std::vector<VectorXd>& x0, const bool analytic);
 	std::vector<std::vector<VectorXcd>> schroedinger(
 		const std::vector<double>& t, const std::vector<VectorXd>& delta, const std::vector<Vector3d>& v, std::vector<VectorXcd>& x0);
 	std::vector<std::vector<MatrixXcd>> master(

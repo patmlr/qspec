@@ -306,7 +306,7 @@ dll.interaction_get_hamiltonian.argtypes = \
 dll.interaction_get_hamiltonian.restype = ctypes.c_void_p
 
 dll.interaction_rates.argtypes = \
-    (InteractionHandler, c_double_p, c_double_p, c_double_p, c_double_p, c_double_p, c_size_t, c_size_t)
+    (InteractionHandler, c_double_p, c_double_p, c_double_p, c_double_p, c_double_p, c_size_t, c_size_t, c_bool)
 dll.interaction_rates.restype = ctypes.c_void_p
 
 dll.interaction_schroedinger.argtypes = \

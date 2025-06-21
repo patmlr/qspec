@@ -217,9 +217,9 @@ def median(a: array_like, axis: int = None) -> (ndarray, ndarray, ndarray):
     :returns: The median (0.5-percentile) as well as the left- (~0.1587) and right-sided (~0.8413) 1-sigma percentile
      of a given sample 'a' along the specified 'axis'.
     """
-    med = np.median(a, axis=axis)
-    neg = np.percentile(a, 15.8655254, axis=axis)
-    pos = np.percentile(a, 84.1344746, axis=axis)
+    med = np.nanmedian(a, axis=axis)
+    neg = np.nanpercentile(a, 15.8655254, axis=axis)
+    pos = np.nanpercentile(a, 84.1344746, axis=axis)
     return med, neg, pos
 
 

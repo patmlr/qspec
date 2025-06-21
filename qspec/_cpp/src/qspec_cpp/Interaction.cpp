@@ -85,6 +85,11 @@ struct f_rate_equations
 	}
 };
 
+VectorXd rate_exponential(double t, VectorXd x0, MatrixXd R)
+{
+	return (R * t).exp() * x0;
+}
+
 struct f_schroedinger
 {
 	MatrixXcd& H;
@@ -863,7 +868,7 @@ void Interaction::update_hamiltonian_leaky_diag(MatrixXcd& H, VectorXd& w0, Vect
 }
 
 std::vector<std::vector<VectorXd>> Interaction::rates(
-	const std::vector<double>& t, const std::vector<VectorXd>& delta, const std::vector<Vector3d>& v, std::vector<VectorXd>& x0)
+	const std::vector<double>& t, const std::vector<VectorXd>& delta, const std::vector<Vector3d>& v, std::vector<VectorXd>& x0, const bool analytic)
 {
 	std::vector<std::vector<VectorXd>> results = std::vector<std::vector<VectorXd>>(x0.size());
 
@@ -878,29 +883,41 @@ std::vector<std::vector<VectorXd>> Interaction::rates(
 	}
 
 	std::for_each(std::execution::par_unseq, n_vec.begin(), n_vec.end(),
-		[this, &t, &x0, &delta, &v, &w0, &results, &progress](size_t i)
+		[this, &t, &x0, &delta, &v, &analytic, &w0, &results, &progress](size_t i)
 		{
 			VectorXd w = gen_w(delta.at(i), v.at(i));
 			MatrixXd R = gen_rates(w0, w);
 			VectorXd R_sum = gen_rates_sum(R);
 			size_t n = 0;
 
-			if (dense)
+			if (analytic)
 			{
-				d_dopri5_vd_type dopri5 = make_dense_output(atol, rtol, dt_max, dopri5_vd_type());
-				n = integrate_times(dopri5, f_rate_equations(R, R_sum, *atom->get_L0(), *atom->get_Lsum()),
-					x0.at(i), t.begin(), t.end(), dt, push_back_VectorXd(results.at(i)));
-			}
-			else if (controlled)
-			{
-				c_dopri5_vd_type dopri5 = make_controlled(atol, rtol, dt_max, dopri5_vd_type());
-				n = integrate_times(dopri5, f_rate_equations(R, R_sum, *atom->get_L0(), *atom->get_Lsum()),
-					x0.at(i), t.begin(), t.end(), dt, push_back_VectorXd(results.at(i)));
+				MatrixXd R_diag = (R_sum + *atom->get_Lsum()).asDiagonal();
+				MatrixXd R_exp = (R + *atom->get_L0()) - R_diag;
+				for (auto it = t.cbegin(); it != t.cend(); ++it)
+				{
+					results.at(i).push_back(rate_exponential(*it, x0.at(i), R_exp));
+				}
 			}
 			else
 			{
-				n = integrate_times(rk4_vd_type(), f_rate_equations(R, R_sum, *atom->get_L0(), *atom->get_Lsum()),
-					x0.at(i), t.begin(), t.end(), dt, push_back_VectorXd(results.at(i)));
+				if (dense)
+				{
+					d_dopri5_vd_type dopri5 = make_dense_output(atol, rtol, dt_max, dopri5_vd_type());
+					n = integrate_times(dopri5, f_rate_equations(R, R_sum, *atom->get_L0(), *atom->get_Lsum()),
+						x0.at(i), t.begin(), t.end(), dt, push_back_VectorXd(results.at(i)));
+				}
+				else if (controlled)
+				{
+					c_dopri5_vd_type dopri5 = make_controlled(atol, rtol, dt_max, dopri5_vd_type());
+					n = integrate_times(dopri5, f_rate_equations(R, R_sum, *atom->get_L0(), *atom->get_Lsum()),
+						x0.at(i), t.begin(), t.end(), dt, push_back_VectorXd(results.at(i)));
+				}
+				else
+				{
+					n = integrate_times(rk4_vd_type(), f_rate_equations(R, R_sum, *atom->get_L0(), *atom->get_Lsum()),
+						x0.at(i), t.begin(), t.end(), dt, push_back_VectorXd(results.at(i)));
+				}
 			}
 			progress.at(i) = 1;
 			printf("\r\033[92mSolving rate equations ... %3.2f %%\033[0m", 100 * std::reduce(progress.begin(), progress.end()) / x0.size());

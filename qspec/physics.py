@@ -24,7 +24,7 @@ __all__ = ['L_LABEL', 'E_NORM', 'pi', 'LEMNISCATE', 'mu_N', 'mu_B', 'g_s', 'me_u
            'f_recoil_v', 'get_f', 'get_m', 'hyperfine', 'lande_n', 'lande_j', 'lande_jj', 'g_j', 'lande_f',
            'zeeman_linear', 'hyper_zeeman_linear',
            'hyper_zeeman_ij', 'hyper_zeeman_num', 'hyper_zeeman_12', 'hyper_zeeman_12_d', 'a_hyper_mu', 'a_einstein_m1',
-           'saturation_intensity', 'saturation', 'rabi', 'scattering_rate', 'mass_factor',
+           'temperature_doppler', 'saturation_intensity', 'saturation', 'rabi', 'scattering_rate', 'mass_factor',
            'delta_r2', 'delta_r4', 'delta_r6', 'lambda_r', 'lambda_rn', 'schmidt_line', 'sellmeier',
            'gamma_3d', 'boost', 'doppler_3d', 'gaussian_beam_3d', 'gaussian_doppler_3d', 't_xi', 'thermal_v_pdf',
            'thermal_v_rvs', 'thermal_e_pdf', 'thermal_e_rvs', 'convolved_boltzmann_norm_pdf',
@@ -786,7 +786,6 @@ def lande_f(i: quant_like, j: quant_like, f: quant_like, gi: array_like, gj: arr
     return val
 
 
-
 def hyperfine(i: quant_like, j: quant_like, f: quant_like,
               a_hyper: array_like = 0., b_hyper: array_like = 0., c_hyper: array_like = 0.) -> ndarray:
     r"""
@@ -1089,9 +1088,9 @@ def hyper_zeeman_12_d(j: quant_like, m: quant_like, a_hyper: array_like = 0.,
     x_b0 = a_hyper * (j + 0.5)
 
     _x = b_field * (mu_B * g_j - mu_N * g_i) / x_b0
-    _dx = (mu_B * g_j - mu_N * g_i) / x_b0
+    _dx = (mu_B * g_j - mu_N * g_i) / x_b0 * z_unit
 
-    dx = -mu_B * g_j * m
+    dx = -mu_B * g_j * m * z_unit
 
     if m == j + 0.5:
         x0 = dx + 0.5 * x_b0 * _dx
@@ -1163,6 +1162,20 @@ def a_einstein_m1(f: array_like, j_l: quant_like = 0, j_u: quant_like = 0, ls: q
     mu = (mu * mu_B) ** 2 / (2 * j_u + 1)
 
     return 8 * mu * np.pi ** 2 * sc.mu_0 * f ** 3 / (3 * sc.hbar * sc.c ** 3) * 1e12
+
+
+def temperature_doppler(a):
+    r"""
+    The minimum temperature achievable through Doppler cooling (Doppler limit)
+
+    $$
+    T\frac{\hbar \Gamma}{2k_\mathrm{B}}.
+    $$
+
+    :param a: The inverse lifetime $\Gamma = 1 / \tau$ of the upper state of the cooling transition (MHz).
+    :returns: The temperature $T_\mathrm{Doppler}$ (K).
+    """
+    return 0.5 * sc.hbar * a * 1e6 / sc.k
 
 
 def saturation_intensity(f: array_like, a: array_like, a_dipole: array_like = 1.) -> ndarray:

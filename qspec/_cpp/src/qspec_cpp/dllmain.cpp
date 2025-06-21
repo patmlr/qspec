@@ -657,14 +657,14 @@ extern "C"
     }
 
     __declspec(dllexport) void interaction_rates(
-        Interaction* interaction, double* t, double* delta, double* v, double* x0, double* results, size_t t_size, size_t sample_size)
+        Interaction* interaction, double* t, double* delta, double* v, double* x0, double* results, size_t t_size, size_t sample_size, bool analytic)
     {
         const std::vector<double> _t = cast_samples_double(t, t_size);
         const std::vector<VectorXd> _delta = cast_samples_VectorXd(delta, sample_size, interaction->get_lasers()->size());
         const std::vector<Vector3d> _v = cast_samples_Vector3d(v, sample_size);
         size_t size = interaction->get_atom()->get_size();
         std::vector<VectorXd> _x0 = cast_samples_VectorXd(x0, sample_size, size);
-        std::vector<std::vector<VectorXd>> _results = interaction->rates(_t, _delta, _v, _x0);
+        std::vector<std::vector<VectorXd>> _results = interaction->rates(_t, _delta, _v, _x0, analytic);
         for (size_t i = 0; i < sample_size; ++i)
         {
             for (size_t j = 0; j < size; ++j)

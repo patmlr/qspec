@@ -20,10 +20,10 @@ import qspec.simulate as sim
 class TestPhysics(ut.TestCase):
 
     def test_simple_atom(self):
-        states = [sim.State(0, 0.5, 0, 0.5, 0, 0.5, -0.5, label='s-'),
-                  sim.State(7e8, 0.5, 1, 0.5, 0, 0.5, -0.5, label='p-'),
-                  sim.State(7e8, 0.5, 1, 0.5, 0, 0.5, 0.5, label='p+'),
-                  sim.State(4e8, 0.5, 2, 1.5, 0, 1.5, 0.5, label='d+')]
+        states = [sim.State(0, 0.5, 0, 0.5, -0.5, 'even', label='s-'),
+                  sim.State(7e8, 0.5, 0, 0.5, -0.5, 'odd', label='p-'),
+                  sim.State(7e8, 0.5, 0, 0.5, 0.5, 'odd', label='p+'),
+                  sim.State(4e8, 1.5, 0, 1.5, 0.5, 'even', label='d+')]
         decay_map = sim.DecayMap([('s-', 'p-'), ('s-', 'p+'), ('d+', 'p-'), ('d+', 'p+')], [1e2, 1e2, 10., 10.])
         atom = sim.Atom(states, decay_map=decay_map)
         pol_0 = sim.Polarization([0, 0, 1], q_axis=2, vec_as_q=False)

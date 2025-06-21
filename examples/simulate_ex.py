@@ -271,7 +271,7 @@ def example(n=None):
         inter.controlled = True
         inter.resonance_info()  # Print the resonance info.
 
-        t = np.concatenate([np.zeros(1), np.logspace(-4, 1, 5000)], axis=0)  # Integration time in us.
+        t = np.concatenate([np.zeros(1), np.logspace(-4, 2.5, 5000)], axis=0)  # Integration time in us.
         y0 = li7.get_y0(['s3', 's5'])
 
         y = inter.rates(t, y0=y0)  # Solve the rate equation for t and plot with logarithmic scaling.
@@ -283,7 +283,7 @@ def example(n=None):
         plt.legend()
         plt.show()
 
-        ''' The result is quiet different with fully coherent dynamics. '''
+        ''' The result is quite different with fully coherent dynamics. '''
         y = inter.master(t, y0=y0)  # Solve the master equation for t and plot with logarithmic scaling.
         y = np.diagonal(y[0], axis1=0, axis2=1).real
         plt.xscale('log')
@@ -486,8 +486,8 @@ def example(n=None):
         a31 = 4.857e-5
         print(f'tau: {1e-3 / a31} ms')
 
-        s1 = sim.gen_electronic_state(0., 0, 0, parity='even', ls=(0, 0), label='s1')
-        s3 = sim.gen_electronic_state(f31, 1, 0, parity='even', ls=(0, 1), label='s3')
+        s1 = sim.gen_electronic_state(0., 0, 0, parity='even', ls=[0, 0], label='s1')
+        s3 = sim.gen_electronic_state(f31, 1, 0, parity='even', ls=[0, 1], label='s3')
 
         decay_map = sim.DecayMap(labels=[('s1', 's3')], a=[a31])
 
@@ -518,7 +518,6 @@ def example(n=None):
         plt.xlabel('Time (ms)')
         plt.ylabel('Population')
         plt.show()
-
 
 
 if __name__ == '__main__':
