@@ -109,3 +109,31 @@ class TestPhysics(ut.TestCase):
         plt.subplots_adjust(left=0.11, bottom=0.1, right=0.98, top=0.99)
         plt.show()
 
+    def test_polarization(self):
+        t = 0.223
+        mod = np.exp(1j * t / (2 * np.pi))
+        phi = np.linspace(0., 2 * np.pi, 1001)
+
+        print(1 / (7e14 / 3e8) * 1e9)
+
+        y0, y1, y2 = [], [], []
+        for _phi in phi:
+            e0 = np.array([0, np.exp(1j * _phi), 0], dtype=complex) * mod
+            e1 = np.array([1, 1, 0], dtype=complex)
+            e1 /= qs.absolute(e1)
+            e1 *= mod
+
+            pol = sim.Polarization(vec=e0 + e1, q_axis=2, vec_as_q=False)
+            y0.append(np.abs(pol.q[0]))
+            y1.append(np.abs(pol.q[1]))
+            y2.append(np.abs(pol.q[2]))
+
+        y0, y1, y2 = np.array(y0, dtype=float), np.array(y1, dtype=float), np.array(y2, dtype=float)
+
+        plt.plot(phi / (2 * np.pi), y0, '-C1', label=r'$\sigma^-$')
+        plt.plot(phi / (2 * np.pi), y1, '-C0', label=r'$\pi$')
+        plt.plot(phi / (2 * np.pi), y2, '-C3', label=r'$\sigma^+$')
+        plt.legend()
+        plt.xlabel(r'Phase ($2\pi$)')
+        plt.ylabel(r'Amplitude')
+        plt.show()
