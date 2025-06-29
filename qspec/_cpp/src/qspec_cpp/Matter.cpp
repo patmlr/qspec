@@ -1,7 +1,7 @@
 
 #include "pch.h"
-#include "Matter.h"
 #include "Physics.h"
+#include "Matter.h"
 
 
 Environment::Environment()
@@ -331,6 +331,9 @@ Atom::Atom()
 Atom::~Atom()
 {
 	std::vector<State*>().swap(states);
+	std::vector<MatrixXi>().swap(ek);
+	std::vector<MatrixXi>().swap(mk);
+	std::vector<MatrixXd>().swap(d_em);
 	for (size_t q = 0; q < 3; ++q)
 	{
 		m_e1.at(q).resize(0, 0);
@@ -344,6 +347,83 @@ void Atom::init(std::vector<State*> _states, DecayMap* _decays)
 	states = _states;
 	decays = _decays;
 	update();
+}
+
+void Atom::gen_multipole()
+{
+	ek.clear();
+	mk.clear();
+	d_em.clear();
+	for (size_t ik = 0; ik < k_em_max; ++ik)
+	{
+		ek.push_back(MatrixXi::Zero(size, size));
+		mk.push_back(MatrixXi::Zero(size, size));
+		d_em.push_back(MatrixXd::Zero(size, size));
+	}
+
+	L0 = MatrixXd::Zero(size, size);
+	L1 = MatrixXd::Zero(size, size);
+	Lsum = VectorXd::Zero(size);
+
+	for (size_t i = 1; i < size; ++i)
+	{
+		for (size_t j = 0; j < i; ++j)
+		{
+
+			double a = decays->get_item(states[i]->get_label(), states[j]->get_label());
+			if (a == 0) continue;
+
+			size_t _i = i;
+			size_t _j = j;
+			if (states[i]->get_freq() > states[j]->get_freq())
+			{
+				_i = j;
+				_j = i;
+			}
+
+			size_t k = get_min_k(_i, _j);
+			bool parity_equal = get_parity_equal(_i, _j);
+			while (k <= k_em_max)
+			{
+				if (parity_equal)
+				{
+					if (k % 2 != 0) mk.at(k - 1)(i, j) = k;
+					else ek.at(k - 1)(i, j) = k;
+				}
+				else
+				{
+					if (k % 2 != 0) ek.at(k - 1)(i, j) = k;
+					else mk.at(k - 1)(i, j) = k;
+				}
+
+				// printf("\nk: %zi", k);
+
+				mk.at(k - 1)(j, i) = mk.at(k - 1)(i, j);
+				ek.at(k - 1)(j, i) = ek.at(k - 1)(i, j);
+
+				double q_val = states[_j]->get_m() - states[_i]->get_m();
+				double ak = a_multipole(k, states[_i]->get_i(), states[_i]->get_j(), states[_i]->get_f(), states[_i]->get_m(),
+																states[_j]->get_j(), states[_j]->get_f(), states[_j]->get_m(), q_val);  // This takes the time.
+
+				L0(_i, _j) = a * ak * ak;
+				L0(_j, _i) = 0.;
+
+				// size_t q = (4 * abs(q_val) + (sgn<double>(q_val) - abs(sgn<double>(q_val)))) / 2;
+				// double q_val = 0.5 * (1 - 2 * (q % 2)) * (q + (q % 2));
+				double norm = d_emk(k, parity_equal, a, states[i]->get_freq(), states[j]->get_freq());
+				d_em.at(k - 1)(i, j) = ak * norm;
+				d_em.at(k - 1)(j, i) = d_em.at(k - 1)(i, j);
+				k += 1;
+			}
+		}
+	}
+	Lsum = L0.colwise().sum();
+	for (size_t i = 0; i < size; ++i)
+	{
+		L1.row(i) += Lsum;
+		L1.col(i) += Lsum;
+	}
+	L1 *= -0.5;
 }
 
 void Atom::gen_dipole()
@@ -454,14 +534,16 @@ void Atom::gen_frequencies(Environment* env)
 
 void Atom::update()
 {
-	gen_dipole();
+	// gen_dipole();
+	gen_multipole();
 }
 
 void Atom::update(Environment* env)
 {
 	gen_frequencies(env);
 	gen_w0();
-	gen_dipole();
+	// gen_dipole();
+	gen_multipole();
 }
 
 size_t Atom::get_size()
@@ -514,6 +596,22 @@ void Atom::set_mass(double _mass)
 	mass = _mass;
 }
 
+size_t Atom::get_k_em_max()
+{
+	return k_em_max;
+}
+
+size_t Atom::get_min_k(size_t i, size_t j)
+{
+	size_t k = 1;
+	return k;
+}
+
+bool Atom::get_parity_equal(size_t i, size_t j)
+{
+	return states.at(i)->get_parity() == states.at(j)->get_parity();
+}
+
 std::vector<size_t>* Atom::get_gs()
 {
 	return &gs;
@@ -527,6 +625,71 @@ std::array<MatrixXd, 3>* Atom::get_m_e1()
 std::array<MatrixXd, 3>* Atom::get_m_m1()
 {
 	return &m_m1;
+}
+
+std::vector<MatrixXi> Atom::get_ek()
+{
+	return ek;
+}
+
+MatrixXi Atom::get_ek(size_t k)
+{
+	return ek.at(k - 1);
+}
+
+size_t Atom::get_ek(size_t k, size_t i, size_t j)
+{
+	return ek.at(k - 1)(i, j);
+}
+
+std::vector<MatrixXi> Atom::get_mk()
+{
+	return mk;
+}
+
+MatrixXi Atom::get_mk(size_t k)
+{
+	return mk.at(k - 1);
+}
+
+size_t Atom::get_mk(size_t k, size_t i, size_t j)
+{
+	return mk.at(k - 1)(i, j);
+}
+
+std::vector<MatrixXi> Atom::get_emk()
+{
+	std::vector<MatrixXi> emk;
+	for (size_t ik = 0; ik < k_em_max; ++ik)
+	{
+		emk.push_back(ek.at(ik) + mk.at(ik));
+	}
+	return emk;
+}
+
+MatrixXi Atom::get_emk(size_t k)
+{
+	return ek.at(k - 1) + mk.at(k - 1);
+}
+
+size_t Atom::get_emk(size_t k, size_t i, size_t j)
+{
+	return ek.at(k - 1)(i, j) + mk.at(k - 1)(i, j);
+}
+
+std::vector<MatrixXd> Atom::get_d_em()
+{
+	return d_em;
+}
+
+MatrixXd Atom::get_d_em(size_t k)
+{
+	return d_em.at(k - 1);
+}
+
+double Atom::get_d_em(size_t k, size_t i, size_t j)
+{
+	return d_em.at(k - 1)(i, j);
 }
 
 VectorXd* Atom::get_w0()

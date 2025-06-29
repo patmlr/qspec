@@ -59,7 +59,7 @@ protected:
 	bool controlled = true;
 	bool dense = true;
 
-	std::array<std::vector<MatrixXi>, 3> lasermap;
+	std::vector<std::vector<MatrixXi>> lasermap;
 	MatrixXi summap;
 	std::vector<MatrixXcd> rabimap;
 	std::vector<std::vector<size_t>> trees;

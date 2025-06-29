@@ -228,10 +228,12 @@ std::vector<Laser*>* Interaction::get_lasers()
 void Interaction::add_laser(Laser* _laser)
 {
 	lasers.push_back(_laser);
-	for (size_t q_i = 0; q_i < 3; ++q_i)
+	std::vector<MatrixXi> q_map;
+	for (size_t q = 0; q < 2 * atom->get_k_em_max() + 1; ++q)
 	{
-		lasermap.at(q_i).push_back(MatrixXi::Zero(atom->get_size(), atom->get_size()));
+		q_map.push_back(MatrixXi::Zero(atom->get_size(), atom->get_size()));
 	}
+	lasermap.push_back(q_map);
 	rabimap.push_back(MatrixXcd::Zero(atom->get_size(), atom->get_size()));
 }
 
@@ -384,43 +386,57 @@ void Interaction::gen_rabi()
 	{
 		rabimap.at(m).setZero();
 	}
-	for (size_t q = 0; q < 3; ++q)
-	{
-		double q_val = static_cast<double>(q) - 1;
-		for (size_t m = 0; m < lasers.size(); ++m)
-		{
-			lasermap.at(q).at(m).setZero();
-			// Which transitions are laser-driven?
-			for (size_t col = 1; col < atom->get_size(); ++col)
-			{
-				for (size_t row = 0; row < col; ++row)
-				{	
-					State* lower = atom->get(col);
-					State* upper = atom->get(row);
-					if (lower->get_freq() > upper->get_freq())
-					{
-						lower = atom->get(row);
-						upper = atom->get(col);
-					}
 
-					if (upper->get_m() - lower->get_m() != q_val) continue;  // Polarization match?
+	for (size_t m = 0; m < lasers.size(); ++m)
+	{
+		for (size_t q = 0; q < 2 * atom->get_k_em_max() + 1; ++q)
+		{
+			lasermap.at(m).at(q).setZero();
+		}
+		// Which transitions are laser-driven?
+		for (size_t col = 1; col < atom->get_size(); ++col)
+		{
+			for (size_t row = 0; row < col; ++row)
+			{	
+				State* lower = atom->get(col);
+				State* upper = atom->get(row);
+				if (lower->get_freq() > upper->get_freq())
+				{
+					lower = atom->get(row);
+					upper = atom->get(col);
+				}
+
+				for (size_t _k = 1; _k <= atom->get_k_em_max(); ++_k)
+				{
+					size_t k = atom->get_emk(_k, row, col);
+					size_t ke = atom->get_ek(_k, row, col);
+					size_t km = atom->get_mk(_k, row, col);
+					printf("\nk(%zi, %zi): e%zi, m%zi", row, col, ke, km);
+					if (k == 0) continue;
 					if (abs(lasers.at(m)->get_freq() - (upper->get_freq() - lower->get_freq())) > delta_max) continue;  // In detuning range?
 
-					std::complex<double> q_i = lasers.at(m)->get_polarization()->get_q()->array()[q];
-					if ((atom->get_m_e1()->at(q)(row, col) + atom->get_m_m1()->at(q)(row, col)) * abs(q_i)  // q_i.real() * q_i.imag()  // (pow(q_i.real(), 2) + pow(q_i.imag(), 2))
+					double q_val = upper->get_m() - lower->get_m();
+					size_t q = k + q_val;
+					printf("\n(k, q): %zi, %3.3f", k, q_val);
+					std::complex<double> q_i = lasers.at(m)->get_kpol(k, *env->get_e_B())(q);
+					//printf("\nqi: %3.3f + %3.3fj", q_i.real(), q_i.imag());
+
+					if ((atom->get_d_em(k, row, col)) * abs(q_i)  // q_i.real() * q_i.imag()  // (pow(q_i.real(), 2) + pow(q_i.imag(), 2))
 						* lasers.at(m)->get_intensity() == 0) continue;  // Transition allowed/active?
-					lasermap.at(q).at(m)(row, col) = 1;
-					lasermap.at(q).at(m)(col, row) = 1;
+
+					lasermap.at(m).at(q)(row, col) = 1;
+					lasermap.at(m).at(q)(col, row) = 1;
 					summap(row, col) = 1;
 					summap(col, row) = 1;
 
-					rabimap.at(m)(row, col) += 0.5 * (atom->get_m_e1()->at(q)(row, col) + atom->get_m_m1()->at(q)(row, col))
+					rabimap.at(m)(row, col) += 0.5 * (atom->get_d_em(k, row, col))
 					* sqrt(lasers[m]->get_intensity()) * q_i * pow(-1, q_val);  // Calc. Omega/2 for all transitions.
 					rabimap.at(m)(col, row) = std::conj(rabimap.at(m)(row, col));
 				}
 			}
 		}
 	}
+	printf("\n");
 }
 
 void Interaction::gen_trees()
@@ -470,9 +486,9 @@ void Interaction::gen_conlist()
 	{
 		for (int m = 0; m < lasers.size(); ++m)
 		{
-			for (size_t q = 0; q < 3; ++q)
+			for (size_t q = 0; q < 2 * atom->get_k_em_max() + 1; ++q)
 			{
-				if (lasermap.at(q).at(m).col(i).any())
+				if (lasermap.at(m).at(q).col(i).any())
 				{
 					con_list.at(i).push_back(m);
 					break;
@@ -548,9 +564,9 @@ void Interaction::propagate(size_t i, size_t i0, std::set<size_t>& visited, cons
 	{
 		for (size_t _j : tree)  // Find all states which are connected to i via the laser m.
 		{
-			for (size_t q = 0; q < 3; ++q)
+			for (size_t q = 0; q < 2 * atom->get_k_em_max() + 1; ++q)
 			{
-				if (lasermap.at(q).at(m)(_j, i) != 0)
+				if (lasermap.at(m).at(q)(_j, i) != 0)
 				{
 					queue.push(_j);
 					break;

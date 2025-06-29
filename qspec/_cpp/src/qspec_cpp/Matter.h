@@ -124,11 +124,17 @@ protected:
 	std::vector<State*> states;
 	DecayMap* decays;
 	double mass = 0;
+	size_t k_em_max = 1;
 	size_t size = 0;
 
 	std::vector<size_t> gs;
 	std::array<MatrixXd, 3> m_e1;  // -1, 0, +1
 	std::array<MatrixXd, 3> m_m1;  // -1, 0, +1
+
+	std::vector<MatrixXi> ek;
+	std::vector<MatrixXi> mk;
+	std::vector<MatrixXd> d_em;
+
 	VectorXd w0;
 	VectorXd Lsum;
 	MatrixXd L0;
@@ -145,24 +151,51 @@ public:
 	VectorXd* get_w0();
 
 	void gen_frequencies(Environment* env);
+	void gen_multipole();
 	void gen_dipole();
 	void update();
 	void update(Environment* env);
 
 	std::vector<State*>* get_states();
+
 	DecayMap* get_decay_map();
 	void set_decay_map(DecayMap* _decays);
+
 	double get_mass();
 	void set_mass(double _mass);
+
+	size_t get_k_em_max();
+	size_t get_min_k(size_t i, size_t j);
+	bool get_parity_equal(size_t i, size_t j);
+
 	size_t get_size();
 
 	State* get(size_t index);
+
 	std::vector<size_t>* get_gs();
 	std::array<MatrixXd, 3>* get_m_e1();
 	std::array<MatrixXd, 3>* get_m_m1();
+
+	std::vector<MatrixXi> get_ek();
+	MatrixXi get_ek(size_t k);
+	size_t get_ek(size_t k, size_t i, size_t j);
+
+	std::vector<MatrixXi> get_mk();
+	MatrixXi get_mk(size_t k);
+	size_t get_mk(size_t k, size_t i, size_t j);
+
+	std::vector<MatrixXi> get_emk();
+	MatrixXi get_emk(size_t k);
+	size_t get_emk(size_t k, size_t i, size_t j);
+
+	std::vector<MatrixXd> get_d_em();
+	MatrixXd get_d_em(size_t k);
+	double get_d_em(size_t k, size_t i, size_t j);
+
 	VectorXd* get_Lsum();
 	MatrixXd* get_L0();
 	MatrixXd* get_L1();
+
 };
 
 

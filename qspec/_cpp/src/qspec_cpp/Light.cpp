@@ -155,3 +155,10 @@ Vector3d Laser::get_kn()
 {
 	return k / k.norm();
 }
+
+VectorXcd Laser::get_kpol(size_t k, Vector3d q_axis)
+{
+	VectorXcd kpol = VectorXcd::Zero(k);
+	Vector3cd q = *polarization->get_q();
+	return q;
+}

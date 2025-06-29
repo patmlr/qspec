@@ -132,12 +132,18 @@ def example(n=None):
         laser_dp = sim.Laser(freq=f_dp + 400, polarization=pol, intensity=1000)  # Linear polarized laser for
         # the metastable-state transition.
 
-        inter = sim.Interaction(atom=ca40, lasers=[laser_sp, laser_dp], delta_max=10000)
+        inter = sim.Interaction(atom=ca40, lasers=[laser_sp, laser_dp], delta_max=1000)
         inter.controlled = True  # Use the controlled solver.
         # inter.dt = 4e-5  # or small step sizes.
 
         times = [0, 2]  # Integration time in us.
         delta = np.linspace(-6.5, 6.5, 501)
+        r0 = inter.get_rabi(0)
+        r1 = inter.get_rabi(1)
+
+        d = inter.get_delta()
+
+        h = inter.hamiltonian(0., [5.], 1, [0.])
 
         results = inter.master(times, delta, m=1)  # m=0 for delta in first laser.
         # Solve the master equation for t, assuming equal population in all s-states.
@@ -519,6 +525,40 @@ def example(n=None):
         plt.ylabel('Population')
         plt.show()
 
+    if 8 in n:
+        f_sp = 755222766
+        f_d3p3 = 352682482
+        f_d5p3 = 350862883
+        a = 1.3e-6
+        print(f'tau: {1e-6 / a} s')
+
+        s = sim.gen_electronic_state(freq_0=0, j=0.5, i=0, parity='e', label='s')
+        d3 = sim.gen_electronic_state(f_sp - f_d3p3, 1.5, 0, parity='e', label='d3')
+        d5 = sim.gen_electronic_state(f_sp - f_d5p3, 2.5, 0, parity='e', label='d5')
+
+        decay_map = sim.DecayMap(labels=[('s', 'd3'), ('s', 'd5')], a=[a, a])
+        ca40 = sim.Atom(s + d3 + d5, decay_map)
+
+        pol_sd3 = sim.Polarization([0, 1, 0], q_axis=2)
+        laser_sd3 = sim.Laser(freq=f_sp - f_d3p3, polarization=pol_sd3, intensity=1000)
+
+        pol_sd5 = sim.Polarization([0, 1, 0], q_axis=2)
+        laser_sd5 = sim.Laser(freq=f_sp - f_d5p3, polarization=pol_sd5, intensity=1000)
+
+        inter = sim.Interaction(ca40, lasers=[laser_sd3, laser_sd5])
+
+        times = np.linspace(0., 100., 101)
+        y = inter.rates(times, analytic=False)[0]
+
+        labels = ['d3', 'd5']
+        for label in labels:
+            i = ca40.get_state_indexes(label)
+            plt.plot(times, np.sum(y[i], axis=0), label=label)
+
+        plt.legend()
+        plt.xlabel(r'Time ($\mu$s)')
+        plt.ylabel('Population')
+        plt.show()
 
 if __name__ == '__main__':
-    example({7})
+    example({8})

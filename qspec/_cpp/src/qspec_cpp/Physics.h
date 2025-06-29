@@ -38,6 +38,9 @@ double d_e1(double a, double freq_0, double freq_1);
 double d_m1(double a, double freq_0, double freq_1);
 double a_dipole(double i, double j_l, double f_l, double m_l, double j_u, double f_u, double m_u, double q);
 
+double d_emk(size_t k, bool parity_equal, double a, double freq_0, double freq_1);
+double a_multipole(size_t k, double i, double j_l, double f_l, double m_l, double j_u, double f_u, double m_u, double q);
+
 double lande_n(double g_n);
 double lande_j(double s, double l, double j);
 double lande_f(double i, double j, double f, double g_n, double g_j);

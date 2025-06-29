@@ -3,7 +3,6 @@
 #include "Utility.h"
 
 
-
 Vector3d cast_Vector3d(double* x)
 {
     Vector3d _x = Vector3d::Zero();

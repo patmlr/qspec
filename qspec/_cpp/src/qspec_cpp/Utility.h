@@ -9,6 +9,10 @@
 
 using namespace Eigen;
 
+template <typename T> int sgn(T val)
+{
+    return (T(0) < val) - (val < T(0));
+}
 
 Vector3d cast_Vector3d(double* x);
 VectorXd cast_VectorXd(double* x, size_t size);

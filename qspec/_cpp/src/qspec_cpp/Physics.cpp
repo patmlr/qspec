@@ -169,6 +169,20 @@ double a_dipole(double i, double j_l, double f_l, double m_l, double j_u, double
     return pow(-1, exp) * sqrt_f * sqrt_j * wigner6j(j_u, j_l, 1, f_l, f_u, i) * clebschGordan(f_l, 1, f_u, m_l, q, m_u);  // wigner6j(j_u, j_l, 1, f_l, f_u, i) * clebschGordan(f_u, f_l, 1, m_u, m_l, q) * SixJSymbol(j_u, j_l, 1, f_l, f_u, i) * CGcoeff(f_u, m_u, f_l, m_l, 1, q);  
 }
 
+double d_emk(size_t k, bool parity_equal, double a, double freq_0, double freq_1)
+{
+    return sqrt(3 * a * pow(sc::c, 2) / (2 * sc::pi * sc::h * pow(abs(freq_0 - freq_1), 3))) * 1e-12;
+}
+
+double a_multipole(size_t k, double i, double j_l, double f_l, double m_l, double j_u, double f_u, double m_u, double q)
+{
+    if (abs(m_u - m_l - q) > 0.1) return 0.;
+    double sqrt_f = sqrt(2 * f_l + 1);
+    double sqrt_j = sqrt(2 * j_u + 1);
+    double exp = f_l + i + k + j_u;
+    return pow(-1, exp) * sqrt_f * sqrt_j * wigner6j(j_u, j_l, k, f_l, f_u, i) * clebschGordan(f_l, k, f_u, m_l, q, m_u);  // wigner6j(j_u, j_l, 1, f_l, f_u, i) * clebschGordan(f_u, f_l, 1, m_u, m_l, q) * SixJSymbol(j_u, j_l, 1, f_l, f_u, i) * CGcoeff(f_u, m_u, f_l, m_l, 1, q);  
+}
+
 double lande_n(double gyro)
 {
     return gyro * sc::h / sc::mu_N;

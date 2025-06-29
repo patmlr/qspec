@@ -526,8 +526,8 @@ def construct_hyperfine_state(freq_0: quant_like, s: quant_like, l: quant_like, 
 
 def gen_electronic_state(
         freq_0: quant_like = 0., j: quant_like = 0, i: quant_like = 0, parity: Union[bool, str] = None,
-        hyper_const: Iterable[array_like] = None, ls: quant_like = (0, 0), jj: quant_like = None, gj: array_like = None, gi: array_like = 0,
-        label: str = None) -> list[State]:
+        hyper_const: Iterable[array_like] = None, ls: quant_like = (0, 0), jj: quant_like = None, gj: array_like = None,
+        gi: array_like = 0, label: str = None) -> list[State]:
     r"""
     Creates all substates of a fine-structure state using a common label.
 
@@ -540,7 +540,8 @@ def gen_electronic_state(
      it is assumed to be the constant $A$ and the other orders are 0 (MHz).
     :param ls: A list or a single pair of electronic angular momentum and spin quantum numbers $(l_i, s_i)$
      used to calculate the electronic g-factor in the LS-coupling scheme. If this is a list of LS-pairs,
-     A list of $j_i$ quantum numbers needs to specified for the parameter `jj`. It is overwritten if `gj` is specified.
+     A list of $j_i$ quantum numbers needs to be specified for the parameter `jj`.
+     It is overwritten if `gj` is specified.
     :param jj: A list of two electronic total angular momentum quantum numbers $(j_0, j_1)$
      used to calculate the electronic g-factor in the jj-coupling scheme.
      Either a list of two $(l_i, s_i)$ pairs needs to be specified for the parameter `ls`
@@ -1471,7 +1472,7 @@ class Interaction:
         """
         :returns: A (atom.size x atom.size)-matrix indicating the states which are laser-connected.
         """
-        matrix_i_p = np.ctypeslib.ndpointer(dtype=int, shape=(self.atom.size, self.atom.size))
+        matrix_i_p = np.ctypeslib.ndpointer(dtype=np.int32, shape=(self.atom.size, self.atom.size))
         set_restype(dll.interaction_get_summap, matrix_i_p)
         return dll.interaction_get_summap(self.instance)
 

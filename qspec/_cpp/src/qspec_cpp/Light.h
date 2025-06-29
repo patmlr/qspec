@@ -63,4 +63,5 @@ public:
 	void set_k(Vector3d _k);
 	Vector3d get_kn();
 
+	VectorXcd get_kpol(size_t k, Vector3d q_axis);
 };
