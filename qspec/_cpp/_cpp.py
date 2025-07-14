@@ -43,36 +43,43 @@ class c_complex(ctypes.Structure):
         return self.real + 1.j * self.imag
 
 
+cast = ctypes.cast
+POINTER = ctypes.POINTER
+
+c_void_p = ctypes.c_void_p
 c_bool = ctypes.c_bool
-c_bool_p = ctypes.POINTER(ctypes.c_bool)
+c_bool_p = POINTER(ctypes.c_bool)
 c_int = ctypes.c_int
-c_int_p = ctypes.POINTER(ctypes.c_int)
+c_int_p = POINTER(ctypes.c_int)
+c_int32 = ctypes.c_int32
+c_int32_p = POINTER(ctypes.c_int32)
 c_size_t = ctypes.c_size_t
-c_size_t_p = ctypes.POINTER(ctypes.c_size_t)
+c_size_t_p = POINTER(ctypes.c_size_t)
 c_float = ctypes.c_float
-c_float_p = ctypes.POINTER(ctypes.c_float)
+c_float_p = POINTER(ctypes.c_float)
 c_double = ctypes.c_double
-c_double_p = ctypes.POINTER(ctypes.c_double)
-c_complex_p = ctypes.POINTER(c_complex)
+c_double_p = POINTER(ctypes.c_double)
+c_complex_p = POINTER(c_complex)
 c_char_p = ctypes.c_char_p
+
 
 vector3d_p = ctypeslib.ndpointer(dtype=float, shape=(3, ))
 vector3cd_p = ctypeslib.ndpointer(dtype=complex, shape=(3, ))
 matrix3cd_p = ctypeslib.ndpointer(dtype=complex, shape=(3, 3))
 
-PolarizationHandler = ctypes.POINTER(ctypes.c_char)
-LaserHandler = ctypes.POINTER(ctypes.c_char)
-EnvironmentHandler = ctypes.POINTER(ctypes.c_char)
-StateHandler = ctypes.POINTER(ctypes.c_char)
-DecayMapHandler = ctypes.POINTER(ctypes.c_char)
-AtomHandler = ctypes.POINTER(ctypes.c_char)
-InteractionHandler = ctypes.POINTER(ctypes.c_char)
-ResultHandler = ctypes.POINTER(ctypes.c_char)
-SpectrumHandler = ctypes.POINTER(ctypes.c_char)
-MultivariateNormalHandler = ctypes.POINTER(ctypes.c_char)
+PolarizationHandler = POINTER(ctypes.c_char)
+LaserHandler = POINTER(ctypes.c_char)
+EnvironmentHandler = POINTER(ctypes.c_char)
+StateHandler = POINTER(ctypes.c_char)
+DecayMapHandler = POINTER(ctypes.c_char)
+AtomHandler = POINTER(ctypes.c_char)
+InteractionHandler = POINTER(ctypes.c_char)
+ResultHandler = POINTER(ctypes.c_char)
+SpectrumHandler = POINTER(ctypes.c_char)
+MultivariateNormalHandler = POINTER(ctypes.c_char)
 
 dll_path = os.path.abspath(os.path.dirname(__file__))
-x64 = r'\x64' if ctypes.sizeof(ctypes.c_void_p) == 8 else ''
+x64 = r'\x64' if ctypes.sizeof(c_void_p) == 8 else ''
 dll_path = os.path.join(dll_path, r'src\qspec_cpp{}\Release'.format(x64))
 dll_name = 'qspec_cpp.dll'
 dll = ctypes.CDLL(os.path.join(dll_path, dll_name))
@@ -141,8 +148,8 @@ dll.environment_set_B_double.argtypes = (EnvironmentHandler, c_double)
 dll.state_construct.restype = StateHandler
 dll.state_destruct.argtypes = (StateHandler, )
 
-dll.state_init.argtypes = (StateHandler, c_double, c_double, c_double, c_double,
-                           c_double, c_bool, vector3d_p, c_double, c_double, c_char_p)
+dll.state_init.argtypes = (StateHandler, c_double, c_double_p, c_double_p, c_double, c_double, c_double, c_double,
+                           c_bool, c_double_p, c_size_t, vector3d_p, c_double, c_double, c_char_p)
 
 dll.state_reset.argtypes = (StateHandler, )
 
@@ -219,6 +226,9 @@ dll.atom_get_mass.argtypes = (AtomHandler, )
 dll.atom_get_mass.restype = c_double
 dll.atom_set_mass.argtypes = (AtomHandler, c_double)
 
+dll.atom_get_k_em_max.argtypes = (AtomHandler, )
+dll.atom_get_k_em_max.restype = c_size_t
+
 dll.atom_get_size.argtypes = (AtomHandler, )
 dll.atom_get_size.restype = c_size_t
 
@@ -229,6 +239,18 @@ dll.atom_get_gs.restype = c_size_t_p
 
 dll.atom_get_m_e1.argtypes = (AtomHandler, c_size_t)
 dll.atom_get_m_e1.restype = c_double_p
+
+dll.atom_get_ek.argtypes = (AtomHandler, c_size_t)
+dll.atom_get_ek.restype = c_int32_p
+
+dll.atom_get_mk.argtypes = (AtomHandler, c_size_t)
+dll.atom_get_mk.restype = c_int32_p
+
+dll.atom_get_emk.argtypes = (AtomHandler, c_size_t)
+dll.atom_get_emk.restype = c_int32_p
+
+dll.atom_get_d_em.argtypes = (AtomHandler, c_size_t)
+dll.atom_get_d_em.restype = c_double_p
 
 dll.atom_get_L0.argtypes = (AtomHandler, )
 dll.atom_get_L0.restype = c_double_p
@@ -303,28 +325,28 @@ dll.interaction_get_delta.argtypes = (InteractionHandler, )
 
 dll.interaction_get_hamiltonian.argtypes = \
     (InteractionHandler, c_double_p, c_double_p, c_double_p, c_complex_p, c_size_t, c_size_t)
-dll.interaction_get_hamiltonian.restype = ctypes.c_void_p
+dll.interaction_get_hamiltonian.restype = c_void_p
 
 dll.interaction_rates.argtypes = \
     (InteractionHandler, c_double_p, c_double_p, c_double_p, c_double_p, c_double_p, c_size_t, c_size_t, c_bool)
-dll.interaction_rates.restype = ctypes.c_void_p
+dll.interaction_rates.restype = c_void_p
 
 dll.interaction_schroedinger.argtypes = \
     (InteractionHandler, c_double_p, c_double_p, c_double_p, c_complex_p, c_complex_p, c_size_t, c_size_t)
-dll.interaction_schroedinger.restype = ctypes.c_void_p
+dll.interaction_schroedinger.restype = c_void_p
 
 dll.interaction_master.argtypes = \
     (InteractionHandler, c_double_p, c_double_p, c_double_p, c_complex_p, c_complex_p, c_size_t, c_size_t)
-dll.interaction_master.restype = ctypes.c_void_p
+dll.interaction_master.restype = c_void_p
 
 dll.interaction_mc_master.argtypes = \
     (InteractionHandler, c_double_p, c_double_p, c_double_p, c_complex_p, c_bool, c_complex_p, c_size_t, c_size_t)
-dll.interaction_mc_master.restype = ctypes.c_void_p
+dll.interaction_mc_master.restype = c_void_p
 
 
 # ScatteringRate
 dll.sr_generate_y.argtypes = (c_complex_p, c_complex_p, c_complex_p, c_size_t_p, c_size_t_p, c_double_p)
-dll.sr_generate_y.restype = ctypes.c_void_p
+dll.sr_generate_y.restype = c_void_p
 
 
 # King
@@ -333,7 +355,7 @@ dll.multivariatenormal_construct.restype = MultivariateNormalHandler
 dll.multivariatenormal_destruct.argtypes = (MultivariateNormalHandler, )
 
 dll.multivariatenormal_size.restype = c_size_t
-dll.multivariatenormal_rvs.restype = ctypes.c_void_p
+dll.multivariatenormal_rvs.restype = c_void_p
 
 dll.gen_collinear.argtypes = (c_double_p, c_double_p, c_double_p, c_size_t_p, c_size_t, c_size_t,
                               c_size_t_p, c_bool, c_size_t, c_bool)

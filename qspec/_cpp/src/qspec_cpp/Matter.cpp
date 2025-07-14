@@ -98,7 +98,8 @@ State::~State()
 }
 
 void State::init(double _freq_j, double _j, double _i, double _f, double _m, bool _parity,
-	double* _hyper_const, double _gj, double _gi, std::string _label)
+				 std::vector<double> _s, std::vector<double> _l, std::vector<double> _jj,
+				 double* _hyper_const, double _gj, double _gi, std::string _label)
 {
 	freq_j = _freq_j;
 	freq = _freq_j;
@@ -108,6 +109,9 @@ void State::init(double _freq_j, double _j, double _i, double _f, double _m, boo
 	f = _f;
 	m = _m;
 	parity = _parity;
+	s = _s;
+	l = _l;
+	jj = _jj;
 
 	for (int i = 0; i < HYPER_SIZE; ++i)
 	{
@@ -154,6 +158,26 @@ double State::get_freq()
 void State::set_freq(double _freq)
 {
 	freq = _freq;
+}
+
+std::vector<double> State::get_s()
+{
+	return s;
+}
+
+void State::set_s(std::vector<double> _s)
+{
+	s = _s;
+}
+
+std::vector<double> State::get_l()
+{
+	return l;
+}
+
+void State::set_l(std::vector<double> _l)
+{
+	l = _l;
 }
 
 double State::get_j()
@@ -204,6 +228,16 @@ bool State::get_parity()
 void State::set_parity(bool _parity)
 {
 	parity = _parity;
+}
+
+std::vector<double> State::get_jj()
+{
+	return jj;
+}
+
+void State::set_jj(std::vector<double> _jj)
+{
+	jj = _jj;
 }
 
 double* State::get_hyper_const()
@@ -305,6 +339,7 @@ double DecayMap::get_item(std::string state_0, std::string state_1)
 		if ((state_0 == states_0[i] && state_1 == states_1[i]) 
 			|| (state_0 == states_1[i] && state_1 == states_0[i])) return a.at(i);
 	}
+
 	return 0.;
 }
 
@@ -361,6 +396,12 @@ void Atom::gen_multipole()
 		d_em.push_back(MatrixXd::Zero(size, size));
 	}
 
+	for (size_t q = 0; q < 3; ++q)  // Deprecated.
+	{
+		m_e1.at(q) = MatrixXd::Zero(size, size);
+		m_m1.at(q) = MatrixXd::Zero(size, size);
+	}
+
 	L0 = MatrixXd::Zero(size, size);
 	L1 = MatrixXd::Zero(size, size);
 	Lsum = VectorXd::Zero(size);
@@ -369,7 +410,6 @@ void Atom::gen_multipole()
 	{
 		for (size_t j = 0; j < i; ++j)
 		{
-
 			double a = decays->get_item(states[i]->get_label(), states[j]->get_label());
 			if (a == 0) continue;
 
@@ -382,7 +422,9 @@ void Atom::gen_multipole()
 			}
 
 			size_t k = get_min_k(_i, _j);
+			if (k == 0) continue;
 			bool parity_equal = get_parity_equal(_i, _j);
+
 			while (k <= k_em_max)
 			{
 				if (parity_equal)
@@ -396,15 +438,15 @@ void Atom::gen_multipole()
 					else mk.at(k - 1)(i, j) = k;
 				}
 
-				// printf("\nk: %zi", k);
+				printf("k: %zi\n", k);
 
 				mk.at(k - 1)(j, i) = mk.at(k - 1)(i, j);
 				ek.at(k - 1)(j, i) = ek.at(k - 1)(i, j);
 
 				double q_val = states[_j]->get_m() - states[_i]->get_m();
-				double ak = a_multipole(k, states[_i]->get_i(), states[_i]->get_j(), states[_i]->get_f(), states[_i]->get_m(),
+				double ak = a_multipole(static_cast<double>(k), states[_i]->get_i(), states[_i]->get_j(), states[_i]->get_f(), states[_i]->get_m(),
 																states[_j]->get_j(), states[_j]->get_f(), states[_j]->get_m(), q_val);  // This takes the time.
-
+				if (k == 1) printf("%s\n", std::format("ak({}, {}): {:.0e}", _i, _j, ak).c_str());
 				L0(_i, _j) = a * ak * ak;
 				L0(_j, _i) = 0.;
 
@@ -413,7 +455,9 @@ void Atom::gen_multipole()
 				double norm = d_emk(k, parity_equal, a, states[i]->get_freq(), states[j]->get_freq());
 				d_em.at(k - 1)(i, j) = ak * norm;
 				d_em.at(k - 1)(j, i) = d_em.at(k - 1)(i, j);
-				k += 1;
+
+				// k += 1;  // Use only leading order for now.
+				k = k_em_max + 1;
 			}
 		}
 	}
@@ -603,8 +647,63 @@ size_t Atom::get_k_em_max()
 
 size_t Atom::get_min_k(size_t i, size_t j)
 {
-	size_t k = 1;
-	return k;
+	State& s0 = *states.at(i);
+	State& s1 = *states.at(j);
+	bool parity_equal = get_parity_equal(i, j);
+	size_t ne = s0.get_l().size();
+
+	size_t dj = s1.get_j() - s0.get_j();
+	size_t ds = 0;
+	size_t dl = 0;
+	size_t n = 0;
+	for (size_t i = 0; i < ne; ++i)
+	{
+		ds += static_cast<size_t>(abs(s1.get_s().at(i) - s0.get_s().at(i)));
+		dl += static_cast<size_t>(abs(s1.get_l().at(i) - s0.get_l().at(i)));
+		if (ds > 0 || dl > 0) ++n;
+	}
+
+	if (n > 1 || ds > 1) return 0;
+	else
+	{
+		if (ne == 1 && s0.get_s().at(0) == 0.5)
+		{
+			if (parity_equal)
+			{
+				if (dl % 2 != 0) return 0;
+			}
+			else
+			{
+				if (dl % 2 == 0) return 0;
+			}
+			return max(1, dl);
+		}
+		else
+		{
+			if (ds == 0)
+			{
+				if (parity_equal && dl == 1) return 2;
+				return max(1, dl);
+			}
+			else
+			{
+				if (dl < 3) return 1;
+				else
+				{
+					if (parity_equal)
+					{
+						if (dl % 2 != 0) return dl - 1;
+					}
+					else
+					{
+						if (dl % 2 == 0) return dl - 1;
+					}
+					return dl;
+				}
+			}
+		}
+	}
+	return 0;
 }
 
 bool Atom::get_parity_equal(size_t i, size_t j)

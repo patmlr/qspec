@@ -346,6 +346,8 @@ def example(n=None):
         theta, phi = np.pi / 2, 0.
         # theta, phi = 0., 0.
 
+        r = inter.get_rabi()
+
         results = inter.rates(times, delta)
         y = he.scattering_rate(results, theta, phi, as_density_matrix=False)[:, -1]
         plt.plot(delta, y, '-C2', label='angular non-QI')
@@ -492,8 +494,8 @@ def example(n=None):
         a31 = 4.857e-5
         print(f'tau: {1e-3 / a31} ms')
 
-        s1 = sim.gen_electronic_state(0., 0, 0, parity='even', ls=[0, 0], label='s1')
-        s3 = sim.gen_electronic_state(f31, 1, 0, parity='even', ls=[0, 1], label='s3')
+        s1 = sim.gen_electronic_state(0., [0, 0], 0, 0, parity='even', label='s1')
+        s3 = sim.gen_electronic_state(f31, [0, 1], 1, 0, parity='even', label='s3')
 
         decay_map = sim.DecayMap(labels=[('s1', 's3')], a=[a31])
 
@@ -526,34 +528,57 @@ def example(n=None):
         plt.show()
 
     if 8 in n:
-        f_sp = 755222766
-        f_d3p3 = 352682482
-        f_d5p3 = 350862883
+        print(2.356 / np.pi)
+        f_sp = 755222766.
+        f_d3p3 = 352682482.
+        f_d5p3 = 350862883.
         a = 1.3e-6
         print(f'tau: {1e-6 / a} s')
 
-        s = sim.gen_electronic_state(freq_0=0, j=0.5, i=0, parity='e', label='s')
-        d3 = sim.gen_electronic_state(f_sp - f_d3p3, 1.5, 0, parity='e', label='d3')
-        d5 = sim.gen_electronic_state(f_sp - f_d5p3, 2.5, 0, parity='e', label='d5')
+        s = sim.gen_electronic_state(freq_0=0, ls=[0, 0.5], j=0.5, i=0, parity='e', label='s')
+        d3 = sim.gen_electronic_state(f_sp - f_d3p3, [2, 0.5], 1.5, 0, parity='e', label='d3')
+        d5 = sim.gen_electronic_state(f_sp - f_d5p3, [2, 0.5], 2.5, 0, parity='e', label='d5')
 
+        states = s + d3
+        # states = s + [d3[-1]]
         decay_map = sim.DecayMap(labels=[('s', 'd3'), ('s', 'd5')], a=[a, a])
-        ca40 = sim.Atom(s + d3 + d5, decay_map)
+        ca40 = sim.Atom(states, decay_map)
 
-        pol_sd3 = sim.Polarization([0, 1, 0], q_axis=2)
-        laser_sd3 = sim.Laser(freq=f_sp - f_d3p3, polarization=pol_sd3, intensity=1000)
+        phase_angle = 3 * np.pi / 2
+        phase = np.exp(1j * phase_angle)
+        pol_sd3_0 = sim.Polarization([0, phase, 0], q_axis=2, vec_as_q=False)
+        laser_sd3_0 = sim.Laser(freq=f_sp - f_d3p3, polarization=pol_sd3_0, intensity=10, k=[-1, 0, 0])
+
+        pol_sd3_1 = sim.Polarization([-1, 1, 0], q_axis=2, vec_as_q=False)
+        laser_sd3_1 = sim.Laser(freq=f_sp - f_d3p3, polarization=pol_sd3_1, intensity=10, k=[-1, -1, 0])
 
         pol_sd5 = sim.Polarization([0, 1, 0], q_axis=2)
-        laser_sd5 = sim.Laser(freq=f_sp - f_d5p3, polarization=pol_sd5, intensity=1000)
+        laser_sd5 = sim.Laser(freq=f_sp - f_d5p3, polarization=pol_sd5, intensity=10)
 
-        inter = sim.Interaction(ca40, lasers=[laser_sd3, laser_sd5])
+        inter = sim.Interaction(ca40, lasers=[laser_sd3_0, laser_sd3_1])
 
-        times = np.linspace(0., 100., 101)
-        y = inter.rates(times, analytic=False)[0]
+        times = np.linspace(0., 2000., 101)
+        y0 = np.zeros(ca40.size, dtype=float)
+        y0[0] = 1.
+        # y = inter.rates(times, analytic=False, y0=y0)[0]
+        y = inter.master(times, y0=y0)[0]
+        y = np.transpose(np.diagonal(y, axis1=0, axis2=1).real, axes=[1, 0])
 
-        labels = ['d3', 'd5']
-        for label in labels:
-            i = ca40.get_state_indexes(label)
-            plt.plot(times, np.sum(y[i], axis=0), label=label)
+        r = inter.get_rabi(0)
+
+        # labels = ['d3', 'd5']
+        # for label in labels:
+        #     i = ca40.get_state_indexes(label)
+        #     plt.plot(times, np.sum(y[i], axis=0), label=label)
+
+        plt.plot(times, y[0], '--k', label='s($' + str(qs.quant(-0.5)) + '$)', zorder=50)
+        plt.plot(times, y[1], ':k', label='s($' + str(qs.quant(0.5)) + '$)', zorder=100)
+
+        i_d3 = ca40.get_state_indexes('d3')
+        cmap = plt.get_cmap('viridis', i_d3.size)
+        for ic, im in enumerate(i_d3):
+            m = ca40.states[im].m
+            plt.plot(times, y[im], c=cmap(ic), label='$m = ' + str(qs.quant(m)) + '$')
 
         plt.legend()
         plt.xlabel(r'Time ($\mu$s)')

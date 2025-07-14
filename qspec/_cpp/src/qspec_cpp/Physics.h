@@ -3,6 +3,8 @@
 // #define NOMINMAX
 
 #include "Utility.h"
+// #include "Wigner.h"
+#include "wignerSymbols-cpp.h"
 
 #include <stdlib.h>
 #include <complex>
@@ -16,7 +18,6 @@ using namespace Eigen;
 namespace sc
 {
 extern std::complex<double> i;
-extern double pi;
 extern double h;
 extern double hbar;
 extern double c;
@@ -28,18 +29,17 @@ extern double mu_B;
 extern double mu_N;
 }
 
-double factorial(double n);
-double CGcoeff(double J, double m, double J1, double m1, double J2, double m2);
-double ThreeJSymbol(double J1, double m1, double J2, double m2, double J3, double m3);
-double SixJSymbol(double J1, double J2, double J3, double J4, double J5, double J6);
-double NineJSymbol(double J1, double J2, double J3, double J4, double J5, double J6, double J7, double J8, double J9);
+double wigner_d_qm(size_t j, int q, int m, double theta);
+std::complex<double> wigner_D_qm(size_t j, int q, int m, double theta, double phi);
+std::complex<double> spherical_tensor(size_t j, int m, std::complex<double> q_i, Vector3cd& k, std::vector<int>& q);
+VectorXcd spherical_tensor_vec(bool electric, size_t j, Vector3cd qk, double theta, double phi);
 
 double d_e1(double a, double freq_0, double freq_1);
 double d_m1(double a, double freq_0, double freq_1);
 double a_dipole(double i, double j_l, double f_l, double m_l, double j_u, double f_u, double m_u, double q);
 
 double d_emk(size_t k, bool parity_equal, double a, double freq_0, double freq_1);
-double a_multipole(size_t k, double i, double j_l, double f_l, double m_l, double j_u, double f_u, double m_u, double q);
+double a_multipole(double k, double i, double j_l, double f_l, double m_l, double j_u, double f_u, double m_u, double q);
 
 double lande_n(double g_n);
 double lande_j(double s, double l, double j);

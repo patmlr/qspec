@@ -1,5 +1,6 @@
 #pragma once
 
+#include <format>
 #include <complex>
 #include <numeric>
 #include <algorithm>
@@ -9,9 +10,27 @@
 
 using namespace Eigen;
 
+namespace sc
+{
+extern double pi;
+}
+
 template <typename T> int sgn(T val)
 {
     return (T(0) < val) - (val < T(0));
+}
+
+template <typename T>
+T factorial(T n) {
+    if (n < T(0)) return T(0);
+    return (n == T(0) || n == T(1)) ? T(1) : factorial(n - T(1)) * n;
+}
+
+template <typename T>
+T double_factorial(T n) {
+    if (n < T(0)) return T(0);
+    if (n == T(0) || n == T(1)) return T(1);
+    return n * double_factorial(n - T(2));
 }
 
 Vector3d cast_Vector3d(double* x);
@@ -32,3 +51,7 @@ bool check_loop(size_t i, size_t j, size_t m, int pm, std::vector<MatrixXd>& shi
 
 std::vector<size_t> argsort(const std::vector<double>& array);
 std::vector<size_t> invert_order(const std::vector<size_t>& indexes);
+
+double rotation_theta(Vector3d vec);
+double rotation_phi(Vector3d vec);
+Matrix3d rotation_matrix(Vector3d vec);

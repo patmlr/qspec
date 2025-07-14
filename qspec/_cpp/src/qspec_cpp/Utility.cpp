@@ -2,6 +2,7 @@
 #include "pch.h"
 #include "Utility.h"
 
+extern double sc::pi = 3.14159265359;
 
 Vector3d cast_Vector3d(double* x)
 {
@@ -157,4 +158,54 @@ std::vector<size_t> invert_order(const std::vector<size_t>& indexes)
         inverted.push_back(index);
     }
     return inverted;
+}
+
+double rotation_theta(Vector3d vec)
+{
+    if (vec.norm() == 0.) return 0.;
+    return acos(vec(2) / vec.norm());
+}
+
+double rotation_phi(Vector3d vec)
+{
+    if (vec.norm() == 0.) return 0.;
+
+    Vector3d _vec = vec / vec.norm();
+    double vec2 = pow(_vec(2), 2);
+    double phi = 0.;
+    if (vec2 < 1.)
+    {
+        if (abs(_vec(0)) < abs(_vec(1)))
+        {
+            if (_vec(0) < 0.) phi = sc::pi - asin(_vec(1) / sqrt(1. - vec2));
+            else phi = asin(_vec(1) / sqrt(1. - vec2));
+        }
+        else
+        {
+            if (_vec(1) < 0.) phi = 2 * sc::pi - acos(_vec(0) / sqrt(1. - vec2));
+            else phi = acos(_vec(0) / sqrt(1. - vec2));
+        }
+    }
+    return phi;
+}
+
+Matrix3d rotation_matrix(Vector3d vec)
+{
+    double theta = rotation_theta(vec);
+    double phi = rotation_phi(vec);
+
+    Matrix3d R = Matrix3d::Identity();
+
+    R(0, 0) = cos(theta) * cos(phi);
+    R(1, 0) = cos(theta) * sin(phi);
+    R(2, 0) = -sin(theta);
+
+    R(0, 1) = -sin(phi);
+    R(1, 1) = cos(phi);
+
+    R(0, 2) = sin(theta) * cos(phi);
+    R(1, 2) = sin(theta) * sin(phi);
+    R(2, 2) = cos(theta);
+
+    return R;
 }

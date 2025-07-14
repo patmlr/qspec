@@ -728,7 +728,7 @@ def lande_jj(j0: quant_like, j1: quant_like, j: quant_like, g0: array_like, g1: 
     return 0.5 * g0 * (jj + jj01) / jj + 0.5 * g1 * (jj - jj01) / jj
 
 
-def g_j(j: quant_like = 0, ls: quant_iter = (0, 0), jj: quant_like = None, gj: array_like = None) -> float:
+def g_j(j: quant_like = 0, ls: quant_iter = None, jj: quant_iter = None, gj: array_like = None) -> float:
     r"""
     The electronic g-factor of a state with angular momentum $\vec{J}$ in the LS- or jj-coupling scheme.
     See `lande_j` and `lande_jj`.
@@ -746,6 +746,8 @@ def g_j(j: quant_like = 0, ls: quant_iter = (0, 0), jj: quant_like = None, gj: a
      and `ls` is overwritten. If `gj` is a scalar, both `ls` and `jj` are overwritten.
     :returns: The g-factor $g_J$.
     """
+    if ls is None and gj is None:
+        raise ValueError('The parameter \'ls\' needs to be specified if \'gj\' is not given.')
     if gj is None:
         if jj is None:
             gj = lande_j(ls[1], ls[0], j)

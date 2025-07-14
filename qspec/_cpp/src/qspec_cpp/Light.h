@@ -1,5 +1,6 @@
 #pragma once
 
+#include <stdexcept>
 #include <complex>
 #include <vector>
 #include <Eigen/Dense>
@@ -34,6 +35,38 @@ public:
 	Vector3d* get_q_axis();
 };
 
+class Polarizationk
+{
+protected:
+	Vector3d Z;
+	Matrix3cd T;
+	Matrix3d Rz;
+
+	double theta_k;
+	double phi_k;
+	Matrix3d Rk;
+
+	Vector3d k;
+	Vector3d q_axis;
+
+	Vector3cd x;
+	Vector3cd qk;
+
+public:
+	Polarizationk();
+	void init(Vector3cd _x, Vector3d _k, Vector3d _q_axis);
+
+	void infer_qk();
+	void def_q_axis(Vector3d _q_axis);
+
+
+	double get_theta_k();
+	double get_phi_k();
+	Vector3cd get_x();
+	Vector3cd get_qk();
+	Vector3d get_q_axis();
+};
+
 
 class Laser
 {
@@ -63,5 +96,6 @@ public:
 	void set_k(Vector3d _k);
 	Vector3d get_kn();
 
-	VectorXcd get_kpol(size_t k, Vector3d q_axis);
+	VectorXcd get_kpol(size_t k);
+	VectorXcd get_kpol2(bool electric, size_t k, Vector3d q_axis);
 };

@@ -196,10 +196,13 @@ extern "C"
         delete state;
     }
 
-    __declspec(dllexport) void state_init(State* state, double _freq_0, double _j, double _i, double _f,
-        double _m, bool _parity, double* _hyper_const, double _gj, double _gi, char* _label)
+    __declspec(dllexport) void state_init(State* state, double freq_0, double* s, double* l, double j, double i, double f, double m,
+        bool parity, double* jj, size_t ls_size, double* hyper_const, double gj, double gi, char* label)
     {
-        state->init(_freq_0, _j, _i, _f, _m, _parity, _hyper_const, _gj, _gi, std::string(_label));
+        std::vector<double> _s = cast_samples_double(s, ls_size);
+        std::vector<double> _l = cast_samples_double(l, ls_size);
+        std::vector<double> _jj = cast_samples_double(jj, ls_size);
+        state->init(freq_0, j, i, f, m, parity, _s, _l, _jj, hyper_const, gj, gi, std::string(label));
     }
 
     __declspec(dllexport) void state_reset(State* state)
@@ -349,17 +352,17 @@ extern "C"
 
     }
 
-    __declspec(dllexport) double* decaymap_get_a(DecayMap* decays)
-    {
-        return decays->get_a()->data();
-    }
-
 
     __declspec(dllexport) size_t decaymap_get_size(DecayMap* decays)
     {
         return decays->get_size();
     }
 
+    __declspec(dllexport) double* decaymap_get_a(DecayMap* decays)
+    {
+
+        return decays->get_a()->data();
+    }
 
     __declspec(dllexport) double decaymap_get_item(DecayMap* decays, char* state_0, char* state_1)
     {
@@ -417,6 +420,11 @@ extern "C"
         atom->set_mass(mass);
     }
 
+    __declspec(dllexport) size_t atom_get_k_em_max(Atom* atom)
+    {
+        return atom->get_k_em_max();
+    }
+
     __declspec(dllexport) size_t atom_get_size(Atom* atom)
     {
         return atom->get_size();
@@ -440,6 +448,26 @@ extern "C"
     __declspec(dllexport) double* atom_get_m_m1(Atom* atom, size_t i)
     {
         return atom->get_m_m1()->at(i).data();
+    }
+
+    __declspec(dllexport) int* atom_get_ek(Atom* atom, size_t k)
+    {
+        return atom->get_ek(k).data();
+    }
+
+    __declspec(dllexport) int* atom_get_mk(Atom* atom, size_t k)
+    {
+        return atom->get_mk(k).data();
+    }
+
+    __declspec(dllexport) int* atom_get_emk(Atom* atom, size_t k)
+    {
+        return atom->get_emk(k).data();
+    }
+
+    __declspec(dllexport) double* atom_get_d_em(Atom* atom, size_t k)
+    {
+        return atom->get_d_em(k).data();
     }
 
     __declspec(dllexport) double* atom_get_L0(Atom* atom)

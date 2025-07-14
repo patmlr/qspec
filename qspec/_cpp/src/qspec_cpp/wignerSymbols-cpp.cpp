@@ -5,6 +5,7 @@
  * https://www.gnu.org/licenses/lgpl.html.              -/
  ********************************************************/
 
+#define NOMINMAX
 #include "pch.h"
 #include "wignerCommonFunctions.h"
 #include "wignerSymbols-cpp.h"
@@ -14,9 +15,9 @@ std::vector<double> wigner3j(double l2, double l3,
 			     double m1, double m2, double m3)
 {
 	// We compute the numeric limits of double precision.
-	double huge = sqrt((std::numeric_limits<double>::max)()/20.0);
+	double huge = sqrt(std::numeric_limits<double>::max()/20.0);
 	double srhuge = sqrt(huge);
-	double tiny = (std::numeric_limits<double>::min)();
+	double tiny = std::numeric_limits<double>::min();
 	double srtiny = sqrt(tiny);
 	double eps = std::numeric_limits<double>::epsilon();
 
@@ -31,7 +32,7 @@ std::vector<double> wigner3j(double l2, double l3,
 	if (!select) return std::vector<double>(1,0.0);
 
 	// We compute the limits of l1.
-	double l1min = (std::max)(std::fabs(l2-l3),std::fabs(m1));
+	double l1min = std::max(std::fabs(l2-l3),std::fabs(m1));
 	double l1max = l2+l3;
 
 	// We compute the size of the resulting array.
@@ -221,7 +222,7 @@ double wigner3j(double l1, double l2, double l3,
 	if (!select) return 0.0;
 
 	// We compute l1min and the position of the array we will want.
-	double l1min = (std::max)(std::fabs(l2-l3),std::fabs(m1));
+	double l1min = std::max(std::fabs(l2-l3),std::fabs(m1));
 
 	// We fetch the proper value in the array.
 	int index = (int)(l1-l1min);
@@ -233,9 +234,9 @@ std::vector<double> wigner6j(double l2, double l3,
 					double l4, double l5, double l6)
 {
 	// We compute the numeric limits of double precision.
-	double huge = (std::numeric_limits<double>::max)();
+	double huge = std::numeric_limits<double>::max();
 	double srhuge = sqrt(huge);
-	double tiny = (std::numeric_limits<double>::min)();
+	double tiny = std::numeric_limits<double>::min();
 	double srtiny = sqrt(tiny);
 	double eps = std::numeric_limits<double>::epsilon();
 
@@ -257,8 +258,8 @@ std::vector<double> wigner6j(double l2, double l3,
 	if (!select) return std::vector<double>(1,0.0);
 
 	// We compute the limits of l1.
-	double l1min = (std::max)(std::fabs(l2-l3),std::fabs(l5-l6));
-	double l1max = (std::min)(l2+l3,l5+l6);
+	double l1min = std::max(std::fabs(l2-l3),std::fabs(l5-l6));
+	double l1max = std::min(l2+l3,l5+l6);
 
 	// We compute the size of the resulting array.
 	unsigned int size = (int)std::floor(l1max-l1min+1.0+eps);
@@ -430,7 +431,7 @@ double wigner6j(double l1, double l2, double l3,
 	bool select(true);
 
 	// Triangle relations for the four tryads
-	select = (
+	select &= (
 		   std::fabs(l1-l2) <= l3 && l3 <= l1+l2
 		&& std::fabs(l1-l5) <= l6 && l6 <= l1+l5
 		&& std::fabs(l4-l2) <= l6 && l6 <= l4+l2
@@ -438,7 +439,7 @@ double wigner6j(double l1, double l2, double l3,
 		);
 
 	// Sum rule of the tryads
-	select = (
+	select &= (
 		   std::floor(l1+l2+l3)==(l1+l2+l3)
 		&& std::floor(l1+l5+l6)==(l1+l5+l6)
 		&& std::floor(l4+l2+l6)==(l4+l2+l6)
@@ -448,7 +449,7 @@ double wigner6j(double l1, double l2, double l3,
 	if (!select) return 0.0;
 
 	// We compute l1min and the position of the array we will want.
-	double l1min = (std::max)(std::fabs(l2-l3),std::fabs(l5-l6));
+	double l1min = std::max(std::fabs(l2-l3),std::fabs(l5-l6));
 	int index = (int)(l1-l1min);
 
 	return wigner6j(l2,l3,l4,l5,l6)[index];

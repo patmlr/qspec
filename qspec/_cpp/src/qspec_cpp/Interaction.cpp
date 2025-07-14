@@ -385,14 +385,25 @@ void Interaction::gen_rabi()
 	for (size_t m = 0; m < lasers.size(); ++m)
 	{
 		rabimap.at(m).setZero();
-	}
-
-	for (size_t m = 0; m < lasers.size(); ++m)
-	{
 		for (size_t q = 0; q < 2 * atom->get_k_em_max() + 1; ++q)
 		{
 			lasermap.at(m).at(q).setZero();
 		}
+		
+		std::array<std::vector<VectorXcd>, 2> kpol_list;  // List of polarization-k-vector tensors in helicity basis for electric and magnetic k-multipole orders.
+		for (size_t _k = 1; _k <= atom->get_k_em_max(); ++_k)
+		{
+			kpol_list.at(0).push_back(lasers.at(m)->get_kpol2(true, _k, *env->get_e_B()));
+			kpol_list.at(1).push_back(lasers.at(m)->get_kpol2(false, _k, *env->get_e_B()));
+			printf("%zi(%zi): ", m, _k);
+			for (size_t i = 0; i < kpol_list.at(0).back().size(); ++i)
+			{
+				printf("%.3f + %.3fj, ", kpol_list.at(0).back()(i).real(), kpol_list.at(0).back()(i).imag());
+			}
+			printf("\n");
+		}
+
+
 		// Which transitions are laser-driven?
 		for (size_t col = 1; col < atom->get_size(); ++col)
 		{
@@ -411,14 +422,19 @@ void Interaction::gen_rabi()
 					size_t k = atom->get_emk(_k, row, col);
 					size_t ke = atom->get_ek(_k, row, col);
 					size_t km = atom->get_mk(_k, row, col);
-					printf("\nk(%zi, %zi): e%zi, m%zi", row, col, ke, km);
+					bool electric = ke != 0;
+					size_t i_em = (electric) ? 0 : 1;
+
+					// printf("\nk(%zi, %zi): e%zi, m%zi", row, col, ke, km);
 					if (k == 0) continue;
 					if (abs(lasers.at(m)->get_freq() - (upper->get_freq() - lower->get_freq())) > delta_max) continue;  // In detuning range?
 
 					double q_val = upper->get_m() - lower->get_m();
+					if (abs(q_val) > k) continue;
 					size_t q = k + q_val;
 					printf("\n(k, q): %zi, %3.3f", k, q_val);
-					std::complex<double> q_i = lasers.at(m)->get_kpol(k, *env->get_e_B())(q);
+
+					std::complex<double> q_i = kpol_list.at(i_em).at(k - 1)(q);
 					//printf("\nqi: %3.3f + %3.3fj", q_i.real(), q_i.imag());
 
 					if ((atom->get_d_em(k, row, col)) * abs(q_i)  // q_i.real() * q_i.imag()  // (pow(q_i.real(), 2) + pow(q_i.imag(), 2))
@@ -430,8 +446,10 @@ void Interaction::gen_rabi()
 					summap(col, row) = 1;
 
 					rabimap.at(m)(row, col) += 0.5 * (atom->get_d_em(k, row, col))
-					* sqrt(lasers[m]->get_intensity()) * q_i * pow(-1, q_val);  // Calc. Omega/2 for all transitions.
+					* sqrt(lasers[m]->get_intensity()) * q_i * pow(-1, q_val) * pow(sc::i, k - 1);  // Calc. Omega/2 for all transitions.
 					rabimap.at(m)(col, row) = std::conj(rabimap.at(m)(row, col));
+
+					break;  // Use only leading order for now.
 				}
 			}
 		}
@@ -686,7 +704,6 @@ std::vector<MatrixXd> Interaction::gen_R_k(VectorXd& w0, VectorXd& w)
 {
 	std::vector<MatrixXd> Rk(lasers.size());
 	double _w0;
-	double a;
 	double gamma;
 	double r;
 
@@ -698,12 +715,14 @@ std::vector<MatrixXd> Interaction::gen_R_k(VectorXd& w0, VectorXd& w)
 		{
 			for (size_t i = 0; i < j; ++i)
 			{
-				a = atom->get_decay_map()->get_item(atom->get(i)->get_label(), atom->get(j)->get_label());  // (*atom->get_L0())(i, j) + (*atom->get_L0())(j, i);
-				if (a == 0) continue;
-				gamma = atom->get_decay_map()->get_gamma(atom->get(i)->get_label(), atom->get(j)->get_label());
+				double a = atom->get_decay_map()->get_item(atom->get(i)->get_label(), atom->get(j)->get_label());  // (*atom->get_L0())(i, j) + (*atom->get_L0())(j, i);
+				if (a == 0.) continue;
+
 				r = 4 * std::pow(std::abs(rabimap.at(m)(i, j)), 2);
 				if (r == 0) continue;
+
 				_w0 = abs(w0(i) - w0(j));
+				gamma = atom->get_decay_map()->get_gamma(atom->get(i)->get_label(), atom->get(j)->get_label());
 				R(i, j) += lorentz(w(m), _w0, gamma, r);
 				R(j, i) = R(i, j);
 			}
@@ -793,12 +812,14 @@ void Interaction::update_rates(MatrixXd& R, VectorXd& w0, VectorXd& w)
 		{
 			for (size_t i = 0; i < j; ++i)
 			{
-				a = atom->get_decay_map()->get_item(atom->get(i)->get_label(), atom->get(j)->get_label());  // (*atom->get_L0())(i, j) + (*atom->get_L0())(j, i);
-				if (a == 0) continue;
-				gamma = atom->get_decay_map()->get_gamma(atom->get(i)->get_label(), atom->get(j)->get_label());
+				double a = atom->get_decay_map()->get_item(atom->get(i)->get_label(), atom->get(j)->get_label());  // (*atom->get_L0())(i, j) + (*atom->get_L0())(j, i);
+				if (a == 0.) continue;
+
 				r = 4 * std::pow(std::abs(rabimap.at(m)(i, j)), 2);
 				if (r == 0) continue;
+
 				_w0 = abs(w0(i) - w0(j));
+				gamma = atom->get_decay_map()->get_gamma(atom->get(i)->get_label(), atom->get(j)->get_label());
 				R(i, j) += lorentz(w(m), _w0, gamma, r);
 				R(j, i) = R(i, j);
 			}

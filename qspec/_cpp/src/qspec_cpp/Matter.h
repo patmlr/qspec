@@ -44,6 +44,9 @@ protected:
 	double i;
 	double f;
 	double m;
+	std::vector<double> s;
+	std::vector<double> l;
+	std::vector<double> jj;
 	bool parity;
 	double* hyper_const;
 	double gj;
@@ -55,7 +58,8 @@ public:
 	State();
 	~State();
 	void init(double _freq_j, double _j, double _i, double _f, double _m, bool _parity,
-		double* _hyper_const, double _gj, double _gi, std::string _label);
+			  std::vector<double> _s, std::vector<double> _l, std::vector<double> _jj,
+			  double* _hyper_const, double _gj, double _gi, std::string _label);
 
 	void reset();
 
@@ -67,6 +71,12 @@ public:
 
 	double get_freq();
 	void set_freq(double _freq);
+
+	std::vector<double> get_s();
+	void set_s(std::vector<double> _s);
+
+	std::vector<double> get_l();
+	void set_l(std::vector<double> _l);
 
 	double get_j();
 	void set_j(double _j);
@@ -82,6 +92,9 @@ public:
 
 	bool get_parity();
 	void set_parity(bool _parity);
+
+	std::vector<double> get_jj();
+	void set_jj(std::vector<double> _jj);
 
 	double* get_hyper_const();
 	void set_hyper_const(double* _hyper_const);
@@ -124,7 +137,7 @@ protected:
 	std::vector<State*> states;
 	DecayMap* decays;
 	double mass = 0;
-	size_t k_em_max = 1;
+	size_t k_em_max = 2;
 	size_t size = 0;
 
 	std::vector<size_t> gs;
