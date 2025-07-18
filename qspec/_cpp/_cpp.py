@@ -207,13 +207,18 @@ dll.decaymap_get_size.restype = c_size_t
 dll.decaymap_get_item.argtypes = (DecayMapHandler, c_char_p, c_char_p)
 dll.decaymap_get_item.restype = c_double
 
+dll.decaymap_get_k_em_max.argtypes = (DecayMapHandler, )
+dll.decaymap_get_k_em_max.restype = c_size_t
+
+dll.decaymap_set_k_em_max.argtypes = (DecayMapHandler, c_size_t)
+
 
 # Atom
 dll.atom_construct.restype = AtomHandler
 dll.atom_destruct.argtypes = (AtomHandler, )
 
 dll.atom_update.argtypes = (AtomHandler, )
-dll.atom_update_env.argtypes = (AtomHandler, EnvironmentHandler)
+dll.atom_set_env.argtypes = (AtomHandler, EnvironmentHandler)
 
 dll.atom_add_state.argtypes = (AtomHandler, StateHandler)
 dll.atom_clear_states.argtypes = (AtomHandler, )
@@ -225,9 +230,6 @@ dll.atom_set_decay_map.argtypes = (AtomHandler, DecayMapHandler)
 dll.atom_get_mass.argtypes = (AtomHandler, )
 dll.atom_get_mass.restype = c_double
 dll.atom_set_mass.argtypes = (AtomHandler, c_double)
-
-dll.atom_get_k_em_max.argtypes = (AtomHandler, )
-dll.atom_get_k_em_max.restype = c_size_t
 
 dll.atom_get_size.argtypes = (AtomHandler, )
 dll.atom_get_size.restype = c_size_t
@@ -241,16 +243,12 @@ dll.atom_get_m_e1.argtypes = (AtomHandler, c_size_t)
 dll.atom_get_m_e1.restype = c_double_p
 
 dll.atom_get_ek.argtypes = (AtomHandler, c_size_t)
-dll.atom_get_ek.restype = c_int32_p
 
 dll.atom_get_mk.argtypes = (AtomHandler, c_size_t)
-dll.atom_get_mk.restype = c_int32_p
 
 dll.atom_get_emk.argtypes = (AtomHandler, c_size_t)
-dll.atom_get_emk.restype = c_int32_p
 
 dll.atom_get_d_em.argtypes = (AtomHandler, c_size_t)
-dll.atom_get_d_em.restype = c_double_p
 
 dll.atom_get_L0.argtypes = (AtomHandler, )
 dll.atom_get_L0.restype = c_double_p

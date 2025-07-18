@@ -17,9 +17,9 @@ std::vector<double> wigner3j(double l2, double l3,
 	// We compute the numeric limits of double precision.
 	double huge = sqrt(std::numeric_limits<double>::max()/20.0);
 	double srhuge = sqrt(huge);
-	double tiny = std::numeric_limits<double>::min();
+	double constexpr tiny = std::numeric_limits<double>::min();
 	double srtiny = sqrt(tiny);
-	double eps = std::numeric_limits<double>::epsilon();
+	double constexpr eps = std::numeric_limits<double>::epsilon();
 
 	// We enforce the selection rules.
 	bool select(true);
@@ -234,11 +234,11 @@ std::vector<double> wigner6j(double l2, double l3,
 					double l4, double l5, double l6)
 {
 	// We compute the numeric limits of double precision.
-	double huge = std::numeric_limits<double>::max();
+	double constexpr huge = std::numeric_limits<double>::max();
 	double srhuge = sqrt(huge);
-	double tiny = std::numeric_limits<double>::min();
+	double constexpr tiny = std::numeric_limits<double>::min();
 	double srtiny = sqrt(tiny);
-	double eps = std::numeric_limits<double>::epsilon();
+	double constexpr eps = std::numeric_limits<double>::epsilon();
 
 	// We enforce the selection rules.
 	bool select(true);

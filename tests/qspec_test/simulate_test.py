@@ -20,10 +20,10 @@ import qspec.simulate as sim
 class TestPhysics(ut.TestCase):
 
     def test_simple_atom(self):
-        states = [sim.State(0, 0.5, 0, 0.5, -0.5, 'even', label='s-'),
-                  sim.State(7e8, 0.5, 0, 0.5, -0.5, 'odd', label='p-'),
-                  sim.State(7e8, 0.5, 0, 0.5, 0.5, 'odd', label='p+'),
-                  sim.State(4e8, 1.5, 0, 1.5, 0.5, 'even', label='d+')]
+        states = [sim.State(0, 'even', 0.5, 0, 0.5, -0.5, label='s-'),
+                  sim.State(7e8, 'odd', 0.5, 0, 0.5, -0.5, label='p-'),
+                  sim.State(7e8, 'odd', 0.5, 0, 0.5, 0.5, label='p+'),
+                  sim.State(4e8, 'even', 1.5, 0, 1.5, 0.5, label='d+')]
         decay_map = sim.DecayMap([('s-', 'p-'), ('s-', 'p+'), ('d+', 'p-'), ('d+', 'p+')], [1e2, 1e2, 10., 10.])
         atom = sim.Atom(states, decay_map=decay_map)
         pol_0 = sim.Polarization([0, 0, 1], q_axis=2, vec_as_q=False)
@@ -67,7 +67,7 @@ class TestPhysics(ut.TestCase):
         b_env = b[2000]
         e_eig, m_list, fm_list, mi_mj_list = qs.hyper_zeeman_num(i, j, a_hyper, b_hyper, gi, gj, b)
 
-        states = sim.gen_electronic_state(0, j, i, [a_hyper, b_hyper], gj=gj, gi=gi)
+        states = sim.gen_electronic_state(0, 'e', j, i, hyper_const=[a_hyper, b_hyper], gj=gj, gi=gi)
         atom = sim.Atom(states)
         env = sim.Environment(B=b_env)
         inter = sim.Interaction(atom, environment=env)

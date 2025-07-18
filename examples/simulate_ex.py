@@ -494,8 +494,8 @@ def example(n=None):
         a31 = 4.857e-5
         print(f'tau: {1e-3 / a31} ms')
 
-        s1 = sim.gen_electronic_state(0., [0, 0], 0, 0, parity='even', label='s1')
-        s3 = sim.gen_electronic_state(f31, [0, 1], 1, 0, parity='even', label='s3')
+        s1 = sim.gen_electronic_state(0., parity='even', j=0, i=0, ls=[0, 0], label='s1')
+        s3 = sim.gen_electronic_state(f31, parity='even', j=1, i=0, ls=[0, 1], label='s3')
 
         decay_map = sim.DecayMap(labels=[('s1', 's3')], a=[a31])
 
@@ -535,9 +535,9 @@ def example(n=None):
         a = 1.3e-6
         print(f'tau: {1e-6 / a} s')
 
-        s = sim.gen_electronic_state(freq_0=0, ls=[0, 0.5], j=0.5, i=0, parity='e', label='s')
-        d3 = sim.gen_electronic_state(f_sp - f_d3p3, [2, 0.5], 1.5, 0, parity='e', label='d3')
-        d5 = sim.gen_electronic_state(f_sp - f_d5p3, [2, 0.5], 2.5, 0, parity='e', label='d5')
+        s = sim.gen_electronic_state(freq_0=0, parity='e', ls=[0, 0.5], j=0.5, label='s')
+        d3 = sim.gen_electronic_state(f_sp - f_d3p3, parity='e', j=1.5, ls=[2, 0.5], label='d3')
+        d5 = sim.gen_electronic_state(f_sp - f_d5p3, parity='e', j=2.5, ls=[2, 0.5], label='d5')
 
         states = s + d3
         # states = s + [d3[-1]]
@@ -555,6 +555,7 @@ def example(n=None):
         pol_sd5 = sim.Polarization([0, 1, 0], q_axis=2)
         laser_sd5 = sim.Laser(freq=f_sp - f_d5p3, polarization=pol_sd5, intensity=10)
 
+        print(ca40.get_multipole_types('s', 'd3'))
         inter = sim.Interaction(ca40, lasers=[laser_sd3_0, laser_sd3_1])
 
         times = np.linspace(0., 2000., 101)

@@ -117,10 +117,12 @@ protected:
 	std::vector<std::string> states_0;
 	std::vector<std::string> states_1;
 	std::vector<double> a;
+	size_t k_em_max = 2;
 public:
 	DecayMap();
 	~DecayMap();
-	DecayMap(std::vector<std::string> _states_0, std::vector<std::string> _states_1, std::vector<double> _a);
+	DecayMap(size_t _k_em_max);
+	DecayMap(std::vector<std::string> _states_0, std::vector<std::string> _states_1, std::vector<double> _a, size_t _k_em_max);
 	void add_decay(std::string state_0, std::string state_1, double _a);
 	size_t get_size();
 	std::vector<std::string>* get_states_0();
@@ -128,6 +130,8 @@ public:
 	std::vector<double>* get_a();
 	double get_item(std::string state_0, std::string state_1);
 	double get_gamma(std::string state_0, std::string state_1);
+	size_t get_k_em_max();
+	void set_k_em_max(size_t _k_em_max);
 };
 
 
@@ -137,8 +141,9 @@ protected:
 	std::vector<State*> states;
 	DecayMap* decays;
 	double mass = 0;
-	size_t k_em_max = 2;
 	size_t size = 0;
+
+	Environment* env;
 
 	std::vector<size_t> gs;
 	std::array<MatrixXd, 3> m_e1;  // -1, 0, +1
@@ -163,11 +168,10 @@ public:
 	void gen_w0();
 	VectorXd* get_w0();
 
-	void gen_frequencies(Environment* env);
+	void gen_frequencies(Environment* _env);
 	void gen_multipole();
 	void gen_dipole();
 	void update();
-	void update(Environment* env);
 
 	std::vector<State*>* get_states();
 
@@ -177,7 +181,9 @@ public:
 	double get_mass();
 	void set_mass(double _mass);
 
-	size_t get_k_em_max();
+	Environment* get_env();
+	void set_env(Environment* _env);
+
 	size_t get_min_k(size_t i, size_t j);
 	bool get_parity_equal(size_t i, size_t j);
 

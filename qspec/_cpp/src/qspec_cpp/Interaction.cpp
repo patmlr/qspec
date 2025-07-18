@@ -229,7 +229,7 @@ void Interaction::add_laser(Laser* _laser)
 {
 	lasers.push_back(_laser);
 	std::vector<MatrixXi> q_map;
-	for (size_t q = 0; q < 2 * atom->get_k_em_max() + 1; ++q)
+	for (size_t q = 0; q < 2 * atom->get_decay_map()->get_k_em_max() + 1; ++q)
 	{
 		q_map.push_back(MatrixXi::Zero(atom->get_size(), atom->get_size()));
 	}
@@ -364,7 +364,8 @@ MatrixXcd Interaction::get_hamiltonian(const double t, const VectorXd& delta, co
 void Interaction::update()
 {
 	gen_coordinates();
-	atom->update(env);
+	atom->set_env(env);
+	atom->update();
 	gen_rabi();
 	gen_trees();
 	gen_conlist();
@@ -385,22 +386,24 @@ void Interaction::gen_rabi()
 	for (size_t m = 0; m < lasers.size(); ++m)
 	{
 		rabimap.at(m).setZero();
-		for (size_t q = 0; q < 2 * atom->get_k_em_max() + 1; ++q)
+		for (size_t q = 0; q < 2 * atom->get_decay_map()->get_k_em_max() + 1; ++q)
 		{
 			lasermap.at(m).at(q).setZero();
 		}
 		
 		std::array<std::vector<VectorXcd>, 2> kpol_list;  // List of polarization-k-vector tensors in helicity basis for electric and magnetic k-multipole orders.
-		for (size_t _k = 1; _k <= atom->get_k_em_max(); ++_k)
+		for (size_t _k = 1; _k <= atom->get_decay_map()->get_k_em_max(); ++_k)
 		{
 			kpol_list.at(0).push_back(lasers.at(m)->get_kpol2(true, _k, *env->get_e_B()));
 			kpol_list.at(1).push_back(lasers.at(m)->get_kpol2(false, _k, *env->get_e_B()));
+			
+			/*
 			printf("%zi(%zi): ", m, _k);
 			for (size_t i = 0; i < kpol_list.at(0).back().size(); ++i)
 			{
 				printf("%.3f + %.3fj, ", kpol_list.at(0).back()(i).real(), kpol_list.at(0).back()(i).imag());
 			}
-			printf("\n");
+			printf("\n");*/
 		}
 
 
@@ -417,7 +420,7 @@ void Interaction::gen_rabi()
 					upper = atom->get(col);
 				}
 
-				for (size_t _k = 1; _k <= atom->get_k_em_max(); ++_k)
+				for (size_t _k = 1; _k <= atom->get_decay_map()->get_k_em_max(); ++_k)
 				{
 					size_t k = atom->get_emk(_k, row, col);
 					size_t ke = atom->get_ek(_k, row, col);
@@ -432,7 +435,7 @@ void Interaction::gen_rabi()
 					double q_val = upper->get_m() - lower->get_m();
 					if (abs(q_val) > k) continue;
 					size_t q = k + q_val;
-					printf("\n(k, q): %zi, %3.3f", k, q_val);
+					// printf("\n(k, q): %zi, %3.3f", k, q_val);
 
 					std::complex<double> q_i = kpol_list.at(i_em).at(k - 1)(q);
 					//printf("\nqi: %3.3f + %3.3fj", q_i.real(), q_i.imag());
@@ -454,7 +457,6 @@ void Interaction::gen_rabi()
 			}
 		}
 	}
-	printf("\n");
 }
 
 void Interaction::gen_trees()
@@ -504,7 +506,7 @@ void Interaction::gen_conlist()
 	{
 		for (int m = 0; m < lasers.size(); ++m)
 		{
-			for (size_t q = 0; q < 2 * atom->get_k_em_max() + 1; ++q)
+			for (size_t q = 0; q < 2 * atom->get_decay_map()->get_k_em_max() + 1; ++q)
 			{
 				if (lasermap.at(m).at(q).col(i).any())
 				{
@@ -582,7 +584,7 @@ void Interaction::propagate(size_t i, size_t i0, std::set<size_t>& visited, cons
 	{
 		for (size_t _j : tree)  // Find all states which are connected to i via the laser m.
 		{
-			for (size_t q = 0; q < 2 * atom->get_k_em_max() + 1; ++q)
+			for (size_t q = 0; q < 2 * atom->get_decay_map()->get_k_em_max() + 1; ++q)
 			{
 				if (lasermap.at(m).at(q)(_j, i) != 0)
 				{

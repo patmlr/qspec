@@ -299,21 +299,22 @@ class Environment:
 
 
 class State:
-    def __init__(self, freq_j: quant_like, ls: quant_iter, j: quant_like, i: quant_like, f: quant_like, m: quant_like,
-                 parity: Union[str, bool], jj: quant_iter = None, hyper_const: array_like = None,
+    def __init__(self, freq_j: quant_like, parity: Union[str, bool],
+                 j: quant_like, i: quant_like, f: quant_like, m: quant_like,
+                 ls: quant_iter = None, jj: quant_iter = None, hyper_const: array_like = None,
                  gj: scalar = 0., gi: scalar = 0., label: str = None, instance=None):
         r"""
         Class representing an atomic quantum state $|(\mathrm{label})IJFm\rangle$.
 
         :param freq_j: The energetic position of the state without the hyperfine structure or the environment (MHz).
-        :param ls: A list or a single pair of electronic angular momentum and spin quantum numbers $(l_i, s_i)$.
-         If this is a list of LS-pairs, a list of $j_i$ quantum numbers can be specified for the parameter `jj`.
+        :param parity: The parity $\pi$ of the state is used to check the selection rules.
+         It can be either `'even'` (`'e'`, `False`) or `'odd'` (`'o'`, `True`).
         :param j: The electronic total angular momentum quantum number $J$.
         :param i: The nuclear spin quantum number $I$.
         :param f: The total angular momentum quantum number $F$.
         :param m: The z-projection quantum number $m$ of the total angular momentum `f`.
-        :param parity: The parity $\pi$ of the state is used to check the selection rules.
-         It can be either `'even'` (`'e'`, `False`) or `'odd'` (`'o'`, `True`).
+        :param ls: A list or a single pair of electronic angular momentum and spin quantum numbers $(l_i, s_i)$.
+         If this is a list of LS-pairs, a list of $j_i$ quantum numbers can be specified for the parameter `jj`.
         :param jj: A list of two electronic total angular momentum quantum numbers $(j_0, j_1)$
          used in the jj-coupling scheme if `ls` is a list.
         :param hyper_const: A list of the hyperfine-structure constants.
@@ -329,8 +330,13 @@ class State:
         if self.instance is None:
             tools.check_half_integer(j, i, f, m)
 
+            if ls is None:
+                ls = []
             if not hasattr(ls, '__getitem__'):
                 raise ValueError('The parameter \'ls\' must be a list of or a single (l_i, s_i) pair.')
+            elif not ls:
+                s = np.array([], dtype=float)
+                l = np.array([], dtype=float)
             elif hasattr(ls[0], '__getitem__'):
                 s = np.array([_ls[1] for _ls in ls], dtype=float, order='C')
                 l = np.array([_ls[0] for _ls in ls], dtype=float, order='C')
@@ -521,8 +527,8 @@ def construct_electronic_state(freq_0: quant_like, s: quant_like, l: quant_like,
     fm = [(_f, _m) for _f, m_f in zip(f, m) for _m in m_f]
     gj = g_j(j, (l, s), None, None)
     parity = bool(l % 2)
-    return [State(freq_0, (l, s), j, i, _f, _m, parity,
-                  hyper_const=hyper_const, gj=gj, gi=g, label=label) for (_f, _m) in fm]
+    return [State(freq_0, parity, j, i, _f, _m,
+                  ls=(l, s), hyper_const=hyper_const, gj=gj, gi=g, label=label) for (_f, _m) in fm]
 
 
 def construct_hyperfine_state(freq_0: quant_like, s: quant_like, l: quant_like, j: quant_like, i: quant_like,
@@ -546,33 +552,34 @@ def construct_hyperfine_state(freq_0: quant_like, s: quant_like, l: quant_like, 
     """
     gj = g_j(j, (l, s), None, None)
     parity = bool(l % 2)
-    return [State(freq_0, (l, s), j, i, f, _m, parity,
-                  hyper_const=hyper_const, gj=gj, gi=g, label=label) for _m in get_m(f)]
+    return [State(freq_0, parity, j, i, f, _m,
+                  ls=(l, s), hyper_const=hyper_const, gj=gj, gi=g, label=label) for _m in get_m(f)]
 
 
 def gen_electronic_state(
-        freq_0: quant_like, ls: quant_iter, j: quant_like, i: quant_like, parity: Union[bool, str] = None,
-        hyper_const: Iterable[array_like] = None, jj: quant_iter = None, gj: array_like = None,
-        gi: array_like = 0, label: str = None) -> list[State]:
+        freq_0: quant_like = 0., parity: Union[bool, str] = None, j: quant_like = 0, i: quant_like = 0,
+        ls: quant_iter = None, jj: quant_iter = None,
+        hyper_const: Iterable[array_like] = None, gj: array_like = None, gi: array_like = 0,
+        label: str = None) -> list[State]:
     r"""
     Creates all substates of a fine-structure state using a common label.
 
     :param freq_0: The energetic position of the state without the hyperfine structure or the magnetic field (MHz).
-    :param ls: A list or a single pair of electronic angular momentum and spin quantum numbers $(l_i, s_i)$
-     used to check the selection rules and to calculate the electronic g-factor in the LS-coupling scheme.
-     If this is a list of LS-pairs, a list of $j_i$ quantum numbers needs to be specified for the parameter `jj`.
-    :param j: The electronic total angular momentum quantum number $J$.
-    :param i: The nuclear spin quantum number $I$.
     :param parity: The parity $\pi$ of the state is used to check the selection rules.
      If None, it is inferred from `ls` if possible.
      It can be either `'even'` (`'e'`, `False`) or `'odd'` (`'o'`, `True`).
-    :param hyper_const: A list of the hyperfine-structure constants.
-     Currently, constants up to the electric quadrupole order are supported ($A$, $B$). If 'hyper_const' is a scalar,
-     it is assumed to be the constant $A$ and the other orders are 0 (MHz).
+    :param j: The electronic total angular momentum quantum number $J$.
+    :param i: The nuclear spin quantum number $I$.
+    :param ls: A list or a single pair of electronic angular momentum and spin quantum numbers $(l_i, s_i)$
+     used to check the selection rules and to calculate the electronic g-factor in the LS-coupling scheme.
+     If this is a list of LS-pairs, the parameter `jj` requires a list of $j_i$ quantum numbers.
     :param jj: A list of two electronic total angular momentum quantum numbers $(j_0, j_1)$
      used to calculate the electronic g-factor in the jj-coupling scheme.
      Either a list of two $(l_i, s_i)$ pairs needs to be specified for the parameter `ls`
      or a list of g-factors $g_{j_i}$ for the parameter `gj`.
+    :param hyper_const: A list of the hyperfine-structure constants.
+     Currently, constants up to the electric quadrupole order are supported ($A$, $B$). If 'hyper_const' is a scalar,
+     it is assumed to be the constant $A$ and the other orders are 0 (MHz).
     :param gj: A list of two $g_{j_i}$ or a single electronic g-factor $g_J$. If `gj` is a list, `jj` is required
      and `ls` is overwritten. If `gj` is a scalar, both `ls` and `jj` are overwritten.
     :param gi: The nuclear g-factor $g_I$.
@@ -589,34 +596,35 @@ def gen_electronic_state(
     m = [get_m(_f) for _f in f]
     fm = [(_f, _m) for _f, m_f in zip(f, m) for _m in m_f]
     gj = g_j(j, ls, jj, gj)
-    return [State(freq_0, ls, j, i, _f, _m, parity, jj=jj,
+    return [State(freq_0, parity, j, i, _f, _m, ls=ls, jj=jj,
                   hyper_const=hyper_const, gj=gj, gi=gi, label=label) for (_f, _m) in fm]
 
 
 def gen_hyperfine_state(
-        freq_0: quant_like, ls: quant_iter, j: quant_like, i: quant_like, f: quant_like,
-        parity: Union[bool, str] = None, hyper_const: Iterable[array_like] = None, jj: quant_iter = None,
+        freq_0: quant_like = 0., parity: Union[bool, str] = None,
+        j: quant_like = 0, i: quant_like = 0, f: quant_like = 0,
+        ls: quant_iter = None, jj: quant_iter = None, hyper_const: Iterable[array_like] = None,
         gj: array_like = None, gi: array_like = 0, label: str = None) -> list[State]:
     r"""
     Creates all substates of a hyperfine-structure state using a common label.
 
     :param freq_0: The energetic position of the state without the hyperfine structure or the magnetic field (MHz).
-    :param ls: A list or a single pair of electronic angular momentum and spin quantum numbers $(l_i, s_i)$
-     used to check the selection rules and to calculate the electronic g-factor in the LS-coupling scheme.
-     If this is a list of LS-pairs, a list of $j_i$ quantum numbers needs to specified for the parameter `jj`.
-    :param j: The electronic total angular momentum quantum number $J$.
-    :param i: The nuclear spin quantum number $I$.
-    :param f: The total angular momentum quantum number $F$.
     :param parity: The parity $\pi$ of the state is used to check the selection rules.
      If None, it is inferred from `ls` if possible.
      It can be either `'even'` (`'e'`, `False`) or `'odd'` (`'o'`, `True`).
-    :param hyper_const: A list of the hyperfine-structure constants.
-     Currently, constants up to the electric quadrupole order are supported ($A$, $B$). If 'hyper_const' is a scalar,
-     it is assumed to be the constant $A$ and the other orders are 0 (MHz).
+    :param j: The electronic total angular momentum quantum number $J$.
+    :param i: The nuclear spin quantum number $I$.
+    :param f: The total angular momentum quantum number $F$.
+    :param ls: A list or a single pair of electronic angular momentum and spin quantum numbers $(l_i, s_i)$
+     used to check the selection rules and to calculate the electronic g-factor in the LS-coupling scheme.
+     If this is a list of LS-pairs, the parameter `jj` requires a list of $j_i$ quantum numbers.
     :param jj: A list of two electronic total angular momentum quantum numbers $(j_0, j_1)$
      used to calculate the electronic g-factor in the jj-coupling scheme.
      Either a list of two $(l_i, s_i)$ pairs needs to be specified for the parameter `ls`
      or a list of g-factors $g_{j_i}$ for the parameter `gj`.
+    :param hyper_const: A list of the hyperfine-structure constants.
+     Currently, constants up to the electric quadrupole order are supported ($A$, $B$). If 'hyper_const' is a scalar,
+     it is assumed to be the constant $A$ and the other orders are 0 (MHz).
     :param gj: A list of two $g_{j_i}$ or a single electronic g-factor $g_J$. If `gj` is a list, `jj` is required
      and `ls` is overwritten. If `gj` is a scalar, both `ls` and `jj` are overwritten.
     :param gi: The nuclear g-factor $g_I$.
@@ -630,17 +638,18 @@ def gen_hyperfine_state(
                          'Please use only one (L, S) pair or specify the parity.')
 
     gj = g_j(j, ls, jj, gj)
-    return [State(freq_0, ls, j, i, f, _m, parity, jj=jj,
+    return [State(freq_0, parity, j, i, f, _m, ls=ls, jj=jj,
                   hyper_const=hyper_const, gj=gj, gi=gi, label=label) for _m in get_m(f)]
 
 
 class DecayMap:
-    def __init__(self, labels: Iterable[tuple] = None, a: Iterable[scalar] = None, instance=None):
+    def __init__(self, labels: Iterable[tuple] = None, a: Iterable[scalar] = None, k_max: int = 1, instance=None):
         """
         Class linking sets of atomic states via Einstein-A coefficients.
 
         :param labels: An iterable of label pairs, corresponding to atomic states which get connected.
         :param a: An Iterable of Einstein-A coefficients (MHz).
+        :param k_max: The maximum considered multipole order. The default value is 1 (dipole).
         :param instance: A pointer to an existing DecayMap instance.
          If this is specified, the other parameters are omitted.
         """
@@ -648,6 +657,7 @@ class DecayMap:
 
         if self.instance is None:
             self.instance = dll.decaymap_construct()
+            dll.decaymap_set_k_em_max(self.instance, c_size_t(int(k_max)))
             if labels is None:
                 labels = []
             if a is None:
@@ -684,6 +694,13 @@ class DecayMap:
         vector_d_p = np.ctypeslib.ndpointer(dtype=float, shape=(self.size, ))
         set_restype(dll.decaymap_get_a, vector_d_p)
         return dll.decaymap_get_a(self.instance).tolist()
+
+    @property
+    def k_em_max(self):
+        """
+        :returns: The maximum considered multipole order. The default value is 1 (dipole).
+        """
+        return dll.decaymap_get_k_em_max(self.instance)
 
     @property
     def size(self):
@@ -758,10 +775,9 @@ class Atom:
         """
         Update the atom.
         """
-        if env is None:
-            dll.atom_update(self.instance)
-        else:
-            dll.atom_update_env(self.instance, env.instance)
+        if env is not None:
+            dll.atom_set_env(self.instance, env.instance)
+        dll.atom_update(self.instance)
         self.label_map = _gen_label_map(self)
 
     @property
@@ -832,13 +848,6 @@ class Atom:
         return dll.atom_get_gs(self.instance)
 
     @property
-    def k_em_max(self):
-        """
-        :returns: The maximum considered multipole order. The default value is 1 (dipole).
-        """
-        return dll.atom_get_k_em_max(self.instance)
-
-    @property
     def dipoles(self):
         """
         :returns: The dipole strengths between the atomic states in the 3 basis-components
@@ -849,37 +858,55 @@ class Atom:
         return np.array([np.ctypeslib.as_array(dll.atom_get_m_e1(self.instance, c_size_t(i)),
                                                (self.size, self.size)).T for i in range(3)])
 
+    def get_multipole_types(self, label_0, label_1):
+        indexes = [[i, j] for i, s0 in enumerate(self.states) for j, s1 in enumerate(self.states)
+                   if s0.label == label_0 and s1.label == label_1 and i < j]
+        mtypes = set()
+        ek_array = self.ek
+        mk_array = self.mk
+        for ij in indexes:
+            for k, (ek, mk) in enumerate(zip(ek_array, mk_array)):
+                _ek = ek[ij[0], ij[1]]
+                _mk = mk[ij[0], ij[1]]
+                if _ek + _mk:
+                    mtypes.add(f'{"m" if _mk else "e"}{_ek + _mk}')
+        return mtypes
+
+    @property
+    def d_em(self):
+        """
+        :returns: Multipole transition strengths ordered by k, starting at k = 1 (dipole).
+        """
+        matrix_d_p = np.ctypeslib.ndpointer(dtype=float, shape=(self.size, self.size))
+        set_restype(dll.atom_get_d_em, matrix_d_p)
+        return np.array([dll.atom_get_d_em(self.instance, c_size_t(k + 1)) for k in range(self.decay_map.k_em_max)])
+
     @property
     def ek(self):
         """
         :returns: A map of the electric multipole orders of the transitions between the states.
         """
-        return np.array([np.ctypeslib.as_array(dll.atom_get_ek(self.instance, c_size_t(k + 1)),
-                                               (self.size, self.size)).T for k in range(self.k_em_max)])
+        matrix_i_p = np.ctypeslib.ndpointer(dtype=np.int32, shape=(self.size, self.size))
+        set_restype(dll.atom_get_ek, matrix_i_p)
+        return np.array([dll.atom_get_ek(self.instance, c_size_t(k + 1)) for k in range(self.decay_map.k_em_max)])
 
     @property
     def mk(self):
         """
         :returns: A map of the magnetic multipole orders of the transitions between the states.
         """
-        return np.array([np.ctypeslib.as_array(dll.atom_get_mk(self.instance, c_size_t(k + 1)),
-                                               (self.size, self.size)).T for k in range(self.k_em_max)])
+        matrix_i_p = np.ctypeslib.ndpointer(dtype=np.int32, shape=(self.size, self.size))
+        set_restype(dll.atom_get_mk, matrix_i_p)
+        return np.array([dll.atom_get_mk(self.instance, c_size_t(k + 1)) for k in range(self.decay_map.k_em_max)])
 
     @property
     def emk(self):
         """
         :returns: A map of the multipole orders of the transitions between the states.
         """
-        return np.array([np.ctypeslib.as_array(dll.atom_get_emk(self.instance, c_size_t(k + 1)),
-                                               (self.size, self.size)).T for k in range(self.k_em_max)])
-
-    @property
-    def multipoles(self):
-        """
-        :returns: Multipole transition strengths ordered by k, starting at k = 1 (dipole).
-        """
-        return np.array([np.ctypeslib.as_array(dll.atom_get_d_em(self.instance, c_size_t(k + 1)),
-                                               (self.size, self.size)).T for k in range(self.k_em_max)])
+        matrix_i_p = np.ctypeslib.ndpointer(dtype=np.int32, shape=(self.size, self.size))
+        set_restype(dll.atom_get_emk, matrix_i_p)
+        return np.array([dll.atom_get_emk(self.instance, c_size_t(k + 1)) for k in range(self.decay_map.k_em_max)])
 
     @property
     def l0(self):

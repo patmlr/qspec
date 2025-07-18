@@ -89,7 +89,7 @@ State::State()
 	gj = 0.;
 	gi = 0.;
 
-	label = std::string ("<State>");
+	label = std::string("<State>");
 }
 
 State::~State()
@@ -289,12 +289,19 @@ DecayMap::DecayMap()
 	size = 0;
 }
 
-DecayMap::DecayMap(std::vector<std::string> _states_0, std::vector<std::string> _states_1, std::vector<double> _a)
+DecayMap::DecayMap(size_t _k_em_max)
+{
+	size = 0;
+	k_em_max = _k_em_max;
+}
+
+DecayMap::DecayMap(std::vector<std::string> _states_0, std::vector<std::string> _states_1, std::vector<double> _a, size_t _k_em_max)
 {
 	size = _a.size();
 	states_0 = _states_0;
 	states_1 = _states_1;
 	a = _a;
+	k_em_max = _k_em_max;
 }
 
 DecayMap::~DecayMap()
@@ -357,10 +364,21 @@ double DecayMap::get_gamma(std::string state_0, std::string state_1)
 	return gamma;
 }
 
+size_t DecayMap::get_k_em_max()
+{
+	return k_em_max;
+}
+
+void DecayMap::set_k_em_max(size_t _k_em_max)
+{
+	k_em_max = _k_em_max;
+}
+
 
 Atom::Atom()
 {
 	decays = new DecayMap();
+	env = new Environment();
 }
 
 Atom::~Atom()
@@ -384,12 +402,31 @@ void Atom::init(std::vector<State*> _states, DecayMap* _decays)
 	update();
 }
 
+void Atom::update()
+{
+	// gen_dipole();
+	gen_frequencies(env);
+	gen_w0();
+	gen_multipole();
+}
+
+
+Environment* Atom::get_env()
+{
+	return env;
+}
+
+void Atom::set_env(Environment* _env)
+{
+	env = _env;
+}
+
 void Atom::gen_multipole()
 {
 	ek.clear();
 	mk.clear();
 	d_em.clear();
-	for (size_t ik = 0; ik < k_em_max; ++ik)
+	for (size_t ik = 0; ik < decays->get_k_em_max(); ++ik)
 	{
 		ek.push_back(MatrixXi::Zero(size, size));
 		mk.push_back(MatrixXi::Zero(size, size));
@@ -421,32 +458,36 @@ void Atom::gen_multipole()
 				_j = i;
 			}
 
-			size_t k = get_min_k(_i, _j);
+			size_t k = 1;  // get_min_k(_i, _j);
+			// printf("k(%zi, %zi): %zi\n", _i, _j, k);
 			if (k == 0) continue;
 			bool parity_equal = get_parity_equal(_i, _j);
 
-			while (k <= k_em_max)
+			while (k <= decays->get_k_em_max())
 			{
-				if (parity_equal)
-				{
-					if (k % 2 != 0) mk.at(k - 1)(i, j) = k;
-					else ek.at(k - 1)(i, j) = k;
-				}
-				else
-				{
-					if (k % 2 != 0) ek.at(k - 1)(i, j) = k;
-					else mk.at(k - 1)(i, j) = k;
-				}
-
-				printf("k: %zi\n", k);
-
-				mk.at(k - 1)(j, i) = mk.at(k - 1)(i, j);
-				ek.at(k - 1)(j, i) = ek.at(k - 1)(i, j);
-
 				double q_val = states[_j]->get_m() - states[_i]->get_m();
 				double ak = a_multipole(static_cast<double>(k), states[_i]->get_i(), states[_i]->get_j(), states[_i]->get_f(), states[_i]->get_m(),
 																states[_j]->get_j(), states[_j]->get_f(), states[_j]->get_m(), q_val);  // This takes the time.
-				if (k == 1) printf("%s\n", std::format("ak({}, {}): {:.0e}", _i, _j, ak).c_str());
+				if (ak == 0.)
+				{
+					k += 1;
+					continue;
+				}
+
+				if (parity_equal)
+				{
+					if (k % 2 != 0) mk.at(k - 1)(_i, _j) = static_cast<int>(k);
+					else ek.at(k - 1)(_i, _j) = static_cast<int>(k);
+				}
+				else
+				{
+					if (k % 2 != 0) ek.at(k - 1)(_i, _j) = static_cast<int>(k);
+					else mk.at(k - 1)(_i, _j) = static_cast<int>(k);
+				}
+				mk.at(k - 1)(_j, _i) = mk.at(k - 1)(_i, _j);
+				ek.at(k - 1)(_j, _i) = ek.at(k - 1)(_i, _j);
+
+				// if (k == 1) printf("%s\n", std::format("ak({}, {}): {:.0e}", _i, _j, ak).c_str());
 				L0(_i, _j) = a * ak * ak;
 				L0(_j, _i) = 0.;
 
@@ -457,7 +498,7 @@ void Atom::gen_multipole()
 				d_em.at(k - 1)(j, i) = d_em.at(k - 1)(i, j);
 
 				// k += 1;  // Use only leading order for now.
-				k = k_em_max + 1;
+				k = decays->get_k_em_max() + 1;
 			}
 		}
 	}
@@ -538,7 +579,7 @@ void Atom::gen_dipole()
 	L1 *= -0.5;
 }
 
-void Atom::gen_frequencies(Environment* env)
+void Atom::gen_frequencies(Environment* _env)
 {
 	std::set<size_t> done;
 	for (size_t k = 0; k < size; ++k)
@@ -546,14 +587,14 @@ void Atom::gen_frequencies(Environment* env)
 		if (done.count(k)) continue;
 
 		State& s = *states.at(k);
-		if (env->get_B() == 0)
+		if (_env->get_B() == 0)
 		{
 			s.reset();
 			done.insert(k);
 			continue;
 		}
 
-		std::vector<double> freqs = hyper_zeeman_num(s.get_i(), s.get_j(), s.get_m(), s.get_gj(), s.get_gi(), s.get_hyper_const(), env->get_B());
+		std::vector<double> freqs = hyper_zeeman_num(s.get_i(), s.get_j(), s.get_m(), s.get_gj(), s.get_gi(), s.get_hyper_const(), _env->get_B());
 
 		double f_min = max(abs(s.get_m()), abs(s.get_i() - s.get_j()));
 		size_t i = static_cast<size_t>(s.get_f() - f_min);
@@ -574,20 +615,6 @@ void Atom::gen_frequencies(Environment* env)
 			}
 		}
 	}
-}
-
-void Atom::update()
-{
-	// gen_dipole();
-	gen_multipole();
-}
-
-void Atom::update(Environment* env)
-{
-	gen_frequencies(env);
-	gen_w0();
-	// gen_dipole();
-	gen_multipole();
 }
 
 size_t Atom::get_size()
@@ -640,11 +667,6 @@ void Atom::set_mass(double _mass)
 	mass = _mass;
 }
 
-size_t Atom::get_k_em_max()
-{
-	return k_em_max;
-}
-
 size_t Atom::get_min_k(size_t i, size_t j)
 {
 	State& s0 = *states.at(i);
@@ -656,13 +678,16 @@ size_t Atom::get_min_k(size_t i, size_t j)
 	size_t ds = 0;
 	size_t dl = 0;
 	size_t n = 0;
-	for (size_t i = 0; i < ne; ++i)
+	for (size_t ie = 0; ie < ne; ++ie)
 	{
-		ds += static_cast<size_t>(abs(s1.get_s().at(i) - s0.get_s().at(i)));
-		dl += static_cast<size_t>(abs(s1.get_l().at(i) - s0.get_l().at(i)));
-		if (ds > 0 || dl > 0) ++n;
+		size_t _ds = static_cast<size_t>(abs(s1.get_s().at(ie) - s0.get_s().at(ie)));
+		size_t _dl = static_cast<size_t>(abs(s1.get_l().at(ie) - s0.get_l().at(ie)));
+		if (_ds > 0 || _dl > 0) ++n;
+		ds += _ds;
+		dl += _dl;
 	}
 
+	// printf("%d %zi [dl, ds](%zi, %zi): [%zi, %zi]\n", parity_equal, n, i, j, dl, ds);
 	if (n > 1 || ds > 1) return 0;
 	else
 	{
@@ -683,6 +708,7 @@ size_t Atom::get_min_k(size_t i, size_t j)
 			if (ds == 0)
 			{
 				if (parity_equal && dl == 1) return 2;
+				// printf("%zi, %zi", dl, max(1, dl));
 				return max(1, dl);
 			}
 			else
@@ -759,7 +785,7 @@ size_t Atom::get_mk(size_t k, size_t i, size_t j)
 std::vector<MatrixXi> Atom::get_emk()
 {
 	std::vector<MatrixXi> emk;
-	for (size_t ik = 0; ik < k_em_max; ++ik)
+	for (size_t ik = 0; ik < decays->get_k_em_max(); ++ik)
 	{
 		emk.push_back(ek.at(ik) + mk.at(ik));
 	}

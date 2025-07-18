@@ -369,6 +369,16 @@ extern "C"
         return decays->get_item(std::string(state_0), std::string(state_1));
     }
 
+    __declspec(dllexport) size_t decaymap_get_k_em_max(DecayMap* decays)
+    {
+        return decays->get_k_em_max();
+    }
+
+    __declspec(dllexport) void decaymap_set_k_em_max(DecayMap* decays, size_t k_em_max)
+    {
+        return decays->set_k_em_max(k_em_max);
+    }
+
     // Atom
     __declspec(dllexport) Atom* atom_construct()
     {
@@ -385,9 +395,9 @@ extern "C"
         atom->update();
     }
 
-    __declspec(dllexport) void atom_update_env(Atom* atom, Environment* env)
+    __declspec(dllexport) void atom_set_env(Atom* atom, Environment* env)
     {
-        atom->update(env);
+        atom->set_env(env);
     }
 
     __declspec(dllexport) void atom_add_state(Atom* atom, State* state)
@@ -420,11 +430,6 @@ extern "C"
         atom->set_mass(mass);
     }
 
-    __declspec(dllexport) size_t atom_get_k_em_max(Atom* atom)
-    {
-        return atom->get_k_em_max();
-    }
-
     __declspec(dllexport) size_t atom_get_size(Atom* atom)
     {
         return atom->get_size();
@@ -452,22 +457,30 @@ extern "C"
 
     __declspec(dllexport) int* atom_get_ek(Atom* atom, size_t k)
     {
-        return atom->get_ek(k).data();
+        MatrixXi* ek = new MatrixXi(atom->get_size(), atom->get_size());
+        *ek = atom->get_ek(k);
+        return ek->data();
     }
 
     __declspec(dllexport) int* atom_get_mk(Atom* atom, size_t k)
     {
-        return atom->get_mk(k).data();
+        MatrixXi* mk = new MatrixXi(atom->get_size(), atom->get_size());
+        *mk = atom->get_mk(k);
+        return mk->data();
     }
 
     __declspec(dllexport) int* atom_get_emk(Atom* atom, size_t k)
     {
-        return atom->get_emk(k).data();
+        MatrixXi* emk = new MatrixXi(atom->get_size(), atom->get_size());
+        *emk = atom->get_emk(k);
+        return emk->data();
     }
 
     __declspec(dllexport) double* atom_get_d_em(Atom* atom, size_t k)
     {
-        return atom->get_d_em(k).data();
+        MatrixXd* d_em = new MatrixXd(atom->get_size(), atom->get_size());
+        *d_em = atom->get_d_em(k);
+        return d_em->data();
     }
 
     __declspec(dllexport) double* atom_get_L0(Atom* atom)
