@@ -643,7 +643,8 @@ def gen_hyperfine_state(
 
 
 class DecayMap:
-    def __init__(self, labels: Iterable[tuple] = None, a: Iterable[scalar] = None, k_max: int = 1, instance=None):
+    def __init__(self, labels: Iterable[tuple] = None, a: Iterable[Union[scalar, dict]] = None, k_max: int = 1,
+                 instance=None):
         """
         Class linking sets of atomic states via Einstein-A coefficients.
 
@@ -660,12 +661,31 @@ class DecayMap:
             dll.decaymap_set_k_em_max(self.instance, c_size_t(int(k_max)))
             if labels is None:
                 labels = []
+            self._labels = list(labels)
+
             if a is None:
                 a = []
-            self._labels = list(labels)
             for (s0, s1), _a in zip(self._labels, a):
+                if isinstance(_a, dict):
+                    ae = [_a.get('e', 0.)]
+                    am = [_a.get('m', 0.)]
+                    if ae[0] == 0.:
+                        ae = [_a.get(f'e{k + 1}', 0.) for k in range(k_max)]
+                        if sum(ae) == 0.:
+                            ae = [0.]
+                    if am[0] == 0.:
+                        am = [_a.get(f'm{k + 1}', 0.) for k in range(k_max)]
+                        if sum(am) == 0.:
+                            am = [0.]
+                else:
+                    ae = [_a]
+                    am = ae
+                ae = np.array(ae, dtype=float)
+                am = np.array(am, dtype=float)
+
                 dll.decaymap_add_decay(self.instance, c_char_p(bytes(s0, 'utf-8')), c_char_p(bytes(s1, 'utf-8')),
-                                       c_double(float(_a)))
+                                       ae.ctypes.data_as(c_double_p), c_size_t(int(ae.size)),
+                                       am.ctypes.data_as(c_double_p), c_size_t(int(am.size)))
         else:
             self._labels = self._get_labels()
 

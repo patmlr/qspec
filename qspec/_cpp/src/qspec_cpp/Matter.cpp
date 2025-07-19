@@ -311,7 +311,7 @@ DecayMap::~DecayMap()
 	std::vector<double>().swap(a);
 }
 
-void DecayMap::add_decay(std::string state_0, std::string state_1, double _a)
+void DecayMap::add_decay(std::string state_0, std::string state_1, std::vector<double> _ae, std::vector<double> _am)
 {
 	size += 1;
 	states_0.push_back(state_0);

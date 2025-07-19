@@ -194,7 +194,7 @@ dll.state_set_label.argtypes = (StateHandler, c_char_p)
 dll.decaymap_construct.restype = DecayMapHandler
 dll.decaymap_destruct.argtypes = (DecayMapHandler, )
 
-dll.decaymap_add_decay.argtypes = (DecayMapHandler, c_char_p, c_char_p, c_double)
+dll.decaymap_add_decay.argtypes = (DecayMapHandler, c_char_p, c_char_p, c_double_p, c_size_t, c_double_p, c_size_t)
 
 dll.decaymap_get_label.argtypes = (DecayMapHandler, c_size_t, c_size_t)
 dll.decaymap_get_label.restype = c_char_p

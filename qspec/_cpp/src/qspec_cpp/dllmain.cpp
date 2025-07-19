@@ -329,9 +329,11 @@ extern "C"
         delete decay_map;
     }
 
-    __declspec(dllexport) void decaymap_add_decay(DecayMap* decays, char* state_0, char* state_1, double a)
+    __declspec(dllexport) void decaymap_add_decay(DecayMap* decays, char* state_0, char* state_1, double* ae, size_t ae_size, double* am, size_t am_size)
     {
-        decays->add_decay(std::string(state_0), std::string(state_1), a);
+        std::vector<double> _ae = cast_samples_double(ae, ae_size);
+        std::vector<double> _am = cast_samples_double(am, am_size);
+        decays->add_decay(std::string(state_0), std::string(state_1), _ae, _am);
     }
 
     __declspec(dllexport) const char* decaymap_get_label(DecayMap* decays, size_t i, size_t j)

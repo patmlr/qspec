@@ -586,5 +586,6 @@ def example(n=None):
         plt.ylabel('Population')
         plt.show()
 
+
 if __name__ == '__main__':
     example({8})
