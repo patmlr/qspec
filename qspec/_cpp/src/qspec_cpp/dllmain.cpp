@@ -128,6 +128,12 @@ extern "C"
         return laser->set_k(_k);
     }
 
+    __declspec(dllexport) std::complex<double>* laser_get_kpol(Laser* laser, bool electric, size_t k, double* q_axis)
+    {
+        Vector3d _q_axis = cast_Vector3d(q_axis);
+        return laser->get_kpol(electric, k, _q_axis).array().data();
+    }
+
 
     //Environment
     __declspec(dllexport) Environment* environment_construct()
@@ -329,11 +335,11 @@ extern "C"
         delete decay_map;
     }
 
-    __declspec(dllexport) void decaymap_add_decay(DecayMap* decays, char* state_0, char* state_1, double* ae, size_t ae_size, double* am, size_t am_size)
+    __declspec(dllexport) void decaymap_add_decay(DecayMap* decays, char* state_0, char* state_1, double* ae, size_t ae_size, double* am, size_t am_size, bool single_leading_order)
     {
         std::vector<double> _ae = cast_samples_double(ae, ae_size);
         std::vector<double> _am = cast_samples_double(am, am_size);
-        decays->add_decay(std::string(state_0), std::string(state_1), _ae, _am);
+        decays->add_decay(std::string(state_0), std::string(state_1), _ae, _am, single_leading_order);
     }
 
     __declspec(dllexport) const char* decaymap_get_label(DecayMap* decays, size_t i, size_t j)
@@ -354,21 +360,9 @@ extern "C"
 
     }
 
-
     __declspec(dllexport) size_t decaymap_get_size(DecayMap* decays)
     {
         return decays->get_size();
-    }
-
-    __declspec(dllexport) double* decaymap_get_a(DecayMap* decays)
-    {
-
-        return decays->get_a()->data();
-    }
-
-    __declspec(dllexport) double decaymap_get_item(DecayMap* decays, char* state_0, char* state_1)
-    {
-        return decays->get_item(std::string(state_0), std::string(state_1));
     }
 
     __declspec(dllexport) size_t decaymap_get_k_em_max(DecayMap* decays)
@@ -380,6 +374,33 @@ extern "C"
     {
         return decays->set_k_em_max(k_em_max);
     }
+
+    __declspec(dllexport) double* decaymap_get_a(DecayMap* decays)
+    {
+
+        return decays->get_a()->data();
+    }
+
+    __declspec(dllexport) double decaymap_get_a_i(DecayMap* decays, char* state_0, char* state_1)
+    {
+        return decays->get_a(std::string(state_0), std::string(state_1));
+    }
+
+    __declspec(dllexport) double decaymap_get_ae_ik(DecayMap* decays, char* state_0, char* state_1, size_t k)
+    {
+        return decays->get_ae(std::string(state_0), std::string(state_1), k);
+    }
+
+    __declspec(dllexport) double decaymap_get_am_ik(DecayMap* decays, char* state_0, char* state_1, size_t k)
+    {
+        return decays->get_am(std::string(state_0), std::string(state_1), k);
+    }
+
+    __declspec(dllexport) double decaymap_get_gamma(DecayMap* decays, char* state_0, char* state_1, bool parity_equal)
+    {
+        return decays->get_gamma(std::string(state_0), std::string(state_1), parity_equal);
+    }
+
 
     // Atom
     __declspec(dllexport) Atom* atom_construct()
@@ -447,16 +468,6 @@ extern "C"
         return atom->get_gs()->data();
     }
 
-    __declspec(dllexport) double* atom_get_m_e1(Atom* atom, size_t i)
-    {
-        return atom->get_m_e1()->at(i).data();
-    }
-
-    __declspec(dllexport) double* atom_get_m_m1(Atom* atom, size_t i)
-    {
-        return atom->get_m_m1()->at(i).data();
-    }
-
     __declspec(dllexport) int* atom_get_ek(Atom* atom, size_t k)
     {
         MatrixXi* ek = new MatrixXi(atom->get_size(), atom->get_size());
@@ -495,6 +506,78 @@ extern "C"
         return atom->get_L1()->data();
     }
 
+    __declspec(dllexport) void atom_scattering_rate_4pi(Atom* atom, double* results, size_t k, std::complex<double>* rho, size_t rho_size, bool as_density_matrix,
+        size_t* i, size_t i_size, size_t* f, size_t f_size)
+    {
+        std::vector<MatrixXcd> _rho;
+        if (as_density_matrix) _rho = cast_samples_MatrixXcd(rho, rho_size, atom->get_size());
+        else _rho = cast_samples_VectorXcd_as_MatrixXcd(rho, rho_size, atom->get_size());
+        
+        std::vector<size_t> _i = cast_samples_size_t(i, i_size);
+        std::vector<size_t> _f = cast_samples_size_t(f, f_size);
+        atom->scattering_rate(results, k, _rho, _i, _f);
+    }
+
+    __declspec(dllexport) void atom_scattering_rate_k(Atom* atom, double* results, size_t k, std::complex<double>* rho, size_t rho_size, bool as_density_matrix,
+        double* k_vec, size_t k_vec_size,
+        size_t* i, size_t i_size, size_t* f, size_t f_size)
+    {
+        std::vector<MatrixXcd> _rho;
+        if (as_density_matrix) _rho = cast_samples_MatrixXcd(rho, rho_size, atom->get_size());
+        else _rho = cast_samples_VectorXcd_as_MatrixXcd(rho, rho_size, atom->get_size());
+        
+        std::vector<Vector3d> _k_vec = cast_samples_Vector3d(k_vec, k_vec_size);
+        std::vector<size_t> _i = cast_samples_size_t(i, i_size);
+        std::vector<size_t> _f = cast_samples_size_t(f, f_size);
+        atom->scattering_rate(results, k, _rho, _k_vec, _i, _f);
+    }
+
+    __declspec(dllexport) void atom_scattering_rate_k_tp(Atom* atom, double* results, size_t k, std::complex<double>* rho, size_t rho_size, bool as_density_matrix,
+        double* theta, double* phi, size_t k_vec_size,
+        size_t* i, size_t i_size, size_t* f, size_t f_size)
+    {
+        std::vector<MatrixXcd> _rho;
+        if (as_density_matrix) _rho = cast_samples_MatrixXcd(rho, rho_size, atom->get_size());
+        else _rho = cast_samples_VectorXcd_as_MatrixXcd(rho, rho_size, atom->get_size());
+
+        std::vector<Vector3d> _k_vec = cast_samples_theta_phi_vec(theta, phi, k_vec_size);
+        std::vector<size_t> _i = cast_samples_size_t(i, i_size);
+        std::vector<size_t> _f = cast_samples_size_t(f, f_size);
+
+        atom->scattering_rate(results, k, _rho, _k_vec, _i, _f);
+    }
+
+    __declspec(dllexport) void atom_scattering_rate_qk(Atom* atom, double* results, size_t k, std::complex<double>* rho, size_t rho_size, bool as_density_matrix,
+        double* k_vec, std::complex<double>* x_vec, size_t k_vec_size,
+        size_t* i, size_t i_size, size_t* f, size_t f_size)
+    {
+        std::vector<MatrixXcd> _rho;
+        if (as_density_matrix) _rho = cast_samples_MatrixXcd(rho, rho_size, atom->get_size());
+        else _rho = cast_samples_VectorXcd_as_MatrixXcd(rho, rho_size, atom->get_size());
+        
+        std::vector<Vector3d> _k_vec = cast_samples_Vector3d(k_vec, k_vec_size);
+        std::vector<Vector3cd> _x_vec = cast_samples_Vector3cd(x_vec, k_vec_size);
+        std::vector<size_t> _i = cast_samples_size_t(i, i_size);
+        std::vector<size_t> _f = cast_samples_size_t(f, f_size);
+        atom->scattering_rate(results, k, _rho, _k_vec, _x_vec, _i, _f);
+    }
+
+    __declspec(dllexport) void atom_scattering_rate_qk_tp(Atom* atom, double* results, size_t k, std::complex<double>* rho, size_t rho_size, bool as_density_matrix,
+        double* theta, double* phi, std::complex<double>* x_vec, size_t k_vec_size,
+        size_t* i, size_t i_size, size_t* f, size_t f_size)
+    {
+        std::vector<MatrixXcd> _rho;
+        if (as_density_matrix) _rho = cast_samples_MatrixXcd(rho, rho_size, atom->get_size());
+        else _rho = cast_samples_VectorXcd_as_MatrixXcd(rho, rho_size, atom->get_size());
+        
+        std::vector<Vector3d> _k_vec = cast_samples_theta_phi_vec(theta, phi, k_vec_size);
+        std::vector<Vector3cd> _x_vec = cast_samples_Vector3cd(x_vec, k_vec_size);
+        std::vector<size_t> _i = cast_samples_size_t(i, i_size);
+        std::vector<size_t> _f = cast_samples_size_t(f, f_size);
+        atom->scattering_rate(results, k, _rho, _k_vec, _x_vec, _i, _f);
+    }
+
+
 
     // Interaction
     __declspec(dllexport) Interaction* interaction_construct()
@@ -507,9 +590,9 @@ extern "C"
         delete interaction;
     }
 
-    __declspec(dllexport) void interaction_update(Interaction* interaction)
+    __declspec(dllexport) int interaction_update(Interaction* interaction)
     {
-        interaction->update();
+        return interaction->update();
     }
 
     __declspec(dllexport) Environment* interaction_get_environment(Interaction* interaction)

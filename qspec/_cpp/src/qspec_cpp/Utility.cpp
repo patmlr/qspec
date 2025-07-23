@@ -56,10 +56,26 @@ std::vector<double> cast_samples_double(double* x, size_t sample_size)
     return _x;
 }
 
+std::vector<size_t> cast_samples_size_t(size_t* x, size_t sample_size)
+{
+    std::vector<size_t> _x = std::vector<size_t>(sample_size);
+    for (size_t i = 0; i < sample_size; ++i) _x.at(i) = x[i];
+    return _x;
+}
 
 std::vector<Vector3d> cast_samples_Vector3d(double* x, size_t sample_size)
 {
     std::vector<Vector3d> _x = std::vector<Vector3d>(sample_size, Vector3d::Zero());
+    for (size_t i = 0; i < sample_size; ++i)
+    {
+        for (size_t r = 0; r < 3; ++r) _x.at(i)(r) = x[3 * i + r];
+    }
+    return _x;
+}
+
+std::vector<Vector3cd> cast_samples_Vector3cd(std::complex<double>* x, size_t sample_size)
+{
+    std::vector<Vector3cd> _x = std::vector<Vector3cd>(sample_size, Vector3cd::Zero());
     for (size_t i = 0; i < sample_size; ++i)
     {
         for (size_t r = 0; r < 3; ++r) _x.at(i)(r) = x[3 * i + r];
@@ -87,6 +103,16 @@ std::vector<VectorXcd> cast_samples_VectorXcd(std::complex<double>* x, size_t sa
     return _x;
 }
 
+std::vector<MatrixXcd> cast_samples_VectorXcd_as_MatrixXcd(std::complex<double>* x, size_t sample_size, size_t size)
+{
+    std::vector<MatrixXcd> _x = std::vector<MatrixXcd>(sample_size, MatrixXcd::Zero(size, 1));
+    for (size_t i = 0; i < sample_size; ++i)
+    {
+        for (size_t m = 0; m < size; ++m) _x.at(i)(m) = x[size * i + m];
+    }
+    return _x;
+}
+
 std::vector<MatrixXd> cast_samples_MatrixXd(double* x, size_t sample_size, size_t size)
 {
     std::vector<MatrixXd> _x = std::vector<MatrixXd>(sample_size, MatrixXd::Zero(size, size));
@@ -107,7 +133,12 @@ std::vector<MatrixXcd> cast_samples_MatrixXcd(std::complex<double>* x, size_t sa
     {
         for (size_t m = 0; m < size; ++m)
         {
-            for (size_t n = 0; n < size; ++n) _x.at(i)(n, m) = x[size * size * i + size * m + n];
+            for (size_t n = 0; n < size; ++n)
+            {
+                _x.at(i)(n, m) = x[size * size * i + size * m + n];
+                // if (i == 100 && n == m) printf("rho(100): %s\n", std::format("({}, {}): {:.3e} + {:.3e}i", m, n, _x.at(i)(n, m).real(), _x.at(i)(n, m).imag()).c_str());
+                // if (i == 301 && n == m) printf("rho(301): %s\n", std::format("({}, {}): {:.3e} + {:.3e}i", m, n, _x.at(i)(n, m).real(), _x.at(i)(n, m).imag()).c_str());
+            }
         }
     }
     return _x;
@@ -171,11 +202,13 @@ double rotation_phi(Vector3d vec)
     if (vec.norm() == 0.) return 0.;
 
     Vector3d _vec = vec / vec.norm();
+    // printf("vec: %.3f, %.3f, %.3f\n", _vec(0), _vec(1), _vec(2));
     double vec2 = pow(_vec(2), 2);
     double phi = 0.;
+    // printf("arg: %.3f\n", _vec(0) / sqrt(1. - vec2));
     if (vec2 < 1.)
     {
-        if (abs(_vec(0)) < abs(_vec(1)))
+        if (abs(_vec(0)) > abs(_vec(1)))
         {
             if (_vec(0) < 0.) phi = sc::pi - asin(_vec(1) / sqrt(1. - vec2));
             else phi = asin(_vec(1) / sqrt(1. - vec2));
@@ -194,6 +227,8 @@ Matrix3d rotation_matrix(Vector3d vec)
     double theta = rotation_theta(vec);
     double phi = rotation_phi(vec);
 
+    // printf("theta, phi: %.3f pi, %.3f pi\n", theta / sc::pi, phi / sc::pi);
+
     Matrix3d R = Matrix3d::Identity();
 
     R(0, 0) = cos(theta) * cos(phi);
@@ -208,4 +243,25 @@ Matrix3d rotation_matrix(Vector3d vec)
     R(2, 2) = cos(theta);
 
     return R;
+}
+
+Vector3d cast_theta_phi_vec(double theta, double phi)
+{
+    Vector3d r = Vector3d::Zero();
+    r(0) = sin(theta) * cos(phi);
+    r(1) = sin(theta) * sin(phi);
+    r(2) = cos(theta);
+    return r / r.norm();
+}
+
+std::vector<Vector3d> cast_samples_theta_phi_vec(double* theta, double* phi, size_t sample_size)
+{
+    printf("theta, phi: %.3f, %.3f\n", theta[0], phi[0]);
+    std::vector<Vector3d> r(sample_size, Vector3d::Zero());
+    for (size_t i = 0; i < sample_size; ++i)
+    {
+        r.at(i) = cast_theta_phi_vec(theta[i], phi[i]);
+    }
+    printf("r: %.3f, %.3f, %.3f\n", r.at(0)(0), r.at(0)(1), r.at(0)(2));
+    return r;
 }

@@ -310,7 +310,7 @@ def example(n=None):
         f_p = 7e8
         a_p = 100.
 
-        i = 1.5
+        i = 0.5
         s_hyper = [0.]
         p_hyper = [10.]
 
@@ -324,15 +324,16 @@ def example(n=None):
         # he.plot()
 
         intensity = 0.1
-        pol_sp = sim.Polarization([0, 0, 1], vec_as_q=False, q_axis=[1, 0, 0])
+        pol_sp = sim.Polarization([0, 0, 1], vec_as_q=False, q_axis=[0, 0, 1])
         qs.printh('Polarization before processing.')
         print('x:', pol_sp.x)
         print('q:', pol_sp.q)
         print('q_axis:', pol_sp.q_axis)
 
-        laser_sp = sim.Laser(freq=f_p, polarization=pol_sp, intensity=intensity)
+        laser_sp = sim.Laser(freq=f_p, polarization=pol_sp, intensity=intensity, k=[0, 1, 0])
 
-        inter = sim.Interaction(atom=he, lasers=[laser_sp, ], delta_max=1000.)
+        env = sim.Environment(B=[0., 0., 1e-6])
+        inter = sim.Interaction(atom=he, lasers=[laser_sp, ], environment=env, delta_max=1000.)
         # inter.dt_max = 1e-4
         inter.controlled = True
         # inter.resonance_info()
@@ -340,6 +341,7 @@ def example(n=None):
         print('x:', pol_sp.x)
         print('q:', pol_sp.q)
         print('q_axis:', pol_sp.q_axis)
+        print('kpol:', laser_sp.get_kpol(1, env.B))
 
         times = [0., 0.2]
         delta = np.linspace(-100, 100, 201)
@@ -349,7 +351,7 @@ def example(n=None):
         r = inter.get_rabi()
 
         results = inter.rates(times, delta)
-        y = he.scattering_rate(results, theta, phi, as_density_matrix=False)[:, -1]
+        y = he.scattering_rate(results, as_density_matrix=False, theta=theta, phi=phi)[0, :, -1]
         plt.plot(delta, y, '-C2', label='angular non-QI')
         y = he.scattering_rate(results, as_density_matrix=False)[:, -1] / (4 * np.pi)
         plt.plot(delta, y, '-C3', label=r'$4\pi$ rates')
@@ -357,11 +359,11 @@ def example(n=None):
         rho = inter.master(times, delta)
         y = he.scattering_rate(rho.real)[:, -1] / (4 * np.pi)
         plt.plot(delta, y, '--C0', label=r'$4\pi$ master')
-        y = he.scattering_rate(rho, theta, phi)[:, -1]
+        y = he.scattering_rate(rho, theta=theta, phi=phi)[0, :, -1]
         plt.plot(delta, y, '-C1', label='QI master')
 
-        sr = sim.ScatteringRate(he, laser=laser_sp)
-        y = sr.generate_y(delta, theta, phi)[:, 0, 0]
+        sr = sim.ScatteringRate(he, laser=laser_sp, b=env.B)
+        y = sr.generate_y(delta, theta=theta, phi=phi)[:, 0, 0]
         plt.plot(delta, y, '--C7', label='QI pert.')
 
         plt.xlabel('f - {} (MHz)'.format(laser_sp.freq))
@@ -541,7 +543,9 @@ def example(n=None):
 
         states = s + d3
         # states = s + [d3[-1]]
-        decay_map = sim.DecayMap(labels=[('s', 'd3'), ('s', 'd5')], a=[a, a])
+        decay_map = sim.DecayMap(labels=[('s', 'd3'), ('s', 'd5')],
+                                 a=[{'m1': 0.01 * a, 'e2': a}, {'e2': a}], k_max=2)
+
         ca40 = sim.Atom(states, decay_map)
 
         phase_angle = 3 * np.pi / 2
@@ -579,13 +583,78 @@ def example(n=None):
         cmap = plt.get_cmap('viridis', i_d3.size)
         for ic, im in enumerate(i_d3):
             m = ca40.states[im].m
-            plt.plot(times, y[im], c=cmap(ic), label='$m = ' + str(qs.quant(m)) + '$')
+            plt.plot(times, y[im], c=cmap(ic), label='d($' + str(qs.quant(m)) + '$)')
 
         plt.legend()
         plt.xlabel(r'Time ($\mu$s)')
         plt.ylabel('Population')
         plt.show()
 
+    if 9 in n:
+
+        f_p = 7e8
+        a_p = 100.
+
+        i = 0.
+        s_hyper = [0.]
+        p_hyper = [5.]
+
+        s = sim.construct_electronic_state(freq_0=0, s=0, l=0, j=0, i=i, hyper_const=s_hyper, label='s')
+        p = sim.construct_electronic_state(freq_0=f_p, s=0, l=1, j=1, i=i, hyper_const=p_hyper, label='p')
+
+        decay = sim.DecayMap(labels=[('s', 'p')], a=[a_p])
+
+        states = s + p
+        he = sim.Atom(states=states, decay_map=decay)
+        # he.plot()
+
+        intensity = 0.1
+        pol_sp = sim.Polarization([0, 0, 1], vec_as_q=False, q_axis=[0, 0, 1])
+
+        laser_sp = sim.Laser(freq=f_p, polarization=pol_sp, intensity=intensity, k=[0, 1, 0])
+
+        env = sim.Environment(B=[0., 0., 1e-6])
+        inter = sim.Interaction(atom=he, lasers=[laser_sp, ], environment=env, delta_max=1000.)
+        # inter.dt_max = 1e-4
+        inter.controlled = True
+
+        t = 0.2
+
+        # n_points = 101
+        # indexes = np.arange(0, n_points, dtype=float) + 0.5
+        # phi = np.arccos(1 - 2 * indexes / n_points)
+        # theta = np.pi * (1 + np.sqrt(5)) * indexes
+
+        n_theta, n_phi = 32, 64
+        theta = np.linspace(0., np.pi, n_theta)
+        phi = np.linspace(0., 2 * np.pi, n_phi)
+
+        theta, phi = np.meshgrid(theta, phi, indexing='ij')
+
+        rho = inter.master(t)
+        r = he.scattering_rate(rho, theta=theta, phi=phi)[:, -1, -1]
+        r /= np.max(r)
+        r = r.reshape((n_theta, n_phi))
+
+        x = r * np.sin(theta) * np.cos(phi)
+        y = r * np.sin(theta) * np.sin(phi)
+        z = r * np.cos(theta)
+
+        fig, ax = plt.subplots(subplot_kw={'projection': '3d'})
+        cm = plt.get_cmap('plasma')
+
+        ax.plot_surface(x, y, z, facecolors=cm(r), rcount=64, ccount=128, linewidth=0, antialiased=False)
+
+        ax.set_xlabel('x')
+        ax.set_ylabel('y')
+        ax.set_zlabel('z')
+
+        ax.set_xlim(-1.1, 1.1)
+        ax.set_ylim(-1.1, 1.1)
+        ax.set_zlim(-1.1, 1.1)
+        ax.set_box_aspect((1., 1., 1.))
+        plt.show()
+
 
 if __name__ == '__main__':
-    example({8})
+    example({4})

@@ -50,7 +50,7 @@ void Polarization::infer_x()
 	x = Rq.matrix() * (T.adjoint() * q);
 	for (size_t i = 0; i < 3; ++i)
 	{
-		if (abs(x.array()[i]) < 1e-9) x(i) = 0;
+		if (abs(x.array()[i]) < 1e-15) x(i) = 0;
 	}
 	x /= x.norm();
 }
@@ -60,7 +60,7 @@ void Polarization::infer_q()
 	q = T * (Rq.matrix().transpose() * x);
 	for (size_t i = 0; i < 3; ++i)
 	{
-		if (abs(q.array()[i]) < 1e-9) q(i) = 0;
+		if (abs(q.array()[i]) < 1e-15) q(i) = 0;
 	}
 	q /= q.norm();
 }
@@ -86,13 +86,30 @@ Polarizationk::Polarizationk()
 	T = Matrix3cd{ {1, -sc::i, 0}, {0, 0, sqrt(2)}, {-1, -sc::i, 0} };
 	T /= sqrt(2);
 
+	q_axis << 0, 0, 1;
 	Rz = Matrix3d::Identity();
 
 	theta_k = 0.;
 	phi_k = 0.;
 	Rk = Matrix3d::Identity();
 
-	q_axis << 0, 0, 1;
+	x << 0, 0, 1;
+	qk << 1, 0, -1;
+	qk /= sqrt(2);
+}
+
+Polarizationk::Polarizationk(Vector3d _q_axis)
+{
+	Z << 0, 0, 1;
+	T = Matrix3cd{ {1, -sc::i, 0}, {0, 0, sqrt(2)}, {-1, -sc::i, 0} };
+	T /= sqrt(2);
+
+	q_axis = _q_axis / _q_axis.norm();
+	Rz = rotation_matrix(q_axis);
+
+	theta_k = 0.;
+	phi_k = 0.;
+	Rk = Matrix3d::Identity();
 
 	x << 0, 0, 1;
 	qk << 1, 0, -1;
@@ -106,10 +123,17 @@ void Polarizationk::init(Vector3cd _x, Vector3d _k, Vector3d _q_axis)
 	def_q_axis(_q_axis);
 }
 
+void Polarizationk::init_qk(Vector3cd _x, Vector3d _k)
+{
+	x = _x / _x.norm();
+	k = _k / _k.norm();
+	infer_qk();
+}
+
 void Polarizationk::def_q_axis(Vector3d _q_axis)
 {
 	q_axis = _q_axis / _q_axis.norm();
-	Rz = rotation_matrix(q_axis);
+	Rz = rotation_matrix(q_axis).transpose();
 	infer_qk();
 }
 
@@ -133,14 +157,14 @@ void Polarizationk::infer_qk()
 	qk = T * (Rk.transpose() * xz);
 	for (size_t i = 0; i < 3; ++i)
 	{
-		if (abs(qk.array()[i]) < 1e-9) qk(i) = 0;
+		if (abs(qk.array()[i]) < 1e-15) qk(i) = 0;
 	}
 	// printf("qk: %.3f, %.3f, %.3f\n", std::abs(qk(0)), std::abs(qk(1)), std::abs(qk(2)));
 
-	if (pow(std::abs(qk(1)), 2) > 1e-2) printf("\033[93mWarning: %3.3f %% of the field amplitude oscillates along the k-vector. Setting component to 0.\033[0m\n",
-		100. * std::abs(qk(1)) / (std::abs(qk(0)) + std::abs(qk(1)) + std::abs(qk(2))));
+	if (pow(std::abs(qk(1)), 2) > 1e-2) printf("\033[93mWarning: %.3f %% of the field amplitude oscillates along the k-vector (%.3f, %.3f, %.3f). Setting field component to 0.\033[0m\n",
+		100. * std::abs(qk(1)) / (std::abs(qk(0)) + std::abs(qk(1)) + std::abs(qk(2))), k(0), k(1), k(2));
 	qk(1) = 0.;
-	if (qk.norm() == 0.) throw std::runtime_error("An electro-magnetic wave cannot oscillate along its k-vector.");
+	if (qk.norm() == 0.) throw polarization_error("An electro-magnetic wave cannot oscillate along its k-vector.");
 	qk /= qk.norm();
 
 }
@@ -246,35 +270,10 @@ Vector3d Laser::get_kn()
 	return k / k.norm();
 }
 
-VectorXcd Laser::get_kpol(size_t _k)
-{
-	Polarization kvec = Polarization();
-	kvec.init(k, *polarization->get_q_axis(), false);
-	// Polarization qvec = Polarization();
-	// qvec.init(*polarization->get_q(), *polarization->get_q_axis(), false);
-
-	Vector3cd& qq = *polarization->get_q();
-	Vector3cd& qk = *kvec.get_q();
-
-	VectorXcd kpol = VectorXcd::Zero(2 * _k + 1);
-	for (size_t im = 0; im < 2 * _k + 1; ++im)
-	{
-		int m = static_cast<int>(im) - static_cast<int>(_k);
-		for (size_t i = 0; i < 3; ++i)
-		{
-			std::vector<int> _q(1);
-			_q.at(0) = static_cast<int>(i) - 1;
-			kpol(im) += spherical_tensor(_k, m - _q.at(0), qq(i), qk, _q);
-		}
-	}
-
-	return kpol;
-}
-
-VectorXcd Laser::get_kpol2(bool electric, size_t _k, Vector3d q_axis)
+VectorXcd Laser::get_kpol(bool electric, size_t _k, Vector3d q_axis)
 {
 	Polarizationk polarization_k = Polarizationk();
 	polarization_k.init(*polarization->get_x(), k, q_axis);
 
-	return spherical_tensor_vec(electric, _k, polarization_k.get_qk(), polarization_k.get_theta_k(), polarization_k.get_phi_k());
+	return spherical_tensor(electric, _k, polarization_k.get_qk(), polarization_k.get_theta_k(), polarization_k.get_phi_k());
 }

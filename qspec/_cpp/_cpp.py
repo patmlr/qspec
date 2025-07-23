@@ -80,7 +80,8 @@ MultivariateNormalHandler = POINTER(ctypes.c_char)
 
 dll_path = os.path.abspath(os.path.dirname(__file__))
 x64 = r'\x64' if ctypes.sizeof(c_void_p) == 8 else ''
-dll_path = os.path.join(dll_path, r'src\qspec_cpp{}\Release'.format(x64))
+debug = 'Debug' if False else 'Release'
+dll_path = os.path.join(dll_path, r'src\qspec_cpp{}\{}'.format(x64, debug))
 dll_name = 'qspec_cpp.dll'
 dll = ctypes.CDLL(os.path.join(dll_path, dll_name))
 
@@ -123,6 +124,8 @@ dll.laser_set_polarization.argtypes = (LaserHandler, PolarizationHandler)
 dll.laser_get_k.argtypes = (LaserHandler, )
 dll.laser_get_k.restype = vector3d_p
 dll.laser_set_k.argtypes = (LaserHandler, vector3d_p)
+
+dll.laser_get_kpol.argtypes = (LaserHandler, c_bool, c_size_t, c_double_p)
 
 
 # Environment
@@ -194,18 +197,28 @@ dll.state_set_label.argtypes = (StateHandler, c_char_p)
 dll.decaymap_construct.restype = DecayMapHandler
 dll.decaymap_destruct.argtypes = (DecayMapHandler, )
 
-dll.decaymap_add_decay.argtypes = (DecayMapHandler, c_char_p, c_char_p, c_double_p, c_size_t, c_double_p, c_size_t)
+dll.decaymap_add_decay.argtypes = \
+    (DecayMapHandler, c_char_p, c_char_p, c_double_p, c_size_t, c_double_p, c_size_t, c_bool)
 
 dll.decaymap_get_label.argtypes = (DecayMapHandler, c_size_t, c_size_t)
 dll.decaymap_get_label.restype = c_char_p
 
 dll.decaymap_get_a.argtypes = (DecayMapHandler, )
 
+dll.decaymap_get_a_i.argtypes = (DecayMapHandler, c_char_p, c_char_p)
+dll.decaymap_get_a_i.restype = c_double
+
+dll.decaymap_get_ae_ik.argtypes = (DecayMapHandler, c_char_p, c_char_p, c_size_t)
+dll.decaymap_get_ae_ik.restype = c_double
+
+dll.decaymap_get_am_ik.argtypes = (DecayMapHandler, c_char_p, c_char_p, c_size_t)
+dll.decaymap_get_am_ik.restype = c_double
+
+dll.decaymap_get_gamma.argtypes = (DecayMapHandler, c_char_p, c_char_p, c_bool)
+dll.decaymap_get_gamma.restype = c_double
+
 dll.decaymap_get_size.argtypes = (DecayMapHandler, )
 dll.decaymap_get_size.restype = c_size_t
-
-dll.decaymap_get_item.argtypes = (DecayMapHandler, c_char_p, c_char_p)
-dll.decaymap_get_item.restype = c_double
 
 dll.decaymap_get_k_em_max.argtypes = (DecayMapHandler, )
 dll.decaymap_get_k_em_max.restype = c_size_t
@@ -239,9 +252,6 @@ dll.atom_get_gs.restype = c_size_t
 dll.atom_get_gs.argtypes = (AtomHandler, )
 dll.atom_get_gs.restype = c_size_t_p
 
-dll.atom_get_m_e1.argtypes = (AtomHandler, c_size_t)
-dll.atom_get_m_e1.restype = c_double_p
-
 dll.atom_get_ek.argtypes = (AtomHandler, c_size_t)
 
 dll.atom_get_mk.argtypes = (AtomHandler, c_size_t)
@@ -256,12 +266,32 @@ dll.atom_get_L0.restype = c_double_p
 dll.atom_get_L1.argtypes = (AtomHandler, )
 dll.atom_get_L1.restype = c_double_p
 
+dll.atom_scattering_rate_4pi.argtypes = (AtomHandler, c_double_p, c_size_t, c_complex_p, c_size_t, c_bool,
+                                         c_size_t_p, c_size_t, c_size_t_p, c_size_t)
+
+dll.atom_scattering_rate_k.argtypes = (AtomHandler, c_double_p, c_size_t, c_complex_p, c_size_t, c_bool,
+                                       c_double_p, c_size_t,
+                                       c_size_t_p, c_size_t, c_size_t_p, c_size_t)
+
+dll.atom_scattering_rate_k_tp.argtypes = (AtomHandler, c_double_p, c_size_t, c_complex_p, c_size_t, c_bool,
+                                          c_double_p, c_double_p, c_size_t,
+                                          c_size_t_p, c_size_t, c_size_t_p, c_size_t)
+
+dll.atom_scattering_rate_qk.argtypes = (AtomHandler, c_double_p, c_size_t, c_complex_p, c_size_t, c_bool,
+                                        c_double_p, c_complex_p, c_size_t,
+                                        c_size_t_p, c_size_t, c_size_t_p, c_size_t)
+
+dll.atom_scattering_rate_qk_tp.argtypes = (AtomHandler, c_double_p, c_size_t, c_complex_p, c_size_t, c_bool,
+                                           c_double_p, c_double_p, c_complex_p, c_size_t,
+                                           c_size_t_p, c_size_t, c_size_t_p, c_size_t)
+
 
 # Interaction
 dll.interaction_construct.restype = InteractionHandler
 dll.interaction_destruct.argtypes = (InteractionHandler, )
 
 dll.interaction_update.argtypes = (InteractionHandler, )
+dll.interaction_update.restype = c_int32
 
 dll.interaction_get_environment.argtypes = (InteractionHandler, )
 dll.interaction_get_environment.restype = EnvironmentHandler

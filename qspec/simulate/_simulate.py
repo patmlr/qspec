@@ -660,7 +660,9 @@ class ScatteringRate:
         self.laser = laser
         if self.laser is None:
             self.laser = Laser(self.freq_0, intensity=1., polarization=Polarization())
-        self.s = saturation(self.laser.intensity, self.laser.freq, self.atom.decay_map.a[self.i_decay], 1.)
+        labels = self.atom.decay_map.labels[self.i_decay]
+        self.s = saturation(
+            self.laser.intensity, self.laser.freq, self.atom.decay_map.get_ae(labels[0], labels[1], 1), 1.)
         self.set_polarization(self.laser.polarization)
 
     def set_states(self):
@@ -694,7 +696,8 @@ class ScatteringRate:
          and saves it to the x attribute of the Spectrum object.
         """
         i = self.state_l[0].i
-        self.gamma = self.atom.decay_map.a[self.i_decay] / (2 * np.pi)
+        labels = self.atom.decay_map.labels[self.i_decay]
+        self.gamma = self.atom.decay_map.get_ae(labels[0], labels[1], 1) / (2 * np.pi)
         j_l = self.state_l[0].j
         j_u = self.state_u[0].j
 

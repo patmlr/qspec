@@ -51,10 +51,8 @@ def _process_q_axis(q_axis: array_like) -> ndarray:
     """
     q_axis = np.asarray(q_axis, dtype=float)
     if not q_axis.shape:
-        if q_axis % 1 != 0:
-            raise ValueError('q_axis must be an integer or a 3d-vector.')
-        elif int(q_axis) not in {0, 1, 2}:
-            raise ValueError('q_axis must be in {0, 1, 2}.')
+        if q_axis % 1 != 0 or int(q_axis) not in {0, 1, 2}:
+            raise ValueError('q_axis must be an element of {0, 1, 2} or a 3d-vector.')
         else:
             q_axis = tools.unit_vector(int(q_axis), 3)
     elif q_axis.shape != (3,):
@@ -220,6 +218,17 @@ class Laser:
         if _value.size != 3:
             raise ValueError('Interaction.k must be a 3d-vector, but has shape {}.'.format(_value.shape))
         dll.laser_set_k(self.instance, _value.flatten())
+
+    def get_kpol(self, k: int, q_axis: array_like = 2):
+        r"""
+        :param k: The multipole order $k \geq 1$.
+        :param q_axis: The quantization axis. Must be an integer in {0, 1, 2} or a 3d-vector. The default is 2 (z-axis).
+        :returns: The rank `k` tensor polarization for the given quantization axis.
+        """
+        q_axis = _process_q_axis(q_axis)
+        vector_cd_p = np.ctypeslib.ndpointer(dtype=complex, shape=(2 * int(k) + 1, ))
+        set_restype(dll.laser_get_kpol, vector_cd_p)
+        return dll.laser_get_kpol(self.instance, c_bool(True), c_size_t(k), q_axis.ctypes.data_as(c_double_p))
 
 
 def _process_hyper_const(hyper_const: array_like) -> ndarray:
@@ -663,6 +672,7 @@ class DecayMap:
                 labels = []
             self._labels = list(labels)
 
+            single_leading_order = False
             if a is None:
                 a = []
             for (s0, s1), _a in zip(self._labels, a):
@@ -680,12 +690,14 @@ class DecayMap:
                 else:
                     ae = [_a]
                     am = ae
+                    single_leading_order = True
                 ae = np.array(ae, dtype=float)
                 am = np.array(am, dtype=float)
 
                 dll.decaymap_add_decay(self.instance, c_char_p(bytes(s0, 'utf-8')), c_char_p(bytes(s1, 'utf-8')),
                                        ae.ctypes.data_as(c_double_p), c_size_t(int(ae.size)),
-                                       am.ctypes.data_as(c_double_p), c_size_t(int(am.size)))
+                                       am.ctypes.data_as(c_double_p), c_size_t(int(am.size)),
+                                       c_bool(single_leading_order))
         else:
             self._labels = self._get_labels()
 
@@ -707,13 +719,11 @@ class DecayMap:
         return self._labels
 
     @property
-    def a(self):
+    def size(self):
         """
-        :returns: The list of Einstein-A coefficients.
+        :returns: The number of linked sets of atomic states.
         """
-        vector_d_p = np.ctypeslib.ndpointer(dtype=float, shape=(self.size, ))
-        set_restype(dll.decaymap_get_a, vector_d_p)
-        return dll.decaymap_get_a(self.instance).tolist()
+        return dll.decaymap_get_size(self.instance)
 
     @property
     def k_em_max(self):
@@ -722,19 +732,53 @@ class DecayMap:
         """
         return dll.decaymap_get_k_em_max(self.instance)
 
-    @property
-    def size(self):
-        """
-        :returns: The number of linked sets of atomic states.
-        """
-        return dll.decaymap_get_size(self.instance)
+    # @property
+    # def a(self):
+    #     """
+    #     :returns: The list of Einstein-A coefficients.
+    #     """
+    #     vector_d_p = np.ctypeslib.ndpointer(dtype=float, shape=(self.size, ))
+    #     set_restype(dll.decaymap_get_a, vector_d_p)
+    #     return dll.decaymap_get_a(self.instance).tolist()
+    #
+    # def get_a(self, label_0: str, label_1: str):
+    #     """
+    #     :returns: The leading order Einstein-A coefficient of the tuple of states `(label_0, label_1)`.
+    #     """
+    #     return dll.decaymap_get_a_i(
+    #         self.instance, c_char_p(bytes(label_0, 'utf-8')), c_char_p(bytes(label_1, 'utf-8')))
 
-    def get(self, label_0: str, label_1: str):
+    def get_ae(self, label_0: str, label_1: str, k: int):
+        r"""
+        :param label_0: The label of the first state.
+        :param label_1: The label of the second state.
+        :param k: The multipole order $k \geq 1$.
+        :returns: The Einstein-A coefficient of the tuple of states `(label_0, label_1)`
+         of electric multipole order `k`.
         """
-        :returns: The leading order Einstein-A coefficient of the tuple of states `(label_0, label_0)`.
+        return dll.decaymap_get_ae_ik(
+            self.instance, c_char_p(bytes(label_0, 'utf-8')), c_char_p(bytes(label_1, 'utf-8')), c_size_t(int(k)))
+
+    def get_am(self, label_0: str, label_1: str, k: int):
+        r"""
+        :param label_0: The label of the first state.
+        :param label_1: The label of the second state.
+        :param k: The multipole order $k \geq 1$.
+        :returns: The Einstein-A coefficient of the tuple of states `(label_0, label_1)`
+         of magnetic multipole order `k`.
         """
-        return dll.decaymap_get_item(
-            self.instance, c_char_p(bytes(label_0, 'utf-8')), c_char_p(bytes(label_1, 'utf-8')))
+        return dll.decaymap_get_am_ik(
+            self.instance, c_char_p(bytes(label_0, 'utf-8')), c_char_p(bytes(label_1, 'utf-8')), c_size_t(int(k)))
+
+    def get_gamma(self, label_0: str, label_1: str, parity_equal: bool):
+        r"""
+        :param label_0: The label of the first state.
+        :param label_1: The label of the second state.
+        :param parity_equal: The parity of the transition between two states can be equal (True) or change (False).
+        :returns: The FWHM of the transition between the states with labels `(label_0, label_1)`.
+        """
+        return dll.decaymap_get_gamma(self.instance, c_char_p(bytes(label_0, 'utf-8')),
+                                      c_char_p(bytes(label_1, 'utf-8')), c_bool(bool(parity_equal)))
 
 
 def _gen_label_map(atom):
@@ -867,17 +911,6 @@ class Atom:
         set_restype(dll.atom_get_gs, vector_i_p)
         return dll.atom_get_gs(self.instance)
 
-    @property
-    def dipoles(self):
-        """
-        :returns: The dipole strengths between the atomic states in the 3 basis-components
-         of the spherical vector basis ( sigma-, pi, sigma+ ). This can be used to calculate Rabi-frequencies by
-         multiplying it with the square-root of a laser intensity in the corresponding polarization.
-         The resulting array has shape (3, size, size).
-        """
-        return np.array([np.ctypeslib.as_array(dll.atom_get_m_e1(self.instance, c_size_t(i)),
-                                               (self.size, self.size)).T for i in range(3)])
-
     def get_multipole_types(self, label_0, label_1):
         indexes = [[i, j] for i, s0 in enumerate(self.states) for j, s1 in enumerate(self.states)
                    if s0.label == label_0 and s1.label == label_1 and i < j]
@@ -986,8 +1019,123 @@ class Atom:
             f = {f}
         return np.array([i for i, s in enumerate(self.states) if s.label in labels and s.f in f], dtype=int)
 
-    def scattering_rate(self, rho: array_like, theta: array_like = None, phi: array_like = None,
-                        as_density_matrix: bool = True, i: array_like = None, j: array_like = None, axis: int = 1):
+    def scattering_rate(self, rho: array_like, as_density_matrix: bool = True, k: int = 1,
+                        theta: array_like = None, phi: array_like = None,
+                        k_vec: array_like = None, x_vec: array_like = None,
+                        i: array_like = None, f: array_like = None, axis: int = 1) -> ndarray:
+
+        rho = np.asarray(rho, dtype=complex)
+
+        if as_density_matrix:
+            axes = [j for j in range(len(rho.shape)) if j not in {axis, axis + 1}]
+            add_axes = [axis, axis + 1]
+        else:
+            axes = [j for j in range(len(rho.shape)) if j != axis]
+            add_axes = [axis]
+
+        results_shape = tuple(rho.shape[j] for j in axes)
+
+        axes += add_axes
+        rho = np.transpose(rho, axes=axes).copy()
+
+        if i is None:
+            i = np.arange(self.size, dtype=int)
+        else:
+            i = np.asarray(i, dtype=int).flatten()
+        if f is None:
+            f = np.arange(self.size, dtype=int)
+        else:
+            f = np.asarray(f, dtype=int).flatten()
+
+        as_density_matrix = c_bool(bool(as_density_matrix))
+        k = c_size_t(int(k))
+        rho = rho.ctypes.data_as(c_complex_p)
+        rho_size = c_size_t(int(np.prod(results_shape)))
+        i_size = c_size_t(i.size)
+        i = i.ctypes.data_as(c_size_t_p)
+        f_size = c_size_t(f.size)
+        f = f.ctypes.data_as(c_size_t_p)
+
+        if theta is None and phi is None:
+
+            if k_vec is None and x_vec is None:
+                results = np.zeros(results_shape, dtype=float, order='C')
+                results_c = results.ctypes.data_as(c_double_p)
+
+                dll.atom_scattering_rate_4pi(self.instance, results_c, k, rho, rho_size, as_density_matrix,
+                                             i, i_size, f, f_size)
+
+            elif x_vec is None:
+                k_vec = _cast_3d_vec(k_vec, dtype=float)
+
+                results_shape = (k_vec.shape[0], ) + results_shape
+                results = np.zeros(results_shape, dtype=float, order='C')
+                results_c = results.ctypes.data_as(c_double_p)
+
+                k_vec_size = c_size_t(k_vec.shape[0])
+                k_vec = k_vec.ctypes.data_as(c_double_p)
+
+                dll.atom_scattering_rate_k(self.instance, results_c, k, rho, rho_size, as_density_matrix,
+                                           k_vec, k_vec_size,
+                                           i, i_size, f, f_size)
+            elif k_vec is None:
+                raise ValueError('Either (\'theta\', \'phi\') or \'k_vec\' must be specified if \'x_vec\' is given.')
+
+            else:
+                k_vec = _cast_3d_vec(k_vec, dtype=float)
+                x_vec = _cast_3d_vec(x_vec, dtype=complex)
+
+                results_shape = (k_vec.shape[0], ) + results_shape
+                results = np.zeros(results_shape, dtype=float, order='C')
+                results_c = results.ctypes.data_as(c_double_p)
+
+                k_vec_size = c_size_t(k_vec.shape[0])
+                k_vec = k_vec.ctypes.data_as(c_double_p)
+                x_vec = x_vec.ctypes.data_as(c_complex_p)
+
+                dll.atom_scattering_rate_qk(self.instance, results_c, k, rho, rho_size, as_density_matrix,
+                                            k_vec, x_vec, k_vec_size,
+                                            i, i_size, f, f_size)
+
+        elif theta is None or phi is None:
+            raise ValueError('\'theta\' and \'phi\' must either both be specified or both be None.')
+
+        else:
+            if k_vec is not None:
+                raise ValueError('Both (\'theta\', \'phi\') and \'k_vec\' were specified.'
+                                 ' This is redundant. Use only one of both.')
+
+            theta = np.asarray(theta, dtype=float).flatten()
+            phi = np.asarray(phi, dtype=float).flatten()
+
+            if theta.size != phi.size:
+                raise ValueError(f'\'theta\' and \'phi\' must have the same size,'
+                                 f' but have sizes {theta.size} and {phi.size}.')
+
+            results_shape = (theta.size, ) + results_shape
+            results = np.zeros(results_shape, dtype=float, order='C')
+            results_c = results.ctypes.data_as(c_double_p)
+
+            k_vec_size = c_size_t(theta.size)
+            theta = theta.ctypes.data_as(c_double_p)
+            phi = phi.ctypes.data_as(c_double_p)
+
+            if x_vec is None:
+                dll.atom_scattering_rate_k_tp(self.instance, results_c, k, rho, rho_size, as_density_matrix,
+                                              theta, phi, k_vec_size,
+                                              i, i_size, f, f_size)
+            else:
+                x_vec = _cast_3d_vec(x_vec, dtype=complex)
+                x_vec = x_vec.ctypes.data_as(c_complex_p)
+                
+                dll.atom_scattering_rate_qk_tp(self.instance, results_c, k, rho, rho_size, as_density_matrix,
+                                               theta, phi, x_vec, k_vec_size,
+                                               i, i_size, f, f_size)
+
+        return results
+
+    def scattering_rate1(self, rho: array_like, theta: array_like = None, phi: array_like = None,
+                            as_density_matrix: bool = True, i: array_like = None, j: array_like = None, axis: int = 1):
         """
         Scattering rate of the atom into the direction
 
@@ -1051,7 +1199,7 @@ class Atom:
         a_cart = [[al.a_dipole_cart(self.states[_j].i, self.states[_j].j, self.states[_j].f, self.states[_j].m,
                                     self.states[_i].j, self.states[_i].f, self.states[_i].m)
                    * np.sqrt(2 * self.states[_j].i + 1) * np.sqrt(2 * self.states[_j].j + 1)
-                   * np.sqrt(self.decay_map.get(self.states[_j].label, self.states[_i].label))
+                   * np.sqrt(self.decay_map.get_ae(self.states[_j].label, self.states[_i].label, 1))
                    if l0[_j, _i] else np.zeros(3, dtype=complex)
                    if _i in i and _j in j else 0. for _i in range(self.size)] for _j in range(self.size)]
         e_theta = tools.e_theta(theta, phi)
@@ -1291,7 +1439,37 @@ def _cast_v(v: Optional[array_like]):
         if v.shape[1] == 3:
             return v
     raise ValueError('\'v\' must be a scalar or have shape (n, ) or (n, 3) but has shape {}.'.format(v.shape))
-    
+
+
+def _cast_3d_vec(x: Optional[array_like], dtype: type = float):
+    """
+    :param x: An array of or a single 3d vector(s). `x` must have shape (3, ) or (n, 3).
+    :param dtype: The type of the array elements of `x`.
+    :returns: The correctly shaped polarization vectors with shape (n, 3).
+    :raises ValueError: If 'x' has the wrong shape.
+    """
+    while True:
+        if x is None:
+            break
+
+        x = np.array(x, dtype=dtype, order='C')
+
+        if len(x.shape) == 0:
+            break
+
+        elif len(x.shape) == 1:
+            if x.size != 3:
+                break
+            return x[None, :]
+
+        elif len(x.shape) == 2:
+            if x.shape[1] == 3:
+                return x
+
+        break
+
+    raise ValueError('\'x\' must have shape (3, ) or (n, 3).')
+
 
 class Interaction:
     def __init__(self, atom: Atom = None, lasers: Iterable[Laser] = None, environment: Environment = None,
@@ -1358,7 +1536,9 @@ class Interaction:
 
         :returns:
         """
-        dll.interaction_update(self.instance)
+        error = dll.interaction_update(self.instance)
+        if error == -1:
+            raise ValueError('An electro-magnetic wave cannot oscillate along its k-vector.')
 
     def resonance_info(self):
         r"""
@@ -1878,7 +2058,7 @@ class Interaction:
         return results, v
 
     def scattering_rate(self, rho: array_like, theta: array_like = None, phi: array_like = None,
-                        as_density_matrix: bool = True, i: array_like = None, j: array_like = None, axis: int = 1):
+                        as_density_matrix: bool = True, i: array_like = None, f: array_like = None, axis: int = 1):
         """
         Scattering rate of the atom into the direction
 
@@ -1893,13 +2073,13 @@ class Interaction:
         :param as_density_matrix: Whether 'rho' is a state vector or a density matrix.
         :param i: The initially excited state indexes to consider for spontaneous decay.
          If None, all states are considered.
-        :param j: The final decayed state indexes to consider for spontaneous decay. If None, all states are considered.
+        :param f: The final decayed state indexes to consider for spontaneous decay. If None, all states are considered.
         :param axis: The axis along which the population is aligned in 'rho'.
         :returns: The scattering rate of the atom given the population 'rho' (MHz or Events / s).
         :raises ValueError: 'rho' must have the same size as the atom along the specified 'axis'.
         """
         return self.atom.scattering_rate(rho, theta=theta, phi=phi, as_density_matrix=as_density_matrix,
-                                         i=i, j=j, axis=axis)
+                                         i=i, f=f, axis=axis)
 
 
 def _define_colors(n: int, label_map: dict, colormap: str = None):

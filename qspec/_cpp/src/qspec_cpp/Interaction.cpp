@@ -361,15 +361,22 @@ MatrixXcd Interaction::get_hamiltonian(const double t, const VectorXd& delta, co
 	return H;
 }
 
-void Interaction::update()
+int Interaction::update()
 {
-	gen_coordinates();
-	atom->set_env(env);
-	atom->update();
-	gen_rabi();
-	gen_trees();
-	gen_conlist();
-	gen_deltamap();
+	try {
+		gen_coordinates();
+		atom->set_env(env);
+		atom->update();
+		gen_rabi();
+		gen_trees();
+		gen_conlist();
+		gen_deltamap();
+	}
+	catch (const polarization_error& e)
+	{
+		return -1;
+	}
+	return 0;
 }
 
 void Interaction::gen_coordinates()
@@ -394,8 +401,8 @@ void Interaction::gen_rabi()
 		std::array<std::vector<VectorXcd>, 2> kpol_list;  // List of polarization-k-vector tensors in helicity basis for electric and magnetic k-multipole orders.
 		for (size_t _k = 1; _k <= atom->get_decay_map()->get_k_em_max(); ++_k)
 		{
-			kpol_list.at(0).push_back(lasers.at(m)->get_kpol2(true, _k, *env->get_e_B()));
-			kpol_list.at(1).push_back(lasers.at(m)->get_kpol2(false, _k, *env->get_e_B()));
+			kpol_list.at(0).push_back(lasers.at(m)->get_kpol(true, _k, *env->get_e_B()));
+			kpol_list.at(1).push_back(lasers.at(m)->get_kpol(false, _k, *env->get_e_B()));
 			
 			/*
 			printf("%zi(%zi): ", m, _k);
@@ -717,14 +724,16 @@ std::vector<MatrixXd> Interaction::gen_R_k(VectorXd& w0, VectorXd& w)
 		{
 			for (size_t i = 0; i < j; ++i)
 			{
+				/*size_t i_decay = atom->get_decay_map()->get_index(atom->get(i)->get_label(), atom->get(j)->get_label());
 				double a = atom->get_decay_map()->get_item(atom->get(i)->get_label(), atom->get(j)->get_label());  // (*atom->get_L0())(i, j) + (*atom->get_L0())(j, i);
-				if (a == 0.) continue;
+				if (a == 0.) continue;*/
 
 				r = 4 * std::pow(std::abs(rabimap.at(m)(i, j)), 2);
-				if (r == 0) continue;
+				if (r == 0.) continue;
 
 				_w0 = abs(w0(i) - w0(j));
-				gamma = atom->get_decay_map()->get_gamma(atom->get(i)->get_label(), atom->get(j)->get_label());
+				bool parity_equal = atom->get_parity_equal(i, j);
+				gamma = atom->get_decay_map()->get_gamma(atom->get(i)->get_label(), atom->get(j)->get_label(), parity_equal);
 				R(i, j) += lorentz(w(m), _w0, gamma, r);
 				R(j, i) = R(i, j);
 			}
@@ -814,14 +823,16 @@ void Interaction::update_rates(MatrixXd& R, VectorXd& w0, VectorXd& w)
 		{
 			for (size_t i = 0; i < j; ++i)
 			{
-				double a = atom->get_decay_map()->get_item(atom->get(i)->get_label(), atom->get(j)->get_label());  // (*atom->get_L0())(i, j) + (*atom->get_L0())(j, i);
-				if (a == 0.) continue;
+				
+				/*double a = atom->get_decay_map()->get_item(atom->get(i)->get_label(), atom->get(j)->get_label());  // (*atom->get_L0())(i, j) + (*atom->get_L0())(j, i);
+				if (a == 0.) continue;*/
 
 				r = 4 * std::pow(std::abs(rabimap.at(m)(i, j)), 2);
 				if (r == 0) continue;
 
 				_w0 = abs(w0(i) - w0(j));
-				gamma = atom->get_decay_map()->get_gamma(atom->get(i)->get_label(), atom->get(j)->get_label());
+				bool parity_equal = atom->get_parity_equal(i, j);
+				gamma = atom->get_decay_map()->get_gamma(atom->get(i)->get_label(), atom->get(j)->get_label(), parity_equal);
 				R(i, j) += lorentz(w(m), _w0, gamma, r);
 				R(j, i) = R(i, j);
 			}

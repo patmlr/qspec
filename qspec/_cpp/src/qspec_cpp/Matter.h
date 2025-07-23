@@ -6,6 +6,7 @@
 #include <vector>
 #include <string>
 #include <random>
+#include <execution>
 #include <Eigen/Dense>
 
 using namespace Eigen;
@@ -114,24 +115,50 @@ class DecayMap
 {
 protected:
 	size_t size;
+	size_t k_em_max = 1;
 	std::vector<std::string> states_0;
 	std::vector<std::string> states_1;
+
 	std::vector<double> a;
-	size_t k_em_max = 2;
+
+	std::vector<bool> single_leading_order;
+	std::vector<std::vector<double>> ae;
+	std::vector<std::vector<double>> am;
 public:
 	DecayMap();
 	~DecayMap();
 	DecayMap(size_t _k_em_max);
-	DecayMap(std::vector<std::string> _states_0, std::vector<std::string> _states_1, std::vector<double> _a, size_t _k_em_max);
-	void add_decay(std::string state_0, std::string state_1, double _a);
+	void add_decay(std::string state_0, std::string state_1, std::vector<double> _ae, std::vector<double> _am, bool _single_leading_order);
+
 	size_t get_size();
-	std::vector<std::string>* get_states_0();
-	std::vector<std::string>* get_states_1();
-	std::vector<double>* get_a();
-	double get_item(std::string state_0, std::string state_1);
-	double get_gamma(std::string state_0, std::string state_1);
+
 	size_t get_k_em_max();
 	void set_k_em_max(size_t _k_em_max);
+
+	std::vector<std::string>* get_states_0();
+	std::vector<std::string>* get_states_1();
+
+	size_t get_index(std::string state_0, std::string state_1);
+
+	std::vector<double>* get_a();
+	double get_a(std::string state_0, std::string state_1);
+
+	bool get_single_leading_order(size_t i);
+	bool get_single_leading_order(std::string state_0, std::string state_1);
+
+	std::vector<std::vector<double>>* get_ae();
+	std::vector<double> get_ae(size_t i);
+	double get_ae(size_t i, size_t k);
+	std::vector<double> get_ae(std::string state_0, std::string state_1);
+	double get_ae(std::string state_0, std::string state_1, size_t k);
+
+	std::vector<std::vector<double>>* get_am();
+	std::vector<double> get_am(size_t i);
+	double get_am(size_t i, size_t k);
+	std::vector<double> get_am(std::string state_0, std::string state_1);
+	double get_am(std::string state_0, std::string state_1, size_t k);
+
+	double get_gamma(std::string state_0, std::string state_1, bool parity_equal);
 };
 
 
@@ -146,15 +173,15 @@ protected:
 	Environment* env;
 
 	std::vector<size_t> gs;
-	std::array<MatrixXd, 3> m_e1;  // -1, 0, +1
-	std::array<MatrixXd, 3> m_m1;  // -1, 0, +1
 
 	std::vector<MatrixXi> ek;
 	std::vector<MatrixXi> mk;
+	std::vector<MatrixXd> a_em;
 	std::vector<MatrixXd> d_em;
 
 	VectorXd w0;
 	VectorXd Lsum;
+	std::vector<MatrixXd> L0_k;
 	MatrixXd L0;
 	MatrixXd L1;
 
@@ -170,7 +197,6 @@ public:
 
 	void gen_frequencies(Environment* _env);
 	void gen_multipole();
-	void gen_dipole();
 	void update();
 
 	std::vector<State*>* get_states();
@@ -192,8 +218,6 @@ public:
 	State* get(size_t index);
 
 	std::vector<size_t>* get_gs();
-	std::array<MatrixXd, 3>* get_m_e1();
-	std::array<MatrixXd, 3>* get_m_m1();
 
 	std::vector<MatrixXi> get_ek();
 	MatrixXi get_ek(size_t k);
@@ -214,6 +238,12 @@ public:
 	VectorXd* get_Lsum();
 	MatrixXd* get_L0();
 	MatrixXd* get_L1();
+
+	void scattering_rate(double* results, size_t k, std::vector<MatrixXcd>& rho, std::vector<Vector3d>& k_vec, std::vector<Vector3cd>& x_vec, std::vector<size_t>& i, std::vector<size_t>& f);
+	void scattering_rate(double* results, size_t k, std::vector<MatrixXcd>& rho, std::vector<Vector3d>& k_vec, std::vector<size_t>& i, std::vector<size_t>& f);
+
+	void scattering_rate(double* results, size_t k, std::vector<MatrixXcd>& rho, std::vector<size_t>& i, std::vector<size_t>& f);
+	void scattering_rate(double* results, size_t k, std::vector<MatrixXcd>& rho, std::vector<VectorXcd>& qk, std::vector<size_t>& i, std::vector<size_t>& f);
 
 };
 

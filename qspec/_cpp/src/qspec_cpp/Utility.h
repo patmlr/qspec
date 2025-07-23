@@ -40,9 +40,12 @@ MatrixXd cast_MatrixXd(double* x, size_t size);
 MatrixXcd cast_MatrixXcd(std::complex<double>* x, size_t size);
 
 std::vector<double> cast_samples_double(double* x, size_t sample_size);
+std::vector<size_t> cast_samples_size_t(size_t* x, size_t sample_size);
 std::vector<Vector3d> cast_samples_Vector3d(double* x, size_t sample_size);
+std::vector<Vector3cd> cast_samples_Vector3cd(std::complex<double>* x, size_t sample_size);
 std::vector<VectorXd> cast_samples_VectorXd(double* x, size_t sample_size, size_t size);
 std::vector<VectorXcd> cast_samples_VectorXcd(std::complex<double>* x, size_t sample_size, size_t size);
+std::vector<MatrixXcd> cast_samples_VectorXcd_as_MatrixXcd(std::complex<double>* x, size_t sample_size, size_t size);
 std::vector<MatrixXd> cast_samples_MatrixXd(double* x, size_t sample_size, size_t size);
 std::vector<MatrixXcd> cast_samples_MatrixXcd(std::complex<double>* x, size_t sample_size, size_t size);
 
@@ -55,3 +58,6 @@ std::vector<size_t> invert_order(const std::vector<size_t>& indexes);
 double rotation_theta(Vector3d vec);
 double rotation_phi(Vector3d vec);
 Matrix3d rotation_matrix(Vector3d vec);
+
+Vector3d cast_theta_phi_vec(double theta, double phi);
+std::vector<Vector3d> cast_samples_theta_phi_vec(double* theta, double* phi, size_t sample_size);

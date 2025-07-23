@@ -1,6 +1,7 @@
 
 #include "pch.h"
 #include "Physics.h"
+#include "Light.h"
 #include "Matter.h"
 
 
@@ -295,33 +296,39 @@ DecayMap::DecayMap(size_t _k_em_max)
 	k_em_max = _k_em_max;
 }
 
-DecayMap::DecayMap(std::vector<std::string> _states_0, std::vector<std::string> _states_1, std::vector<double> _a, size_t _k_em_max)
-{
-	size = _a.size();
-	states_0 = _states_0;
-	states_1 = _states_1;
-	a = _a;
-	k_em_max = _k_em_max;
-}
-
 DecayMap::~DecayMap()
 {
 	std::vector<std::string>().swap(states_0);
 	std::vector<std::string>().swap(states_1);
 	std::vector<double>().swap(a);
+	std::vector<std::vector<double>>().swap(ae);
+	std::vector<std::vector<double>>().swap(am);
+	std::vector<bool>().swap(single_leading_order);
 }
 
-void DecayMap::add_decay(std::string state_0, std::string state_1, std::vector<double> _ae, std::vector<double> _am)
+void DecayMap::add_decay(std::string state_0, std::string state_1, std::vector<double> _ae, std::vector<double> _am, bool _single_leading_order)
 {
 	size += 1;
 	states_0.push_back(state_0);
 	states_1.push_back(state_1);
-	a.push_back(_a);
+	ae.push_back(_ae);
+	am.push_back(_am);
+	single_leading_order.push_back(_single_leading_order);
 }
 
 size_t DecayMap::get_size()
 {
 	return size;
+}
+
+size_t DecayMap::get_k_em_max()
+{
+	return k_em_max;
+}
+
+void DecayMap::set_k_em_max(size_t _k_em_max)
+{
+	k_em_max = _k_em_max;
 }
 
 std::vector<std::string>* DecayMap::get_states_0()
@@ -334,44 +341,156 @@ std::vector<std::string>* DecayMap::get_states_1()
 	return &states_1;
 }
 
+size_t DecayMap::get_index(std::string state_0, std::string state_1)
+{
+	for (size_t i = 0; i < size; ++i)
+	{
+		if ((state_0 == states_0[i] && state_1 == states_1[i])
+			|| (state_0 == states_1[i] && state_1 == states_0[i])) return i;
+	}
+	return size;
+}
+
 std::vector<double>* DecayMap::get_a()
 {
 	return &a;
 }
 
-double DecayMap::get_item(std::string state_0, std::string state_1)
+double DecayMap::get_a(std::string state_0, std::string state_1)
 {
 	for (size_t i = 0; i < size; ++i)
 	{
-		if ((state_0 == states_0[i] && state_1 == states_1[i]) 
+		if ((state_0 == states_0[i] && state_1 == states_1[i])
 			|| (state_0 == states_1[i] && state_1 == states_0[i])) return a.at(i);
 	}
 
 	return 0.;
 }
 
-double DecayMap::get_gamma(std::string state_0, std::string state_1)
+bool DecayMap::get_single_leading_order(size_t i)
 {
-	double gamma = 0;
+	if (i < size) return single_leading_order.at(i);
+	return true;
+}
+
+bool DecayMap::get_single_leading_order(std::string state_0, std::string state_1)
+{
+	size_t i = get_index(state_0, state_1);
+	return get_single_leading_order(i);
+}
+
+
+std::vector<std::vector<double>>* DecayMap::get_ae()
+{
+	return &ae;
+}
+
+std::vector<double> DecayMap::get_ae(size_t i)
+{
+	if (i < size) return ae.at(i);
+	return std::vector<double>(1);
+}
+
+double DecayMap::get_ae(size_t i, size_t k)
+{
+	if (i < size && k > 0)
+	{
+		if (ae.at(i).size() > k - 1) return ae.at(i).at(k - 1);
+		else return ae.at(i).at(0);
+	}
+	return 0.;
+}
+
+std::vector<double> DecayMap::get_ae(std::string state_0, std::string state_1)
+{
+	size_t i = get_index(state_0, state_1);
+	return get_ae(i);
+}
+
+double DecayMap::get_ae(std::string state_0, std::string state_1, size_t k)
+{
+	size_t i = get_index(state_0, state_1);
+	return get_ae(i, k);
+}
+
+std::vector<std::vector<double>>* DecayMap::get_am()
+{
+	return &am;
+}
+
+std::vector<double> DecayMap::get_am(size_t i)
+{
+	if (i < size) return am.at(i);
+	return std::vector<double>(1);
+}
+
+double DecayMap::get_am(size_t i, size_t k)
+{
+	if (i < size && k > 0)
+	{
+		if (am.at(i).size() > k - 1) return am.at(i).at(k - 1);
+		else return am.at(i).at(0);
+	}
+	return 0.;
+}
+
+std::vector<double> DecayMap::get_am(std::string state_0, std::string state_1)
+{
+	size_t i = get_index(state_0, state_1);
+	return get_am(i);
+}
+
+double DecayMap::get_am(std::string state_0, std::string state_1, size_t k)
+{
+	size_t i = get_index(state_0, state_1);
+	return get_am(i, k);
+}
+
+double DecayMap::get_gamma(std::string state_0, std::string state_1, bool parity_equal)
+{
+	double gamma = 0.;
 	for (size_t i = 0; i < size; ++i)
 	{
 		if (states_0.at(i) == state_0 || states_0.at(i) == state_1 || states_1.at(i) == state_0 || states_1.at(i) == state_1)
 		{
-			gamma += a.at(i);
-			continue;
+			if (single_leading_order.at(i)) gamma += ae.at(i).at(0);
+			else
+			{
+				if (ae.at(i).size() > 1)
+				{
+					for (size_t k = 0; k < k_em_max; ++k)
+					{
+						if (parity_equal)
+						{
+							if (k % 2 != 0) gamma += ae.at(i).at(k);
+						}
+						else
+						{
+							if (k % 2 == 0) gamma += ae.at(i).at(k);
+						}
+					}
+				}
+				else gamma += ae.at(i).at(0);
+
+				if (am.at(i).size() > 1)
+				{
+					for (size_t k = 0; k < k_em_max; ++k)
+					{
+						if (parity_equal)
+						{
+							if (k % 2 == 0) gamma += am.at(i).at(k);
+						}
+						else
+						{
+							if (k % 2 != 0) gamma += am.at(i).at(k);
+						}
+					}
+				}
+				else gamma += am.at(i).at(0);
+			}
 		}
 	}
 	return gamma;
-}
-
-size_t DecayMap::get_k_em_max()
-{
-	return k_em_max;
-}
-
-void DecayMap::set_k_em_max(size_t _k_em_max)
-{
-	k_em_max = _k_em_max;
 }
 
 
@@ -386,12 +505,8 @@ Atom::~Atom()
 	std::vector<State*>().swap(states);
 	std::vector<MatrixXi>().swap(ek);
 	std::vector<MatrixXi>().swap(mk);
+	std::vector<MatrixXd>().swap(a_em);
 	std::vector<MatrixXd>().swap(d_em);
-	for (size_t q = 0; q < 3; ++q)
-	{
-		m_e1.at(q).resize(0, 0);
-		m_m1.at(q).resize(0, 0);
-	}
 }
 
 void Atom::init(std::vector<State*> _states, DecayMap* _decays)
@@ -404,222 +519,19 @@ void Atom::init(std::vector<State*> _states, DecayMap* _decays)
 
 void Atom::update()
 {
-	// gen_dipole();
 	gen_frequencies(env);
 	gen_w0();
 	gen_multipole();
 }
 
-
-Environment* Atom::get_env()
-{
-	return env;
-}
-
-void Atom::set_env(Environment* _env)
-{
-	env = _env;
-}
-
-void Atom::gen_multipole()
-{
-	ek.clear();
-	mk.clear();
-	d_em.clear();
-	for (size_t ik = 0; ik < decays->get_k_em_max(); ++ik)
-	{
-		ek.push_back(MatrixXi::Zero(size, size));
-		mk.push_back(MatrixXi::Zero(size, size));
-		d_em.push_back(MatrixXd::Zero(size, size));
-	}
-
-	for (size_t q = 0; q < 3; ++q)  // Deprecated.
-	{
-		m_e1.at(q) = MatrixXd::Zero(size, size);
-		m_m1.at(q) = MatrixXd::Zero(size, size);
-	}
-
-	L0 = MatrixXd::Zero(size, size);
-	L1 = MatrixXd::Zero(size, size);
-	Lsum = VectorXd::Zero(size);
-
-	for (size_t i = 1; i < size; ++i)
-	{
-		for (size_t j = 0; j < i; ++j)
-		{
-			double a = decays->get_item(states[i]->get_label(), states[j]->get_label());
-			if (a == 0) continue;
-
-			size_t _i = i;
-			size_t _j = j;
-			if (states[i]->get_freq() > states[j]->get_freq())
-			{
-				_i = j;
-				_j = i;
-			}
-
-			size_t k = 1;  // get_min_k(_i, _j);
-			// printf("k(%zi, %zi): %zi\n", _i, _j, k);
-			if (k == 0) continue;
-			bool parity_equal = get_parity_equal(_i, _j);
-
-			while (k <= decays->get_k_em_max())
-			{
-				double q_val = states[_j]->get_m() - states[_i]->get_m();
-				double ak = a_multipole(static_cast<double>(k), states[_i]->get_i(), states[_i]->get_j(), states[_i]->get_f(), states[_i]->get_m(),
-																states[_j]->get_j(), states[_j]->get_f(), states[_j]->get_m(), q_val);  // This takes the time.
-				if (ak == 0.)
-				{
-					k += 1;
-					continue;
-				}
-
-				if (parity_equal)
-				{
-					if (k % 2 != 0) mk.at(k - 1)(_i, _j) = static_cast<int>(k);
-					else ek.at(k - 1)(_i, _j) = static_cast<int>(k);
-				}
-				else
-				{
-					if (k % 2 != 0) ek.at(k - 1)(_i, _j) = static_cast<int>(k);
-					else mk.at(k - 1)(_i, _j) = static_cast<int>(k);
-				}
-				mk.at(k - 1)(_j, _i) = mk.at(k - 1)(_i, _j);
-				ek.at(k - 1)(_j, _i) = ek.at(k - 1)(_i, _j);
-
-				// if (k == 1) printf("%s\n", std::format("ak({}, {}): {:.0e}", _i, _j, ak).c_str());
-				L0(_i, _j) = a * ak * ak;
-				L0(_j, _i) = 0.;
-
-				// size_t q = (4 * abs(q_val) + (sgn<double>(q_val) - abs(sgn<double>(q_val)))) / 2;
-				// double q_val = 0.5 * (1 - 2 * (q % 2)) * (q + (q % 2));
-				double norm = d_emk(k, parity_equal, a, states[i]->get_freq(), states[j]->get_freq());
-				d_em.at(k - 1)(i, j) = ak * norm;
-				d_em.at(k - 1)(j, i) = d_em.at(k - 1)(i, j);
-
-				// k += 1;  // Use only leading order for now.
-				k = decays->get_k_em_max() + 1;
-			}
-		}
-	}
-	Lsum = L0.colwise().sum();
-	for (size_t i = 0; i < size; ++i)
-	{
-		L1.row(i) += Lsum;
-		L1.col(i) += Lsum;
-	}
-	L1 *= -0.5;
-}
-
-void Atom::gen_dipole()
-{
-	L0 = MatrixXd::Zero(size, size);
-	L1 = MatrixXd::Zero(size, size);
-	Lsum = VectorXd::Zero(size);
-	for (size_t q = 0; q < 3; ++q)
-	{
-		m_e1.at(q) = MatrixXd::Zero(size, size);
-		m_m1.at(q) = MatrixXd::Zero(size, size);
-	}
-
-	size_t _i = 0;
-	size_t _j = 0;
-	for (size_t i = 1; i < size; ++i)
-	{
-		for (size_t j = 0; j < i; ++j)
-		{
-			_i = i;
-			_j = j;
-			if (states[i]->get_freq() > states[j]->get_freq())
-			{
-				_i = j;
-				_j = i;
-			}
-
-			// Calculate (F, m) reduction of dipole (e1 and m1) moments.
-			double a = decays->get_item(states[i]->get_label(), states[j]->get_label());
-			double a1 = 0.;
-			if (abs(states[_i]->get_j() - states[_j]->get_j()) < 1.1 
-				&& abs(states[_i]->get_f() - states[_j]->get_f()) < 1.1
-				&& abs(states[_i]->get_m() - states[_j]->get_m()) < 1.1)  // Check dipole condition before calling a_dipole.
-			{
-				a1 = a_dipole(states[_i]->get_i(), states[_i]->get_j(), states[_i]->get_f(), states[_i]->get_m(),
-					states[_j]->get_j(), states[_j]->get_f(), states[_j]->get_m(), states[_j]->get_m() - states[_i]->get_m());  // This takes the time.
-			}
-
-			L0(_i, _j) = a * a1 * a1;
-			L0(_j, _i) = 0.;
-
-			if (states[i]->get_freq() == states[j]->get_freq()) continue;
-
-			size_t q = 1;
-			if (states[_j]->get_m() - states[_i]->get_m() < 0) q = 0;
-			else if (states[_j]->get_m() - states[_i]->get_m() > 0) q = 2;
-			
-			if (states[i]->get_parity() != states[j]->get_parity())
-			{
-				double norm = d_e1(a, states[i]->get_freq(), states[j]->get_freq());
-				m_e1.at(q)(i, j) = norm * a1;
-				m_e1.at(q)(j, i) = m_e1.at(q)(i, j);
-			}
-			else
-			{
-				double norm = d_m1(a, states[i]->get_freq(), states[j]->get_freq());
-				m_m1.at(q)(i, j) = norm * a1;
-				m_m1.at(q)(j, i) = m_m1.at(q)(i, j);
-			}
-		}
-	}
-	Lsum = L0.colwise().sum();
-	for (size_t i = 0; i < size; ++i)
-	{
-		L1.row(i) += Lsum;
-		L1.col(i) += Lsum;
-	}
-	L1 *= -0.5;
-}
-
-void Atom::gen_frequencies(Environment* _env)
-{
-	std::set<size_t> done;
-	for (size_t k = 0; k < size; ++k)
-	{
-		if (done.count(k)) continue;
-
-		State& s = *states.at(k);
-		if (_env->get_B() == 0)
-		{
-			s.reset();
-			done.insert(k);
-			continue;
-		}
-
-		std::vector<double> freqs = hyper_zeeman_num(s.get_i(), s.get_j(), s.get_m(), s.get_gj(), s.get_gi(), s.get_hyper_const(), _env->get_B());
-
-		double f_min = max(abs(s.get_m()), abs(s.get_i() - s.get_j()));
-		size_t i = static_cast<size_t>(s.get_f() - f_min);
-		s.set_shift(freqs.at(i));
-		done.insert(k);
-
-		// The below section can be omitted. But it should increase the execution speed by using the already found eigenvalues for the other states.
-		for (size_t l = 0; l < size; ++l)
-		{
-			if (done.count(l)) continue;
-
-			State& s_mix = *states.at(l);
-			if (s_mix.get_i() == s.get_i() && s_mix.get_j() == s.get_j() && s_mix.get_m() == s.get_m() && s_mix.get_freq_j() == s.get_freq_j())
-			{
-				size_t i = static_cast<size_t>(s_mix.get_f() - f_min);
-				s_mix.set_shift(freqs.at(i));
-				done.insert(l);
-			}
-		}
-	}
-}
-
 size_t Atom::get_size()
 {
 	return size;
+}
+
+std::vector<State*>* Atom::get_states()
+{
+	return &states;
 }
 
 void Atom::add_state(State* state)
@@ -634,17 +546,6 @@ void Atom::clear_states()
 	states.clear();
 	gs.clear();
 	size = 0;
-}
-
-void Atom::gen_w0()
-{
-	w0.resize(size);
-	for (size_t i = 0; i < size; ++i) w0(i) = 2 * sc::pi * get(i)->get_freq();
-}
-
-std::vector<State*>* Atom::get_states()
-{
-	return &states;
 }
 
 DecayMap* Atom::get_decay_map()
@@ -667,71 +568,6 @@ void Atom::set_mass(double _mass)
 	mass = _mass;
 }
 
-size_t Atom::get_min_k(size_t i, size_t j)
-{
-	State& s0 = *states.at(i);
-	State& s1 = *states.at(j);
-	bool parity_equal = get_parity_equal(i, j);
-	size_t ne = s0.get_l().size();
-
-	size_t dj = s1.get_j() - s0.get_j();
-	size_t ds = 0;
-	size_t dl = 0;
-	size_t n = 0;
-	for (size_t ie = 0; ie < ne; ++ie)
-	{
-		size_t _ds = static_cast<size_t>(abs(s1.get_s().at(ie) - s0.get_s().at(ie)));
-		size_t _dl = static_cast<size_t>(abs(s1.get_l().at(ie) - s0.get_l().at(ie)));
-		if (_ds > 0 || _dl > 0) ++n;
-		ds += _ds;
-		dl += _dl;
-	}
-
-	// printf("%d %zi [dl, ds](%zi, %zi): [%zi, %zi]\n", parity_equal, n, i, j, dl, ds);
-	if (n > 1 || ds > 1) return 0;
-	else
-	{
-		if (ne == 1 && s0.get_s().at(0) == 0.5)
-		{
-			if (parity_equal)
-			{
-				if (dl % 2 != 0) return 0;
-			}
-			else
-			{
-				if (dl % 2 == 0) return 0;
-			}
-			return max(1, dl);
-		}
-		else
-		{
-			if (ds == 0)
-			{
-				if (parity_equal && dl == 1) return 2;
-				// printf("%zi, %zi", dl, max(1, dl));
-				return max(1, dl);
-			}
-			else
-			{
-				if (dl < 3) return 1;
-				else
-				{
-					if (parity_equal)
-					{
-						if (dl % 2 != 0) return dl - 1;
-					}
-					else
-					{
-						if (dl % 2 == 0) return dl - 1;
-					}
-					return dl;
-				}
-			}
-		}
-	}
-	return 0;
-}
-
 bool Atom::get_parity_equal(size_t i, size_t j)
 {
 	return states.at(i)->get_parity() == states.at(j)->get_parity();
@@ -740,16 +576,6 @@ bool Atom::get_parity_equal(size_t i, size_t j)
 std::vector<size_t>* Atom::get_gs()
 {
 	return &gs;
-}
-
-std::array<MatrixXd, 3>* Atom::get_m_e1()
-{
-	return &m_e1;
-}
-
-std::array<MatrixXd, 3>* Atom::get_m_m1()
-{
-	return &m_m1;
 }
 
 std::vector<MatrixXi> Atom::get_ek()
@@ -840,6 +666,402 @@ MatrixXd* Atom::get_L1()
 State* Atom::get(size_t index)
 {
 	return states[index];
+}
+
+Environment* Atom::get_env()
+{
+	return env;
+}
+
+void Atom::set_env(Environment* _env)
+{
+	env = _env;
+}
+
+void Atom::gen_multipole()
+{
+	ek.clear();
+	mk.clear();
+	d_em.clear();
+	for (size_t ik = 0; ik < decays->get_k_em_max(); ++ik)
+	{
+		ek.push_back(MatrixXi::Zero(size, size));
+		mk.push_back(MatrixXi::Zero(size, size));
+		a_em.push_back(MatrixXd::Zero(size, size));
+		d_em.push_back(MatrixXd::Zero(size, size));
+	}
+
+	L0 = MatrixXd::Zero(size, size);
+	L1 = MatrixXd::Zero(size, size);
+	Lsum = VectorXd::Zero(size);
+
+	bool leading_order_e_set = false;
+	bool leading_order_m_set = false;
+	std::vector<size_t> leading_order_e(decays->get_size(), 1);
+	std::vector<size_t> leading_order_m(decays->get_size(), 1);
+	for (size_t k = 1; k <= decays->get_k_em_max(); ++k)
+	{
+		// printf("%zi\n", k);
+		for (size_t i = 1; i < size; ++i)
+		{
+			for (size_t j = 0; j < i; ++j)
+			{
+				size_t i_decay = decays->get_index(states[i]->get_label(), states[j]->get_label());
+				if (i_decay == decays->get_size()) continue;
+				if (not leading_order_e_set) leading_order_e.at(i_decay) = k + 1;
+				if (not leading_order_m_set) leading_order_m.at(i_decay) = k + 1;
+
+				bool parity_equal = get_parity_equal(i, j);
+				double a = 0.;
+
+				bool electric = true;
+				if ((parity_equal && k % 2 != 0) || (not parity_equal && k % 2 == 0)) electric = false;
+
+				if (electric)
+				{
+					if (k > leading_order_e.at(i_decay)) continue;
+					a = decays->get_ae(i_decay, k);
+				}
+				else
+				{
+					if (k > leading_order_m.at(i_decay)) continue;
+					a = decays->get_am(i_decay, k);
+				}
+
+				// printf("a: %.9f\n", a);
+				if (a == 0.) continue;
+
+				size_t _i = i;
+				size_t _j = j;
+				if (states[i]->get_freq() > states[j]->get_freq())
+				{
+					_i = j;
+					_j = i;
+				}
+
+				double q_val = states[_j]->get_m() - states[_i]->get_m();
+				double ak = a_multipole(static_cast<double>(k), states[_i]->get_i(), states[_i]->get_j(), states[_i]->get_f(), states[_i]->get_m(),
+																states[_j]->get_j(), states[_j]->get_f(), states[_j]->get_m(), q_val);  // This takes the time.
+				if (ak == 0.) continue;
+
+				if (electric) ek.at(k - 1)(_i, _j) = static_cast<int>(k);
+				else mk.at(k - 1)(_i, _j) = static_cast<int>(k);
+				mk.at(k - 1)(_j, _i) = mk.at(k - 1)(_i, _j);
+				ek.at(k - 1)(_j, _i) = ek.at(k - 1)(_i, _j);
+
+				// printf("%s\n", std::format("ak({}, {}): {:.0e}", _i, _j, ak).c_str());
+				L0(_i, _j) += a * ak * ak;
+				L0(_j, _i) = 0.;
+
+				// size_t q = (4 * abs(q_val) + (sgn<double>(q_val) - abs(sgn<double>(q_val)))) / 2;
+				// double q_val = 0.5 * (1 - 2 * (q % 2)) * (q + (q % 2));
+				double norm = d_emk(k, parity_equal, a, states[i]->get_freq(), states[j]->get_freq());
+				a_em.at(k - 1)(_i, _j) = ak;
+				a_em.at(k - 1)(_j, _i) = a_em.at(k - 1)(_i, _j);
+				d_em.at(k - 1)(_i, _j) = ak * norm;
+				d_em.at(k - 1)(_j, _i) = d_em.at(k - 1)(_i, _j);
+
+				if (decays->get_single_leading_order(i_decay))
+				{
+					leading_order_e.at(i_decay) = k;
+					leading_order_m.at(i_decay) = k;
+					leading_order_e_set = true;
+					leading_order_m_set = true;
+				}
+				else
+				{
+					if (electric && decays->get_ae(i_decay).size() == 1)
+					{
+						leading_order_e.at(i_decay) = k;
+						leading_order_e_set = true;
+					}
+					if (not electric && decays->get_am(i_decay).size() == 1)
+					{
+						leading_order_m.at(i_decay) = k;
+						leading_order_m_set = true;
+					}
+				}
+			}
+		}
+	}
+	Lsum = L0.colwise().sum();
+	for (size_t i = 0; i < size; ++i)
+	{
+		L1.row(i) += Lsum;
+		L1.col(i) += Lsum;
+	}
+	L1 *= -0.5;
+}
+
+void Atom::gen_frequencies(Environment* _env)
+{
+	std::set<size_t> done;
+	for (size_t k = 0; k < size; ++k)
+	{
+		if (done.count(k)) continue;
+
+		State& s = *states.at(k);
+		if (_env->get_B() == 0)
+		{
+			s.reset();
+			done.insert(k);
+			continue;
+		}
+
+		std::vector<double> freqs = hyper_zeeman_num(s.get_i(), s.get_j(), s.get_m(), s.get_gj(), s.get_gi(), s.get_hyper_const(), _env->get_B());
+
+		double f_min = max(abs(s.get_m()), abs(s.get_i() - s.get_j()));
+		size_t i = static_cast<size_t>(s.get_f() - f_min);
+		s.set_shift(freqs.at(i));
+		done.insert(k);
+
+		// The below section can be omitted. But it should increase the execution speed by using the already found eigenvalues for the other states.
+		for (size_t l = 0; l < size; ++l)
+		{
+			if (done.count(l)) continue;
+
+			State& s_mix = *states.at(l);
+			if (s_mix.get_i() == s.get_i() && s_mix.get_j() == s.get_j() && s_mix.get_m() == s.get_m() && s_mix.get_freq_j() == s.get_freq_j())
+			{
+				size_t i = static_cast<size_t>(s_mix.get_f() - f_min);
+				s_mix.set_shift(freqs.at(i));
+				done.insert(l);
+			}
+		}
+	}
+}
+
+void Atom::gen_w0()
+{
+	w0.resize(size);
+	for (size_t i = 0; i < size; ++i) w0(i) = 2 * sc::pi * get(i)->get_freq();
+}
+
+void Atom::scattering_rate(double* results, size_t k, std::vector<MatrixXcd>& rho, std::vector<Vector3d>& k_vec, std::vector<Vector3cd>& x_vec, std::vector<size_t>& i, std::vector<size_t>& f)
+{
+	if (k < 1 || k > decays->get_k_em_max()) return;
+
+	std::vector<VectorXcd> qk(k_vec.size(), VectorXcd::Zero(2 * k + 1));
+
+	Polarizationk kpol = Polarizationk(*env->get_e_B());
+	for (size_t index_qk = 0; index_qk < k_vec.size(); ++index_qk)
+	{
+		kpol.init_qk(x_vec.at(index_qk), k_vec.at(index_qk));
+		qk.at(index_qk) = spherical_tensor(true, k, kpol.get_qk(), kpol.get_theta_k(), kpol.get_phi_k());
+	}
+
+	scattering_rate(results, k, rho, qk, i, f);
+}
+
+void Atom::scattering_rate(double* results, size_t k, std::vector<MatrixXcd>& rho, std::vector<Vector3d>& k_vec, std::vector<size_t>& i, std::vector<size_t>& f)
+{
+	if (k < 1 || k > decays->get_k_em_max()) return;
+
+	std::vector<VectorXcd> qk_0(k_vec.size(), VectorXcd::Zero(2 * k + 1));
+	std::vector<VectorXcd> qk_1(k_vec.size(), VectorXcd::Zero(2 * k + 1));
+
+	Polarizationk kpol = Polarizationk(*env->get_e_B());
+	for (size_t index_qk = 0; index_qk < k_vec.size(); ++index_qk)
+	{
+		Vector3d _k_vec = k_vec.at(index_qk);
+		// printf("k_vec: %.3f, %.3f, %.3f\n", _k_vec(0), _k_vec(1), _k_vec(2));
+
+		Vector3d x = Vector3d::Zero();
+		x(0) = _k_vec(1) - _k_vec(2);
+		x(1) = _k_vec(2) - _k_vec(0);
+		x(2) = _k_vec(0) - _k_vec(1);
+		x /= x.norm();
+		// printf("x_sc: %.3f, %.3f, %.3f\n", x(0), x(1), x(2));
+
+		kpol.init_qk(x, _k_vec);
+		qk_0.at(index_qk) = spherical_tensor(true, k, kpol.get_qk(), kpol.get_theta_k(), kpol.get_phi_k());
+
+		Vector3d y = Vector3d::Zero();
+		y = _k_vec.cross(x);
+		y /= y.norm();
+		// printf("y_sc: %.3f, %.3f, %.3f\n", y(0), y(1), y(2));
+		kpol.init_qk(y, _k_vec);
+		qk_1.at(index_qk) = spherical_tensor(true, k, kpol.get_qk(), kpol.get_theta_k(), kpol.get_phi_k());
+	}
+
+	scattering_rate(results, k, rho, qk_0, i, f);
+	// printf("--------------------------------\n");
+	scattering_rate(results, k, rho, qk_1, i, f);
+}
+
+void Atom::scattering_rate(double* results, size_t k, std::vector<MatrixXcd>& rho, std::vector<VectorXcd>& qk, std::vector<size_t>& i, std::vector<size_t>& f)
+{
+	if (k < 1 || k > decays->get_k_em_max()) return;
+
+	std::vector<size_t> indexes(rho.size() * qk.size());
+	std::iota(indexes.begin(), indexes.end(), 0);
+
+	// printf("qk: %.3f + %.3fi, %.3f + %.3fi, %.3f + %.3fi\n", qk.at(0)(0).real(), qk.at(0)(0).imag(), qk.at(0)(1).real(), qk.at(0)(1).imag(), qk.at(0)(2).real(), qk.at(0)(2).imag());
+	std::for_each(std::execution::par_unseq, indexes.begin(), indexes.end(),
+		[this, results, rho, qk, k, i, f](size_t index)
+		{
+			size_t index_qk = index / rho.size();
+			size_t index_rho = index % rho.size();
+			// printf("%zi, %zi, %zi, %zi\n", index_qk, index_rho, qk.size(), rho.size());
+
+			double k_double = static_cast<double>(k);
+
+			std::complex<double> _result = 0.;
+			for (size_t _f : f)
+			{
+				for (size_t _i : i)
+				{
+					double delta_mi = states.at(_i)->get_m() - states.at(_f)->get_m();
+					if (std::abs(delta_mi) > k_double) continue;
+
+					size_t i_qk = static_cast<size_t>(delta_mi + k_double);
+
+					double d_fi = a_em.at(k - 1)(_f, _i);
+
+					if (rho.at(index_rho).outerSize() == 1)
+					{
+						double norm = pow(std::abs(d_fi), 2);
+						if (norm == 0.) continue;
+
+						double a_if = L0(_f, _i);
+						if (a_if == 0.) continue;
+
+						std::complex<double> y = a_if;
+						// printf("y0: %s\n", std::format("{:.3e} + i{:.3e}", y.real(), y.imag()).c_str());
+						y *= rho.at(index_rho)(_i);
+						// printf("y1: %s\n", std::format("{:.3e} + i{:.3e}", y.real(), y.imag()).c_str());
+						y *= pow(std::abs(d_fi * qk.at(index_qk)(i_qk)), 2);
+						// printf("y2: %s\n", std::format("{:.3e} + i{:.3e}", y.real(), y.imag()).c_str());
+						y /= norm;
+
+						_result += y;
+
+					}
+					else
+					{
+						for (size_t _j : i)
+						{
+							double delta_mj = states.at(_j)->get_m() - states.at(_f)->get_m();
+							if (std::abs(delta_mj) > k_double) continue;
+
+							size_t j_qk = static_cast<size_t>(delta_mj + k_double);
+
+							double d_jf = a_em.at(k - 1)(_j, _f);
+							double norm = std::abs(d_fi) * std::abs(d_jf);
+							if (norm == 0.) continue;
+
+							double a_ijf = L0(_f, _i) * L0(_f, _j);
+							if (a_ijf == 0.) continue;
+
+							std::complex<double> y = sqrt(a_ijf);  // *pow(-1., static_cast<double>(j_qk) - static_cast<double>(k))* pow(-1., static_cast<double>(i_qk) - static_cast<double>(k)); // * (2 * states.at(_f)->get_i() + 1) * (2 * states.at(_f)->get_j() + 1);
+							// printf("y0: %s\n", std::format("{:.3e} + i{:.3e}", y.real(), y.imag()).c_str());
+							y *= rho.at(index_rho)(_j, _i);
+							// if (index_rho == 201) printf("rho: %s\n", std::format("({}, {}): {:.3e} + {:.3e}i", _i, _j, rho.at(index_rho)(_j, _i).real(), rho.at(index_rho)(_j, _i).imag()).c_str());
+							// printf("y1: %s\n", std::format("{:.3e} + i{:.3e}", y.real(), y.imag()).c_str());
+							y *= qk.at(index_qk)(i_qk) * d_fi * std::conj(qk.at(index_qk)(j_qk)) * d_jf;
+							// printf("y2: %s\n", std::format("{:.3e} + i{:.3e}", y.real(), y.imag()).c_str());
+							y /= norm;
+							// printf("y3: %s\n", std::format("{:.3e} + i{:.3e}", y.real(), y.imag()).c_str());
+
+							_result += y;
+						}
+					}
+				}
+			}
+			_result *= (2 * k_double + 1) / (8. * sc::pi);
+			// printf("%s\n", std::format("r{}: {:.3e} + {:.3e}i", index_rho, _result.real(), _result.imag()).c_str());
+			results[index] += _result.real();
+		}
+	);
+}
+
+void Atom::scattering_rate(double* results, size_t k, std::vector<MatrixXcd>& rho, std::vector<size_t>& i, std::vector<size_t>& f)
+{
+	if (k < 1 || k > decays->get_k_em_max()) return;
+
+	size_t index = 0;
+	for (MatrixXcd _rho : rho)
+	{
+		double _result = 0.;
+		for (size_t _f : f)
+		{
+			for (size_t _i : i)
+			{
+				size_t i_qk = static_cast<size_t>(states.at(_i)->get_m() - states.at(_f)->get_m() + static_cast<double>(k));
+				double d_fi = d_em.at(k - 1)(_f, _i);
+
+				if (_rho.outerSize() == 1) _result += L0(_f, _i) * _rho(_i).real();
+				else _result += L0(_f, _i) * _rho(_i, _i).real();
+			}
+		}
+
+		results[index] += _result;
+		index += 1;
+	}
+}
+
+size_t Atom::get_min_k(size_t i, size_t j)
+{
+	State& s0 = *states.at(i);
+	State& s1 = *states.at(j);
+	bool parity_equal = get_parity_equal(i, j);
+	size_t ne = s0.get_l().size();
+
+	size_t ds = 0;
+	size_t dl = 0;
+	size_t n = 0;
+	for (size_t ie = 0; ie < ne; ++ie)
+	{
+		size_t _ds = static_cast<size_t>(abs(s1.get_s().at(ie) - s0.get_s().at(ie)));
+		size_t _dl = static_cast<size_t>(abs(s1.get_l().at(ie) - s0.get_l().at(ie)));
+		if (_ds > 0 || _dl > 0) ++n;
+		ds += _ds;
+		dl += _dl;
+	}
+
+	// printf("%d %zi [dl, ds](%zi, %zi): [%zi, %zi]\n", parity_equal, n, i, j, dl, ds);
+	if (n > 1 || ds > 1) return 0;
+	else
+	{
+		if (ne == 1 && s0.get_s().at(0) == 0.5)
+		{
+			if (parity_equal)
+			{
+				if (dl % 2 != 0) return 0;
+			}
+			else
+			{
+				if (dl % 2 == 0) return 0;
+			}
+			return max(1, dl);
+		}
+		else
+		{
+			if (ds == 0)
+			{
+				if (parity_equal && dl == 1) return 2;
+				// printf("%zi, %zi", dl, max(1, dl));
+				return max(1, dl);
+			}
+			else
+			{
+				if (dl < 3) return 1;
+				else
+				{
+					if (parity_equal)
+					{
+						if (dl % 2 != 0) return dl - 1;
+					}
+					else
+					{
+						if (dl % 2 == 0) return dl - 1;
+					}
+					return dl;
+				}
+			}
+		}
+	}
+	return 0;
 }
 
 

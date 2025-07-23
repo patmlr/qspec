@@ -118,7 +118,7 @@ public:
 	MatrixXd* get_deltamap();
 	MatrixXcd get_hamiltonian(const double t, const VectorXd& delta, const Vector3d& v);
 
-	void update();
+	int update();
 	void gen_coordinates();
 	void gen_rabi();
 	void gen_trees();

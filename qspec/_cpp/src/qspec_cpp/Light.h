@@ -9,6 +9,11 @@
 using namespace Eigen;
 typedef std::complex<double> dcomp;
 
+class polarization_error : public std::runtime_error {
+public:
+	polarization_error(const std::string& message) : std::runtime_error(message) {}
+};
+
 class Polarization
 {
 protected:
@@ -54,7 +59,9 @@ protected:
 
 public:
 	Polarizationk();
+	Polarizationk(Vector3d _q_axis);
 	void init(Vector3cd _x, Vector3d _k, Vector3d _q_axis);
+	void init_qk(Vector3cd _x, Vector3d _k);
 
 	void infer_qk();
 	void def_q_axis(Vector3d _q_axis);
@@ -96,6 +103,5 @@ public:
 	void set_k(Vector3d _k);
 	Vector3d get_kn();
 
-	VectorXcd get_kpol(size_t k);
-	VectorXcd get_kpol2(bool electric, size_t k, Vector3d q_axis);
+	VectorXcd get_kpol(bool electric, size_t k, Vector3d q_axis);
 };

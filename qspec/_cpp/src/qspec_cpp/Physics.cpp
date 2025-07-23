@@ -57,29 +57,10 @@ std::complex<double> wigner_D_qm(size_t j, int q, int m, double theta, double ph
     return exp(sc::i * static_cast<double>(m) * phi) * wigner_d_qm(j, q, m, theta);
 }
 
-
-std::complex<double> spherical_tensor(size_t j, int m, std::complex<double> q_i, Vector3cd& k, std::vector<int>& q)
-{
-    if (q.size() == j)
-    {
-        if (std::accumulate(q.begin(), q.end(), 0) == m) return q_i;
-        else return 0.;
-    }
-
-    std::complex<double> ret = 0.;
-    for (size_t i = 0; i < 3; ++i)
-    {
-        std::vector<int> q_new = q;
-        q_new.push_back(static_cast<int>(i) - 1);
-        ret += spherical_tensor(j, m, q_i * k(i), k, q_new);
-    }
-    return ret;
-}
-
-VectorXcd spherical_tensor_vec(bool electric, size_t j, Vector3cd qk, double theta, double phi)
+VectorXcd spherical_tensor(bool electric, size_t k, Vector3cd qk, double theta, double phi)
 {
     // printf("theta, phi: %.3f, %.3f\n", theta, phi);
-    VectorXcd ret = VectorXcd::Zero(2 * j + 1);
+    VectorXcd ret = VectorXcd::Zero(2 * k + 1);
 
     double pm = 1.;  // -1.;
     std::complex<double> phase = 1.;  // sc::i;
@@ -88,15 +69,19 @@ VectorXcd spherical_tensor_vec(bool electric, size_t j, Vector3cd qk, double the
         phase = 1.;
     }
 
-    for (size_t im = 0; im < 2 * j + 1; ++im)
+    for (size_t im = 0; im < 2 * k + 1; ++im)
     {
-        int m = static_cast<int>(im) - static_cast<int>(j);
-        ret(im) = qk(0) * wigner_D_qm(j, 1, -m, theta, phi) + pm * qk(2) * wigner_D_qm(j, -1, -m, theta, phi);
+        int m = static_cast<int>(im) - static_cast<int>(k);
+        ret(im) = qk(0) * wigner_D_qm(k, 1, -m, theta, phi) + pm * qk(2) * wigner_D_qm(k, -1, -m, theta, phi);
 
+        if (abs(ret(im).real()) < 1e-15) ret.real()(im) = 0.;
+        if (abs(ret(im).imag()) < 1e-15) ret.imag()(im) = 0.;
     }
+    ret *= phase;
+    ret /= ret.norm();
 
-    double _j = static_cast<double>(j);
-    return phase * ret;  // sqrt((_j + 1.) / (2. * _j)) / double_factorial(2. * _j - 1.)
+    // double _k = static_cast<double>(k);
+    return ret;  // sqrt((_k + 1.) / (2. * _k)) / double_factorial(2. * _k - 1.)
 }
 
 double d_e1(double a, double freq_0, double freq_1)

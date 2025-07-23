@@ -31,8 +31,7 @@ extern double mu_N;
 
 double wigner_d_qm(size_t j, int q, int m, double theta);
 std::complex<double> wigner_D_qm(size_t j, int q, int m, double theta, double phi);
-std::complex<double> spherical_tensor(size_t j, int m, std::complex<double> q_i, Vector3cd& k, std::vector<int>& q);
-VectorXcd spherical_tensor_vec(bool electric, size_t j, Vector3cd qk, double theta, double phi);
+VectorXcd spherical_tensor(bool electric, size_t k, Vector3cd qk, double theta, double phi);
 
 double d_e1(double a, double freq_0, double freq_1);
 double d_m1(double a, double freq_0, double freq_1);
