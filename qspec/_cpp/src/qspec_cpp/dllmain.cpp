@@ -119,6 +119,7 @@ extern "C"
 
     __declspec(dllexport) double* laser_get_k(Laser* laser)
     {
+        printf("%.3f, %.3f, %.3f\n", laser->get_k()(0), laser->get_k()(1), laser->get_k()(2));
         return laser->get_k().data();
     }
 

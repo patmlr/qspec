@@ -404,13 +404,13 @@ void Interaction::gen_rabi()
 			kpol_list.at(0).push_back(lasers.at(m)->get_kpol(true, _k, *env->get_e_B()));
 			kpol_list.at(1).push_back(lasers.at(m)->get_kpol(false, _k, *env->get_e_B()));
 			
-			/*
+			
 			printf("%zi(%zi): ", m, _k);
 			for (size_t i = 0; i < kpol_list.at(0).back().size(); ++i)
 			{
 				printf("%.3f + %.3fj, ", kpol_list.at(0).back()(i).real(), kpol_list.at(0).back()(i).imag());
 			}
-			printf("\n");*/
+			printf("\n");/**/
 		}
 
 

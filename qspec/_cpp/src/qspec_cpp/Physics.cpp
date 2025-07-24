@@ -28,6 +28,9 @@ extern double sc::mu_N = 5.0507837461e-27;
 double wigner_d_qm(size_t j, int q, int m, double theta)
 {
     int _j = static_cast<int>(j);
+    double jd = static_cast<double>(j);
+    double qd = static_cast<double>(q);
+    double md = static_cast<double>(m);
 
     int N = min(j + q, min(j - q, min(j + m, j - m))) + 1;
     std::vector<int> k_list;
@@ -42,11 +45,14 @@ double wigner_d_qm(size_t j, int q, int m, double theta)
     double ret = 0.;
     for (int k: k_list)
     {
+        double kd = static_cast<double>(k);
         ret += pow(-1, k) * pow(cos(0.5 * theta), q + m + 2 * k) * pow(sin(0.5 * theta), 2 * _j - q - m - 2 * k) 
-            / (factorial(k) * factorial(_j - q - k) * factorial(_j - m - k) * factorial(q + m + k));
-        // printf("fac: %d\n", factorial(k) * factorial(_j - q - k) * factorial(_j - m - k) * factorial(q + m + k));
+            / static_cast<double>(factorial(kd) * factorial(jd - qd - kd) * factorial(jd - md - kd) * factorial(qd + md + kd));
+        // printf("fac: %.3f\n", factorial(kd) * factorial(jd - qd - kd) * factorial(jd - md - kd) * factorial(qd + md + kd));
     }
-    return ret * pow(-1, _j - m) * sqrt(factorial(_j + q) * factorial(_j - q) * factorial(_j + m) * factorial(_j - m));
+    // printf("sqrt_arg: %.3f\n", factorial(jd + qd) * factorial(jd - qd) * factorial(jd + md) * factorial(jd - md));
+    // printf("-1: %.3f\n", pow(-1, _j - m));
+    return ret * pow(-1, _j - m) * sqrt(factorial(jd + qd) * factorial(jd - qd) * factorial(jd + md) * factorial(jd - md));
 }
 
 
@@ -128,7 +134,7 @@ double a_multipole(double k, double i, double j_l, double f_l, double m_l, doubl
     double cg = clebschGordan(f_l, k, f_u, m_l, q, m_u);
     // if (w6j_n != w6j) printf("w6j: %s\n", std::format("{:.3e}", w6j_n - w6j).c_str());
     // if (cg_n != cg) printf("cg: %s\n", std::format("{:.3e}", cg_n - cg).c_str());
-    // if (k == 1.) printf("%s\n", std::format("  w6j,   cg: {:.3e}, {:.3e}", w6j, cg).c_str());
+    // printf("%s\n", std::format("  w6j,   cg: {:.3e}, {:.3e}", w6j, cg).c_str());
     // if (k == 1.) printf("%s\n", std::format("w6j_n, cg_n: {:.3e}, {:.3e}", w6j_n, cg_n).c_str());
     return pow(-1, exp) * sqrt_f * sqrt_j * w6j * cg;  // wigner6j(j_u, j_l, 1, f_l, f_u, i) * clebschGordan(f_u, f_l, 1, m_u, m_l, q)
 }
