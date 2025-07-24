@@ -310,7 +310,7 @@ def example(n=None):
         f_p = 7e8
         a_p = 100.
 
-        i = 0.5
+        i = 1.5
         s_hyper = [0.]
         p_hyper = [10.]
 
@@ -592,33 +592,49 @@ def example(n=None):
 
     if 9 in n:
 
-        f_p = 7e8
-        a_p = 100.
+        f_eg = 7e8
+        a_eg = 1.
+
+        g_hyper = [0.]
+        e_hyper = [5.]
 
         i = 0.
-        s_hyper = [0.]
-        p_hyper = [5.]
+        jg = 2.
+        je = 4.
+        dm = 1
 
-        s = sim.construct_electronic_state(freq_0=0, s=0, l=0, j=0, i=i, hyper_const=s_hyper, label='s')
-        p = sim.construct_electronic_state(freq_0=f_p, s=0, l=1, j=1, i=i, hyper_const=p_hyper, label='p')
+        g = sim.State(0., parity='e', j=jg, i=i, f=jg + i, m=jg + i, hyper_const=g_hyper, label='g')
+        e = sim.State(f_eg, parity='e', j=je, i=i, f=je + i, m=je + i - 2 + dm, hyper_const=e_hyper, label='e')
 
-        decay = sim.DecayMap(labels=[('s', 'p')], a=[a_p])
+        decay = sim.DecayMap(labels=[('g', 'e')], a=[{'e2': a_eg}], k_max=2)
 
-        states = s + p
-        he = sim.Atom(states=states, decay_map=decay)
-        # he.plot()
+        states = [g, e]
+        atom = sim.Atom(states=states, decay_map=decay)
+        # atom.plot()
 
-        intensity = 0.1
-        pol_sp = sim.Polarization([0, 0, 1], vec_as_q=False, q_axis=[0, 0, 1])
-
-        laser_sp = sim.Laser(freq=f_p, polarization=pol_sp, intensity=intensity, k=[0, 1, 0])
+        intensity = 100.
+        pol_eg = sim.Polarization([0, 0, 1], vec_as_q=False, q_axis=[0, 0, 1])
+        laser_eg = sim.Laser(freq=f_eg, polarization=pol_eg, intensity=intensity, k=[0, 1, 0])
 
         env = sim.Environment(B=[0., 0., 1e-6])
-        inter = sim.Interaction(atom=he, lasers=[laser_sp, ], environment=env, delta_max=1000.)
+        inter = sim.Interaction(atom=atom, lasers=[laser_eg, ], environment=env, delta_max=1000.)
         # inter.dt_max = 1e-4
         inter.controlled = True
 
-        t = 0.2
+        t = np.linspace(0., 3., 301)
+
+        y0 = np.zeros(atom.size, dtype=complex)
+        y0[0] = 1.
+
+        rho = inter.master(t, y0=y0)
+        y = sim.density_matrix_diagonal(rho, axis=1)[0]
+
+        plt.plot(t, y[0], label=g.label)
+        plt.plot(t, y[1], label=e.label)
+        plt.legend()
+        plt.xlabel(r'Time ($\mu$s)')
+        plt.ylabel('Population')
+        plt.show()
 
         # n_points = 101
         # indexes = np.arange(0, n_points, dtype=float) + 0.5
@@ -631,8 +647,7 @@ def example(n=None):
 
         theta, phi = np.meshgrid(theta, phi, indexing='ij')
 
-        rho = inter.master(t)
-        r = he.scattering_rate(rho, theta=theta, phi=phi)[:, -1, -1]
+        r = atom.scattering_rate(rho, theta=theta, phi=phi)[:, -1, -1]
         r /= np.max(r)
         r = r.reshape((n_theta, n_phi))
 
@@ -657,4 +672,4 @@ def example(n=None):
 
 
 if __name__ == '__main__':
-    example({4})
+    example({9})

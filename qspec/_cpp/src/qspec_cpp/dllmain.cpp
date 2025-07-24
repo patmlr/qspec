@@ -506,22 +506,32 @@ extern "C"
         return atom->get_L1()->data();
     }
 
-    __declspec(dllexport) void atom_scattering_rate_4pi(Atom* atom, double* results, size_t k, std::complex<double>* rho, size_t rho_size, bool as_density_matrix,
+    __declspec(dllexport) int atom_scattering_rate_4pi(Atom* atom, double* results, size_t* k, size_t k_size,
+        std::complex<double>* rho, size_t rho_size, bool as_density_matrix,
         size_t* i, size_t i_size, size_t* f, size_t f_size)
     {
+        std::vector<size_t> _k = cast_samples_size_t(k, k_size);
+        for (size_t _ki : _k) if (_ki < 1 || _ki > atom->get_decay_map()->get_k_em_max()) return -1;
+
         std::vector<MatrixXcd> _rho;
         if (as_density_matrix) _rho = cast_samples_MatrixXcd(rho, rho_size, atom->get_size());
         else _rho = cast_samples_VectorXcd_as_MatrixXcd(rho, rho_size, atom->get_size());
-        
+
         std::vector<size_t> _i = cast_samples_size_t(i, i_size);
         std::vector<size_t> _f = cast_samples_size_t(f, f_size);
-        atom->scattering_rate(results, k, _rho, _i, _f);
+        atom->scattering_rate(results, _k, _rho, _i, _f);
+
+        return 0;
     }
 
-    __declspec(dllexport) void atom_scattering_rate_k(Atom* atom, double* results, size_t k, std::complex<double>* rho, size_t rho_size, bool as_density_matrix,
+    __declspec(dllexport) int atom_scattering_rate_k(Atom* atom, double* results, size_t* k, size_t k_size,
+        std::complex<double>* rho, size_t rho_size, bool as_density_matrix,
         double* k_vec, size_t k_vec_size,
         size_t* i, size_t i_size, size_t* f, size_t f_size)
     {
+        std::vector<size_t> _k = cast_samples_size_t(k, k_size);
+        for (size_t _ki : _k) if (_ki < 1 || _ki > atom->get_decay_map()->get_k_em_max()) return -1;
+
         std::vector<MatrixXcd> _rho;
         if (as_density_matrix) _rho = cast_samples_MatrixXcd(rho, rho_size, atom->get_size());
         else _rho = cast_samples_VectorXcd_as_MatrixXcd(rho, rho_size, atom->get_size());
@@ -529,13 +539,20 @@ extern "C"
         std::vector<Vector3d> _k_vec = cast_samples_Vector3d(k_vec, k_vec_size);
         std::vector<size_t> _i = cast_samples_size_t(i, i_size);
         std::vector<size_t> _f = cast_samples_size_t(f, f_size);
-        atom->scattering_rate(results, k, _rho, _k_vec, _i, _f);
+
+        atom->scattering_rate(results, _k, _rho, _k_vec, _i, _f);
+
+        return 0;
     }
 
-    __declspec(dllexport) void atom_scattering_rate_k_tp(Atom* atom, double* results, size_t k, std::complex<double>* rho, size_t rho_size, bool as_density_matrix,
+    __declspec(dllexport) int atom_scattering_rate_k_tp(Atom* atom, double* results, size_t* k, size_t k_size,
+        std::complex<double>* rho, size_t rho_size, bool as_density_matrix,
         double* theta, double* phi, size_t k_vec_size,
         size_t* i, size_t i_size, size_t* f, size_t f_size)
     {
+        std::vector<size_t> _k = cast_samples_size_t(k, k_size);
+        for (size_t _ki : _k) if (_ki < 1 || _ki > atom->get_decay_map()->get_k_em_max()) return -1;
+
         std::vector<MatrixXcd> _rho;
         if (as_density_matrix) _rho = cast_samples_MatrixXcd(rho, rho_size, atom->get_size());
         else _rho = cast_samples_VectorXcd_as_MatrixXcd(rho, rho_size, atom->get_size());
@@ -544,13 +561,19 @@ extern "C"
         std::vector<size_t> _i = cast_samples_size_t(i, i_size);
         std::vector<size_t> _f = cast_samples_size_t(f, f_size);
 
-        atom->scattering_rate(results, k, _rho, _k_vec, _i, _f);
+        atom->scattering_rate(results, _k, _rho, _k_vec, _i, _f);
+
+        return 0;
     }
 
-    __declspec(dllexport) void atom_scattering_rate_qk(Atom* atom, double* results, size_t k, std::complex<double>* rho, size_t rho_size, bool as_density_matrix,
+    __declspec(dllexport) int atom_scattering_rate_qk(Atom* atom, double* results, size_t* k, size_t k_size,
+        std::complex<double>* rho, size_t rho_size, bool as_density_matrix,
         double* k_vec, std::complex<double>* x_vec, size_t k_vec_size,
         size_t* i, size_t i_size, size_t* f, size_t f_size)
     {
+        std::vector<size_t> _k = cast_samples_size_t(k, k_size);
+        for (size_t _ki : _k) if (_ki < 1 || _ki > atom->get_decay_map()->get_k_em_max()) return -1;
+
         std::vector<MatrixXcd> _rho;
         if (as_density_matrix) _rho = cast_samples_MatrixXcd(rho, rho_size, atom->get_size());
         else _rho = cast_samples_VectorXcd_as_MatrixXcd(rho, rho_size, atom->get_size());
@@ -559,13 +582,19 @@ extern "C"
         std::vector<Vector3cd> _x_vec = cast_samples_Vector3cd(x_vec, k_vec_size);
         std::vector<size_t> _i = cast_samples_size_t(i, i_size);
         std::vector<size_t> _f = cast_samples_size_t(f, f_size);
-        atom->scattering_rate(results, k, _rho, _k_vec, _x_vec, _i, _f);
+        atom->scattering_rate(results, _k, _rho, _k_vec, _x_vec, _i, _f);
+
+        return 0;
     }
 
-    __declspec(dllexport) void atom_scattering_rate_qk_tp(Atom* atom, double* results, size_t k, std::complex<double>* rho, size_t rho_size, bool as_density_matrix,
+    __declspec(dllexport) int atom_scattering_rate_qk_tp(Atom* atom, double* results, size_t* k, size_t k_size,
+        std::complex<double>* rho, size_t rho_size, bool as_density_matrix,
         double* theta, double* phi, std::complex<double>* x_vec, size_t k_vec_size,
         size_t* i, size_t i_size, size_t* f, size_t f_size)
     {
+        std::vector<size_t> _k = cast_samples_size_t(k, k_size);
+        for (size_t _ki : _k) if (_ki < 1 || _ki > atom->get_decay_map()->get_k_em_max()) return -1;
+
         std::vector<MatrixXcd> _rho;
         if (as_density_matrix) _rho = cast_samples_MatrixXcd(rho, rho_size, atom->get_size());
         else _rho = cast_samples_VectorXcd_as_MatrixXcd(rho, rho_size, atom->get_size());
@@ -574,7 +603,9 @@ extern "C"
         std::vector<Vector3cd> _x_vec = cast_samples_Vector3cd(x_vec, k_vec_size);
         std::vector<size_t> _i = cast_samples_size_t(i, i_size);
         std::vector<size_t> _f = cast_samples_size_t(f, f_size);
-        atom->scattering_rate(results, k, _rho, _k_vec, _x_vec, _i, _f);
+        atom->scattering_rate(results, _k, _rho, _k_vec, _x_vec, _i, _f);
+
+        return 0;
     }
 
 

@@ -181,7 +181,9 @@ protected:
 
 	VectorXd w0;
 	VectorXd Lsum;
-	std::vector<MatrixXd> L0_k;
+	// std::vector<MatrixXd> L0_k;
+	// std::vector<MatrixXd> L1_k;
+	std::vector<MatrixXd> A_einst;
 	MatrixXd L0;
 	MatrixXd L1;
 
@@ -239,11 +241,11 @@ public:
 	MatrixXd* get_L0();
 	MatrixXd* get_L1();
 
-	void scattering_rate(double* results, size_t k, std::vector<MatrixXcd>& rho, std::vector<Vector3d>& k_vec, std::vector<Vector3cd>& x_vec, std::vector<size_t>& i, std::vector<size_t>& f);
-	void scattering_rate(double* results, size_t k, std::vector<MatrixXcd>& rho, std::vector<Vector3d>& k_vec, std::vector<size_t>& i, std::vector<size_t>& f);
+	void scattering_rate(double* results, std::vector<size_t>& k, std::vector<MatrixXcd>& rho, std::vector<Vector3d>& k_vec, std::vector<Vector3cd>& x_vec, std::vector<size_t>& i, std::vector<size_t>& f);
+	void scattering_rate(double* results, std::vector<size_t>& k, std::vector<MatrixXcd>& rho, std::vector<Vector3d>& k_vec, std::vector<size_t>& i, std::vector<size_t>& f);
 
-	void scattering_rate(double* results, size_t k, std::vector<MatrixXcd>& rho, std::vector<size_t>& i, std::vector<size_t>& f);
-	void scattering_rate(double* results, size_t k, std::vector<MatrixXcd>& rho, std::vector<VectorXcd>& qk, std::vector<size_t>& i, std::vector<size_t>& f);
+	void scattering_rate(double* results, std::vector<size_t>& k, std::vector<MatrixXcd>& rho, std::vector<std::vector<VectorXcd>>& qk, std::vector<size_t>& i, std::vector<size_t>& f);
+	void scattering_rate(double* results, std::vector<size_t>& k, std::vector<MatrixXcd>& rho, std::vector<size_t>& i, std::vector<size_t>& f);
 
 };
 

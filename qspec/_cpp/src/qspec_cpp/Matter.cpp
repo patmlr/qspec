@@ -689,6 +689,9 @@ void Atom::gen_multipole()
 		mk.push_back(MatrixXi::Zero(size, size));
 		a_em.push_back(MatrixXd::Zero(size, size));
 		d_em.push_back(MatrixXd::Zero(size, size));
+		A_einst.push_back(MatrixXd::Zero(size, size));
+		// L0_k.push_back(MatrixXd::Zero(size, size));
+		// L1_k.push_back(MatrixXd::Zero(size, size));
 	}
 
 	L0 = MatrixXd::Zero(size, size);
@@ -750,8 +753,13 @@ void Atom::gen_multipole()
 				ek.at(k - 1)(_j, _i) = ek.at(k - 1)(_i, _j);
 
 				// printf("%s\n", std::format("ak({}, {}): {:.0e}", _i, _j, ak).c_str());
+				// L0_k.at(k - 1)(_i, _j) = a * ak * ak;
+				// L0_k.at(k - 1)(_j, _i) = 0.;
+
+				A_einst.at(k - 1)(_i, _j) = a;
 				L0(_i, _j) += a * ak * ak;
 				L0(_j, _i) = 0.;
+
 
 				// size_t q = (4 * abs(q_val) + (sgn<double>(q_val) - abs(sgn<double>(q_val)))) / 2;
 				// double q_val = 0.5 * (1 - 2 * (q % 2)) * (q + (q % 2));
@@ -837,28 +845,29 @@ void Atom::gen_w0()
 	for (size_t i = 0; i < size; ++i) w0(i) = 2 * sc::pi * get(i)->get_freq();
 }
 
-void Atom::scattering_rate(double* results, size_t k, std::vector<MatrixXcd>& rho, std::vector<Vector3d>& k_vec, std::vector<Vector3cd>& x_vec, std::vector<size_t>& i, std::vector<size_t>& f)
+void Atom::scattering_rate(double* results, std::vector<size_t>& k, std::vector<MatrixXcd>& rho, std::vector<Vector3d>& k_vec, std::vector<Vector3cd>& x_vec, std::vector<size_t>& i, std::vector<size_t>& f)
 {
-	if (k < 1 || k > decays->get_k_em_max()) return;
-
-	std::vector<VectorXcd> qk(k_vec.size(), VectorXcd::Zero(2 * k + 1));
+	std::vector<std::vector<VectorXcd>> qk(k_vec.size(), std::vector<VectorXcd>(k.size()));
 
 	Polarizationk kpol = Polarizationk(*env->get_e_B());
 	for (size_t index_qk = 0; index_qk < k_vec.size(); ++index_qk)
 	{
-		kpol.init_qk(x_vec.at(index_qk), k_vec.at(index_qk));
-		qk.at(index_qk) = spherical_tensor(true, k, kpol.get_qk(), kpol.get_theta_k(), kpol.get_phi_k());
+		for (size_t index_k = 0; index_k < k.size(); ++index_k)
+		{
+			size_t _k = k.at(index_k);
+
+			kpol.init_qk(x_vec.at(index_qk), k_vec.at(index_qk));
+			qk.at(index_qk).at(index_k) = spherical_tensor(true, _k, kpol.get_qk(), kpol.get_theta_k(), kpol.get_phi_k());
+		}
 	}
 
 	scattering_rate(results, k, rho, qk, i, f);
 }
 
-void Atom::scattering_rate(double* results, size_t k, std::vector<MatrixXcd>& rho, std::vector<Vector3d>& k_vec, std::vector<size_t>& i, std::vector<size_t>& f)
+void Atom::scattering_rate(double* results, std::vector<size_t>& k, std::vector<MatrixXcd>& rho, std::vector<Vector3d>& k_vec, std::vector<size_t>& i, std::vector<size_t>& f)
 {
-	if (k < 1 || k > decays->get_k_em_max()) return;
-
-	std::vector<VectorXcd> qk_0(k_vec.size(), VectorXcd::Zero(2 * k + 1));
-	std::vector<VectorXcd> qk_1(k_vec.size(), VectorXcd::Zero(2 * k + 1));
+	std::vector<std::vector<VectorXcd>> qk_0(k_vec.size(), std::vector<VectorXcd>(k.size()));
+	std::vector<std::vector<VectorXcd>> qk_1(k_vec.size(), std::vector<VectorXcd>(k.size()));
 
 	Polarizationk kpol = Polarizationk(*env->get_e_B());
 	for (size_t index_qk = 0; index_qk < k_vec.size(); ++index_qk)
@@ -871,17 +880,19 @@ void Atom::scattering_rate(double* results, size_t k, std::vector<MatrixXcd>& rh
 		x(1) = _k_vec(2) - _k_vec(0);
 		x(2) = _k_vec(0) - _k_vec(1);
 		x /= x.norm();
-		// printf("x_sc: %.3f, %.3f, %.3f\n", x(0), x(1), x(2));
 
-		kpol.init_qk(x, _k_vec);
-		qk_0.at(index_qk) = spherical_tensor(true, k, kpol.get_qk(), kpol.get_theta_k(), kpol.get_phi_k());
-
-		Vector3d y = Vector3d::Zero();
-		y = _k_vec.cross(x);
+		Vector3d y = _k_vec.cross(x);
 		y /= y.norm();
-		// printf("y_sc: %.3f, %.3f, %.3f\n", y(0), y(1), y(2));
-		kpol.init_qk(y, _k_vec);
-		qk_1.at(index_qk) = spherical_tensor(true, k, kpol.get_qk(), kpol.get_theta_k(), kpol.get_phi_k());
+
+		for (size_t index_k = 0; index_k < k.size(); ++index_k)
+		{
+			size_t _k = k.at(index_k);
+
+			kpol.init_qk(x, _k_vec);
+			qk_0.at(index_qk).at(index_k) = spherical_tensor(true, _k, kpol.get_qk(), kpol.get_theta_k(), kpol.get_phi_k());
+			kpol.init_qk(y, _k_vec);
+			qk_1.at(index_qk).at(index_k) = spherical_tensor(true, _k, kpol.get_qk(), kpol.get_theta_k(), kpol.get_phi_k());
+		}
 	}
 
 	scattering_rate(results, k, rho, qk_0, i, f);
@@ -889,10 +900,8 @@ void Atom::scattering_rate(double* results, size_t k, std::vector<MatrixXcd>& rh
 	scattering_rate(results, k, rho, qk_1, i, f);
 }
 
-void Atom::scattering_rate(double* results, size_t k, std::vector<MatrixXcd>& rho, std::vector<VectorXcd>& qk, std::vector<size_t>& i, std::vector<size_t>& f)
+void Atom::scattering_rate(double* results, std::vector<size_t>& k, std::vector<MatrixXcd>& rho, std::vector<std::vector<VectorXcd>>& qk, std::vector<size_t>& i, std::vector<size_t>& f)
 {
-	if (k < 1 || k > decays->get_k_em_max()) return;
-
 	std::vector<size_t> indexes(rho.size() * qk.size());
 	std::iota(indexes.begin(), indexes.end(), 0);
 
@@ -904,81 +913,81 @@ void Atom::scattering_rate(double* results, size_t k, std::vector<MatrixXcd>& rh
 			size_t index_rho = index % rho.size();
 			// printf("%zi, %zi, %zi, %zi\n", index_qk, index_rho, qk.size(), rho.size());
 
-			double k_double = static_cast<double>(k);
 
 			std::complex<double> _result = 0.;
 			for (size_t _f : f)
 			{
 				for (size_t _i : i)
 				{
-					double delta_mi = states.at(_i)->get_m() - states.at(_f)->get_m();
-					if (std::abs(delta_mi) > k_double) continue;
-
-					size_t i_qk = static_cast<size_t>(delta_mi + k_double);
-
-					double d_fi = a_em.at(k - 1)(_f, _i);
-
-					if (rho.at(index_rho).outerSize() == 1)
+					for (size_t index_ki = 0; index_ki < k.size(); ++index_ki)
 					{
-						double norm = pow(std::abs(d_fi), 2);
-						if (norm == 0.) continue;
+						size_t _ki = k.at(index_ki);
+						double ki_double = static_cast<double>(_ki);
 
-						double a_if = L0(_f, _i);
-						if (a_if == 0.) continue;
+						double delta_mi = states.at(_i)->get_m() - states.at(_f)->get_m();
+						if (std::abs(delta_mi) > ki_double) continue;
+						size_t i_qk = static_cast<size_t>(delta_mi + ki_double);
+						std::complex<double> _qk = qk.at(index_qk).at(index_ki)(i_qk);
 
-						std::complex<double> y = a_if;
-						// printf("y0: %s\n", std::format("{:.3e} + i{:.3e}", y.real(), y.imag()).c_str());
-						y *= rho.at(index_rho)(_i);
-						// printf("y1: %s\n", std::format("{:.3e} + i{:.3e}", y.real(), y.imag()).c_str());
-						y *= pow(std::abs(d_fi * qk.at(index_qk)(i_qk)), 2);
-						// printf("y2: %s\n", std::format("{:.3e} + i{:.3e}", y.real(), y.imag()).c_str());
-						y /= norm;
+						double a_if = A_einst.at(_ki - 1)(_f, _i);
+						double d_fi = a_em.at(_ki - 1)(_f, _i);
+						if (a_if * d_fi == 0.) continue;
 
-						_result += y;
-
-					}
-					else
-					{
-						for (size_t _j : i)
+						if (rho.at(index_rho).outerSize() == 1)
 						{
-							double delta_mj = states.at(_j)->get_m() - states.at(_f)->get_m();
-							if (std::abs(delta_mj) > k_double) continue;
-
-							size_t j_qk = static_cast<size_t>(delta_mj + k_double);
-
-							double d_jf = a_em.at(k - 1)(_j, _f);
-							double norm = std::abs(d_fi) * std::abs(d_jf);
-							if (norm == 0.) continue;
-
-							double a_ijf = L0(_f, _i) * L0(_f, _j);
-							if (a_ijf == 0.) continue;
-
-							std::complex<double> y = sqrt(a_ijf);  // *pow(-1., static_cast<double>(j_qk) - static_cast<double>(k))* pow(-1., static_cast<double>(i_qk) - static_cast<double>(k)); // * (2 * states.at(_f)->get_i() + 1) * (2 * states.at(_f)->get_j() + 1);
+							std::complex<double> y = a_if;
 							// printf("y0: %s\n", std::format("{:.3e} + i{:.3e}", y.real(), y.imag()).c_str());
-							y *= rho.at(index_rho)(_j, _i);
-							// if (index_rho == 201) printf("rho: %s\n", std::format("({}, {}): {:.3e} + {:.3e}i", _i, _j, rho.at(index_rho)(_j, _i).real(), rho.at(index_rho)(_j, _i).imag()).c_str());
+							y *= rho.at(index_rho)(_i);
 							// printf("y1: %s\n", std::format("{:.3e} + i{:.3e}", y.real(), y.imag()).c_str());
-							y *= qk.at(index_qk)(i_qk) * d_fi * std::conj(qk.at(index_qk)(j_qk)) * d_jf;
+							y *= pow(std::abs(d_fi * _qk), 2);
 							// printf("y2: %s\n", std::format("{:.3e} + i{:.3e}", y.real(), y.imag()).c_str());
-							y /= norm;
-							// printf("y3: %s\n", std::format("{:.3e} + i{:.3e}", y.real(), y.imag()).c_str());
+							y *= (2 * ki_double + 1) / (8. * sc::pi);
 
 							_result += y;
+
+						}
+						else
+						{
+							for (size_t _j : i)
+							{
+								for (size_t index_kj = 0; index_kj < k.size(); ++index_kj)
+								{
+									size_t _kj = k.at(index_kj);
+									double kj_double = static_cast<double>(_kj);
+
+									double delta_mj = states.at(_j)->get_m() - states.at(_f)->get_m();
+									if (std::abs(delta_mj) > kj_double) continue;
+									size_t j_qk = static_cast<size_t>(delta_mj + kj_double);
+
+									double a_jf = A_einst.at(_kj - 1)(_f, _j);
+									double d_jf = a_em.at(_kj - 1)(_j, _f);
+									if (a_jf * d_jf == 0.) continue;
+
+									std::complex<double> y = sqrt(a_if * a_jf);  // *pow(-1., static_cast<double>(j_qk) - static_cast<double>(k))* pow(-1., static_cast<double>(i_qk) - static_cast<double>(k)); // * (2 * states.at(_f)->get_i() + 1) * (2 * states.at(_f)->get_j() + 1);
+									// printf("y0: %s\n", std::format("{:.3e} + i{:.3e}", y.real(), y.imag()).c_str());
+									y *= rho.at(index_rho)(_j, _i);
+									// if (index_rho == 201) printf("rho: %s\n", std::format("({}, {}): {:.3e} + {:.3e}i", _i, _j, rho.at(index_rho)(_j, _i).real(), rho.at(index_rho)(_j, _i).imag()).c_str());
+									// printf("y1: %s\n", std::format("{:.3e} + i{:.3e}", y.real(), y.imag()).c_str());
+									y *= qk.at(index_qk).at(index_ki)(i_qk) * d_fi * std::conj(qk.at(index_qk).at(index_kj)(j_qk)) * d_jf;
+									// printf("y2: %s\n", std::format("{:.3e} + i{:.3e}", y.real(), y.imag()).c_str());
+									y *= sqrt((2 * ki_double + 1) * (2 * kj_double + 1)) / (8. * sc::pi);
+									// printf("y3: %s\n", std::format("{:.3e} + i{:.3e}", y.real(), y.imag()).c_str());
+
+									_result += y;
+								}
+							}
 						}
 					}
 				}
 			}
-			_result *= (2 * k_double + 1) / (8. * sc::pi);
 			// printf("%s\n", std::format("r{}: {:.3e} + {:.3e}i", index_rho, _result.real(), _result.imag()).c_str());
 			results[index] += _result.real();
 		}
 	);
 }
 
-void Atom::scattering_rate(double* results, size_t k, std::vector<MatrixXcd>& rho, std::vector<size_t>& i, std::vector<size_t>& f)
+void Atom::scattering_rate(double* results, std::vector<size_t>& k, std::vector<MatrixXcd>& rho, std::vector<size_t>& i, std::vector<size_t>& f)
 {
-	if (k < 1 || k > decays->get_k_em_max()) return;
-
 	size_t index = 0;
 	for (MatrixXcd _rho : rho)
 	{
@@ -987,11 +996,17 @@ void Atom::scattering_rate(double* results, size_t k, std::vector<MatrixXcd>& rh
 		{
 			for (size_t _i : i)
 			{
-				size_t i_qk = static_cast<size_t>(states.at(_i)->get_m() - states.at(_f)->get_m() + static_cast<double>(k));
-				double d_fi = d_em.at(k - 1)(_f, _i);
+				for (size_t index_k = 0; index_k < k.size(); ++index_k)
+				{
+					size_t _k = k.at(index_k);
+					double k_double = static_cast<double>(_k);
 
-				if (_rho.outerSize() == 1) _result += L0(_f, _i) * _rho(_i).real();
-				else _result += L0(_f, _i) * _rho(_i, _i).real();
+					double delta_mi = states.at(_i)->get_m() - states.at(_f)->get_m();
+					if (std::abs(delta_mi) > k_double) continue;
+
+					if (_rho.outerSize() == 1) _result += L0(_f, _i) * _rho(_i).real();
+					else _result += L0(_f, _i) * _rho(_i, _i).real();
+				}
 			}
 		}
 

@@ -18,6 +18,7 @@ import qspec.algebra as al
 
 
 __all__ = ['Polarization', 'Laser', 'Environment', 'construct_electronic_state', 'construct_hyperfine_state',
+           'density_matrix_diagonal',
            'gen_electronic_state', 'gen_hyperfine_state', 'State', 'DecayMap', 'Atom', 'Interaction']
 
 
@@ -1019,7 +1020,7 @@ class Atom:
             f = {f}
         return np.array([i for i, s in enumerate(self.states) if s.label in labels and s.f in f], dtype=int)
 
-    def scattering_rate(self, rho: array_like, as_density_matrix: bool = True, k: int = 1,
+    def scattering_rate(self, rho: array_like, as_density_matrix: bool = True, k: array_like = None,
                         theta: array_like = None, phi: array_like = None,
                         k_vec: array_like = None, x_vec: array_like = None,
                         i: array_like = None, f: array_like = None, axis: int = 1) -> ndarray:
@@ -1038,6 +1039,13 @@ class Atom:
         axes += add_axes
         rho = np.transpose(rho, axes=axes).copy()
 
+        if k is None:
+            k = np.array(list(range(1, self.decay_map.k_em_max + 1)), dtype=int)
+        else:
+            k = np.array(k, dtype=int).flatten()
+
+        k_size = k.size
+
         if i is None:
             i = np.arange(self.size, dtype=int)
         else:
@@ -1048,7 +1056,7 @@ class Atom:
             f = np.asarray(f, dtype=int).flatten()
 
         as_density_matrix = c_bool(bool(as_density_matrix))
-        k = c_size_t(int(k))
+        k = k.ctypes.data_as(c_size_t_p)
         rho = rho.ctypes.data_as(c_complex_p)
         rho_size = c_size_t(int(np.prod(results_shape)))
         i_size = c_size_t(i.size)
@@ -1062,8 +1070,9 @@ class Atom:
                 results = np.zeros(results_shape, dtype=float, order='C')
                 results_c = results.ctypes.data_as(c_double_p)
 
-                dll.atom_scattering_rate_4pi(self.instance, results_c, k, rho, rho_size, as_density_matrix,
-                                             i, i_size, f, f_size)
+                error = dll.atom_scattering_rate_4pi(self.instance, results_c, k, k_size,
+                                                     rho, rho_size, as_density_matrix,
+                                                     i, i_size, f, f_size)
 
             elif x_vec is None:
                 k_vec = _cast_3d_vec(k_vec, dtype=float)
@@ -1075,9 +1084,10 @@ class Atom:
                 k_vec_size = c_size_t(k_vec.shape[0])
                 k_vec = k_vec.ctypes.data_as(c_double_p)
 
-                dll.atom_scattering_rate_k(self.instance, results_c, k, rho, rho_size, as_density_matrix,
-                                           k_vec, k_vec_size,
-                                           i, i_size, f, f_size)
+                error = dll.atom_scattering_rate_k(self.instance, results_c, k, k_size,
+                                                   rho, rho_size, as_density_matrix,
+                                                   k_vec, k_vec_size,
+                                                   i, i_size, f, f_size)
             elif k_vec is None:
                 raise ValueError('Either (\'theta\', \'phi\') or \'k_vec\' must be specified if \'x_vec\' is given.')
 
@@ -1093,9 +1103,10 @@ class Atom:
                 k_vec = k_vec.ctypes.data_as(c_double_p)
                 x_vec = x_vec.ctypes.data_as(c_complex_p)
 
-                dll.atom_scattering_rate_qk(self.instance, results_c, k, rho, rho_size, as_density_matrix,
-                                            k_vec, x_vec, k_vec_size,
-                                            i, i_size, f, f_size)
+                error = dll.atom_scattering_rate_qk(self.instance, results_c, k, k_size,
+                                                    rho, rho_size, as_density_matrix,
+                                                    k_vec, x_vec, k_vec_size,
+                                                    i, i_size, f, f_size)
 
         elif theta is None or phi is None:
             raise ValueError('\'theta\' and \'phi\' must either both be specified or both be None.')
@@ -1121,16 +1132,21 @@ class Atom:
             phi = phi.ctypes.data_as(c_double_p)
 
             if x_vec is None:
-                dll.atom_scattering_rate_k_tp(self.instance, results_c, k, rho, rho_size, as_density_matrix,
-                                              theta, phi, k_vec_size,
-                                              i, i_size, f, f_size)
+                error = dll.atom_scattering_rate_k_tp(self.instance, results_c, k, k_size,
+                                                      rho, rho_size, as_density_matrix,
+                                                      theta, phi, k_vec_size,
+                                                      i, i_size, f, f_size)
             else:
                 x_vec = _cast_3d_vec(x_vec, dtype=complex)
                 x_vec = x_vec.ctypes.data_as(c_complex_p)
                 
-                dll.atom_scattering_rate_qk_tp(self.instance, results_c, k, rho, rho_size, as_density_matrix,
-                                               theta, phi, x_vec, k_vec_size,
-                                               i, i_size, f, f_size)
+                error = dll.atom_scattering_rate_qk_tp(self.instance, results_c, k, k_size,
+                                                       rho, rho_size, as_density_matrix,
+                                                       theta, phi, x_vec, k_vec_size,
+                                                       i, i_size, f, f_size)
+
+        if error == -1:
+            raise ValueError('Integer parameter \'1 <= k <= DecayMap.k_em_max\' is out of range.')
 
         return results
 
@@ -2080,6 +2096,10 @@ class Interaction:
         """
         return self.atom.scattering_rate(rho, theta=theta, phi=phi, as_density_matrix=as_density_matrix,
                                          i=i, f=f, axis=axis)
+
+
+def density_matrix_diagonal(rho: array_like, axis=1):
+    return np.transpose(np.diagonal(rho, axis1=axis, axis2=axis + 1).real, axes=[0, 2, 1])
 
 
 def _define_colors(n: int, label_map: dict, colormap: str = None):

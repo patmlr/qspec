@@ -266,22 +266,27 @@ dll.atom_get_L0.restype = c_double_p
 dll.atom_get_L1.argtypes = (AtomHandler, )
 dll.atom_get_L1.restype = c_double_p
 
-dll.atom_scattering_rate_4pi.argtypes = (AtomHandler, c_double_p, c_size_t, c_complex_p, c_size_t, c_bool,
+dll.atom_scattering_rate_4pi.argtypes = (AtomHandler, c_double_p, c_size_t_p, c_size_t,
+                                         c_complex_p, c_size_t, c_bool,
                                          c_size_t_p, c_size_t, c_size_t_p, c_size_t)
 
-dll.atom_scattering_rate_k.argtypes = (AtomHandler, c_double_p, c_size_t, c_complex_p, c_size_t, c_bool,
+dll.atom_scattering_rate_k.argtypes = (AtomHandler, c_double_p, c_size_t_p, c_size_t,
+                                       c_complex_p, c_size_t, c_bool,
                                        c_double_p, c_size_t,
                                        c_size_t_p, c_size_t, c_size_t_p, c_size_t)
 
-dll.atom_scattering_rate_k_tp.argtypes = (AtomHandler, c_double_p, c_size_t, c_complex_p, c_size_t, c_bool,
+dll.atom_scattering_rate_k_tp.argtypes = (AtomHandler, c_double_p, c_size_t_p, c_size_t,
+                                          c_complex_p, c_size_t, c_bool,
                                           c_double_p, c_double_p, c_size_t,
                                           c_size_t_p, c_size_t, c_size_t_p, c_size_t)
 
-dll.atom_scattering_rate_qk.argtypes = (AtomHandler, c_double_p, c_size_t, c_complex_p, c_size_t, c_bool,
+dll.atom_scattering_rate_qk.argtypes = (AtomHandler, c_double_p, c_size_t_p, c_size_t,
+                                        c_complex_p, c_size_t, c_bool,
                                         c_double_p, c_complex_p, c_size_t,
                                         c_size_t_p, c_size_t, c_size_t_p, c_size_t)
 
-dll.atom_scattering_rate_qk_tp.argtypes = (AtomHandler, c_double_p, c_size_t, c_complex_p, c_size_t, c_bool,
+dll.atom_scattering_rate_qk_tp.argtypes = (AtomHandler, c_double_p, c_size_t_p, c_size_t,
+                                           c_complex_p, c_size_t, c_bool,
                                            c_double_p, c_double_p, c_complex_p, c_size_t,
                                            c_size_t_p, c_size_t, c_size_t_p, c_size_t)
 
