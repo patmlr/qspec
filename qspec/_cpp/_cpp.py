@@ -285,10 +285,20 @@ dll.atom_scattering_rate_qk.argtypes = (AtomHandler, c_double_p, c_size_t_p, c_s
                                         c_double_p, c_complex_p, c_size_t,
                                         c_size_t_p, c_size_t, c_size_t_p, c_size_t)
 
+dll.atom_scattering_rate_qk_xb.argtypes = (AtomHandler, c_double_p, c_size_t_p, c_size_t,
+                                           c_complex_p, c_size_t, c_bool,
+                                           c_double_p, c_size_t, c_size_t,
+                                           c_size_t_p, c_size_t, c_size_t_p, c_size_t)
+
 dll.atom_scattering_rate_qk_tp.argtypes = (AtomHandler, c_double_p, c_size_t_p, c_size_t,
                                            c_complex_p, c_size_t, c_bool,
                                            c_double_p, c_double_p, c_complex_p, c_size_t,
                                            c_size_t_p, c_size_t, c_size_t_p, c_size_t)
+
+dll.atom_scattering_rate_qk_tp_xb.argtypes = (AtomHandler, c_double_p, c_size_t_p, c_size_t,
+                                              c_complex_p, c_size_t, c_bool,
+                                              c_double_p, c_double_p, c_size_t, c_size_t,
+                                              c_size_t_p, c_size_t, c_size_t_p, c_size_t)
 
 
 # Interaction

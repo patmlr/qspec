@@ -119,8 +119,8 @@ extern "C"
 
     __declspec(dllexport) double* laser_get_k(Laser* laser)
     {
-        printf("%.3f, %.3f, %.3f\n", laser->get_k()(0), laser->get_k()(1), laser->get_k()(2));
-        return laser->get_k().data();
+        // printf("%.3f, %.3f, %.3f\n", laser->get_k()(0), laser->get_k()(1), laser->get_k()(2));
+        return laser->get_k()->data();
     }
 
     __declspec(dllexport) void laser_set_k(Laser* laser, double* k)
@@ -525,7 +525,8 @@ extern "C"
         return 0;
     }
 
-    __declspec(dllexport) int atom_scattering_rate_k(Atom* atom, double* results, size_t* k, size_t k_size,
+    __declspec(dllexport) int atom_scattering_rate_k(
+        Atom* atom, double* results, size_t* k, size_t k_size,
         std::complex<double>* rho, size_t rho_size, bool as_density_matrix,
         double* k_vec, size_t k_vec_size,
         size_t* i, size_t i_size, size_t* f, size_t f_size)
@@ -546,7 +547,8 @@ extern "C"
         return 0;
     }
 
-    __declspec(dllexport) int atom_scattering_rate_k_tp(Atom* atom, double* results, size_t* k, size_t k_size,
+    __declspec(dllexport) int atom_scattering_rate_k_tp(
+        Atom* atom, double* results, size_t* k, size_t k_size,
         std::complex<double>* rho, size_t rho_size, bool as_density_matrix,
         double* theta, double* phi, size_t k_vec_size,
         size_t* i, size_t i_size, size_t* f, size_t f_size)
@@ -558,7 +560,7 @@ extern "C"
         if (as_density_matrix) _rho = cast_samples_MatrixXcd(rho, rho_size, atom->get_size());
         else _rho = cast_samples_VectorXcd_as_MatrixXcd(rho, rho_size, atom->get_size());
 
-        std::vector<Vector3d> _k_vec = cast_samples_theta_phi_vec(theta, phi, k_vec_size);
+        std::vector<Vector3d> _k_vec = cast_samples_theta_phi_er(theta, phi, k_vec_size);
         std::vector<size_t> _i = cast_samples_size_t(i, i_size);
         std::vector<size_t> _f = cast_samples_size_t(f, f_size);
 
@@ -567,7 +569,8 @@ extern "C"
         return 0;
     }
 
-    __declspec(dllexport) int atom_scattering_rate_qk(Atom* atom, double* results, size_t* k, size_t k_size,
+    __declspec(dllexport) int atom_scattering_rate_qk(
+        Atom* atom, double* results, size_t* k, size_t k_size,
         std::complex<double>* rho, size_t rho_size, bool as_density_matrix,
         double* k_vec, std::complex<double>* x_vec, size_t k_vec_size,
         size_t* i, size_t i_size, size_t* f, size_t f_size)
@@ -588,7 +591,46 @@ extern "C"
         return 0;
     }
 
-    __declspec(dllexport) int atom_scattering_rate_qk_tp(Atom* atom, double* results, size_t* k, size_t k_size,
+    __declspec(dllexport) int atom_scattering_rate_qk_xb(
+        Atom* atom, double* results, size_t* k, size_t k_size,
+        std::complex<double>* rho, size_t rho_size, bool as_density_matrix,
+        double* k_vec, size_t x_vec, size_t k_vec_size,
+        size_t* i, size_t i_size, size_t* f, size_t f_size)
+    {
+        std::vector<size_t> _k = cast_samples_size_t(k, k_size);
+        for (size_t _ki : _k) if (_ki < 1 || _ki > atom->get_decay_map()->get_k_em_max()) return -1;
+
+        std::vector<MatrixXcd> _rho;
+        if (as_density_matrix) _rho = cast_samples_MatrixXcd(rho, rho_size, atom->get_size());
+        else _rho = cast_samples_VectorXcd_as_MatrixXcd(rho, rho_size, atom->get_size());
+
+        std::vector<Vector3d> _k_vec = cast_samples_Vector3d(k_vec, k_vec_size);
+        std::vector<Vector3cd> _x_vec(k_vec_size, Vector3cd::Zero());
+        for (size_t index_qk = 0; index_qk < k_vec_size; ++index_qk)
+        {
+            double _theta = rotation_theta(_k_vec.at(index_qk));
+            double _phi = rotation_phi(_k_vec.at(index_qk));
+            if (x_vec == 0) _x_vec.at(index_qk).real() = cast_theta_phi_et(_theta, _phi);
+            else if (x_vec == 1) _x_vec.at(index_qk).real() = cast_theta_phi_ep(_theta, _phi);
+            else
+            {
+                Vector3d t = cast_theta_phi_et(_theta, _phi);
+                Vector3d p = cast_theta_phi_ep(_theta, _phi);
+                if (x_vec == 2) _x_vec.at(index_qk) = t + sc::i * p;
+                else if (x_vec == 3) _x_vec.at(index_qk) = t - sc::i * p;
+                else return -2;
+            }
+        }
+
+        std::vector<size_t> _i = cast_samples_size_t(i, i_size);
+        std::vector<size_t> _f = cast_samples_size_t(f, f_size);
+        atom->scattering_rate(results, _k, _rho, _k_vec, _x_vec, _i, _f);
+
+        return 0;
+    }
+
+    __declspec(dllexport) int atom_scattering_rate_qk_tp(
+        Atom* atom, double* results, size_t* k, size_t k_size,
         std::complex<double>* rho, size_t rho_size, bool as_density_matrix,
         double* theta, double* phi, std::complex<double>* x_vec, size_t k_vec_size,
         size_t* i, size_t i_size, size_t* f, size_t f_size)
@@ -600,8 +642,47 @@ extern "C"
         if (as_density_matrix) _rho = cast_samples_MatrixXcd(rho, rho_size, atom->get_size());
         else _rho = cast_samples_VectorXcd_as_MatrixXcd(rho, rho_size, atom->get_size());
         
-        std::vector<Vector3d> _k_vec = cast_samples_theta_phi_vec(theta, phi, k_vec_size);
+        std::vector<Vector3d> _k_vec = cast_samples_theta_phi_er(theta, phi, k_vec_size);
         std::vector<Vector3cd> _x_vec = cast_samples_Vector3cd(x_vec, k_vec_size);
+        std::vector<size_t> _i = cast_samples_size_t(i, i_size);
+        std::vector<size_t> _f = cast_samples_size_t(f, f_size);
+        atom->scattering_rate(results, _k, _rho, _k_vec, _x_vec, _i, _f);
+
+        return 0;
+    }
+
+    __declspec(dllexport) int atom_scattering_rate_qk_tp_xb(
+        Atom* atom, double* results, size_t* k, size_t k_size,
+        std::complex<double>* rho, size_t rho_size, bool as_density_matrix,
+        double* theta, double* phi, size_t x_vec, size_t k_vec_size,
+        size_t* i, size_t i_size, size_t* f, size_t f_size)
+    {
+        std::vector<size_t> _k = cast_samples_size_t(k, k_size);
+        for (size_t _ki : _k) if (_ki < 1 || _ki > atom->get_decay_map()->get_k_em_max()) return -1;
+
+        std::vector<MatrixXcd> _rho;
+        if (as_density_matrix) _rho = cast_samples_MatrixXcd(rho, rho_size, atom->get_size());
+        else _rho = cast_samples_VectorXcd_as_MatrixXcd(rho, rho_size, atom->get_size());
+
+        std::vector<Vector3d> _k_vec = cast_samples_theta_phi_er(theta, phi, k_vec_size);
+        std::vector<Vector3cd> _x_vec(k_vec_size, Vector3cd::Zero());
+        for (size_t index_qk = 0; index_qk < k_vec_size; ++index_qk)
+        {
+            double _theta = theta[index_qk];
+            double _phi = phi[index_qk];
+            if (x_vec == 0) _x_vec.at(index_qk).real() = cast_theta_phi_et(_theta, _phi);
+            else if (x_vec == 1) _x_vec.at(index_qk).real() = cast_theta_phi_ep(_theta, _phi);
+            else
+            {
+                Vector3d t = cast_theta_phi_et(_theta, _phi);
+                Vector3d p = cast_theta_phi_ep(_theta, _phi);
+                if (x_vec == 2) _x_vec.at(index_qk) = t + sc::i * p;
+                else if (x_vec == 3) _x_vec.at(index_qk) = t - sc::i * p;
+                else return -2;
+            }
+        }
+
+
         std::vector<size_t> _i = cast_samples_size_t(i, i_size);
         std::vector<size_t> _f = cast_samples_size_t(f, f_size);
         atom->scattering_rate(results, _k, _rho, _k_vec, _x_vec, _i, _f);

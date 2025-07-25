@@ -600,22 +600,21 @@ def example(n=None):
 
         i = 0.
         jg = 2.
-        je = 7.
-        dm = 2
+        je = 4.
+        dm = 0
 
         g = sim.State(0., parity='e', j=jg, i=i, f=jg + i, m=jg + i, hyper_const=g_hyper, label='g')
-        e = sim.State(f_eg, parity='o', j=je, i=i, f=je + i, m=jg + i + dm, hyper_const=e_hyper, label='e')
+        e = sim.State(f_eg, parity='e', j=je, i=i, f=je + i, m=jg + i + dm, hyper_const=e_hyper, label='e')
 
-        decay = sim.DecayMap(labels=[('g', 'e')], a=[a_eg], k_max=je - jg)
+        decay = sim.DecayMap(labels=[('g', 'e')], a=[a_eg], k_max=int(je - jg))
 
         states = [g, e]
         atom = sim.Atom(states=states, decay_map=decay)
         # atom.plot()
 
         intensity = 100.
-        pol_eg = sim.Polarization([0, 0, 1], vec_as_q=False, q_axis=[0, 0, 1])
+        pol_eg = sim.Polarization([1, 0, 0], vec_as_q=False, q_axis=[0, 0, 1])
         laser_eg = sim.Laser(freq=f_eg, polarization=pol_eg, intensity=intensity, k=[0., 1., 0.])
-        print(laser_eg.k)
 
         env = sim.Environment(B=[0., 0., 1e-6])
         inter = sim.Interaction(atom=atom, lasers=[laser_eg, ], environment=env, delta_max=1000.)
@@ -624,7 +623,7 @@ def example(n=None):
 
         r = inter.get_rabi()
 
-        t = np.linspace(0., 3., 301)
+        t = np.linspace(0., 1., 301)
 
         y0 = np.zeros(atom.size, dtype=complex)
         y0[1] = 1.
@@ -650,7 +649,10 @@ def example(n=None):
 
         theta, phi = np.meshgrid(theta, phi, indexing='ij')
 
-        r = atom.scattering_rate(rho, theta=theta, phi=phi)[:, -1, -1]
+        r0 = atom.scattering_rate(rho[0, :, :, -1], theta=np.pi / 2, phi=0., x_vec='-', axis=0)
+        print(f'r0: {r0[0]} MHz')
+
+        r = atom.scattering_rate(rho[0, :, :, -1], theta=theta, phi=phi, x_vec='+', axis=0)
         r /= np.max(r)
         r = r.reshape((n_theta, n_phi))
 

@@ -245,7 +245,7 @@ Matrix3d rotation_matrix(Vector3d vec)
     return R;
 }
 
-Vector3d cast_theta_phi_vec(double theta, double phi)
+Vector3d cast_theta_phi_er(double theta, double phi)
 {
     Vector3d r = Vector3d::Zero();
     r(0) = sin(theta) * cos(phi);
@@ -254,14 +254,55 @@ Vector3d cast_theta_phi_vec(double theta, double phi)
     return r / r.norm();
 }
 
-std::vector<Vector3d> cast_samples_theta_phi_vec(double* theta, double* phi, size_t sample_size)
+std::vector<Vector3d> cast_samples_theta_phi_er(double* theta, double* phi, size_t sample_size)
 {
-    printf("theta, phi: %.3f, %.3f\n", theta[0], phi[0]);
+    // printf("theta, phi: %.3f, %.3f\n", theta[0], phi[0]);
     std::vector<Vector3d> r(sample_size, Vector3d::Zero());
     for (size_t i = 0; i < sample_size; ++i)
     {
-        r.at(i) = cast_theta_phi_vec(theta[i], phi[i]);
+        r.at(i) = cast_theta_phi_er(theta[i], phi[i]);
     }
-    printf("r: %.3f, %.3f, %.3f\n", r.at(0)(0), r.at(0)(1), r.at(0)(2));
+    // printf("r: %.3f, %.3f, %.3f\n", r.at(0)(0), r.at(0)(1), r.at(0)(2));
+    return r;
+}
+
+Vector3d cast_theta_phi_et(double theta, double phi)
+{
+    Vector3d r = Vector3d::Zero();
+    r(0) = cos(theta) * cos(phi);
+    r(1) = cos(theta) * sin(phi);
+    r(2) = -sin(theta);
+    return r / r.norm();
+}
+
+std::vector<Vector3d> cast_samples_theta_phi_et(double* theta, double* phi, size_t sample_size)
+{
+    // printf("theta, phi: %.3f, %.3f\n", theta[0], phi[0]);
+    std::vector<Vector3d> r(sample_size, Vector3d::Zero());
+    for (size_t i = 0; i < sample_size; ++i)
+    {
+        r.at(i) = cast_theta_phi_et(theta[i], phi[i]);
+    }
+    // printf("r: %.3f, %.3f, %.3f\n", r.at(0)(0), r.at(0)(1), r.at(0)(2));
+    return r;
+}
+
+Vector3d cast_theta_phi_ep(double theta, double phi)
+{
+    Vector3d r = Vector3d::Zero();
+    r(0) = -sin(phi);
+    r(1) = cos(phi);
+    return r / r.norm();
+}
+
+std::vector<Vector3d> cast_samples_theta_phi_ep(double* theta, double* phi, size_t sample_size)
+{
+    // printf("theta, phi: %.3f, %.3f\n", theta[0], phi[0]);
+    std::vector<Vector3d> r(sample_size, Vector3d::Zero());
+    for (size_t i = 0; i < sample_size; ++i)
+    {
+        r.at(i) = cast_theta_phi_ep(theta[i], phi[i]);
+    }
+    // printf("r: %.3f, %.3f, %.3f\n", r.at(0)(0), r.at(0)(1), r.at(0)(2));
     return r;
 }

@@ -405,12 +405,12 @@ void Interaction::gen_rabi()
 			kpol_list.at(1).push_back(lasers.at(m)->get_kpol(false, _k, *env->get_e_B()));
 			
 			
-			printf("%zi(%zi): ", m, _k);
+			/*printf("%zi(%zi): ", m, _k);
 			for (size_t i = 0; i < kpol_list.at(0).back().size(); ++i)
 			{
 				printf("%.3f + %.3fj, ", kpol_list.at(0).back()(i).real(), kpol_list.at(0).back()(i).imag());
 			}
-			printf("\n");/**/
+			printf("\n");*/
 		}
 
 
@@ -767,7 +767,7 @@ Vector3d Interaction::gen_k_up(std::mt19937& gen, VectorXd& w0, VectorXd& w, siz
 				chance += Rk.at(m)(c, l) / norm;
 				if (choice < chance)
 				{
-					k_up += lasers.at(m)->get_k();
+					k_up += lasers.at(m)->get_k_si();
 					c = l;
 					inner_flag = true;
 					if (c == j) outer_flag = true;
@@ -814,7 +814,6 @@ void Interaction::update_rates(MatrixXd& R, VectorXd& w0, VectorXd& w)
 {
 	R.setZero();
 	double _w0;
-	double a;
 	double gamma;
 	double r;
 	for (size_t m = 0; m < lasers.size(); ++m)

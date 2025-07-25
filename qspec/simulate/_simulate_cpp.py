@@ -1093,7 +1093,6 @@ class Atom:
 
             else:
                 k_vec = _cast_3d_vec(k_vec, dtype=float)
-                x_vec = _cast_3d_vec(x_vec, dtype=complex)
 
                 results_shape = (k_vec.shape[0], ) + results_shape
                 results = np.zeros(results_shape, dtype=float, order='C')
@@ -1101,12 +1100,22 @@ class Atom:
 
                 k_vec_size = c_size_t(k_vec.shape[0])
                 k_vec = k_vec.ctypes.data_as(c_double_p)
-                x_vec = x_vec.ctypes.data_as(c_complex_p)
 
-                error = dll.atom_scattering_rate_qk(self.instance, results_c, k, k_size,
-                                                    rho, rho_size, as_density_matrix,
-                                                    k_vec, x_vec, k_vec_size,
-                                                    i, i_size, f, f_size)
+                if isinstance(x_vec, str):
+                    x_vec = c_size_t(_cast_x_vec_str(x_vec))
+                    error = dll.atom_scattering_rate_qk_xb(self.instance, results_c, k, k_size,
+                                                           rho, rho_size, as_density_matrix,
+                                                           k_vec, x_vec, k_vec_size,
+                                                           i, i_size, f, f_size)
+
+                else:
+                    x_vec = _cast_3d_vec(x_vec, dtype=complex)
+                    x_vec = x_vec.ctypes.data_as(c_complex_p)
+
+                    error = dll.atom_scattering_rate_qk(self.instance, results_c, k, k_size,
+                                                        rho, rho_size, as_density_matrix,
+                                                        k_vec, x_vec, k_vec_size,
+                                                        i, i_size, f, f_size)
 
         elif theta is None or phi is None:
             raise ValueError('\'theta\' and \'phi\' must either both be specified or both be None.')
@@ -1137,13 +1146,19 @@ class Atom:
                                                       theta, phi, k_vec_size,
                                                       i, i_size, f, f_size)
             else:
-                x_vec = _cast_3d_vec(x_vec, dtype=complex)
-                x_vec = x_vec.ctypes.data_as(c_complex_p)
-                
-                error = dll.atom_scattering_rate_qk_tp(self.instance, results_c, k, k_size,
-                                                       rho, rho_size, as_density_matrix,
-                                                       theta, phi, x_vec, k_vec_size,
-                                                       i, i_size, f, f_size)
+                if isinstance(x_vec, str):
+                    x_vec = c_size_t(_cast_x_vec_str(x_vec))
+                    error = dll.atom_scattering_rate_qk_tp_xb(self.instance, results_c, k, k_size,
+                                                              rho, rho_size, as_density_matrix,
+                                                              theta, phi, x_vec, k_vec_size,
+                                                              i, i_size, f, f_size)
+                else:
+                    x_vec = _cast_3d_vec(x_vec, dtype=complex)
+                    x_vec = x_vec.ctypes.data_as(c_complex_p)
+                    error = dll.atom_scattering_rate_qk_tp(self.instance, results_c, k, k_size,
+                                                           rho, rho_size, as_density_matrix,
+                                                           theta, phi, x_vec, k_vec_size,
+                                                           i, i_size, f, f_size)
 
         if error == -1:
             raise ValueError('Integer parameter \'1 <= k <= DecayMap.k_em_max\' is out of range.')
@@ -1485,6 +1500,25 @@ def _cast_3d_vec(x: Optional[array_like], dtype: type = float):
         break
 
     raise ValueError('\'x\' must have shape (3, ) or (n, 3).')
+
+
+def _cast_x_vec_str(x_vec: str) -> int:
+    if x_vec.lower() in {'z', 'theta', 't'}:
+        return 0
+    elif x_vec.lower() in {'x', 'y', 'xy', 'phi', 'p'}:
+        return 1
+    elif x_vec.lower() in {'-', 's-', 'sigma-', 'l'}:
+        return 2
+    elif x_vec.lower() in {'+', 's+', 'sigma+', 'r'}:
+        return 3
+    else:
+        raise ValueError(
+            '\'x_vec\' must be an array of complex vectors with the same size as'
+            ' (\'theta\', \'phi\') or \'k_vec\', or a str'
+            ' in {\'z\', \'theta\', \'t\'} for vectors along the longitudes,'
+            ' in {\'x\', \'y\', \'xy\', \'phi\', \'p\'} for vectors along the latitudes,'
+            ' in {\'-\', \'s-\', \'sigma-\', \'l\'} for sigma- polarized light or'
+            ' in {\'+\', \'s+\', \'sigma+\', \'r\'} for sigma+ polarized light.')
 
 
 class Interaction:

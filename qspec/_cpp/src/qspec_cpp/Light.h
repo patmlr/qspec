@@ -69,9 +69,9 @@ public:
 
 	double get_theta_k();
 	double get_phi_k();
-	Vector3cd get_x();
-	Vector3cd get_qk();
-	Vector3d get_q_axis();
+	Vector3cd* get_x();
+	Vector3cd* get_qk();
+	Vector3d* get_q_axis();
 };
 
 
@@ -99,9 +99,9 @@ public:
 	double get_freq();
 	void set_freq(double _freq_0);
 
-	Vector3d get_k();
+	Vector3d* get_k();
 	void set_k(Vector3d _k);
-	Vector3d get_kn();
 
+	Vector3d get_k_si();
 	VectorXcd get_kpol(bool electric, size_t k, Vector3d q_axis);
 };

@@ -40,19 +40,18 @@ double wigner_d_qm(size_t j, int q, int m, double theta)
             &&  q + m + k >= 0) k_list.push_back(k);
 
     // printf("j, q, m, theta: %zi, %d, %d, %.3f\n", j, q, m, theta);
-    // printf("k_min, N: %d, %d\n", k_min, N);
 
     double ret = 0.;
     for (int k: k_list)
     {
         double kd = static_cast<double>(k);
-        ret += pow(-1, k) * pow(cos(0.5 * theta), q + m + 2 * k) * pow(sin(0.5 * theta), 2 * _j - q - m - 2 * k) 
-            / static_cast<double>(factorial(kd) * factorial(jd - qd - kd) * factorial(jd - md - kd) * factorial(qd + md + kd));
+        ret += pow(-1., k) * pow(cos(0.5 * theta), q + m + 2 * k) * pow(sin(0.5 * theta), 2 * _j - q - m - 2 * k) 
+            / (factorial(kd) * factorial(jd - qd - kd) * factorial(jd - md - kd) * factorial(qd + md + kd));
         // printf("fac: %.3f\n", factorial(kd) * factorial(jd - qd - kd) * factorial(jd - md - kd) * factorial(qd + md + kd));
     }
     // printf("sqrt_arg: %.3f\n", factorial(jd + qd) * factorial(jd - qd) * factorial(jd + md) * factorial(jd - md));
     // printf("-1: %.3f\n", pow(-1, _j - m));
-    return ret * pow(-1, _j - m) * sqrt(factorial(jd + qd) * factorial(jd - qd) * factorial(jd + md) * factorial(jd - md));
+    return ret * pow(-1., _j - m) * sqrt(factorial(jd + qd) * factorial(jd - qd) * factorial(jd + md) * factorial(jd - md));
 }
 
 
@@ -68,8 +67,8 @@ VectorXcd spherical_tensor(bool electric, size_t k, Vector3cd qk, double theta, 
     // printf("theta, phi: %.3f, %.3f\n", theta, phi);
     VectorXcd ret = VectorXcd::Zero(2 * k + 1);
 
-    double pm = 1.;  // -1.;
-    std::complex<double> phase = 1.;  // sc::i;
+    double pm = -1.;
+    std::complex<double> phase = -sc::i;
     if (electric) {
         pm = 1.;
         phase = 1.;

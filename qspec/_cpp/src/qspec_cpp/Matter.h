@@ -197,8 +197,9 @@ public:
 	void gen_w0();
 	VectorXd* get_w0();
 
-	void gen_frequencies(Environment* _env);
+	bool is_electric(size_t k, size_t i, size_t j);
 	void gen_multipole();
+	void gen_frequencies(Environment* _env);
 	void update();
 
 	std::vector<State*>* get_states();
@@ -244,7 +245,7 @@ public:
 	void scattering_rate(double* results, std::vector<size_t>& k, std::vector<MatrixXcd>& rho, std::vector<Vector3d>& k_vec, std::vector<Vector3cd>& x_vec, std::vector<size_t>& i, std::vector<size_t>& f);
 	void scattering_rate(double* results, std::vector<size_t>& k, std::vector<MatrixXcd>& rho, std::vector<Vector3d>& k_vec, std::vector<size_t>& i, std::vector<size_t>& f);
 
-	void scattering_rate(double* results, std::vector<size_t>& k, std::vector<MatrixXcd>& rho, std::vector<std::vector<VectorXcd>>& qk, std::vector<size_t>& i, std::vector<size_t>& f);
+	void scattering_rate(double* results, std::vector<size_t>& k, std::vector<MatrixXcd>& rho, std::vector<std::vector<MatrixXcd>>& qk, std::vector<size_t>& i, std::vector<size_t>& f);
 	void scattering_rate(double* results, std::vector<size_t>& k, std::vector<MatrixXcd>& rho, std::vector<size_t>& i, std::vector<size_t>& f);
 
 };

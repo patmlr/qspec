@@ -179,19 +179,19 @@ double Polarizationk::get_phi_k()
 	return phi_k;
 }
 
-Vector3cd Polarizationk::get_x()
+Vector3cd* Polarizationk::get_x()
 {
-	return x;
+	return &x;
 }
 
-Vector3cd Polarizationk::get_qk()
+Vector3cd* Polarizationk::get_qk()
 {
-	return qk;
+	return &qk;
 }
 
-Vector3d Polarizationk::get_q_axis()
+Vector3d* Polarizationk::get_q_axis()
 {
-	return q_axis;
+	return &q_axis;
 }
 
 
@@ -255,9 +255,9 @@ void Laser::set_freq(double _freq)
 	freq = _freq;
 }
 
-Vector3d Laser::get_k()
+Vector3d* Laser::get_k()
 {
-	return k;
+	return &k;
 }
 
 void Laser::set_k(Vector3d _k)
@@ -265,9 +265,9 @@ void Laser::set_k(Vector3d _k)
 	k = _k / _k.norm() * freq / sc::c;
 }
 
-Vector3d Laser::get_kn()
+Vector3d Laser::get_k_si()
 {
-	return k / k.norm();
+	return k * freq / sc::c;
 }
 
 VectorXcd Laser::get_kpol(bool electric, size_t _k, Vector3d q_axis)
@@ -275,5 +275,5 @@ VectorXcd Laser::get_kpol(bool electric, size_t _k, Vector3d q_axis)
 	Polarizationk polarization_k = Polarizationk();
 	polarization_k.init(*polarization->get_x(), k, q_axis);
 
-	return spherical_tensor(electric, _k, polarization_k.get_qk(), polarization_k.get_theta_k(), polarization_k.get_phi_k());
+	return spherical_tensor(electric, _k, *polarization_k.get_qk(), polarization_k.get_theta_k(), polarization_k.get_phi_k());
 }
