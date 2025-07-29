@@ -662,7 +662,7 @@ class ScatteringRate:
             self.laser = Laser(self.freq_0, intensity=1., polarization=Polarization())
         labels = self.atom.decay_map.labels[self.i_decay]
         self.s = saturation(
-            self.laser.intensity, self.laser.freq, self.atom.decay_map.get_ae(labels[0], labels[1], 1), 1.)
+            self.laser.intensity, self.laser.freq, self.atom.decay_map.get_ae(labels[0], labels[1], 1))
         self.set_polarization(self.laser.polarization)
 
     def set_states(self):

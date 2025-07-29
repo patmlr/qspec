@@ -24,7 +24,7 @@ __all__ = ['L_LABEL', 'E_NORM', 'pi', 'LEMNISCATE', 'mu_N', 'mu_B', 'g_s', 'me_u
            'f_recoil_v', 'get_f', 'get_m', 'hyperfine', 'lande_n', 'lande_j', 'lande_jj', 'g_j', 'lande_f',
            'zeeman_linear', 'hyper_zeeman_linear',
            'hyper_zeeman_ij', 'hyper_zeeman_num', 'hyper_zeeman_12', 'hyper_zeeman_12_d', 'a_hyper_mu', 'a_einstein_m1',
-           'temperature_doppler', 'saturation_intensity', 'saturation', 'rabi', 'scattering_rate', 'mass_factor',
+           'temperature_doppler', 'saturation_intensity', 'saturation', 'rabi_s', 'scattering_rate', 'mass_factor',
            'delta_r2', 'delta_r4', 'delta_r6', 'lambda_r', 'lambda_rn', 'schmidt_line', 'sellmeier',
            'gamma_3d', 'boost', 'doppler_3d', 'gaussian_beam_3d', 'gaussian_doppler_3d', 't_xi', 'thermal_v_pdf',
            'thermal_v_rvs', 'thermal_e_pdf', 'thermal_e_rvs', 'convolved_boltzmann_norm_pdf',
@@ -47,6 +47,7 @@ gn_s = sc.physical_constants['neutron g factor'][0]
 
 """ Units """
 
+# --- freq <-> cm ---
 
 def inv_cm_to_freq(k: array_like) -> ndarray:
     r"""
@@ -68,12 +69,14 @@ def freq_to_inv_cm(f: array_like) -> ndarray:
     return np.asarray(f, dtype=float) / sc.c * 1e4
 
 
+# --- wav <-> freq ---
+
 def wavelength_to_freq(lam: array_like) -> ndarray:
     r"""
     Convert &mu;m into MHz using $f = c / \lambda$.
 
     :param lam: The wavelength $\lambda$ of a transition (&mu;m).
-    :returns: The frequency corresponding to the wavelength `lam` (MHz).
+    :returns: (freq) The frequency corresponding to the wavelength `lam` (MHz).
     """
     return sc.c / np.asarray(lam, dtype=float)
 
@@ -83,17 +86,19 @@ def freq_to_wavelength(f: array_like) -> ndarray:
     Convert MHz into &mu;m using $\lambda = c / f$.
 
     :param f: The frequency $f$ of a transition (MHz).
-    :returns: The wavelength corresponding to the frequency `f` (&mu;m).
+    :returns: (lambda) The wavelength corresponding to the frequency `f` (&mu;m).
     """
     return sc.c / np.asarray(f, dtype=float)
 
+
+# --- cm <-> wav ---
 
 def inv_cm_to_wavelength(k: array_like) -> ndarray:
     r"""
     Convert cm<sup>-1</sup> into &mu;m using $\lambda = 10^4 / k$.
 
     :param k: The wavenumber $k$ of a transition (cm<sup>-1</sup>).
-    :returns: The wavelength corresponding to the wavenumber `k` (um).
+    :returns: (lambda) The wavelength corresponding to the wavenumber `k` (um).
     """
     return 1e4 / np.asarray(k, dtype=float)
 
@@ -103,7 +108,7 @@ def wavelength_to_inv_cm(lam: array_like) -> ndarray:
     Convert &mu;m into cm<sup>-1</sup> using $\lambda = 10^4 / \lambda$.
 
     :param lam: The wavelength $\lambda$ of a transition (&mu;m).
-    :returns: The wavenumber $k$ corresponding to the wavelength `lam` (cm<sup>-1</sup>).
+    :returns: (k) The wavenumber $k$ corresponding to the wavelength `lam` (cm<sup>-1</sup>).
     """
     return 1e4 / np.asarray(lam, dtype=float)
 
@@ -116,7 +121,7 @@ def beta(v: array_like) -> ndarray:
     The relativistic velocity $\beta = v / c$.
 
     :param v: The velocity $v$ of a body (m/s).
-    :returns: The velocity `v` relative to the vacuum speed of light $c$.
+    :returns: (beta) The velocity `v` relative to the vacuum speed of light $c$.
     """
     return np.asarray(v, dtype=float) / sc.c
 
@@ -126,7 +131,7 @@ def gamma_beta(b: array_like) -> ndarray:
     The time-dilation/Lorentz factor $\gamma = \sqrt{1 - \beta^2}^{-1}$.
 
     :param b: The relativistic velocity $\beta$ of a body.
-    :returns: The time-dilation/Lorentz factor $\gamma$ corresponding to the relativistic velocity `b`.
+    :returns: (gamma) The time-dilation/Lorentz factor $\gamma$ corresponding to the relativistic velocity `b`.
     """
     return 1. / np.sqrt(1. - np.asarray(b, dtype=float) ** 2)
 
@@ -136,7 +141,7 @@ def gamma(v: array_like) -> ndarray:
     The time-dilation/Lorentz factor $\gamma = \sqrt{1 - (v/c)^2}^{-1}$.
 
     :param v: The velocity of a body (m/s).
-    :returns: The time-dilation/Lorentz factor $\gamma$ corresponding to the velocity `v`.
+    :returns: (gamma) The time-dilation/Lorentz factor $\gamma$ corresponding to the velocity `v`.
     """
     return gamma_beta(beta(v))
 
@@ -147,7 +152,7 @@ def gamma_e(e: array_like, m: array_like) -> ndarray:
 
     :param e: The total energy $E$ of a body, including the energy of the rest mass (eV).
     :param m: The mass $m$ of the body (u).
-    :returns: The time-dilation/Lorentz factor $\gamma$ corresponding to the total energy `e` of a body with mass `m`.
+    :returns: (gamma) The time-dilation/Lorentz factor $\gamma$ corresponding to the total energy `e` of a body with mass `m`.
     """
     return np.asarray(e, dtype=float) / e_rest(m)
 
@@ -158,7 +163,7 @@ def gamma_e_kin(e: array_like, m: array_like) -> ndarray:
 
     :param e: The kinetic energy $E_\mathrm{kin}$ of a body (eV).
     :param m: The mass $m$ of the body (u).
-    :returns: The time-dilation/Lorentz factor $\gamma$ corresponding to the kinetic energy `e` of a body with mass `m`.
+    :returns: (gamma) The time-dilation/Lorentz factor $\gamma$ corresponding to the kinetic energy `e` of a body with mass `m`.
     """
     return 1. + gamma_e(e, m)
 
@@ -168,7 +173,7 @@ def e_rest(m: array_like) -> ndarray:
     The resting energy $E_\mathrm{rest} = mc^2$.
 
     :param m: The mass $m$ of a body (u).
-    :returns: The resting energy $E_\mathrm{rest}$ of the body with mass `m` (eV).
+    :returns: (E_rest) The resting energy $E_\mathrm{rest}$ of the body with mass `m` (eV).
     """
     return np.asarray(m, dtype=float) * sc.atomic_mass * sc.c ** 2 / E_NORM
 
@@ -182,7 +187,7 @@ def e_kin(v: array_like, m: array_like, relativistic: bool = True) -> ndarray:
     :param m: The mass $m$ of the body (u).
     :param relativistic: The calculation is performed either relativistically (`True`) or classically (`False`).
      The default is `True`.
-    :returns: The kinetic energy $E_\mathrm{kin}$ of a body with velocity `v` and mass `m` (eV).
+    :returns: (E_kin) The kinetic energy $E_\mathrm{kin}$ of a body with velocity `v` and mass `m` (eV).
     """
     if relativistic:
         return (gamma(v) - 1.) * e_rest(m)
@@ -197,7 +202,7 @@ def e_total(v: array_like, m: array_like) -> ndarray:
 
     :param v: The velocity $v$ of a body (m/s).
     :param m: The mass $m$ of the body (u).
-    :returns: The total energy $E$ of a body with velocity `v` and mass `m` (eV).
+    :returns: (E) The total energy $E$ of a body with velocity `v` and mass `m` (eV).
     """
     return gamma(v) * e_rest(m)
 
@@ -208,7 +213,7 @@ def e_el(u: array_like, q: array_like) -> ndarray:
 
     :param u: An electric potential difference $U$ (V).
     :param q: The electric charge $q$ of a body (e).
-    :returns: The potential energy difference $E_\mathrm{pot}$ of a body with electric charge `q`
+    :returns: (E_pot) The potential energy difference $E_\mathrm{pot}$ of a body with electric charge `q`
      inside an electric potential with voltage `u` (eV).
     """
     q, u = np.asarray(q, dtype=float), np.asarray(u, dtype=float)
@@ -225,7 +230,7 @@ def v_e(e: array_like, m: array_like, v0: array_like = 0, relativistic: bool = T
     :param v0: The initial velocity $v_0$ of the body (m/s).
     :param relativistic: The calculation is performed either relativistically (`True`) or classically (`False`).
      The default is `True`.
-    :returns: The velocity $v$ of a body with mass `m` and velocity `v0`
+    :returns: (v) The velocity $v$ of a body with mass `m` and velocity `v0`
      after the addition of the energy `e` (m/s).
     """
     if relativistic:
@@ -245,7 +250,7 @@ def v_e_d1(e: array_like, m: array_like, v0: array_like = 0, relativistic: bool 
     :param v0: The initial velocity $v_0$ of the body (m/s).
     :param relativistic: The calculation is performed either relativistically (`True`) or classically (`False`).
      The default is `True`.
-    :returns: The first derivative $\partial v / \partial E$ of the velocity $v(E)$ of a body with mass `m`
+    :returns: (dv_dE) The first derivative $\partial v / \partial E$ of the velocity $v(E)$ of a body with mass `m`
      and velocity `v0` with respect to the added energy `e` (m/(s eV)).
     """
     m = np.asarray(m, dtype=float)
@@ -266,7 +271,7 @@ def v_el(u: array_like, q: array_like, m: array_like, v0: array_like = 0, relati
     :param v0: The initial velocity $v_0$ of the body (m/s).
     :param relativistic: The calculation is performed either relativistically (`True`) or classically (`False`).
      The default is `True`.
-    :returns: The velocity $v$ of the body with starting velocity `v0`, electric charge `q` and mass `m`
+    :returns: (v) The velocity $v$ of the body with starting velocity `v0`, electric charge `q` and mass `m`
      after electrostatic acceleration with the voltage `u` (m/s).
     """
     return v_e(e_el(u, q), m, v0=v0, relativistic=relativistic)
@@ -283,7 +288,7 @@ def v_el_d1(u: array_like, q: array_like, m: array_like, v0: array_like = 0, rel
     :param v0: The initial velocity $v_0$ of the body (m/s).
     :param relativistic: The calculation is performed either relativistically (`True`) or classically (`False`).
      The default is `True`.
-    :returns: The first derivative $\partial v / \partial U$ of the velocity $v$ of the body
+    :returns: (dv_dU) The first derivative $\partial v / \partial U$ of the velocity $v$ of the body
      with starting velocity `v0`, electric charge `q` and mass `m` after electrostatic acceleration
      with the voltage `u` (m/(s V)).
     """
@@ -299,7 +304,7 @@ def p_v(v: array_like, m: array_like, relativistic: bool = True) -> ndarray:
     :param m: The mass $m$ of the body (u).
     :param relativistic: The calculation is performed either relativistically (`True`) or classically (`False`).
      The default is `True`.
-    :returns: The momentum $p$ of a body with velocity `v` and mass `m` (u m/s).
+    :returns: (p) The momentum $p$ of a body with velocity `v` and mass `m` (u m/s).
     """
     v, m = np.asarray(v, dtype=float), np.asarray(m, dtype=float)
     if relativistic:
@@ -317,7 +322,7 @@ def p_e(e: array_like, m: array_like, p0: array_like = 0, relativistic: bool = T
     :param p0: The initial momentum of the body (u m/s).
     :param relativistic: The calculation is performed either relativistically (`True`) or classically (`False`).
      The default is `True`.
-    :returns: The momentum $p$ of a body with mass `m` and starting momentum `p0`
+    :returns: (p) The momentum $p$ of a body with mass `m` and starting momentum `p0`
      after the addition of the energy `e` (u m/s).
     """
     e, p0 = np.asarray(e, dtype=float), np.asarray(p0, dtype=float)
@@ -341,7 +346,7 @@ def p_el(u: array_like, q: array_like, m: array_like, p0: array_like = 0, relati
     :param p0: The initial momentum of the body (u m/s).
     :param relativistic: The calculation is performed either relativistically (`True`) or classically (`False`).
      The default is `True`.
-    :returns: The momentum $p$ of a body with electric charge `q`, mass `m` and starting momentum `p0`
+    :returns: (p) The momentum $p$ of a body with electric charge `q`, mass `m` and starting momentum `p0`
      after the addition of the energy `e` (u m/s).
     """
     return p_e(e_el(u, q), m, p0, relativistic=relativistic)
@@ -356,7 +361,7 @@ def doppler(f: array_like, v: array_like, alpha: array_like, return_frame: str =
     :param v: The velocity $v$ of a body (m/s).
     :param alpha: The angle $\alpha$ between the velocity- and the light-vector in the laboratory frame (rad).
     :param return_frame: The coordinate system for which the frequency is returned. Can be either `'atom'` or `'lab'`.
-    :returns: the Doppler-shifted frequency $f^\prime$ in either the rest frame of the atom
+    :returns: (f_doppler) the Doppler-shifted frequency $f^\prime$ in either the rest frame of the atom
      or the laboratory frame ([`f`]).
     :raises ValueError: `return_frame` must be either `'atom'` or `'lab'`.
     """
@@ -384,7 +389,7 @@ def doppler_d1(f: array_like, v: array_like, alpha: array_like, return_frame: st
     :param v: The velocity $v$ of a body (m/s).
     :param alpha: The angle $\alpha$ between the velocity- and the light-vector in the laboratory frame (rad).
     :param return_frame: The coordinate system for which the frequency is returned. Can be either `'atom'` or `'lab'`.
-    :returns: the first derivative $\partial f^\prime / \partial v$ of the Doppler-shifted frequency
+    :returns: (df_dv) the first derivative $\partial f^\prime / \partial v$ of the Doppler-shifted frequency
      $f^\prime$ with respect to `v` in either the rest frame of the atom or the laboratory frame ([`f`] s/m).
     :raises ValueError: `return_frame` must be either `'atom'` or `'lab'`.
     """
@@ -418,7 +423,7 @@ def doppler_e_d1(f: array_like, alpha: array_like, e: array_like, m: array_like,
     :param return_frame: The coordinate system for which the frequency is returned. Can be either `'atom'` or `'lab'`.
     :param relativistic: The calculation is performed either relativistically (`True`) or classically (`False`).
      The default is `True`.
-    :returns: the first derivative $\partial f^\prime / \partial E$ of the Doppler-shifted frequency
+    :returns: (df_dE) The first derivative $\partial f^\prime / \partial E$ of the Doppler-shifted frequency
      $f^\prime$ with respect to `e` in either the rest frame of the atom or the laboratory frame ([`f`] / eV).
     :raises ValueError: `return_frame` must be either `'atom'` or `'lab'`.
     """
@@ -442,7 +447,7 @@ def doppler_el_d1(f: array_like, alpha: array_like, u: array_like, q: array_like
     :param return_frame: The coordinate system for which the frequency is returned. Can be either `'atom'` or `'lab'`.
     :param relativistic: The calculation is performed either relativistically (`True`) or classically (`False`).
      The default is `True`.
-    :returns: the first derivative $\partial f^\prime / \partial U$ of the Doppler-shifted frequency
+    :returns: (df_dU) The first derivative $\partial f^\prime / \partial U$ of the Doppler-shifted frequency
      $f^\prime$ with respect to `u` in either the rest frame of the atom or the laboratory frame ([`f`] / V).
     :raises ValueError: `return_frame` must be either `'atom'` or `'lab'`.
     """
@@ -473,7 +478,7 @@ def inverse_doppler(f_atom: array_like, f_lab: array_like, alpha: array_like,
     <li> `'isnan-large'`: Ignore `nan` values and return the larger velocity.</li>
     </ul>
     :param return_mask: Whether the mask where the velocity is ambiguous is returned as a second argument.
-    :returns: the velocity $v$ required to shift `f_lab` to `f_atom`.
+    :returns: (v) The velocity $v$ required to shift `f_lab` to `f_atom`.
      Optionally returns the mask where the velocity is ambiguous (m/s).
     :raises ValueError: `mode` must be `'raise-raise'`, `'raise-small'`, `'raise-large'`, `'isnan-raise'`,
      `'isnan-small'`, or `'isnan-large'`. For additionally raised errors, see the description of the `mode` parameter.
@@ -555,7 +560,7 @@ def inverse_doppler_d1(f_atom: array_like, f_lab: array_like, alpha: array_like,
     <li>`'isnan-large'`: Ignore `nan` values and return the larger velocity.</li>
     </ul>
     :param return_mask: Whether the mask where the velocity is ambiguous is returned as a second argument.
-    :returns: the first derivative $\partial v / \partial f_\mathrm{atom}$ of the velocity $v$ required to shift
+    :returns: (dv_df) The first derivative $\partial v / \partial f_\mathrm{atom}$ of the velocity $v$ required to shift
      `f_lab` to `f_atom`. Optionally returns the mask where the velocity is ambiguous (m/(s MHz)).
     """
     modes = ['raise-raise', 'raise-small', 'raise-large', 'isnan-raise', 'isnan-small', 'isnan-large']
@@ -595,7 +600,8 @@ def alpha_atom(alpha: array_like, v: array_like) -> array_like:
 
     :param alpha: The angle $\alpha$ between a velocity- and a wave-vector in the laboratory frame (rad).
     :param v: The velocity $v$ of a body (m/s).
-    :returns: The angle $\alpha^\prime$ between the velocity- and the wave-vector in the atom's rest frame (rad).
+    :returns: (alpha) The angle $\alpha^\prime$ between the velocity-
+     and the wave-vector in the atom's rest frame (rad).
     """
     alpha = np.asarray(alpha, dtype=float)
     cos = np.cos(alpha)
@@ -610,7 +616,7 @@ def v_recoil(f: array_like, m: array_like) -> ndarray:
 
     :param f: The frequency of light $f$ in the atom's rest frame (MHz).
     :param m: The mass $m$ of the atom (u).
-    :returns: The change of velocity  $\delta v$ (m/s).
+    :returns: (dv_rec) The change of velocity  $\delta v$ (m/s).
     """
     f, m = np.asarray(f, dtype=float), np.asarray(m, dtype=float)
     return sc.h * f / (m * sc.atomic_mass * sc.c) * 1e6
@@ -623,7 +629,7 @@ def f_recoil(f: array_like, m: array_like) -> ndarray:
 
     :param f: The frequency of light in the atoms rest frame (MHz).
     :param m: The mass $m$ of the atom (u).
-    :returns: The change of the transition frequency $\delta f$ (MHz).
+    :returns: (df_rec) The change of the transition frequency $\delta f$ (MHz).
     """
     f, m = np.asarray(f, dtype=float), np.asarray(m, dtype=float)
     return (sc.h * (f * 1e6) ** 2) / (2 * m * sc.atomic_mass * sc.c ** 2) * 1e-6
@@ -639,7 +645,7 @@ def f_recoil_v(v: array_like, alpha: array_like, f_lab: array_like, m: array_lik
     :param alpha: The angle $\alpha$ between a velocity- and a wave-vector in the laboratory frame (rad).
     :param f_lab: The frequency of light $f$ in the laboratory frame (MHz).
     :param m: The mass $m$ of the atom (u).
-    :returns: The change of the transition frequency $\delta f$ (MHz).
+    :returns: (df_rec) The change of the transition frequency $\delta f$ (MHz).
     """
     f = doppler(f_lab, v, alpha, return_frame='atom')
     return f_recoil(f, m)
@@ -654,7 +660,7 @@ def get_f(i: quant_like, j: quant_like) -> list[quant]:
 
     :param i: The nuclear spin quantum number $I$.
     :param j: The electronic total angular momentum quantum number $J$.
-    :returns: All possible $F$ quantum numbers.
+    :returns: (F_list) All possible $F$ quantum numbers.
     """
     return [quant(k + abs(i - j)) for k in range(int(i + j - abs(i - j) + 1))]
 
@@ -664,7 +670,7 @@ def get_m(f: quant_like) -> list[quant]:
     All quantum numbers fulfilling $-F \leq m \leq F$, where $m\in\mathbb{Z}$.
 
     :param f: The total angular momentum quantum number $F$.
-    :returns: All possible magnetic quantum numbers $m$ of the specified quantum number $F$.
+    :returns: (m_list) All possible magnetic quantum numbers $m$ of the specified quantum number $F$.
     """
     return [quant(k - f) for k in range(int(2 * f + 1))]
 
@@ -674,7 +680,7 @@ def lande_n(gyro: array_like) -> ndarray:
     The nuclear g-factor $g_I = \gamma_I h / \mu_N$ calculated from the gyromagnetic ratio `gyro`.
 
     :param gyro: The gyromagnetic ratio $\gamma_I$ (MHz).
-    :returns: The nuclear g-factor $g_I$.
+    :returns: (g_I) The nuclear g-factor $g_I$.
     """
     gyro = np.asarray(gyro, dtype=float)
     return gyro * sc.h / mu_N
@@ -696,7 +702,7 @@ def lande_j(s: quant_like, l: quant_like, j: quant_like, approx_g_s: bool = Fals
     :param j: The electronic total angular momentum quantum number $J$.
     :param approx_g_s: Whether to use g_s = -2 (`True`) or the QED result g_s = -2.0023... (`False`).
      The default is `False`.
-    :returns: The electronic g-factor $g_J$.
+    :returns: (g_J) The electronic g-factor $g_J$.
     """
     if j == 0:
         return 0.
@@ -721,7 +727,7 @@ def lande_jj(j0: quant_like, j1: quant_like, j: quant_like, g0: array_like, g1: 
     :param j: The angular momentum quantum number $J$.
     :param g0: The g-factor $g_{J_0}$.
     :param g1: The g-factor $g_{J_1}$.
-    :returns: The g-factor $g_J$.
+    :returns: (g_J) The g-factor $g_J$.
     """
     jj = j * (j + 1)
     jj01 = j0 * (j0 + 1) - j1 * (j1 + 1)
@@ -744,7 +750,7 @@ def g_j(j: quant_like = 0, ls: quant_iter = None, jj: quant_iter = None, gj: arr
      If `gj` is a single scalar value, it also overwrites `jj`.
     :param gj: A list of two $g_{j_i}$ or a single electronic g-factor $g_J$. If `gj` is a list, `jj` is required
      and `ls` is overwritten. If `gj` is a scalar, both `ls` and `jj` are overwritten.
-    :returns: The g-factor $g_J$.
+    :returns: (g_J) The g-factor $g_J$.
     """
     if ls is None and gj is None:
         raise ValueError('The parameter \'ls\' needs to be specified if \'gj\' is not given.')
@@ -778,7 +784,7 @@ def lande_f(i: quant_like, j: quant_like, f: quant_like, gi: array_like, gj: arr
     :param f: The total angular momentum quantum number $F$.
     :param gi: The nuclear g-factor $g_I$.
     :param gj: The electronic g-factor $g_J$.
-    :returns: The total atomic g-factor $g_F$.
+    :returns: (g_F) The total atomic g-factor $g_F$.
     """
     gi, gj = np.asarray(gi, dtype=float), np.asarray(gj, dtype=float)
     ff = f * (f + 1.)
@@ -806,7 +812,7 @@ def hyperfine(i: quant_like, j: quant_like, f: quant_like,
     :param a_hyper: The magnetic dipole hyperfine constant $A = \mu_I \mathcal{B}_J / (IJ)$ (arb. units).
     :param b_hyper: The electric quadrupole hyperfine constant $B = eQ_I (\partial^2 V_J / \partial z^2)$ ([`a_hyper`]).
     :param c_hyper: The magnetic octupole hyperfine constant $C = \Omega_I T_J^{(3)}$ ([`a_hyper`])
-    :returns: The hyperfine structure shift $\Delta_\mathrm{hfs}$ ([`a_hyper`]).
+    :returns: (dnu_hfs) The hyperfine structure shift $\Delta_\mathrm{hfs}$ ([`a_hyper`]).
     """
     a_hyper = np.asarray(a_hyper, dtype=float)
 
@@ -847,7 +853,8 @@ def zeeman_linear(m: quant_like, g: array_like, b_field: array_like = 0., as_fre
     :param b_field: The B-field $\mathcal{B}$ (T).
     :param as_freq: The shift can be returned in energy (`False`, eV) or frequency units (`True`, MHz).
      The default is `True`
-    :returns: The linear Zeeman shift $\Delta_\mathrm{Zeeman}$ in energy or frequency units (MHz if `as_freq` else eV).
+    :returns: (dnu_zeeman) The linear Zeeman shift $\Delta_\mathrm{Zeeman}$
+     in energy or frequency units (MHz if `as_freq` else eV).
     """
     g, b_field = np.asarray(g, dtype=float), np.asarray(b_field, dtype=float)
 
@@ -873,7 +880,7 @@ def hyper_zeeman_linear(i: quant_like, j: quant_like, f: quant_like, m: quant_li
     :param b_field: The B-field $\mathcal{B}$ (T).
     :param as_freq: The shift can be returned in energy (`False`, eV) or frequency units (`True`, MHz).
      The default is `True`
-    :returns: The hyperfine structure + linear Zeeman shift $\Delta$ (MHz if `as_freq` else eV)
+    :returns: (dnu_hfs_zeeman) The hyperfine structure + linear Zeeman shift $\Delta$ (MHz if `as_freq` else eV)
     """
     return hyperfine(i, j, f, a_hyper, b_hyper, c_hyper) + zeeman_linear(m, g_f, b_field, as_freq=as_freq)
 
@@ -898,7 +905,7 @@ def hyper_zeeman_ij(mi0: quant_like, mj0: quant_like, mi1: quant_like, mj1: quan
     :param b_field: The B-field $\mathcal{B}$ (T).
     :param as_freq: The matrix element can be returned in energy (`False`, eV) or frequency units (`True`, MHz).
      The default is `True`
-    :returns: One matrix element of the hyperfine-structure + Zeeman-effect hamiltonian.
+    :returns: (h_ij) One matrix element of the hyperfine-structure + Zeeman-effect hamiltonian.
     """
     a_hyper, b_hyper = np.asarray(a_hyper, dtype=float), np.asarray(b_hyper, dtype=float)
     g_i, g_j = np.asarray(g_i, dtype=float), np.asarray(g_j, dtype=float)
@@ -1110,7 +1117,7 @@ def hyper_zeeman_12_d(j: quant_like, m: quant_like, a_hyper: array_like = 0.,
 def a_hyper_mu(i: quant_like, j: quant_like, mu: array_like, b_field: array_like) -> ndarray:
     r"""
     The magnetic dipole hyperfine structure constant as a function of the nuclear magnetic moment `mu`
-    and the magnetic field of the electrons at the nucleus `b_field` $A = \mu\mathcal{B} / (IJ)$.
+    and the magnetic field `b_field` of the electrons at the nucleus $A = \mu\mathcal{B} / (IJ)$.
 
     :param i: The nuclear spin quantum number $I$.
     :param j: The electronic total angular momentum quantum number $J$.
@@ -1124,8 +1131,8 @@ def a_hyper_mu(i: quant_like, j: quant_like, mu: array_like, b_field: array_like
     return mu * mu_N * b / (i * j * sc.h) * 1e-6
 
 
-def a_einstein_m1(f: array_like, j_l: quant_like = 0, j_u: quant_like = 0, ls: quant_iter = (0, 0),
-                  jj_l: quant_iter = None, jj_u: quant_iter = None) -> ndarray:
+def a_einstein_m1(f: array_like, mu: array_like = None, j_l: quant_like = 0, j_u: quant_like = 0,
+                  ls: quant_iter = (0, 0), jj_l: quant_iter = None, jj_u: quant_iter = None) -> ndarray:
     r"""
     The Einstein coefficient of an M1 transition
 
@@ -1136,11 +1143,14 @@ def a_einstein_m1(f: array_like, j_l: quant_like = 0, j_u: quant_like = 0, ls: q
 
     where $\mu_0$ is the vacuum permeability, $\vec{\mu}$ is the electronic magnetic moment operator
     in units of the Bohr magneton, $h$ is the Planck constant, and $c$ is the speed of light.
-    This calculation neglects spin-orbit couplings, as $\Delta S = \Delta L = 0$ holds strictly.
-    Consequently, M1 transition rates of transition such as $^3\mathrm{S}_1\rightarrow\, ^1\mathrm{S}_0$
-    cannot be calculated with this function.
+    If `mu` is `None`, this calculation neglects spin-orbit couplings, as $\Delta S = \Delta L = 0$ holds strictly
+    in the estimation of `mu`. Consequently, M1 transition rates of transition such as
+    $^3\mathrm{S}_1\rightarrow\, ^1\mathrm{S}_0$ cannot be calculated with this function without specifying `mu`.
 
     :param f: The frequency $f$ of a transition (MHz).
+    :param mu: The magnetic dipole moment $\mu$ of a transition ($\mu_\mathrm{B}$).
+     If `None`, the parameters `j_l`, `j_u`, `ls`, `jj_l`, `jj_u` are used to determine `mu`.
+     Otherwise, they are omitted.
     :param j_l: The electronic total angular momentum quantum number $J_\mathrm{l}$ of the lower state.
     :param j_u: The electronic total angular momentum quantum number $J_\mathrm{u}$ of the upper state.
     :param ls: A list `[(l_c, s_c), (l_o, l_c)]` or a single pair `(L, S)`
@@ -1152,62 +1162,66 @@ def a_einstein_m1(f: array_like, j_l: quant_like = 0, j_u: quant_like = 0, ls: q
      of the lower state. Only needs to be specified if `ls` is a list of ls-pairs.
     :param jj_u: A tuple of electronic total angular momentum quantum numbers $(j_\mathrm{c}, j_\mathrm{o})$
      of the upper state. Only needs to be specified if `ls` is a list of ls-pairs.
-    :returns: (A_ul) The Einstein coefficient $A_\mathrm{ul}$ of an M1 transition,
-     neglecting spin-orbit couplings (MHz).
+    :returns: (A_ul) The Einstein coefficient $A_\mathrm{ul}$ of an M1 transition (MHz).
     """
     f = np.asarray(f, dtype=float)
 
-    if jj_l is None or jj_u is None:
-        mu = mu_j_m1(ls[1], ls[0], j_l, j_u)
-    else:
-        mu = mu_jj_m1(ls[0][1], ls[0][0], jj_l[0], jj_l[1], j_l, ls[1][1], ls[1][0], jj_u[0], jj_u[1], j_u)
-    mu = (mu * mu_B) ** 2 / (2 * j_u + 1)
+    if mu is None:
+        if jj_l is None or jj_u is None:
+            mu = mu_j_m1(ls[1], ls[0], j_l, j_u)
+        else:
+            mu = mu_jj_m1(ls[0][1], ls[0][0], jj_l[0], jj_l[1], j_l, ls[1][1], ls[1][0], jj_u[0], jj_u[1], j_u)
 
+    mu = np.asarray(mu, dtype=float)
+    mu = (mu * mu_B) ** 2 / (2 * j_u + 1)
     return 8 * mu * np.pi ** 2 * sc.mu_0 * f ** 3 / (3 * sc.hbar * sc.c ** 3) * 1e12
 
 
-def temperature_doppler(a):
+def temperature_doppler(a: array_like) -> ndarray:
     r"""
-    The minimum temperature achievable through Doppler cooling (Doppler limit)
+    The minimum temperature achievable through Doppler cooling in a closed two-level transition (Doppler limit)
 
     $$
-    T\frac{\hbar \Gamma}{2k_\mathrm{B}}.
+    T_\mathrm{Doppler} = \frac{\hbar \Gamma}{2k_\mathrm{B}}.
     $$
 
     :param a: The inverse lifetime $\Gamma = 1 / \tau$ of the upper state of the cooling transition (MHz).
-    :returns: The temperature $T_\mathrm{Doppler}$ (K).
+    :returns: (T_doppler) The temperature $T_\mathrm{Doppler}$ (K).
     """
+    a = np.asarray(a, dtype=float)
     return 0.5 * sc.hbar * a * 1e6 / sc.k
 
 
-def saturation_intensity(f: array_like, a: array_like, a_dipole: array_like = 1.) -> ndarray:
+def saturation_intensity(f: array_like, a: array_like) -> ndarray:
     r"""
-    The saturation intensity of an electronic dipole transition $I_0 = \pi f^3hA_{ki} / (3c^2a_\mathrm{dipole})$.
+    The saturation intensity of an electronic dipole transition
+
+    $$
+    I_0 = \frac{\pi hf^3A_{ki}}{3c^2}.
+    $$
 
     :param f: The frequency $f$ of the transition $|i\rangle\rightarrow|k\rangle$ (MHz).
     :param a: The Einstein $A_{ki}$ coefficient (MHz).
-    :param a_dipole: The reduced dipole coefficient of the transition (see `qspec.a_dipole`).
     :returns: (sat_intensity) The saturation intensity $I_0$.
     """
-    f, a, a_dipole = np.asarray(f, dtype=float), np.asarray(a, dtype=float), np.asarray(a_dipole, dtype=float)
-    return np.pi * (f * 1e6) ** 3 * sc.h * a * 1e6 / (3 * sc.c ** 2 * a_dipole)
+    f, a = np.asarray(f, dtype=float), np.asarray(a, dtype=float)
+    return np.pi * (f * 1e6) ** 3 * sc.h * a * 1e6 / (3 * sc.c ** 2)
 
 
-def saturation(intensity: array_like, f: array_like, a: array_like, a_dipole: array_like) -> ndarray:
+def saturation(intensity: array_like, f: array_like, a: array_like) -> ndarray:
     r"""
     The saturation parameter $s = I / I_0$, with the `saturation_intensity` $I_0$.
 
-    :param intensity: The intensity of the laser ($\mu$W/mm<sup>2</sup> = W/m<sup>2</sup>).
+    :param intensity: The intensity of the laser (&mu;W/mm<sup>2</sup> = W/m<sup>2</sup>).
     :param f: The frequency $f$ of the transition $|i\rangle\rightarrow|k\rangle$ (MHz).
     :param a: The Einstein $A_{ki}$ coefficient (MHz).
-    :param a_dipole: The reduced dipole coefficient of the transition (see `qspec.a_dipole`).
     :returns: (s) The saturation parameter $s$.
     """
     intensity = np.asarray(intensity, dtype=float)
-    return intensity / saturation_intensity(f, a, a_dipole)
+    return intensity / saturation_intensity(f, a)
 
 
-def rabi(a: array_like, s: array_like) -> ndarray:
+def rabi_s(a: array_like, s: array_like) -> ndarray:
     r"""
     The Rabi frequency $\Omega = A_{ki}\sqrt{s/2}$.
 
@@ -1221,7 +1235,7 @@ def rabi(a: array_like, s: array_like) -> ndarray:
 
 def scattering_rate(df: array_like, a: array_like, s: array_like) -> ndarray:
     r"""
-    The two-state-equilibrium scattering-rate of an electronic dipole transition
+    The equilibrium scattering rate of a closed two-level transition
 
     $$\begin{aligned}
     \Gamma_\mathrm{sc} &= \frac{s}{2}\frac{A_{ki}^3}{(4\pi\Delta f)^2 + (1 + s)A_{ki}^2}\\[2ex]
@@ -1232,8 +1246,8 @@ def scattering_rate(df: array_like, a: array_like, s: array_like) -> ndarray:
      This must be differences of real frequencies, such that $\Delta\omega = 2\pi\Delta f$ (MHz).
     :param a: The Einstein $A_{ki}$ coefficient (MHz).
     :param s: The saturation parameter $s$.
-    :returns: (gamma) The two-state-equilibrium scattering-rate $\Gamma_\mathrm{sc}$
-     of an electronic dipole transition (MHz).
+    :returns: (Gamma) The equilibrium scattering rate $\Gamma_\mathrm{sc}$
+     of a closed two-level transition (MHz).
     """
     df, a, s = np.asarray(df), np.asarray(a), np.asarray(s)
     return 0.125 * s * a ** 3 / (0.25 * (1 + s) * a ** 2 + (2 * np.pi * df) ** 2)
@@ -1523,7 +1537,7 @@ def lambda_r(r: array_like, r_d: array_like, r_ref: array_like, r_ref_d: array_l
     :param v6_ref: The shape factor $V_{6,\mathrm{ref}}$ of the second isotope.
     :param c2c1: Seltzer's coefficient for the quartic moment $C_2 / C_1$ ([`1 / r**2`]).
     :param c3c1: Seltzer's coefficient for the sextic moment $C_3 / C_1$ ([`1 / r**4`]).
-    :returns: The difference of the nuclear charge radius series between two isotopes $\Lambda$
+    :returns: (Lambda, Lambda_d) The difference of the nuclear charge radius series between two isotopes $\Lambda$
      and its uncertainty $\Delta\Lambda$ ([`r**2`]).
     """
     r2 = delta_r2(r, r_d, r_ref, r_ref_d, dr, dr_d, v2, v2_ref)
@@ -1560,7 +1574,7 @@ def lambda_rn(r2: array_like, r2_d: array_like, r4: array_like, r4_d: array_like
     $\Delta\delta\!\langle r^6\rangle$.
     :param c2c1: Seltzer's coefficient for the quartic moment $C_2 / C_1$ ([`1 / r**2`]).
     :param c3c1: Seltzer's coefficient for the sextic moment $C_3 / C_1$ ([`1 / r**4`]).
-    :returns: The difference of the nuclear charge radius series between two isotopes $\Lambda$
+    :returns: (Lambda, Lambda_d) The difference of the nuclear charge radius series between two isotopes $\Lambda$
      and its uncertainty $\Delta\Lambda$ ([`r**2`]).
     """
     r2, r2_d = np.asarray(r2, dtype=float), np.asarray(r2_d, dtype=float)
@@ -1580,13 +1594,13 @@ def schmidt_line(l: quant_like, i: quant_like, is_proton: bool) -> ndarray:
 
     $$
     \mu = \begin{cases}\frac{I}{(I + 1)}\left((L + 1)g_L - \frac{1}{2}g_s\right) & I < L \\
-    Lg_L + \frac{1}{2}g_s & else\end{cases}.
+    Lg_L + \frac{1}{2}g_s & \text{else}\end{cases}.
     $$
     
     :param l: The orbital angular momentum quantum number of the nucleon $L$.
     :param i: The nuclear spin quantum number $I$.
     :param is_proton: Whether the contributing nucleon is a proton (`True`) or a neutron (`False`).
-    :returns: The Schmidt value of the nuclear magnetic moment $\mu$ ($\mu_\mathrm{N}$).
+    :returns: (mu_schmidt) The Schmidt value of the nuclear magnetic moment $\mu$ ($\mu_\mathrm{N}$).
     """
     _g_s = gp_s if is_proton else gn_s
     _g_l = 1 if is_proton else 0
@@ -1602,7 +1616,7 @@ def schmidt_line(l: quant_like, i: quant_like, is_proton: bool) -> ndarray:
 """ Optics """
 
 
-def sellmeier(w: array_like, a: array_iter, b: array_iter) -> ndarray:
+def sellmeier(w: array_like, a: array_like, b: array_like) -> ndarray:
     r"""
     The Sellmeier equation for calculating the refractive index of a material with the lists of coefficients
     `a` and `b` for the wavelength `w`
@@ -1614,7 +1628,7 @@ def sellmeier(w: array_like, a: array_iter, b: array_iter) -> ndarray:
     :param w: The wavelength $\lambda$ (&mu;m).
     :param a: A list of coefficients $A_i$.
     :param b: A list of coefficients $B_i$ (&mu;m).
-    :return: (n) The refractive index $n$.
+    :returns: (n) The refractive index $n$.
     """
     w, a, b = np.asarray(w, dtype=float), np.asarray(a, dtype=float), np.asarray(b, dtype=float)
     tools.check_dimension(a.shape[0], 0, b)
@@ -1625,25 +1639,43 @@ def sellmeier(w: array_like, a: array_iter, b: array_iter) -> ndarray:
 """ 3-D kinematics """
 
 
-def gamma_3d(v: array_like, axis=-1) -> array_like:
+def gamma_3d(v: array_like, axis: int = -1) -> ndarray:
     """
-    :param v: The velocity 3-vector (m/s).
+    The time-dilation/Lorentz factor
+
+    $$
+    \gamma = \frac{1}{\sqrt{1 - (\vec{v}/ c)^2}},
+    $$
+
+    with the vacuum speed of light $c$ and the velocity vector $\vec{v}$.
+
+    :param v: The velocity 3-vector $\vec{v}$. Must have size 3 in the specified `axis` (m/s).
     :param axis: The axis along which the vector components are aligned.
-    :returns: The time-dilation/Lorentz factor corresponding to the velocity vector v.
-    :raises ValueError: v must have 3 components along the specified axis.
+    :returns: (gamma) The time-dilation/Lorentz factor $\gamma$ corresponding to the velocity vector `v`.
+    :raises ValueError: `v` must have 3 components along the specified `axis`.
     """
     tools.check_dimension(3, axis, v)
     return gamma(tools.absolute(v, axis=axis))
 
 
-def boost(x: array_like, v: array_like, axis=-1) -> array_like:
+def boost(x: array_like, v: array_like, axis: int = -1) -> ndarray:
     """
-    :param x: The 4-vector x in the current rest frame (arb. units).
-    :param v: The velocity 3-vector (m/s).
+    The relativistic Lorentz-boosted 4-vector
+
+    $$
+    x^{\prime\mu} = \Lambda^\nu_\mu(\vec{v})x^\mu,
+    $$
+
+    with the Lorentz-boost matrix $\Lambda_\nu^\mu$.
+
+    :param x: The 4-vector $x^\mu$ in the stationary rest frame (arb. units).
+     Must have size 4 in the specified `axis`.
+    :param v: The velocity 3-vector $\vec{v}$. Must have size 3 in the specified `axis` (m/s).
     :param axis: The axis along which the vector components are aligned.
-    :returns: The 4-vector x in the coordinate system moving with velocity v relative to the current rest frame ([x]).
-    :raises ValueError: x and v must have 4 and 3 components along the specified axis, respectively.
-     The shapes of x and v must be compatible.
+    :returns: (x_boosted) The 4-vector $x^{\prime\mu}$ in the coordinate system moving with velocity `v`
+    relative to the current rest frame ([`x`]).
+    :raises ValueError: `x` and `v` must have 4 and 3 components along the specified `axis`, respectively.
+     The shapes of `x` and `v` must be compatible.
     """
     x, v = np.asarray(x), np.asarray(v)
     tools.check_dimension(4, axis, x)
@@ -1671,14 +1703,23 @@ def boost(x: array_like, v: array_like, axis=-1) -> array_like:
     return np.transpose(y, axes=axes)
 
 
-def doppler_3d(k: array_like, v: array_like, return_frame='atom', axis=-1) -> array_like:
+def doppler_3d(k: array_like, v: array_like, return_frame='atom', axis=-1) -> ndarray:
     """
-    :param k: The k-wave-3-vector of light (arb. units).
-    :param v: The velocity 3-vector (m/s).
-    :param return_frame: The coordinate system in which the frequency is returned. Can be either 'atom' or 'lab'.
+    The 3D Doppler shift of the 3-vector $\vec{k}$
+
+    $$
+    k^{\prime\mu} = \Lambda^\nu_\mu(\pm\vec{v})k^\mu,
+    $$
+
+    with the Lorentz-boost matrix $\Lambda_\nu^\mu$.
+
+    :param k: The 3-vector $\vec{k}$ of light. Must have size 3 in the specified `axis (arb. units)`.
+    :param v: The velocity 3-vector $\vec{v}$. Must have size 3 in the specified `axis` (m/s).
+    :param return_frame: The coordinate system in which the frequency is returned. Can be either `'atom'` or `'lab'`.
     :param axis: The axis along which the vector components are aligned.
-    :returns: the Doppler-shifted k-wave-4-vector in either the rest frame of the atom or the laboratory frame ([k]).
-    :raises ValueError: rest_frame must be either 'atom' or 'lab'. The shapes of k and v must be compatible.
+    :returns: (k_boosted) the Doppler-shifted 3-vector $\vec{k}^{\prime}$ in either the rest frame of the atom
+     or the laboratory frame ([`k`]).
+    :raises ValueError: `rest_frame` must be either `'atom'` or `'lab'`. The shapes of `k` and `v` must be compatible.
     """
     k, v = np.asarray(k), np.asarray(v)
     tools.check_dimension(3, axis, k, v)
@@ -1686,38 +1727,51 @@ def doppler_3d(k: array_like, v: array_like, return_frame='atom', axis=-1) -> ar
     k_4 = np.concatenate([np.expand_dims(k_0, axis=axis), k], axis=axis)
     if return_frame == 'atom':
         """ Return k in the atomic system. """
-        return boost(k_4, v)
+        ret = boost(k_4, v)
     elif return_frame == 'lab':
         """ Return k in the laboratory system. """
-        return boost(k_4, -v)
+        ret = boost(k_4, -v)
     else:
-        raise ValueError('rest_frame must be either "atom" or "lab".')
+        raise ValueError('rest_frame must be either \'atom\' or \'lab\'.')
+
+    i = [slice(None)] * len(ret.shape)
+    i[axis] = slice(1, None)
+    return ret[i]
 
 
-def gaussian_beam_3d(r: array_like, k: array_like, w0: array_like,
-                     r0: array_like = None, p0: array_like = None, axis: int = -1) -> array_like:
+def gaussian_beam_3d(r: array_like, k: array_like, w0: array_like, p0: array_like,
+                     r0: array_like = None, axis: int = -1) -> ndarray:
     """
-    :param r: The position 3-vector where to calculate the beam intensity (m).
-    :param k: The k-wave-3-vector of light (rad / m).
-    :param w0: The beam waist (m).
-    :param r0: The position 3-vector of the beam waist. Is (0m, 0m, 0m) if r0 is not specified (m).
-    :param p0: The total power propagated by the gaussian beam. Is 1W if p0 is not specified (W).
+    The Gaussian beam intensity
+
+    $$\begin{aligned}
+    I(\vec{r}) = \fracc{2P_0}{\pi w_z^2}\exp\left[-2\left(\!\frac{\rho}{w_z}\right\!)^{\! 2}\right]
+    \end{aligned}$$
+
+    :param r: The position 3-vector $\vec{r}$ where to calculate the beam intensity (m).
+    :param k: The 3-vector $\vec{k}$ of light, where $|\vec{k}| = \omega / c$ (rad / m).
+    :param w0: The beam waist $w_0$ (m).
+    :param p0: The total power $P_0$ propagated by the gaussian beam. (W).
+    :param r0: The position 3-vector $\vec{r}_0$ of the beam waist. If `r0` is `None`, it is `[0., 0., 0.]` (m).
     :param axis: The axis along which the vector components are aligned.
     :returns: The intensity of a gaussian beam with k-wave-vector k at the position r - r0 (W/m**2 == uW/mm**2).
     :raises ValueError: r, k and r0 must have 3 components along the specified axis.
      The shapes of r, k, w0, r0 and p0 must be compatible.
     """
     if r0 is None:
-        r0 = np.zeros_like(r)
-    if p0 is None:
-        p0 = np.ones_like(w0)
-    r, r0, k = np.asarray(r, dtype=float), np.asarray(r0, dtype=float), np.asarray(k, dtype=float)
-    tools.check_dimension(3, axis, r, r0, k)
+        r0 = 0.
+
+    r, k, w0, p0, r0 = (np.asarray(r, dtype=float), np.asarray(k, dtype=float), np.asarray(w0, dtype=float),
+                        np.asarray(p0, dtype=float), np.asarray(r0, dtype=float))
+    # tools.check_dimension(3, axis, r, k)
     # tools.check_shape_like(np.sum(r, axis=axis), np.sum(k, axis=axis), w0, np.sum(r0, axis=axis), p0)
+
     k_abs = tools.absolute(k, axis=axis)
     e_r, e_theta, e_phi = tools.orthonormal(k)
+
     rho = np.sqrt(np.sum((r - r0) * e_theta, axis=axis) ** 2 + np.sum((r - r0) * e_phi, axis=axis) ** 2)
     z = np.sum((r - r0) * e_r, axis=axis)
+
     z0 = 0.5 * w0 ** 2 * k_abs
     w_z = w0 * np.sqrt(1. + (z / z0) ** 2)
     return 2. * p0 / (np.pi * w_z ** 2) * np.exp(-2. * (rho / w_z) ** 2)

@@ -269,8 +269,8 @@ def example(n=None):
         laser_b = sim.Laser(freq=f + 6234.29, polarization=pol_b, intensity=i_b)  # blue laser
         laser_r = sim.Laser(freq=f - 13566., polarization=pol_r, intensity=i_r)  # red laser
 
-        print('Saturation s(blue): {}'.format(qs.saturation(i_b, f, a, qs.a(1.5, 1, 1.5, 2, 2.5))))
-        print('Saturation s(red): {}'.format(qs.saturation(i_r, f, a, qs.a(1.5, 1, 2.5, 2, 2.5))))
+        print('Saturation s(blue): {}'.format(qs.saturation(i_b, f, a)))
+        print('Saturation s(red): {}'.format(qs.saturation(i_r, f, a)))
         # The saturation intensity can be compared easily to the specified values in the paper.
 
         inter = sim.Interaction(atom=li7, lasers=[laser_b, laser_r])
