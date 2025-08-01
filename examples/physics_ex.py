@@ -9,7 +9,6 @@ Example script / Guide for the qspec.physics module.
 import numpy as np
 import scipy.constants as sc
 import matplotlib.pyplot as plt
-from sympy.abc import alpha
 
 import qspec as qs
 
@@ -92,7 +91,7 @@ def example(n=None):
         U = 20e3  # The acceleration voltage (V).
         f_col = 1321038455  # Resonant collinear laser frequency at 20kV.
 
-        v_vec = qs.thermal_v_rvs(m, 2500, (num, 3))
+        v_vec = qs.normal_vx_rvs(m, 2500, (num, 3))
         # Generate 100,000 thermally distributed velocity values for each direction.
 
         v_vec[:, 0] = qs.v_el(U, q, m, v_vec[:, 0], relativistic=True)
@@ -255,4 +254,4 @@ def example(n=None):
 
 
 if __name__ == '__main__':
-    example(3)
+    example({0, 1, 2, 3, 4, 5})

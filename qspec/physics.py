@@ -26,8 +26,8 @@ __all__ = ['L_LABEL', 'E_NORM', 'pi', 'LEMNISCATE', 'mu_N', 'mu_B', 'g_s', 'me_u
            'hyper_zeeman_ij', 'hyper_zeeman_num', 'hyper_zeeman_12', 'hyper_zeeman_12_d', 'a_hyper_mu', 'a_einstein_m1',
            'temperature_doppler', 'saturation_intensity', 'saturation', 'rabi_s', 'scattering_rate', 'mass_factor',
            'delta_r2', 'delta_r4', 'delta_r6', 'lambda_r', 'lambda_rn', 'schmidt_line', 'sellmeier',
-           'gamma_3d', 'boost', 'doppler_3d', 'gaussian_beam_3d', 'gaussian_doppler_3d', 't_xi', 'thermal_v_pdf',
-           'thermal_v_rvs', 'thermal_e_pdf', 'thermal_e_rvs', 'convolved_boltzmann_norm_pdf',
+           'gamma_3d', 'boost', 'doppler_3d', 'gaussian_beam_3d', 'gaussian_doppler_3d', 't_xi', 'normal_vx_pdf',
+           'normal_vx_rvs', 'chi2_ex_pdf', 'chi2_ex_rvs', 'convolved_boltzmann_norm_pdf',
            'convolved_thermal_norm_v_pdf', 'convolved_thermal_norm_f_pdf', 'convolved_thermal_norm_f_lin_pdf',
            'source_energy_pdf']
 
@@ -593,7 +593,7 @@ def inverse_doppler_d1(f_atom: array_like, f_lab: array_like, alpha: array_like,
     return bet * sc.c
 
 
-def alpha_atom(alpha: array_like, v: array_like) -> array_like:
+def alpha_atom(alpha: array_like, v: array_like) -> ndarray:
     r"""
     The angle in the rest frame of the atom
      $\alpha^\prime = \arccos\left[\frac{(v/c) + \cos(\alpha)}{1 + (v/c)\cos(\alpha)}\right]$.
@@ -887,7 +887,7 @@ def hyper_zeeman_linear(i: quant_like, j: quant_like, f: quant_like, m: quant_li
 
 def hyper_zeeman_ij(mi0: quant_like, mj0: quant_like, mi1: quant_like, mj1: quant_like, i: quant_like, j: quant_like,
                     a_hyper: array_like = 0., b_hyper: array_like = 0.,
-                    g_i: array_like = 0., g_j: array_like = 0., b_field: array_like = 0.,
+                    gi: array_like = 0., gj: array_like = 0., b_field: array_like = 0.,
                     as_freq: bool = True) -> ndarray:
     r"""
     The matrix element $\langle m_{i, 0} m_{j, 0}| H_\mathrm{hfs} + H_\mathrm{Zeeman} |m_{i, 1} m_{j, 1}\rangle$.
@@ -900,19 +900,19 @@ def hyper_zeeman_ij(mi0: quant_like, mj0: quant_like, mi1: quant_like, mj1: quan
     :param j: The electronic total angular momentum quantum number $J$.
     :param a_hyper: The magnetic dipole hyperfine constant $A = \mu_I \mathcal{B}_J / (IJ)$ (MHz if `as_freq` else eV).
     :param b_hyper: The electric quadrupole hyperfine constant $B = eQ_I (\partial^2 V_J / \partial z^2)$ ([`a_hyper`]).
-    :param g_i: The nuclear g-factor $g_I$ or the gyromagnetic ratio $\gamma_I$ if `g_n_as_gyro == True`.
-    :param g_j: The electronic g-factor $g_J$.
+    :param gi: The nuclear g-factor $g_I$ or the gyromagnetic ratio $\gamma_I$ if `g_n_as_gyro == True`.
+    :param gj: The electronic g-factor $g_J$.
     :param b_field: The B-field $\mathcal{B}$ (T).
     :param as_freq: The matrix element can be returned in energy (`False`, eV) or frequency units (`True`, MHz).
      The default is `True`
     :returns: (h_ij) One matrix element of the hyperfine-structure + Zeeman-effect hamiltonian.
     """
     a_hyper, b_hyper = np.asarray(a_hyper, dtype=float), np.asarray(b_hyper, dtype=float)
-    g_i, g_j = np.asarray(g_i, dtype=float), np.asarray(g_j, dtype=float)
+    gi, gj = np.asarray(gi, dtype=float), np.asarray(gj, dtype=float)
 
     z_unit = 1e-6 / sc.h if as_freq else 1 / E_NORM
     b_field = (np.asarray(b_field, dtype=float) + np.zeros_like(a_hyper) + np.zeros_like(b_hyper)
-               + np.zeros_like(g_i) + np.zeros_like(g_j)) * z_unit
+               + np.zeros_like(gi) + np.zeros_like(gj)) * z_unit
 
     b_hyper_n = b_hyper / (2 * i * (2 * i - 1) * j * (2 * j - 1)) if i > 0.5 and j > 0.5 else 0.
 
@@ -920,7 +920,7 @@ def hyper_zeeman_ij(mi0: quant_like, mj0: quant_like, mi1: quant_like, mj1: quan
         return np.zeros_like(b_field, dtype=float)
 
     elif mi0 == mi1 and mj0 == mj1:
-        ret = a_hyper * mi0 * mj0 - (mi0 * g_i * mu_N + mj0 * g_j * mu_B) * b_field
+        ret = a_hyper * mi0 * mj0 - (mi0 * gi * mu_N + mj0 * gj * mu_B) * b_field
         ret += b_hyper_n * (3 * (mi0 * mj0) ** 2 - i * (i + 1) * j * (j + 1) + 1.5 * mi0 * mj0
                             + 0.75 * (j - mj0) * (j + mj0 + 1) * (i + mi0) * (i - mi0 + 1)
                             + 0.75 * (i - mi0) * (i + mi0 + 1) * (j + mj0) * (j - mj0 + 1))
@@ -948,7 +948,7 @@ def hyper_zeeman_ij(mi0: quant_like, mj0: quant_like, mi1: quant_like, mj1: quan
 
 
 def hyper_zeeman_num(i: quant_like, j: quant_like, a_hyper: array_like = 0., b_hyper: array_like = 0.,
-                     g_i: array_like = 0., g_j: array_like = 0., b_field: array_like = 0.,
+                     gi: array_like = 0., gj: array_like = 0., b_field: array_like = 0.,
                      g_n_as_gyro: bool = False, as_freq: bool = True) \
         -> (list[ndarray], list[quant], list[list[quant]], list[list[tuple[quant, quant]]]):
     r"""
@@ -961,12 +961,12 @@ def hyper_zeeman_num(i: quant_like, j: quant_like, a_hyper: array_like = 0., b_h
 
     :param i: The nuclear spin quantum number $I$.
     :param j: The electronic total angular momentum quantum number $J$.
-    :param g_i: The nuclear g-factor $g_I$ or the gyromagnetic ratio $\gamma_I$ if `g_n_as_gyro == True`.
-    :param g_j: The electronic g-factor $g_J$.
+    :param gi: The nuclear g-factor $g_I$ or the gyromagnetic ratio $\gamma_I$ if `g_n_as_gyro == True`.
+    :param gj: The electronic g-factor $g_J$.
     :param a_hyper: The magnetic dipole hyperfine constant $A = \mu_I \mathcal{B}_J / (IJ)$ (MHz if `as_freq` else eV).
     :param b_hyper: The electric quadrupole hyperfine constant $B = eQ_I (\partial^2 V_J / \partial z^2)$ ([`a_hyper`]).
     :param b_field: The B-field $\mathcal{B}$ (T).
-    :param g_n_as_gyro: Whether `g_i` is the nuclear g-factor or the gyromagnetic ratio $\gamma_I$ (MHz).
+    :param g_n_as_gyro: Whether `gi` is the nuclear g-factor or the gyromagnetic ratio $\gamma_I$ (MHz).
     :param as_freq: The matrix element can be returned in energy (`False`, eV) or frequency units (`True`, MHz).
      The default is `True`
     :returns: (e_eig, m_list, f_list, mi_mj_list) The eigenvalues of the Hamiltonian $H$
@@ -974,35 +974,28 @@ def hyper_zeeman_num(i: quant_like, j: quant_like, a_hyper: array_like = 0., b_h
     """
     b_field = np.asarray(b_field, dtype=float).flatten()
 
-    g_i = lande_n(g_i) if g_n_as_gyro else g_i
+    gi = lande_n(gi) if g_n_as_gyro else gi
 
     f_list = get_f(i, j)
-    mf_list = [get_m(_f) for _f in f_list]
+    # mf_list = [get_m(_f) for _f in f_list]
     mi_list = get_m(i)
     mj_list = get_m(j)
 
     m_list = get_m(max(f_list))
     fm_list = [[_f for _f in f_list if abs(_m) <= _f] for _m in m_list]
     mi_mj_list = [[(_mi, _m - _mi) for _mi in mi_list if _m - _mi in mj_list] for _m in m_list]
-    # print(f_list)
-    # print(mf_list)
-    # print(m_list)
-    # print(fm_list)
-    # print(mi_mj_list)
 
-    n_list = [sum(int(abs(_m) <= _f) for _f in f_list) for _m in m_list]
-    h_list = [np.array([[hyper_zeeman_ij(_mi0, _mj0, _mi1, _mj1, i, j, a_hyper, b_hyper, g_i, g_j, b_field,
+    # n_list = [sum(int(abs(_m) <= _f) for _f in f_list) for _m in m_list]
+    h_list = [np.array([[hyper_zeeman_ij(_mi0, _mj0, _mi1, _mj1, i, j, a_hyper, b_hyper, gi, gj, b_field,
                                          as_freq=as_freq)
                          for (_mi1, _mj1) in _mi_mj_list] for (_mi0, _mj0) in _mi_mj_list], dtype=float)
               for _m, _mi_mj_list in zip(m_list, mi_mj_list)]
     h_list = [np.transpose(_h, axes=[2, 0, 1]) for _h in h_list]
-    # print(n_list)
 
     h_eig = [np.linalg.eigh(_h) for _h in h_list]
 
     e_eig = [_h_eig[0] for _h_eig in h_eig]
-    v_eig = [_h_eig[1] for _h_eig in h_eig]
-    # print([_e_eig.shape for _e_eig in e_eig])
+    # v_eig = [_h_eig[1] for _h_eig in h_eig]
 
     e_0 = [np.array([hyperfine(i, j, _f, a_hyper, b_hyper) for _f in _f_list], dtype=float) for _f_list in fm_list]
     inv_order_fm = [list(np.argsort(_e_0)) for _e_0 in e_0]
@@ -1010,7 +1003,7 @@ def hyper_zeeman_num(i: quant_like, j: quant_like, a_hyper: array_like = 0., b_h
                 for _inv_order in inv_order_fm]
     e_eig = [_e_eig[:, _order] for _e_eig, _order in zip(e_eig, order_fm)]
 
-    e_b = [np.array([-(mi * g_i * mu_N + mj * g_j * mu_B) * 100. / sc.h * 1e-6  # B = 100. can be any positive number.
+    e_b = [np.array([-(mi * gi * mu_N + mj * gj * mu_B) * 100. / sc.h * 1e-6  # B = 100. can be any positive number.
                      for (mi, mj) in _mi_mj_list], dtype=float) for _mi_mj_list in mi_mj_list]
     inv_order_ij = [list(np.argsort(_e_b)) for _e_b in e_b]
     mi_mj_list = [[_mi_mj_list[k] for k in _inv_order]
@@ -1022,7 +1015,7 @@ def hyper_zeeman_num(i: quant_like, j: quant_like, a_hyper: array_like = 0., b_h
 
 
 def hyper_zeeman_12(j: quant_like, m: quant_like, a_hyper: array_like = 0.,
-                    g_i: array_like = 0., g_j: array_like = 0., b_field: array_like = 0.,
+                    gi: array_like = 0., gj: array_like = 0., b_field: array_like = 0.,
                     g_n_as_gyro: bool = False, as_freq: bool = True) -> (ndarray, ndarray):
     r"""
     The two eigenvalues of the hyperfine structure + Zeeman effect hamailtonian for a nuclear spin of $I=1/2$
@@ -1031,27 +1024,27 @@ def hyper_zeeman_12(j: quant_like, m: quant_like, a_hyper: array_like = 0.,
     :param j: The electronic total angular momentum quantum number $J$.
     :param m: The magnetic quantum number $m_F$.
     :param a_hyper: The magnetic dipole hyperfine constant $A = \mu_I \mathcal{B}_J / (IJ)$ (MHz if `as_freq` else eV).
-    :param g_i: The nuclear g-factor $g_I$ or the gyromagnetic ratio $\gamma_I$ if `g_n_as_gyro == True`.
-    :param g_j: The electronic g-factor $g_J$.
+    :param gi: The nuclear g-factor $g_I$ or the gyromagnetic ratio $\gamma_I$ if `g_n_as_gyro == True`.
+    :param gj: The electronic g-factor $g_J$.
     :param b_field: The B-field $\mathcal{B}$ (T).
-    :param g_n_as_gyro: Whether `g_i` is the nuclear g-factor or the gyromagnetic ratio $\gamma_I$ (MHz).
+    :param g_n_as_gyro: Whether `gi` is the nuclear g-factor or the gyromagnetic ratio $\gamma_I$ (MHz).
     :param as_freq: The shift can be returned in energy (`False`, eV) or frequency units (`True`, MHz).
      The default is `True`
     :returns: (x0, x1) The two solutions of the Breit-Rabi equation,
      where `x0` and `x1` correspond to $F = J \mp 1/2$, respectively.
     """
     a_hyper = np.asarray(a_hyper, dtype=float)
-    g_i, g_j = np.asarray(g_i, dtype=float), np.asarray(g_j, dtype=float)
+    gi, gj = np.asarray(gi, dtype=float), np.asarray(gj, dtype=float)
 
-    g_i = lande_n(g_i) if g_n_as_gyro else g_i
+    gi = lande_n(gi) if g_n_as_gyro else gi
 
     z_unit = 1e-6 / sc.h if as_freq else 1 / E_NORM
     b_field = np.asarray(b_field, dtype=float) * z_unit
 
     x_b0 = a_hyper * (j + 0.5)
-    _x = b_field * (mu_B * g_j - mu_N * g_i) / x_b0
+    _x = b_field * (mu_B * gj - mu_N * gi) / x_b0
 
-    x = -x_b0 / (2 * (2 * j + 1)) - mu_B * g_j * m * b_field
+    x = -x_b0 / (2 * (2 * j + 1)) - mu_B * gj * m * b_field
 
     if m == j + 0.5:
         x0 = x + 0.5 * x_b0 * (1 + _x)
@@ -1067,7 +1060,7 @@ def hyper_zeeman_12(j: quant_like, m: quant_like, a_hyper: array_like = 0.,
 
 
 def hyper_zeeman_12_d(j: quant_like, m: quant_like, a_hyper: array_like = 0.,
-                      g_i: array_like = 0., g_j: array_like = 0., b_field: array_like = 0.,
+                      gi: array_like = 0., gj: array_like = 0., b_field: array_like = 0.,
                       g_n_as_gyro: bool = False, as_freq: bool = True) -> (ndarray, ndarray):
     r"""
     The first derivative of the two eigenvalues of the hyperfine structure + Zeeman effect hamailtonian,
@@ -1077,29 +1070,29 @@ def hyper_zeeman_12_d(j: quant_like, m: quant_like, a_hyper: array_like = 0.,
     :param j: The electronic total angular momentum quantum number $J$.
     :param m: The magnetic quantum number $m_F$.
     :param a_hyper: The magnetic dipole hyperfine constant $A = \mu_I \mathcal{B}_J / (IJ)$ (MHz if `as_freq` else eV).
-    :param g_i: The nuclear g-factor $g_I$ or the gyromagnetic ratio $\gamma_I$ if `g_n_as_gyro == True`.
-    :param g_j: The electronic g-factor $g_J$.
+    :param gi: The nuclear g-factor $g_I$ or the gyromagnetic ratio $\gamma_I$ if `g_n_as_gyro == True`.
+    :param gj: The electronic g-factor $g_J$.
     :param b_field: The B-field $\mathcal{B}$ (T).
-    :param g_n_as_gyro: Whether `g_i` is the nuclear g-factor or the gyromagnetic ratio $\gamma_I$ (MHz).
+    :param g_n_as_gyro: Whether `gi` is the nuclear g-factor or the gyromagnetic ratio $\gamma_I$ (MHz).
     :param as_freq: The shift can be returned in energy (`False`, eV) or frequency units (`True`, MHz).
      The default is `True`
     :returns: (x0, x1) The first derivatives of the two solutions of the Breit-Rabi equation,
      where `x0` and `x1` correspond to $F = J \mp 1/2$, respectively.
     """
     a_hyper = np.asarray(a_hyper, dtype=float)
-    g_i, g_j = np.asarray(g_i, dtype=float), np.asarray(g_j, dtype=float)
+    gi, gj = np.asarray(gi, dtype=float), np.asarray(gj, dtype=float)
 
-    g_i = lande_n(g_i) if g_n_as_gyro else g_i
+    gi = lande_n(gi) if g_n_as_gyro else gi
 
     z_unit = 1e-6 / sc.h if as_freq else 1 / E_NORM
     b_field = np.asarray(b_field, dtype=float) * z_unit
 
     x_b0 = a_hyper * (j + 0.5)
 
-    _x = b_field * (mu_B * g_j - mu_N * g_i) / x_b0
-    _dx = (mu_B * g_j - mu_N * g_i) / x_b0 * z_unit
+    _x = b_field * (mu_B * gj - mu_N * gi) / x_b0
+    _dx = (mu_B * gj - mu_N * gi) / x_b0 * z_unit
 
-    dx = -mu_B * g_j * m * z_unit
+    dx = -mu_B * gj * m * z_unit
 
     if m == j + 0.5:
         x0 = dx + 0.5 * x_b0 * _dx
@@ -1640,7 +1633,7 @@ def sellmeier(w: array_like, a: array_like, b: array_like) -> ndarray:
 
 
 def gamma_3d(v: array_like, axis: int = -1) -> ndarray:
-    """
+    r"""
     The time-dilation/Lorentz factor
 
     $$
@@ -1659,7 +1652,7 @@ def gamma_3d(v: array_like, axis: int = -1) -> ndarray:
 
 
 def boost(x: array_like, v: array_like, axis: int = -1) -> ndarray:
-    """
+    r"""
     The relativistic Lorentz-boosted 4-vector
 
     $$
@@ -1704,7 +1697,7 @@ def boost(x: array_like, v: array_like, axis: int = -1) -> ndarray:
 
 
 def doppler_3d(k: array_like, v: array_like, return_frame='atom', axis=-1) -> ndarray:
-    """
+    r"""
     The 3D Doppler shift of the 3-vector $\vec{k}$
 
     $$
@@ -1741,22 +1734,30 @@ def doppler_3d(k: array_like, v: array_like, return_frame='atom', axis=-1) -> nd
 
 def gaussian_beam_3d(r: array_like, k: array_like, w0: array_like, p0: array_like,
                      r0: array_like = None, axis: int = -1) -> ndarray:
-    """
-    The Gaussian beam intensity
+    r"""
+    The Gaussian beam intensity at the position $\vec{r} - \vec{r}_0$
 
     $$\begin{aligned}
-    I(\vec{r}) = \fracc{2P_0}{\pi w_z^2}\exp\left[-2\left(\!\frac{\rho}{w_z}\right\!)^{\! 2}\right]
+    I(\vec{r}) &= \fracc{2P_0}{\pi w_z^2}\exp\left[-2\left(\!\frac{\rho}{w_z}\right\!)^{\! 2}\right]\\[1ex]
+    w_z &= w_0\sqrt{1 + \left(\!\frac{z}{z_0}\!\right)^{\!2}}\\[1ex]
+    z_0 &= \frac{1}{2}|\vec{k}|w_0^2\\[2ex]
+    z &= (\vec{r} - \vec{r}_0)\cdot\hat{k}\\[2ex]
+    \rho &= \sqrt{\left[(\vec{r} - \vec{r}_0)\cdot\hat{x}\right]^2
+    + \left[(\vec{r} - \vec{r}_0)\cdot\hat{y}\right]^2},
     \end{aligned}$$
+
+    where \hat{k} is the unit vector in $\vec{k}$ direction and $\hat{x}$, $\hat{y}$
+    are unit vectors orthogonal to \hat{k}.
 
     :param r: The position 3-vector $\vec{r}$ where to calculate the beam intensity (m).
     :param k: The 3-vector $\vec{k}$ of light, where $|\vec{k}| = \omega / c$ (rad / m).
     :param w0: The beam waist $w_0$ (m).
-    :param p0: The total power $P_0$ propagated by the gaussian beam. (W).
+    :param p0: The total power $P_0$ propagated by the gaussian beam (W).
     :param r0: The position 3-vector $\vec{r}_0$ of the beam waist. If `r0` is `None`, it is `[0., 0., 0.]` (m).
     :param axis: The axis along which the vector components are aligned.
-    :returns: The intensity of a gaussian beam with k-wave-vector k at the position r - r0 (W/m**2 == uW/mm**2).
-    :raises ValueError: r, k and r0 must have 3 components along the specified axis.
-     The shapes of r, k, w0, r0 and p0 must be compatible.
+    :returns: (I_r) The intensity $I(\vec{r}) (W/m<sup>2</sup> = uW/mm<sup>2</sup>).
+    :raises ValueError: `r`, `k` and `r0` must have 3 components along the specified `axis`.
+     The shapes of `r`, `k`, `w0`, `r0` and `p0` must be compatible.
     """
     if r0 is None:
         r0 = 0.
@@ -1777,17 +1778,33 @@ def gaussian_beam_3d(r: array_like, k: array_like, w0: array_like, p0: array_lik
     return 2. * p0 / (np.pi * w_z ** 2) * np.exp(-2. * (rho / w_z) ** 2)
 
 
-def gaussian_doppler_3d(r: array_like, k: array_like, w0: array_like, v: array_like, r0=None, axis=-1) -> array_like:
-    """
-    :param r: The position 3-vector relative to 'r0' where to calculate the doppler-shifted wave number (m).
-    :param k: The k-wave-3-vector of light (rad / m).
-    :param w0: The beam waist (m).
-    :param v: The velocity 3-vector (m/s).
-    :param r0: The position 3-vector of the beam waist. Is (0m, 0m, 0m) if r0 is not specified (m).
+def gaussian_doppler_3d(r: array_like, k: array_like, w0: array_like, v: array_like, r0: array_like = None,
+                        axis: int = -1) -> ndarray:
+    r"""
+    The length |$\vec{k}^\prime$| of the Doppler-shifted 3-vector `k` in the rest frame of the atom
+
+    $$\begin{aligned}
+    |\vec{k}^\prime| &= |\vec{k}^\prime|\gamma\left[1 - \beta\cos(\alpha)\left(1 - \frac{w_0^2}{2z_+} 
+    - \frac{\rho^2z_-}{2z_+^2}\right) - \beta\sin(\alpha)\rho\frac{z}{z_+}\right]\\[2ex]
+    z_\pm &= z^2 \pm z_0^2\\[2ex]
+    z_0 &= \frac{1}{2}|\vec{k}|w_0^2\\[2ex]
+    z &= (\vec{r} - \vec{r}_0)\cdot\hat{k}\\[2ex]
+    \rho &= \sqrt{\left[(\vec{r} - \vec{r}_0)\cdot\hat{x}\right]^2
+    + \left[(\vec{r} - \vec{r}_0)\cdot\hat{y}\right]^2},
+    \end{aligned}$$
+    
+    where $\beta = |\vec{v}| / c$ is the relativistic velocity, $\gamma$ the time-dilation factor and $\alpha$ the angle
+    between $\vec{k}$ and $\vec{v}$.
+
+    :param r: The position 3-vector $\vec{r}$ where to calculate the beam intensity (m).
+    :param k: The 3-vector $\vec{k}$ of light, where $|\vec{k}| = \omega / c$ (rad / m).
+    :param w0: The beam waist $w_0$ (m).
+    :param v: The velocity 3-vector $\vec{v}$ (m/s).
+    :param r0: The position 3-vector $\vec{r}_0$ of the beam waist. If `r0` is `None`, it is `[0., 0., 0.]` (m).
     :param axis: The axis along which the vector components are aligned.
-    :returns: The length of the k-wave-3-vector in the atoms rest frame (rad / m).
-    :raises ValueError: r, k, v and r0 must have 3 components along the specified axis.
-     The shapes of r, k, w0, v and r0 must be compatible.
+    :returns: (k_abs) The length |$\vec{k}^\prime$| (rad / m).
+    :raises ValueError: `r`, `k`, `v` and `r0` must have 3 components along the specified `axis`.
+     The shapes of `r`, `k`, `w0`, `v` and `r0` must be compatible.
     """
     if r0 is None:
         r0 = np.zeros_like(r)
@@ -1804,75 +1821,118 @@ def gaussian_doppler_3d(r: array_like, k: array_like, w0: array_like, v: array_l
     z_minus = z ** 2 - z_0 ** 2
     alpha = tools.angle(v, k, axis=axis)
     bet_abs = beta(tools.absolute(v, axis=axis))
-    return k_abs * gamma_3d(v) * (1. - bet_abs * np.cos(alpha) * (1. - w0 ** 2 / 2. / z_plus
-                                                                  - rho ** 2 / 2. * z_minus / (z_plus ** 2))
+    return k_abs * gamma_3d(v) * (1. - bet_abs * np.cos(alpha) * (1. - 0.5 * w0 ** 2 / z_plus
+                                                                  - 0.5 * rho ** 2 * z_minus / (z_plus ** 2))
                                   - bet_abs * np.sin(alpha) * rho * z / z_plus)
 
 
 """ Probability distributions """
 
 
-def t_xi(xi, f, u, q, m):
-    """
-    :param xi: The acceleration/bunching parameter xi (MHz).
+def t_xi(xi: array_like, f: array_like, u: array_like, q: array_like, m: array_like) -> ndarray:
+    r"""
+    The temperature of an ensemble of ions with acceleration/bunching parameter `xi`
+
+    $$
+    T = \xi\frac{\sqrt{8qUmc^2}}{\gamma k_\mathrm{B}f},
+    $$
+
+    where $\gamma$ is the relativistic time-dilation factor.
+
+    :param xi: The acceleration/bunching parameter $\xi$ used as a parameter in `source_energy_pdf`.
+     `xi` is usually derived from fitting to asymmetric spectral lines (MHz).
     :param f: The rest-frame transition frequency (MHz).
     :param u: The acceleration voltage (V).
-    :param q: The charge of the ions (e).
-    :param m: The mass of the ensembles bodies (u).
-    :returns: The temperature of an ensemble of ions with acceleration/bunching parameter xi (K).
+    :param q: The electric charge of the ions (e).
+    :param m: The mass of the ions (u).
+    :returns: (T) The temperature $T$ (K).
     """
+    xi, f, u, q, m = (np.asarray(xi, dtype=float), np.asarray(f, dtype=float), np.asarray(u, dtype=float),
+                      np.asarray(q, dtype=float), np.asarray(m, dtype=float))
     return xi * np.sqrt(8 * q * sc.e * u * m * sc.u * sc.c ** 2) / (sc.k * f * gamma_e_kin(q * u, m))
 
 
-def thermal_v_pdf(v: array_like, m: array_like, t: array_like) -> array_like:
+def normal_vx_pdf(vx: array_like, m: array_like, t: array_like) -> ndarray:
+    r"""
+    The Gaussian probability density of a velocity component $v_x$
+
+    $$
+    \rho(v_x) = \sqrt{\frac{m}{2\pi\k_\mathrm{B}T}}\exp\left(-\frac{mv_x^2}{2\k_\mathrm{B}T}\right),
+    $$
+
+    for a mass $m$ particle in thermal equilibrium at temperature $T$.
+
+    :param vx: The velocity quantiles $v_x$ (m/s).
+    :param m: The mass $m$ of the particle (u).
+    :param t: The temperature $T$ of the environment (K).
+    :returns: (rho_vx) The probability density in thermal equilibrium at the velocity `vx` (s/m).
     """
-    :param v: velocity quantiles (m/s).
-    :param m: The mass of the ensembles bodies (u).
-    :param t: The temperature of the ensemble (K).
-    :returns: The probability density in thermal equilibrium at the velocity v (s/m).
-    """
-    v, m, t = np.asarray(v), np.asarray(m), np.asarray(t)
+    vx, m, t = np.asarray(vx, dtype=float), np.asarray(m, dtype=float), np.asarray(t, dtype=float)
     scale = np.sqrt(sc.k * t / (m * sc.atomic_mass))
-    return st.norm.pdf(v, scale=scale)
+    return st.norm.pdf(vx, scale=scale)
 
 
-def thermal_v_rvs(m: array_like, t: array_like, size: Union[int, tuple] = 1) -> array_like:
+def normal_vx_rvs(m: array_like, t: array_like, size: Union[int, tuple] = 1) -> ndarray:
+    r"""
+    Random sample velocity components $v_x$ from the Gaussian probability density function
+
+    $$
+    \rho(v_x) = \sqrt{\frac{m}{2\pi\k_\mathrm{B}T}}\exp\left(-\frac{mv_x^2}{2\k_\mathrm{B}T}\right),
+    $$
+
+    for a mass $m$ particle in thermal equilibrium at temperature $T$.
+
+    :param m: The mass $m$ of the particle (u).
+    :param t: The temperature $T$ of the environment (K).
+    :param size: Either the size (`int`) or shape (`tuple`) of the returned velocity array.
+     If `m` or `t` is an iterable/array, their common shape must be appended to the desired shape of the random samples.
+    :returns: (vx) Random velocities $v_x$ (m/s).
     """
-    :param m: The mass of the ensembles bodies (u).
-    :param t: The temperature of the ensemble (K).
-    :param size: Either the size (int) or shape (tuple) of the returned velocity array.
-     If 'm' or 't' is an iterable/array, their common shape must be appended to the desired shape of the random samples.
-    :returns: Random velocities according to the thermal equilibrium distribution (m/s).
-    """
-    m, t = np.asarray(m), np.asarray(t)
+    m, t = np.asarray(m, dtype=float), np.asarray(t, dtype=float)
     scale = np.sqrt(sc.k * t / (m * sc.atomic_mass))
     return st.norm.rvs(scale=scale, size=size)
 
 
-def thermal_e_pdf(e: array_like, t: array_like) -> array_like:
+def chi2_ex_pdf(e: array_like, t: array_like) -> ndarray:
+    r"""
+    The $\chi^2_1$ probability density of an energy component $E_x$
+
+    $$
+    \rho(E_x) = \sqrt{\frac{1}{\piE_x\k_\mathrm{B}T}}\exp\left(-\frac{E_x}{\k_\mathrm{B}T}\right),
+    $$
+
+    in thermal equilibrium at temperature $T$.
+
+    :param e: The energy quantiles $E_x$ (eV).
+    :param t: The temperature $T$ of the environment (K).
+    :returns: The probability density in thermal equilibrium at the energy `e` (1/eV).
     """
-    :param e: energy quantiles (eV).
-    :param t: The temperature of the ensemble (K).
-    :returns: The probability density at the energy e, distributed according to a boltzmann distribution (1/eV).
-    """
-    e, t = np.asarray(e), np.asarray(t)
-    scale = sc.k * t / 2. / E_NORM
+    e, t = np.asarray(e, dtype=float), np.asarray(t, dtype=float)
+    scale = 0.5 * sc.k * t / E_NORM
     return st.chi2.pdf(e, 1, scale=scale)
 
 
-def thermal_e_rvs(t: array_like, size: Union[int, tuple] = 1) -> array_like:
+def chi2_ex_rvs(t: array_like, size: Union[int, tuple] = 1) -> ndarray:
+    r"""
+    A random sample energy components $E_x$ from the $\chi^2_1$ probability density function
+
+    $$
+    \rho(E_x) = \sqrt{\frac{1}{\piE_x\k_\mathrm{B}T}}\exp\left(-\frac{E_x}{\k_\mathrm{B}T}\right),
+    $$
+
+    in thermal equilibrium at temperature $T$.
+
+    :param t: The temperature $T$ of the environment (K).
+    :param size: Either the size (`int`) or shape (`tuple`) of the returned velocity array.
+     If `m` or `t` is an iterable/array, their common shape must be appended to the desired shape of the random samples.
+    :returns: (vx) Random energies $E_x$ (m/s).
     """
-    :param t: The temperature of the ensemble (K).
-    :param size: Either the size (int) or shape (tuple) of the returned energy array.
-     If 't' is an iterable/array, its shape must be appended to the desired shape of the random samples.
-    :returns: Random energies according to the boltzmann distribution (m/s).
-    """
-    t = np.asarray(t)
-    scale = sc.k * t / 2. / E_NORM
+    t = np.asarray(t, dtype=float)
+    scale = 0.5 * sc.k * t / E_NORM
     return st.chi2.rvs(1, scale=scale, size=size)
 
 
-def convolved_boltzmann_norm_pdf(e: array_like, t: array_like, scale_e: array_like, e0: array_like = 0) -> array_like:
+def convolved_boltzmann_norm_pdf(e: array_like, t: array_like, scale_e: array_like, e0: array_like = 0) -> ndarray:
     """
     :param e: energy quantiles (eV).
     :param t: The temperature of the ensemble (K).
@@ -1902,7 +1962,7 @@ def convolved_boltzmann_norm_pdf(e: array_like, t: array_like, scale_e: array_li
 
 
 def convolved_thermal_norm_v_pdf(v: array_like, m: array_like, t: array_like,
-                                 scale_e: array_like, e0: array_like = 0, relativistic=True) -> array_like:
+                                 scale_e: array_like, e0: array_like = 0, relativistic=True) -> ndarray:
     """
     :param v: velocity quantiles. All values must have the same sign (m/s).
     :param m: The mass of the ensembles bodies (amu).
@@ -1924,7 +1984,7 @@ def convolved_thermal_norm_v_pdf(v: array_like, m: array_like, t: array_like,
 
 
 def convolved_thermal_norm_f_pdf(f: array_like, f_lab: array_like, alpha: array_like, m: array_like, t: array_like,
-                                 scale_e: array_like, e0: array_like = 0, relativistic=True) -> array_like:
+                                 scale_e: array_like, e0: array_like = 0, relativistic=True) -> ndarray:
     """
     :param f: Frequency quantiles (arb. units).
     :param f_lab: Laser frequency in the laboratory frame ([f]).
@@ -1949,7 +2009,7 @@ def convolved_thermal_norm_f_pdf(f: array_like, f_lab: array_like, alpha: array_
     return ret
 
 
-def convolved_thermal_norm_f_lin_pdf(f: array_like, xi: array_like, sigma: array_like, col=True) -> array_like:
+def convolved_thermal_norm_f_lin_pdf(f: array_like, xi: array_like, sigma: array_like, col=True) -> ndarray:
     """
     :param f: Frequency quantiles (arb. units).
     :param xi: The proportionality constant between kinetic energy differences and frequency differences ([f]).
