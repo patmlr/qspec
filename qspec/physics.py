@@ -27,8 +27,8 @@ __all__ = ['L_LABEL', 'E_NORM', 'pi', 'LEMNISCATE', 'mu_N', 'mu_B', 'g_s', 'me_u
            'temperature_doppler', 'saturation_intensity', 'saturation', 'rabi_s', 'scattering_rate', 'mass_factor',
            'delta_r2', 'delta_r4', 'delta_r6', 'lambda_r', 'lambda_rn', 'schmidt_line', 'sellmeier',
            'gamma_3d', 'boost', 'doppler_3d', 'gaussian_beam_3d', 'gaussian_doppler_3d', 't_xi', 'normal_vx_pdf',
-           'normal_vx_rvs', 'chi2_ex_pdf', 'chi2_ex_rvs', 'convolved_boltzmann_norm_pdf',
-           'convolved_thermal_norm_v_pdf', 'convolved_thermal_norm_f_pdf', 'convolved_thermal_norm_f_lin_pdf',
+           'normal_vx_rvs', 'chi2_ex_pdf', 'chi2_ex_rvs', 'normal_chi2_convolved_ex_pdf',
+           'normal_chi2_convolved_vx_pdf', 'normal_chi2_convolved_f_pdf', 'normal_chi2_convolved_f_xi_pdf',
            'source_energy_pdf']
 
 
@@ -1806,9 +1806,11 @@ def gaussian_doppler_3d(r: array_like, k: array_like, w0: array_like, v: array_l
     :raises ValueError: `r`, `k`, `v` and `r0` must have 3 components along the specified `axis`.
      The shapes of `r`, `k`, `w0`, `v` and `r0` must be compatible.
     """
+    r, k, v = np.asarray(r, dtype=float), np.asarray(k, dtype=float), np.asarray(v, dtype=float)
     if r0 is None:
-        r0 = np.zeros_like(r)
-    r, r0, k, v = np.asarray(r), np.asarray(r0), np.asarray(k), np.asarray(v)
+        r0 = np.zeros_like(r, dtype=float)
+    r0 = np.asarray(r0, dtype=float)
+
     tools.check_dimension(3, axis, r, r0, k, v)
     tools.check_shape_like(np.sum(r, axis=axis), np.sum(k, axis=axis), np.array(w0),
                            np.sum(v, axis=axis), np.sum(r0, axis=axis))
@@ -1829,9 +1831,42 @@ def gaussian_doppler_3d(r: array_like, k: array_like, w0: array_like, v: array_l
 """ Probability distributions """
 
 
+def sigma_v(m: array_like, t: array_like) -> ndarray:
+    """
+    The standard deviation of a normal distribution of particle velocities in thermal equilibrium
+
+    $$
+    \sigma_v = \sqrt{\frac{k_\mathrm{B}T}{m}}.
+    $$
+
+    :param m: The mass $m$ of the particle (u).
+    :param t: The temperature $T$ of the environment (K).
+    :returns: The standard deviation $\sigma_v$ (m/s).
+    """
+    m, t = np.asarray(m, dtype=float), np.asarray(t, dtype=float)
+    return np.sqrt(sc.k * t / (m * sc.atomic_mass))
+
+
+def t_sigma(sigma: array_like, m: array_like) -> ndarray:
+    """
+    The temperature of the environment, given the standard deviation `sigma`
+    of a normal distribution of particle velocities
+
+    $$
+    T = \sqrt{\frac{k_\mathrm{B}T}{m}}.
+    $$
+
+    :param sigma: The standard deviation $\sigma$ (m/s).
+    :param m: The mass $m$ of the particle (u).
+    :returns: The temperature $T$ of the environment (K).
+    """
+    sigma, m = np.asarray(sigma, dtype=float), np.asarray(m, dtype=float)
+    return m * sc.atomic_mass * sigma ** 2 / sc.k
+
+
 def t_xi(xi: array_like, f: array_like, u: array_like, q: array_like, m: array_like) -> ndarray:
     r"""
-    The temperature of an ensemble of ions with acceleration/bunching parameter `xi`
+    The temperature of an ensemble of ions with asymmetry parameter `xi`
 
     $$
     T = \xi\frac{\sqrt{8qUmc^2}}{\gamma k_\mathrm{B}f},
@@ -1839,9 +1874,8 @@ def t_xi(xi: array_like, f: array_like, u: array_like, q: array_like, m: array_l
 
     where $\gamma$ is the relativistic time-dilation factor.
 
-    :param xi: The acceleration/bunching parameter $\xi$ used as a parameter in `source_energy_pdf`.
-     `xi` is usually derived from fitting to asymmetric spectral lines (MHz).
-    :param f: The rest-frame transition frequency (MHz).
+    :param xi: The asymmetry parameter $\xi$ ([`f`]).
+    :param f: The rest-frame transition frequency (arb. units).
     :param u: The acceleration voltage (V).
     :param q: The electric charge of the ions (e).
     :param m: The mass of the ions (u).
@@ -1849,7 +1883,29 @@ def t_xi(xi: array_like, f: array_like, u: array_like, q: array_like, m: array_l
     """
     xi, f, u, q, m = (np.asarray(xi, dtype=float), np.asarray(f, dtype=float), np.asarray(u, dtype=float),
                       np.asarray(q, dtype=float), np.asarray(m, dtype=float))
+
     return xi * np.sqrt(8 * q * sc.e * u * m * sc.u * sc.c ** 2) / (sc.k * f * gamma_e_kin(q * u, m))
+
+
+def xi_t(t: array_like, f: array_like, u: array_like, q: array_like, m: array_like) -> ndarray:
+    r"""
+    The acceleration/bunching parameter for an ensemble of ions with temperature $T$
+
+    $$
+    \xi = T\frac{\gamma k_\mathrm{B}f}{\sqrt{8qUmc^2}},
+    $$
+
+    where $\gamma$ is the relativistic time-dilation factor.
+
+    :param t: The temperature $T$ of the environment (K).
+    :param f: The rest-frame transition frequency (arb. units).
+    :param u: The acceleration voltage (V).
+    :param q: The electric charge of the ions (e).
+    :param m: The mass of the ions (u).
+    :returns: (xi) The asymmetry parameter $\xi$ ([`f`]).
+    """
+    t = np.asarray(t, dtype=float)
+    return t / t_xi(1., f, u, q, m)
 
 
 def normal_vx_pdf(vx: array_like, m: array_like, t: array_like) -> ndarray:
@@ -1868,6 +1924,7 @@ def normal_vx_pdf(vx: array_like, m: array_like, t: array_like) -> ndarray:
     :returns: (rho_vx) The probability density in thermal equilibrium at the velocity `vx` (s/m).
     """
     vx, m, t = np.asarray(vx, dtype=float), np.asarray(m, dtype=float), np.asarray(t, dtype=float)
+
     scale = np.sqrt(sc.k * t / (m * sc.atomic_mass))
     return st.norm.pdf(vx, scale=scale)
 
@@ -1889,11 +1946,12 @@ def normal_vx_rvs(m: array_like, t: array_like, size: Union[int, tuple] = 1) -> 
     :returns: (vx) Random velocities $v_x$ (m/s).
     """
     m, t = np.asarray(m, dtype=float), np.asarray(t, dtype=float)
+
     scale = np.sqrt(sc.k * t / (m * sc.atomic_mass))
     return st.norm.rvs(scale=scale, size=size)
 
 
-def chi2_ex_pdf(e: array_like, t: array_like) -> ndarray:
+def chi2_ex_pdf(ex: array_like, t: array_like) -> ndarray:
     r"""
     The $\chi^2_1$ probability density of an energy component $E_x$
 
@@ -1903,13 +1961,14 @@ def chi2_ex_pdf(e: array_like, t: array_like) -> ndarray:
 
     in thermal equilibrium at temperature $T$.
 
-    :param e: The energy quantiles $E_x$ (eV).
+    :param ex: The energy quantiles $E_x$ (eV).
     :param t: The temperature $T$ of the environment (K).
-    :returns: The probability density in thermal equilibrium at the energy `e` (1/eV).
+    :returns: (rho_ex) The probability density in thermal equilibrium at the energy `ex` (1/eV).
     """
-    e, t = np.asarray(e, dtype=float), np.asarray(t, dtype=float)
+    ex, t = np.asarray(ex, dtype=float), np.asarray(t, dtype=float)
+
     scale = 0.5 * sc.k * t / E_NORM
-    return st.chi2.pdf(e, 1, scale=scale)
+    return st.chi2.pdf(ex, 1, scale=scale)
 
 
 def chi2_ex_rvs(t: array_like, size: Union[int, tuple] = 1) -> ndarray:
@@ -1932,137 +1991,173 @@ def chi2_ex_rvs(t: array_like, size: Union[int, tuple] = 1) -> ndarray:
     return st.chi2.rvs(1, scale=scale, size=size)
 
 
-def convolved_boltzmann_norm_pdf(e: array_like, t: array_like, scale_e: array_like, e0: array_like = 0) -> ndarray:
+def normal_chi2_convolved_ex_pdf(ex: array_like, t: array_like, scale_e: array_like, e0: array_like = 0) -> ndarray:
+    r"""
+    The probability density at the energy $E_x$, distributed according
+    to a convolution of a normal and a $\chi^2_1$ distribution
+
+    $$\begin{aligned}
+    asd
+    \end{aligned}$$
+
+    :param ex: The energy quantiles $E_x$ (eV).
+    :param t: The temperature $T$ of the environment (K).
+    :param scale_e: The standard deviation $\sigma_{E_x}$ of the normal distribution (eV).
+    :param e0: The mean energy $E_0$ of the normal distribution (eV).
+    :returns: (rho_ex) The probability density in thermal equilibrium at the energy `ex` (1/eV).
     """
-    :param e: energy quantiles (eV).
-    :param t: The temperature of the ensemble (K).
-    :param scale_e: The standard deviation of the normal distribution (eV).
-    :param e0: The mean energy of the normal distribution (eV).
-    :returns: The probability density at the energy e, distributed according
-     to a convolution of the boltzmann and a normal distribution (1/eV).
-    """
-    e, t, scale_e, e0 = np.asarray(e), np.asarray(t), np.asarray(scale_e), np.asarray(e0)
+    ex, t, scale_e, e0 = (np.asarray(ex, dtype=float), np.asarray(t, dtype=float),
+                          np.asarray(scale_e, dtype=float), np.asarray(e0, dtype=float))
+
     t /= E_NORM
     scale = scale_e / (sc.k * t)
-    loc = (e - e0) / (sc.k * t) - scale ** 2
-    nonzero = loc.astype(bool)
+    loc = (ex - e0) / (sc.k * t) - scale ** 2
+
+    norm = np.exp(-0.5 * scale ** 2) / (np.sqrt(2.) * np.pi * scale * sc.k * t)
+
+    nonzero = ~loc.astype(bool)
+    nonzero += norm <= 0.
+    nonzero += np.isinf(np.exp(np.abs(loc)))
+    nonzero = ~nonzero
     loc = loc[nonzero]
-    norm = np.exp(-0.5 * scale ** 2) \
-        / (np.sqrt(2.) * np.pi * scale * sc.k * t)
     x = (loc / (2. * scale)) ** 2
-    main = np.full(e.shape, np.sqrt(LEMNISCATE * np.sqrt(np.pi) * scale))
-    main_nonzero = np.empty_like(e[nonzero], dtype=float)
+
+    main = np.full(ex.shape, np.sqrt(LEMNISCATE * np.sqrt(np.pi) * scale))
+    main_nonzero = np.empty_like(ex[nonzero], dtype=float)
     mask = loc < 0.
+
     main_nonzero[mask] = np.sqrt(-loc[mask] / 2.) * np.exp(-loc[mask]) \
         * sp.kv(0.25, x[mask]) * np.exp(-x[mask])
     main_nonzero[~mask] = np.pi / 2. * np.sqrt(loc[~mask]) * np.exp(-loc[~mask]) \
         * (sp.ive(0.25, x[~mask]) + sp.ive(-0.25, x[~mask]))
     main[nonzero] = main_nonzero * norm
+
     return main
 
 
-def convolved_thermal_norm_v_pdf(v: array_like, m: array_like, t: array_like,
-                                 scale_e: array_like, e0: array_like = 0, relativistic=True) -> ndarray:
+def normal_chi2_convolved_vx_pdf(vx: array_like, m: array_like, t: array_like,
+                                 scale_e: array_like, e0: array_like = 0, relativistic: bool = True) -> ndarray:
+    r"""
+    The probability density at the velocity $v_x$ of particles with kinetic energy $E_x$, distributed according
+    to a convolution of a normal and a $\chi^2_1$ distribution
+
+    $$\begin{aligned}
+    asd\\[2ex]
+    E_x = (\gamma - 1)mc^2,
+    \end{aligned}$$
+
+    where
+
+    :param vx: The velocity quantiles $v_x$ (m/s).
+    :param m: The mass $m$ of the particle (u).
+    :param t: The temperature $T$ of the environment (K).
+    :param scale_e: The standard deviation $\sigma_{E_x}$ of the normal distribution (eV).
+    :param e0: The mean energy $E_0$ of the normal distribution (eV).
+    :param relativistic: Kinetic energies are calculated either relativistically (`True`) or classically (`False`).
+    :returns: (rho_vx) The probability density in thermal equilibrium at the velocity `vx` (s/m).
     """
-    :param v: velocity quantiles. All values must have the same sign (m/s).
-    :param m: The mass of the ensembles bodies (amu).
-    :param t: The temperature of the ensemble (K).
-    :param scale_e: The standard deviation of the normal distribution (eV).
-    :param e0: The mean energy of the normal distribution (eV).
-    :param relativistic: The calculation is performed either relativistically or classically.
-    :returns: The probability density at the velocity v, corresponding to the kinetic energy, distributed according
-     to a convolution of the boltzmann and a normal distribution (s/m).
-    """
-    v, m, t, scale_e, e0 = np.asarray(v), np.asarray(m), np.asarray(t), np.asarray(scale_e), np.asarray(e0)
-    if np.any(v < 0.) and np.any(v > 0.):
-        raise ValueError('This pdf can only describe the case where all velocities have the same sign.')
-    energy = e_kin(v, m, relativistic)
-    tr = m * sc.atomic_mass * np.abs(v)
+    vx, m, t, scale_e, e0 = (np.asarray(vx, dtype=float), np.asarray(m, dtype=float), np.asarray(t, dtype=float),
+                             np.asarray(scale_e, dtype=float), np.asarray(e0, dtype=float))
+
+    # if np.any(vx < 0.) and np.any(vx > 0.):
+    #     raise ValueError('This pdf can only describe the case where all velocities have the same sign.')
+
+    energy = e_kin(vx, m, relativistic)
+    tr = m * sc.atomic_mass * np.abs(vx)
     if relativistic:
-        tr *= gamma(v) ** 3
-    return convolved_boltzmann_norm_pdf(energy, t, scale_e, e0=e0) * tr / E_NORM
+        tr *= gamma(vx) ** 3
+
+    return normal_chi2_convolved_ex_pdf(energy, t, scale_e, e0=e0) * tr / E_NORM
 
 
-def convolved_thermal_norm_f_pdf(f: array_like, f_lab: array_like, alpha: array_like, m: array_like, t: array_like,
-                                 scale_e: array_like, e0: array_like = 0, relativistic=True) -> ndarray:
+def normal_chi2_convolved_f_pdf(f: array_like, f_lab: array_like, alpha: array_like, m: array_like, t: array_like,
+                                scale_e: array_like, e0: array_like = 0, relativistic: bool = True) -> ndarray:
+    r"""
+    The probability density at the frequency $f$ in the rest frame of an atom with kinetic energy $E_x$,
+    determined through the Doppler shift of $f_\text{lab}$,
+    and distributed according to a convolution of a normal and a $\chi^2_1$ distribution
+
+    $$\begin{aligned}
+    asd\\[2ex]
+    E_x = (\gamma - 1)mc^2,
+    \end{aligned}$$
+
+
+    :param f: The frequency quantiles $f$ (arb. units).
+    :param f_lab: The laser frequency $f_\text{lab}$ in the laboratory frame ([`f`]).
+    :param alpha: The angle $\alpha$ between the laser and the velocity of the atom (rad).
+    :param m: The mass $m$ of the atom (u).
+    :param t: The temperature $T$ of the environment (K).
+    :param scale_e: The standard deviation $\sigma_{E_x}$ of the normal distribution (eV).
+    :param e0: The mean energy $E_0$ of the normal distribution (eV).
+    :param relativistic: Kinetic energies are calculated either relativistically (`True`) or classically (`False`).
+    :returns: (rho_f) The probability density in thermal equilibrium at the frequency `f` (1/[`f`]).
     """
-    :param f: Frequency quantiles (arb. units).
-    :param f_lab: Laser frequency in the laboratory frame ([f]).
-    :param alpha: Angle between the laser and the atoms velocity direction (rad).
-    :param m: The mass of the ensembles bodies (amu).
-    :param t: The temperature of the ensemble (K).
-    :param scale_e: The standard deviation of the normal distribution (eV).
-    :param e0: The mean energy of the normal distribution (eV).
-    :param relativistic: The calculation is performed either relativistically or classically.
-    :returns: The probability density at the frequency 'f' in the atoms rest frame,
-     related to the kinetic energy via the laser frequency 'f_lab' and the Doppler effect.
-     The kinetic energies are distributed according to a convolution of the boltzmann and a normal distribution (1/MHz).
-    """
-    f, f_lab = np.asarray(f), np.asarray(f_lab)
-    m, t, scale_e, e0 = np.asarray(m), np.asarray(t), np.asarray(scale_e), np.asarray(e0)
+    f, f_lab = np.asarray(f, dtype=float), np.asarray(f_lab, dtype=float)
+    m, t, scale_e, e0 = (np.asarray(m, dtype=float), np.asarray(t, dtype=float),
+                         np.asarray(scale_e, dtype=float), np.asarray(e0, dtype=float))
 
     v = inverse_doppler(f, f_lab, alpha, mode='isnan-small')
     tr = np.abs(inverse_doppler_d1(f, f_lab, alpha, mode='isnan-small'))
     mask = np.isnan(v)
     ret = np.zeros(f.shape)
-    ret[~mask] = convolved_thermal_norm_v_pdf(v[~mask], m, t, scale_e, e0=e0, relativistic=relativistic) * tr[~mask]
+    ret[~mask] = normal_chi2_convolved_vx_pdf(v[~mask], m, t, scale_e, e0=e0, relativistic=relativistic) * tr[~mask]
     return ret
 
 
-def convolved_thermal_norm_f_lin_pdf(f: array_like, xi: array_like, sigma: array_like, col=True) -> ndarray:
+def normal_chi2_convolved_f_xi_pdf(f: array_like, xi: array_like, sigma: array_like, col: bool = True) -> ndarray:
+    r"""
+    The probability density at the frequency $f$ in the rest frame of an atom with kinetic energy $E_x$,
+    determined through the parameter $\xi$,
+    and distributed according to a convolution of a normal and a $\chi^2_1$ distribution
+
+    $$\begin{aligned}
+    asd\\[2ex]
+    E_x = (\gamma - 1)mc^2,
+    \end{aligned}$$
+
+    :param f: The frequency quantiles $f$ (arb. units).
+    :param xi: The asymmetry parameter $\xi$ ([`f`]).
+    :param sigma: The standard deviation $\sigma$ of the normal distribution ([`f`]).
+    :param col: The laser can be aligned collinearly (`True`) or anticollinearly (`False`) to the velocity of the atom.
+    :returns: (rho_f) The probability density in thermal equilibrium at the frequency `f` (1/[`f`]).
     """
-    :param f: Frequency quantiles (arb. units).
-    :param xi: The proportionality constant between kinetic energy differences and frequency differences ([f]).
-    :param sigma: The standard deviation of the underlying normal distribution in frequency units ([f]).
-    :param col: Col/Acol alignment of the laser relative to the atom beam.
-    :returns: The probability density at the frequency 'f' in the atoms rest frame,
-     related to differences in kinetic energy via the proportionality constant 'xi'.
-     The kinetic energies are distributed according to a convolution of the boltzmann and a normal distribution (1/[f]).
-    """
-    pm = 1. if col else -1.
-    f, xi, sigma = np.asarray(f), np.asarray(xi), np.asarray(sigma)
+    f, xi, sigma = np.asarray(f, dtype=float), np.asarray(xi, dtype=float), np.asarray(sigma, dtype=float)
+
     scalar_true = tools.check_shape((), f, xi, sigma, return_mode=True)
     if scalar_true:
         f = np.array([f])
-    sig = (0.5 * sigma / xi) ** 2
-    norm = np.exp(-0.5 * sig) / (np.sqrt(2.) * np.pi * sigma)
-    mu = -0.5 * pm * f / xi - sig
-    b_arg = 0.25 * mu ** 2 / sig
 
-    nonzero = mu.astype(bool)
-    mu = mu[nonzero]
-    b_arg = b_arg[nonzero]
-    main = np.full(f.shape, np.sqrt(LEMNISCATE * np.sqrt(sig * np.pi)))
-    main_nonzero = np.empty_like(f[nonzero], dtype=float)
-    mask = mu < 0.
+    r = source_energy_pdf(f, 0., sigma, xi, col)
 
-    main_nonzero[mask] = np.sqrt(-0.5 * mu[mask]) * np.exp(-mu[mask]) \
-        * np.exp(-b_arg[mask]) * sp.kv(0.25, b_arg[mask])
-    main_nonzero[~mask] = 0.5 * np.pi * np.sqrt(mu[~mask]) * np.exp(-mu[~mask]) \
-        * (sp.ive(0.25, b_arg[~mask]) + sp.ive(-0.25, b_arg[~mask]))
-    main[nonzero] = main_nonzero
     if scalar_true:
-        return main[0] * norm
-    return main * norm
+        return r[0]
+    return r
 
 
-def source_energy_pdf(f, f0, sigma, xi, collinear=True):
-    """
-    :param f: Frequency quantiles (arb. units).
-    :param f0: Frequency offset (arb. units).
-    :param sigma: The standard deviation of the underlying normal distribution in frequency units ([f]).
-    :param xi: The proportionality constant between kinetic energy differences and frequency differences ([f]).
-    :param collinear:
-    :returns: PDF of rest frame frequencies after acceleration of thermally and normally distributed kinetic energies.
+def source_energy_pdf(f, f0, sigma, xi, collinear: bool = True) -> ndarray:
+    r"""
+    This is the same function as `normal_chi2_convolved_f_xi_pdf` with less array processing for `qspec.models`.
+
+    :param f: The frequency quantiles $f$ (arb. units).
+    :param f0: A frequency offset $f_0$ ([`f`]).
+    :param sigma: The standard deviation of the underlying normal distribution in frequency units ([`f`]).
+    :param xi: The asymmetry parameter $\xi$ ([`f`]).
+    :param collinear: The laser can be aligned collinearly (`True`)
+     or anticollinearly (`False`) to the velocity of the atom.
+    :returns: (rho_f) The probability density in thermal equilibrium at the frequency `f` (1/[`f`]).
     """
     pm = 1. if collinear else -1.
-    f = np.asarray(f)
+    f = np.asarray(f, dtype=float)
+
     sig = (sigma / (2. * xi)) ** 2
     _norm = np.exp(-0.5 * sig) / (sigma * np.sqrt(2. * np.pi))
+
     mu = -pm * (f - f0) / (2. * xi) - sig
     nonzero = mu.astype(bool)
     mu = mu[nonzero]
     b_arg = mu ** 2 / (4. * sig)
+
     main = np.full(f.shape, np.sqrt(LEMNISCATE * np.sqrt(sig / np.pi)))
     main_nonzero = np.empty_like(f[nonzero], dtype=float)
     mask = mu < 0.

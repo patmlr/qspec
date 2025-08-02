@@ -197,7 +197,7 @@ def example(n=None):
 
         v0 = qs.v_el(u, q, m)  # m/s  # The expected ion velocity.
         v = np.linspace(-20, 20, 1001, dtype=float)  # m/s
-        y = qs.convolved_thermal_norm_v_pdf(v0 + v, m, t, 0.4, u)  # The distribution of the ion velocities.
+        y = qs.normal_chi2_convolved_vx_pdf(v0 + v, m, t, 0.4, u)  # The distribution of the ion velocities.
 
         plt.xlabel('$v - v_0$ (m/s)')
         plt.ylabel('Abundance')
