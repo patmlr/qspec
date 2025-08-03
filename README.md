@@ -4,7 +4,7 @@
 
 [![Static Badge](https://img.shields.io/badge/OS-Windows-yellow)](https://www.microsoft.com)
 [![Static Badge](https://img.shields.io/badge/Python-3.9%2B-blue?logo=python&logoColor=white)](https://www.python.org/)
-[![Static Badge](https://img.shields.io/badge/License-MIT-slateblue)](https://opensource.org/license/mit)
+[![Static Badge](https://img.shields.io/badge/License-MIT-slateblue)](https://github.com/patmlr/qspec/blob/main/LICENSE)
 
 [![Static Badge](https://img.shields.io/badge/DOI-10.1016/j.cpc.2025.109550-orange)](https://doi.org/10.1016/j.cpc.2025.109550)
 [![Static Badge](https://img.shields.io/badge/arXiv-2409.01417-red)](https://arxiv.org/abs/2409.01417)
