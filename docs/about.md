@@ -13,7 +13,7 @@ This enables fast calculations with large samples of data, *e.g.*, facilitating 
 See the [_installation instructions_]({{ site.baseurl }}{% link install.html %}),
 [_tutorials_]({{ site.baseurl }}{% link tutorials/tutorials.html %})
 and the [_API documentation_]({{ site.baseurl }}{% link doc/doc.html %}) to get started and explore potential use cases.
-A comprehensive summary with highlights and some theoretical background can be found in the official [_publication_](https://doi.org/10.48550/arXiv.2409.01417).
+A comprehensive summary with highlights and some theoretical background can be found in the official [_publication_](https://doi.org/10.1016/j.cpc.2025.109550).
 
 ## Developers and Maintainers
 
