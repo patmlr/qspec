@@ -1,17 +1,19 @@
 [build-system]
 build-backend = 'setuptools.build_meta'
 requires = [
-    'setuptools >= 61.2',
+    'setuptools >= 77.0.1',
     'wheel',
 ]
 
 [project]
 name = 'qspec'
-version = '0.4.0'
+version = '0.4.1'
 description = 'Physics toolbox for laser spectroscopy'
 readme = 'README.md'
-requires-python = '>=3.8'
-license = {file = 'LICENSE'}
+requires-python = '>=3.9'
+license = 'MIT'
+license-files = ['LICENSE']
+
 keywords = ['physics', 'simulation', 'data analysis', 'atomic structure', 'laser spectroscopy', 'laser cooling', 'coherent interaction', 'quantum computing']
 authors = [
     {name = 'Patrick Müller', email = 'pmueller@physics.ucla.edu'},
@@ -19,7 +21,6 @@ authors = [
 classifiers = [
     'Development Status :: 4 - Beta',
     'Intended Audience :: Science/Research',
-    'License :: OSI Approved :: MIT License',
     'Operating System :: Microsoft :: Windows',
     'Programming Language :: C++',
     'Programming Language :: Python :: 3',
