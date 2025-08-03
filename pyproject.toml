@@ -12,7 +12,7 @@ description = 'Physics toolbox for laser spectroscopy'
 readme = 'README.md'
 requires-python = '>=3.8'
 license = {file = 'LICENSE'}
-keywords = ['physics', 'laser spectroscopy', 'simulation', 'quantum mechanics', 'data analysis']
+keywords = ['physics', 'simulation', 'data analysis', 'atomic structure', 'laser spectroscopy', 'laser cooling', 'coherent interaction', 'quantum computing']
 authors = [
     {name = 'Patrick Müller', email = 'pmueller@physics.ucla.edu'},
 ]
