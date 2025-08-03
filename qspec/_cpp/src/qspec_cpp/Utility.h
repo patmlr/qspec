@@ -67,3 +67,5 @@ std::vector<Vector3d> cast_samples_theta_phi_et(double* theta, double* phi, size
 
 Vector3d cast_theta_phi_ep(double theta, double phi);
 std::vector<Vector3d> cast_samples_theta_phi_ep(double* theta, double* phi, size_t sample_size);
+
+std::string half_int_to_str(double value);

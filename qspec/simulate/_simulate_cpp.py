@@ -18,6 +18,7 @@ import qspec.algebra as al
 
 
 __all__ = ['Polarization', 'Laser', 'Environment', 'construct_electronic_state', 'construct_hyperfine_state',
+           'gen_electronic_ls_state', 'gen_hyperfine_ls_state',
            'density_matrix_diagonal',
            'gen_electronic_state', 'gen_hyperfine_state', 'State', 'DecayMap', 'Atom', 'Interaction']
 
@@ -61,22 +62,39 @@ def _process_q_axis(q_axis: array_like) -> ndarray:
     return q_axis
 
 
-class Polarization:
-    def __init__(self, vec: array_iter = None, q_axis: array_like = 2, vec_as_q: bool = True, instance=None):
-        """
-        Class representing a polarization state of light. The property 'x' holds the polarization in cartesian coordinates.
-        The property 'q' holds the polarization in spherical coordinates ( sigma-, pi, sigma+ )
-        with respect to the chosen quantization axis.
+class CppClass:
+    def __init__(self, instance: Union['CppClass', CppClassHandler] = None):
+        self.instance = _cast_cpp_type(instance)
 
-        :param vec: The polarization vector. I.e. the amplitude of the electromagnetic wave. So to specify, e.g.,
-         1/3 of pi and 2/3 sigma+ light for a given 'q_axis', vec must be ( 0, sqrt(1/3), sqrt(2/3) ).
-         The default is linear polarization in z-direction, such that x = (0, 0, 1) and q = (0, 1, 0).
-        :param q_axis: The quantization axis. Must be an integer in {0, 1, 2} or a 3d-vector. The default is 2 (z-axis).
-        :param vec_as_q: Whether 'vec' is given as ( sigma-, pi, sigma+ ) (True) or in cartesian coordinates (False).
-        :param instance: A pointer to an existing Polarization instance.
-         If this is specified, the other parameters are omitted.
+
+def _cast_cpp_type(instance: Union[CppClass, CppClassHandler] = None) -> CppClassHandler:
+    if instance is None:
+        return None
+    if isinstance(instance, CppClass):
+        return instance.instance
+    return instance
+
+
+class Polarization(CppClass):
+    def __init__(self, vec: array_like = None, q_axis: array_like = 2, vec_as_q: bool = True,
+                 instance: Union['Polarization', PolarizationHandler] = None):
+        r"""
+        Class representing a polarization state of light. The property `Polarization.x` holds the polarization
+        vector in cartesian coordinates. The property `Polarization.q` holds the polarization vector
+        in the helicity basis $(\vec{\sigma}^-, \vec{\pi}, \vec{\sigma}^+)$ for the given quantization axis `q_axis`.
+
+        :param vec: The complex-valued polarization vector $\vec{\varepsilon}$ of an electromagnetic wave / photon.
+         The user input is normalized to a vector with length 1.
+         The default value corresponds to linear polarization in $z$-direction,
+         such that `Polarization.x = [0, 0, 1]` and `Polarization.q = [0, 1, 0]`.
+        :param q_axis: The quantization axis used to transform `Polarization.x` and `Polarization.q` into each other.
+         Must be an integer in `{0, 1, 2}` or a 3d-vector. The default is `q_axis = 2` (z-axis).
+        :param vec_as_q: Whether `vec` is given in the helicity basis (`True`) or in cartesian coordinates (`False`).
+         The default is `True`.
+        :param instance: An existing `Polarization` instance. If this is specified, the other parameters are omitted.
         """
-        self.instance = instance
+        super().__init__(instance)
+
         if self.instance is None:
             self.instance = dll.polarization_construct()
 
@@ -93,62 +111,80 @@ class Polarization:
         dll.polarization_destruct(self.instance)
 
     def def_q_axis(self, q_axis: array_like = 2, q_fixed: bool = False):
-        """
-        Defines the quantization axis. This changes either 'x' or 'q', depending on 'q_fixed'.
+        r"""
+        Define the quantization axis. This changes either `Polarization.x` or `Polarization.q`, depending on `q_fixed`.
 
-        :param q_axis: The quantization axis. Must be an integer in {0, 1, 2} or a 3d-vector. The default is 2 (z-axis).
-        :param q_fixed: Whether 'q' should stay the same with the new quantization axis (True) or 'x' (False).
+        :param q_axis: The quantization axis. Must be an integer in `{0, 1, 2}` or a 3d-vector.
+         The default is `q_axis = 2` (z-axis).
+        :param q_fixed: Whether `q` (`True`) or `x` (`False`) should stay the same with the new quantization axis.
         """
         q_axis = _process_q_axis(q_axis)
         dll.polarization_def_q_axis(self.instance, q_axis, q_fixed)
 
     @property
     def q_axis(self) -> ndarray:
-        """
-        :returns: The complex polarization in spherical coordinates ( sigma-, pi, sigma+ ).
+        r"""
+        :returns: The quantization axis.
         """
         return dll.polarization_get_q_axis(self.instance)
 
     @property
     def x(self) -> ndarray:
-        """
-        :returns: The complex polarization in cartesian coordinates ( x, y, z ).
+        r"""
+        :returns: The complex polarization in cartesian coordinates $(\vec{x}, \vec{y}, \vec{z})$.
         """
         return dll.polarization_get_x(self.instance)
 
     @property
     def q(self) -> ndarray:
-        """
-        :returns: The complex polarization in spherical coordinates ( sigma-, pi, sigma+ ).
+        r"""
+        :returns: The complex polarization in the helicity basis $(\vec{\sigma}^-, \vec{\pi}, \vec{\sigma}^+)$.
         """
         return dll.polarization_get_q(self.instance)
 
 
-class Laser:
-    def __init__(self, freq: array_like, intensity: array_like = 1., polarization: Polarization = None,
-                 k: array_like = None, instance=None):
-        """
-        Class representing a laser.
+def _cast_laser_polarization(polarization: Polarization):
+    if polarization is None:
+        polarization = Polarization()
+    elif not isinstance(polarization, Polarization):
+        polarization = np.asarray(polarization, dtype=complex)
+        if polarization.shape != (3,):
+            raise ValueError('\'polarization\' must be a 3d-vector, but has shape {}.'
+                             .format(polarization.shape))
+        polarization = Polarization(vec=polarization, vec_as_q=False)
+    return polarization
 
-        :param freq: The frequency of the laser (MHz).
-        :param intensity: The intensity of the laser (uW / mm**2 = W / m**2).
-        :param polarization: The polarization of the laser.
-        :param k: The direction of the laser.
-        :param instance: A pointer to an existing Laser instance.
-         If this is specified, the other parameters are omitted.
+
+class Laser(CppClass):
+    def __init__(
+            self, freq: array_like, intensity: array_like = 1., polarization: Union[array_like, Polarization] = None,
+            k: array_like = None, instance: Union['Laser', LaserHandler] = None):
+        r"""
+        Class representing a laser that has a frequency $\nu$, an intensity $I = \frac{1}{2}\varepsilon_0c\vec{E}^2$,
+        a polarization $\vec{\varepsilon} = \vec{E} / |E|$ and a direction $\vec{k}$.
+
+        :param freq: The frequency $\nu$ of the laser (MHz).
+        :param intensity: The intensity $I$ of the laser
+         $(\mu\mathrm{W} / \mathrm{mm}^2 = \mathrm{W} / \mathrm{m}^2)$.
+        :param polarization: The polarization of the laser $\vec{\varepsilon}$ as a complex vector
+         in cartesian coordinates or as a `Polarization` object.
+        :param k: The direction of the laser $\vec{k}$. The user input is normalized to a vector with length 1.
+        :param instance: An existing `Laser` instance. If this is specified, the other parameters are omitted.
         """
-        self.instance = instance
+        super().__init__(instance)
+
         if self.instance is None:
             self.instance = dll.laser_construct()
-            self._polarization = polarization
-            if self.polarization is None:
-                self._polarization = Polarization()
+
+            self._polarization = _cast_laser_polarization(polarization)
+
             if k is None:
                 k = tools.unit_vector(0, 3)
             k = np.asarray(k, dtype=float)
             if k.shape != (3,):
-                raise ValueError('Interaction.k must be a 3d-vector, but has shape {}.'.format(k.shape))
-            dll.laser_init(self.instance, c_double(freq), c_double(intensity), self.polarization.instance,
+                raise ValueError('\'k\' must be a 3d-vector, but has shape {}.'.format(k.shape))
+
+            dll.laser_init(self.instance, c_double(freq), c_double(intensity), self._polarization.instance,
                            k.ctypes.data_as(c_double_p))
         else:
             self._polarization = Polarization(instance=dll.laser_get_polarization(self.instance))
@@ -158,78 +194,78 @@ class Laser:
 
     @property
     def freq(self):
-        """
-        :returns: The frequency of the laser.
+        r"""
+        :returns: The frequency of the laser $\nu$.
         """
         return dll.laser_get_freq(self.instance)
 
     @freq.setter
     def freq(self, value: scalar):
-        """
-        :param value: The new frequency of the laser.
-        :returns:
+        r"""
+        :param value: The new frequency of the laser $\nu$.
         """
         dll.laser_set_freq(self.instance, c_double(value))
 
     @property
     def intensity(self):
-        """
-        :returns: The intensity of the laser.
+        r"""
+        :returns: The intensity of the laser $I = \frac{1}{2}\varepsilon_0c\vec{E}^2$.
         """
         return dll.laser_get_intensity(self.instance)
 
     @intensity.setter
     def intensity(self, value: scalar):
-        """
-        :param value: The new intensity of the laser.
-        :returns:
+        r"""
+        :param value: The new intensity of the laser $I = \frac{1}{2}\varepsilon_0c\vec{E}^2$.
         """
         dll.laser_set_intensity(self.instance, c_double(value))
 
     @property
     def polarization(self):
-        """
-        :returns: The polarization of the laser.
+        r"""
+        :returns: The polarization of the laser $\varepsilon$ as a `Polarization` object.
         """
         return self._polarization
 
     @polarization.setter
     def polarization(self, value: Polarization):
+        r"""
+        :param value: The new polarization of the laser $\varepsilon$ as a complex vector in cartesian coordinates
+         or as a `Polarization` object.
         """
-        :param value: The new polarization of the laser.
-        :return: None.
-        """
-        self._polarization = value
-        dll.laser_set_polarization(self.instance, value.instance)
+        self._polarization = _cast_laser_polarization(value)
+        dll.laser_set_polarization(self.instance, self._polarization.instance)
 
     @property
     def k(self):
-        """
-        :returns: The direction of the laser. The default direction is ( 1, 0, 0 ).
+        r"""
+        :returns: The normalized direction of the laser $\vec{k}$. The default direction is $(1, 0, 0)$.
         """
         return dll.laser_get_k(self.instance)
 
     @k.setter
     def k(self, value: array_like):
-        """
-        :param value: The new direction of the laser.
-        :return: None.
+        r"""
+        :param value: The new direction of the laser $\vec{k}$. The user input is normalized to a vector with length 1.
         """
         _value = np.asarray(value, dtype=float)
         if _value.size != 3:
             raise ValueError('Interaction.k must be a 3d-vector, but has shape {}.'.format(_value.shape))
         dll.laser_set_k(self.instance, _value.flatten())
 
-    def get_kpol(self, k: int, q_axis: array_like = 2):
+    def get_kpol(self, k: int, electric: bool, q_axis: array_like = 2):
         r"""
         :param k: The multipole order $k \geq 1$.
-        :param q_axis: The quantization axis. Must be an integer in {0, 1, 2} or a 3d-vector. The default is 2 (z-axis).
-        :returns: The rank `k` tensor polarization for the given quantization axis.
+        :param electric: Whether the electric (`True`) or the magnetic (`False`) field component is returned.
+        :param q_axis: The quantization axis. Must be an integer in `{0, 1, 2}` or a 3d-vector.
+         The default is `q_axis = 2` (z-axis).
+        :returns: The rank `k` electric or magnetic irreducible tensor polarization in the helicity basis
+         for the given quantization axis.
         """
         q_axis = _process_q_axis(q_axis)
         vector_cd_p = np.ctypeslib.ndpointer(dtype=complex, shape=(2 * int(k) + 1, ))
         set_restype(dll.laser_get_kpol, vector_cd_p)
-        return dll.laser_get_kpol(self.instance, c_bool(True), c_size_t(k), q_axis.ctypes.data_as(c_double_p))
+        return dll.laser_get_kpol(self.instance, c_bool(electric), c_size_t(k), q_axis.ctypes.data_as(c_double_p))
 
 
 def _process_hyper_const(hyper_const: array_like) -> ndarray:
@@ -252,17 +288,23 @@ def _process_hyper_const(hyper_const: array_like) -> ndarray:
 
 
 # noinspection PyPep8Naming
-class Environment:
-    def __init__(self, E: array_like = None, B: array_like = None, instance=None):
-        """
-        Class representing an electromagnetic environment.
+class Environment(CppClass):
+    def __init__(self, E: array_like = None, B: array_like = None,
+                 instance: Union['Environment', EnvironmentHandler] = None):
+        r"""
+        Class representing an electromagnetic environment with static electric field $\vec{E}$
+        and magnetic field $\vec{B}$. Currently implemented:
 
-        :param E: A static electric field (not implemented).
-        :param B: A static magnetic field (linear Zeeman effect).
-        :param instance: A pointer to an existing Environment instance.
-         If this is specified, the other parameters are omitted.
+        <ul>
+          <li>Nonlinear Zeeman effect (fully diagonalized, dipole transition strengths unaffected)</li>
+        </ul>
+
+        :param E: A static electric field $\vec{E}$. <span style="color: #F54927;">(NOT IMPLEMENTED)</span>
+        :param B: A static magnetic field $\vec{B}$.
+        :param instance: An existing `Environment` instance. If this is specified, the other parameters are omitted.
         """
-        self.instance = instance
+        super().__init__(instance)
+
         if self.instance is None:
             self.instance = dll.environment_construct()
             self.E = E
@@ -308,35 +350,37 @@ class Environment:
                 raise ValueError('B must be a scalar, 3d-vector or None, but has shape {}'.format(value.shape))
 
 
-class State:
+class State(CppClass):
     def __init__(self, freq_j: quant_like, parity: Union[str, bool],
                  j: quant_like, i: quant_like, f: quant_like, m: quant_like,
                  ls: quant_iter = None, jj: quant_iter = None, hyper_const: array_like = None,
-                 gj: scalar = 0., gi: scalar = 0., label: str = None, instance=None):
+                 gj: scalar = 0., gi: scalar = 0., label: str = None, instance: Union['State', StateHandler] = None):
         r"""
-        Class representing an atomic quantum state $|(\mathrm{label})IJFm\rangle$.
+        Class representing an atomic quantum state $|\mathrm{[label]}\pi JIFm\rangle$.
 
-        :param freq_j: The energetic position of the state without the hyperfine structure or the environment (MHz).
+        :param freq_j: The absolute frequency of the state without the hyperfine structure or the environment (MHz).
         :param parity: The parity $\pi$ of the state is used to check the selection rules.
          It can be either `'even'` (`'e'`, `False`) or `'odd'` (`'o'`, `True`).
         :param j: The electronic total angular momentum quantum number $J$.
         :param i: The nuclear spin quantum number $I$.
         :param f: The total angular momentum quantum number $F$.
-        :param m: The z-projection quantum number $m$ of the total angular momentum `f`.
+        :param m: The $z$-projection quantum number $m$ of the total angular momentum `f`.
         :param ls: A list or a single pair of electronic angular momentum and spin quantum numbers $(l_i, s_i)$.
          If this is a list of LS-pairs, a list of $j_i$ quantum numbers can be specified for the parameter `jj`.
+         IMPORTANT: Since $L$ and $S$ are not good quantum numbers, this parameter has no effect, currently.
         :param jj: A list of two electronic total angular momentum quantum numbers $(j_0, j_1)$
          used in the jj-coupling scheme if `ls` is a list.
+         IMPORTANT: Since $j_i$ are not good quantum numbers, this parameter has no effect, currently.
         :param hyper_const: A list of the hyperfine-structure constants.
          Currently, constants up to the electric quadrupole order are supported ($A$, $B$).
-         If 'hyper_const' is a scalar, it is assumed to be the constant $A$ and the other orders are 0 (MHz).
-        :param gi: The nuclear g-factor $g_I$.
+         If `hyper_const` is a scalar, it is assumed to be the constant $A$ and the other orders are 0 (MHz).
         :param gj: The electronic g-factor $g_J$.
+        :param gi: The nuclear g-factor $g_I$.
         :param label: The label of the state. The label is used to link states via a `DecayMap`.
-        :param instance: A pointer to an existing State instance.
-         If this is specified, the other parameters are omitted.
+        :param instance: An existing `State` instance. If this is specified, the other parameters are omitted.
         """
-        self.instance = instance
+        super().__init__(instance)
+
         if self.instance is None:
             tools.check_half_integer(j, i, f, m)
 
@@ -386,24 +430,22 @@ class State:
             .format(*[tools.half_integer_to_str(qn, '/') for qn in [self.j, self.i, self.f, self.m]])
 
     def reset(self):
-        """
-        Reset the shifted frequency of the state to a vacuum environment.
-
-        :returns:
+        r"""
+        Reset the frequency `State.freq` shifted by the `Environment` to a vacuum environment.
         """
         dll.state_update(self.instance)
 
     def get_shift(self):
-        """
-        :returns: The difference between the shifted frequency of the hyperfine-structure
-         and the frequency of the fine-structure state.
+        r"""
+        The difference between the shifted frequency `State.freq` of the hyperfine-structure state
+         plus Environment and the frequency of the fine-structure state `State.freq_j`.
         """
         return dll.state_get_shift(self.instance)
 
     @property
     def freq_j(self):
-        """
-        :returns: The frequency of the fine-structure state.
+        r"""
+        :returns: The unperturbed frequency of the fine-structure state.
         """
         return dll.state_get_freq_j(self.instance)
 
@@ -413,8 +455,8 @@ class State:
 
     @property
     def freq(self):
-        """
-        :returns: The shifted frequency of the hyperfine-structure state.
+        r"""
+        :returns: The shifted frequency of the hyperfine-structure state plus Environment.
         """
         return dll.state_get_freq(self.instance)
 
@@ -424,44 +466,44 @@ class State:
 
     @property
     def j(self):
-        """
-        :returns: The electronic total angular momentum quantum number J.
+        r"""
+        :returns: The electronic total angular momentum quantum number $J$.
         """
         return dll.state_get_j(self.instance)
 
     @property
     def i(self):
-        """
-        :returns: The nuclear spin quantum number I.
+        r"""
+        :returns: The nuclear spin quantum number $I$.
         """
         return dll.state_get_i(self.instance)
 
     @property
     def f(self):
-        """
-        :returns: The total angular momentum quantum number F.
+        r"""
+        :returns: The total angular momentum quantum number $F$.
         """
         return dll.state_get_f(self.instance)
 
     @property
     def m(self):
-        """
-        :returns: The B-field-axis component quantum number m of the total angular momentum.
+        r"""
+        :returns: The projection quantum number $m$ of the total angular momentum $F$.
         """
         return dll.state_get_m(self.instance)
 
     @property
     def hyper_const(self):
-        """
-        :returns: The hyperfine-structure constants as a 3d-vector.
+        r"""
+        :returns: The hyperfine-structure constants $(A, B, C)$ as a 3d-vector.
         """
         return dll.state_get_hyper_const(self.instance)
 
     @hyper_const.setter
     def hyper_const(self, value: array_like):
-        """
+        r"""
         :param value: The new hyperfine-structure constants. Currently, constants up to the electric quadrupole order
-         are supported (A, B). If 'hyper_const' is a scalar, it is assumed to be the constant A
+         are supported (A, B). If `hyper_const` is a scalar, it is assumed to be the constant $A$
          and the other orders are 0 (MHz).
         :returns:
         """
@@ -470,14 +512,14 @@ class State:
 
     @property
     def gj(self):
-        """
+        r"""
         :returns: The electronic g-factor.
         """
         return dll.state_get_gj(self.instance)
 
     @gj.setter
     def gj(self, value: scalar):
-        """
+        r"""
         :param value: The new electronic g-factor.
         :returns:
         """
@@ -485,14 +527,14 @@ class State:
 
     @property
     def gi(self):
-        """
+        r"""
         :returns: The nuclear g-factor.
         """
         return dll.state_get_gi(self.instance)
 
     @gi.setter
     def gi(self, value: scalar):
-        """
+        r"""
         :param value: The new nuclear g-factor.
         :returns:
         """
@@ -500,171 +542,37 @@ class State:
 
     @property
     def label(self):
-        """
-        :returns: The label of the state. The label is used to link states via decay maps.
+        r"""
+        :returns: The label of the state. The label is used to link states via `DecayMap`.
         """
         return dll.state_get_label(self.instance).decode('utf-8')
 
     @label.setter
     def label(self, value: str):
-        """
-        :param value: The label of the state. The label is used to link states via decay maps.
-        :returns:
+        r"""
+        :param value: The label of the state. The label is used to link states via `DecayMap`.
         """
         dll.state_set_label(self.instance, c_char_p(bytes(value, 'utf-8')))
 
 
-def construct_electronic_state(freq_0: quant_like, s: quant_like, l: quant_like, j: quant_like, i: quant_like = 0,
-                               hyper_const: Iterable[array_like] = None, g: array_like = 0, label: str = None) \
-        -> list[State]:
-    """
-    Creates all substates of a fine-structure state using a common label.
-
-    :param freq_0: The energetic position of the state without the hyperfine structure or the magnetic field (MHz).
-    :param s: The electron spin quantum number S.
-    :param l: The electronic angular momentum quantum number L.
-    :param j: The electronic total angular momentum quantum number J.
-    :param i: The nuclear spin quantum number I.
-    :param hyper_const: The hyperfine-structure constants. Currently, constants up to the electric quadrupole order are
-     supported (A, B). If 'hyper_const' is a quant_like,
-     it is assumed to be the constant A and the other orders are 0 (MHz).
-    :param g: The nuclear g-factor.
-    :param label: The label of the states. The labels are used to link states via decay maps.
-    :returns: A list of the created states.
-    """
-    f = get_f(i, j)
-    m = [get_m(_f) for _f in f]
-    fm = [(_f, _m) for _f, m_f in zip(f, m) for _m in m_f]
-    gj = g_j(j, (l, s), None, None)
-    parity = bool(l % 2)
-    return [State(freq_0, parity, j, i, _f, _m,
-                  ls=(l, s), hyper_const=hyper_const, gj=gj, gi=g, label=label) for (_f, _m) in fm]
-
-
-def construct_hyperfine_state(freq_0: quant_like, s: quant_like, l: quant_like, j: quant_like, i: quant_like,
-                              f: quant_like, hyper_const: Iterable[scalar] = None, g: scalar = 0, label: str = None) \
-        -> list[State]:
-    """
-    Creates all substates of a hyperfine-structure state using a common label.
-
-    :param freq_0: The energetic position of the state without the hyperfine structure or the magnetic field (MHz).
-    :param s: The electron spin quantum number S.
-    :param l: The electronic angular momentum quantum number L.
-    :param j: The electronic total angular momentum quantum number J.
-    :param i: The nuclear spin quantum number I.
-    :param f: The total angular momentum quantum number $F$.
-    :param hyper_const: The hyperfine-structure constants. Currently, constants up to the electric quadrupole order are
-     supported (A, B). If 'hyper_const' is a scalar,
-     it is assumed to be the constant A and the other orders are 0 (MHz).
-    :param g: The nuclear g-factor.
-    :param label: The label of the states. The labels are used to link states via decay maps.
-    :returns: A list of the created states.
-    """
-    gj = g_j(j, (l, s), None, None)
-    parity = bool(l % 2)
-    return [State(freq_0, parity, j, i, f, _m,
-                  ls=(l, s), hyper_const=hyper_const, gj=gj, gi=g, label=label) for _m in get_m(f)]
-
-
-def gen_electronic_state(
-        freq_0: quant_like = 0., parity: Union[bool, str] = None, j: quant_like = 0, i: quant_like = 0,
-        ls: quant_iter = None, jj: quant_iter = None,
-        hyper_const: Iterable[array_like] = None, gj: array_like = None, gi: array_like = 0,
-        label: str = None) -> list[State]:
-    r"""
-    Creates all substates of a fine-structure state using a common label.
-
-    :param freq_0: The energetic position of the state without the hyperfine structure or the magnetic field (MHz).
-    :param parity: The parity $\pi$ of the state is used to check the selection rules.
-     If None, it is inferred from `ls` if possible.
-     It can be either `'even'` (`'e'`, `False`) or `'odd'` (`'o'`, `True`).
-    :param j: The electronic total angular momentum quantum number $J$.
-    :param i: The nuclear spin quantum number $I$.
-    :param ls: A list or a single pair of electronic angular momentum and spin quantum numbers $(l_i, s_i)$
-     used to check the selection rules and to calculate the electronic g-factor in the LS-coupling scheme.
-     If this is a list of LS-pairs, the parameter `jj` requires a list of $j_i$ quantum numbers.
-    :param jj: A list of two electronic total angular momentum quantum numbers $(j_0, j_1)$
-     used to calculate the electronic g-factor in the jj-coupling scheme.
-     Either a list of two $(l_i, s_i)$ pairs needs to be specified for the parameter `ls`
-     or a list of g-factors $g_{j_i}$ for the parameter `gj`.
-    :param hyper_const: A list of the hyperfine-structure constants.
-     Currently, constants up to the electric quadrupole order are supported ($A$, $B$). If 'hyper_const' is a scalar,
-     it is assumed to be the constant $A$ and the other orders are 0 (MHz).
-    :param gj: A list of two $g_{j_i}$ or a single electronic g-factor $g_J$. If `gj` is a list, `jj` is required
-     and `ls` is overwritten. If `gj` is a scalar, both `ls` and `jj` are overwritten.
-    :param gi: The nuclear g-factor $g_I$.
-    :param label: The label of the states. The labels are used to link states via a `DecayMap`.
-    :returns: (list[State], ) A list of the created states.
-    """
-    if parity is None and not hasattr(ls[0], '__getitem__'):
-        parity = bool(ls[0] % 2)
-    elif parity is None:
-        raise ValueError('Could not infer the state \'parity\' from \'ls\'.'
-                         'Please use only one (L, S) pair or specify the parity.')
-
-    f = get_f(i, j)
-    m = [get_m(_f) for _f in f]
-    fm = [(_f, _m) for _f, m_f in zip(f, m) for _m in m_f]
-    gj = g_j(j, ls, jj, gj)
-    return [State(freq_0, parity, j, i, _f, _m, ls=ls, jj=jj,
-                  hyper_const=hyper_const, gj=gj, gi=gi, label=label) for (_f, _m) in fm]
-
-
-def gen_hyperfine_state(
-        freq_0: quant_like = 0., parity: Union[bool, str] = None,
-        j: quant_like = 0, i: quant_like = 0, f: quant_like = 0,
-        ls: quant_iter = None, jj: quant_iter = None, hyper_const: Iterable[array_like] = None,
-        gj: array_like = None, gi: array_like = 0, label: str = None) -> list[State]:
-    r"""
-    Creates all substates of a hyperfine-structure state using a common label.
-
-    :param freq_0: The energetic position of the state without the hyperfine structure or the magnetic field (MHz).
-    :param parity: The parity $\pi$ of the state is used to check the selection rules.
-     If None, it is inferred from `ls` if possible.
-     It can be either `'even'` (`'e'`, `False`) or `'odd'` (`'o'`, `True`).
-    :param j: The electronic total angular momentum quantum number $J$.
-    :param i: The nuclear spin quantum number $I$.
-    :param f: The total angular momentum quantum number $F$.
-    :param ls: A list or a single pair of electronic angular momentum and spin quantum numbers $(l_i, s_i)$
-     used to check the selection rules and to calculate the electronic g-factor in the LS-coupling scheme.
-     If this is a list of LS-pairs, the parameter `jj` requires a list of $j_i$ quantum numbers.
-    :param jj: A list of two electronic total angular momentum quantum numbers $(j_0, j_1)$
-     used to calculate the electronic g-factor in the jj-coupling scheme.
-     Either a list of two $(l_i, s_i)$ pairs needs to be specified for the parameter `ls`
-     or a list of g-factors $g_{j_i}$ for the parameter `gj`.
-    :param hyper_const: A list of the hyperfine-structure constants.
-     Currently, constants up to the electric quadrupole order are supported ($A$, $B$). If 'hyper_const' is a scalar,
-     it is assumed to be the constant $A$ and the other orders are 0 (MHz).
-    :param gj: A list of two $g_{j_i}$ or a single electronic g-factor $g_J$. If `gj` is a list, `jj` is required
-     and `ls` is overwritten. If `gj` is a scalar, both `ls` and `jj` are overwritten.
-    :param gi: The nuclear g-factor $g_I$.
-    :param label: The label of the states. The labels are used to link states via a `DecayMap`.
-    :returns: (list[State], ) A list of the created states.
-    """
-    if parity is None and not hasattr(ls[0], '__getitem__'):
-        parity = bool(ls[0] % 2)
-    else:
-        raise ValueError('Could not infer the state \'parity\' from \'ls\'.'
-                         'Please use only one (L, S) pair or specify the parity.')
-
-    gj = g_j(j, ls, jj, gj)
-    return [State(freq_0, parity, j, i, f, _m, ls=ls, jj=jj,
-                  hyper_const=hyper_const, gj=gj, gi=gi, label=label) for _m in get_m(f)]
-
-
-class DecayMap:
+class DecayMap(CppClass):
     def __init__(self, labels: Iterable[tuple] = None, a: Iterable[Union[scalar, dict]] = None, k_max: int = 1,
-                 instance=None):
-        """
+                 instance: Union['DecayMap', DecayMapHandler] = None):
+        r"""
         Class linking sets of atomic states via Einstein-A coefficients.
+        The class supports all multipole orders for electric and magnetic transitions.
 
-        :param labels: An iterable of label pairs, corresponding to atomic states which get connected.
-        :param a: An Iterable of Einstein-A coefficients (MHz).
-        :param k_max: The maximum considered multipole order. The default value is 1 (dipole).
-        :param instance: A pointer to an existing DecayMap instance.
-         If this is specified, the other parameters are omitted.
+        :param labels: An iterable of pairs of labels connected via Einstein-A coefficients.
+         The order of each pair is arbitrary.
+        :param a: An Iterable of Einstein-A coefficients $A_{if}$, where the states $|i\rangle$ and $|f\rangle$
+         have the labels specified in the list of `labels`. If `a[i]` is a single value,
+         only the lowest allowed (not necessarily the dominant!) multipole transition will be used.
+         Each `a[i]` can also be a `dict` with keys `'e'` or `'m'` to use either first allowed multipole order, or
+          `f'e{k}'` or `f'm{k}'` to define specific rank-$k$ multipole transitions. (MHz).
+        :param k_max: The maximum considered multipole order $k_\mathrm{max}$. The default value is 1 (dipole).
+        :param instance: An existing `DecayMap` instance. If this is specified, the other parameters are omitted.
         """
-        self.instance = instance
+        super().__init__(instance)
 
         if self.instance is None:
             self.instance = dll.decaymap_construct()
@@ -706,7 +614,7 @@ class DecayMap:
         dll.decaymap_destruct(self.instance)
 
     def _get_labels(self):
-        """
+        r"""
         :returns: The labels used in the C++ class.
         """
         return [(dll.decaymap_get_label(self.instance, 0, i).decode('utf-8'),
@@ -714,22 +622,23 @@ class DecayMap:
 
     @property
     def labels(self):
-        """
-        :returns: The list of label pairs, corresponding to atomic states which get connected.
+        r"""
+        :returns: A list of pairs of labels connected via Einstein-A coefficients.
+         The order of each pair is arbitrary.
         """
         return self._labels
 
     @property
     def size(self):
-        """
+        r"""
         :returns: The number of linked sets of atomic states.
         """
         return dll.decaymap_get_size(self.instance)
 
     @property
-    def k_em_max(self):
-        """
-        :returns: The maximum considered multipole order. The default value is 1 (dipole).
+    def k_max(self):
+        r"""
+        :returns: The maximum considered multipole order $k_\matrhrm{max}$. The default value is 1 (dipole).
         """
         return dll.decaymap_get_k_em_max(self.instance)
 
@@ -799,18 +708,18 @@ def _gen_label_map(atom):
     return label_map
 
 
-class Atom:
-    def __init__(self, states: Iterable[State] = None, decay_map: DecayMap = None, mass: scalar = 0, instance=None):
-        """
+class Atom(CppClass):
+    def __init__(self, states: Iterable[State] = None, decay_map: DecayMap = None, mass: scalar = 0,
+                 instance: Union['Atom', AtomHandler] = None):
+        r"""
         Class representing an Atom and its inner structure.
 
-        :param states: The states of the atom.
-        :param decay_map: The decay map which connects the atomic states.
-        :param mass: The mass of the atom (u).
-        :param instance: A pointer to an existing Atom instance.
-         If this is specified, the other parameters are omitted.
+        :param states: The states $|\mathrm{[label]}\pi JIFm\rangle$ of the atom.
+        :param decay_map: The `DecayMap` connecting the atomic states.
+        :param mass: The mass $m$ of the atom (u).
+        :param instance: An existing `Atom` instance. If this is specified, the other parameters are omitted.
         """
-        self.instance = instance
+        super().__init__(instance)
 
         if self.instance is None:
             self.instance = dll.atom_construct()
@@ -837,8 +746,9 @@ class Atom:
         return self.states[key]
 
     def update(self, env: Environment = None):
-        """
+        r"""
         Update the atom.
+        :param env: The electromagnetic `Environment` of the atom.
         """
         if env is not None:
             dll.atom_set_env(self.instance, env.instance)
@@ -847,17 +757,13 @@ class Atom:
 
     @property
     def states(self):
-        """
-        :returns: The states of the atom.
+        r"""
+        :returns: A list of the atom states $|\mathrm{[label]}\pi JIFm\rangle$.
         """
         return self._states
 
     @states.setter
     def states(self, value: Iterable[State]):
-        """
-        :param value: The new states of the atom.
-        :returns:
-        """
         dll.atom_clear_states(self.instance)
         self._states = list(value)
         for s in self._states:
@@ -865,17 +771,13 @@ class Atom:
 
     @property
     def decay_map(self):
-        """
-        :returns: The decay map which connects the atomic states.
+        r"""
+        :returns: The `DecayMap` connecting the atomic states.
         """
         return self._decay_map
 
     @decay_map.setter
     def decay_map(self, value: DecayMap):
-        """
-        :param value: The new decay map which connects the atomic states.
-        :returns:
-        """
         self._decay_map = value
         if self._decay_map is None:
             self._decay_map = DecayMap()
@@ -883,36 +785,38 @@ class Atom:
 
     @property
     def mass(self):
-        """
-        :returns: The mass of the atom (u).
+        r"""
+        :returns: The mass $m$ of the atom (u).
         """
         return dll.atom_get_mass(self.instance)
 
     @mass.setter
     def mass(self, value: scalar):
-        """
-        :param value: The new mass of the atom (u).
-        :returns:
-        """
         dll.atom_set_mass(self.instance, c_double(value))
 
     @property
     def size(self):
-        """
+        r"""
         :returns: The number of states of the atom.
         """
         return dll.atom_get_size(self.instance)
 
     @property
     def gs(self) -> ndarray:
-        """
-        :returns: The indices of the ground states.
+        r"""
+        :returns: The indexes of the states with same label as the first state `Atom.states[0]` in the Atom.
         """
         vector_i_p = np.ctypeslib.ndpointer(dtype=c_size_t, shape=(dll.atom_get_gs_size(self.instance), ))
         set_restype(dll.atom_get_gs, vector_i_p)
         return dll.atom_get_gs(self.instance)
 
     def get_multipole_types(self, label_0, label_1):
+        r"""
+        :param label_0: The label of the first state.
+        :param label_1: The label of the second state.
+        :returns: (multipole_orders) A set of multipole orders contributing to the transition
+         between the specified labels in the format `f'e{k}'` and `f'm{k}'`.
+        """
         indexes = [[i, j] for i, s0 in enumerate(self.states) for j, s1 in enumerate(self.states)
                    if s0.label == label_0 and s1.label == label_1 and i < j]
         mtypes = set()
@@ -928,39 +832,39 @@ class Atom:
 
     @property
     def d_em(self):
-        """
-        :returns: Multipole transition strengths ordered by k, starting at k = 1 (dipole).
+        r"""
+        :returns: Multipole transition strengths ordered by the rank $k$, starting at `k = 1` (dipole).
         """
         matrix_d_p = np.ctypeslib.ndpointer(dtype=float, shape=(self.size, self.size))
         set_restype(dll.atom_get_d_em, matrix_d_p)
-        return np.array([dll.atom_get_d_em(self.instance, c_size_t(k + 1)) for k in range(self.decay_map.k_em_max)])
+        return np.array([dll.atom_get_d_em(self.instance, c_size_t(k + 1)) for k in range(self.decay_map.k_max)])
 
     @property
     def ek(self):
-        """
+        r"""
         :returns: A map of the electric multipole orders of the transitions between the states.
         """
         matrix_i_p = np.ctypeslib.ndpointer(dtype=np.int32, shape=(self.size, self.size))
         set_restype(dll.atom_get_ek, matrix_i_p)
-        return np.array([dll.atom_get_ek(self.instance, c_size_t(k + 1)) for k in range(self.decay_map.k_em_max)])
+        return np.array([dll.atom_get_ek(self.instance, c_size_t(k + 1)) for k in range(self.decay_map.k_max)])
 
     @property
     def mk(self):
-        """
+        r"""
         :returns: A map of the magnetic multipole orders of the transitions between the states.
         """
         matrix_i_p = np.ctypeslib.ndpointer(dtype=np.int32, shape=(self.size, self.size))
         set_restype(dll.atom_get_mk, matrix_i_p)
-        return np.array([dll.atom_get_mk(self.instance, c_size_t(k + 1)) for k in range(self.decay_map.k_em_max)])
+        return np.array([dll.atom_get_mk(self.instance, c_size_t(k + 1)) for k in range(self.decay_map.k_max)])
 
     @property
     def emk(self):
-        """
+        r"""
         :returns: A map of the multipole orders of the transitions between the states.
         """
         matrix_i_p = np.ctypeslib.ndpointer(dtype=np.int32, shape=(self.size, self.size))
         set_restype(dll.atom_get_emk, matrix_i_p)
-        return np.array([dll.atom_get_emk(self.instance, c_size_t(k + 1)) for k in range(self.decay_map.k_em_max)])
+        return np.array([dll.atom_get_emk(self.instance, c_size_t(k + 1)) for k in range(self.decay_map.k_max)])
 
     @property
     def l0(self):
@@ -973,9 +877,9 @@ class Atom:
         return np.ctypeslib.as_array(a, (self.size, self.size)).T
 
     def get_y0(self, ground_state_labels: Union[Iterable[str], str] = None) -> np.ndarray:
-        """
+        r"""
         :param ground_state_labels: An Iterable of labels belonging to ground states.
-        :returns: The initial population of the atom.
+        :returns: (y0) The initial population of the atom.
         """
         if ground_state_labels is None:
             ground_state_labels = [self.states[0].label]
@@ -985,10 +889,10 @@ class Atom:
         return y0
     
     def get_y0_mc(self, n_samples: int = None, ground_state_labels: Union[Iterable[str], str] = None) -> np.ndarray:
-        """
+        r"""
         :param n_samples: The number of samples to create.
         :param ground_state_labels: An Iterable of labels belonging to ground states.
-        :returns: The initial population of the atom for the Monte-Carlo master equation solver.
+        :returns: (y0_mc) The initial population of the atom for the Monte-Carlo master equation solver.
         """
         if ground_state_labels is None:
             ground_state_labels = [self.states[0].label]
@@ -1004,26 +908,107 @@ class Atom:
         return y0
 
     def get_state_indexes(self, labels: Union[Iterable[str], str] = None,
-                          f: Union[Iterable[scalar], scalar] = None) -> np.ndarray:
+                          f: Union[Iterable[scalar], scalar] = None,
+                          m: Union[Iterable[scalar], scalar] = None) -> np.ndarray:
         """
         :param labels: The labels of the states whose indexes are to be returned.
-        :param f: The F quantum numbers whose indexes are to be returned.
+        :param f: The $F$ quantum numbers whose indexes are to be returned.
+        :param m: The $m$ quantum numbers whose indexes are to be returned.
         :returns: The indexes corresponding to the specified labels and F quantum numbers.
         """
         if labels is None:
             labels = set(s.label for s in self.states)
+
         if f is None:
             f = set(s.f for s in self.states)
         try:
             f = set(f)
         except TypeError:
             f = {f}
-        return np.array([i for i, s in enumerate(self.states) if s.label in labels and s.f in f], dtype=int)
+
+        if m is None:
+            m = set(s.m for s in self.states)
+        try:
+            m = set(m)
+        except TypeError:
+            m = {m}
+
+        return np.array([i for i, s in enumerate(self.states) if s.label in labels
+                         and s.f in f and s.m in m], dtype=int)
 
     def scattering_rate(self, rho: array_like, as_density_matrix: bool = True, k: array_like = None,
                         theta: array_like = None, phi: array_like = None,
                         k_vec: array_like = None, x_vec: array_like = None,
                         i: array_like = None, f: array_like = None, axis: int = 1) -> ndarray:
+        r"""
+        The photon scattering rate
+
+        $$\begin{aligned}
+        \Gamma_\mathrm{sc}\left(\rho, \hat{k}(\theta, \phi), \vec{\varepsilon}\right) &= \sum\limits_{f\in\mathcal{F}}
+        \,\sum\limits_{i\in\mathcal{I}}\sum\limits_{Xk_{fi}}\sum\limits_{j\in\mathcal{I}}\sum\limits_{Xk_{fj}}
+        \rho_{ji}\sqrt{A_{if}^{Xk_{fi}}A_{jf}^{Xk_{fj}}}\\[1ex]
+        &\quad\times\left\lbrace\sum\limits_\lambda (-1)^{k_{fi} + \lambda}\,a_{fi,k_{fi}}^\lambda
+        \left[(-\mathrm{i})^{k_{fi} - X_{fi}}\,\vec{\varepsilon}
+        \cdot\vec{Y}_{k_{fi}\lambda}^{(X_{fi})}(\hat{k}(\theta, \phi))\right]\right\rbrace\\[1ex]
+        &\quad\times\left\lbrace\sum\limits_\lambda (-1)^{k_{fj} + \lambda}\,a_{jf,k_{fj}}^\lambda
+        \left[(-\mathrm{i})^{k_{fj} - X_{fj}}\,\vec{\varepsilon}
+        \cdot\vec{Y}_{k_{fj}\lambda}^{(X_{fj})}(\hat{k}(\theta, \phi))\right]^\ast\right\rbrace\\[3ex]
+        a_{fi,k_{fi}}^\lambda &= (-1)^{F_f + I + k_{fi} + J_i}\sqrt{(2F_f + 1)(2J_i + 1)}
+        \langle F_fm_fk_{fi}\lambda|F_im_i\rangle\begin{Bmatrix}J_i & J_f & k_{fi} \\F_f & F_i & I\end{Bmatrix}\\[3ex]
+        X_{\!fi} &= \begin{cases}+1, & \text{if electric } (\mathrm{E}k_{fi}) \\
+        \ \,0, & \text{if magnetic } (\mathrm{M}k_{fi})\end{cases},
+        \end{aligned}$$
+
+        where $A_{if}^{Xk_{fi}}$ is the Einstein coefficient for the electric (magnetic)
+        decay $|i\rangle\rightarrow|f\rangle$ and the rank-$k_{fi}$ multipole order,
+        $\vec{Y}_{k_{fi}\lambda}^{(X_{fi})}(\hat{k})$ is the vector spherical harmonic
+        (see p. 215, Eq. (35) in [<a href=https://doi.org/10.1142/0270>1</a>]), $\rho$ is the density matrix,
+        $\hat{k}$ is the direction of emission and $\vec{\varepsilon}$
+        is the complex polarization vector of the emitted photons.
+        The calculation includes interference terms between all multipole ranks `1 <= k <= Atom.decay_map.k_max`
+        if emission directions are chosen through the (`theta`, `phi`) or `k_vec` parameters.
+        Parity mixing is currently not considered, such that all rank-$k$ electric (magnetic) transition are pure.
+        The emitted polarization can be chosen through the `x_vec` parameter. If `x_vec` is `None`, the above equation
+        will be summed over two orthogonal polarization vectors.
+        The emitted multipole orders can be limited through the `k` parameter.
+        The transitions contributing to the scattering rate can be limited through the index lists `i` and `f`
+        of the initial and final states, before and after spontaneous decay, respectively.</br></br>
+
+        If no emission direction is chosen (`theta = phi = k_vec = None`), the above equation simplifies
+        to the scattering rate into the complete $4\pi$ solid angle (without polarization selection)
+
+        $$\begin{aligned}
+        \Gamma_\mathrm{sc}(\rho) &= \sum\limits_{f\in\mathcal{F}}
+        \sum\limits_{i\in\mathcal{I}}\sum\limits_{(Xk)_{fi}}
+        \rho_{ii}A_{if}^{Xk_{fi}}\left(a_{fi,k_{fi}}^{m_i - m_f}\right)^2.
+        \end{aligned}$$
+
+        :param rho: The density matrix $\rho$ of the `Atom`. Must have the same size as the `Atom`
+         along the specified `axis`, and `axis + 1` if `as_density_matrix == True`.
+        :param as_density_matrix: Whether 'rho' is a state vector or a density matrix.
+        :param k: The rank(s) $k$ of the emitted multipole radiation. If `None`,
+         all orders `1 <= k <= Atom.decay_map.k_max` are considered.
+        :param theta: The elevation angle of detection relative to the $z$-axis.
+        :param phi: The azimuthal angle of detection in the $xy$-plane.
+        :param k_vec: An iterable of directional vectors $\hat{k}$ emitted by the atom.
+         `k_vec` must have shape `(3, )` or `(m, 3)` .
+        :param x_vec: An iterable of complex polarization vectors $\vec{\varepsilon}$ emitted by the atom.
+         `x_vec` must have shape `(3, )` or `(m, 3)` or be a `str` indicating a special polarization:
+          <ul>
+            <li>$e_\theta$: `{'z', 'theta', 't'}`</li>
+            <li>$e_\phi$: `{'x', 'y', 'xy', 'phi', 'p'}`</li>
+            <li>$\sigma^-$: `{'-', 's-', 'sigma-', 'l'}`</li>
+            <li>$\sigma^+$: `{'+', 's+', 'sigma+', 'r'}`</li>
+          </ul>
+          In these cases, the polarizations are created automatically based on the emission directions.
+        :param i: The initially excited state indexes to consider for spontaneous decay.
+         If `None`, all states are considered.
+        :param f: The final decayed state indexes to consider for spontaneous decay.
+         If `None`, all states are considered.
+        :param axis: The axis along which the population is aligned in `rho`. The default is `axis = 1`,
+         expecting `rho` as an array with shape `(n, Atom.size, Atom.size, ... )`.
+        :returns: (Gamma_sc) The scattering rate $\Gamma_\mathrm{sc}$ as an array with shape `(m, n, ...)`.
+        """
 
         rho = np.asarray(rho, dtype=complex)
 
@@ -1040,7 +1025,7 @@ class Atom:
         rho = np.transpose(rho, axes=axes).copy()
 
         if k is None:
-            k = np.array(list(range(1, self.decay_map.k_em_max + 1)), dtype=int)
+            k = np.array(list(range(1, self.decay_map.k_max + 1)), dtype=int)
         else:
             k = np.array(k, dtype=int).flatten()
 
@@ -1165,8 +1150,8 @@ class Atom:
 
         return results
 
-    def scattering_rate1(self, rho: array_like, theta: array_like = None, phi: array_like = None,
-                            as_density_matrix: bool = True, i: array_like = None, j: array_like = None, axis: int = 1):
+    def _scattering_rate(self, rho: array_like, theta: array_like = None, phi: array_like = None,
+                         as_density_matrix: bool = True, i: array_like = None, j: array_like = None, axis: int = 1):
         """
         Scattering rate of the atom into the direction
 
@@ -1278,10 +1263,10 @@ class Atom:
         """
         Plot a term scheme of the atom.
 
-        :param indices: The indices of the states to be drawn. If None, all states are drawn.
+        :param indices: The indices of the states to be drawn. If `None`, all states are drawn.
         :param draw_bounds: Whether to draw the upper vertical bounds of the states.
         :param show: Whether to show the plot.
-        :returns: The x and y positions of the states as well as the distance constant d.
+        :returns: The $x$ and $y$ positions of the states as well as the distance constant $d$ in plot.
         """
         if indices is None:
             indices = np.argsort([state.freq for state in self.states])
@@ -1521,24 +1506,27 @@ def _cast_x_vec_str(x_vec: str) -> int:
             ' in {\'+\', \'s+\', \'sigma+\', \'r\'} for sigma+ polarized light.')
 
 
-class Interaction:
+class Interaction(CppClass):
     def __init__(self, atom: Atom = None, lasers: Iterable[Laser] = None, environment: Environment = None,
-                 delta_max: scalar = 1e3, controlled: bool = True, instance=None):
-        """
-        Class representing an Interaction between lasers and an atom.
+                 delta_max: scalar = 1e3, controlled: bool = True,
+                 instance: Union['Interaction', InteractionHandler] = None):
+        r"""
+        Class representing an Interaction between an `Atom` and a list of `lasers` in an `Environment`.
+        All frequencies are in $\mathrm{MHz}$, all times are in $\mu\mathrm{s}$.
 
-        :param atom: The atom interacting with the lasers.
-        :param lasers: The lasers interacting with the atom.
-        :param environment: The electromagnetic environment of the interaction.
-        :param delta_max: The maximum absolute difference between a laser and a transition frequency
-         for that transition to be considered laser-driven (MHz). The default value is 1 GHz.
+        :param atom: The `Atom` interacting with the `lasers`.
+        :param lasers: The lasers interacting with the `Atom`.
+        :param environment: The electromagnetic `Environment` of the interaction.
+        :param delta_max: The maximum difference between a laser and a transition frequency
+         for that transition to be considered laser-driven. The default value is `1000.0` (MHz).
         :param controlled: Whether the ODE solver uses an error controlled stepper or a fixed step size.
          Setting this to True is particularly useful for dynamics where a changing resolution is required.
          However, this comes at the cost of computing time.
-        :param instance: A pointer to an existing Interaction instance.
-         If this is specified, the other parameters are omitted.
+         The default step size for the uncontrolled stepper is `dt = 1e-3` (1 ns).
+        :param instance: An existing `Interaction` instance. If this is specified, the other parameters are omitted.
         """
-        self.instance = instance
+        super().__init__(instance)
+
         if self.instance is None:
             self.instance = dll.interaction_construct()
             self._environment = self._get_environemnt()
@@ -1562,29 +1550,27 @@ class Interaction:
         dll.interaction_destruct(self.instance)
 
     def _get_environemnt(self):
-        """
+        r"""
         :return: The environment used in the C++ class.
         """
         return Environment(instance=dll.interaction_get_environment(self.instance))
 
     def _get_atom(self):
-        """
+        r"""
         :return: The atom used in the C++ class.
         """
         return Atom(instance=dll.interaction_get_atom(self.instance))
 
     def _get_lasers(self):
-        """
+        r"""
         :returns: The lasers used in the C++ class.
         """
         return [Laser(0, instance=dll.interaction_get_laser(self.instance, m))
                 for m in range(dll.interaction_get_lasers_size(self.instance))]
 
     def update(self):
-        """
-        Updates the Interaction.
-
-        :returns:
+        r"""
+        Update the Interaction.
         """
         error = dll.interaction_update(self.instance)
         if error == -1:
@@ -1594,40 +1580,18 @@ class Interaction:
         r"""
         Prints the detunings of the base frequencies of the lasers in the given atomic system.
         In particular useful for systems with a hyperfine structure. Here $\Delta = \nu_0 - \nu_\mathrm{L}$.
-
-        :returns:
         """
-        print('Resonance info:')  # \n<label>(S, L, J, I, F, m) -> <label\'>(S\', L\', J\', I\', F\', m\')')
-        for k, (laser, laser_m) in enumerate(zip(self.lasers, self.get_rabi())):
-            n = 0
-            print('Laser {} @ {} MHz:'.format(k, laser.freq))
-            for i, state_i in enumerate(self.atom):
-                for j, state_j in enumerate(self.atom):
-                    if np.abs(laser_m)[i, j] != 0 and i < j:
-                        if state_i.freq < state_j.freq:
-                            print('{} -> {}: {} MHz'.format(repr(state_i), repr(state_j),
-                                                            state_j.freq - state_i.freq - laser.freq))
-                        else:
-                            print('{} -> {}: {} MHz'.format(repr(state_j), repr(state_i),
-                                                            state_i.freq - state_j.freq - laser.freq))
-                        n += 1
-            if n == 0:
-                print('No resonances!')
-        print()
+        dll.interaction_resonance_info(self.instance)
 
     @property
     def environment(self):
-        """
-        :returns: The environment of the interaction.
+        r"""
+        :returns: The `Environment` of the interaction.
         """
         return self._environment
 
     @environment.setter
     def environment(self, value: Environment):
-        """
-        :param value: The new environment of the interaction.
-        :returns:
-        """
         if value is None:
             value = Environment()
         self._environment = value
@@ -1635,33 +1599,25 @@ class Interaction:
 
     @property
     def atom(self):
-        """
-        :returns: The atom of the interaction.
+        r"""
+        :returns: The `Atom` of the interaction.
         """
         return self._atom
 
     @atom.setter
     def atom(self, value: Atom):
-        """
-        :param value: The new atom of the interaction.
-        :returns:
-        """
         self._atom = value
         dll.interaction_set_atom(self.instance, value.instance)
 
     @property
     def lasers(self):
-        """
+        r"""
         :returns: The lasers of the interaction.
         """
         return self._lasers
 
     @lasers.setter
     def lasers(self, value: Iterable[Laser]):
-        """
-        :param value: The new lasers of the interaction.
-        :returns:
-        """
         if value is None:
             value = []
         self._lasers = list(value)
@@ -1671,148 +1627,202 @@ class Interaction:
 
     @property
     def delta_max(self):
-        """
-        :returns: The maximum absolute difference between a laser and a transition frequency
-         for that transition to be considered laser-driven (MHz). The default value is 1 GHz.
+        r"""
+        :returns: The maximum difference between a laser and a transition frequency
+         for that transition to be considered laser-driven. The default value is `1000.0` (MHz).
         """
         return dll.interaction_get_delta_max(self.instance)
 
     @delta_max.setter
     def delta_max(self, value: scalar):
-        """
-        :param value: The new maximum absolute difference between a laser and a transition frequency
-         for that transition to be considered laser-driven (MHz). The default value is 1 GHz.
-        :returns:
-        """
         dll.interaction_set_delta_max(self.instance, c_double(value))
 
     @property
     def controlled(self):
-        """
+        r"""
         :returns: Whether the ODE solver uses an error controlled stepper or a fixed step size.
          Setting this to True is particularly useful for dynamics where a changing resolution is required.
          However, this comes at the cost of computing time.
+         The default step size for the uncontrolled stepper is `dt = 1e-3` (1 ns).
         """
         return dll.interaction_get_controlled(self.instance)
 
     @controlled.setter
     def controlled(self, value: bool):
-        """
-        :param value: Whether the ODE solver uses an error controlled stepper or a fixed step size.
-         Setting this to True is particularly useful for dynamics where a changing resolution is required.
-         However, this comes at the cost of computing time.
-        :returns:
-        """
         dll.interaction_set_controlled(self.instance, c_bool(value))
 
     @property
     def dense(self):
-        """
-        :returns: Whether the ODE solver uses an error controlled dense output stepper.
+        r"""
+        :returns: Whether the ODE solver uses an error controlled dense output stepper or a fixed step size.
          If True, this overrides the controlled flag.
          Setting this to True is particularly useful for dynamics where a changing resolution is required.
          However, this comes at the cost of computing time.
+         The default step size for the uncontrolled stepper is `dt = 1e-3` (1 ns).
         """
         return dll.interaction_get_dense(self.instance)
 
     @dense.setter
     def dense(self, value: bool):
-        """
-        :param value: Whether the ODE solver uses an error controlled dense output stepper.
-         If True, this overrides the controlled flag.
-         Setting this to True is particularly useful for dynamics where a changing resolution is required.
-         However, this comes at the cost of computing time.
-        :returns:
-        """
         dll.interaction_set_dense(self.instance, c_bool(value))
 
     @property
     def dt(self):
-        """
+        r"""
         :returns: The (initial) step size of (controlled) solvers.
         """
         return dll.interaction_get_dt(self.instance)
 
     @dt.setter
     def dt(self, value: scalar):
-        """
-        :param value: The (initial) step size of (controlled) solvers.
-        :returns:
-        """
         dll.interaction_set_dt(self.instance, c_double(value))
 
     @property
     def dt_max(self):
-        """
+        r"""
         :returns: The maximum step size of controlled solvers.
         """
         return dll.interaction_get_dt_max(self.instance)
 
     @dt_max.setter
     def dt_max(self, value: scalar):
-        """
-        :param value: The maximum step size of controlled solvers.
-        :returns:
-        """
         dll.interaction_set_dt_max(self.instance, c_double(value))
 
     @property
     def atol(self):
-        """
+        r"""
         :returns: The absolute error tolerance of controlled solver.
         """
         return dll.interaction_get_atol(self.instance)
 
     @atol.setter
     def atol(self, value: scalar):
-        """
-        :param value: The absolute error tolerance of controlled solver.
-        :returns:
-        """
         dll.interaction_set_atol(self.instance, c_double(value))
 
     @property
     def rtol(self):
-        """
+        r"""
         :returns: The relative error tolerance of controlled solver.
         """
         return dll.interaction_get_rtol(self.instance)
 
     @rtol.setter
     def rtol(self, value: scalar):
-        """
-        :param value: The relative error tolerance of controlled solver.
-        :returns:
-        """
         dll.interaction_set_rtol(self.instance, c_double(value))
 
     @property
     def loop(self):
-        """
+        r"""
         :returns: Whether there are loops formed by the lasers in the atom.
         """
         return dll.interaction_get_loop(self.instance)
 
     @property
     def time_dependent(self):
-        """
-        :returns: Whether the system hamiltonian is allowed to be time dependent.
+        r"""
+        :returns: Whether the system hamiltonian is allowed to be time-dependent.
         """
         return dll.interaction_get_time_dependent(self.instance)
 
     @time_dependent.setter
     def time_dependent(self, value: bool):
-        """
-        :param value: Set whether the system hamiltonian is allowed to be time dependent.
-        :returns:
-        """
         dll.interaction_set_time_dependent(self.instance, c_bool(value))
 
-    def get_rabi(self, m: int = None):
+    @property
+    def summap(self):
+        r"""
+        :returns: An array with shape `(atom.size, atom.size)`, indicating the laser-connected states.
         """
-        :param m: The laser number 'm'. If None, the Rabi frequencies are returned for all lasers
-         as an array with shape (#lasers, atom.size, atom.size).
-        :returns: The Rabi frequencies (generated by the laser 'm').
+        matrix_i_p = np.ctypeslib.ndpointer(dtype=np.int32, shape=(self.atom.size, self.atom.size))
+        set_restype(dll.interaction_get_summap, matrix_i_p)
+        return dll.interaction_get_summap(self.instance)
+
+    @property
+    def atommap(self):
+        r"""
+        :returns: A projection matrix $A$ mapping the state frequencies onto the diagonal of the Hamiltonian.
+         It holds $H_{ii} \leftarrow \sum\limits_j A_{ij} (\omega_0)_j$.
+        """
+        matrix_d_p = np.ctypeslib.ndpointer(dtype=float, shape=(self.atom.size, self.atom.size))
+        set_restype(dll.interaction_get_atommap, matrix_d_p)
+        return dll.interaction_get_atommap(self.instance).T
+
+    @property
+    def deltamap(self):
+        r"""
+        :returns: A projection matrix $B$ mapping the laser frequencies onto the diagonal of the Hamiltonian.
+         It holds $H_{ii} \leftarrow s\sum\limits_j B_{im} \omega_m.
+        """
+        matrix_d_p = np.ctypeslib.ndpointer(dtype=float, shape=(len(self.lasers), self.atom.size))
+        set_restype(dll.interaction_get_deltamap, matrix_d_p)
+        return dll.interaction_get_deltamap(self.instance).T
+
+    @property
+    def history_size(self):
+        r"""
+        :returns: The length of the history of states visited during the generation of the diagonal maps.
+        """
+        return dll.interaction_get_n_history(self.instance)
+
+    @property
+    def history(self) -> ndarray:
+        r"""
+        :returns: The history of states visited during the generation of the diagonal maps.
+        """
+        vector_i_p = np.ctypeslib.ndpointer(dtype=c_size_t, shape=(self.history_size, ))
+        set_restype(dll.interaction_get_history, vector_i_p)
+        return dll.interaction_get_history(self.instance)
+
+    def delta(self) -> ndarray:
+        r"""
+        The diagonal of the Hamiltonian without Doppler or additional laser frequency shifts
+
+        $$
+        \operatorname{diag}(H_\text{diagonal}) = A\vec{\omega}_0 + B\vec{\omega},
+        $$
+
+        where $A$ (`Interaction.atommap`) is a matrix with shape `(atom.size, atom.size)`,
+        mapping the atomic frequencies $\vec{\omega}_0$ onto the diagonal of the Hamiltonian, and
+        $B$ (`Interaction.deltamap`) is a matrix with shape `(atom.size, #lasers)`,
+        mapping the laser frequencies $\vec{\omega}$ onto the diagonal of the Hamiltonian.
+
+        :returns: (Delta) The diagonal of the Hamiltonian without Doppler or additional laser-frequency shifts.
+        """
+        vector_d_p = np.ctypeslib.ndpointer(dtype=float, shape=(self.atom.size, ))
+        set_restype(dll.interaction_get_delta, vector_d_p)
+        return dll.interaction_get_delta(self.instance)
+
+    def rabi(self, m: int = None) -> ndarray:
+        r"""
+        The Rabi-frequency matrices $\Omega_m$ generated by laser `m` with direction $\hat{k}$
+        and polarization $\vec{\varepsilon}$
+
+        $$\begin{aligned}
+        (\Omega_m)_{ij} &= (\Omega_m)_{ji}^\ast = \frac{E_m}{\hbar}\sum\limits_{(Xk)_{ij}}\sum\limits_\lambda
+        (-1)^{k_{ij} + \lambda}\ d_{ij,k_{ij}}^\lambda
+        \left[(-\mathrm{i})^{k_{ij} - X_{ij}}\,\vec{\varepsilon}_m
+        \cdot\vec{Y}_{k_{ij}\lambda}^{(X_{ij})}(\hat{k}_m)\right]\\[2ex]
+        d_{ij,k_{ij}}^\lambda &= d_{ji,k_{ij}}^\lambda = a_{ij,k_{ij}}^\lambda
+        \sqrt{A_{ji}^{Xk_{fj}}\,8\pi^2\varepsilon_0\hbar\left(\!\frac{c}{\omega_{ij}}\!\right)^{\!3}}
+        \quad\text{for all }\omega_i < \omega_j\\[2ex]
+        a_{ij,k_{ij}}^\lambda &= (-1)^{F_i + I + k_{ij} + J_j}\sqrt{(2F_i + 1)(2J_j + 1)}
+        \langle F_im_ik_{ij}\lambda|F_jm_j\rangle\begin{Bmatrix}J_j & J_i & k_{ij} \\F_i & F_j & I\end{Bmatrix}\\[2ex]
+        X_{\!fi} &= \begin{cases}+1, & \text{if electric } (\mathrm{E}k_{fi}) \\
+        \ \,0, & \text{if magnetic } (\mathrm{M}k_{fi})\end{cases}\\[2ex]
+        E_m &= \sqrt{\frac{2I_m}{\varepsilon_0c}},
+        \end{aligned}$$
+
+        where $A_{if}^{Xk_{fi}}$ is the Einstein coefficient for the electric (magnetic)
+        decay $|i\rangle\rightarrow|f\rangle$ and the rank-$k_{fi}$ multipole order,
+        $\vec{Y}_{k_{fi}\lambda}^{(X_{fi})}(\hat{k})$ is the vector spherical harmonic
+        (see p. 215, Eq. (35) in [<a href=https://doi.org/10.1142/0270>1</a>]),
+        $\hat{k}_m$ is the direction, $\vec{\varepsilon}_m$ the polarization,
+        and $I_m$ the optical intensity of laser `m`.
+
+        :param m: The laser index `m`. If `None`, an array of the Rabi frequencies of all lasers is returned.
+        :returns: (Omega) The Rabi-frequency matrix $\Omega_m$ generated by laser `m` or an array for all lasers
+         with shape `(nl, atom.size, atom.size)`, where `nl` is the number of lasers of the `Interaction`
+         ($2\pi\,\mathrm{MHz}$).
         """
         matrix_cd_p = np.ctypeslib.ndpointer(dtype=np.complex128, shape=(self.atom.size, self.atom.size))
         set_restype(dll.interaction_get_rabi, matrix_cd_p)
@@ -1821,65 +1831,52 @@ class Interaction:
                              for _m in range(len(self.lasers))], dtype=complex)
         return dll.interaction_get_rabi(self.instance, c_size_t(m))
 
-    @property
-    def summap(self):
-        """
-        :returns: A (atom.size x atom.size)-matrix indicating the states which are laser-connected.
-        """
-        matrix_i_p = np.ctypeslib.ndpointer(dtype=np.int32, shape=(self.atom.size, self.atom.size))
-        set_restype(dll.interaction_get_summap, matrix_i_p)
-        return dll.interaction_get_summap(self.instance)
-
-    @property
-    def atommap(self):
-        """
-        :returns: A projection matrix A mapping the state frequencies onto the diagonal of the Hamiltonian.
-         It holds diag(H)_i <- sum_j(A_ij * state_j.freq).
-        """
-        matrix_d_p = np.ctypeslib.ndpointer(dtype=float, shape=(self.atom.size, self.atom.size))
-        set_restype(dll.interaction_get_atommap, matrix_d_p)
-        return dll.interaction_get_atommap(self.instance).T
-
-    @property
-    def deltamap(self):
-        """
-        :returns: A projection matrix B mapping the laser frequencies onto the diagonal of the Hamiltonian.
-         It holds diag(H)_i <- sum_j(B_im * laser_m.freq).
-        """
-        matrix_d_p = np.ctypeslib.ndpointer(dtype=float, shape=(len(self.lasers), self.atom.size))
-        set_restype(dll.interaction_get_deltamap, matrix_d_p)
-        return dll.interaction_get_deltamap(self.instance).T
-
-    def get_delta(self):
-        vector_d_p = np.ctypeslib.ndpointer(dtype=float, shape=(self.atom.size, ))
-        set_restype(dll.interaction_get_delta, vector_d_p)
-        return dll.interaction_get_delta(self.instance)
-
-    @property
-    def history_size(self):
-        """
-        :returns: The length of the history of states visited during the generation of the diagonal maps.
-        """
-        return dll.interaction_get_n_history(self.instance)
-
-    @property
-    def history(self):
-        """
-        :returns: The history of states visited during the generation of the diagonal maps.
-        """
-        vector_i_p = np.ctypeslib.ndpointer(dtype=c_size_t, shape=(self.history_size, ))
-        set_restype(dll.interaction_get_history, vector_i_p)
-        return dll.interaction_get_history(self.instance)
-
     def hamiltonian(self, t: array_like, delta: array_like = None, m: Optional[int] = 0, v: array_like = None):
-        """
-        :param t: The times when to compute the solution.
-        :param delta: An array of frequency shifts for the laser(s). 'delta' must be a scalar or a 1d- or 2d-array
-         with shapes (n, ) or (n, #lasers), respectively.
-        :param m: The index of the shifted laser. If delta is a 2d-array, 'm' ist omitted.
-        :param v: Atom velocities. Must be a scalar or have shape (n, ) or (n, 3). In the first two cases,
-         the velocity vector(s) are assumed to be aligned with the x-axis.
-        :returns: The integrated master equation as a complex-valued array of shape (n, #states, #states, #times).
+        r"""
+        The interaction Hamiltonian of the coherent light-matter interaction in frequency units
+
+        $$\begin{align}
+        H &= H_\text{diagonal} + H_\text{off-diagonal}\\[1ex]
+          &= \operatorname{diag}(A\vec{\omega}_0 + B\vec{\omega}^\prime) + \frac{1}{2}\sum\limits_m\Omega_m,\\[2ex]
+        \omega^\prime_m &= 2\pi(\nu_m + \Delta_m) \gamma(\vec{v})(1 - \hat{k}_m\cdot\frac{\vec{v}}{c})
+        \end{align}$$
+
+        where $A$ (`Interaction.atommap`) is a matrix with shape `(atom.size, atom.size)`,
+        mapping the atomic frequencies $\vec{\omega}_0$ onto the diagonal of the Hamiltonian,
+        $B$ (`Interaction.deltamap`) is a matrix with shape `(atom.size, #lasers)`,
+        mapping the laser frequencies in the rest-frame of the atom $\vec{\omega}^\prime$
+        onto the diagonal of the Hamiltonian, $\vec{v}$ is the velocity vector of the atom,
+        $\hat{k}_m$ is the direction of laser `m`,
+        $\Delta_m$ is the detuning of lasers `m`,
+        $\gamma(\vec{v})$ is the time-dilation factor
+        <a href="{{ '/doc/functions/physics/gamma_3d.html' | relative_url }}">
+        `qspec.physics.gamma_3d`</a>,
+        and $\Omega_m$ is the complex Rabi-frequency matrix of laser `m`, see
+        <a href="{{ '/doc/functions/simulate/Interaction/rabi.html' | relative_url }}">
+        `qspec.simulate.Interaction.rabi`</a>.</br></br>
+
+        If the Hamiltonian is time-dependent, because two or more lasers drive the same transition
+        or form loops within the atom, the off-diagonal Hamiltonian becomes
+
+        $$
+        (H_\text{off-diagonal})_{ij} = \frac{1}{2}\sum\limits_m(\Omega_m)_{ij}
+        \exp\left[\operatorname{sign}(j - i)\,\mathrm{i}t\left(B\vec{\omega}^\prime\,-
+        (T_m)_{ij}\,\omega^\prime_m\right)\right]\quad\text{for all }i\neq j,
+        $$
+
+        where $T_m$ is a matrix for laser `m` that maps the laser frequency onto
+        the transitions $|i\rangle\rightarrow |j\rangle$, whose entries take values $0,\pm 1$,
+        depending on the energetic order of the two involved states and if the transition is driven by laser `m`.
+
+        :param t: The times $t$ when to compute the solution. Any array is cast to the shape `(nt, )`,
+         where `nt` is the size of the array `t` (&mu;s).
+        :param delta: An array of laser frequency shifts $\vec{\Delta}$. `delta` must be a scalar, a 1d- or 2d-array
+         with shapes `(n, )` or `(n, nl)`, respectively, where `nl` is the number of lasers of the `Interaction` (MHz).
+        :param m: The index of the shifted laser. If `delta` is a 2d-array, `m` ist omitted.
+        :param v: Atom velocities $\vec{v}$. Must be a scalar or have shape `(n, )` or `(n, 3)`. In the first two cases,
+         the velocity vector(s) are assumed to be aligned with the $x$-axis (m/s).
+        :returns: (H) The (time-dependent) Hamiltonian(s) for `n` samples and `nt` times in the shape
+         `(n, atom.size, atom.size, nt)` ($2\pi\,\mathrm{MHz}$).
         """
         t, t_size, ex = _cast_t(t)
 
@@ -1908,21 +1905,52 @@ class Interaction:
         return results
 
     def rates(self, t: array_like, delta: array_like = None, m: Optional[int] = 0, v: array_like = None,
-              y0: array_like = None, analytic: bool = False):
-        """
-        Solver for the rate equations. Solutions for n samples can be calculated in parallel.
+              y0: array_like = None, analytic: bool = False) \
+            -> ndarray:
+        r"""
+        Solver for the rate equations
 
-        :param t: The times when to compute the solution (us).
-        :param delta: An array of frequency shifts for the laser(s) (MHz).
-         'delta' must be a scalar or a 1d- or 2d-array with shapes (n, ) or (n, #lasers), respectively.
-        :param m: The index of the shifted laser. If delta is a 2d-array, 'm' ist omitted.
-        :param v: Atom velocities (m/s). Must be a scalar or have shape (n, ) or (n, 3). In the first two cases,
-         the velocity vector(s) is(are) assumed to be aligned with the x-axis.
-        :param y0: The initial state of the atom. This must be None or have shape (#states, ) or (n, #states).
-         If None, the ground states are populated equally.
-        :param analytic: Calculate the rate equations analytically through a matrix exponential (True)
-         or numerically (False, default).
-        :returns: The integrated rate equations as a real-valued array of shape (n, #states, #times).
+        $$\begin{aligned}
+        \frac{\partial\rho_{ii}}{\partial t}
+        &= \sum\limits_j \left[ \left(\sum\limits_m R_{ij}^m\right)(\rho_{jj} - \rho_{ii})
+        + \Gamma_{\!ij}\,\rho_{jj} - \Gamma_{\!ji}\,\rho_{ii}\right]\\[2ex]
+        R_{ij}^m &= \frac{|\Omega_{ij}^m|^2\,\tilde{\Gamma}_{\!ij}}{
+        (\omega^\prime_m - \omega_{ij})^2 + \frac{1}{4}\tilde{\Gamma}_{\!ij}^2}\\[2ex]
+        \omega^\prime_m &= 2\pi(\nu_m + \Delta_m) \gamma(\vec{v})(1 - \hat{k}_m\cdot\frac{\vec{v}}{c})\\[2ex]
+        \tilde{\Gamma}_{\!ij} &= \sum\limits_u\sum\limits_{Xk_{ui}}A_{iu}^{Xk_{ui}}
+        + \sum\limits_v\sum\limits_{Xk_{vj}}A_{jv}^{Xk_{vj}}\\[2ex]
+        \Gamma_{\!ij} &= \sum\limits_{Xk_{ij}} (a_{ij,k_{ij}}^{m_j - m_i})^2\,A_{ji}^{Xk_{ij}}\\[2ex]
+        a_{ij,k_{ij}}^\lambda &= (-1)^{F_i + I + k_{ij} + J_j}\sqrt{(2F_i + 1)(2J_j + 1)}
+        \langle F_im_ik_{ij}\lambda|F_jm_j\rangle\begin{Bmatrix}J_j & J_i & k_{ij} \\F_i & F_j & I\end{Bmatrix}\\[2ex]
+        X_{\!ij} &= \begin{cases}+1, & \text{if electric } (\mathrm{E}k_{ij}) \\
+        \ \,0, & \text{if magnetic } (\mathrm{M}k_{ij})\end{cases},
+        \end{aligned}$$
+
+        where $A_{ji}^{Xk_{ij}}$ is the Einstein coefficient for the electric (magnetic)
+        decay $|i\rangle\rightarrow|f\rangle$ and the rank-$k_{fi}$ multipole order,
+        $\vec{v}$ is the velocity vector of the atom,
+        $\hat{k}_m$ is the direction of laser `m`,
+        $\Delta_m$ is the detuning of lasers `m`,
+        $\gamma(\vec{v})$ is the time-dilation factor, see
+        <a href="{{ '/doc/functions/physics/gamma_3d.html' | relative_url }}">
+        `qspec.physics.gamma_3d`</a>
+        and $\Omega_{ij}^m$ is the Rabi frequency induced by laser `m`, see
+        <a href="{{ '/doc/functions/simulate/Interaction/rabi.html' | relative_url }}">
+        `qspec.simulate.Interaction.rabi`</a>. Solutions for `n` samples can be calculated in parallel for `nt` times.
+
+        :param t: The times $t$ when to compute the solution. Any array is cast to the shape `(nt, )`,
+         where `nt` is the size of the array `t` (&mu;s).
+        :param delta: An array of laser frequency shifts $\vec{\Delta}$. `delta` must be a scalar, a 1d- or 2d-array
+         with shapes `(n, )` or `(n, nl)`, respectively, where `nl` is the number of lasers of the `Interaction` (MHz).
+        :param m: The index of the shifted laser. If `delta` is a 2d-array, `m` ist omitted.
+        :param v: Atom velocities $\vec{v}$. Must be a scalar or have shape `(n, )` or `(n, 3)`. In the first two cases,
+         the velocity vector(s) are assumed to be aligned with the $x$-axis (m/s).
+        :param y0: The initial state of the `Atom`.
+         This must be `None` or have shape `(Atom.size, )` or `(n, Atom.size)`.
+         If `None`, all states with the same label as the first `State` in `atom.states` are populated equally.
+        :param analytic: Calculate the rate equations analytically through a matrix exponential (`True`)
+         or numerically (`False`, default).
+        :returns: (diag_rho_t) The integrated rate equations as a real-valued array of shape `(n, atom.size, nt)`.
         """
         t, t_size, ex = _cast_t(t)
 
@@ -1956,19 +1984,31 @@ class Interaction:
         return results
 
     def schroedinger(self, t: array_like, delta: array_like = None, m: Optional[int] = 0, v: array_like = None,
-                     y0: array_like = None):
-        """
-        Solver for the Schroedinger equation. Solutions for n samples can be calculated in parallel.
+                     y0: array_like = None) \
+            -> ndarray:
+        r"""
+        Solver for the Schr&ouml;dinger equation
 
-        :param t: The times when to compute the solution (us).
-        :param delta: An array of frequency shifts for the laser(s) (MHz).
-         'delta' must be a scalar or a 1d- or 2d-array with shapes (n, ) or (n, #lasers), respectively.
-        :param m: The index of the shifted laser. If delta is a 2d-array, 'm' ist omitted.
-        :param v: Atom velocities (m/s). Must be a scalar or have shape (n, ) or (n, 3). In the first two cases,
-         the velocity vector(s) is(are) assumed to be aligned with the x-axis.
-        :param y0: The initial state of the atom. This must be None or have shape (n, #states).
-         If None, only the first ground state is populated.
-        :returns: The integrated Schroedinger equation as a complex-valued array of shape (n, #states, #times).
+        $$\begin{aligned}
+        \frac{\partial\vec{\psi}}{\partial t} &= -\mathrm{i}H\vec{\psi},
+        \end{aligned}$$
+
+        where the Hamiltonian $H$ (2&pi;&thinsp;MHz) is time-independent whenever possible, see
+        <a href="{{ '/doc/functions/simulate/Interaction/hamiltonian.html' | relative_url }}">
+        `qspec.simulate.Interaction.hamiltonian`</a>.
+        Solutions for `n` samples can be calculated in parallel for `nt` times.
+
+        :param t: The times $t$ when to compute the solution. Any array is cast to the shape `(nt, )`,
+         where `nt` is the size of the array `t` (&mu;s).
+        :param delta: An array of laser frequency shifts $\vec{\Delta}$. `delta` must be a scalar, a 1d- or 2d-array
+         with shapes `(n, )` or `(n, nl)`, respectively, where `nl` is the number of lasers of the `Interaction` (MHz).
+        :param m: The index of the shifted laser. If `delta` is a 2d-array, `m` ist omitted.
+        :param v: Atom velocities $\vec{v}$. Must be a scalar or have shape `(n, )` or `(n, 3)`. In the first two cases,
+         the velocity vector(s) are assumed to be aligned with the $x$-axis (m/s).
+        :param y0: The initial state of the `Atom`.
+         This must be `None` or have shape `(Atom.size, )` or `(n, Atom.size)`.
+         If `None`, all states with the same label as the first `State` in `atom.states` are populated equally.
+        :returns: (psi_t) The integrated Schr&ouml;dinger equation as a complex-valued array of shape `(n, Atom.size, nt)`.
         """
         t, t_size, ex = _cast_t(t)
 
@@ -2001,20 +2041,39 @@ class Interaction:
         return results
 
     def master(self, t: array_like, delta: array_like = None, m: Optional[int] = 0, v: array_like = None,
-               y0: array_like = None):
-        """
-        Solver for the master equation. Solutions for n samples can be calculated in parallel.
+               y0: array_like = None) \
+            -> ndarray:
+        r"""
+        Solver for the master equation
 
-        :param t: The times when to compute the solution (us).
-        :param delta: An array of frequency shifts for the laser(s) (MHz).
-         'delta' must be a scalar or a 1d- or 2d-array with shapes (n, ) or (n, #lasers), respectively.
-        :param m: The index of the shifted laser. If delta is a 2d-array, 'm' ist omitted.
-        :param v: Atom velocities (m/s). Must be a scalar or have shape (n, ) or (n, 3). In the first two cases,
-         the velocity vector(s) is(are) assumed to be aligned with the x-axis.
-        :param y0: The initial state / density matrix of the atom.
-         This must be None or have shape (#states, ), (n or 1, #states) or (n or 1, #states, #states).
-         If #states == n, it is interpreted as (n, #states). If None, the ground states are populated equally.
-        :returns: The integrated master equation as a complex-valued array of shape (n, #states, #states, #times).
+        $$\begin{aligned}
+        \frac{\partial\rho}{\partial t} &= -i[H, \rho]
+        + \sum\limits_{i,j} \Gamma_{\!ij}\mathcal{D}[\sigma_{ij}]\rho\\[2ex]
+        \mathcal{D}[\sigma]\rho &\coloneqq \sigma\rho\sigma^\dagger
+        - \frac{1}{2}(\sigma^\dagger\sigma\rho + \rho\sigma^\dagger\sigma),\quad\sigma_{ij} = |i\rangle\langle j|\\[2ex]
+        \Gamma_{\!ij} &= \sum\limits_{Xk_{ij}} (a_{ij,k_{ij}}^{m_j - m_i})^2\,A_{ji}^{Xk_{ij}}\\[2ex]
+        a_{ij,k_{ij}}^\lambda &= (-1)^{F_i + I + k_{ij} + J_j}\sqrt{(2F_i + 1)(2J_j + 1)}
+        \langle F_im_ik_{ij}\lambda|F_jm_j\rangle\begin{Bmatrix}J_j & J_i & k_{ij} \\F_i & F_j & I\end{Bmatrix}\\[2ex]
+        X_{\!ij} &= \begin{cases}+1, & \text{if electric } (\mathrm{E}k_{ij}) \\
+        \ \,0, & \text{if magnetic } (\mathrm{M}k_{ij})\end{cases},
+        \end{aligned}$$
+
+        where the Hamiltonian $H$ (2&pi;&thinsp;MHz) is time-independent whenever possible, see
+        <a href="{{ '/doc/functions/simulate/Interaction/hamiltonian.html' | relative_url }}">
+        `qspec.simulate.Interaction.hamiltonian`</a>.
+        Solutions for `n` samples can be calculated in parallel for `nt` times.
+
+        :param t: The times $t$ when to compute the solution. Any array is cast to the shape `(nt, )`,
+         where `nt` is the size of the array `t` (&mu;s).
+        :param delta: An array of laser frequency shifts $\vec{\Delta}$. `delta` must be a scalar, a 1d- or 2d-array
+         with shapes `(n, )` or `(n, nl)`, respectively, where `nl` is the number of lasers of the `Interaction` (MHz).
+        :param m: The index of the shifted laser. If `delta` is a 2d-array, `m` ist omitted.
+        :param v: Atom velocities $\vec{v}$. Must be a scalar or have shape `(n, )` or `(n, 3)`. In the first two cases,
+         the velocity vector(s) are assumed to be aligned with the $x$-axis (m/s).
+        :param y0: The initial state / density matrix of the `Atom`.
+         This must be `None` or have shape `(Atom.size, )`, `(n or 1, Atom.size)` or `(n or 1, Atom.size, Atom.size)`.
+         If `None`, all states with the same label as the first `State` in `atom.states` are populated equally.
+        :returns: (rho_t) The integrated master equation as a complex-valued array of shape `(n, Atom.size, Atom.size, nt)`.
         """
         t, t_size, ex = _cast_t(t)
 
@@ -2047,22 +2106,48 @@ class Interaction:
         return results
 
     def mc_master(self, t: array_like, delta: array_like = None, m: Optional[int] = 0, v: array_like = None,
-                  y0: array_like = None, dynamics: bool = False, ntraj: int = 500, as_density_matrix: bool = False):
-        """
-        Solver for the Monte-Carlo master equation. Solutions for n samples can be calculated in parallel.
+                  y0: array_like = None, dynamics: bool = False, ntraj: int = 500, as_density_matrix: bool = True) \
+            -> (ndarray, ndarray):
+        r"""
+        Solver for the Monte-Carlo master equation, which is the Schr&ouml;dinger equation
+        with a non-hermitian Hamiltonian
 
-        :param t: The times when to compute the solution (us).
-        :param delta: An array of frequency shifts for the laser(s) (MHz).
-         'delta' must be a scalar or a 1d- or 2d-array with shapes (n, ) or (n, #lasers), respectively.
-        :param m: The index of the shifted laser. If delta is a 2d-array, 'm' ist omitted.
-        :param v: Atom velocities (m/s). Must be a scalar or have shape (n, ) or (n, 3). In the first two cases,
-         the velocity vector(s) is(are) assumed to be aligned with the x-axis.
-        :param y0: The initial state of the atom. This must be None or have shape (n, #states).
-         If None, only the first ground state is populated.
-        :param dynamics: Whether to compute the dynamics of the photon-atom interactions.
-        :param ntraj: The number of samples to compute if no samples were given with 'delta', 'v', or 'y0'.
+        $$\begin{aligned}
+        \frac{\partial\vec{\psi}}{\partial t} &= -\mathrm{i}(H + H_\text{leaky})\vec{\psi},\qquad
+        \rho_{ij} = \lim\limits_{n\rightarrow\infty}\frac{1}{n}\sum\limits_{s=1}^n
+        \langle i|\psi_s\rangle\langle\psi_s|j\rangle\\[2ex]
+        (H_\text{leaky})_{jj} &= -\frac{\mathrm{i}}{2}\sum\limits_i\Gamma_{ij},\qquad
+        (H_\text{leaky})_{ij}\big|_{i\neq j} = 0\\[2ex]
+        \Gamma_{\!ij} &= \sum\limits_{Xk_{ij}} (a_{ij,k_{ij}}^{m_j - m_i})^2\,A_{ji}^{Xk_{ij}}\\[2ex]
+        a_{ij,k_{ij}}^\lambda &= (-1)^{F_i + I + k_{ij} + J_j}\sqrt{(2F_i + 1)(2J_j + 1)}
+        \langle F_im_ik_{ij}\lambda|F_jm_j\rangle\begin{Bmatrix}J_j & J_i & k_{ij} \\F_i & F_j & I\end{Bmatrix}\\[2ex]
+        X_{\!ij} &= \begin{cases}+1, & \text{if electric } (\mathrm{E}k_{ij}) \\
+        \ \,0, & \text{if magnetic } (\mathrm{M}k_{ij})\end{cases},
+        \end{aligned}$$
+
+        where the Hamiltonian $H$ (2&pi;&thinsp;MHz) is time-independent whenever possible, see
+        <a href="{{ '/doc/functions/simulate/Interaction/hamiltonian.html' | relative_url }}">
+        `qspec.simulate.Interaction.hamiltonian`</a>, $H_\text{leaky}$ is an imaginary diagonal operator,
+        and $\rho$ is the density matrix in the limit of an infinite number of samples.
+        Solutions for `n` samples can be calculated in parallel for `nt` times.
+        The complexity of the Monte-Carlo approach only scales linearly with `Atom.size`,
+        as compared with that of the exact master equation, scaling with `Atom.size ** 2`.
+
+        :param t: The times $t$ when to compute the solution. Any array is cast to the shape `(nt, )`,
+         where `nt` is the size of the array `t` (&mu;s).
+        :param delta: An array of laser frequency shifts $\vec{\Delta}$. `delta` must be a scalar, a 1d- or 2d-array
+         with shapes `(n, )` or `(n, nl)`, respectively, where `nl` is the number of lasers of the `Interaction` (MHz).
+        :param m: The index of the shifted laser. If `delta` is a 2d-array, `m` ist omitted.
+        :param v: Atom velocities $\vec{v}$. Must be a scalar or have shape `(n, )` or `(n, 3)`. In the first two cases,
+         the velocity vector(s) are assumed to be aligned with the $x$-axis (m/s).
+        :param y0: The initial state of the `Atom`.
+         This must be `None` or have shape `(Atom.size, )` or `(n, Atom.size)`.
+         If `None`, all states with the same label as the first `State` in `atom.states` are populated equally.
+        :param dynamics: Whether to compute the momentum dynamics of the photon-atom interactions.
+        :param ntraj: The number of samples `n` to compute if no samples were given with `delta`, `v`, or `y0`.
         :param as_density_matrix: Whether the result is returned as density matrices or as state vectors.
-        :returns: The integrated MC-Schroedinger equation as a complex-valued array of shape (n, #states, #times).
+        :returns: (rho_t) The integrated Monte-Carlo master equation as a complex-valued array of shape
+         `(n, Atom.size, Atom.size, nt)` or `(n, Atom.size, nt)`.
         """
         if self.controlled:
             raise ValueError('Controlled or Dense steppers are not supported for \'mc_master\'.'
@@ -2107,32 +2192,92 @@ class Interaction:
 
         return results, v
 
-    def scattering_rate(self, rho: array_like, theta: array_like = None, phi: array_like = None,
-                        as_density_matrix: bool = True, i: array_like = None, f: array_like = None, axis: int = 1):
-        """
-        Scattering rate of the atom into the direction
+    def scattering_rate(self, rho: array_like, as_density_matrix: bool = True, k: array_like = None,
+                        theta: array_like = None, phi: array_like = None,
+                        k_vec: array_like = None, x_vec: array_like = None,
+                        i: array_like = None, f: array_like = None, axis: int = 1) -> ndarray:
+        r"""
+        The photon scattering rate
 
-            e_r = (sin(theta), cos(theta) * sin(phi), cos(theta) * cos(phi))
+        $$\begin{aligned}
+        \Gamma_\mathrm{sc}\left(\rho, \hat{k}(\theta, \phi), \vec{\varepsilon}\right) &= \sum\limits_{f\in\mathcal{F}}
+        \,\sum\limits_{i\in\mathcal{I}}\sum\limits_{Xk_{fi}}\sum\limits_{j\in\mathcal{I}}\sum\limits_{Xk_{fj}}
+        \rho_{ji}\sqrt{A_{if}^{Xk_{fi}}A_{jf}^{Xk_{fj}}}\\[1ex]
+        &\quad\times\left\lbrace\sum\limits_\lambda (-1)^{k_{fi} + \lambda}\,a_{fi,k_{fi}}^\lambda
+        \left[(-\mathrm{i})^{k_{fi} - X_{fi}}\,\vec{\varepsilon}
+        \cdot\vec{Y}_{k_{fi}\lambda}^{(X_{fi})}(\hat{k}(\theta, \phi))\right]\right\rbrace\\[1ex]
+        &\quad\times\left\lbrace\sum\limits_\lambda (-1)^{k_{fj} + \lambda}\,a_{jf,k_{fj}}^\lambda
+        \left[(-\mathrm{i})^{k_{fj} - X_{fj}}\,\vec{\varepsilon}
+        \cdot\vec{Y}_{k_{fj}\lambda}^{(X_{fj})}(\hat{k}(\theta, \phi))\right]^\ast\right\rbrace\\[3ex]
+        a_{fi,k_{fi}}^\lambda &= (-1)^{F_f + I + k_{fi} + J_i}\sqrt{(2F_f + 1)(2J_i + 1)}
+        \langle F_fm_fk_{fi}\lambda|F_im_i\rangle\begin{Bmatrix}J_i & J_f & k_{fi} \\F_f & F_i & I\end{Bmatrix}\\[3ex]
+        X_{\!fi} &= \begin{cases}+1, & \text{if electric } (\mathrm{E}k_{fi}) \\
+        \ \,0, & \text{if magnetic } (\mathrm{M}k_{fi})\end{cases},
+        \end{aligned}$$
 
-        where the z-axis is the quantization axis, which is either (0, 0, 1) or the B-field axis.
+        where $A_{if}^{Xk_{fi}}$ is the Einstein coefficient for the electric (magnetic)
+        decay $|i\rangle\rightarrow|f\rangle$ and the rank-$k_{fi}$ multipole order,
+        $\vec{Y}_{k_{fi}\lambda}^{(X_{fi})}(\hat{k})$ is the vector spherical harmonic
+        (see p. 215, Eq. (35) in [<a href=https://doi.org/10.1142/0270>1</a>]), $\rho$ is the density matrix,
+        $\hat{k}$ is the direction of emission and $\vec{\varepsilon}$
+        is the complex polarization vector of the emitted photons.
+        The calculation includes interference terms between all multipole ranks `1 <= k <= Atom.decay_map.k_max`
+        if emission directions are chosen through the (`theta`, `phi`) or `k_vec` parameters.
+        Parity mixing is currently not considered, such that all rank-$k$ electric (magnetic) transition are pure.
+        The emitted polarization can be chosen through the `x_vec` parameter. If `x_vec` is `None`, the above equation
+        will be summed over two orthogonal polarization vectors.
+        The emitted multipole orders can be limited through the `k` parameter.
+        The transitions contributing to the scattering rate can be limited through the index lists `i` and `f`
+        of the initial and final states, before and after spontaneous decay, respectively.</br></br>
 
-        :param rho: The density matrix of the atom. Must have the same size as the atom
-         along the specified 'axis' and 'axis' + 1.
-        :param theta: The elevation angle of detection relative to the quantization axis.
-        :param phi: The azimuthal angle of detection relative to the quantization axis.
+        If no emission direction is chosen (`theta = phi = k_vec = None`), the above equation simplifies
+        to the scattering rate into the complete $4\pi$ solid angle (without polarization selection)
+
+        $$\begin{aligned}
+        \Gamma_\mathrm{sc}(\rho) &= \sum\limits_{f\in\mathcal{F}}
+        \sum\limits_{i\in\mathcal{I}}\sum\limits_{(Xk)_{fi}}
+        \rho_{ii}A_{if}^{Xk_{fi}}\left(a_{fi,k_{fi}}^{m_i - m_f}\right)^2.
+        \end{aligned}$$
+
+        :param rho: The density matrix $\rho$ of the `Atom`. Must have the same size as the `Atom`
+         along the specified `axis`, and `axis + 1` if `as_density_matrix == True`.
         :param as_density_matrix: Whether 'rho' is a state vector or a density matrix.
+        :param k: The rank(s) $k$ of the emitted multipole radiation. If `None`,
+         all orders `1 <= k <= Atom.decay_map.k_max` are considered.
+        :param theta: The elevation angle of detection relative to the $z$-axis.
+        :param phi: The azimuthal angle of detection in the $xy$-plane.
+        :param k_vec: An iterable of directional vectors $\hat{k}$ emitted by the atom.
+         `k_vec` must have shape `(3, )` or `(m, 3)` .
+        :param x_vec: An iterable of complex polarization vectors $\vec{\varepsilon}$ emitted by the atom.
+         `x_vec` must have shape `(3, )` or `(m, 3)` or be a `str` indicating a special polarization:
+          <ul>
+            <li>$e_\theta$: `{'z', 'theta', 't'}`</li>
+            <li>$e_\phi$: `{'x', 'y', 'xy', 'phi', 'p'}`</li>
+            <li>$\sigma^-$: `{'-', 's-', 'sigma-', 'l'}`</li>
+            <li>$\sigma^+$: `{'+', 's+', 'sigma+', 'r'}`</li>
+          </ul>
+          In these cases, the polarizations are created automatically based on the emission directions.
         :param i: The initially excited state indexes to consider for spontaneous decay.
-         If None, all states are considered.
-        :param f: The final decayed state indexes to consider for spontaneous decay. If None, all states are considered.
-        :param axis: The axis along which the population is aligned in 'rho'.
-        :returns: The scattering rate of the atom given the population 'rho' (MHz or Events / s).
-        :raises ValueError: 'rho' must have the same size as the atom along the specified 'axis'.
+         If `None`, all states are considered.
+        :param f: The final decayed state indexes to consider for spontaneous decay.
+         If `None`, all states are considered.
+        :param axis: The axis along which the population is aligned in `rho`. The default is `axis = 1`,
+         expecting `rho` as an array with shape `(n, Atom.size, Atom.size, ... )`.
+        :returns: (Gamma_sc) The scattering rate $\Gamma_\mathrm{sc}$ as an array with shape `(m, n, ...)`.
         """
-        return self.atom.scattering_rate(rho, theta=theta, phi=phi, as_density_matrix=as_density_matrix,
-                                         i=i, f=f, axis=axis)
+        return self.atom.scattering_rate(rho, as_density_matrix=as_density_matrix, k=k, theta=theta, phi=phi,
+                                         k_vec=k_vec, x_vec=x_vec, i=i, f=f, axis=axis)
 
 
-def density_matrix_diagonal(rho: array_like, axis=1):
+def density_matrix_diagonal(rho: array_like, axis: int = 1) -> ndarray:
+    r"""
+    The diagonal of the density matrix $\operatorname{diag}(\rho)$.
+
+    :param rho: The density matrix $\rho$. Must have the same size in `axis` and `axis + 1`.
+    :param axis: The axis along which the population is aligned in `rho`. The default is `axis = 1`,
+     expecting `rho` as an array with shape `(n, Atom.size, Atom.size, ... )`.
+    :returns: the diagonal of the density matrix as an array with shape `(n, Atom.size, ...)`.
+    """
     return np.transpose(np.diagonal(rho, axis1=axis, axis2=axis + 1).real, axes=[0, 2, 1])
 
 
@@ -2155,3 +2300,197 @@ def _define_colors(n: int, label_map: dict, colormap: str = None):
             else:
                 colors[index] = cmap(i / (len(labels) - 1))
     return colors
+
+
+def construct_electronic_state(freq_0: quant_like, s: quant_like, l: quant_like, j: quant_like, i: quant_like = 0,
+                               hyper_const: Iterable[array_like] = None, g: array_like = 0, label: str = None) \
+        -> list[State]:
+    r"""
+    DEPRECATED: For LS coupling, use `gen_electronic_ls_state` instead.
+    For general electronic states use `gen_electronic_state` instead.
+
+    Creates all substates of a fine-structure state $|\mathrm{[label]}\pi SLJI\rangle$ using a common label.
+
+    :param freq_0: The energetic position of the state without the hyperfine structure or the magnetic field (MHz).
+    :param s: The electron spin quantum number $S$.
+    :param l: The electronic angular momentum quantum number $L$.
+    :param j: The electronic total angular momentum quantum number $J$.
+    :param i: The nuclear spin quantum number $I$.
+    :param hyper_const: A list of the hyperfine-structure constants.
+     Currently, constants up to the electric quadrupole order are supported ($A$, $B$).
+     If `hyper_const` is a scalar, it is assumed to be the constant $A$ and the other orders are 0 (MHz).
+    :param g: The nuclear g-factor.
+    :param label: The label of the state. The label is used to link states via a `DecayMap`.
+    :returns: (states) A list of the created states $|\mathrm{[label]}\pi JIFm\rangle$.
+    """
+    tools.printw('DEPRECATED: For LS coupling, use `gen_electronic_ls_state` instead.'
+                 ' For general electronic states use `gen_electronic_state` instead.')
+    return gen_electronic_ls_state(freq_0, s, l, j, i=i, hyper_const=hyper_const, gi=g, label=label)
+
+
+def gen_electronic_ls_state(freq_j: quant_like, s: quant_like, l: quant_like, j: quant_like, i: quant_like = 0,
+                               hyper_const: Iterable[array_like] = None, gi: array_like = 0, label: str = None) \
+        -> list[State]:
+    r"""
+    Creates all substates of a fine-structure state $|\mathrm{[label]}\pi SLJI\rangle$ using a common label.
+
+    :param freq_j: The energetic position of the state without the hyperfine structure or the magnetic field (MHz).
+    :param s: The electron spin quantum number $S$.
+    :param l: The electronic angular momentum quantum number $L$.
+    :param j: The electronic total angular momentum quantum number $J$.
+    :param i: The nuclear spin quantum number $I$.
+    :param hyper_const: A list of the hyperfine-structure constants.
+     Currently, constants up to the electric quadrupole order are supported ($A$, $B$).
+     If `hyper_const` is a scalar, it is assumed to be the constant $A$ and the other orders are 0 (MHz).
+    :param gi: The nuclear g-factor $g_I$.
+    :param label: The label of the state. The label is used to link states via a `DecayMap`.
+    :returns: (states) A list of the created states $|\mathrm{[label]}\pi JIFm\rangle$.
+    """
+    f = get_f(i, j)
+    m = [get_m(_f) for _f in f]
+    fm = [(_f, _m) for _f, m_f in zip(f, m) for _m in m_f]
+    gj = g_j(j, (l, s), None, None)
+    parity = bool(l % 2)
+    return [State(freq_j, parity, j, i, _f, _m,
+                  ls=(l, s), hyper_const=hyper_const, gj=gj, gi=gi, label=label) for (_f, _m) in fm]
+
+
+def construct_hyperfine_state(freq_0: quant_like, s: quant_like, l: quant_like, j: quant_like, i: quant_like,
+                              f: quant_like, hyper_const: Iterable[scalar] = None, g: scalar = 0, label: str = None) \
+        -> list[State]:
+    r"""
+    DEPRECATED: For LS coupling, use `gen_hyperfine_ls_state` instead.
+    For general hyperfine states use `gen_hyperfine_state` instead.
+
+    Creates all magnetic substates of a hyperfine-structure state $|\mathrm{[label]}\pi SLJIF\rangle$
+    using a common `label`.
+
+    :param freq_0: The energetic position of the state without the hyperfine structure or the magnetic field (MHz).
+    :param s: The electron spin quantum number $S$.
+    :param l: The electronic angular momentum quantum number $L$.
+    :param j: The electronic total angular momentum quantum number $J$.
+    :param i: The nuclear spin quantum number $I$.
+    :param f: The total angular momentum quantum number $F$.
+    :param hyper_const: A list of the hyperfine-structure constants.
+     Currently, constants up to the electric quadrupole order are supported ($A$, $B$).
+     If `hyper_const` is a scalar, it is assumed to be the constant $A$ and the other orders are 0 (MHz).
+    :param g: The nuclear g-factor.
+    :param label: The label of the state. The label is used to link states via a `DecayMap`.
+    :returns: (states) A list of the created states $|\mathrm{[label]}\pi JIFm\rangle$.
+    """
+    tools.printw('DEPRECATED: For LS coupling, use `gen_electronic_ls_state` instead.'
+                 ' For general electronic states use `gen_electronic_state` instead.')
+    return gen_hyperfine_ls_state(freq_0, s, l, j, i, f, hyper_const=hyper_const, gi=g, label=label)
+
+
+def gen_hyperfine_ls_state(freq_j: quant_like, s: quant_like, l: quant_like, j: quant_like, i: quant_like,
+                           f: quant_like, hyper_const: Iterable[scalar] = None, gi: scalar = 0, label: str = None) \
+        -> list[State]:
+    r"""
+    Creates all magnetic substates of a hyperfine-structure state $|\mathrm{[label]}\pi SLJIF\rangle$
+    using a common `label`.
+
+    :param freq_j: The energetic position of the state without the hyperfine structure or the magnetic field (MHz).
+    :param s: The electron spin quantum number $S$.
+    :param l: The electronic angular momentum quantum number $L$.
+    :param j: The electronic total angular momentum quantum number $J$.
+    :param i: The nuclear spin quantum number $I$.
+    :param f: The total angular momentum quantum number $F$.
+    :param hyper_const: A list of the hyperfine-structure constants.
+     Currently, constants up to the electric quadrupole order are supported ($A$, $B$).
+     If `hyper_const` is a scalar, it is assumed to be the constant $A$ and the other orders are 0 (MHz).
+    :param gi: The nuclear g-factor $g_I$.
+    :param label: The label of the state. The label is used to link states via a `DecayMap`.
+    :returns: (states) A list of the created states $|\mathrm{[label]}\pi JIFm\rangle$.
+    """
+    gj = g_j(j, (l, s), None, None)
+    parity = bool(l % 2)
+    return [State(freq_j, parity, j, i, f, _m,
+                  ls=(l, s), hyper_const=hyper_const, gj=gj, gi=gi, label=label) for _m in get_m(f)]
+
+
+def gen_electronic_state(
+        freq_j: quant_like = 0., parity: Union[bool, str] = None, j: quant_like = 0, i: quant_like = 0,
+        ls: quant_iter = None, jj: quant_iter = None,
+        hyper_const: Iterable[array_like] = None, gj: array_like = None, gi: array_like = 0,
+        label: str = None) -> list[State]:
+    r"""
+    Creates all substates of a fine-structure state $|\mathrm{[label]}\pi JI\rangle$ using a common label.
+
+    :param freq_j: The energetic position of the state without the hyperfine structure or the magnetic field (MHz).
+    :param parity: The parity $\pi$ of the state is used to check the selection rules.
+     If None, it is inferred from `ls` if possible.
+     It can be either `'even'` (`'e'`, `False`) or `'odd'` (`'o'`, `True`).
+    :param j: The electronic total angular momentum quantum number $J$.
+    :param i: The nuclear spin quantum number $I$.
+    :param ls: A list or a single pair of electronic angular momentum and spin quantum numbers $(l_i, s_i)$
+     used to check the selection rules and to calculate the electronic g-factor in the LS-coupling scheme.
+     If this is a list of LS-pairs, the parameter `jj` requires a list of $j_i$ quantum numbers.
+    :param jj: A list of two electronic total angular momentum quantum numbers $(j_0, j_1)$
+     used to calculate the electronic g-factor in the jj-coupling scheme.
+     Either a list of two $(l_i, s_i)$ pairs needs to be specified for the parameter `ls`
+     or a list of g-factors $g_{j_i}$ for the parameter `gj`.
+    :param hyper_const: A list of the hyperfine-structure constants.
+     Currently, constants up to the electric quadrupole order are supported ($A$, $B$). If 'hyper_const' is a scalar,
+     it is assumed to be the constant $A$ and the other orders are 0 (MHz).
+    :param gj: A list of two $g_{j_i}$ or a single electronic g-factor $g_J$. If `gj` is a list, `jj` is required
+     and `ls` is overwritten. If `gj` is a scalar, both `ls` and `jj` are overwritten.
+    :param gi: The nuclear g-factor $g_I$.
+    :param label: The label of the states. The labels are used to link states via a `DecayMap`.
+    :returns: (states) A list of the created states $|\mathrm{[label]}\pi JIFm\rangle$.
+    """
+    if parity is None and not hasattr(ls[0], '__getitem__'):
+        parity = bool(ls[0] % 2)
+    elif parity is None:
+        raise ValueError('Could not infer the state \'parity\' from \'ls\'.'
+                         'Please use only one (L, S) pair or specify the parity.')
+
+    f = get_f(i, j)
+    m = [get_m(_f) for _f in f]
+    fm = [(_f, _m) for _f, m_f in zip(f, m) for _m in m_f]
+    gj = g_j(j, ls, jj, gj)
+    return [State(freq_j, parity, j, i, _f, _m, ls=ls, jj=jj,
+                  hyper_const=hyper_const, gj=gj, gi=gi, label=label) for (_f, _m) in fm]
+
+
+def gen_hyperfine_state(
+        freq_j: quant_like = 0., parity: Union[bool, str] = None,
+        j: quant_like = 0, i: quant_like = 0, f: quant_like = 0,
+        ls: quant_iter = None, jj: quant_iter = None, hyper_const: Iterable[array_like] = None,
+        gj: array_like = None, gi: array_like = 0, label: str = None) -> list[State]:
+    r"""
+    Creates all magnetic substates of a hyperfine-structure state $|\mathrm{[label]}\pi JIF\rangle$
+    using a common `label`.
+
+    :param freq_j: The energetic position of the state without the hyperfine structure or the magnetic field (MHz).
+    :param parity: The parity $\pi$ of the state is used to check the selection rules.
+     If None, it is inferred from `ls` if possible.
+     It can be either `'even'` (`'e'`, `False`) or `'odd'` (`'o'`, `True`).
+    :param j: The electronic total angular momentum quantum number $J$.
+    :param i: The nuclear spin quantum number $I$.
+    :param f: The total angular momentum quantum number $F$.
+    :param ls: A list or a single pair of electronic angular momentum and spin quantum numbers $(l_i, s_i)$
+     used to check the selection rules and to calculate the electronic g-factor in the LS-coupling scheme.
+     If this is a list of LS-pairs, the parameter `jj` requires a list of $j_i$ quantum numbers.
+    :param jj: A list of two electronic total angular momentum quantum numbers $(j_0, j_1)$
+     used to calculate the electronic g-factor in the jj-coupling scheme.
+     Either a list of two $(l_i, s_i)$ pairs needs to be specified for the parameter `ls`
+     or a list of g-factors $g_{j_i}$ for the parameter `gj`.
+    :param hyper_const: A list of the hyperfine-structure constants.
+     Currently, constants up to the electric quadrupole order are supported ($A$, $B$). If 'hyper_const' is a scalar,
+     it is assumed to be the constant $A$ and the other orders are 0 (MHz).
+    :param gj: A list of two $g_{j_i}$ or a single electronic g-factor $g_J$. If `gj` is a list, `jj` is required
+     and `ls` is overwritten. If `gj` is a scalar, both `ls` and `jj` are overwritten.
+    :param gi: The nuclear g-factor $g_I$.
+    :param label: The label of the states. The labels are used to link states via a `DecayMap`.
+    :returns: (states) A list of the created states $|\mathrm{[label]}\pi JIFm\rangle$.
+    """
+    if parity is None and not hasattr(ls[0], '__getitem__'):
+        parity = bool(ls[0] % 2)
+    else:
+        raise ValueError('Could not infer the state \'parity\' from \'ls\'.'
+                         'Please use only one (L, S) pair or specify the parity.')
+
+    gj = g_j(j, ls, jj, gj)
+    return [State(freq_j, parity, j, i, f, _m, ls=ls, jj=jj,
+                  hyper_const=hyper_const, gj=gj, gi=gi, label=label) for _m in get_m(f)]

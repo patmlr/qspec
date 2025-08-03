@@ -31,6 +31,8 @@ __all__ = ['L_LABEL', 'E_NORM', 'pi', 'LEMNISCATE', 'mu_N', 'mu_B', 'g_s', 'me_u
            'normal_chi2_convolved_vx_pdf', 'normal_chi2_convolved_f_pdf', 'normal_chi2_convolved_f_xi_pdf',
            'source_energy_pdf']
 
+max_float64_value = np.finfo(np.float64).max
+max_exp_input = np.log(max_float64_value) - 0.1
 
 L_LABEL = ['S', 'P', 'D', ] + list(string.ascii_uppercase[5:])
 E_NORM = sc.e
@@ -1738,16 +1740,14 @@ def gaussian_beam_3d(r: array_like, k: array_like, w0: array_like, p0: array_lik
     The Gaussian beam intensity at the position $\vec{r} - \vec{r}_0$
 
     $$\begin{aligned}
-    I(\vec{r}) &= \fracc{2P_0}{\pi w_z^2}\exp\left[-2\left(\!\frac{\rho}{w_z}\right\!)^{\! 2}\right]\\[1ex]
-    w_z &= w_0\sqrt{1 + \left(\!\frac{z}{z_0}\!\right)^{\!2}}\\[1ex]
-    z_0 &= \frac{1}{2}|\vec{k}|w_0^2\\[2ex]
-    z &= (\vec{r} - \vec{r}_0)\cdot\hat{k}\\[2ex]
-    \rho &= \sqrt{\left[(\vec{r} - \vec{r}_0)\cdot\hat{x}\right]^2
+    I(\vec{r}) &= \frac{2P_0}{\pi w_z^2}\,\exp\!\left[-2\left(\!\frac{\rho}{w_z}\!\right)^{\! 2}\right]\\[2ex]
+    w_z &= w_0\sqrt{1 + \left(\!\frac{z}{z_0}\!\right)^{\!2}},\qquad z_0 = \frac{1}{2}|\vec{k}|w_0^2\\[2ex]
+    z &= (\vec{r} - \vec{r}_0)\cdot\hat{k},\qquad \rho = \sqrt{\left[(\vec{r} - \vec{r}_0)\cdot\hat{x}\right]^2
     + \left[(\vec{r} - \vec{r}_0)\cdot\hat{y}\right]^2},
     \end{aligned}$$
 
-    where \hat{k} is the unit vector in $\vec{k}$ direction and $\hat{x}$, $\hat{y}$
-    are unit vectors orthogonal to \hat{k}.
+    where $\hat{k}$ is the unit vector in $\vec{k}$ direction and $\hat{x}$, $\hat{y}$
+    are unit vectors orthogonal to $\hat{k}$.
 
     :param r: The position 3-vector $\vec{r}$ where to calculate the beam intensity (m).
     :param k: The 3-vector $\vec{k}$ of light, where $|\vec{k}| = \omega / c$ (rad / m).
@@ -1755,7 +1755,7 @@ def gaussian_beam_3d(r: array_like, k: array_like, w0: array_like, p0: array_lik
     :param p0: The total power $P_0$ propagated by the gaussian beam (W).
     :param r0: The position 3-vector $\vec{r}_0$ of the beam waist. If `r0` is `None`, it is `[0., 0., 0.]` (m).
     :param axis: The axis along which the vector components are aligned.
-    :returns: (I_r) The intensity $I(\vec{r}) (W/m<sup>2</sup> = uW/mm<sup>2</sup>).
+    :returns: (I_r) The intensity $I(\vec{r})$ (W/m<sup>2</sup> = &mu;W/mm<sup>2</sup>).
     :raises ValueError: `r`, `k` and `r0` must have 3 components along the specified `axis`.
      The shapes of `r`, `k`, `w0`, `r0` and `p0` must be compatible.
     """
@@ -1784,9 +1784,9 @@ def gaussian_doppler_3d(r: array_like, k: array_like, w0: array_like, v: array_l
     The length |$\vec{k}^\prime$| of the Doppler-shifted 3-vector `k` in the rest frame of the atom
 
     $$\begin{aligned}
-    |\vec{k}^\prime| &= |\vec{k}^\prime|\gamma\left[1 - \beta\cos(\alpha)\left(1 - \frac{w_0^2}{2z_+} 
-    - \frac{\rho^2z_-}{2z_+^2}\right) - \beta\sin(\alpha)\rho\frac{z}{z_+}\right]\\[2ex]
-    z_\pm &= z^2 \pm z_0^2\\[2ex]
+    |\vec{k}^\prime| &= |\vec{k}|\gamma\left[1 - \beta\cos(\alpha)\left(1 - \frac{w_0^2}{2z_+^2}
+    - \frac{\rho^2z_-^2}{2z_+^4}\right) - \beta\sin(\alpha)\frac{\rho z}{z_+^2}\right]\\[2ex]
+    z_\pm^2 &= z^2 \pm z_0^2\\[2ex]
     z_0 &= \frac{1}{2}|\vec{k}|w_0^2\\[2ex]
     z &= (\vec{r} - \vec{r}_0)\cdot\hat{k}\\[2ex]
     \rho &= \sqrt{\left[(\vec{r} - \vec{r}_0)\cdot\hat{x}\right]^2
@@ -1832,7 +1832,7 @@ def gaussian_doppler_3d(r: array_like, k: array_like, w0: array_like, v: array_l
 
 
 def sigma_v(m: array_like, t: array_like) -> ndarray:
-    """
+    r"""
     The standard deviation of a normal distribution of particle velocities in thermal equilibrium
 
     $$
@@ -1848,7 +1848,7 @@ def sigma_v(m: array_like, t: array_like) -> ndarray:
 
 
 def t_sigma(sigma: array_like, m: array_like) -> ndarray:
-    """
+    r"""
     The temperature of the environment, given the standard deviation `sigma`
     of a normal distribution of particle velocities
 
@@ -1913,7 +1913,7 @@ def normal_vx_pdf(vx: array_like, m: array_like, t: array_like) -> ndarray:
     The Gaussian probability density of a velocity component $v_x$
 
     $$
-    \rho(v_x) = \sqrt{\frac{m}{2\pi\k_\mathrm{B}T}}\exp\left(-\frac{mv_x^2}{2\k_\mathrm{B}T}\right),
+    \rho(v_x) = \sqrt{\frac{m}{2\pi k_\mathrm{B}T}}\exp\!\left(-\frac{mv_x^2}{2k_\mathrm{B}T}\right),
     $$
 
     for a mass $m$ particle in thermal equilibrium at temperature $T$.
@@ -1934,7 +1934,7 @@ def normal_vx_rvs(m: array_like, t: array_like, size: Union[int, tuple] = 1) -> 
     Random sample velocity components $v_x$ from the Gaussian probability density function
 
     $$
-    \rho(v_x) = \sqrt{\frac{m}{2\pi\k_\mathrm{B}T}}\exp\left(-\frac{mv_x^2}{2\k_\mathrm{B}T}\right),
+    \rho(v_x) = \sqrt{\frac{m}{2\pi k_\mathrm{B}T}}\exp\!\left(-\frac{mv_x^2}{2k_\mathrm{B}T}\right),
     $$
 
     for a mass $m$ particle in thermal equilibrium at temperature $T$.
@@ -1956,7 +1956,7 @@ def chi2_ex_pdf(ex: array_like, t: array_like) -> ndarray:
     The $\chi^2_1$ probability density of an energy component $E_x$
 
     $$
-    \rho(E_x) = \sqrt{\frac{1}{\piE_x\k_\mathrm{B}T}}\exp\left(-\frac{E_x}{\k_\mathrm{B}T}\right),
+    \rho(E_x) = \sqrt{\frac{1}{\pi E_xk_\mathrm{B}T}}\exp\left(-\frac{E_x}{k_\mathrm{B}T}\right),
     $$
 
     in thermal equilibrium at temperature $T$.
@@ -1973,10 +1973,10 @@ def chi2_ex_pdf(ex: array_like, t: array_like) -> ndarray:
 
 def chi2_ex_rvs(t: array_like, size: Union[int, tuple] = 1) -> ndarray:
     r"""
-    A random sample energy components $E_x$ from the $\chi^2_1$ probability density function
+    Random sample energy components $E_x$ from the $\chi^2_1$ probability density function
 
     $$
-    \rho(E_x) = \sqrt{\frac{1}{\piE_x\k_\mathrm{B}T}}\exp\left(-\frac{E_x}{\k_\mathrm{B}T}\right),
+    \rho(E_x) = \sqrt{\frac{1}{\pi E_xk_\mathrm{B}T}}\exp\left(-\frac{E_x}{k_\mathrm{B}T}\right),
     $$
 
     in thermal equilibrium at temperature $T$.
@@ -1997,17 +1997,35 @@ def normal_chi2_convolved_ex_pdf(ex: array_like, t: array_like, scale_e: array_l
     to a convolution of a normal and a $\chi^2_1$ distribution
 
     $$\begin{aligned}
-    asd
+    \rho(E_x) &= \frac{1}{\sqrt{2\pi^2 k_\mathrm{B}T}\sigma_\mathrm{e}}\int\limits_0^\infty \frac{1}{\sqrt{\varepsilon}}
+    \exp\left[-\frac{1}{2}\left(\frac{E_x - E_0 - \varepsilon}{\sigma_\mathrm{e}}\right)^2
+    - \frac{\varepsilon}{k_\mathrm{B}T}\right]\mathrm{d}\varepsilon\\[1ex]
+    &= N\times\begin{cases}
+    \sqrt{-\frac{\mu}{2\pi}}\exp[-(x + \mu)] K_{1/4}(x), & \text{if } \mu < 0 \\[1.5ex]
+    \sqrt{\frac{\varpi}{\sqrt{\pi}}\sigma}, & \text{if } \mu = 0 \\[1.5ex]
+    \sqrt{\pi\mu}\exp[-(x + \mu)] \frac{1}{2}\left[ I_{1/4}(x) + I_{-1/4}(x) \right], & \text{if } \mu > 0
+    \end{cases}\\[2ex]
+    x &= \left(\!\frac{\mu}{2\sigma}\!\right)^{\!2},\quad\mu = \frac{E_x - E_0}{k_\mathrm{B}T} - \sigma^2,
+    \quad\sigma = \frac{\sigma_\mathrm{e}}{k_\mathrm{B}T}\\[2ex]
+    N &= \frac{1}{\sqrt{2\pi}\sigma_\mathrm{e}}\exp\left(-\frac{\sigma^2}{2}\right),
     \end{aligned}$$
+
+    where $I_\alpha$, and $K_\alpha$ are the modified Bessel functions of first and second kind,
+    and $\varpi \approx 2.6220575543$ is the lemniscate constant.
 
     :param ex: The energy quantiles $E_x$ (eV).
     :param t: The temperature $T$ of the environment (K).
-    :param scale_e: The standard deviation $\sigma_{E_x}$ of the normal distribution (eV).
+    :param scale_e: The standard deviation $\sigma_\mathrm{e}$ of the normal distribution (eV).
     :param e0: The mean energy $E_0$ of the normal distribution (eV).
     :returns: (rho_ex) The probability density in thermal equilibrium at the energy `ex` (1/eV).
     """
     ex, t, scale_e, e0 = (np.asarray(ex, dtype=float), np.asarray(t, dtype=float),
                           np.asarray(scale_e, dtype=float), np.asarray(e0, dtype=float))
+
+
+    scalar_true = tools.check_shape((), ex, t, scale_e, e0, return_mode=True)
+    if scalar_true:
+        ex = np.array([ex])
 
     t /= E_NORM
     scale = scale_e / (sc.k * t)
@@ -2015,23 +2033,29 @@ def normal_chi2_convolved_ex_pdf(ex: array_like, t: array_like, scale_e: array_l
 
     norm = np.exp(-0.5 * scale ** 2) / (np.sqrt(2.) * np.pi * scale * sc.k * t)
 
-    nonzero = ~loc.astype(bool)
-    nonzero += norm <= 0.
-    nonzero += np.isinf(np.exp(np.abs(loc)))
-    nonzero = ~nonzero
+    isnan = norm > 0.
+    isnan += np.abs(loc) <= max_exp_input
+    isnan = ~isnan
+
+    nonzero = loc.astype(bool)
     loc = loc[nonzero]
     x = (loc / (2. * scale)) ** 2
 
-    main = np.full(ex.shape, np.sqrt(LEMNISCATE * np.sqrt(np.pi) * scale))
-    main_nonzero = np.empty_like(ex[nonzero], dtype=float)
-    mask = loc < 0.
+    main = np.full(ex.shape, norm * np.sqrt(LEMNISCATE * np.sqrt(np.pi) * scale), dtype=float)
+    main[isnan] = 0.
 
-    main_nonzero[mask] = np.sqrt(-loc[mask] / 2.) * np.exp(-loc[mask]) \
-        * sp.kv(0.25, x[mask]) * np.exp(-x[mask])
-    main_nonzero[~mask] = np.pi / 2. * np.sqrt(loc[~mask]) * np.exp(-loc[~mask]) \
-        * (sp.ive(0.25, x[~mask]) + sp.ive(-0.25, x[~mask]))
+    main_nonzero = np.empty_like(ex[nonzero], dtype=float)
+    mask0 = loc < 0.
+    mask1 = loc > 0.
+
+    main_nonzero[mask0] = np.sqrt(-loc[mask0] / 2.) * np.exp(-loc[mask0]) \
+        * sp.kv(0.25, x[mask0]) * np.exp(-x[mask0])
+    main_nonzero[mask1] = np.pi / 2. * np.sqrt(loc[mask1]) * np.exp(-loc[mask1]) \
+        * (sp.ive(0.25, x[mask1]) + sp.ive(-0.25, x[mask1]))
     main[nonzero] = main_nonzero * norm
 
+    if scalar_true:
+        return main[0]
     return main
 
 
@@ -2042,11 +2066,12 @@ def normal_chi2_convolved_vx_pdf(vx: array_like, m: array_like, t: array_like,
     to a convolution of a normal and a $\chi^2_1$ distribution
 
     $$\begin{aligned}
-    asd\\[2ex]
-    E_x = (\gamma - 1)mc^2,
+    \rho^\prime(v_x) = m|v_x|\gamma^3(v_x)\rho(E_x(v_x)), \qquad\int\limits_0^\infty \rho^\prime(v_x)\mathrm{d}v_x = 1,
     \end{aligned}$$
 
-    where
+    where $\gamma$ is the time-dilation factor and $\rho$ is the probability density function
+    <a href="{{ '/doc/functions/physics/normal_chi2_convolved_ex_pdf.html' | relative_url }}">
+    `normal_chi2_convolved_ex_pdf`</a>.
 
     :param vx: The velocity quantiles $v_x$ (m/s).
     :param m: The mass $m$ of the particle (u).
@@ -2078,10 +2103,14 @@ def normal_chi2_convolved_f_pdf(f: array_like, f_lab: array_like, alpha: array_l
     and distributed according to a convolution of a normal and a $\chi^2_1$ distribution
 
     $$\begin{aligned}
-    asd\\[2ex]
-    E_x = (\gamma - 1)mc^2,
+    \rho^{\prime\prime}(f) = \left|\frac{\partial v_x}{\partial f}(f, f_\text{lab})\right|
+    \rho^\prime(v_x(f, f_\text{lab})),
+    \qquad\int\limits_0^\infty \rho^{\prime\prime}(f)\mathrm{d}f = 1,
     \end{aligned}$$
 
+    where $\rho^\prime$ is the probability density function
+    <a href="{{ '/doc/functions/physics/normal_chi2_convolved_vx_pdf.html' | relative_url }}">
+    `normal_chi2_convolved_vx_pdf`</a>.
 
     :param f: The frequency quantiles $f$ (arb. units).
     :param f_lab: The laser frequency $f_\text{lab}$ in the laboratory frame ([`f`]).
@@ -2091,7 +2120,7 @@ def normal_chi2_convolved_f_pdf(f: array_like, f_lab: array_like, alpha: array_l
     :param scale_e: The standard deviation $\sigma_{E_x}$ of the normal distribution (eV).
     :param e0: The mean energy $E_0$ of the normal distribution (eV).
     :param relativistic: Kinetic energies are calculated either relativistically (`True`) or classically (`False`).
-    :returns: (rho_f) The probability density in thermal equilibrium at the frequency `f` (1/[`f`]).
+    :returns: (rho_f) The probability density in thermal equilibrium at the frequency `f` ([`1/f`]).
     """
     f, f_lab = np.asarray(f, dtype=float), np.asarray(f_lab, dtype=float)
     m, t, scale_e, e0 = (np.asarray(m, dtype=float), np.asarray(t, dtype=float),
@@ -2105,30 +2134,44 @@ def normal_chi2_convolved_f_pdf(f: array_like, f_lab: array_like, alpha: array_l
     return ret
 
 
-def normal_chi2_convolved_f_xi_pdf(f: array_like, xi: array_like, sigma: array_like, col: bool = True) -> ndarray:
+def normal_chi2_convolved_f_xi_pdf(f: array_like, f0: array_like, xi: array_like, sigma_f: array_like,
+                                   col: bool = True) -> ndarray:
     r"""
     The probability density at the frequency $f$ in the rest frame of an atom with kinetic energy $E_x$,
     determined through the parameter $\xi$,
     and distributed according to a convolution of a normal and a $\chi^2_1$ distribution
 
     $$\begin{aligned}
-    asd\\[2ex]
-    E_x = (\gamma - 1)mc^2,
+    \rho(f) &= \frac{1}{2\pi\sigma_\mathrm{f}\sqrt{\xi}}\int\limits_0^\infty \frac{1}{\sqrt{\eta}}
+    \exp\left[-\frac{1}{2}\left(\frac{f - f_0 - \eta}{\sigma_\mathrm{f}}\right)^2
+    - \frac{\eta}{2\xi}\right]\mathrm{d}\eta\\[1ex]
+    &= N\times\begin{cases}
+    \sqrt{-\frac{\mu}{2\pi}}\exp[-(x + \mu)] K_{1/4}(x), & \text{if } \mu < 0 \\[1.5ex]
+    \sqrt{\frac{\varpi}{\sqrt{\pi}}\sigma}, & \text{if } \mu = 0 \\[1.5ex]
+    \sqrt{\pi\mu}\exp[-(x + \mu)] \frac{1}{2}\left[ I_{1/4}(x) + I_{-1/4}(x) \right], & \text{if } \mu > 0
+    \end{cases}\\[2ex]
+    x &= \left(\!\frac{\mu}{2\sigma}\!\right)^{\!2},\quad\mu = \frac{f - f_0}{2\xi} - \sigma^2,
+    \quad\sigma = \frac{\sigma_\mathrm{f}}{2\xi}\\[2ex]
+    N &= \frac{1}{\sqrt{2\pi}\sigma_\mathrm{f}}\exp\left(-\frac{\sigma^2}{2}\right),
     \end{aligned}$$
 
+    where $I_\alpha$, and $K_\alpha$ are the modified Bessel functions of first and second kind,
+    and $\varpi \approx 2.6220575543$ is the lemniscate constant.
+
     :param f: The frequency quantiles $f$ (arb. units).
+    :param f0: A frequency offset $f_0$ ([`f`]).
     :param xi: The asymmetry parameter $\xi$ ([`f`]).
-    :param sigma: The standard deviation $\sigma$ of the normal distribution ([`f`]).
+    :param sigma_f: The standard deviation $\sigma_\mathrm{f}$ of the normal distribution ([`f`]).
     :param col: The laser can be aligned collinearly (`True`) or anticollinearly (`False`) to the velocity of the atom.
     :returns: (rho_f) The probability density in thermal equilibrium at the frequency `f` (1/[`f`]).
     """
-    f, xi, sigma = np.asarray(f, dtype=float), np.asarray(xi, dtype=float), np.asarray(sigma, dtype=float)
+    f, xi, sigma_f = np.asarray(f, dtype=float), np.asarray(xi, dtype=float), np.asarray(sigma_f, dtype=float)
 
-    scalar_true = tools.check_shape((), f, xi, sigma, return_mode=True)
+    scalar_true = tools.check_shape((), f, f0, xi, sigma_f, return_mode=True)
     if scalar_true:
         f = np.array([f])
 
-    r = source_energy_pdf(f, 0., sigma, xi, col)
+    r = source_energy_pdf(f, f0, sigma_f, xi, col)
 
     if scalar_true:
         return r[0]
@@ -2137,7 +2180,9 @@ def normal_chi2_convolved_f_xi_pdf(f: array_like, xi: array_like, sigma: array_l
 
 def source_energy_pdf(f, f0, sigma, xi, collinear: bool = True) -> ndarray:
     r"""
-    This is the same function as `normal_chi2_convolved_f_xi_pdf` with less array processing for `qspec.models`.
+    This is the same function as
+    <a href="{{ '/doc/functions/physics/normal_chi2_convolved_f_xi_pdf.html' | relative_url }}">
+    `normal_chi2_convolved_f_xi_pdf`</a> with less array processing and reordered parameters, used in `qspec.models`.
 
     :param f: The frequency quantiles $f$ (arb. units).
     :param f0: A frequency offset $f_0$ ([`f`]).
@@ -2151,20 +2196,27 @@ def source_energy_pdf(f, f0, sigma, xi, collinear: bool = True) -> ndarray:
     f = np.asarray(f, dtype=float)
 
     sig = (sigma / (2. * xi)) ** 2
-    _norm = np.exp(-0.5 * sig) / (sigma * np.sqrt(2. * np.pi))
-
     mu = -pm * (f - f0) / (2. * xi) - sig
+    norm = np.exp(-0.5 * sig) / (sigma * np.sqrt(2. * np.pi))
+
+    isnan = norm > 0.
+    isnan += np.abs(mu) <= max_exp_input
+    isnan = ~isnan
+
     nonzero = mu.astype(bool)
     mu = mu[nonzero]
     b_arg = mu ** 2 / (4. * sig)
 
-    main = np.full(f.shape, np.sqrt(LEMNISCATE * np.sqrt(sig / np.pi)))
-    main_nonzero = np.empty_like(f[nonzero], dtype=float)
-    mask = mu < 0.
+    main = np.full(f.shape, norm * np.sqrt(LEMNISCATE * np.sqrt(sig / np.pi)), dtype=float)
+    main[isnan] = 0.
 
-    main_nonzero[mask] = np.sqrt(-0.5 * mu[mask] / np.pi) * np.exp(-mu[mask]) \
-        * np.exp(-b_arg[mask]) * sp.kv(0.25, b_arg[mask])
-    main_nonzero[~mask] = 0.5 * np.sqrt(mu[~mask] * np.pi) * np.exp(-mu[~mask]) \
-        * (sp.ive(0.25, b_arg[~mask]) + sp.ive(-0.25, b_arg[~mask]))
+    main_nonzero = np.empty_like(f[nonzero], dtype=float)
+    mask0 = mu < 0.
+    mask1 = mu > 0.
+
+    main_nonzero[mask0] = np.sqrt(-0.5 * mu[mask0] / np.pi) * np.exp(-mu[mask0]) \
+        * np.exp(-b_arg[mask0]) * sp.kv(0.25, b_arg[mask0])
+    main_nonzero[mask1] = 0.5 * np.sqrt(mu[mask1] * np.pi) * np.exp(-mu[mask1]) \
+        * (sp.ive(0.25, b_arg[mask1]) + sp.ive(-0.25, b_arg[mask1]))
     main[nonzero] = main_nonzero
-    return main * _norm
+    return main * norm

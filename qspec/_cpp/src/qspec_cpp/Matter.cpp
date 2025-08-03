@@ -126,6 +126,11 @@ void State::init(double _freq_j, double _j, double _i, double _f, double _m, boo
 	reset();
 }
 
+std::string State::repr()
+{
+	return std::format("{}({}, {}, {}, {})", label, half_int_to_str(j), half_int_to_str(i), half_int_to_str(f), half_int_to_str(m));
+}
+
 void State::reset()
 {
 	freq = freq_j + hyperfine(i, j, f, hyper_const);
@@ -994,7 +999,8 @@ void Atom::scattering_rate(double* results, std::vector<size_t>& k, std::vector<
 									// printf("y1: %s\n", std::format("{:.3e} + i{:.3e}", y.real(), y.imag()).c_str());
 									y *= qk_i * d_fi * std::conj(qk_j) * d_jf;
 									// printf("y2: %s\n", std::format("{:.3e} + i{:.3e}", y.real(), y.imag()).c_str());
-									y *= sqrt((2 * ki_double + 1) * (2 * kj_double + 1)) / (8. * sc::pi);
+									y *= pow(sc::i, static_cast<int>(2. * delta_mi + ki_double - 1.)) * pow(-sc::i, static_cast<int>(2. * delta_mj + kj_double - 1.));
+									y *= sqrt((2. * ki_double + 1.) * (2. * kj_double + 1.)) / (8. * sc::pi);
 									// printf("y3: %s\n", std::format("{:.3e} + i{:.3e}", y.real(), y.imag()).c_str());
 
 									_result += y;

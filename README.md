@@ -6,7 +6,7 @@
 [![Static Badge](https://img.shields.io/badge/Python-3.8%2B-blue?logo=python&logoColor=white)](https://www.python.org/)
 [![Static Badge](https://img.shields.io/badge/License-MIT-slateblue)](https://opensource.org/license/mit)
 
-[![Static Badge](https://img.shields.io/badge/DOI-10.48550/arXiv.2409.01417-orange)](https://doi.org/10.48550/arXiv.2409.01417)
+[![Static Badge](https://img.shields.io/badge/DOI-10.1016/j.cpc.2025.109550-orange)](https://doi.org/10.1016/j.cpc.2025.109550)
 [![Static Badge](https://img.shields.io/badge/arXiv-2409.01417-red)](https://arxiv.org/abs/2409.01417)
 
 The [_qspec_](https://pypi.org/project/qspec/) Python package provides mathematical and physical functions
@@ -36,9 +36,9 @@ Additional example scripts can be found in the example folder on [_GitHub_](http
 ### Exemplary use cases
 - Calculate frequently used physical observables such as kinetic energies, velocities, Doppler shifts, 
 hyperfine structure splittings, etc.
-- Coherently evolve atomic state population in a classical laser field. 
+- Coherently evolve atomic state population in a classical laser field, including rank-*k* multipole interactions. 
 In contrast to powerful packages such as [_qutip_](https://qutip.org/),
-the quantum mechanical system is set up automatically by just providing atomic state and laser information.
+the quantum mechanical system is set up automatically by providing atomic state and laser information.
 - Generate modular lineshape models for fitting. The modular system can be used
 to sum, convolve, link models and share parameters, fit hyperfine structure spectra, etc. This module is similar to the [_satlas2_](https://iks-nm.github.io/satlas2/) Python package.
 - Perform multidimensional King-plot analyses.

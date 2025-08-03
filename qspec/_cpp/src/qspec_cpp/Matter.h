@@ -62,6 +62,7 @@ public:
 			  std::vector<double> _s, std::vector<double> _l, std::vector<double> _jj,
 			  double* _hyper_const, double _gj, double _gi, std::string _label);
 
+	std::string repr();
 	void reset();
 
 	double get_shift();

@@ -10,9 +10,15 @@ title: qspec.simulate.gen_electronic_state
 <span class="sig-prename"><span class="pre">qspec.simulate.</span></span><span class="sig-name"><span class="pre">gen_electronic_state</span></span>
 <span class="sig-paren">&nbsp;(&nbsp;</span>
 <em class="sig-param">
-<span class="n"><span class="pre">freq_0</span></span>
+<span class="n"><span class="pre">freq_j</span></span>
 <span class="o"><span class="pre">=</span></span>
 <span class="default_value"><span class="pre num">0.0</span></span>
+</em>
+,&nbsp;
+<em class="sig-param">
+<span class="n"><span class="pre">parity</span></span>
+<span class="o"><span class="pre">=</span></span>
+<span class="default_value"><span class="pre">None</span></span>
 </em>
 ,&nbsp;
 <em class="sig-param">
@@ -28,25 +34,19 @@ title: qspec.simulate.gen_electronic_state
 </em>
 ,&nbsp;
 <em class="sig-param">
-<span class="n"><span class="pre">parity</span></span>
+<span class="n"><span class="pre">ls</span></span>
+<span class="o"><span class="pre">=</span></span>
+<span class="default_value"><span class="pre">None</span></span>
+</em>
+,&nbsp;
+<em class="sig-param">
+<span class="n"><span class="pre">jj</span></span>
 <span class="o"><span class="pre">=</span></span>
 <span class="default_value"><span class="pre">None</span></span>
 </em>
 ,&nbsp;
 <em class="sig-param">
 <span class="n"><span class="pre">hyper_const</span></span>
-<span class="o"><span class="pre">=</span></span>
-<span class="default_value"><span class="pre">None</span></span>
-</em>
-,&nbsp;
-<em class="sig-param">
-<span class="n"><span class="pre">ls</span></span>
-<span class="o"><span class="pre">=</span></span>
-<span class="default_value"><span class="pre num">(0, 0)</span></span>
-</em>
-,&nbsp;
-<em class="sig-param">
-<span class="n"><span class="pre">jj</span></span>
 <span class="o"><span class="pre">=</span></span>
 <span class="default_value"><span class="pre">None</span></span>
 </em>
@@ -68,35 +68,36 @@ title: qspec.simulate.gen_electronic_state
 <span class="o"><span class="pre">=</span></span>
 <span class="default_value"><span class="pre">None</span></span>
 </em>
-<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/dev-jekyll/qspec/simulate\_simulate_cpp.py#L526-L558' }}"><span class="sig-source">[source]</span></a>
+<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/dev-jekyll/qspec/simulate\_simulate_cpp.py#L2412-L2453' }}"><span class="sig-source">[source]</span></a>
 </dt>
-<dd class="field-body"><p>Creates all substates of a fine-structure state using a common label.</p>
+<dd class="field-body"><p>Creates all substates of a fine-structure state $|\mathrm{[label]}\pi JI\rangle$ using a common label.</p>
 <dl class="field-list">
 <dt class="field-head">Parameters<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>freq_0<span class="classifier"><em>quant_like</em></span></dt>
+<dt>freq_j<span class="classifier"><em>quant_like</em></span></dt>
 <dd class="field-desc"><p>The energetic position of the state without the hyperfine structure or the magnetic field (MHz).</p></dd>
+<dt>parity<span class="classifier"><em>bool | str</em></span></dt>
+<dd class="field-desc"><p>The parity $\pi$ of the state is used to check the selection rules.
+     If None, it is inferred from <code>ls</code> if possible.
+     It can be either <code>'even'</code> (<code>'e'</code>, <code>False</code>) or <code>'odd'</code> (<code>'o'</code>, <code>True</code>).</p></dd>
 <dt>j<span class="classifier"><em>quant_like</em></span></dt>
 <dd class="field-desc"><p>The electronic total angular momentum quantum number $J$.</p></dd>
 <dt>i<span class="classifier"><em>quant_like</em></span></dt>
 <dd class="field-desc"><p>The nuclear spin quantum number $I$.</p></dd>
-<dt>parity<span class="classifier"><em>bool | str</em></span></dt>
-<dd class="field-desc"><p>The parity $\pi$ of the state. Can be either <code>'even'</code> (<code>False</code>) or <code>'odd'</code> (<code>True</code>).</p></dd>
+<dt>ls<span class="classifier"><em>quant_like | Iterable</em></span></dt>
+<dd class="field-desc"><p>A list or a single pair of electronic angular momentum and spin quantum numbers $(l_i, s_i)$
+     used to check the selection rules and to calculate the electronic g-factor in the LS-coupling scheme.
+     If this is a list of LS-pairs, the parameter <code>jj</code> requires a list of $j_i$ quantum numbers.</p></dd>
+<dt>jj<span class="classifier"><em>quant_like | Iterable</em></span></dt>
+<dd class="field-desc"><p>A list of two electronic total angular momentum quantum numbers $(j_0, j_1)$
+     used to calculate the electronic g-factor in the jj-coupling scheme.
+     Either a list of two $(l_i, s_i)$ pairs needs to be specified for the parameter <code>ls</code>
+     or a list of g-factors $g_{j_i}$ for the parameter <code>gj</code>.</p></dd>
 <dt>hyper_const<span class="classifier"><em>Iterable[array_like]</em></span></dt>
 <dd class="field-desc"><p>A list of the hyperfine-structure constants.
      Currently, constants up to the electric quadrupole order are supported ($A$, $B$). If 'hyper_const' is a scalar,
      it is assumed to be the constant $A$ and the other orders are 0 (MHz).</p></dd>
-<dt>ls<span class="classifier"><em>quant_like</em></span></dt>
-<dd class="field-desc"><p>A list or a single pair of electronic angular momentum and spin quantum numbers $(l_i, s_i)$
-     used to calculate the electronic g-factor in the LS-coupling scheme. If this is a list of LS-pairs,
-     A list of $j_i$ quantum numbers needs to specified for the parameter <code>jj</code>. It is overwritten if <code>gj</code> is specified.</p></dd>
-<dt>jj<span class="classifier"><em>quant_like</em></span></dt>
-<dd class="field-desc"><p>A list of two electronic total angular momentum quantum numbers $(j_0, j_1)$
-     used to calculate the electronic g-factor in the jj-coupling scheme.
-     Either a list of two $(l_i, s_i)$ pairs needs to be specified for the parameter <code>ls</code>
-     or a list of g-factors $g_{j_i}$ for the parameter <code>gj</code>. The parameter <code>gj</code> overwrites <code>ls</code>.
-     If <code>gj</code> is a single scalar value, it also overwrites <code>jj</code>.</p></dd>
 <dt>gj<span class="classifier"><em>array_like</em></span></dt>
 <dd class="field-desc"><p>A list of two $g_{j_i}$ or a single electronic g-factor $g_J$. If <code>gj</code> is a list, <code>jj</code> is required
      and <code>ls</code> is overwritten. If <code>gj</code> is a scalar, both <code>ls</code> and <code>jj</code> are overwritten.</p></dd>
@@ -107,11 +108,12 @@ title: qspec.simulate.gen_electronic_state
 </dd><dt class="field-head">Returns<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>(list[State], )<span class="classifier"><em>list[qspec.simulate._simulate_cpp.State]</em></span></dt>
-<dd class="field-desc"><p> A list of the created states.</p></dd></dl>
+<dt>states<span class="classifier"><em>list[qspec.simulate.State]</em></span></dt>
+<dd class="field-desc"><p> A list of the created states $|\mathrm{[label]}\pi JIFm\rangle$.</p></dd></dl>
 </dd>
 </dl></dd>
 </dl>
+<div class="end-spacer"></div>
 </article>
 </div>
 <div class="bd-content-table">
@@ -906,10 +908,8 @@ title: qspec.simulate.gen_electronic_state
 <li class="spaced"><a href="{{ '/doc/functions/physics/alpha_atom.html' | relative_url }}">qspec.alpha_atom</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/physics/beta.html' | relative_url }}">qspec.beta</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/physics/boost.html' | relative_url }}">qspec.boost</a></li>
-<li class="spaced"><a href="{{ '/doc/functions/physics/convolved_boltzmann_norm_pdf.html' | relative_url }}">qspec.convolved_boltzmann_norm_pdf</a></li>
-<li class="spaced"><a href="{{ '/doc/functions/physics/convolved_thermal_norm_f_lin_pdf.html' | relative_url }}">qspec.convolved_thermal_norm_f_lin_pdf</a></li>
-<li class="spaced"><a href="{{ '/doc/functions/physics/convolved_thermal_norm_f_pdf.html' | relative_url }}">qspec.convolved_thermal_norm_f_pdf</a></li>
-<li class="spaced"><a href="{{ '/doc/functions/physics/convolved_thermal_norm_v_pdf.html' | relative_url }}">qspec.convolved_thermal_norm_v_pdf</a></li>
+<li class="spaced"><a href="{{ '/doc/functions/physics/chi2_ex_pdf.html' | relative_url }}">qspec.chi2_ex_pdf</a></li>
+<li class="spaced"><a href="{{ '/doc/functions/physics/chi2_ex_rvs.html' | relative_url }}">qspec.chi2_ex_rvs</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/physics/delta_r2.html' | relative_url }}">qspec.delta_r2</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/physics/delta_r4.html' | relative_url }}">qspec.delta_r4</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/physics/delta_r6.html' | relative_url }}">qspec.delta_r6</a></li>
@@ -952,10 +952,16 @@ title: qspec.simulate.gen_electronic_state
 <li class="spaced"><a href="{{ '/doc/functions/physics/lande_jj.html' | relative_url }}">qspec.lande_jj</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/physics/lande_n.html' | relative_url }}">qspec.lande_n</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/physics/mass_factor.html' | relative_url }}">qspec.mass_factor</a></li>
+<li class="spaced"><a href="{{ '/doc/functions/physics/normal_chi2_convolved_ex_pdf.html' | relative_url }}">qspec.normal_chi2_convolved_ex_pdf</a></li>
+<li class="spaced"><a href="{{ '/doc/functions/physics/normal_chi2_convolved_f_pdf.html' | relative_url }}">qspec.normal_chi2_convolved_f_pdf</a></li>
+<li class="spaced"><a href="{{ '/doc/functions/physics/normal_chi2_convolved_f_xi_pdf.html' | relative_url }}">qspec.normal_chi2_convolved_f_xi_pdf</a></li>
+<li class="spaced"><a href="{{ '/doc/functions/physics/normal_chi2_convolved_vx_pdf.html' | relative_url }}">qspec.normal_chi2_convolved_vx_pdf</a></li>
+<li class="spaced"><a href="{{ '/doc/functions/physics/normal_vx_pdf.html' | relative_url }}">qspec.normal_vx_pdf</a></li>
+<li class="spaced"><a href="{{ '/doc/functions/physics/normal_vx_rvs.html' | relative_url }}">qspec.normal_vx_rvs</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/physics/p_e.html' | relative_url }}">qspec.p_e</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/physics/p_el.html' | relative_url }}">qspec.p_el</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/physics/p_v.html' | relative_url }}">qspec.p_v</a></li>
-<li class="spaced"><a href="{{ '/doc/functions/physics/rabi.html' | relative_url }}">qspec.rabi</a></li>
+<li class="spaced"><a href="{{ '/doc/functions/physics/rabi_s.html' | relative_url }}">qspec.rabi_s</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/physics/saturation.html' | relative_url }}">qspec.saturation</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/physics/saturation_intensity.html' | relative_url }}">qspec.saturation_intensity</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/physics/scattering_rate.html' | relative_url }}">qspec.scattering_rate</a></li>
@@ -963,10 +969,7 @@ title: qspec.simulate.gen_electronic_state
 <li class="spaced"><a href="{{ '/doc/functions/physics/sellmeier.html' | relative_url }}">qspec.sellmeier</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/physics/source_energy_pdf.html' | relative_url }}">qspec.source_energy_pdf</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/physics/t_xi.html' | relative_url }}">qspec.t_xi</a></li>
-<li class="spaced"><a href="{{ '/doc/functions/physics/thermal_e_pdf.html' | relative_url }}">qspec.thermal_e_pdf</a></li>
-<li class="spaced"><a href="{{ '/doc/functions/physics/thermal_e_rvs.html' | relative_url }}">qspec.thermal_e_rvs</a></li>
-<li class="spaced"><a href="{{ '/doc/functions/physics/thermal_v_pdf.html' | relative_url }}">qspec.thermal_v_pdf</a></li>
-<li class="spaced"><a href="{{ '/doc/functions/physics/thermal_v_rvs.html' | relative_url }}">qspec.thermal_v_rvs</a></li>
+<li class="spaced"><a href="{{ '/doc/functions/physics/temperature_doppler.html' | relative_url }}">qspec.temperature_doppler</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/physics/v_e.html' | relative_url }}">qspec.v_e</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/physics/v_e_d1.html' | relative_url }}">qspec.v_e_d1</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/physics/v_el.html' | relative_url }}">qspec.v_el</a></li>
@@ -988,6 +991,7 @@ title: qspec.simulate.gen_electronic_state
 <span class="toctree-toggle" role="presentation"><img src="{{ '/assets/img/chevron-down.svg' | relative_url }}" class="chevron"/></span>
 </summary>
 <ul class="extern-a">
+<li><a href="{{ '/doc/functions/simulate/Atom/get_multipole_types.html' | relative_url }}">qspec.simulate.Atom.get_multipole_types</a></li>
 <li><a href="{{ '/doc/functions/simulate/Atom/get_state_indexes.html' | relative_url }}">qspec.simulate.Atom.get_state_indexes</a></li>
 <li><a href="{{ '/doc/functions/simulate/Atom/get_y0.html' | relative_url }}">qspec.simulate.Atom.get_y0</a></li>
 <li><a href="{{ '/doc/functions/simulate/Atom/get_y0_mc.html' | relative_url }}">qspec.simulate.Atom.get_y0_mc</a></li>
@@ -1001,7 +1005,9 @@ title: qspec.simulate.gen_electronic_state
 <span class="toctree-toggle" role="presentation"><img src="{{ '/assets/img/chevron-down.svg' | relative_url }}" class="chevron"/></span>
 </summary>
 <ul class="extern-a">
-<li><a href="{{ '/doc/functions/simulate/DecayMap/get.html' | relative_url }}">qspec.simulate.DecayMap.get</a></li></ul>
+<li><a href="{{ '/doc/functions/simulate/DecayMap/get_ae.html' | relative_url }}">qspec.simulate.DecayMap.get_ae</a></li>
+<li><a href="{{ '/doc/functions/simulate/DecayMap/get_am.html' | relative_url }}">qspec.simulate.DecayMap.get_am</a></li>
+<li><a href="{{ '/doc/functions/simulate/DecayMap/get_gamma.html' | relative_url }}">qspec.simulate.DecayMap.get_gamma</a></li></ul>
 </details>
 </li><li class="has-children spaced"><a href="{{ '/doc/functions/simulate/Environment/Environment.html' | relative_url }}">qspec.simulate.Environment</a>
 <details>
@@ -1029,11 +1035,11 @@ title: qspec.simulate.gen_electronic_state
 <span class="toctree-toggle" role="presentation"><img src="{{ '/assets/img/chevron-down.svg' | relative_url }}" class="chevron"/></span>
 </summary>
 <ul class="extern-a">
-<li><a href="{{ '/doc/functions/simulate/Interaction/get_delta.html' | relative_url }}">qspec.simulate.Interaction.get_delta</a></li>
-<li><a href="{{ '/doc/functions/simulate/Interaction/get_rabi.html' | relative_url }}">qspec.simulate.Interaction.get_rabi</a></li>
+<li><a href="{{ '/doc/functions/simulate/Interaction/delta.html' | relative_url }}">qspec.simulate.Interaction.delta</a></li>
 <li><a href="{{ '/doc/functions/simulate/Interaction/hamiltonian.html' | relative_url }}">qspec.simulate.Interaction.hamiltonian</a></li>
 <li><a href="{{ '/doc/functions/simulate/Interaction/master.html' | relative_url }}">qspec.simulate.Interaction.master</a></li>
 <li><a href="{{ '/doc/functions/simulate/Interaction/mc_master.html' | relative_url }}">qspec.simulate.Interaction.mc_master</a></li>
+<li><a href="{{ '/doc/functions/simulate/Interaction/rabi.html' | relative_url }}">qspec.simulate.Interaction.rabi</a></li>
 <li><a href="{{ '/doc/functions/simulate/Interaction/rates.html' | relative_url }}">qspec.simulate.Interaction.rates</a></li>
 <li><a href="{{ '/doc/functions/simulate/Interaction/resonance_info.html' | relative_url }}">qspec.simulate.Interaction.resonance_info</a></li>
 <li><a href="{{ '/doc/functions/simulate/Interaction/scattering_rate.html' | relative_url }}">qspec.simulate.Interaction.scattering_rate</a></li>
@@ -1045,7 +1051,8 @@ title: qspec.simulate.gen_electronic_state
 <summary>
 <span class="toctree-toggle" role="presentation"><img src="{{ '/assets/img/chevron-down.svg' | relative_url }}" class="chevron"/></span>
 </summary>
-<ul class="extern-a"></ul>
+<ul class="extern-a">
+<li><a href="{{ '/doc/functions/simulate/Laser/get_kpol.html' | relative_url }}">qspec.simulate.Laser.get_kpol</a></li></ul>
 </details>
 </li><li class="has-children spaced"><a href="{{ '/doc/functions/simulate/Polarization/Polarization.html' | relative_url }}">qspec.simulate.Polarization</a>
 <details>
@@ -1093,7 +1100,10 @@ title: qspec.simulate.gen_electronic_state
 <li class="spaced"><a href="{{ '/doc/functions/simulate/construct_hyperfine_state.html' | relative_url }}">qspec.simulate.construct_hyperfine_state</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/simulate/ct_markov_analytic.html' | relative_url }}">qspec.simulate.ct_markov_analytic</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/simulate/ct_markov_dgl.html' | relative_url }}">qspec.simulate.ct_markov_dgl</a></li>
+<li class="spaced"><a href="{{ '/doc/functions/simulate/density_matrix_diagonal.html' | relative_url }}">qspec.simulate.density_matrix_diagonal</a></li>
+<li class="spaced"><a href="{{ '/doc/functions/simulate/gen_electronic_ls_state.html' | relative_url }}">qspec.simulate.gen_electronic_ls_state</a></li>
 <li class="spaced table-current"><a href="{{ '/doc/functions/simulate/gen_electronic_state.html' | relative_url }}">qspec.simulate.gen_electronic_state</a></li>
+<li class="spaced"><a href="{{ '/doc/functions/simulate/gen_hyperfine_ls_state.html' | relative_url }}">qspec.simulate.gen_hyperfine_ls_state</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/simulate/gen_hyperfine_state.html' | relative_url }}">qspec.simulate.gen_hyperfine_state</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/simulate/lambda_ge_rec.html' | relative_url }}">qspec.simulate.lambda_ge_rec</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/simulate/lambda_states.html' | relative_url }}">qspec.simulate.lambda_states</a></li></ul>

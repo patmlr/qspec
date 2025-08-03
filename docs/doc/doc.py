@@ -4,10 +4,13 @@ import os
 import inspect
 from docutils.core import publish_parts
 from qspec.qtypes import *
+from qspec.simulate import *
+
+QSPEC_SIM_TYPES = [Polarization, Laser, Environment, State, DecayMap, Atom, Interaction]
 
 FOLDER_FILES = {'models', 'simulate', 'analyze'}
 FILES = sorted(['physics', 'algebra', 'models', 'analyze', 'simulate', 'tools', 'stats'])
-# 'physics', 'algebra', 'models', 'analyze', 'simulate', 'tools', 'stats'
+# FILES = sorted(['physics'])
 
 
 def is_num(val):
@@ -21,6 +24,13 @@ def type_to_str(_type):
     ret = ret.replace(str(Union[sympy_core, float]), 'Union[sympy_core, float]')
     ret = ret.replace(str(sympy_core), 'sympy_core')
     ret = ret.replace(str(Union[array_like, object]), 'Union[array_like, object]')
+    for t in QSPEC_SIM_TYPES:
+        if t.__name__ in ret:
+            ret = ret.replace(str(Union[array_like, t]), f'Union[array_like, {t}]')
+            ret = ret.replace(f'_simulate_cpp.{t.__name__}', t.__name__)
+            ret = ret.replace(f'ForwardRef(\'{t.__name__}\')', f'qspec.simulate.{t.__name__}')
+            if ret == t.__name__:
+                ret = ret.replace(t.__name__, f'qspec.simulate.{t.__name__}')
     ret = ret.replace(str(quant_iter), 'Union[quant_like, Iterable]')
     ret = ret.replace(str(quant_like), 'quant_like')
     ret = ret.replace(str(array_like), 'array_like')
@@ -403,6 +413,7 @@ def _gen_class_functions(directory, file, f, class_funcs, namespace):
 
 
 def gen_functions():
+    unused_functions = []
     for file in FILES:
         directory = os.path.join('functions', file)
         if not os.path.exists(directory):
@@ -430,6 +441,22 @@ def gen_functions():
             with open(os.path.join(directory, f'{f_path}.html'), 'w', encoding='utf-8') as html_file:
                 html_file.write(html)
             print(f'Function \'{f}\' done.')
+
+        func_str_set = set(func_str)
+        for f in os.listdir(directory):
+            if not 'html' in f:
+                if f not in func_str_set:
+                    unused_functions.append(f)
+                class_funcs = set(m[0] for m in inspect.getmembers(funcs[f], inspect.isfunction)
+                                  if not m[0].startswith('_'))
+                for _f in os.listdir(os.path.join(directory, f)):
+                    if _f[:-5] not in class_funcs and _f[:-5] != f:
+                        unused_functions.append(f'{f}.{_f[:-5]}')
+            else:
+                if f[:-5] not in func_str_set:
+                    unused_functions.append(f[:-5])
+
+    print(f'Unused functions: {unused_functions}')
 
 
 if __name__ == '__main__':

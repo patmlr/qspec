@@ -10,11 +10,15 @@
   link: /tutorials/models.html
   title: Construction and fitting of modular lineshape models
   identifier: /models
-- name: simulate
-  link: /tutorials/simulate.html
-  title: Time evolution of quantum interference in fluorescence spectra
-  identifier: /simulate
 - name: king-2d
   link: /tutorials/king-2d.html
   title: 2d King-plot analysis
   identifier: /king-2d
+- name: simulate
+  link: /tutorials/simulate.html
+  title: Time evolution of quantum interference in fluorescence spectra
+  identifier: /simulate
+- name: multipoles
+  link: /tutorials/multipoles.html
+  title: Simulation of k-multipole emission patterns
+  identifier: /multipoles

@@ -110,6 +110,57 @@ def example_2():
 
 
 def example_3():
+    import qspec as qs
+
+    # The mass numbers of the Ca isotopes.
+    a = [40, 42, 43, 44, 46, 48, 50, 52]
+
+    # The masses of the isotopes (u, AME 2020).
+    m = [(39.962590850, 22e-9), (41.958617780, 159e-9),  # 40Ca, 42Ca
+         (42.958766381, 244e-9), (43.955481489, 348e-9),  # 43Ca, 44Ca
+         (45.953687726, 2398e-9), (47.952522654, 18e-9),  # 46Ca, 48Ca
+         (49.957499215, 1.7e-6), (51.963213646, 720e-9)]  # 50Ca, 52Ca
+
+    # Use absolute values given in the shape (#isotopes, #observables, 2).
+    # Frequencies for the (D1, D2) lines (MHz).
+    x_abs = [[(755222765.66, 0.10), (761905012.53, 0.11)],  # 40Ca
+             [(755223191.15, 0.10), (761905438.57, 0.10)],  # 42Ca
+             [(755223443.57, 0.30), (761905691.89, 0.17)],  # 43Ca
+             [(755223614.66, 0.10), (761905862.62, 0.09)],  # 44Ca
+             [(755224063.27, 0.33), (761906311.60, 0.57)],  # 46Ca
+             [(755224471.12, 0.10), (761906720.11, 0.11)],  # 48Ca
+             [(        0.  , 0.  ), (        0.  , 0.  )],  # 50Ca
+             [(        0.  , 0.  ), (        0.  , 0.  )]]  # 52Ca
+
+    # Construct a King object. Optionally specify 'x_abs' here
+    # to omit isotope shifts when fitting. 20 electron masses are subtracted
+    # to perform the King plot analysis with the nuclear masses.
+    king = qs.King(a=a, m=m, x_abs=x_abs, subtract_electrons=20)
+
+    a_fit = [42, 43, 44, 46, 48]  # Choose the isotopes to fit.
+    a_ref = [40, 48, 42, 40, 44]  # Choose individual reference isotopes.
+
+    # Do a simple 2d King plot.
+    # The 'mode' keyword is only used for the axis labels.
+    popt, pcov = king.fit(a_fit, a_ref, mode='shifts')
+    # >>> f(x) = (177.3 u MHz) + 1.00068 * x
+
+    a_unknown = [50, 52]  # Specify the unknown isotopes
+    a_unknown_ref = [40, 40]  # and their references.
+
+    # Specify the isotope shifts of the D2 line.
+    y = [(1969.2, 5.6), (2219.2, 7.0)]
+
+    # Calculate the isotope shifts of the D1 line and their covariances.
+    x, cov, cov_stat = king.get_unmodified(
+        a_unknown, a_unknown_ref, y, axis=1, show=True, mode='shifts')
+
+    for iso, c in zip(a_unknown, cov):
+        qs.printh(f'\n{iso}Ca+:')  # Print colored headline.
+        qs.print_cov(c)  # Print color-coded covariance matrix.
+
+
+def example_4():
     import numpy as np
     import qspec.simulate as sim
 
@@ -188,55 +239,84 @@ def example_3():
     plt.show()
 
 
-def example_4():
+def example_5():
+    import numpy as np
     import qspec as qs
+    import qspec.simulate as sim
+    import matplotlib.pyplot as plt
 
-    # The mass numbers of the Ca isotopes.
-    a = [40, 42, 43, 44, 46, 48, 50, 52]
+    f_eg = 7e8  # Transition frequency
+    a_eg = 10.  # Einstein coefficient
 
-    # The masses of the isotopes (u, AME 2020).
-    m = [(39.962590850, 22e-9), (41.958617780, 159e-9),  # 40Ca, 42Ca
-         (42.958766381, 244e-9), (43.955481489, 348e-9),  # 43Ca, 44Ca
-         (45.953687726, 2398e-9), (47.952522654, 18e-9),  # 46Ca, 48Ca
-         (49.957499215, 1.7e-6), (51.963213646, 720e-9)]  # 50Ca, 52Ca
+    g_hyper = [0.]  # HFS A-constant of the g state
+    e_hyper = [5.]  # HFS A-constant of the e state
 
-    # Use absolute values given in the shape (#isotopes, #observables, 2).
-    # Frequencies for the (D1, D2) lines (MHz).
-    x_abs = [[(755222765.66, 0.10), (761905012.53, 0.11)],  # 40Ca
-             [(755223191.15, 0.10), (761905438.57, 0.10)],  # 42Ca
-             [(755223443.57, 0.30), (761905691.89, 0.17)],  # 43Ca
-             [(755223614.66, 0.10), (761905862.62, 0.09)],  # 44Ca
-             [(755224063.27, 0.33), (761906311.60, 0.57)],  # 46Ca
-             [(755224471.12, 0.10), (761906720.11, 0.11)],  # 48Ca
-             [(        0.  , 0.  ), (        0.  , 0.  )],  # 50Ca
-             [(        0.  , 0.  ), (        0.  , 0.  )]]  # 52Ca
+    i, jg, je = 0., 2., 5.
+    dm = 1  # The change of the m quantum number
 
-    # Construct a King object. Optionally specify 'x_abs' here
-    # to omit isotope shifts when fitting. 20 electron masses are subtracted
-    # to perform the King plot analysis with the nuclear masses.
-    king = qs.King(a=a, m=m, x_abs=x_abs, subtract_electrons=20)
+    g = sim.State(0., parity='e', j=jg, i=i, f=jg + i, m=jg + i,
+                  hyper_const=g_hyper, label='g')
+    e = sim.State(f_eg, parity='o', j=je, i=i, f=je + i, m=jg + i + dm,
+                  hyper_const=e_hyper, label='e')
 
-    a_fit = [42, 43, 44, 46, 48]  # Choose the isotopes to fit.
-    a_ref = [40, 48, 42, 40, 44]  # Choose individual reference isotopes.
+    states = [g, e]
+    decay = sim.DecayMap(labels=[('g', 'e')], a=[a_eg], k_max=int(je - jg))
+    atom = sim.Atom(states=states, decay_map=decay)
+    print(atom.get_multipole_types('g', 'e'))
+    # >>> {'e3'}
 
-    # Do a simple 2d King plot.
-    # The 'mode' keyword is only used for the axis labels.
-    popt, pcov = king.fit(a_fit, a_ref, mode='shifts')
-    # >>> f(x) = (177.3 u MHz) + 1.00068 * x
+    intensity = 1e3
+    pol_eg = sim.Polarization([1., 0, 1j], vec_as_q=False)
+    laser_eg = sim.Laser(freq=f_eg, polarization=pol_eg,
+                         intensity=intensity, k=[0., 1., 0.])
 
-    a_unknown = [50, 52]  # Specify the unknown isotopes
-    a_unknown_ref = [40, 40]  # and their references.
+    B = [0., 0., 1e-6]  # The B-field vector
+    env = sim.Environment(B=B)
+    inter = sim.Interaction(atom=atom, lasers=[laser_eg, ],
+                            environment=env, delta_max=1000.)
 
-    # Specify the isotope shifts of the D2 line.
-    y = [(1969.2, 5.6), (2219.2, 7.0)]
+    t = np.linspace(0., 1., 301)  # Create an array of times to simulate
+    y0 = qs.unit_vector(0, 2, dtype=float)  # Create initial population [1., 0.]
 
-    # Calculate the isotope shifts of the D1 line and their covariances.
-    x, cov, cov_stat = king.get_unmodified(
-        a_unknown, a_unknown_ref, y, axis=1, show=True, mode='shifts')
+    rho = inter.master(t, y0=y0)
+    y = sim.density_matrix_diagonal(rho, axis=1)[0]
 
-    for iso, c in zip(a_unknown, cov):
-        qs.printh(f'\n{iso}Ca+:')  # Print colored headline.
-        qs.print_cov(c)  # Print color-coded covariance matrix.
+    plt.figure(figsize=(6, 4))
+    plt.plot(t, y[0], label=g.label)
+    plt.plot(t, y[1], label=e.label)
+    plt.legend()
+    plt.xlabel(r'Time ($\mu$s)')
+    plt.ylabel('Population')
+    plt.show()
+
+    n_theta, n_phi = 128, 256
+    theta = np.linspace(0., np.pi, n_theta)
+    phi = np.linspace(0., 2 * np.pi, n_phi)
+    theta, phi = np.meshgrid(theta, phi, indexing='ij')
+
+    r = atom.scattering_rate(rho[0, :, :, -1], theta=theta, phi=phi,
+                             x_vec=None, axis=0)
+    r /= np.max(r)
+    r = r.reshape((n_theta, n_phi))
+
+    x = r * np.sin(theta) * np.cos(phi)
+    y = r * np.sin(theta) * np.sin(phi)
+    z = r * np.cos(theta)
+
+    fig, ax = plt.subplots(subplot_kw={'projection': '3d'})
+
+    cm = plt.get_cmap('plasma')
+    ax.plot_surface(x, y, z, facecolors=cm(r), rcount=128, ccount=256,
+                    linewidth=0, antialiased=False)
+
+    xyz_lim = 0.7
+    ax.set_xlim(-xyz_lim, xyz_lim)
+    ax.set_ylim(-xyz_lim, xyz_lim)
+    ax.set_zlim(-xyz_lim, xyz_lim)
+    ax.set_box_aspect((1., 1., 1.))
+    ax.set_axis_off()
+    plt.subplots_adjust(left=0., bottom=0., right=1., top=1.)
+    plt.show()
 
 
 def pycode_to_html(code):
@@ -265,5 +345,5 @@ def gen_example(n):
 if __name__ == '__main__':
     # gen_pycode_css()
     # gen_example(0)
-    gen_example(0)
-    # example_4()
+    gen_example(5)
+    # example_5()

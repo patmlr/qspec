@@ -15,6 +15,18 @@ title: qspec.simulate.Interaction.scattering_rate
 </em>
 ,&nbsp;
 <em class="sig-param">
+<span class="n"><span class="pre">as_density_matrix</span></span>
+<span class="o"><span class="pre">=</span></span>
+<span class="default_value"><span class="pre bool">True</span></span>
+</em>
+,&nbsp;
+<em class="sig-param">
+<span class="n"><span class="pre">k</span></span>
+<span class="o"><span class="pre">=</span></span>
+<span class="default_value"><span class="pre">None</span></span>
+</em>
+,&nbsp;
+<em class="sig-param">
 <span class="n"><span class="pre">theta</span></span>
 <span class="o"><span class="pre">=</span></span>
 <span class="default_value"><span class="pre">None</span></span>
@@ -27,9 +39,15 @@ title: qspec.simulate.Interaction.scattering_rate
 </em>
 ,&nbsp;
 <em class="sig-param">
-<span class="n"><span class="pre">as_density_matrix</span></span>
+<span class="n"><span class="pre">k_vec</span></span>
 <span class="o"><span class="pre">=</span></span>
-<span class="default_value"><span class="pre bool">True</span></span>
+<span class="default_value"><span class="pre">None</span></span>
+</em>
+,&nbsp;
+<em class="sig-param">
+<span class="n"><span class="pre">x_vec</span></span>
+<span class="o"><span class="pre">=</span></span>
+<span class="default_value"><span class="pre">None</span></span>
 </em>
 ,&nbsp;
 <em class="sig-param">
@@ -39,7 +57,7 @@ title: qspec.simulate.Interaction.scattering_rate
 </em>
 ,&nbsp;
 <em class="sig-param">
-<span class="n"><span class="pre">j</span></span>
+<span class="n"><span class="pre">f</span></span>
 <span class="o"><span class="pre">=</span></span>
 <span class="default_value"><span class="pre">None</span></span>
 </em>
@@ -49,47 +67,96 @@ title: qspec.simulate.Interaction.scattering_rate
 <span class="o"><span class="pre">=</span></span>
 <span class="default_value"><span class="pre num">1</span></span>
 </em>
-<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/dev-jekyll/qspec/simulate\_simulate_cpp.py#L1751-L1773' }}"><span class="sig-source">[source]</span></a>
+<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/dev-jekyll/qspec/simulate\_simulate_cpp.py#L2195-L2269' }}"><span class="sig-source">[source]</span></a>
 </dt>
-<dd class="field-body"><p>Scattering rate of the atom into the direction
+<dd class="field-body"><p>The photon scattering rate
 
-            e_r = (sin(theta), cos(theta) * sin(phi), cos(theta) * cos(phi))
+        $$\begin{aligned}
+        \Gamma_\mathrm{sc}\left(\rho, \hat{k}(\theta, \phi), \vec{\varepsilon}\right) &= \sum\limits_{f\in\mathcal{F}}
+        \,\sum\limits_{i\in\mathcal{I}}\sum\limits_{Xk_{fi}}\sum\limits_{j\in\mathcal{I}}\sum\limits_{Xk_{fj}}
+        \rho_{ji}\sqrt{A_{if}^{Xk_{fi}}A_{jf}^{Xk_{fj}}}\\[1ex]
+        &\quad\times\left\lbrace\sum\limits_\lambda (-1)^{k_{fi} + \lambda}\,a_{fi,k_{fi}}^\lambda
+        \left[(-\mathrm{i})^{k_{fi} - X_{fi}}\,\vec{\varepsilon}
+        \cdot\vec{Y}_{k_{fi}\lambda}^{(X_{fi})}(\hat{k}(\theta, \phi))\right]\right\rbrace\\[1ex]
+        &\quad\times\left\lbrace\sum\limits_\lambda (-1)^{k_{fj} + \lambda}\,a_{jf,k_{fj}}^\lambda
+        \left[(-\mathrm{i})^{k_{fj} - X_{fj}}\,\vec{\varepsilon}
+        \cdot\vec{Y}_{k_{fj}\lambda}^{(X_{fj})}(\hat{k}(\theta, \phi))\right]^\ast\right\rbrace\\[3ex]
+        a_{fi,k_{fi}}^\lambda &= (-1)^{F_f + I + k_{fi} + J_i}\sqrt{(2F_f + 1)(2J_i + 1)}
+        \langle F_fm_fk_{fi}\lambda|F_im_i\rangle\begin{Bmatrix}J_i & J_f & k_{fi} \\F_f & F_i & I\end{Bmatrix}\\[3ex]
+        X_{\!fi} &= \begin{cases}+1, & \text{if electric } (\mathrm{E}k_{fi}) \\
+        \ \,0, & \text{if magnetic } (\mathrm{M}k_{fi})\end{cases},
+        \end{aligned}$$
 
-        where the z-axis is the quantization axis, which is either (0, 0, 1) or the B-field axis.</p>
+        where $A_{if}^{Xk_{fi}}$ is the Einstein coefficient for the electric (magnetic)
+        decay $|i\rangle\rightarrow|f\rangle$ and the rank-$k_{fi}$ multipole order,
+        $\vec{Y}_{k_{fi}\lambda}^{(X_{fi})}(\hat{k})$ is the vector spherical harmonic
+        (see p. 215, Eq. (35) in [<a href=https://doi.org/10.1142/0270>1</a>]), $\rho$ is the density matrix,
+        $\hat{k}$ is the direction of emission and $\vec{\varepsilon}$
+        is the complex polarization vector of the emitted photons.
+        The calculation includes interference terms between all multipole ranks <code>1 <= k <= Atom.decay_map.k_max</code>
+        if emission directions are chosen through the (<code>theta</code>, <code>phi</code>) or <code>k_vec</code> parameters.
+        Parity mixing is currently not considered, such that all rank-$k$ electric (magnetic) transition are pure.
+        The emitted polarization can be chosen through the <code>x_vec</code> parameter. If <code>x_vec</code> is <code>None</code>, the above equation
+        will be summed over two orthogonal polarization vectors.
+        The emitted multipole orders can be limited through the <code>k</code> parameter.
+        The transitions contributing to the scattering rate can be limited through the index lists <code>i</code> and <code>f</code>
+        of the initial and final states, before and after spontaneous decay, respectively.</br></br>
+
+        If no emission direction is chosen (<code>theta = phi = k_vec = None</code>), the above equation simplifies
+        to the scattering rate into the complete $4\pi$ solid angle (without polarization selection)
+
+        $$\begin{aligned}
+        \Gamma_\mathrm{sc}(\rho) &= \sum\limits_{f\in\mathcal{F}}
+        \sum\limits_{i\in\mathcal{I}}\sum\limits_{(Xk)_{fi}}
+        \rho_{ii}A_{if}^{Xk_{fi}}\left(a_{fi,k_{fi}}^{m_i - m_f}\right)^2.
+        \end{aligned}$$</p>
 <dl class="field-list">
 <dt class="field-head">Parameters<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
 <dt>rho<span class="classifier"><em>array_like</em></span></dt>
-<dd class="field-desc"><p>The density matrix of the atom. Must have the same size as the atom
-         along the specified 'axis' and 'axis' + 1.</p></dd>
-<dt>theta<span class="classifier"><em>array_like</em></span></dt>
-<dd class="field-desc"><p>The elevation angle of detection relative to the quantization axis.</p></dd>
-<dt>phi<span class="classifier"><em>array_like</em></span></dt>
-<dd class="field-desc"><p>The azimuthal angle of detection relative to the quantization axis.</p></dd>
+<dd class="field-desc"><p>The density matrix $\rho$ of the <code>Atom</code>. Must have the same size as the <code>Atom</code>
+         along the specified <code>axis</code>, and <code>axis + 1</code> if <code>as_density_matrix == True</code>.</p></dd>
 <dt>as_density_matrix<span class="classifier"><em>bool</em></span></dt>
 <dd class="field-desc"><p>Whether 'rho' is a state vector or a density matrix.</p></dd>
+<dt>k<span class="classifier"><em>array_like</em></span></dt>
+<dd class="field-desc"><p>The rank(s) $k$ of the emitted multipole radiation. If <code>None</code>,
+         all orders <code>1 <= k <= Atom.decay_map.k_max</code> are considered.</p></dd>
+<dt>theta<span class="classifier"><em>array_like</em></span></dt>
+<dd class="field-desc"><p>The elevation angle of detection relative to the $z$-axis.</p></dd>
+<dt>phi<span class="classifier"><em>array_like</em></span></dt>
+<dd class="field-desc"><p>The azimuthal angle of detection in the $xy$-plane.</p></dd>
+<dt>k_vec<span class="classifier"><em>array_like</em></span></dt>
+<dd class="field-desc"><p>An iterable of directional vectors $\hat{k}$ emitted by the atom.
+         <code>k_vec</code> must have shape <code>(3, )</code> or <code>(m, 3)</code> .</p></dd>
+<dt>x_vec<span class="classifier"><em>array_like</em></span></dt>
+<dd class="field-desc"><p>An iterable of complex polarization vectors $\vec{\varepsilon}$ emitted by the atom.
+         <code>x_vec</code> must have shape <code>(3, )</code> or <code>(m, 3)</code> or be a <code>str</code> indicating a special polarization:
+          <ul>
+            <li>$e_\theta$: <code>{'z', 'theta', 't'}</code></li>
+            <li>$e_\phi$: <code>{'x', 'y', 'xy', 'phi', 'p'}</code></li>
+            <li>$\sigma^-$: <code>{'-', 's-', 'sigma-', 'l'}</code></li>
+            <li>$\sigma^+$: <code>{'+', 's+', 'sigma+', 'r'}</code></li>
+          </ul>
+          In these cases, the polarizations are created automatically based on the emission directions.</p></dd>
 <dt>i<span class="classifier"><em>array_like</em></span></dt>
 <dd class="field-desc"><p>The initially excited state indexes to consider for spontaneous decay.
-         If None, all states are considered.</p></dd>
-<dt>j<span class="classifier"><em>array_like</em></span></dt>
-<dd class="field-desc"><p>The final decayed state indexes to consider for spontaneous decay. If None, all states are considered.</p></dd>
+         If <code>None</code>, all states are considered.</p></dd>
+<dt>f<span class="classifier"><em>array_like</em></span></dt>
+<dd class="field-desc"><p>The final decayed state indexes to consider for spontaneous decay.
+         If <code>None</code>, all states are considered.</p></dd>
 <dt>axis<span class="classifier"><em>int</em></span></dt>
-<dd class="field-desc"><p>The axis along which the population is aligned in 'rho'.</p></dd></dl>
+<dd class="field-desc"><p>The axis along which the population is aligned in <code>rho</code>. The default is <code>axis = 1</code>,
+         expecting <code>rho</code> as an array with shape <code>(n, Atom.size, Atom.size, ... )</code>.</p></dd></dl>
 </dd><dt class="field-head">Returns<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>out<span class="classifier"><em>None</em></span></dt>
-<dd class="field-desc"><p>The scattering rate of the atom given the population 'rho' (MHz or Events / s).
-        </p></dd></dl>
-</dd><dt class="field-head">Raises<span class="colon">:</span></dt>
-<dd class="field-par">
-<dl>
-<dt>ValueError</dt>
-<dd class="field-desc"><p>'rho' must have the same size as the atom along the specified 'axis'.</p></dd></dl>
+<dt>Gamma_sc<span class="classifier"><em>ndarray</em></span></dt>
+<dd class="field-desc"><p> The scattering rate $\Gamma_\mathrm{sc}$ as an array with shape <code>(m, n, ...)</code>.</p></dd></dl>
 </dd>
 </dl></dd>
 </dl>
+<div class="end-spacer"></div>
 </article>
 </div>
 <div class="bd-content-table">
@@ -884,10 +951,8 @@ title: qspec.simulate.Interaction.scattering_rate
 <li class="spaced"><a href="{{ '/doc/functions/physics/alpha_atom.html' | relative_url }}">qspec.alpha_atom</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/physics/beta.html' | relative_url }}">qspec.beta</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/physics/boost.html' | relative_url }}">qspec.boost</a></li>
-<li class="spaced"><a href="{{ '/doc/functions/physics/convolved_boltzmann_norm_pdf.html' | relative_url }}">qspec.convolved_boltzmann_norm_pdf</a></li>
-<li class="spaced"><a href="{{ '/doc/functions/physics/convolved_thermal_norm_f_lin_pdf.html' | relative_url }}">qspec.convolved_thermal_norm_f_lin_pdf</a></li>
-<li class="spaced"><a href="{{ '/doc/functions/physics/convolved_thermal_norm_f_pdf.html' | relative_url }}">qspec.convolved_thermal_norm_f_pdf</a></li>
-<li class="spaced"><a href="{{ '/doc/functions/physics/convolved_thermal_norm_v_pdf.html' | relative_url }}">qspec.convolved_thermal_norm_v_pdf</a></li>
+<li class="spaced"><a href="{{ '/doc/functions/physics/chi2_ex_pdf.html' | relative_url }}">qspec.chi2_ex_pdf</a></li>
+<li class="spaced"><a href="{{ '/doc/functions/physics/chi2_ex_rvs.html' | relative_url }}">qspec.chi2_ex_rvs</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/physics/delta_r2.html' | relative_url }}">qspec.delta_r2</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/physics/delta_r4.html' | relative_url }}">qspec.delta_r4</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/physics/delta_r6.html' | relative_url }}">qspec.delta_r6</a></li>
@@ -930,10 +995,16 @@ title: qspec.simulate.Interaction.scattering_rate
 <li class="spaced"><a href="{{ '/doc/functions/physics/lande_jj.html' | relative_url }}">qspec.lande_jj</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/physics/lande_n.html' | relative_url }}">qspec.lande_n</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/physics/mass_factor.html' | relative_url }}">qspec.mass_factor</a></li>
+<li class="spaced"><a href="{{ '/doc/functions/physics/normal_chi2_convolved_ex_pdf.html' | relative_url }}">qspec.normal_chi2_convolved_ex_pdf</a></li>
+<li class="spaced"><a href="{{ '/doc/functions/physics/normal_chi2_convolved_f_pdf.html' | relative_url }}">qspec.normal_chi2_convolved_f_pdf</a></li>
+<li class="spaced"><a href="{{ '/doc/functions/physics/normal_chi2_convolved_f_xi_pdf.html' | relative_url }}">qspec.normal_chi2_convolved_f_xi_pdf</a></li>
+<li class="spaced"><a href="{{ '/doc/functions/physics/normal_chi2_convolved_vx_pdf.html' | relative_url }}">qspec.normal_chi2_convolved_vx_pdf</a></li>
+<li class="spaced"><a href="{{ '/doc/functions/physics/normal_vx_pdf.html' | relative_url }}">qspec.normal_vx_pdf</a></li>
+<li class="spaced"><a href="{{ '/doc/functions/physics/normal_vx_rvs.html' | relative_url }}">qspec.normal_vx_rvs</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/physics/p_e.html' | relative_url }}">qspec.p_e</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/physics/p_el.html' | relative_url }}">qspec.p_el</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/physics/p_v.html' | relative_url }}">qspec.p_v</a></li>
-<li class="spaced"><a href="{{ '/doc/functions/physics/rabi.html' | relative_url }}">qspec.rabi</a></li>
+<li class="spaced"><a href="{{ '/doc/functions/physics/rabi_s.html' | relative_url }}">qspec.rabi_s</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/physics/saturation.html' | relative_url }}">qspec.saturation</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/physics/saturation_intensity.html' | relative_url }}">qspec.saturation_intensity</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/physics/scattering_rate.html' | relative_url }}">qspec.scattering_rate</a></li>
@@ -941,10 +1012,7 @@ title: qspec.simulate.Interaction.scattering_rate
 <li class="spaced"><a href="{{ '/doc/functions/physics/sellmeier.html' | relative_url }}">qspec.sellmeier</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/physics/source_energy_pdf.html' | relative_url }}">qspec.source_energy_pdf</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/physics/t_xi.html' | relative_url }}">qspec.t_xi</a></li>
-<li class="spaced"><a href="{{ '/doc/functions/physics/thermal_e_pdf.html' | relative_url }}">qspec.thermal_e_pdf</a></li>
-<li class="spaced"><a href="{{ '/doc/functions/physics/thermal_e_rvs.html' | relative_url }}">qspec.thermal_e_rvs</a></li>
-<li class="spaced"><a href="{{ '/doc/functions/physics/thermal_v_pdf.html' | relative_url }}">qspec.thermal_v_pdf</a></li>
-<li class="spaced"><a href="{{ '/doc/functions/physics/thermal_v_rvs.html' | relative_url }}">qspec.thermal_v_rvs</a></li>
+<li class="spaced"><a href="{{ '/doc/functions/physics/temperature_doppler.html' | relative_url }}">qspec.temperature_doppler</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/physics/v_e.html' | relative_url }}">qspec.v_e</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/physics/v_e_d1.html' | relative_url }}">qspec.v_e_d1</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/physics/v_el.html' | relative_url }}">qspec.v_el</a></li>
@@ -966,6 +1034,7 @@ title: qspec.simulate.Interaction.scattering_rate
 <span class="toctree-toggle" role="presentation"><img src="{{ '/assets/img/chevron-down.svg' | relative_url }}" class="chevron"/></span>
 </summary>
 <ul class="extern-a">
+<li><a href="{{ '/doc/functions/simulate/Atom/get_multipole_types.html' | relative_url }}">qspec.simulate.Atom.get_multipole_types</a></li>
 <li><a href="{{ '/doc/functions/simulate/Atom/get_state_indexes.html' | relative_url }}">qspec.simulate.Atom.get_state_indexes</a></li>
 <li><a href="{{ '/doc/functions/simulate/Atom/get_y0.html' | relative_url }}">qspec.simulate.Atom.get_y0</a></li>
 <li><a href="{{ '/doc/functions/simulate/Atom/get_y0_mc.html' | relative_url }}">qspec.simulate.Atom.get_y0_mc</a></li>
@@ -979,7 +1048,9 @@ title: qspec.simulate.Interaction.scattering_rate
 <span class="toctree-toggle" role="presentation"><img src="{{ '/assets/img/chevron-down.svg' | relative_url }}" class="chevron"/></span>
 </summary>
 <ul class="extern-a">
-<li><a href="{{ '/doc/functions/simulate/DecayMap/get.html' | relative_url }}">qspec.simulate.DecayMap.get</a></li></ul>
+<li><a href="{{ '/doc/functions/simulate/DecayMap/get_ae.html' | relative_url }}">qspec.simulate.DecayMap.get_ae</a></li>
+<li><a href="{{ '/doc/functions/simulate/DecayMap/get_am.html' | relative_url }}">qspec.simulate.DecayMap.get_am</a></li>
+<li><a href="{{ '/doc/functions/simulate/DecayMap/get_gamma.html' | relative_url }}">qspec.simulate.DecayMap.get_gamma</a></li></ul>
 </details>
 </li><li class="has-children spaced"><a href="{{ '/doc/functions/simulate/Environment/Environment.html' | relative_url }}">qspec.simulate.Environment</a>
 <details>
@@ -1007,11 +1078,11 @@ title: qspec.simulate.Interaction.scattering_rate
 <span class="toctree-toggle" role="presentation"><img src="{{ '/assets/img/chevron-down.svg' | relative_url }}" class="chevron"/></span>
 </summary>
 <ul class="extern-a">
-<li><a href="{{ '/doc/functions/simulate/Interaction/get_delta.html' | relative_url }}">qspec.simulate.Interaction.get_delta</a></li>
-<li><a href="{{ '/doc/functions/simulate/Interaction/get_rabi.html' | relative_url }}">qspec.simulate.Interaction.get_rabi</a></li>
+<li><a href="{{ '/doc/functions/simulate/Interaction/delta.html' | relative_url }}">qspec.simulate.Interaction.delta</a></li>
 <li><a href="{{ '/doc/functions/simulate/Interaction/hamiltonian.html' | relative_url }}">qspec.simulate.Interaction.hamiltonian</a></li>
 <li><a href="{{ '/doc/functions/simulate/Interaction/master.html' | relative_url }}">qspec.simulate.Interaction.master</a></li>
 <li><a href="{{ '/doc/functions/simulate/Interaction/mc_master.html' | relative_url }}">qspec.simulate.Interaction.mc_master</a></li>
+<li><a href="{{ '/doc/functions/simulate/Interaction/rabi.html' | relative_url }}">qspec.simulate.Interaction.rabi</a></li>
 <li><a href="{{ '/doc/functions/simulate/Interaction/rates.html' | relative_url }}">qspec.simulate.Interaction.rates</a></li>
 <li><a href="{{ '/doc/functions/simulate/Interaction/resonance_info.html' | relative_url }}">qspec.simulate.Interaction.resonance_info</a></li>
 <li class="table-current"><a href="{{ '/doc/functions/simulate/Interaction/scattering_rate.html' | relative_url }}">qspec.simulate.Interaction.scattering_rate</a></li>
@@ -1023,7 +1094,8 @@ title: qspec.simulate.Interaction.scattering_rate
 <summary>
 <span class="toctree-toggle" role="presentation"><img src="{{ '/assets/img/chevron-down.svg' | relative_url }}" class="chevron"/></span>
 </summary>
-<ul class="extern-a"></ul>
+<ul class="extern-a">
+<li><a href="{{ '/doc/functions/simulate/Laser/get_kpol.html' | relative_url }}">qspec.simulate.Laser.get_kpol</a></li></ul>
 </details>
 </li><li class="has-children spaced"><a href="{{ '/doc/functions/simulate/Polarization/Polarization.html' | relative_url }}">qspec.simulate.Polarization</a>
 <details>
@@ -1071,7 +1143,10 @@ title: qspec.simulate.Interaction.scattering_rate
 <li class="spaced"><a href="{{ '/doc/functions/simulate/construct_hyperfine_state.html' | relative_url }}">qspec.simulate.construct_hyperfine_state</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/simulate/ct_markov_analytic.html' | relative_url }}">qspec.simulate.ct_markov_analytic</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/simulate/ct_markov_dgl.html' | relative_url }}">qspec.simulate.ct_markov_dgl</a></li>
+<li class="spaced"><a href="{{ '/doc/functions/simulate/density_matrix_diagonal.html' | relative_url }}">qspec.simulate.density_matrix_diagonal</a></li>
+<li class="spaced"><a href="{{ '/doc/functions/simulate/gen_electronic_ls_state.html' | relative_url }}">qspec.simulate.gen_electronic_ls_state</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/simulate/gen_electronic_state.html' | relative_url }}">qspec.simulate.gen_electronic_state</a></li>
+<li class="spaced"><a href="{{ '/doc/functions/simulate/gen_hyperfine_ls_state.html' | relative_url }}">qspec.simulate.gen_hyperfine_ls_state</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/simulate/gen_hyperfine_state.html' | relative_url }}">qspec.simulate.gen_hyperfine_state</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/simulate/lambda_ge_rec.html' | relative_url }}">qspec.simulate.lambda_ge_rec</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/simulate/lambda_states.html' | relative_url }}">qspec.simulate.lambda_states</a></li></ul>

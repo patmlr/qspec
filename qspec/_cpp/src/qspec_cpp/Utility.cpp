@@ -306,3 +306,17 @@ std::vector<Vector3d> cast_samples_theta_phi_ep(double* theta, double* phi, size
     // printf("r: %.3f, %.3f, %.3f\n", r.at(0)(0), r.at(0)(1), r.at(0)(2));
     return r;
 }
+
+std::string half_int_to_str(double value)
+{
+    std::string ret = std::to_string(value);
+    std::string suf = "";
+
+    if (ret.find(".5") != std::string::npos)
+    {
+        ret = std::to_string(2 * value);
+        suf = "/2";
+    }
+    size_t index = ret.find(".");
+    return ret.substr(0, index) + suf;
+}

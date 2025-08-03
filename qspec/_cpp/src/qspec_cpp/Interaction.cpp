@@ -361,6 +361,39 @@ MatrixXcd Interaction::get_hamiltonian(const double t, const VectorXd& delta, co
 	return H;
 }
 
+void Interaction::resonance_info()
+{
+	printf("\033[95mResonance info:\033[0m\n");
+
+	for (size_t k = 0; k < lasers.size(); ++k)
+	{
+		size_t n = 0;
+		Laser* laser = lasers.at(k);
+		printf("\033[94mLaser %zi @ %.3f MHz:\033[0m\n", k, laser->get_freq());
+
+		for (size_t i = 1; i < atom->get_size(); ++i)
+		{
+			for (size_t j = 0; j < i; ++j)
+			{
+				if (abs(rabimap.at(k)(i, j)) == 0.) continue;
+
+				State* lower = atom->get(i);
+				State* upper = atom->get(j);
+				if (lower->get_freq() > upper->get_freq())
+				{
+					lower = atom->get(j);
+					upper = atom->get(i);
+				}
+				printf("%s\n", std::format("{} -> {}: {:.3e} MHz", lower->repr(), upper->repr(), upper->get_freq() - lower->get_freq() - laser->get_freq()).c_str());
+				n += 1;
+
+			}
+		}
+		if (n == 0) printf("No resonances!");
+		printf("\n");
+	}
+}
+
 int Interaction::update()
 {
 	try {
@@ -455,7 +488,7 @@ void Interaction::gen_rabi()
 					summap(row, col) = 1;
 					summap(col, row) = 1;
 
-					rabimap.at(m)(row, col) += 0.5 * (atom->get_d_em(k, row, col))
+					rabimap.at(m)(row, col) += -0.5 * (atom->get_d_em(k, row, col))
 					* sqrt(lasers[m]->get_intensity()) * q_i * pow(-1, q_val) * pow(sc::i, k - 1);  // Calc. Omega/2 for all transitions.
 					rabimap.at(m)(col, row) = std::conj(rabimap.at(m)(row, col));
 

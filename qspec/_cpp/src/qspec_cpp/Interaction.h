@@ -118,6 +118,8 @@ public:
 	MatrixXd* get_deltamap();
 	MatrixXcd get_hamiltonian(const double t, const VectorXd& delta, const Vector3d& v);
 
+	void resonance_info();
+
 	int update();
 	void gen_coordinates();
 	void gen_rabi();

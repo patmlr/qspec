@@ -61,9 +61,9 @@ def example(n=None):
         a_sp = 140  # The Einstein coefficients of the two transitions
         a_dp = 10.7
 
-        s = sim.construct_electronic_state(freq_0=0, s=0.5, l=0, j=0.5, label='s')  # A list of all 4s substates.
-        p = sim.construct_electronic_state(f_sp, 0.5, 1, 0.5, label='p')  # A list of all 4p 2P1/2 substates.
-        d = sim.construct_electronic_state(f_sp - f_dp, 0.5, 2, 1.5, label='d')  # A list of all 3d 2D3/2 substates.
+        s = sim.gen_electronic_ls_state(freq_j=0, s=0.5, l=0, j=0.5, label='s')  # A list of all 4s substates.
+        p = sim.gen_electronic_ls_state(f_sp, 0.5, 1, 0.5, label='p')  # A list of all 4p 2P1/2 substates.
+        d = sim.gen_electronic_ls_state(f_sp - f_dp, 0.5, 2, 1.5, label='d')  # A list of all 3d 2D3/2 substates.
 
         decay = sim.DecayMap(labels=[('s', 'p'), ('p', 'd')], a=[a_sp, a_dp])
         # The states are linked by Einstein-A coefficients via the specified labels.
@@ -117,9 +117,9 @@ def example(n=None):
         a_sp = 140  # The Einstein coefficients of the two transitions
         a_dp = 10.7
 
-        s = sim.construct_electronic_state(freq_0=0, s=0.5, l=0, j=0.5, label='s')  # A list of all 4s substates.
-        p = sim.construct_electronic_state(f_sp, 0.5, 1, 0.5, label='p')  # A list of all 4p 2P1/2 substates.
-        d = sim.construct_electronic_state(f_sp - f_dp, 0.5, 2, 1.5, label='d')  # A list of all 3d 2D3/2 substates.
+        s = sim.gen_electronic_ls_state(freq_j=0, s=0.5, l=0, j=0.5, label='s')  # A list of all 4s substates.
+        p = sim.gen_electronic_ls_state(f_sp, 0.5, 1, 0.5, label='p')  # A list of all 4p 2P1/2 substates.
+        d = sim.gen_electronic_ls_state(f_sp - f_dp, 0.5, 2, 1.5, label='d')  # A list of all 3d 2D3/2 substates.
 
         decay = sim.DecayMap(labels=[('s', 'p'), ('p', 'd')], a=[a_sp, a_dp])
         # The states are linked by Einstein-A coefficients via the specified labels.
@@ -138,10 +138,10 @@ def example(n=None):
 
         times = [0, 2]  # Integration time in us.
         delta = np.linspace(-6.5, 6.5, 501)
-        r0 = inter.get_rabi(0)
-        r1 = inter.get_rabi(1)
+        r0 = inter.rabi(0)
+        r1 = inter.rabi(1)
 
-        d = inter.get_delta()
+        d = inter.delta()
 
         h = inter.hamiltonian(0., [5.], 1, [0.])
 
@@ -189,10 +189,10 @@ def example(n=None):
         i = 3.5
 
         # Create only the states for the D2 transition.
-        s = sim.construct_electronic_state(freq_0=0, s=0.5, l=0, j=0.5, i=i, hyper_const=s_hyper, label='s')
-        p3 = sim.construct_electronic_state(f_sp3, 0.5, 1, 1.5, i=i, hyper_const=p3_hyper, label='p3')
-        d3 = sim.construct_electronic_state(f_sp3 - f_d3p3, 0.5, 2, 1.5, i=i, hyper_const=d3_hyper, label='d3')
-        d5 = sim.construct_electronic_state(f_sp3 - f_d5p3, 0.5, 2, 2.5, i=i, hyper_const=d5_hyper, label='d5')
+        s = sim.gen_electronic_ls_state(freq_j=0, s=0.5, l=0, j=0.5, i=i, hyper_const=s_hyper, label='s')
+        p3 = sim.gen_electronic_ls_state(f_sp3, 0.5, 1, 1.5, i=i, hyper_const=p3_hyper, label='p3')
+        d3 = sim.gen_electronic_ls_state(f_sp3 - f_d3p3, 0.5, 2, 1.5, i=i, hyper_const=d3_hyper, label='d3')
+        d5 = sim.gen_electronic_ls_state(f_sp3 - f_d5p3, 0.5, 2, 2.5, i=i, hyper_const=d5_hyper, label='d5')
 
         decay = sim.DecayMap(labels=[('s', 'p3'), ('p3', 'd3'), ('p3', 'd5')], a=[a_sp3, a_d3p3, a_d5p3])
         # The states are linked by Einstein-A coefficients via the specified labels.
@@ -251,10 +251,10 @@ def example(n=None):
         df_s = 19.8e3  # frequency splitting between the two s-states.
         df_p = 11.8e3  # frequency splitting between two p-states.
 
-        states = sim.construct_hyperfine_state(freq_0=0, s=1, l=0, j=1, i=1.5, f=1.5,
-                                               hyper_const=[df_s / 2.5, ], label='s3')
-        states += sim.construct_hyperfine_state(0, 1, 0, 1, 1.5, 2.5, [df_s / 2.5, ], label='s5')
-        states += sim.construct_hyperfine_state(f, 1, 1, 2, 1.5, 2.5, [df_p / 3.5, ], label='p')
+        states = sim.gen_hyperfine_ls_state(freq_j=0, s=1, l=0, j=1, i=1.5, f=1.5,
+                                            hyper_const=[df_s / 2.5, ], label='s3')
+        states += sim.gen_hyperfine_ls_state(0, 1, 0, 1, 1.5, 2.5, [df_s / 2.5, ], label='s5')
+        states += sim.gen_hyperfine_ls_state(f, 1, 1, 2, 1.5, 2.5, [df_p / 3.5, ], label='p')
 
         decay = sim.DecayMap(labels=[('s3', 'p'), ('s5', 'p')], a=[a, a])
 
@@ -310,12 +310,12 @@ def example(n=None):
         f_p = 7e8
         a_p = 100.
 
-        i = 1.5
+        i = 0.
         s_hyper = [0.]
         p_hyper = [10.]
 
-        s = sim.construct_electronic_state(freq_0=0, s=0, l=0, j=0, i=i, hyper_const=s_hyper, label='s')
-        p = sim.construct_electronic_state(freq_0=f_p, s=0, l=1, j=1, i=i, hyper_const=p_hyper, label='p')
+        s = sim.gen_electronic_ls_state(freq_j=0, s=0, l=0, j=0, i=i, hyper_const=s_hyper, label='s')
+        p = sim.gen_electronic_ls_state(freq_j=f_p, s=0, l=1, j=1, i=i, hyper_const=p_hyper, label='p')
 
         decay = sim.DecayMap(labels=[('s', 'p')], a=[a_p])
 
@@ -341,14 +341,14 @@ def example(n=None):
         print('x:', pol_sp.x)
         print('q:', pol_sp.q)
         print('q_axis:', pol_sp.q_axis)
-        print('kpol:', laser_sp.get_kpol(1, env.B))
+        print('kpol:', laser_sp.get_kpol(1, True, env.B))
 
         times = [0., 0.2]
         delta = np.linspace(-100, 100, 201)
         theta, phi = np.pi / 2, 0.
         # theta, phi = 0., 0.
 
-        r = inter.get_rabi()
+        r = inter.rabi()
 
         results = inter.rates(times, delta)
         y = he.scattering_rate(results, as_density_matrix=False, theta=theta, phi=phi)[0, :, -1]
@@ -384,8 +384,8 @@ def example(n=None):
         s_hyper = [0.]
         p_hyper = [10.]
 
-        s = sim.construct_electronic_state(freq_0=0, s=0, l=0, j=0, i=i, hyper_const=s_hyper, label='s')
-        p = sim.construct_electronic_state(freq_0=f_p, s=0, l=1, j=1, i=i, hyper_const=p_hyper, label='p')
+        s = sim.gen_electronic_ls_state(freq_j=0, s=0, l=0, j=0, i=i, hyper_const=s_hyper, label='s')
+        p = sim.gen_electronic_ls_state(freq_j=f_p, s=0, l=1, j=1, i=i, hyper_const=p_hyper, label='p')
 
         decay = sim.DecayMap(labels=[('s', 'p')], a=[a_p])
 
@@ -437,9 +437,9 @@ def example(n=None):
         a_sp = 140  # The Einstein coefficients of the two transitions
         a_dp = 10.7
 
-        s = sim.construct_electronic_state(freq_0=0, s=0.5, l=0, j=0.5, label='s')  # A list of all 4s substates.
-        p = sim.construct_electronic_state(f_sp, 0.5, 1, 0.5, label='p')  # A list of all 4p 2P1/2 substates.
-        d = sim.construct_electronic_state(f_sp - f_dp, 0.5, 2, 1.5, label='d')  # A list of all 3d 2D3/2 substates.
+        s = sim.gen_electronic_ls_state(freq_j=0, s=0.5, l=0, j=0.5, label='s')  # A list of all 4s substates.
+        p = sim.gen_electronic_ls_state(f_sp, 0.5, 1, 0.5, label='p')  # A list of all 4p 2P1/2 substates.
+        d = sim.gen_electronic_ls_state(f_sp - f_dp, 0.5, 2, 1.5, label='d')  # A list of all 3d 2D3/2 substates.
 
         decay = sim.DecayMap(labels=[('s', 'p'), ('p', 'd')], a=[a_sp, a_dp])
         # The states are linked by Einstein-A coefficients via the specified labels.
@@ -537,7 +537,7 @@ def example(n=None):
         a = 1.3e-6
         print(f'tau: {1e-6 / a} s')
 
-        s = sim.gen_electronic_state(freq_0=0, parity='e', ls=[0, 0.5], j=0.5, label='s')
+        s = sim.gen_electronic_state(freq_j=0, parity='e', ls=[0, 0.5], j=0.5, label='s')
         d3 = sim.gen_electronic_state(f_sp - f_d3p3, parity='e', j=1.5, ls=[2, 0.5], label='d3')
         d5 = sim.gen_electronic_state(f_sp - f_d5p3, parity='e', j=2.5, ls=[2, 0.5], label='d5')
 
@@ -561,6 +561,7 @@ def example(n=None):
 
         print(ca40.get_multipole_types('s', 'd3'))
         inter = sim.Interaction(ca40, lasers=[laser_sd3_0, laser_sd3_1])
+        inter.resonance_info()
 
         times = np.linspace(0., 2000., 101)
         y0 = np.zeros(ca40.size, dtype=float)
@@ -569,7 +570,7 @@ def example(n=None):
         y = inter.master(times, y0=y0)[0]
         y = np.transpose(np.diagonal(y, axis1=0, axis2=1).real, axes=[1, 0])
 
-        r = inter.get_rabi(0)
+        r = inter.rabi(0)
 
         # labels = ['d3', 'd5']
         # for label in labels:
@@ -621,7 +622,7 @@ def example(n=None):
         # inter.dt_max = 1e-4
         inter.controlled = True
 
-        r = inter.get_rabi()
+        r = inter.rabi()
 
         t = np.linspace(0., 1., 301)
 
@@ -677,4 +678,5 @@ def example(n=None):
 
 
 if __name__ == '__main__':
+    # example({0, 1, 2, 3, 4, 5, 6, 7, 8, 9})
     example({9})

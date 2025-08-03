@@ -703,6 +703,11 @@ extern "C"
         delete interaction;
     }
 
+    __declspec(dllexport) void interaction_resonance_info(Interaction* interaction)
+    {
+        return interaction->resonance_info();
+    }
+
     __declspec(dllexport) int interaction_update(Interaction* interaction)
     {
         return interaction->update();

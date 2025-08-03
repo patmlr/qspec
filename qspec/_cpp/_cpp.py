@@ -67,6 +67,7 @@ vector3d_p = ctypeslib.ndpointer(dtype=float, shape=(3, ))
 vector3cd_p = ctypeslib.ndpointer(dtype=complex, shape=(3, ))
 matrix3cd_p = ctypeslib.ndpointer(dtype=complex, shape=(3, 3))
 
+CppClassHandler = POINTER(ctypes.c_char)
 PolarizationHandler = POINTER(ctypes.c_char)
 LaserHandler = POINTER(ctypes.c_char)
 EnvironmentHandler = POINTER(ctypes.c_char)
@@ -304,6 +305,8 @@ dll.atom_scattering_rate_qk_tp_xb.argtypes = (AtomHandler, c_double_p, c_size_t_
 # Interaction
 dll.interaction_construct.restype = InteractionHandler
 dll.interaction_destruct.argtypes = (InteractionHandler, )
+
+dll.interaction_resonance_info.argtypes = (InteractionHandler, )
 
 dll.interaction_update.argtypes = (InteractionHandler, )
 dll.interaction_update.restype = c_int32
