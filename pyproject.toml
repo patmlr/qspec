@@ -12,7 +12,6 @@ description = 'Physics toolbox for laser spectroscopy'
 readme = 'README.md'
 requires-python = '>=3.9'
 license = 'MIT'
-license-files = ['LICENSE']
 
 keywords = ['physics', 'simulation', 'data analysis', 'atomic structure', 'laser spectroscopy', 'laser cooling', 'coherent interaction', 'quantum computing']
 authors = [
