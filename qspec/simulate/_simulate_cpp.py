@@ -556,7 +556,7 @@ class State(CppClass):
 
 
 class DecayMap(CppClass):
-    def __init__(self, labels: Iterable[tuple] = None, a: Iterable[Union[scalar, dict]] = None, k_max: int = 1,
+    def __init__(self, labels: Iterable[tuple] = None, a: Iterable[Union[scalar_like, dict]] = None, k_max: int = 1,
                  instance: Union['DecayMap', DecayMapHandler] = None):
         r"""
         Class linking sets of atomic states via Einstein-A coefficients.

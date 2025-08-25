@@ -14,7 +14,7 @@ import scipy.special as sp
 
 from qspec.qtypes import *
 from qspec import tools
-from qspec.algebra import mu_j_m1, mu_jj_m1
+from qspec.algebra import mu_j_m1, mu_jj_m1, a_dipole
 
 __all__ = ['L_LABEL', 'E_NORM', 'pi', 'LEMNISCATE', 'mu_N', 'mu_B', 'g_s', 'me_u', 'me_u_d', 'gp_s', 'gn_s',
            'inv_cm_to_freq', 'freq_to_inv_cm', 'wavelength_to_freq', 'freq_to_wavelength', 'inv_cm_to_wavelength',
@@ -23,7 +23,8 @@ __all__ = ['L_LABEL', 'E_NORM', 'pi', 'LEMNISCATE', 'mu_N', 'mu_B', 'g_s', 'me_u
            'doppler_el_d1', 'inverse_doppler', 'inverse_doppler_d1', 'alpha_atom', 'v_recoil', 'f_recoil',
            'f_recoil_v', 'get_f', 'get_m', 'hyperfine', 'lande_n', 'lande_j', 'lande_jj', 'g_j', 'lande_f',
            'zeeman_linear', 'hyper_zeeman_linear',
-           'hyper_zeeman_ij', 'hyper_zeeman_num', 'hyper_zeeman_12', 'hyper_zeeman_12_d', 'a_hyper_mu', 'a_einstein_m1',
+           'hyper_zeeman_ij', 'hyper_zeeman_num', 'hyper_zeeman_12', 'hyper_zeeman_12_d', 'a_hyper_mu',
+           'a_einstein_m1',  # 'a_einstein_m1_fm',
            'temperature_doppler', 'saturation_intensity', 'saturation', 'rabi_s', 'scattering_rate', 'mass_factor',
            'delta_r2', 'delta_r4', 'delta_r6', 'lambda_r', 'lambda_rn', 'schmidt_line', 'sellmeier',
            'gamma_3d', 'boost', 'doppler_3d', 'gaussian_beam_3d', 'gaussian_doppler_3d', 't_xi', 'normal_vx_pdf',
@@ -974,6 +975,10 @@ def hyper_zeeman_num(i: quant_like, j: quant_like, a_hyper: array_like = 0., b_h
     :returns: (e_eig, m_list, f_list, mi_mj_list) The eigenvalues of the Hamiltonian $H$
      sorted according to lists of $m_F$, $F$ and $(m_I, m_J)$, which are returned as the second to forth arguments.
     """
+    # is_scalar = True
+    # if hasattr(b_field, '__getitem__'):
+    #     is_scalar = False
+
     b_field = np.asarray(b_field, dtype=float).flatten()
 
     gi = lande_n(gi) if g_n_as_gyro else gi
@@ -1170,6 +1175,18 @@ def a_einstein_m1(f: array_like, mu: array_like = None, j_l: quant_like = 0, j_u
     mu = np.asarray(mu, dtype=float)
     mu = (mu * mu_B) ** 2 / (2 * j_u + 1)
     return 8 * mu * np.pi ** 2 * sc.mu_0 * f ** 3 / (3 * sc.hbar * sc.c ** 3) * 1e12
+
+
+# def a_einstein_m1_fm(f: array_like, mu: array_like = None, f_l: quant_like = 0, f_u: quant_like = 0,
+#                      m_l: quant_like = 0, m_u: quant_like = 0, j: quant_like = 0,
+#                      i: quant_like = 0, ls: quant_iter = (0, 0), jj: quant_iter = None) -> ndarray:
+#     if mu is None:
+#         mu = g_j(j, ls, jj) * np.sqrt(j * (j + 1))
+#     # mu *= a_dipole(i, j, f_l, m_l, j, f_u, m_u, m_u - m_l, as_sympy=False) ** 2
+#
+#     mu = np.asarray(mu, dtype=float)
+#     mu = (mu * mu_B) ** 2 / (2 * f_u + 1)
+#     return 8 * mu * np.pi ** 2 * sc.mu_0 * f ** 3 / (3 * sc.hbar * sc.c ** 3) * 1e12
 
 
 def temperature_doppler(a: array_like) -> ndarray:

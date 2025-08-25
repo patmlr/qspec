@@ -11,14 +11,14 @@ from string import ascii_uppercase
 import numpy as np
 
 from qspec.qtypes import *
-from qspec.tools import merge_intervals
-from qspec.physics import get_f
-from qspec.algebra import wigner_6j, a, b, c
+from qspec.tools import merge_intervals, unit_vector
+from qspec.physics import get_f, get_m, lande_f, zeeman_linear, hyper_zeeman_num
+from qspec.algebra import clebsch_gordan, wigner_6j, a, b, c
 from qspec.models._base import Model, Summed
 from qspec.models._spectrum import LorentzQI
 
 __all__ = ['gen_splitter_model', 'get_all_f', 'hf_coeff', 'hf_trans', 'hf_shift', 'hf_int', 'Splitter',
-           'SplitterSummed', 'Hyperfine', 'HyperfineQI', 'HyperfineMixed']
+           'SplitterSummed', 'Hyperfine', 'HyperfineQI', 'HyperfineMixed', 'HyperfineZeeman']
 
 
 def gen_splitter_model(qi: bool = False, hf_mixing: bool = False) -> type['Splitter']:
@@ -95,16 +95,36 @@ def hf_trans(i: quant_like, j_l: quant_like, j_u: quant_like) -> list[list[tuple
 
 
 def hf_shift(hyper_l: Iterable[scalar_like], hyper_u: Iterable[scalar_like],
-             coeff_l: Iterable[scalar_like], coeff_u: Iterable[scalar_like]) -> float:
-    """
+             coeff_l: Iterable[scalar_like], coeff_u: Iterable[scalar_like]):
+    r"""
     :param hyper_l: The hyperfine structure constants of the lower state (Al, Bl, Cl, ...).
     :param hyper_u: The hyperfine structure constants of the upper state (Au, Bu, Cu, ...).
     :param coeff_l: The coefficients of the lower state to be multiplied by the constants (coAl, coBl, coCl, ...).
     :param coeff_u: The coefficients of the lower state to be multiplied by the constants (coAu, coBu, coCu, ...).
     :returns: The hyperfine structure shift of an optical transition.
     """
-    return float(sum(const * coeff for const, coeff in zip(hyper_u, coeff_u))
-                 - sum(const * coeff for const, coeff in zip(hyper_l, coeff_l)))
+    return (sum(const * coeff for const, coeff in zip(hyper_u, coeff_u))
+            - sum(const * coeff for const, coeff in zip(hyper_l, coeff_l)))
+
+
+def hfm_lin_shift(hyper_l: Iterable[scalar_like], hyper_u: Iterable[scalar_like],
+                  coeff_l: Iterable[scalar_like], coeff_u: Iterable[scalar_like],
+                  m_l, m_u, g_l, g_u, b_field):
+    r"""
+    :param hyper_l: The hyperfine structure constants of the lower state (Al, Bl, Cl, ...).
+    :param hyper_u: The hyperfine structure constants of the upper state (Au, Bu, Cu, ...).
+    :param coeff_l: The coefficients of the lower state to be multiplied by the constants (coAl, coBl, coCl, ...).
+    :param coeff_u: The coefficients of the lower state to be multiplied by the constants (coAu, coBu, coCu, ...).
+    :param m_l: The lower state magnetic quantum number.
+    :param m_u: The upper state magnetic quantum number.
+    :param g_l: The lower F state Lande g-factor.
+    :param g_u: The upper F state Lande g-factor.
+    :param b_field: The magnetic flux density $B$.
+    :returns: The hyperfine structure and Zeeman shift of an optical transition.
+    """
+    return (sum(const * coeff for const, coeff in zip(hyper_u, coeff_u))
+            - sum(const * coeff for const, coeff in zip(hyper_l, coeff_l))
+            + zeeman_linear(m_u, g_u, b_field, as_freq=True) - zeeman_linear(m_l, g_l, b_field, as_freq=True))
 
 
 def hf_int(i: quant_like, j_l: quant_like, j_u: quant_like, transitions: Iterable) -> list[float_like]:
@@ -394,7 +414,8 @@ class HyperfineMixed(Splitter):
         :param j_u: The total upper state electron angular momentum $J^\prime$.
         :param label: A label for the `Splitter` (isotope / isomer / transition).
         :param config: The configuration of the hyperfine-induced mixing. This is a dictionary such as
-         `{'enabled_l'=False, 'enabled_u'=False, 'Jl'=[0.5, ], 'Ju'=[0.5, ], 'Tl'=[[1.]], 'Tu'=[[1.]], 'fl'=[0., ], 'fu'=[0., ], 'mu'=0.}`,
+         `{'enabled_l'=False, 'enabled_u'=False, 'Jl'=[0.5, ], 'Ju'=[0.5, ],
+           'Tl'=[[1.]], 'Tu'=[[1.]], 'fl'=[0., ], 'fu'=[0., ], 'mu'=0.}`,
          where 'enabled_l'/'enabled_u' decide if the corresponding lower/upper J mix, 'Jl'/'Ju' are lists of lower/upper
          state J, including `j_l` and `j_u`, 'Tl'/'Tu' are matrix representations of
          the electronic magnetic dipole operator, see [1], 'fl'/'fu' are lists of initial fine-structure energies
@@ -519,6 +540,171 @@ class HyperfineMixed(Splitter):
         """
         return merge_intervals([[self.model.min() + _x0, self.model.max() + _x0]
                                 for _x0 in self.x0(*self.vals)]).tolist()
+
+    def racah(self):
+        """
+        Set the intensity values to the Racah intensities.
+
+        :returns:
+        """
+        for i, intensity in zip(self.racah_indices, self.racah_intensities):
+            self.vals[i] = intensity
+
+
+class HyperfineZeeman(Splitter):
+    def __init__(self, model: Model, i: quant_like, j_l: quant_like, j_u: quant_like,
+                 gi: scalar_like, gj_l: scalar_like, gj_u: scalar_like,
+                 f_l: quant_like = None, f_u: quant_like = None, q: array_like = None,
+                 linear: bool = False, label: str = None):
+        r"""
+        :param model: A submodel whose parameters are adopted by this model.
+        :param i: The nuclear spin $I$.
+        :param j_l: The total lower state electron angular momentum $J$.
+        :param j_u: The total upper state electron angular momentum $J^\prime$.
+        :param gi: The nuclear Lande g-factor.
+        :param gj_l: The lower state Lande gj-factor.
+        :param gj_u: The upper state Lande gj-factor.
+        :param f_l: The total lower state angular momenta $F$.
+        :param f_u: The total upper state angular momenta $F^\prime$.
+        :param q: The polarization vector $\vec{q}$.
+        :param linear: Whether the Zeeman shift is linear (`True`) or nonlinear (`False`).
+        :param label: A label for the `Splitter` (isotope / isomer / transition).
+        """
+        super().__init__(model, i, j_l, j_u, label=label)
+        self.type = 'HyperfineZeeman'
+
+        self.gi = gi
+        self.gj_l = gj_l
+        self.gj_u = gj_u
+
+        self.linear = linear
+
+        if f_l is None:
+            self.f_l = get_f(self.i, self.j_l)
+        elif hasattr(f_l, '__getitem__'):
+            self.f_l = np.array(f_l, dtype=float)
+        else:
+            self.f_l = np.array([f_l], dtype=float)
+
+        if f_u is None:
+            self.f_u = get_f(self.i, self.j_u)
+        elif hasattr(f_u, '__getitem__'):
+            self.f_u = np.array(f_u, dtype=float)
+        else:
+            self.f_u = np.array([f_u], dtype=float)
+
+        if q is None:
+            self.q = np.array([1., 1., 1.])
+        elif hasattr(q, '__getitem__'):
+            self.q = np.array(q, dtype=float)
+        else:
+            self.q = unit_vector(int(q) + 1, 3, dtype=float)
+        self.q /= np.sum(self.q)
+
+        self.transitions = hf_trans(self.i, self.j_l, self.j_u)
+        self.transitions_m = []
+        self._racah_intensities = hf_int(self.i, self.j_l, self.j_u, self.transitions)
+        self.racah_intensities = []
+
+        self.n_l = len(self.transitions[0][1])
+        self.n_u = len(self.transitions[0][2])
+        for i in range(self.n_l):
+            self._add_arg('{}l'.format(ascii_uppercase[i]), 0., False, False)
+        for i in range(self.n_u):
+            self._add_arg('{}u'.format(ascii_uppercase[i]), 0., False, False)
+
+        for i in range(min([self.n_l, self.n_u])):
+            fix = '{} / {}'.format('{}u'.format(ascii_uppercase[i]), '{}l'.format(ascii_uppercase[i]))
+            self._add_arg('{}_ratio'.format(ascii_uppercase[i]), 0., fix, False)
+
+        self._add_arg('B_field', 0., False, False)
+
+        for i, (t, intensity) in enumerate(zip(self.transitions, self._racah_intensities)):
+            if t[0][0] not in self.f_l or t[0][1] not in self.f_u:
+                continue
+            f_l, f_u = t[0]
+            ml_list = get_m(f_l)
+            g_l = lande_f(self.i, self.j_l, f_l, self.gi, self.gj_l)
+            g_u = lande_f(self.i, self.j_u, f_u, self.gi, self.gj_u)
+
+            for iq, _q in enumerate(self.q):
+                if _q == 0.:
+                    continue
+                for m_l in ml_list:
+                    m_u = quant(m_l + iq - 1)
+                    if abs(m_u) > f_u:
+                        continue
+                    # print('{}: int[({}, {}), ({}, {})]'.format(iq - 1, f_l, m_l, f_u, m_u))
+                    self.racah_indices.append(self._index)
+                    cg = clebsch_gordan(f_l, 1, f_u, m_l, iq - 1, m_u) ** 2
+                    _intensity = float(3 * _q * intensity * cg / (2 * f_u + 1))
+                    self._add_arg('int[({}, {}), ({}, {})]'.format(f_l, m_l, f_u, m_u), _intensity, True, False)
+                    self.racah_intensities.append(_intensity)
+                    self.transitions_m.append([(f_l, f_u), (m_l, m_u), (g_l, g_u), t[1], t[2]])
+
+    def evaluate(self, x: array_like, *args: array_iter, **kwargs: dict) -> ndarray:
+        const_l = tuple(args[self.model.size + i] for i in range(self.n_l))
+        const_u = tuple(args[self.model.size + self.n_l + i] for i in range(self.n_u))
+
+        if self.linear:
+            return np.sum([args[i] * self.model.evaluate(
+                x - hfm_lin_shift(const_l, const_u, t[3], t[4], t[1][0], t[1][1], t[2][0], t[2][1],
+                                  args[self.racah_indices[0] - 1]), *args, **kwargs)
+                           for i, t in zip(self.racah_indices, self.transitions_m)], axis=0)
+        else:
+            shifts = []
+            shifts_l = hyper_zeeman_num(self.i, self.j_l,
+                                        0. if len(const_l) < 1 else const_l[0],
+                                        0. if len(const_l) < 2 else const_l[1],
+                                        gi=self.gi, gj=self.gj_l, b_field=args[self.racah_indices[0] - 1],
+                                        g_n_as_gyro=False, as_freq=True)
+            shifts_u = hyper_zeeman_num(self.i, self.j_u,
+                                        0. if len(const_u) < 1 else const_u[0],
+                                        0. if len(const_u) < 2 else const_u[1],
+                                        gi=self.gi, gj=self.gj_u, b_field=args[self.racah_indices[0] - 1],
+                                        g_n_as_gyro=False, as_freq=True)
+
+            for i, t in zip(self.racah_indices, self.transitions_m):
+                il_m = shifts_l[1].index(t[1][0])
+                il_f = shifts_l[2][il_m].index(t[0][0])
+
+                iu_m = shifts_u[1].index(t[1][1])
+                iu_f = shifts_u[2][iu_m].index(t[0][1])
+
+                shifts.append(shifts_u[0][iu_m][:, iu_f] - shifts_l[0][il_m][:, il_f])
+
+            return np.sum([args[i] * self.model.evaluate(x - shifts[i - self.racah_indices[0]], *args, **kwargs)
+                           for i, t in zip(self.racah_indices, self.transitions_m)], axis=0)
+
+    def min(self) -> float:
+        """
+        :returns: A hint for an x-axis minimum for a complete display of the model.
+        """
+        const_l = tuple(self.vals[self.model.size + i] for i in range(self.n_l))
+        const_u = tuple(self.vals[self.model.size + self.n_l + i] for i in range(self.n_u))
+        return self.model.min() + np.min([hfm_lin_shift(
+            const_l, const_u, t[3], t[4], t[1][0], t[1][1], t[2][0], t[2][1], self.vals[self.racah_indices[0] - 1])
+            for t in self.transitions_m])
+
+    def max(self) -> float:
+        """
+        :returns: A hint for an x-axis maximum for a complete display of the model.
+        """
+        const_l = tuple(self.vals[self.model.size + i] for i in range(self.n_l))
+        const_u = tuple(self.vals[self.model.size + self.n_l + i] for i in range(self.n_u))
+        return self.model.max() + np.max([hfm_lin_shift(
+            const_l, const_u, t[3], t[4], t[1][0], t[1][1], t[2][0], t[2][1], self.vals[self.racah_indices[0] - 1])
+            for t in self.transitions_m])
+
+    def intervals(self) -> list[list[float]]:
+        """
+        :returns: A list of x-axis intervals for a complete display of the model.
+        """
+        const_l = tuple(self.vals[self.model.size + i] for i in range(self.n_l))
+        const_u = tuple(self.vals[self.model.size + self.n_l + i] for i in range(self.n_u))
+        shifts = [hfm_lin_shift(const_l, const_u, t[3], t[4], t[1][0], t[1][1], t[2][0], t[2][1],
+                                self.vals[self.racah_indices[0] - 1]) for t in self.transitions_m]
+        return merge_intervals([[self.model.min() + shift, self.model.max() + shift] for shift in shifts]).tolist()
 
     def racah(self):
         """
