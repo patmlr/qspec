@@ -77,9 +77,15 @@ def example(n=None):
         # b_field = 0.
         linear = True
 
+        rho_ml = None
+        # rho_ml = [[0.18969951, 0.09892333, 0.06145972, 0.04556696, 0.03783738, 0.03401298, 0.03250012, 0.03250012,
+        #            0.03401298, 0.03783738, 0.04556696, 0.06145972, 0.09892333, 0.18969951]]
+        # rho_ml = [[8.74141443e-06, 1.90481794e-04, 8.38033358e-04, 1.90855185e-03, 3.52054361e-03, 5.88331253e-03,
+        #            9.21553518e-03, 1.38322805e-02, 2.07207003e-02, 3.21888520e-02, 5.40292143e-02, 1.02873158e-01,
+        #            2.25612578e-01, 5.29178017e-01]]
         models = [mod.HyperfineZeeman(
-            mod.Lorentz(), i, jl, ju, gi, gj_l, gj_u, f_l=6.5, f_u=5.5, q=_q - 1, linear=linear, label=f'{_q - 1}')
-            for _q in range(3)]
+            mod.Lorentz(), i, jl, ju, gi, gj_l, gj_u, f_l=6.5, f_u=5.5, q=_q - 1, rho_ml=rho_ml, rho_as_par=True,
+            linear=linear, label=f'{_q - 1}') for _q in range(3)]
 
         x_min, x_max = [], []
         for model in models:
@@ -98,6 +104,7 @@ def example(n=None):
         x_max = np.max(x_max)
 
         x = np.linspace(x_min, x_max, 6001)
+        
         y = [model(x, *model.vals) for model in models]
 
         c = [0, 1, 4]

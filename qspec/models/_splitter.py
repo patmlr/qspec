@@ -173,6 +173,10 @@ class Splitter(Model):
         for i, intensity in zip(self.racah_indices, self.racah_intensities):
             self.vals[i] = intensity
 
+    def racah_fixed(self, fix):
+        for i in self.racah_indices:
+            self.fixes[i] = fix
+
 
 class SplitterSummed(Summed):
     def __init__(self, splitter_models: list[Splitter]):
@@ -555,7 +559,8 @@ class HyperfineZeeman(Splitter):
     def __init__(self, model: Model, i: quant_like, j_l: quant_like, j_u: quant_like,
                  gi: scalar_like, gj_l: scalar_like, gj_u: scalar_like,
                  f_l: quant_like = None, f_u: quant_like = None, q: array_like = None,
-                 linear: bool = False, label: str = None):
+                 rho_ml: array_like = None, rho_as_par: bool = False,
+                 scale_par_with_shift: str = None, linear: bool = False, label: str = None):
         r"""
         :param model: A submodel whose parameters are adopted by this model.
         :param i: The nuclear spin $I$.
@@ -567,6 +572,10 @@ class HyperfineZeeman(Splitter):
         :param f_l: The total lower state angular momenta $F$.
         :param f_u: The total upper state angular momenta $F^\prime$.
         :param q: The polarization vector $\vec{q}$.
+        :param rho_ml: The lower state population. Must be a list of arrays. If `None`, the default list is given by
+        `rho_ml = [np.ones(2 * f + 1) for f in f_l]`.
+        :param scale_par_with_shift: Choose a parameter that is scaled with the Zeeman shift
+         such as the Lorentz width `'Gamma'`.
         :param linear: Whether the Zeeman shift is linear (`True`) or nonlinear (`False`).
         :param label: A label for the `Splitter` (isotope / isomer / transition).
         """
@@ -601,6 +610,15 @@ class HyperfineZeeman(Splitter):
             self.q = unit_vector(int(q) + 1, 3, dtype=float)
         self.q /= np.sum(self.q)
 
+        if rho_ml is None:
+            self.rho_ml = [np.ones(int(2 * f + 1), dtype=float) for f in self.f_l]
+        else:
+            rho_ml = [np.asarray(r, dtype=float) for r in rho_ml]
+            self.rho_ml = [r / np.sum(r) * (2 * f + 1) for f, r in zip(self.f_l, rho_ml)]
+
+        self.rho_as_par = rho_as_par
+        self.rho_indexes = []
+
         self.transitions = hf_trans(self.i, self.j_l, self.j_u)
         self.transitions_m = []
         self._racah_intensities = hf_int(self.i, self.j_l, self.j_u, self.transitions)
@@ -623,47 +641,82 @@ class HyperfineZeeman(Splitter):
             if t[0][0] not in self.f_l or t[0][1] not in self.f_u:
                 continue
             f_l, f_u = t[0]
+            index_fl = np.argmax(self.f_l == f_l)
             ml_list = get_m(f_l)
             g_l = lande_f(self.i, self.j_l, f_l, self.gi, self.gj_l)
             g_u = lande_f(self.i, self.j_u, f_u, self.gi, self.gj_u)
 
+            # print(f_l, f_u, g_l, g_u)
+
+            self._index_0 = self._index
+
+            if self.rho_as_par:
+                for iq, _q in enumerate(self.q):
+                    self._add_arg('q({})'.format(iq - 1), _q, True, False)
+
             for iq, _q in enumerate(self.q):
                 if _q == 0.:
                     continue
-                for m_l in ml_list:
+
+                for im, m_l in enumerate(ml_list):
+
+                    population = self.rho_ml[index_fl][im]
+
+                    if (f_l, m_l) not in self.rho_indexes:
+                        self._add_arg('rho({}, {})'.format(f_l, m_l), population, [0., 2 * f_l + 1], False)
+                        self.rho_indexes.append((f_l, m_l))
+
                     m_u = quant(m_l + iq - 1)
                     if abs(m_u) > f_u:
                         continue
+
                     # print('{}: int[({}, {}), ({}, {})]'.format(iq - 1, f_l, m_l, f_u, m_u))
-                    self.racah_indices.append(self._index)
                     cg = clebsch_gordan(f_l, 1, f_u, m_l, iq - 1, m_u) ** 2
-                    _intensity = float(3 * _q * intensity * cg / (2 * f_u + 1))
-                    self._add_arg('int[({}, {}), ({}, {})]'.format(f_l, m_l, f_u, m_u), _intensity, True, False)
-                    self.racah_intensities.append(_intensity)
-                    self.transitions_m.append([(f_l, f_u), (m_l, m_u), (g_l, g_u), t[1], t[2]])
+                    _intensity = float(3 * intensity * cg / (2 * f_u + 1) * 1e4)
+
+                    if self.rho_as_par:
+                        self.racah_intensities.append(population)
+                        self.racah_indices.append(self._index_0 + im + 3)
+                        self.transitions_m.append([(f_l, f_u), (m_l, m_u), (g_l, g_u), _intensity, t[1], t[2]])
+                    else:
+                        self.racah_indices.append(self._index)
+                        self._add_arg('int[({}, {}), ({}, {})]'.format(f_l, m_l, f_u, m_u), _intensity, True, False)
+                        self.racah_intensities.append(_intensity * _q * population)
+                        self.transitions_m.append([(f_l, f_u), (m_l, m_u), (g_l, g_u), population, t[1], t[2]])
+
+        self.scale_par_with_shift = ''
+        self.index_scale_with_sift = -1
+        self.index_shift_scale_par = -1
+        if scale_par_with_shift is not None:
+            self.scale_par_with_shift = scale_par_with_shift
+            self.index_scale_with_sift = self.p.get(self.scale_par_with_shift, -1)
+            self.index_shift_scale_par = self._index
+            self._add_arg('shift_scale_par', 0., False, False)
 
     def evaluate(self, x: array_like, *args: array_iter, **kwargs: dict) -> ndarray:
         const_l = tuple(args[self.model.size + i] for i in range(self.n_l))
         const_u = tuple(args[self.model.size + self.n_l + i] for i in range(self.n_u))
 
         if self.linear:
-            return np.sum([args[i] * self.model.evaluate(
-                x - hfm_lin_shift(const_l, const_u, t[3], t[4], t[1][0], t[1][1], t[2][0], t[2][1],
-                                  args[self.racah_indices[0] - 1]), *args, **kwargs)
+            return np.sum([args[i] * t[3] * self.model.evaluate(
+                x - hfm_lin_shift(const_l, const_u, t[4], t[5], t[1][0], t[1][1], t[2][0], t[2][1],
+                                  args[self._index_0 - 1]), *args, **kwargs)
                            for i, t in zip(self.racah_indices, self.transitions_m)], axis=0)
         else:
-            shifts = []
             shifts_l = hyper_zeeman_num(self.i, self.j_l,
                                         0. if len(const_l) < 1 else const_l[0],
                                         0. if len(const_l) < 2 else const_l[1],
-                                        gi=self.gi, gj=self.gj_l, b_field=args[self.racah_indices[0] - 1],
+                                        gi=self.gi, gj=self.gj_l, b_field=args[self._index_0 - 1],
                                         g_n_as_gyro=False, as_freq=True)
             shifts_u = hyper_zeeman_num(self.i, self.j_u,
                                         0. if len(const_u) < 1 else const_u[0],
                                         0. if len(const_u) < 2 else const_u[1],
-                                        gi=self.gi, gj=self.gj_u, b_field=args[self.racah_indices[0] - 1],
+                                        gi=self.gi, gj=self.gj_u, b_field=args[self._index_0 - 1],
                                         g_n_as_gyro=False, as_freq=True)
 
+
+            shifts, args_list = [], []
+            intensities = []
             for i, t in zip(self.racah_indices, self.transitions_m):
                 il_m = shifts_l[1].index(t[1][0])
                 il_f = shifts_l[2][il_m].index(t[0][0])
@@ -671,10 +724,24 @@ class HyperfineZeeman(Splitter):
                 iu_m = shifts_u[1].index(t[1][1])
                 iu_f = shifts_u[2][iu_m].index(t[0][1])
 
+                shift0 = hf_shift(const_l, const_u, t[4], t[5])
                 shifts.append(shifts_u[0][iu_m][:, iu_f] - shifts_l[0][il_m][:, il_f])
+                args_list.append([arg for arg in args])
 
-            return np.sum([args[i] * self.model.evaluate(x - shifts[i - self.racah_indices[0]], *args, **kwargs)
-                           for i, t in zip(self.racah_indices, self.transitions_m)], axis=0)
+                iq = int(t[1][1] - t[1][0] + 1)
+                if self.rho_as_par:
+                    intensities.append(args[i] * t[3] * args[self._index_0 + iq])
+                else:
+                    intensities.append(args[i] * t[3])
+
+                if self.index_scale_with_sift != -1:
+                    args_list[-1][self.index_scale_with_sift] *= \
+                        (1 + args[self.index_shift_scale_par] * np.abs((shifts[-1] - shift0)))
+                    # print(i, 1 + args[self.index_shift_scale_par] * np.abs((shifts[-1] - shift0)))
+
+            # print(args[self._index_0:self._index_0+14])
+            return np.sum([intensities[index] * self.model.evaluate(x - shifts[index], *args_list[index], **kwargs)
+                           for index, (i, t) in enumerate(zip(self.racah_indices, self.transitions_m))], axis=0)
 
     def min(self) -> float:
         """
@@ -683,7 +750,7 @@ class HyperfineZeeman(Splitter):
         const_l = tuple(self.vals[self.model.size + i] for i in range(self.n_l))
         const_u = tuple(self.vals[self.model.size + self.n_l + i] for i in range(self.n_u))
         return self.model.min() + np.min([hfm_lin_shift(
-            const_l, const_u, t[3], t[4], t[1][0], t[1][1], t[2][0], t[2][1], self.vals[self.racah_indices[0] - 1])
+            const_l, const_u, t[4], t[5], t[1][0], t[1][1], t[2][0], t[2][1], self.vals[self._index_0 - 1])
             for t in self.transitions_m])
 
     def max(self) -> float:
@@ -693,7 +760,7 @@ class HyperfineZeeman(Splitter):
         const_l = tuple(self.vals[self.model.size + i] for i in range(self.n_l))
         const_u = tuple(self.vals[self.model.size + self.n_l + i] for i in range(self.n_u))
         return self.model.max() + np.max([hfm_lin_shift(
-            const_l, const_u, t[3], t[4], t[1][0], t[1][1], t[2][0], t[2][1], self.vals[self.racah_indices[0] - 1])
+            const_l, const_u, t[4], t[5], t[1][0], t[1][1], t[2][0], t[2][1], self.vals[self._index_0 - 1])
             for t in self.transitions_m])
 
     def intervals(self) -> list[list[float]]:
@@ -702,8 +769,8 @@ class HyperfineZeeman(Splitter):
         """
         const_l = tuple(self.vals[self.model.size + i] for i in range(self.n_l))
         const_u = tuple(self.vals[self.model.size + self.n_l + i] for i in range(self.n_u))
-        shifts = [hfm_lin_shift(const_l, const_u, t[3], t[4], t[1][0], t[1][1], t[2][0], t[2][1],
-                                self.vals[self.racah_indices[0] - 1]) for t in self.transitions_m]
+        shifts = [hfm_lin_shift(const_l, const_u, t[4], t[5], t[1][0], t[1][1], t[2][0], t[2][1],
+                                self.vals[self._index_0 - 1]) for t in self.transitions_m]
         return merge_intervals([[self.model.min() + shift, self.model.max() + shift] for shift in shifts]).tolist()
 
     def racah(self):
