@@ -120,8 +120,6 @@ protected:
 	std::vector<std::string> states_0;
 	std::vector<std::string> states_1;
 
-	std::vector<double> a;
-
 	std::vector<bool> single_leading_order;
 	std::vector<std::vector<double>> ae;
 	std::vector<std::vector<double>> am;
@@ -141,8 +139,8 @@ public:
 
 	size_t get_index(std::string state_0, std::string state_1);
 
-	std::vector<double>* get_a();
-	double get_a(std::string state_0, std::string state_1);
+	double get_a(size_t i, bool parity_equal);
+	double get_a(std::string state_0, std::string state_1, bool parity_equal);
 
 	bool get_single_leading_order(size_t i);
 	bool get_single_leading_order(std::string state_0, std::string state_1);
@@ -158,8 +156,6 @@ public:
 	double get_am(size_t i, size_t k);
 	std::vector<double> get_am(std::string state_0, std::string state_1);
 	double get_am(std::string state_0, std::string state_1, size_t k);
-
-	double get_gamma(std::string state_0, std::string state_1, bool parity_equal);
 };
 
 
@@ -207,6 +203,7 @@ public:
 
 	DecayMap* get_decay_map();
 	void set_decay_map(DecayMap* _decays);
+	double get_gamma(size_t i);
 
 	double get_mass();
 	void set_mass(double _mass);

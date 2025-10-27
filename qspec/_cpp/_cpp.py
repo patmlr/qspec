@@ -204,8 +204,6 @@ dll.decaymap_add_decay.argtypes = \
 dll.decaymap_get_label.argtypes = (DecayMapHandler, c_size_t, c_size_t)
 dll.decaymap_get_label.restype = c_char_p
 
-dll.decaymap_get_a.argtypes = (DecayMapHandler, )
-
 dll.decaymap_get_a_i.argtypes = (DecayMapHandler, c_char_p, c_char_p)
 dll.decaymap_get_a_i.restype = c_double
 
@@ -214,9 +212,6 @@ dll.decaymap_get_ae_ik.restype = c_double
 
 dll.decaymap_get_am_ik.argtypes = (DecayMapHandler, c_char_p, c_char_p, c_size_t)
 dll.decaymap_get_am_ik.restype = c_double
-
-dll.decaymap_get_gamma.argtypes = (DecayMapHandler, c_char_p, c_char_p, c_bool)
-dll.decaymap_get_gamma.restype = c_double
 
 dll.decaymap_get_size.argtypes = (DecayMapHandler, )
 dll.decaymap_get_size.restype = c_size_t
@@ -240,6 +235,9 @@ dll.atom_clear_states.argtypes = (AtomHandler, )
 dll.atom_get_decay_map.argtypes = (AtomHandler, )
 dll.atom_get_decay_map.restype = DecayMapHandler
 dll.atom_set_decay_map.argtypes = (AtomHandler, DecayMapHandler)
+
+dll.atom_get_gamma.argtypes = (DecayMapHandler, c_size_t)
+dll.atom_get_gamma.restype = c_double
 
 dll.atom_get_mass.argtypes = (AtomHandler, )
 dll.atom_get_mass.restype = c_double

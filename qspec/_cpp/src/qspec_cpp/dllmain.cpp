@@ -376,15 +376,9 @@ extern "C"
         return decays->set_k_em_max(k_em_max);
     }
 
-    __declspec(dllexport) double* decaymap_get_a(DecayMap* decays)
+    __declspec(dllexport) double decaymap_get_a_i(DecayMap* decays, char* state_0, char* state_1, bool parity_equal)
     {
-
-        return decays->get_a()->data();
-    }
-
-    __declspec(dllexport) double decaymap_get_a_i(DecayMap* decays, char* state_0, char* state_1)
-    {
-        return decays->get_a(std::string(state_0), std::string(state_1));
+        return decays->get_a(std::string(state_0), std::string(state_1), parity_equal);
     }
 
     __declspec(dllexport) double decaymap_get_ae_ik(DecayMap* decays, char* state_0, char* state_1, size_t k)
@@ -395,11 +389,6 @@ extern "C"
     __declspec(dllexport) double decaymap_get_am_ik(DecayMap* decays, char* state_0, char* state_1, size_t k)
     {
         return decays->get_am(std::string(state_0), std::string(state_1), k);
-    }
-
-    __declspec(dllexport) double decaymap_get_gamma(DecayMap* decays, char* state_0, char* state_1, bool parity_equal)
-    {
-        return decays->get_gamma(std::string(state_0), std::string(state_1), parity_equal);
     }
 
 
@@ -442,6 +431,11 @@ extern "C"
     __declspec(dllexport) void atom_set_decay_map(Atom* atom, DecayMap* decay_map)
     {
         return atom->set_decay_map(decay_map);
+    }
+
+    __declspec(dllexport) double atom_get_gamma(Atom* atom, size_t i)
+    {
+        return atom->get_gamma(i);
     }
 
     __declspec(dllexport) double atom_get_mass(Atom* atom)

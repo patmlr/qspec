@@ -384,7 +384,8 @@ void Interaction::resonance_info()
 					lower = atom->get(j);
 					upper = atom->get(i);
 				}
-				printf("%s\n", std::format("{} -> {}: {:.3e} MHz", lower->repr(), upper->repr(), upper->get_freq() - lower->get_freq() - laser->get_freq()).c_str());
+				// printf("%s\n", std::format("{} -> {}: {:.3e} MHz", lower->repr(), upper->repr(), upper->get_freq() - lower->get_freq() - laser->get_freq()).c_str());
+				printf("%s\n", std::format("{} -> {}: {:.10f} MHz", lower->repr(), upper->repr(), upper->get_freq() - lower->get_freq() - laser->get_freq()).c_str());
 				n += 1;
 
 			}
@@ -765,8 +766,7 @@ std::vector<MatrixXd> Interaction::gen_R_k(VectorXd& w0, VectorXd& w)
 				if (r == 0.) continue;
 
 				_w0 = abs(w0(i) - w0(j));
-				bool parity_equal = atom->get_parity_equal(i, j);
-				gamma = atom->get_decay_map()->get_gamma(atom->get(i)->get_label(), atom->get(j)->get_label(), parity_equal);
+				gamma = atom->get_gamma(i) + atom->get_gamma(j);
 				R(i, j) += lorentz(w(m), _w0, gamma, r);
 				R(j, i) = R(i, j);
 			}
@@ -863,8 +863,7 @@ void Interaction::update_rates(MatrixXd& R, VectorXd& w0, VectorXd& w)
 				if (r == 0) continue;
 
 				_w0 = abs(w0(i) - w0(j));
-				bool parity_equal = atom->get_parity_equal(i, j);
-				gamma = atom->get_decay_map()->get_gamma(atom->get(i)->get_label(), atom->get(j)->get_label(), parity_equal);
+				gamma = atom->get_gamma(i) + atom->get_gamma(j);
 				R(i, j) += lorentz(w(m), _w0, gamma, r);
 				R(j, i) = R(i, j);
 			}

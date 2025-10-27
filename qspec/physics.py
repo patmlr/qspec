@@ -16,7 +16,7 @@ from qspec.qtypes import *
 from qspec import tools
 from qspec.algebra import mu_j_m1, mu_jj_m1, a_dipole
 
-__all__ = ['L_LABEL', 'E_NORM', 'pi', 'LEMNISCATE', 'mu_N', 'mu_B', 'g_s', 'me_u', 'me_u_d', 'gp_s', 'gn_s',
+__all__ = ['L_LABEL', 'E_NORM', 'pi', 'LEMNISCATE', 'h', 'kB', 'mu_N', 'mu_B', 'g_s', 'me_u', 'me_u_d', 'gp_s', 'gn_s',
            'inv_cm_to_freq', 'freq_to_inv_cm', 'wavelength_to_freq', 'freq_to_wavelength', 'inv_cm_to_wavelength',
            'wavelength_to_inv_cm', 'beta', 'gamma', 'gamma_e', 'gamma_e_kin', 'e_rest', 'e_kin', 'e_total', 'e_el',
            'v_e', 'v_e_d1', 'v_el', 'v_el_d1', 'p_v', 'p_e', 'p_el', 'doppler', 'doppler_d1', 'doppler_e_d1',
@@ -39,6 +39,8 @@ L_LABEL = ['S', 'P', 'D', ] + list(string.ascii_uppercase[5:])
 E_NORM = sc.e
 pi = np.pi
 LEMNISCATE = 2.6220575543
+h = sc.h
+kB = sc.k
 mu_N = sc.physical_constants['nuclear magneton'][0]
 mu_B = sc.physical_constants['Bohr magneton'][0]
 g_s = sc.physical_constants['electron g factor'][0]

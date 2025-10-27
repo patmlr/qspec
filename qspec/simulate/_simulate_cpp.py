@@ -13,7 +13,7 @@ import matplotlib.pyplot as plt
 from qspec.qtypes import *
 from qspec._cpp import *
 from qspec import tools
-from qspec import get_f, get_m, g_j
+from qspec import get_f, get_m, g_j, h, kB
 import qspec.algebra as al
 
 
@@ -680,15 +680,15 @@ class DecayMap(CppClass):
         return dll.decaymap_get_am_ik(
             self.instance, c_char_p(bytes(label_0, 'utf-8')), c_char_p(bytes(label_1, 'utf-8')), c_size_t(int(k)))
 
-    def get_gamma(self, label_0: str, label_1: str, parity_equal: bool):
-        r"""
-        :param label_0: The label of the first state.
-        :param label_1: The label of the second state.
-        :param parity_equal: The parity of the transition between two states can be equal (True) or change (False).
-        :returns: The FWHM of the transition between the states with labels `(label_0, label_1)`.
-        """
-        return dll.decaymap_get_gamma(self.instance, c_char_p(bytes(label_0, 'utf-8')),
-                                      c_char_p(bytes(label_1, 'utf-8')), c_bool(bool(parity_equal)))
+    # def get_gamma(self, label_0: str, label_1: str, parity_equal: bool):
+    #     r"""
+    #     :param label_0: The label of the first state.
+    #     :param label_1: The label of the second state.
+    #     :param parity_equal: The parity of the transition between two states can be equal (True) or change (False).
+    #     :returns: The FWHM of the transition between the states with labels `(label_0, label_1)`.
+    #     """
+    #     return dll.decaymap_get_gamma(self.instance, c_char_p(bytes(label_0, 'utf-8')),
+    #                                   c_char_p(bytes(label_1, 'utf-8')), c_bool(bool(parity_equal)))
 
 
 def _gen_label_map(atom):
@@ -783,6 +783,13 @@ class Atom(CppClass):
             self._decay_map = DecayMap()
         dll.atom_set_decay_map(self.instance, value.instance)
 
+    def get_gamma(self, index: int_like):
+        r"""
+        :param index: The index of the atomic state.
+        :returns: The total spontaneous decay rate $\Gamma$ of state number `index`.
+        """
+        return dll.atom_get_gamma(self.instance, c_size_t(int(index)))
+
     @property
     def mass(self):
         r"""
@@ -818,7 +825,8 @@ class Atom(CppClass):
          between the specified labels in the format `f'e{k}'` and `f'm{k}'`.
         """
         indexes = [[i, j] for i, s0 in enumerate(self.states) for j, s1 in enumerate(self.states)
-                   if s0.label == label_0 and s1.label == label_1 and i < j]
+                   if ((s0.label == label_0 and s1.label == label_1)
+                       or (s0.label == label_1 and s1.label == label_0)) and i < j]
         mtypes = set()
         ek_array = self.ek
         mk_array = self.mk
@@ -906,6 +914,21 @@ class Atom(CppClass):
             y0[i * batch:(i + 1) * batch, index] \
                 = np.exp(np.random.random(size=batch) * 2 * np.pi * 1j)
         return y0
+
+    def get_y0_thermal(self, temperature):
+        r"""
+
+        :param temperature: The temperature $T$ of the ensemble.
+        :returns: (y0) The initial population of the atom ensemble for the given `temperature`.
+        """
+        if temperature == 0.:
+            return self.get_y0()
+
+        t = np.full(self.size, temperature)
+        e = np.array([s.freq * h * 1e6 for s in self.states])
+        y0 = np.exp(-e / (kB * t))
+        return y0 / np.sum(y0)
+
 
     def get_state_indexes(self, labels: Union[Iterable[str], str] = None,
                           f: Union[Iterable[scalar], scalar] = None,
@@ -2487,7 +2510,7 @@ def gen_hyperfine_state(
     """
     if parity is None and not hasattr(ls[0], '__getitem__'):
         parity = bool(ls[0] % 2)
-    else:
+    elif parity is None:
         raise ValueError('Could not infer the state \'parity\' from \'ls\'.'
                          'Please use only one (L, S) pair or specify the parity.')
 

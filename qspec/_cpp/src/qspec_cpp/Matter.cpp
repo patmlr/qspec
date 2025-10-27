@@ -305,7 +305,6 @@ DecayMap::~DecayMap()
 {
 	std::vector<std::string>().swap(states_0);
 	std::vector<std::string>().swap(states_1);
-	std::vector<double>().swap(a);
 	std::vector<std::vector<double>>().swap(ae);
 	std::vector<std::vector<double>>().swap(am);
 	std::vector<bool>().swap(single_leading_order);
@@ -356,20 +355,54 @@ size_t DecayMap::get_index(std::string state_0, std::string state_1)
 	return size;
 }
 
-std::vector<double>* DecayMap::get_a()
+double DecayMap::get_a(size_t i, bool parity_equal)
 {
-	return &a;
-}
+	if (i >= size) return 0.;
 
-double DecayMap::get_a(std::string state_0, std::string state_1)
-{
-	for (size_t i = 0; i < size; ++i)
+	double ret = 0.;
+	if (get_single_leading_order(i)) return ae.at(i).at(0);
+	else
 	{
-		if ((state_0 == states_0[i] && state_1 == states_1[i])
-			|| (state_0 == states_1[i] && state_1 == states_0[i])) return a.at(i);
+		if (ae.at(i).size() > 1)
+		{
+			for (size_t k = 0; k < k_em_max; ++k)
+			{
+				if (parity_equal)
+				{
+					if (k % 2 != 0) ret += ae.at(i).at(k);
+				}
+				else
+				{
+					if (k % 2 == 0) ret += ae.at(i).at(k);
+				}
+			}
+		}
+		else ret += ae.at(i).at(0);
+
+		if (am.at(i).size() > 1)
+		{
+			for (size_t k = 0; k < k_em_max; ++k)
+			{
+				if (parity_equal)
+				{
+					if (k % 2 == 0) ret += am.at(i).at(k);
+				}
+				else
+				{
+					if (k % 2 != 0) ret += am.at(i).at(k);
+				}
+			}
+		}
+		else ret += am.at(i).at(0);
 	}
 
-	return 0.;
+	return ret;
+}
+
+double DecayMap::get_a(std::string state_0, std::string state_1, bool parity_equal)
+{
+	size_t i = get_index(state_0, state_1);
+	return get_a(i, parity_equal);
 }
 
 bool DecayMap::get_single_leading_order(size_t i)
@@ -451,53 +484,6 @@ double DecayMap::get_am(std::string state_0, std::string state_1, size_t k)
 	return get_am(i, k);
 }
 
-double DecayMap::get_gamma(std::string state_0, std::string state_1, bool parity_equal)
-{
-	double gamma = 0.;
-	for (size_t i = 0; i < size; ++i)
-	{
-		if (states_0.at(i) == state_0 || states_0.at(i) == state_1 || states_1.at(i) == state_0 || states_1.at(i) == state_1)
-		{
-			if (single_leading_order.at(i)) gamma += ae.at(i).at(0);
-			else
-			{
-				if (ae.at(i).size() > 1)
-				{
-					for (size_t k = 0; k < k_em_max; ++k)
-					{
-						if (parity_equal)
-						{
-							if (k % 2 != 0) gamma += ae.at(i).at(k);
-						}
-						else
-						{
-							if (k % 2 == 0) gamma += ae.at(i).at(k);
-						}
-					}
-				}
-				else gamma += ae.at(i).at(0);
-
-				if (am.at(i).size() > 1)
-				{
-					for (size_t k = 0; k < k_em_max; ++k)
-					{
-						if (parity_equal)
-						{
-							if (k % 2 == 0) gamma += am.at(i).at(k);
-						}
-						else
-						{
-							if (k % 2 != 0) gamma += am.at(i).at(k);
-						}
-					}
-				}
-				else gamma += am.at(i).at(0);
-			}
-		}
-	}
-	return gamma;
-}
-
 
 Atom::Atom()
 {
@@ -561,6 +547,31 @@ DecayMap* Atom::get_decay_map()
 void Atom::set_decay_map(DecayMap* _decays)
 {
 	decays = _decays;
+}
+
+double Atom::get_gamma(size_t i)
+{
+	double gamma = 0.;
+	std::vector<std::string>* states_0 = decays->get_states_0();
+	std::vector<std::string>* states_1 = decays->get_states_1();
+	std::string label_i = states.at(i)->get_label();
+	for (size_t d = 0; d < decays->get_size(); ++d)
+	{
+		std::string label_j;
+		if (label_i != states_0->at(d) && label_i != states_1->at(d)) continue;
+		else if (label_i == states_0->at(d)) label_j = states_1->at(d);
+		else label_j = states_0->at(d);
+
+		size_t j = 0;
+		while (true)
+		{
+			if (label_j == states.at(j)->get_label()) break;
+			j += 1;
+		}
+		bool parity_equal = get_parity_equal(i, j);
+		if (states.at(i)->get_freq() > states.at(j)->get_freq()) gamma += decays->get_a(d, parity_equal);
+	}
+	return gamma;
 }
 
 double Atom::get_mass()

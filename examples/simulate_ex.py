@@ -19,7 +19,7 @@ import matplotlib.pyplot as plt
 
 import qspec as qs
 import qspec.simulate as sim
-from qspec import a_einstein_m1, a_einstein_m1_fm
+# from qspec import a_einstein_m1, a_einstein_m1_fm
 
 
 def example(n=None):
@@ -684,7 +684,7 @@ def example(n=None):
         a_hyper = [4018.87083385]
         f_laser = qs.hyperfine(i, j, 2, a_hyper[0]) - qs.hyperfine(i, j, 1, a_hyper[0])
 
-        a_eg = a_einstein_m1_fm(f_laser, mu=None, f_l=1, f_u=2, m_l=0., m_u=0., j=j, i=i, ls=(0., 0.5))
+        a_eg = 1. # a_einstein_m1_fm(f_laser, mu=None, f_l=1, f_u=2, m_l=0., m_u=0., j=j, i=i, ls=(0., 0.5))
 
         g = sim.State(0., parity='e', j=j, i=i, f=1, m=0, hyper_const=a_hyper, label='g')
         e = sim.State(0., parity='e', j=j, i=i, f=2, m=0, hyper_const=a_hyper, label='e')
@@ -731,5 +731,5 @@ def example(n=None):
 
 
 if __name__ == '__main__':
-    # example({0, 1, 2, 3, 4, 5, 6, 7, 8, 9})
-    example({10})
+    example({0, 1, 2, 3, 4, 5, 6, 7, 8, 9})
+    # example({10})
