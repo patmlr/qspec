@@ -576,7 +576,8 @@ class HyperfineZeeman(Splitter):
         `rho_ml = [np.ones(2 * f + 1) for f in f_l]`.
         :param scale_par_with_shift: Choose a parameter that is scaled with the Zeeman shift
          such as the Lorentz width `'Gamma'`.
-        :param linear: Whether the Zeeman shift is linear (`True`) or nonlinear (`False`).
+        :param linear: Whether the Zeeman shift is linear (`True`) or nonlinear (`False`). If nonlinear,
+         the Zeeman shift is calculated numerically, decreasing computing speed.
         :param label: A label for the `Splitter` (isotope / isomer / transition).
         """
         super().__init__(model, i, j_l, j_u, label=label)
@@ -703,14 +704,16 @@ class HyperfineZeeman(Splitter):
                                   args[self._index_0 - 1]), *args, **kwargs)
                            for i, t in zip(self.racah_indices, self.transitions_m)], axis=0)
         else:
-            shifts_l = hyper_zeeman_num(self.i, self.j_l,
-                                        0. if len(const_l) < 1 else const_l[0],
-                                        0. if len(const_l) < 2 else const_l[1],
+            hyper_const = [0. if len(const_l) < 1 else const_l[0],
+                           0. if len(const_l) < 2 else const_l[1],
+                           0. if len(const_l) < 3 else const_l[2]]
+            shifts_l = hyper_zeeman_num(self.i, self.j_l, hyper_const,
                                         gi=self.gi, gj=self.gj_l, b_field=args[self._index_0 - 1],
                                         g_n_as_gyro=False, as_freq=True)
-            shifts_u = hyper_zeeman_num(self.i, self.j_u,
-                                        0. if len(const_u) < 1 else const_u[0],
-                                        0. if len(const_u) < 2 else const_u[1],
+            hyper_const = [0. if len(const_u) < 1 else const_u[0],
+                           0. if len(const_u) < 2 else const_u[1],
+                           0. if len(const_u) < 3 else const_u[2]]
+            shifts_u = hyper_zeeman_num(self.i, self.j_u, hyper_const,
                                         gi=self.gi, gj=self.gj_u, b_field=args[self._index_0 - 1],
                                         g_n_as_gyro=False, as_freq=True)
 

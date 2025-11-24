@@ -24,25 +24,20 @@ import qspec.simulate as sim
 
 def example(n=None):
     """
-    Run one or several of the available examples. Scroll to the end for the function call.
-
-    :param n: The number of the example or a list of numbers.
+    Run one or several of the available examples.
 
     Example 0: Interaction between 40Ca+ and a laser.
-
     Example 1: Interaction between 40Ca+ and two lasers off-resonance / Rabi pumping.
-
     Example 2: Interaction between 43Ca+ with hyperfine structure and a laser.
-
     Example 3: Interaction between a singly-charged lithium-ion and two lasers.
-
     Example 4: Time-evolved scattering rate of a para-he-like system.
-
     Example 5: Coherent excitation with two laser beams resulting in time-dependent Rabi frequencies.
-
     Example 6: Monte-Carlo simulation of 40Ca+ interacting with two lasers, including photon recoils.
+    Example 7: M1 decay of the 3S1 ground state of ortho-heliumlike C4+ into the para-heliumlike 1S0 ground state.
+    Example 8: Rabi oscillations in the S1/2 <-> D3/2,5/2 transitions.
+    Example 9: 3D multipole emission pattern.
 
-    :returns:
+    :param n: The number of the example or a list/set of numbers.
     """
     if n is None:
         n = {0, 1, 2, 3, 4, 5, 6}
@@ -531,6 +526,12 @@ def example(n=None):
         plt.show()
 
     if 8 in n:
+        """
+        Example 8: Rabi oscillations in the S1/2 <-> D3/2,5/2 transitions.
+        
+        In example 8, coherent population transfer between the S1/2 ground state and the D3/2 or D5/2 excited state
+        in Ca+ is simulated.
+        """
         print(2.356 / np.pi)
         f_sp = 755222766.
         f_d3p3 = 352682482.
@@ -593,7 +594,11 @@ def example(n=None):
         plt.show()
 
     if 9 in n:
-
+        """
+        Example 9: 3D multipole emission pattern.
+        
+        In example 9, the differential scattering rate for higher multipole orders is calculated and plotted in 3D.
+        """
         f_eg = 7e8
         a_eg = 1.
 
@@ -677,59 +682,8 @@ def example(n=None):
         ax.set_box_aspect((1., 1., 1.))
         plt.show()
 
-    if 10 in n:
-        j = 0.5
-        i = 1.5
-
-        a_hyper = [4018.87083385]
-        f_laser = qs.hyperfine(i, j, 2, a_hyper[0]) - qs.hyperfine(i, j, 1, a_hyper[0])
-
-        a_eg = 1. # a_einstein_m1_fm(f_laser, mu=None, f_l=1, f_u=2, m_l=0., m_u=0., j=j, i=i, ls=(0., 0.5))
-
-        g = sim.State(0., parity='e', j=j, i=i, f=1, m=0, hyper_const=a_hyper, label='g')
-        e = sim.State(0., parity='e', j=j, i=i, f=2, m=0, hyper_const=a_hyper, label='e')
-
-        decay = sim.DecayMap(labels=[('g', 'e')], a=[a_eg], k_max=1)
-
-        states = [g, e]
-        atom = sim.Atom(states=states, decay_map=decay)
-        # atom.plot()
-
-        delta = 0.0146
-        intensity = 100.
-
-        pol_0 = sim.Polarization([-1., 0., 0.], vec_as_q=False, q_axis=[0, 0, 1])
-        laser_0 = sim.Laser(freq=f_laser - delta, polarization=pol_0, intensity=intensity, k=[0., 0., 1.])
-
-        pol_1 = sim.Polarization([1., 0., 0.], vec_as_q=False, q_axis=[0, 0, 1])
-        laser_1 = sim.Laser(freq=f_laser + delta, polarization=pol_1, intensity=intensity, k=[0., 0., 1.])
-
-        env = sim.Environment(B=[0., 1e-9, 0.])
-        inter = sim.Interaction(atom=atom, lasers=[laser_0, laser_1], environment=env, delta_max=1000.)
-        # inter.dt_max = 1e-4
-        inter.controlled = True
-
-        r = inter.rabi()
-        print(f'Rabi matrix: {r} MHz')
-
-
-        t = np.linspace(0., 200., 401)
-
-        y0 = np.zeros(atom.size, dtype=complex)
-        y0[0] = 1.
-
-        rho = inter.master(t, y0=y0)
-        y = sim.density_matrix_diagonal(rho, axis=1)[0]
-
-        plt.plot(t, y[0], label=g.label)
-        plt.plot(t, y[1], label=e.label)
-        plt.legend()
-        plt.xlabel(r'Time ($\mu$s)')
-        plt.ylabel('Population')
-        plt.show()
-
 
 
 if __name__ == '__main__':
     example({0, 1, 2, 3, 4, 5, 6, 7, 8, 9})
-    # example({10})
+    # example({4})

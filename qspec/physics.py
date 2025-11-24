@@ -14,20 +14,21 @@ import scipy.special as sp
 
 from qspec.qtypes import *
 from qspec import tools
-from qspec.algebra import mu_j_m1, mu_jj_m1, a_dipole
+from qspec.algebra import mu_j_m1, mu_jj_m1
 
 __all__ = ['L_LABEL', 'E_NORM', 'pi', 'LEMNISCATE', 'h', 'kB', 'mu_N', 'mu_B', 'g_s', 'me_u', 'me_u_d', 'gp_s', 'gn_s',
            'inv_cm_to_freq', 'freq_to_inv_cm', 'wavelength_to_freq', 'freq_to_wavelength', 'inv_cm_to_wavelength',
            'wavelength_to_inv_cm', 'beta', 'gamma', 'gamma_e', 'gamma_e_kin', 'e_rest', 'e_kin', 'e_total', 'e_el',
            'v_e', 'v_e_d1', 'v_el', 'v_el_d1', 'p_v', 'p_e', 'p_el', 'doppler', 'doppler_d1', 'doppler_e_d1',
            'doppler_el_d1', 'inverse_doppler', 'inverse_doppler_d1', 'alpha_atom', 'v_recoil', 'f_recoil',
-           'f_recoil_v', 'get_f', 'get_m', 'hyperfine', 'lande_n', 'lande_j', 'lande_jj', 'g_j', 'lande_f',
-           'zeeman_linear', 'hyper_zeeman_linear',
+           'f_recoil_v', 'get_f', 'get_m', 'lande_n', 'lande_j', 'lande_jj', 'g_j', 'lande_f',
+           '_process_hyper_const', 'hyperfine', 'zeeman_linear', 'hyper_zeeman_linear',
            'hyper_zeeman_ij', 'hyper_zeeman_num', 'hyper_zeeman_12', 'hyper_zeeman_12_d', 'a_hyper_mu',
            'a_einstein_m1',  # 'a_einstein_m1_fm',
            'temperature_doppler', 'saturation_intensity', 'saturation', 'rabi_s', 'scattering_rate', 'mass_factor',
            'delta_r2', 'delta_r4', 'delta_r6', 'lambda_r', 'lambda_rn', 'schmidt_line', 'sellmeier',
-           'gamma_3d', 'boost', 'doppler_3d', 'gaussian_beam_3d', 'gaussian_doppler_3d', 't_xi', 'normal_vx_pdf',
+           'gamma_3d', 'boost', 'doppler_3d', 'gaussian_beam_3d', 'gaussian_doppler_3d',
+           'sigma_v', 't_sigma', 't_xi', 'normal_vx_pdf',
            'normal_vx_rvs', 'chi2_ex_pdf', 'chi2_ex_rvs', 'normal_chi2_convolved_ex_pdf',
            'normal_chi2_convolved_vx_pdf', 'normal_chi2_convolved_f_pdf', 'normal_chi2_convolved_f_xi_pdf',
            'source_energy_pdf']
@@ -54,7 +55,7 @@ gn_s = sc.physical_constants['neutron g factor'][0]
 
 # --- freq <-> cm ---
 
-def inv_cm_to_freq(k: array_like) -> ndarray:
+def cm1_to_freq(k: array_like) -> ndarray:
     r"""
     Convert cm<sup>-1</sup> into MHz using $f = 10^{-4}ck$.
 
@@ -64,7 +65,7 @@ def inv_cm_to_freq(k: array_like) -> ndarray:
     return np.asarray(k, dtype=float) * sc.c * 1e-4
 
 
-def freq_to_inv_cm(f: array_like) -> ndarray:
+def freq_to_cm1(f: array_like) -> ndarray:
     r"""
     Convert MHz into cm<sup>-1</sup> using $k = 10^4 f / c$.
 
@@ -72,6 +73,25 @@ def freq_to_inv_cm(f: array_like) -> ndarray:
     :returns: (k) The wavenumber $k$ corresponding to the frequency `f` (1/cm).
     """
     return np.asarray(f, dtype=float) / sc.c * 1e4
+
+def inv_cm_to_freq(k: array_like) -> ndarray:
+    r"""
+    Convert cm<sup>-1</sup> into MHz using $f = 10^{-4}ck$.
+
+    :param k: The wavenumber $k \equiv f/c$ of a transition (1/cm).
+    :returns: (freq) The frequency corresponding to the wavenumber `k` (MHz).
+    """
+    return cm1_to_freq(k)
+
+
+def freq_to_inv_cm(f: array_like) -> ndarray:
+    r"""
+    Convert MHz into cm<sup>-1</sup> using $k = 10^4 f / c$.
+
+    :param f: The frequency $f \equiv ck$ of a transition (MHz).
+    :returns: (k) The wavenumber $k$ corresponding to the frequency `f` (1/cm).
+    """
+    return freq_to_cm1(f)
 
 
 # --- wav <-> freq ---
@@ -98,7 +118,7 @@ def freq_to_wavelength(f: array_like) -> ndarray:
 
 # --- cm <-> wav ---
 
-def inv_cm_to_wavelength(k: array_like) -> ndarray:
+def cm1_to_wavelength(k: array_like) -> ndarray:
     r"""
     Convert cm<sup>-1</sup> into &mu;m using $\lambda = 10^4 / k$.
 
@@ -108,7 +128,7 @@ def inv_cm_to_wavelength(k: array_like) -> ndarray:
     return 1e4 / np.asarray(k, dtype=float)
 
 
-def wavelength_to_inv_cm(lam: array_like) -> ndarray:
+def wavelength_to_cm1(lam: array_like) -> ndarray:
     r"""
     Convert &mu;m into cm<sup>-1</sup> using $\lambda = 10^4 / \lambda$.
 
@@ -116,6 +136,26 @@ def wavelength_to_inv_cm(lam: array_like) -> ndarray:
     :returns: (k) The wavenumber $k$ corresponding to the wavelength `lam` (cm<sup>-1</sup>).
     """
     return 1e4 / np.asarray(lam, dtype=float)
+
+
+def inv_cm_to_wavelength(k: array_like) -> ndarray:
+    r"""
+    Convert cm<sup>-1</sup> into &mu;m using $\lambda = 10^4 / k$.
+
+    :param k: The wavenumber $k$ of a transition (cm<sup>-1</sup>).
+    :returns: (lambda) The wavelength corresponding to the wavenumber `k` (um).
+    """
+    return cm1_to_wavelength(k)
+
+
+def wavelength_to_inv_cm(lam: array_like) -> ndarray:
+    r"""
+    Convert &mu;m into cm<sup>-1</sup> using $\lambda = 10^4 / \lambda$.
+
+    :param lam: The wavelength $\lambda$ of a transition (&mu;m).
+    :returns: (k) The wavenumber $k$ corresponding to the wavelength `lam` (cm<sup>-1</sup>).
+    """
+    return wavelength_to_cm1(lam)
 
 
 """ 1-D kinematics """
@@ -799,8 +839,26 @@ def lande_f(i: quant_like, j: quant_like, f: quant_like, gi: array_like, gj: arr
     return val
 
 
-def hyperfine(i: quant_like, j: quant_like, f: quant_like,
-              a_hyper: array_like = 0., b_hyper: array_like = 0., c_hyper: array_like = 0.) -> ndarray:
+def _process_hyper_const(hyper_const: array_like) -> ndarray:
+    """
+    Preprocess the hyperfine-structure constants.
+
+    :param hyper_const: The hyperfine-structure constants. Currently, constants up to the magnetic octupole order are
+     supported (A, B, C). If 'hyper_const' is a scalar,
+     it is assumed to be the constant A and the other orders are 0 (MHz).
+    :returns: The hyperfine-structure constants as a 3d-vector.
+    """
+    if hyper_const is None or not hyper_const:
+        hyper_const = [0., 0., 0.]
+    elif not np.asarray(hyper_const, dtype=float).shape:
+        hyper_const = [float(hyper_const), 0., 0.]
+    hyper_const = list(hyper_const)
+    while len(hyper_const) < 3:
+        hyper_const.append(0.)
+    return np.asarray(hyper_const, dtype=float)[:3]
+
+
+def hyperfine(i: quant_like, j: quant_like, f: quant_like, hyper_const: array_like = 0.) -> ndarray:
     r"""
     The hyperfine structure shift of an atomic state `(i, j, f)` with the hyperfine constants `a` and `b` and `c`
 
@@ -814,12 +872,13 @@ def hyperfine(i: quant_like, j: quant_like, f: quant_like,
     :param i: The nuclear spin quantum number $I$.
     :param j: The electronic total angular momentum quantum number $J$.
     :param f: The total angular momentum quantum number $F$.
-    :param a_hyper: The magnetic dipole hyperfine constant $A = \mu_I \mathcal{B}_J / (IJ)$ (arb. units).
-    :param b_hyper: The electric quadrupole hyperfine constant $B = eQ_I (\partial^2 V_J / \partial z^2)$ ([`a_hyper`]).
-    :param c_hyper: The magnetic octupole hyperfine constant $C = \Omega_I T_J^{(3)}$ ([`a_hyper`])
+    :param hyper_const: The hyperfine structure constants $A = \mu_I \mathcal{B}_J / (IJ)$,
+     $B = eQ_I (\partial^2 V_J / \partial z^2)$ and $C = \Omega_I T_J^{(3)}$
+     of the magnetic dipole, electric quadrupole and magnetic octupole order, respectively (MHz if `as_freq` else eV)
+     If a scalar is given, this corresponds to the $A$ constant.
     :returns: (dnu_hfs) The hyperfine structure shift $\Delta_\mathrm{hfs}$ ([`a_hyper`]).
     """
-    a_hyper = np.asarray(a_hyper, dtype=float)
+    a_hyper, b_hyper, c_hyper = _process_hyper_const(hyper_const)
 
     if i < 0. or j < 0. or f < 0.:
         raise ValueError('All quantum numbers must be >= 0.')
@@ -833,13 +892,11 @@ def hyperfine(i: quant_like, j: quant_like, f: quant_like,
     shift = 0.5 * a_hyper * k
 
     if i > 0.5 and j > 0.5:
-        b_hyper = np.asarray(b_hyper, dtype=float)
         k_2 = 3 * k * (k + 1) - 4 * i * (i + 1) * j * (j + 1)
         k_2 /= 2 * i * (2 * i - 1) * j * (2 * j - 1)
         shift += 0.25 * b_hyper * k_2
 
     if i > 1 and j > 1:
-        c_hyper = np.asarray(c_hyper, dtype=float)
         k_3 = k ** 3 + 4 * k ** 2 + 0.8 * k * (-3 * i * (i + 1) * j * (j + 1) + i * (i + 1) + j * (j + 1) + 3) \
             - 4 * i * (i + 1) * j * (j + 1)
         k_3 /= i * (i - 1) * (2 * i - 1) * j * (j - 1) * (2 * j - 1)
@@ -867,8 +924,7 @@ def zeeman_linear(m: quant_like, g: array_like, b_field: array_like = 0., as_fre
     return -g * m * mu_B * b_field * z_unit
 
 
-def hyper_zeeman_linear(i: quant_like, j: quant_like, f: quant_like, m: quant_like,
-                        a_hyper: array_like = 0., b_hyper: array_like = 0., c_hyper: array_like = 0.,
+def hyper_zeeman_linear(i: quant_like, j: quant_like, f: quant_like, m: quant_like, hyper_const: array_like = 0.,
                         g_f: array_like = 0., b_field: array_like = 0., as_freq: bool = True) -> ndarray:
     r"""
     The total energy shift of an atomic state with quantum numbers `F` and `m` due to the hyperfine structure splitting
@@ -878,22 +934,24 @@ def hyper_zeeman_linear(i: quant_like, j: quant_like, f: quant_like, m: quant_li
     :param j: The electronic total angular momentum quantum number $J$.
     :param f: The total angular momentum quantum number $F$.
     :param m: The magnetic quantum number $m_F$.
-    :param a_hyper: The magnetic dipole hyperfine constant $A = \mu_I \mathcal{B}_J / (IJ)$ (MHz if `as_freq` else eV).
-    :param b_hyper: The electric quadrupole hyperfine constant $B = eQ_I (\partial^2 V_J / \partial z^2)$ ([`a_hyper`]).
-    :param c_hyper: The magnetic octupole hyperfine constant $C = \Omega_I T_J^{(3)}$ ([`a_hyper`]).
+    :param hyper_const: The hyperfine structure constants $A = \mu_I \mathcal{B}_J / (IJ)$,
+     $B = eQ_I (\partial^2 V_J / \partial z^2)$ and $C = \Omega_I T_J^{(3)}$
+     of the magnetic dipole, electric quadrupole and magnetic octupole order, respectively (MHz if `as_freq` else eV)
+     If a scalar is given, this corresponds to the $A$ constant.
     :param g_f: The atomic g-factor $g_F$.
     :param b_field: The B-field $\mathcal{B}$ (T).
     :param as_freq: The shift can be returned in energy (`False`, eV) or frequency units (`True`, MHz).
      The default is `True`
     :returns: (dnu_hfs_zeeman) The hyperfine structure + linear Zeeman shift $\Delta$ (MHz if `as_freq` else eV)
     """
-    return hyperfine(i, j, f, a_hyper, b_hyper, c_hyper) + zeeman_linear(m, g_f, b_field, as_freq=as_freq)
+    return hyperfine(i, j, f, hyper_const) + zeeman_linear(m, g_f, b_field, as_freq=as_freq)
 
 
-def hyper_zeeman_ij(mi0: quant_like, mj0: quant_like, mi1: quant_like, mj1: quant_like, i: quant_like, j: quant_like,
-                    a_hyper: array_like = 0., b_hyper: array_like = 0.,
-                    gi: array_like = 0., gj: array_like = 0., b_field: array_like = 0.,
-                    as_freq: bool = True) -> ndarray:
+def _hyper_zeeman_ij_old(mi0: quant_like, mj0: quant_like, mi1: quant_like, mj1: quant_like,
+                         i: quant_like, j: quant_like,
+                         a_hyper: array_like = 0., b_hyper: array_like = 0.,
+                         gi: array_like = 0., gj: array_like = 0., b_field: array_like = 0.,
+                         as_freq: bool = True) -> ndarray:
     r"""
     The matrix element $\langle m_{i, 0} m_{j, 0}| H_\mathrm{hfs} + H_\mathrm{Zeeman} |m_{i, 1} m_{j, 1}\rangle$.
 
@@ -952,7 +1010,171 @@ def hyper_zeeman_ij(mi0: quant_like, mj0: quant_like, mi1: quant_like, mj1: quan
     return np.zeros_like(b_field, dtype=float)
 
 
-def hyper_zeeman_num(i: quant_like, j: quant_like, a_hyper: array_like = 0., b_hyper: array_like = 0.,
+def hyper_zeeman_ij(mi0: quant_like, mj0: quant_like, mi1: quant_like, mj1: quant_like, i: quant_like, j: quant_like,
+                    hyper_const: array_like = 0., gi: array_like = 0., gj: array_like = 0., b_field: array_like = 0.,
+                    as_freq: bool = True) -> ndarray:
+    r"""
+    The matrix element
+
+    $$
+    \langle m_{i, 0} m_{j, 0}| H_\mathrm{hfs} + H_\mathrm{Zeeman} |m_{i, 1} m_{j, 1}\rangle
+    $$,
+
+    with the Hamiltonian
+
+    $$
+    H = \sum\limits_{k=1}^{3} \left[\mathbf{T}_I^{(k)}\otimes\mathbf{T}_J^{(k)}\right]^{(0)}
+     - \vec{\mu}_F\cdot\vec{\mathcal{B}}.
+    $$
+
+    :param mi0: The first magnetic quantum number $m_{i, 0}$ of the nuclear spin $I$.
+    :param mj0: The first magnetic quantum number $m_{j, 0}$ of the total electronic angular momentum $J$.
+    :param mi1: The second magnetic quantum number $m_{i, 1}$ of the nuclear spin $I$.
+    :param mj1: The second magnetic quantum number $m_{j, 1}$ of the total electronic angular momentum $J$.
+    :param i: The nuclear spin quantum number $I$.
+    :param j: The electronic total angular momentum quantum number $J$.
+    :param hyper_const: The hyperfine structure constants $A = \mu_I \mathcal{B}_J / (IJ)$,
+     $B = eQ_I (\partial^2 V_J / \partial z^2)$ and $C = \Omega_I T_J^{(3)}$
+     of the magnetic dipole, electric quadrupole and magnetic octupole order, respectively (MHz if `as_freq` else eV)
+     If a scalar is given, this corresponds to the $A$ constant.
+    :param gi: The nuclear g-factor $g_I$ or the gyromagnetic ratio $\gamma_I$ if `g_n_as_gyro == True`.
+    :param gj: The electronic g-factor $g_J$.
+    :param b_field: The B-field $\mathcal{B}$ (T).
+    :param as_freq: The matrix element can be returned in energy (`False`, eV) or frequency units (`True`, MHz).
+     The default is `True`
+    :returns: (h_ij) One matrix element of the hyperfine-structure + Zeeman-effect hamiltonian.
+    """
+    a_hyper, b_hyper, c_hyper = _process_hyper_const(hyper_const)
+    gi, gj = np.asarray(gi, dtype=float), np.asarray(gj, dtype=float)
+
+    z_unit = 1e-6 / sc.h if as_freq else 1 / E_NORM
+    b_field = (np.asarray(b_field, dtype=float) + np.zeros_like(a_hyper) + np.zeros_like(b_hyper)
+               + np.zeros_like(gi) + np.zeros_like(gj)) * z_unit
+
+    b_hyper_n = b_hyper / (4 * i * (2 * i - 1) * j * (2 * j - 1)) if i > 0.5 and j > 0.5 else 0.
+    c_hyper_n = c_hyper / (i * (2 * i - 1) * (i - 1) * j * (2 * j - 1) * (j - 1)) if i > 1. and j > 1. else 0.
+
+    if mi0 + mj0 != mi1 + mj1:
+        return np.zeros_like(b_field, dtype=float)
+
+    elif mi0 == mi1 and mj0 == mj1:
+        ret = -(mi1 * gi * mu_N + mj1 * gj * mu_B) * b_field
+        ret += a_hyper * mi1 * mj1
+        ret += b_hyper_n * (i * j
+                            + i ** 2 * j
+                            + i * j ** 2
+                            + i ** 2 * j ** 2
+                            - 3 * j * mi1 ** 2
+                            - 3 * i * mj1 ** 2
+                            - 3 * j ** 2 * mi1 ** 2
+                            - 3 * i ** 2 * mj1 ** 2
+                            + 9 * mi1 ** 2 * mj1 ** 2)
+        ret += c_hyper_n * (mi1 * mj1 * (1
+                                         - 3 * i
+                                         - 3 * j
+                                         - 3 * i ** 2
+                                         - 3 * j ** 2
+                                         + 9 * i * j
+                                         + 9 * i ** 2 * j
+                                         + 9 * i * j ** 2
+                                         + 9 * i ** 2 * j ** 2
+                                         + 5 * mi1 ** 2
+                                         + 5 * mj1 ** 2
+                                         - 15 * i * mj1 ** 2
+                                         - 15 * j * mi1 ** 2
+                                         - 15 * i ** 2 * mj1 ** 2
+                                         - 15 * j ** 2 * mi1 ** 2
+                                         + 25 * mi1 ** 2 * mj1 ** 2))
+        return ret
+
+    elif mi0 == mi1 + 1 and mj0 == mj1 - 1:
+        ret = (a_hyper
+               * np.sqrt((i - mi1) * (i + mi1 + 1))
+               * np.sqrt((j + mj1) * (j - mj1 + 1)) / 2)
+        ret += (b_hyper_n * 3
+                * np.sqrt(i ** 2 + i - mi1 ** 2 - mi1)
+                * np.sqrt(j ** 2 + j - mj1 ** 2 + mj1)
+                * (2 * mi1 * mj1 - mi1 + mj1 - 1 / 2))
+        ret += (c_hyper_n * 3
+                * np.sqrt(i ** 2 + i - mi1 ** 2 - mi1)
+                * np.sqrt(j ** 2 + j - mj1 ** 2 + mj1)
+                * (i ** 2 * j ** 2 + i ** 2 * j - 5 * i ** 2 * mj1 ** 2 + 5 * i ** 2 * mj1 - 2 * i ** 2 + i * j ** 2
+                   + i * j - 5 * i * mj1 ** 2 + 5 * i * mj1 - 2 * i - 5 * j ** 2 * mi1 ** 2 - 5 * j ** 2 * mi1
+                   - 2 * j ** 2 - 5 * j * mi1 ** 2 - 5 * j * mi1 - 2 * j + 25 * mi1 ** 2 * mj1 ** 2
+                   - 25 * mi1 ** 2 * mj1 + 10 * mi1 ** 2 + 25 * mi1 * mj1 ** 2 - 25 * mi1 * mj1 + 10 * mi1
+                   + 10 * mj1 ** 2 - 10 * mj1 + 4) / 4)
+        return np.full_like(b_field, ret)
+
+    elif mi0 == mi1 - 1 and mj0 == mj1 + 1:
+        ret = (a_hyper
+               * np.sqrt((i + mi1) * (i - mi1 + 1))
+               * np.sqrt((j - mj1) * (j + mj1 + 1)) / 2)
+        ret += (b_hyper_n * 3
+                * np.sqrt(i ** 2 + i - mi1 ** 2 + mi1)
+                * np.sqrt(j ** 2 + j - mj1 ** 2 - mj1)
+                * (2 * mi1 * mj1 + mi1 - mj1 - 1 / 2))
+        ret += (c_hyper_n * 3
+                * np.sqrt(i ** 2 + i - mi1 ** 2 + mi1)
+                * np.sqrt(j ** 2 + j - mj1 ** 2 - mj1)
+                * (i ** 2 * j ** 2 + i ** 2 * j - 5 * i ** 2 * mj1 ** 2 - 5 * i ** 2 * mj1 - 2 * i ** 2 + i * j ** 2
+                   + i * j - 5 * i * mj1 ** 2 - 5 * i * mj1 - 2 * i - 5 * j ** 2 * mi1 ** 2 + 5 * j ** 2 * mi1
+                   - 2 * j ** 2 - 5 * j * mi1 ** 2 + 5 * j * mi1 - 2 * j + 25 * mi1 ** 2 * mj1 ** 2
+                   + 25 * mi1 ** 2 * mj1 + 10 * mi1 ** 2 - 25 * mi1 * mj1 ** 2 - 25 * mi1 * mj1 - 10 * mi1
+                   + 10 * mj1 ** 2 + 10 * mj1 + 4) / 4)
+        return np.full_like(b_field, ret)
+
+    elif mi0 == mi1 + 2 and mj0 == mj1 - 2:
+        ret = (b_hyper_n * 3
+               * np.sqrt((i - mi1) * (i + mi1 + 1))
+               * np.sqrt((j + mj1) * (j - mj1 + 1))
+               * np.sqrt((j - mj1 + 2) * (j + mj1 - 1))
+               * np.sqrt(-(-i + mi1 + 1) * (i + mi1 + 2)) / 2)
+        ret += (c_hyper_n * 15
+                * np.sqrt(i ** 2 + i - mi1 ** 2 - mi1)
+                * np.sqrt(j ** 2 + j - mj1 ** 2 + mj1)
+                * np.sqrt(i ** 2 + i - mi1 ** 2 - 3 * mi1 - 2)
+                * np.sqrt(j ** 2 + j - mj1 ** 2 + 3 * mj1 - 2)
+                * (mi1 * mj1 - mi1 + mj1 - 1) / 2)
+        return np.full_like(b_field, ret)
+
+    elif mi0 == mi1 - 2 and mj0 == mj1 + 2:
+        ret = (b_hyper_n * 3
+               * np.sqrt((i + mi1) * (i - mi1 + 1))
+               * np.sqrt((j - mj1) * (j + mj1 + 1))
+               * np.sqrt((i - mi1 + 2) * (i + mi1 - 1))
+               * np.sqrt(-(-j + mj1 + 1) * (j + mj1 + 2)) / 2)
+        ret += (c_hyper_n * 15
+                * np.sqrt(i ** 2 + i - mi1 ** 2 + mi1)
+                * np.sqrt(j ** 2 + j - mj1 ** 2 - mj1)
+                * np.sqrt(i ** 2 + i - mi1 ** 2 + 3 * mi1 - 2)
+                * np.sqrt(j ** 2 + j - mj1 ** 2 - 3 * mj1 - 2)
+                * (mi1 * mj1 + mi1 - mj1 - 1) / 2)
+        return np.full_like(b_field, ret)
+
+    elif mi0 == mi1 + 3 and mj0 == mj1 - 3:
+        ret = (c_hyper_n * 5
+               * np.sqrt((i - mi1) * (i + mi1 + 1))
+               * np.sqrt((j + mj1) * (j - mj1 + 1))
+               * np.sqrt((j - mj1 + 2) * (j + mj1 - 1))
+               * np.sqrt((j - mj1 + 3) * (j + mj1 - 2))
+               * np.sqrt(-(-i + mi1 + 1) * (i + mi1 + 2))
+               * np.sqrt(-(-i + mi1 + 2) * (i + mi1 + 3)) / 4)
+        return np.full_like(b_field, ret)
+
+    elif mi0 == mi1 - 3 and mj0 == mj1 + 3:
+        ret = (c_hyper_n * 5
+               * np.sqrt((i + mi1) * (i - mi1 + 1))
+               * np.sqrt((j - mj1) * (j + mj1 + 1))
+               * np.sqrt((i - mi1 + 2) * (i + mi1 - 1))
+               * np.sqrt((i - mi1 + 3) * (i + mi1 - 2))
+               * np.sqrt(-(-j + mj1 + 1) * (j + mj1 + 2))
+               * np.sqrt(-(-j + mj1 + 2) * (j + mj1 + 3)) / 4)
+        return np.full_like(b_field, ret)
+
+    return np.zeros_like(b_field, dtype=float)
+
+
+def hyper_zeeman_num(i: quant_like, j: quant_like, hyper_const: array_like = 0.,
                      gi: array_like = 0., gj: array_like = 0., b_field: array_like = 0.,
                      g_n_as_gyro: bool = False, as_freq: bool = True) \
         -> (list[ndarray], list[quant], list[list[quant]], list[list[tuple[quant, quant]]]):
@@ -961,15 +1183,18 @@ def hyper_zeeman_num(i: quant_like, j: quant_like, a_hyper: array_like = 0., b_h
     This function numerically calculates the full diagonalization of the Hyperfine-structure + Zeeman-effect Hamiltonian
 
     $$
-    H = \sum\limits_{k=1}^{2} \vec{T}_I^{(k)}\cdot\vec{T}_J^{(k)} - \vec{\mu}_F\cdot\vec{\mathcal{B}}.
+    H = \sum\limits_{k=1}^{3} \left[\mathbf{T}_I^{(k)}\otimes\mathbf{T}_J^{(k)}\right]^{(0)}
+     - \vec{\mu}_F\cdot\vec{\mathcal{B}}.
     $$
 
     :param i: The nuclear spin quantum number $I$.
     :param j: The electronic total angular momentum quantum number $J$.
+    :param hyper_const: The hyperfine structure constants $A = \mu_I \mathcal{B}_J / (IJ)$,
+     $B = eQ_I (\partial^2 V_J / \partial z^2)$ and $C = \Omega_I T_J^{(3)}$
+     of the magnetic dipole, electric quadrupole and magnetic octupole order, respectively (MHz if `as_freq` else eV)
+     If a scalar is given, this corresponds to the $A$ constant.
     :param gi: The nuclear g-factor $g_I$ or the gyromagnetic ratio $\gamma_I$ if `g_n_as_gyro == True`.
     :param gj: The electronic g-factor $g_J$.
-    :param a_hyper: The magnetic dipole hyperfine constant $A = \mu_I \mathcal{B}_J / (IJ)$ (MHz if `as_freq` else eV).
-    :param b_hyper: The electric quadrupole hyperfine constant $B = eQ_I (\partial^2 V_J / \partial z^2)$ ([`a_hyper`]).
     :param b_field: The B-field $\mathcal{B}$ (T).
     :param g_n_as_gyro: Whether `gi` is the nuclear g-factor or the gyromagnetic ratio $\gamma_I$ (MHz).
     :param as_freq: The matrix element can be returned in energy (`False`, eV) or frequency units (`True`, MHz).
@@ -994,8 +1219,7 @@ def hyper_zeeman_num(i: quant_like, j: quant_like, a_hyper: array_like = 0., b_h
     fm_list = [[_f for _f in f_list if abs(_m) <= _f] for _m in m_list]
     mi_mj_list = [[(_mi, _m - _mi) for _mi in mi_list if _m - _mi in mj_list] for _m in m_list]
 
-    # n_list = [sum(int(abs(_m) <= _f) for _f in f_list) for _m in m_list]
-    h_list = [np.array([[hyper_zeeman_ij(_mi0, _mj0, _mi1, _mj1, i, j, a_hyper, b_hyper, gi, gj, b_field,
+    h_list = [np.array([[hyper_zeeman_ij(_mi0, _mj0, _mi1, _mj1, i, j, hyper_const, gi, gj, b_field,
                                          as_freq=as_freq)
                          for (_mi1, _mj1) in _mi_mj_list] for (_mi0, _mj0) in _mi_mj_list], dtype=float)
               for _m, _mi_mj_list in zip(m_list, mi_mj_list)]
@@ -1006,7 +1230,8 @@ def hyper_zeeman_num(i: quant_like, j: quant_like, a_hyper: array_like = 0., b_h
     e_eig = [_h_eig[0] for _h_eig in h_eig]
     # v_eig = [_h_eig[1] for _h_eig in h_eig]
 
-    e_0 = [np.array([hyperfine(i, j, _f, a_hyper, b_hyper) for _f in _f_list], dtype=float) for _f_list in fm_list]
+    e_0 = [np.array([hyperfine(i, j, _f, hyper_const)
+                     for _f in _f_list], dtype=float) for _f_list in fm_list]
     inv_order_fm = [list(np.argsort(_e_0)) for _e_0 in e_0]
     order_fm = [np.array([_inv_order.index(k) for k in range(len(_inv_order))], dtype=int)
                 for _inv_order in inv_order_fm]

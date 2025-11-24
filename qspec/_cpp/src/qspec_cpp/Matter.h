@@ -54,6 +54,9 @@ protected:
 	double gi;
 	std::string label;
 
+	MatrixXd z_matrix;  // Zeeman mixing transform.
+	VectorXd z_mix;  // Zeeman F-amplitude vector.
+
 public:
 
 	State();
@@ -109,6 +112,12 @@ public:
 
 	std::string get_label();
 	void set_label(std::string _label);
+
+	MatrixXd get_z_matrix();
+	void set_z_matrix(MatrixXd _z_matrix);
+
+	VectorXd get_z_mix();
+	void set_z_mix(VectorXd _z_mix);
 };
 
 

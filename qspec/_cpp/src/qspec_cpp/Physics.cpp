@@ -200,8 +200,8 @@ double hyper_zeeman_linear(double i, double j, double f, double m, double g_j, d
     return ret;
 }
 
-double hyper_zeeman_ij(double mi0, double mj0, double mi1, double mj1, double i, double j, double g_j, double g_n, double* hyper_const, double b)
-{   
+/*double hyper_zeeman_ij(double mi0, double mj0, double mi1, double mj1, double i, double j, double g_j, double g_n, double* hyper_const, double b)
+{
     double b_field = b * 1e-6 / sc::h;
     double b_hyper_n = 0.;
     if (i > 0.5 && j > 0.5)
@@ -235,24 +235,179 @@ double hyper_zeeman_ij(double mi0, double mj0, double mi1, double mj1, double i,
     else if (mi0 == mi1 + 2 && mj0 == mj1 - 2)
     {
         return 0.75 * b_hyper_n * sqrt((j + mj1) * (j - mj1 + 1) * (j + mj1 - 1) * (j - mj1 + 2)
-                * (i - mi1) * (i + mi1 + 1) * (i - mi1 - 1) * (i + mi1 + 2));
+            * (i - mi1) * (i + mi1 + 1) * (i - mi1 - 1) * (i + mi1 + 2));
     }
 
     else if (mi0 == mi1 - 2 && mj0 == mj1 + 2)
     {
         return 0.75 * b_hyper_n * sqrt((i + mi1) * (i - mi1 + 1) * (i + mi1 - 1) * (i - mi1 + 2)
-                * (j - mj1) * (j + mj1 + 1) * (j - mj1 - 1) * (j + mj1 + 2));
+            * (j - mj1) * (j + mj1 + 1) * (j - mj1 - 1) * (j + mj1 + 2));
+    }
+
+    return 0;
+}*/
+
+double hyper_zeeman_ij(double mi0, double mj0, double mi1, double mj1, double i, double j, double g_j, double g_n, double* hyper_const, double b)
+{   
+    // The matrix element expressions have been generated using the sympy python package, see qspec/resources/hfs_algebra.py.
+    double b_field = b * 1e-6 / sc::h;
+    double a_hyper = hyper_const[0];
+    double b_hyper_n = 0.;
+    double c_hyper_n = 0.;
+    if (i > 0.5 && j > 0.5)
+    {
+        b_hyper_n = hyper_const[1] / (4 * i * (2 * i - 1) * j * (2 * j - 1));
+    }
+
+    if (i > 1. && j > 1.)
+    {
+        c_hyper_n = hyper_const[2] / (i * (2 * i - 1) * (i - 1) * j * (2 * j - 1) * (j - 1));
+    }
+
+    if (mi0 + mj0 != mi1 + mj1) return 0;
+
+    else if (mi0 == mi1 && mj0 == mj1)
+    {
+        double ret =  -(mi1 * g_n * sc::mu_N + mj1 * g_j * sc::mu_B) * b_field;
+
+        ret += a_hyper * mi1 * mj1;
+        ret += b_hyper_n * (i * j
+            + pow(i, 2) * j
+            + i * pow(j, 2)
+            + pow(i, 2) * pow(j, 2)
+            - 3 * j * pow(mi1, 2)
+            - 3 * i * pow(mj1, 2)
+            - 3 * pow(j, 2) * pow(mi1, 2)
+            - 3 * pow(i, 2) * pow(mj1, 2)
+            + 9 * pow(mi1, 2) * pow(mj1, 2));
+        ret += c_hyper_n * (mi1 * mj1 * (1
+            - 3 * i
+            - 3 * j
+            - 3 * pow(i, 2)
+            - 3 * pow(j, 2)
+            + 9 * i * j
+            + 9 * pow(i, 2) * j
+            + 9 * i * pow(j, 2)
+            + 9 * pow(i, 2) * pow(j, 2)
+            + 5 * pow(mi1, 2)
+            + 5 * pow(mj1, 2)
+            - 15 * i * pow(mj1, 2)
+            - 15 * j * pow(mi1, 2)
+            - 15 * pow(i, 2) * pow(mj1, 2)
+            - 15 * pow(j, 2) * pow(mi1, 2)
+            + 25 * pow(mi1, 2) * pow(mj1, 2)));
+        return ret;
+    }
+
+    else if (mi0 == mi1 + 1 && mj0 == mj1 - 1)
+    {
+        double ret = a_hyper * 0.5
+            * sqrt((i - mi1) * (i + mi1 + 1))
+            * sqrt((j + mj1) * (j - mj1 + 1));
+        ret += (b_hyper_n * 3.
+            * sqrt(pow(i, 2) + i - pow(mi1, 2) - mi1)
+            * sqrt(pow(j, 2) + j - pow(mj1, 2) + mj1)
+            * (2 * mi1 * mj1 - mi1 + mj1 - 0.5));
+        ret += (c_hyper_n * 0.75
+            * sqrt(pow(i, 2) + i - pow(mi1, 2) - mi1)
+            * sqrt(pow(j, 2) + j - pow(mj1, 2) + mj1)
+            * (pow(i, 2) * pow(j, 2) + pow(i, 2) * j - 5 * pow(i, 2) * pow(mj1, 2) + 5 * pow(i, 2) * mj1 - 2 * pow(i, 2) + i * pow(j, 2)
+                + i * j - 5 * i * pow(mj1, 2) + 5 * i * mj1 - 2 * i - 5 * pow(j, 2) * pow(mi1, 2) - 5 * pow(j, 2) * mi1
+                - 2 * pow(j, 2) - 5 * j * pow(mi1, 2) - 5 * j * mi1 - 2 * j + 25 * pow(mi1, 2) * pow(mj1, 2)
+                - 25 * pow(mi1, 2) * mj1 + 10 * pow(mi1, 2) + 25 * mi1 * pow(mj1, 2) - 25 * mi1 * mj1 + 10 * mi1
+                + 10 * pow(mj1, 2) - 10 * mj1 + 4));
+        return ret;
+    }
+
+    else if (mi0 == mi1 - 1 && mj0 == mj1 + 1)
+    {
+        double ret = (a_hyper * 0.5
+            * sqrt((i + mi1) * (i - mi1 + 1))
+            * sqrt((j - mj1) * (j + mj1 + 1)));
+        ret += (b_hyper_n * 3.
+            * sqrt(pow(i, 2) + i - pow(mi1, 2) + mi1)
+            * sqrt(pow(j, 2) + j - pow(mj1, 2) - mj1)
+            * (2 * mi1 * mj1 + mi1 - mj1 - 0.5));
+        ret += (c_hyper_n * 0.75
+            * sqrt(pow(i, 2) + i - pow(mi1, 2) + mi1)
+            * sqrt(pow(j, 2) + j - pow(mj1, 2) - mj1)
+            * (pow(i, 2) * pow(j, 2) + pow(i, 2) * j - 5 * pow(i, 2) * pow(mj1, 2) - 5 * pow(i, 2) * mj1 - 2 * pow(i, 2) + i * pow(j, 2)
+                + i * j - 5 * i * pow(mj1, 2) - 5 * i * mj1 - 2 * i - 5 * pow(j, 2) * pow(mi1, 2) + 5 * pow(j, 2) * mi1
+                - 2 * pow(j, 2) - 5 * j * pow(mi1, 2) + 5 * j * mi1 - 2 * j + 25 * pow(mi1, 2) * pow(mj1, 2)
+                + 25 * pow(mi1, 2) * mj1 + 10 * pow(mi1, 2) - 25 * mi1 * pow(mj1, 2) - 25 * mi1 * mj1 - 10 * mi1
+                + 10 * pow(mj1, 2) + 10 * mj1 + 4));
+        return ret;
+    }
+
+    else if (mi0 == mi1 + 2 && mj0 == mj1 - 2)
+    {
+        double ret = (b_hyper_n * 1.5
+            * sqrt((i - mi1) * (i + mi1 + 1))
+            * sqrt((j + mj1) * (j - mj1 + 1))
+            * sqrt((j - mj1 + 2) * (j + mj1 - 1))
+            * sqrt(-(-i + mi1 + 1) * (i + mi1 + 2)));
+        ret += (c_hyper_n * 7.5
+            * sqrt(pow(i, 2) + i - pow(mi1, 2) - mi1)
+            * sqrt(pow(j, 2) + j - pow(mj1, 2) + mj1)
+            * sqrt(pow(i, 2) + i - pow(mi1, 2) - 3 * mi1 - 2)
+            * sqrt(pow(j, 2) + j - pow(mj1, 2) + 3 * mj1 - 2)
+            * (mi1 * mj1 - mi1 + mj1 - 1));
+        return ret;
+    }
+
+    else if (mi0 == mi1 - 2 && mj0 == mj1 + 2)
+    {
+        double ret = (b_hyper_n * 1.5
+            * sqrt((i + mi1) * (i - mi1 + 1))
+            * sqrt((j - mj1) * (j + mj1 + 1))
+            * sqrt((i - mi1 + 2) * (i + mi1 - 1))
+            * sqrt(-(-j + mj1 + 1) * (j + mj1 + 2)));
+        ret += (c_hyper_n * 7.5
+            * sqrt(pow(i, 2) + i - pow(mi1, 2) + mi1)
+            * sqrt(pow(j, 2) + j - pow(mj1, 2) - mj1)
+            * sqrt(pow(i, 2) + i - pow(mi1, 2) + 3 * mi1 - 2)
+            * sqrt(pow(j, 2) + j - pow(mj1, 2) - 3 * mj1 - 2)
+            * (mi1 * mj1 + mi1 - mj1 - 1));
+        return ret;
+    }
+
+    else if (mi0 == mi1 + 3 && mj0 == mj1 - 3)
+    {
+        double ret = (c_hyper_n * 1.25
+            * sqrt((i - mi1) * (i + mi1 + 1))
+            * sqrt((j + mj1) * (j - mj1 + 1))
+            * sqrt((j - mj1 + 2) * (j + mj1 - 1))
+            * sqrt((j - mj1 + 3) * (j + mj1 - 2))
+            * sqrt(-(-i + mi1 + 1) * (i + mi1 + 2))
+            * sqrt(-(-i + mi1 + 2) * (i + mi1 + 3)));
+        return ret;
+    }
+
+    else if (mi0 == mi1 - 3 && mj0 == mj1 + 3)
+    {
+        double ret = (c_hyper_n * 1.25
+            * sqrt((i + mi1) * (i - mi1 + 1))
+            * sqrt((j - mj1) * (j + mj1 + 1))
+            * sqrt((i - mi1 + 2) * (i + mi1 - 1))
+            * sqrt((i - mi1 + 3) * (i + mi1 - 2))
+            * sqrt(-(-j + mj1 + 1) * (j + mj1 + 2))
+            * sqrt(-(-j + mj1 + 2) * (j + mj1 + 3)));
+        return ret;
     }
 
     return 0;
 }
 
-std::vector<double> hyper_zeeman_num(double i, double j, double m, double g_j, double g_n, double* hyper_const, double b)
+EigenReturn hyper_zeeman_num(double i, double j, double m, double g_j, double g_n, double* hyper_const, double b)
 {
     double f_min = max(abs(m), abs(i - j));
     double f_max = i + j;
     size_t n = static_cast<size_t>(f_max - f_min + 1);
-    std::vector<double> ret(n);
+
+    EigenReturn ret;
+
+    ret.values = std::vector<double>(n);
+    ret.vectors = std::vector<VectorXd>(n, VectorXd::Zero(n));
 
     MatrixXd h = MatrixXd::Zero(n, n);
     size_t k0 = 0;
@@ -275,6 +430,7 @@ std::vector<double> hyper_zeeman_num(double i, double j, double m, double g_j, d
 
     SelfAdjointEigenSolver<MatrixXd> eigen_solver(h);
     VectorXd e_eig = eigen_solver.eigenvalues();
+    MatrixXd e_vec = eigen_solver.eigenvectors();
 
     // Find indexes to sort eigenvalues in ascending order regarding F quantum number.
     std::vector<double> e_ref(n);
@@ -289,11 +445,12 @@ std::vector<double> hyper_zeeman_num(double i, double j, double m, double g_j, d
     double f = f_min;
     for (size_t k = 0; k < n; ++k)
     {
-        ret.at(k) = e_eig(indexes.at(k));
+        ret.values.at(k) = e_eig(indexes.at(k));
+        ret.vectors.at(k) = e_vec.col(indexes.at(k));
         ++f;
     }
+
     return ret;
-    
 }
 
 double lorentz(double w, double w0, double a, double rabi_square)

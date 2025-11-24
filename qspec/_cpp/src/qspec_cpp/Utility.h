@@ -55,6 +55,8 @@ bool check_loop(size_t i, size_t j, size_t m, int pm, std::vector<MatrixXd>& shi
 std::vector<size_t> argsort(const std::vector<double>& array);
 std::vector<size_t> invert_order(const std::vector<size_t>& indexes);
 
+VectorXd gen_unit_vector(size_t dim, size_t index);
+
 double rotation_theta(Vector3d vec);
 double rotation_phi(Vector3d vec);
 Matrix3d rotation_matrix(Vector3d vec);

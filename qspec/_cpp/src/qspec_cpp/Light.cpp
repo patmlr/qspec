@@ -221,7 +221,13 @@ double Laser::get_detuned(const Vector3d& v)
 double Laser::get_detuned(double delta, const Vector3d& v)
 {
 	double angle = 0;
-	if (v.norm() != 0) angle = acos(v.dot(k) / (v.norm() * k.norm()));
+	if (v.norm() != 0)
+	{
+		double arg = v.dot(k) / (v.norm() * k.norm());
+		if (arg < -1) arg = -1;
+		else if (arg > 1) arg = 1;
+		angle = acos(arg);
+	}
 	return doppler(freq + delta, v.norm(), angle);
 }
 

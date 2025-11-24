@@ -216,9 +216,10 @@ def example(n=None):
         g_j = qs.lande_j(0.5, 2, 2.5)
         a_hyper = 2.1743
         b_hyper = 49.11
+        c_hyper = 5.
         b = np.linspace(0., 4e-3, 4000)
-        e_eig, m_list, fm_list, mi_mj_list = qs.hyper_zeeman_num(i, j, a_hyper, b_hyper, g_n, g_j, b)
-        e_th = [qs.hyperfine(i, j, f, a_hyper, b_hyper) for f in qs.get_f(i, j)]
+        e_eig, m_list, fm_list, mi_mj_list = qs.hyper_zeeman_num(i, j, [a_hyper, b_hyper, c_hyper], g_n, g_j, b)
+        e_th = [qs.hyperfine(i, j, f, [a_hyper, b_hyper, c_hyper]) for f in qs.get_f(i, j)]
 
         f_plotted = set()
         m_plotted = set()
@@ -254,4 +255,5 @@ def example(n=None):
 
 
 if __name__ == '__main__':
-    example({0, 1, 2, 3, 4, 5})
+    # example({0, 1, 2, 3, 4, 5})
+    example({5})

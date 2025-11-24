@@ -48,7 +48,7 @@ class TestPhysics(ut.TestCase):
         plt.show()
 
         for s in ['s-', 'd+']:
-            sr = atom.scattering_rate(y, j=atom.get_state_indexes(s), axis=0)
+            sr = atom.scattering_rate(y, f=atom.get_state_indexes(s), axis=0, as_density_matrix=False)
             plt.plot(t, sr, label=f'into {s}')
         plt.xlabel('time (us)')
         plt.ylabel('scattering rate (MHz)')
@@ -57,17 +57,18 @@ class TestPhysics(ut.TestCase):
 
     def test_magnetic_field(self):
         i = 1.5
-        j = 1
+        j = 2.
         mu = -1.09316
         gi = mu / i
         gj = 1.35
         a_hyper = 2.1743
         b_hyper = 49.11
+        c_hyper = 5.
         b = np.linspace(0., 4e-3, 4000)
         b_env = b[2000]
-        e_eig, m_list, fm_list, mi_mj_list = qs.hyper_zeeman_num(i, j, a_hyper, b_hyper, gi, gj, b)
+        e_eig, m_list, fm_list, mi_mj_list = qs.hyper_zeeman_num(i, j, [a_hyper, b_hyper, c_hyper], gi, gj, b)
 
-        states = sim.gen_electronic_state(0, 'e', j, i, hyper_const=[a_hyper, b_hyper], gj=gj, gi=gi)
+        states = sim.gen_electronic_state(0, 'e', j, i, hyper_const=[a_hyper, b_hyper, c_hyper], gj=gj, gi=gi)
         atom = sim.Atom(states)
         env = sim.Environment(B=b_env)
         inter = sim.Interaction(atom, environment=env)

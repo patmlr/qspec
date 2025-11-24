@@ -191,6 +191,13 @@ std::vector<size_t> invert_order(const std::vector<size_t>& indexes)
     return inverted;
 }
 
+VectorXd gen_unit_vector(size_t dim, size_t index)
+{
+    VectorXd u = VectorXd::Zero(dim);
+    u(index) = 1.;
+    return u;
+}
+
 double rotation_theta(Vector3d vec)
 {
     if (vec.norm() == 0.) return 0.;

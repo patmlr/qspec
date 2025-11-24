@@ -13,7 +13,7 @@ import matplotlib.pyplot as plt
 from qspec.qtypes import *
 from qspec._cpp import *
 from qspec import tools
-from qspec import get_f, get_m, g_j, h, kB
+from qspec import get_f, get_m, g_j, h, kB, _process_hyper_const
 import qspec.algebra as al
 
 
@@ -266,25 +266,6 @@ class Laser(CppClass):
         vector_cd_p = np.ctypeslib.ndpointer(dtype=complex, shape=(2 * int(k) + 1, ))
         set_restype(dll.laser_get_kpol, vector_cd_p)
         return dll.laser_get_kpol(self.instance, c_bool(electric), c_size_t(k), q_axis.ctypes.data_as(c_double_p))
-
-
-def _process_hyper_const(hyper_const: array_like) -> ndarray:
-    """
-    Preprocess the hyperfine-structure constants.
-
-    :param hyper_const: The hyperfine-structure constants. Currently, constants up to the electric quadrupole order are
-     supported (A, B). If 'hyper_const' is a scalar,
-     it is assumed to be the constant A and the other orders are 0 (MHz).
-    :returns: The hyperfine-structure constants as a 3d-vector.
-    """
-    if hyper_const is None or not hyper_const:
-        hyper_const = [0., 0., 0.]
-    elif not np.asarray(hyper_const, dtype=float).shape:
-        hyper_const = [float(hyper_const), 0., 0.]
-    hyper_const = list(hyper_const)
-    while len(hyper_const) < 3:
-        hyper_const.append(0.)
-    return np.asarray(hyper_const, dtype=float)[:3]
 
 
 # noinspection PyPep8Naming

@@ -5,6 +5,7 @@
 #include "Matter.h"
 
 
+
 Environment::Environment()
 {
 	E = 0.;
@@ -84,6 +85,10 @@ State::State()
 	i = 0.;
 	f = 0.;
 	m = 0.;
+	parity = false;
+	s = std::vector<double>(1);
+	l = std::vector<double>(1);
+	jj = std::vector<double>(1);
 
 	hyper_const = new double[HYPER_SIZE]{0., 0., 0.};
 
@@ -91,6 +96,8 @@ State::State()
 	gi = 0.;
 
 	label = std::string("<State>");
+
+	z_mix = VectorXd::Zero(1);
 }
 
 State::~State()
@@ -122,6 +129,13 @@ void State::init(double _freq_j, double _j, double _i, double _f, double _m, boo
 	gi = _gi;
 
 	label = _label;
+
+	double f_min = max(abs(m), abs(i - j));
+	double f_max = i + j;
+	size_t n = static_cast<size_t>(f_max - f_min + 1);
+	size_t index = static_cast<size_t>(f - f_min);
+	z_mix = VectorXd::Zero(n);
+	z_mix(index) = 1.;
 
 	reset();
 }
@@ -287,6 +301,26 @@ std::string State::get_label()
 void State::set_label(std::string _label)
 {
 	label = _label;
+}
+
+MatrixXd State::get_z_matrix()
+{
+	return z_matrix;
+}
+
+void State::set_z_matrix(MatrixXd _z_matrix)
+{
+	z_matrix = _z_matrix;
+}
+
+VectorXd State::get_z_mix()
+{
+	return z_mix;
+}
+
+void State::set_z_mix(VectorXd _z_mix)
+{
+	z_mix = _z_mix;
 }
 
 
@@ -768,8 +802,32 @@ void Atom::gen_multipole()
 				}
 
 				double q_val = states[_j]->get_m() - states[_i]->get_m();
-				double ak = a_multipole(static_cast<double>(k), states[_i]->get_i(), states[_i]->get_j(), states[_i]->get_f(), states[_i]->get_m(),
-																states[_j]->get_j(), states[_j]->get_f(), states[_j]->get_m(), q_val);  // This takes the time.
+
+				// double ak = a_multipole(static_cast<double>(k), states[_i]->get_i(), states[_i]->get_j(), states[_i]->get_f(), states[_i]->get_m(),
+				// 												states[_j]->get_j(), states[_j]->get_f(), states[_j]->get_m(), q_val);  // This takes the time.
+
+				double fi_min = max(abs(states[_i]->get_m()), abs(states[_i]->get_i() - states[_i]->get_j()));
+				double fi_max = states[_i]->get_i() + states[_i]->get_j();
+
+				double fj_min = max(abs(states[_j]->get_m()), abs(states[_j]->get_i() - states[_j]->get_j()));
+				double fj_max = states[_j]->get_i() + states[_j]->get_j();
+
+				double ak = 0.;
+				size_t index_fi = 0;
+				for (double _fi = fi_min; _fi < fi_max + 0.1; ++_fi)
+				{
+					size_t index_fj = 0;
+					for (double _fj = fj_min; _fj < fj_max + 0.1; ++_fj)
+					{
+						ak += states[_i]->get_z_mix()(index_fi) * states[_j]->get_z_mix()(index_fj) 
+							* a_multipole(static_cast<double>(k), states[_i]->get_i(),
+										  states[_i]->get_j(), _fi, states[_i]->get_m(),
+										  states[_j]->get_j(), _fj, states[_j]->get_m(), q_val);  // This takes the time.
+						index_fj += 1;
+					}
+					index_fi += 1;
+				}
+
 				if (ak == 0.) continue;
 
 				if (electric) ek.at(k - 1)(_i, _j) = static_cast<int>(k);
@@ -828,24 +886,39 @@ void Atom::gen_multipole()
 
 void Atom::gen_frequencies(Environment* _env)
 {
+	for (size_t k = 0; k < size; ++k)
+	{
+	}
 	std::set<size_t> done;
 	for (size_t k = 0; k < size; ++k)
 	{
 		if (done.count(k)) continue;
 
 		State& s = *states.at(k);
+		double f_min = max(abs(s.get_m()), abs(s.get_i() - s.get_j()));
+		double f_max = s.get_i() + s.get_j();
+		size_t n = static_cast<size_t>(f_max - f_min + 1);
+		size_t i = static_cast<size_t>(s.get_f() - f_min);
+
+		EigenReturn evv = hyper_zeeman_num(s.get_i(), s.get_j(), s.get_m(), s.get_gj(), s.get_gi(), s.get_hyper_const(), 0.);
+		MatrixXd _z_matrix = MatrixXd::Zero(n, n);
+		for (size_t j = 0; j < n; ++j) _z_matrix.row(j) = evv.vectors.at(j);
+		s.set_z_matrix(_z_matrix);
+
 		if (_env->get_B() == 0)
 		{
 			s.reset();
+			s.set_z_mix(gen_unit_vector(n, i));
 			done.insert(k);
 			continue;
 		}
 
-		std::vector<double> freqs = hyper_zeeman_num(s.get_i(), s.get_j(), s.get_m(), s.get_gj(), s.get_gi(), s.get_hyper_const(), _env->get_B());
+		evv = hyper_zeeman_num(s.get_i(), s.get_j(), s.get_m(), s.get_gj(), s.get_gi(), s.get_hyper_const(), _env->get_B());
 
-		double f_min = max(abs(s.get_m()), abs(s.get_i() - s.get_j()));
-		size_t i = static_cast<size_t>(s.get_f() - f_min);
-		s.set_shift(freqs.at(i));
+		s.set_shift(evv.values.at(i));
+		s.set_z_mix(s.get_z_matrix() * evv.vectors.at(i));
+		// printf("Mixing (%.1f, %.1f): %.6f, %.6f (%zi)\n", s.get_f(), s.get_m(), evv.vectors.at(i)(0), evv.vectors.at(i)(1), n);
+		// printf("F (%.1f, %.1f): %.6f, %.6f\n", s.get_f(), s.get_m(), s.get_z_mix()(0), s.get_z_mix()(1));
 		done.insert(k);
 
 		// The below section can be omitted. But it should increase the execution speed by using the already found eigenvalues for the other states.
@@ -854,10 +927,20 @@ void Atom::gen_frequencies(Environment* _env)
 			if (done.count(l)) continue;
 
 			State& s_mix = *states.at(l);
-			if (s_mix.get_i() == s.get_i() && s_mix.get_j() == s.get_j() && s_mix.get_m() == s.get_m() && s_mix.get_freq_j() == s.get_freq_j())
+			if (s_mix.get_i() == s.get_i()
+				&& s_mix.get_j() == s.get_j()
+				&& s_mix.get_m() == s.get_m()
+				&& s_mix.get_gj() == s.get_gj()
+				&& s_mix.get_gi() == s.get_gi()
+				&& s_mix.get_hyper_const()[0] == s.get_hyper_const()[0]
+				&& s_mix.get_hyper_const()[1] == s.get_hyper_const()[1])
 			{
 				size_t i = static_cast<size_t>(s_mix.get_f() - f_min);
-				s_mix.set_shift(freqs.at(i));
+				s_mix.set_z_matrix(s.get_z_matrix());
+				s_mix.set_shift(evv.values.at(i));
+				s_mix.set_z_mix(s_mix.get_z_matrix() * evv.vectors.at(i));
+				// printf("Mixing (%.1f, %.1f): %.6f, %.6f (%zi)\n", s_mix.get_f(), s_mix.get_m(), evv.vectors.at(i)(0), evv.vectors.at(i)(1), n);
+				// printf("F (%.1f, %.1f): %.6f, %.6f\n", s_mix.get_f(), s_mix.get_m(), s_mix.get_z_mix()(0), s_mix.get_z_mix()(1));
 				done.insert(l);
 			}
 		}
