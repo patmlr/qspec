@@ -17,7 +17,7 @@ A comprehensive summary with highlights and some theoretical background can be f
 
 ## Developers and Maintainers
 
-- Patrick M&uuml;ller ([_email_](mailto:pmueller@physics.ucla.edu))
+- Patrick M&uuml;ller ([_email_](mailto:pamueller.ikp@gmail.com))
 
 ## Testers
 

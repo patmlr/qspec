@@ -11,16 +11,18 @@ version = '0.4.3'
 description = 'Physics toolbox for laser spectroscopy'
 readme = 'README.md'
 requires-python = '>=3.9'
-license = {file = 'LICENSE'}
+license = 'MIT'
+license-files = ['LICENSE']
+# license = {file = 'LICENSE'}
 
 keywords = ['physics', 'simulation', 'data analysis', 'atomic structure', 'laser spectroscopy', 'laser cooling', 'coherent interaction', 'quantum computing']
 authors = [
-    {name = 'Patrick Müller', email = 'pmueller@physics.ucla.edu'},
+    {name = 'Patrick Müller', email = 'pamueller.ikp@gmail.com'},
 ]
 classifiers = [
     'Development Status :: 4 - Beta',
     'Intended Audience :: Science/Research',
-    'License :: OSI Approved :: MIT License',
+    # 'License :: OSI Approved :: MIT License',
     'Operating System :: Microsoft :: Windows',
     'Programming Language :: C++',
     'Programming Language :: Python :: 3',
@@ -40,6 +42,9 @@ documentation = 'https://patmlr.github.io/qspec/doc/doc.html'
 download = 'https://pypi.org/project/qspec/#files'
 source = 'https://github.com/patmlr/qspec'
 tracker = 'https://github.com/patmlr/qspec/issues'
+
+[tool.setuptools]
+packages = ['qspec']
 
 [tool.setuptools.package-data]
 '*' = ['*.dll']
