@@ -27,7 +27,7 @@ def example(n=None):
     :returns:
     """
     if n is None:
-        n = {0, 1, }
+        n = {0, 1, 2}
     if isinstance(n, int):
         n = {n, }
 
@@ -200,4 +200,5 @@ def example(n=None):
 
 
 if __name__ == '__main__':
-    example({1})
+    example({0, 1, 2})
+    # example({0})

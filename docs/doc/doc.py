@@ -10,7 +10,7 @@ QSPEC_SIM_TYPES = [Polarization, Laser, Environment, State, DecayMap, Atom, Inte
 
 FOLDER_FILES = {'models', 'simulate', 'analyze'}
 FILES = sorted(['physics', 'algebra', 'models', 'analyze', 'simulate', 'tools', 'stats'])
-# FILES = sorted(['physics'])
+# FILES = sorted(['algebra'])
 
 
 def is_num(val):
@@ -460,7 +460,7 @@ def gen_functions():
 
 
 if __name__ == '__main__':
-    # gen_table()
-    # gen_doc()
-    # gen_modules()
+    gen_table()
+    gen_doc()
+    gen_modules()
     gen_functions()

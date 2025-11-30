@@ -36,18 +36,24 @@ class MultivariateNormal:
 
 
 def generate_collinear_points_cpp(mean: ndarray, cov: ndarray, n_samples: int = None, n_accepted: int = None,
-                                  seed: int = None, report: bool = None, **kwargs):
-    """
-    :param mean: The data vectors. Must have shape (k, n), where k is the number of data points
-     and n is the number of dimensions of each point.
-    :param cov: The covariance matrices of the data vectors. Must have shape (k, n, n).
-     Use 'covariance_matrix' to construct covariance matrices.
+                                  seed: int = None, report: bool = None, **kwargs) -> (ndarray, int, int):
+    r"""
+    Randomly generate points $\vec{p}_i$ according to the given data vectors $\vec{\mu}_i\in\mathbb{R}^n$
+    and covariance matrices $\mathbf{\Sigma}_i\in\mathbb{R}^{n\times n}$,
+    under the condition that they are aligned on a straight line. This function uses C++.
+
+    :param mean: The data vectors $\vec{\mu}_i$. Must have shape `(k, n)`, where `k` is the number of data points
+     and `n` is the number of dimensions of each point.
+    :param cov: The covariance matrices $\mathbf{\Sigma}_i$ of the data vectors. Must have shape `(k, n, n)`.
+     Use <a href="{{ '/doc/functions/analyze/covariance_matrix.html' | relative_url }}">
+    `covariance_matrix`</a> to construct covariance matrices.
     :param n_samples: The number of samples generated for each data point.
+     If `None` and `method == 'cpp'`, samples are generated until `n_accepted` samples get accepted.
     :param n_accepted: The number of samples to be accepted for each data point.
     :param seed: A seed for the random number generator.
     :param report: Whether to report the number of samples.
     :param kwargs: Additional keyword arguments.
-    :returns: The randomly generated data vectors p with shape (n_accepted, k ,n) aligned along a straight line
+    :returns: (p, n_accepted, n_samples) The generated data vectors $\vec{p}_i$ with shape `(n_accepted, k ,n)`
      and the number of accepted and generated samples.
     """
     mean, cov = np.ascontiguousarray(mean, dtype=float), np.ascontiguousarray(cov, dtype=float)

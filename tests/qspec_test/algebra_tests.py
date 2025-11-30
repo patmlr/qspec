@@ -18,9 +18,9 @@ import qspec.algebra as al
 class TestAlgebra(ut.TestCase):
 
     def test_cast_sympy(self):
-        self.assertIsInstance(al.cast_sympy(False, S(0), dtype=int), int)
-        self.assertIsInstance(al.cast_sympy(False, S(0), dtype=float), float)
-        self.assertIsInstance(al.cast_sympy(True, S(0)), Integer)
+        self.assertIsInstance(al.cast_sympy(S(0), as_sympy=False, dtype=int), int)
+        self.assertIsInstance(al.cast_sympy(S(0), as_sympy=False, dtype=float), float)
+        self.assertIsInstance(al.cast_sympy(S(0), as_sympy=True), Integer)
 
     def test_a(self):
         self.assertEqual(al.a(3.5, 0.5, 3, 1.5, 2, as_sympy=True), S(5) / 48)

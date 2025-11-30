@@ -597,11 +597,13 @@ double Atom::get_gamma(size_t i)
 		else label_j = states_0->at(d);
 
 		size_t j = 0;
-		while (true)
+		while (j < size)
 		{
 			if (label_j == states.at(j)->get_label()) break;
 			j += 1;
 		}
+		if (j >= size) continue;
+
 		bool parity_equal = get_parity_equal(i, j);
 		if (states.at(i)->get_freq() > states.at(j)->get_freq()) gamma += decays->get_a(d, parity_equal);
 	}

@@ -40,7 +40,7 @@ def example(n=None):
     :param n: The number of the example or a list/set of numbers.
     """
     if n is None:
-        n = {0, 1, 2, 3, 4, 5, 6}
+        n = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9}
     if isinstance(n, int):
         n = {n, }
 
@@ -306,7 +306,7 @@ def example(n=None):
         f_p = 7e8
         a_p = 100.
 
-        i = 0.
+        i = 0.5
         s_hyper = [0.]
         p_hyper = [10.]
 
@@ -686,4 +686,4 @@ def example(n=None):
 
 if __name__ == '__main__':
     example({0, 1, 2, 3, 4, 5, 6, 7, 8, 9})
-    # example({4})
+    # example({0})

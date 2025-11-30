@@ -17,7 +17,9 @@
     --border-padding: 39px;
     --navigation-chevron: 20px;
     --navigation-chevron-padding: 12px;
+    --navigation-text-padding: 24px;
     --navigation-indent: 12px;
+    --navigation-indent-margin: 10px;
     --topnav-bg-color: #281d42;
     --infobox-bg-color: #624491;
     --code-prose-bg-color: hsl(210, 8%, 90%);
@@ -339,7 +341,7 @@ span.mod-num { color: #bcbec4;}  // #2aacb8
 .chevron {
     height: var(--navigation-chevron);
     transform: rotate(0deg);
-    padding: 0 var(--navigation-chevron-padding) 0 0;
+    padding: 0 0 0 0;
     margin: 0 0 0 auto;
     }
 
@@ -347,6 +349,14 @@ span.mod-num { color: #bcbec4;}  // #2aacb8
     }
 
 .table-current {
+    font-weight: bold;
+
+    > a {
+        padding: 0 0 0 var(--navigation-text-padding);
+        }
+    }
+
+.table-current-tut {
     font-weight: bold;
     }
 
@@ -356,6 +366,10 @@ span.mod-num { color: #bcbec4;}  // #2aacb8
 
 .bd-content-table li.has-children {
     position: relative;
+
+    > a {
+        padding: 0 0 0 var(--navigation-text-padding);
+        }
 
     > details {
         > summary {
@@ -376,7 +390,7 @@ span.mod-num { color: #bcbec4;}  // #2aacb8
             align-items: center;
             position: absolute;
             top: 0;
-            right: 0;
+            left: 0;
             height: 21px;
             width: 21px;
             cursor: pointer;
@@ -388,7 +402,7 @@ span.mod-num { color: #bcbec4;}  // #2aacb8
                 .chevron {
                     height: var(--navigation-chevron);
                     transform: rotate(180deg);
-                    padding: 0 0 0 var(--navigation-chevron-padding);
+                    padding: 0 0 0 0;
                     margin: 0 0 0 auto;
                     }
                 }
@@ -396,7 +410,21 @@ span.mod-num { color: #bcbec4;}  // #2aacb8
         }
     }
 
+.bd-content-table li.indent-a {
+    > a {
+        padding: 0 0 0 var(--navigation-text-padding);
+        }
+    }
+
 .bd-content-table li.spaced {
+    margin-bottom: 4px;
+
+    > a {
+        padding: 0 0 0 var(--navigation-text-padding);
+        }
+    }
+
+.bd-content-table li.spaced-tut {
     margin-bottom: 4px;
     }
 
@@ -546,10 +574,11 @@ ol.extern-ol > li > details {
 
 ul.extern-a {
     list-style: none;
-    padding: 0 0 0 var(--navigation-indent);
+    padding: 0 0 0 calc(var(--navigation-indent) - var(--navigation-indent-margin));  //
     width: calc(var(--side-width) - var(--navigation-indent));  // calc(var(--header-width) - var(--navigation-indent))
     border-left: 1px dashed darkgrey;
     margin-bottom: 0;
+    margin-left: var(--navigation-indent-margin);
     }
 ul.extern-a > li > details {
     margin-top: 2px;

@@ -22,7 +22,7 @@ __all__ = ['L_LABEL', 'E_NORM', 'pi', 'LEMNISCATE', 'h', 'kB', 'mu_N', 'mu_B', '
            'v_e', 'v_e_d1', 'v_el', 'v_el_d1', 'p_v', 'p_e', 'p_el', 'doppler', 'doppler_d1', 'doppler_e_d1',
            'doppler_el_d1', 'inverse_doppler', 'inverse_doppler_d1', 'alpha_atom', 'v_recoil', 'f_recoil',
            'f_recoil_v', 'get_f', 'get_m', 'lande_n', 'lande_j', 'lande_jj', 'g_j', 'lande_f',
-           '_process_hyper_const', 'hyperfine', 'zeeman_linear', 'hyper_zeeman_linear',
+           'cast_hyper_const', 'hyperfine', 'zeeman_linear', 'hyper_zeeman_linear',
            'hyper_zeeman_ij', 'hyper_zeeman_num', 'hyper_zeeman_12', 'hyper_zeeman_12_d', 'a_hyper_mu',
            'a_einstein_m1',  # 'a_einstein_m1_fm',
            'temperature_doppler', 'saturation_intensity', 'saturation', 'rabi_s', 'scattering_rate', 'mass_factor',
@@ -839,7 +839,7 @@ def lande_f(i: quant_like, j: quant_like, f: quant_like, gi: array_like, gj: arr
     return val
 
 
-def _process_hyper_const(hyper_const: array_like) -> ndarray:
+def cast_hyper_const(hyper_const: array_like) -> ndarray:
     """
     Preprocess the hyperfine-structure constants.
 
@@ -854,31 +854,33 @@ def _process_hyper_const(hyper_const: array_like) -> ndarray:
         hyper_const = [float(hyper_const), 0., 0.]
     hyper_const = list(hyper_const)
     while len(hyper_const) < 3:
-        hyper_const.append(0.)
+        hyper_const.append(np.zeros_like(hyper_const[0]))
     return np.asarray(hyper_const, dtype=float)[:3]
 
 
 def hyperfine(i: quant_like, j: quant_like, f: quant_like, hyper_const: array_like = 0.) -> ndarray:
     r"""
-    The hyperfine structure shift of an atomic state `(i, j, f)` with the hyperfine constants `a` and `b` and `c`
+    The hyperfine structure (HFS) shift of an atomic state $|IJF\rangle$
 
     $$\begin{aligned}
     \Delta_\mathrm{hfs} &= A\frac{K}{2} + B\frac{\frac{3}{4}K(K + 1) - I(I + 1)J(J + 1)}{2I(2I - 1)J(2J - 1)}\\[1ex]
     &\quad + C\frac{\left[\splitdfrac{\frac{5}{4}K^3 + 5K^2 - 5I(I + 1)J(J + 1)}
     {+ K(I(I + 1) + J(J + 1) - 3I(I + 1)J(J + 1) + 3)}\right]}{I(I - 1)(2I - 1)J(J - 1)(2J - 1)}\\[3ex]
-    K &= F(F + 1) - I(I + 1) - J(J + 1)
+    K &= F(F + 1) - I(I + 1) - J(J + 1),
     \end{aligned}$$
+
+    with the HFS constants $A$, $B$ and $C$, specified as a list in `hyper_const`.
 
     :param i: The nuclear spin quantum number $I$.
     :param j: The electronic total angular momentum quantum number $J$.
     :param f: The total angular momentum quantum number $F$.
     :param hyper_const: The hyperfine structure constants $A = \mu_I \mathcal{B}_J / (IJ)$,
      $B = eQ_I (\partial^2 V_J / \partial z^2)$ and $C = \Omega_I T_J^{(3)}$
-     of the magnetic dipole, electric quadrupole and magnetic octupole order, respectively (MHz if `as_freq` else eV)
-     If a scalar is given, this corresponds to the $A$ constant.
+     of the magnetic dipole, electric quadrupole and magnetic octupole order, respectively.
+     If a scalar is given, only the $A$ constant is used (MHz if `as_freq` else eV).
     :returns: (dnu_hfs) The hyperfine structure shift $\Delta_\mathrm{hfs}$ ([`a_hyper`]).
     """
-    a_hyper, b_hyper, c_hyper = _process_hyper_const(hyper_const)
+    a_hyper, b_hyper, c_hyper = cast_hyper_const(hyper_const)
 
     if i < 0. or j < 0. or f < 0.:
         raise ValueError('All quantum numbers must be >= 0.')
@@ -907,8 +909,9 @@ def hyperfine(i: quant_like, j: quant_like, f: quant_like, hyper_const: array_li
 
 def zeeman_linear(m: quant_like, g: array_like, b_field: array_like = 0., as_freq: bool = True) -> ndarray:
     r"""
-    The shift of an atomic state with magnetic quantum number `m` due to the linear Zeeman effect
-     $\Delta_\mathrm{Zeeman} = -gm\mu_\mathrm{B}\mathcal{B}$
+    The shift of an atomic state with magnetic quantum number $m$ due to the linear Zeeman effect
+
+    $$\Delta_\mathrm{Zeeman} = -gm\mu_\mathrm{B}\mathcal{B}.$$
 
     :param m: The magnetic quantum number $m$.
     :param g: The g-factor $g$.
@@ -927,8 +930,10 @@ def zeeman_linear(m: quant_like, g: array_like, b_field: array_like = 0., as_fre
 def hyper_zeeman_linear(i: quant_like, j: quant_like, f: quant_like, m: quant_like, hyper_const: array_like = 0.,
                         g_f: array_like = 0., b_field: array_like = 0., as_freq: bool = True) -> ndarray:
     r"""
-    The total energy shift of an atomic state with quantum numbers `F` and `m` due to the hyperfine structure splitting
-     and the linear Zeeman effect $\Delta = \Delta_\mathrm{hfs} + \Delta_\mathrm{Zeeman}$.
+    The total energy shift of an atomic state $|Fm\rangle$ due to the hyperfine structure splitting
+     and the linear Zeeman effect
+
+     $$\Delta = \Delta_\mathrm{hfs} + \Delta_\mathrm{Zeeman}.$$
 
     :param i: The nuclear spin quantum number $I$.
     :param j: The electronic total angular momentum quantum number $J$.
@@ -936,8 +941,8 @@ def hyper_zeeman_linear(i: quant_like, j: quant_like, f: quant_like, m: quant_li
     :param m: The magnetic quantum number $m_F$.
     :param hyper_const: The hyperfine structure constants $A = \mu_I \mathcal{B}_J / (IJ)$,
      $B = eQ_I (\partial^2 V_J / \partial z^2)$ and $C = \Omega_I T_J^{(3)}$
-     of the magnetic dipole, electric quadrupole and magnetic octupole order, respectively (MHz if `as_freq` else eV)
-     If a scalar is given, this corresponds to the $A$ constant.
+     of the magnetic dipole, electric quadrupole and magnetic octupole order, respectively.
+     If a scalar is given, only the $A$ constant is used (MHz if `as_freq` else eV).
     :param g_f: The atomic g-factor $g_F$.
     :param b_field: The B-field $\mathcal{B}$ (T).
     :param as_freq: The shift can be returned in energy (`False`, eV) or frequency units (`True`, MHz).
@@ -1017,7 +1022,7 @@ def hyper_zeeman_ij(mi0: quant_like, mj0: quant_like, mi1: quant_like, mj1: quan
     The matrix element
 
     $$
-    \langle m_{i, 0} m_{j, 0}| H_\mathrm{hfs} + H_\mathrm{Zeeman} |m_{i, 1} m_{j, 1}\rangle
+    \langle m_{i, 0} m_{j, 0}| H_\mathrm{hfs} + H_\mathrm{Zeeman} |m_{i, 1} m_{j, 1}\rangle,
     $$,
 
     with the Hamiltonian
@@ -1035,8 +1040,8 @@ def hyper_zeeman_ij(mi0: quant_like, mj0: quant_like, mi1: quant_like, mj1: quan
     :param j: The electronic total angular momentum quantum number $J$.
     :param hyper_const: The hyperfine structure constants $A = \mu_I \mathcal{B}_J / (IJ)$,
      $B = eQ_I (\partial^2 V_J / \partial z^2)$ and $C = \Omega_I T_J^{(3)}$
-     of the magnetic dipole, electric quadrupole and magnetic octupole order, respectively (MHz if `as_freq` else eV)
-     If a scalar is given, this corresponds to the $A$ constant.
+     of the magnetic dipole, electric quadrupole and magnetic octupole order, respectively.
+     If a scalar is given, only the $A$ constant is used (MHz if `as_freq` else eV).
     :param gi: The nuclear g-factor $g_I$ or the gyromagnetic ratio $\gamma_I$ if `g_n_as_gyro == True`.
     :param gj: The electronic g-factor $g_J$.
     :param b_field: The B-field $\mathcal{B}$ (T).
@@ -1044,7 +1049,7 @@ def hyper_zeeman_ij(mi0: quant_like, mj0: quant_like, mi1: quant_like, mj1: quan
      The default is `True`
     :returns: (h_ij) One matrix element of the hyperfine-structure + Zeeman-effect hamiltonian.
     """
-    a_hyper, b_hyper, c_hyper = _process_hyper_const(hyper_const)
+    a_hyper, b_hyper, c_hyper = cast_hyper_const(hyper_const)
     gi, gj = np.asarray(gi, dtype=float), np.asarray(gj, dtype=float)
 
     z_unit = 1e-6 / sc.h if as_freq else 1 / E_NORM
@@ -1191,8 +1196,8 @@ def hyper_zeeman_num(i: quant_like, j: quant_like, hyper_const: array_like = 0.,
     :param j: The electronic total angular momentum quantum number $J$.
     :param hyper_const: The hyperfine structure constants $A = \mu_I \mathcal{B}_J / (IJ)$,
      $B = eQ_I (\partial^2 V_J / \partial z^2)$ and $C = \Omega_I T_J^{(3)}$
-     of the magnetic dipole, electric quadrupole and magnetic octupole order, respectively (MHz if `as_freq` else eV)
-     If a scalar is given, this corresponds to the $A$ constant.
+     of the magnetic dipole, electric quadrupole and magnetic octupole order, respectively.
+     If a scalar is given, only the $A$ constant is used (MHz if `as_freq` else eV).
     :param gi: The nuclear g-factor $g_I$ or the gyromagnetic ratio $\gamma_I$ if `g_n_as_gyro == True`.
     :param gj: The electronic g-factor $g_J$.
     :param b_field: The B-field $\mathcal{B}$ (T).
@@ -1252,7 +1257,7 @@ def hyper_zeeman_12(j: quant_like, m: quant_like, a_hyper: array_like = 0.,
                     gi: array_like = 0., gj: array_like = 0., b_field: array_like = 0.,
                     g_n_as_gyro: bool = False, as_freq: bool = True) -> (ndarray, ndarray):
     r"""
-    The two eigenvalues of the hyperfine structure + Zeeman effect hamailtonian for a nuclear spin of $I=1/2$
+    The two eigenvalues of the hyperfine structure + Zeeman effect Hamiltonian for a nuclear spin of $I=1/2$
     and the magnetic quantum number `m`, calculated analytically using the Breit-Rabi equation.
 
     :param j: The electronic total angular momentum quantum number $J$.
@@ -1297,7 +1302,7 @@ def hyper_zeeman_12_d(j: quant_like, m: quant_like, a_hyper: array_like = 0.,
                       gi: array_like = 0., gj: array_like = 0., b_field: array_like = 0.,
                       g_n_as_gyro: bool = False, as_freq: bool = True) -> (ndarray, ndarray):
     r"""
-    The first derivative of the two eigenvalues of the hyperfine structure + Zeeman effect hamailtonian,
+    The first derivative of the two eigenvalues of the hyperfine structure + Zeeman effect Hamiltonian,
     with respect to the `b-field`, for a nuclear spin of $I=1/2$ and the magnetic quantum number `m`,
     calculated analytically using the Breit-Rabi equation.
 

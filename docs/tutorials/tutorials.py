@@ -52,11 +52,11 @@ def example_1():
     g_j = qs.lande_j(s=0.5, l=2, j=2.5)
     # The nuclear g-factor, calculated from the nuclear magnetic moment
 
-    A, B = 2.1743, 49.11  # (MHz), The hyperfine-structure constants [2]
+    A, B, C = 2.1743, 49.11, 0.  # (MHz), The hyperfine-structure constants [2]
     b_field = np.linspace(0., 4e-3, 4000)  # (T), The magnetic flux density
 
     e_eig, m_list, fm_list, mi_mj_list \
-        = qs.hyper_zeeman_num(I, J, A, B, g_i, g_j, b_field)
+        = qs.hyper_zeeman_num(I, J, [A, B, C], g_i, g_j, b_field)
     # The eigenvalues of the HFS + Zeeman-effect Hamiltonian
     # and the lists of m_F, F and (m_I, m_J) quantum numbers
 
@@ -170,9 +170,9 @@ def example_4():
     s_hyper = [401.75825]  # HFS constants (MHz)
     p_hyper = [-3.055038, -0.29670]
 
-    s = sim.construct_electronic_state(
+    s = sim.gen_electronic_ls_state(
         0., s=0.5, l=0, j=0.5, i=1.5, hyper_const=s_hyper, label='s')
-    p = sim.construct_electronic_state(
+    p = sim.gen_electronic_ls_state(
         f_sp, s=0.5, l=1, j=1.5, i=1.5, hyper_const=p_hyper, label='p')
 
     decay = sim.DecayMap(labels=[('s', 'p')], a=[a_sp])
@@ -190,16 +190,21 @@ def example_4():
     theta, phi = 0., 0.  # Angles from z-axis in x- and y-direction (rad)
 
     n = inter.rates(t, delta)  # Rate equations, 0.2 us
-    y_rates = li7.scattering_rate(n, theta, phi, as_density_matrix=False)
+    y_rates = li7.scattering_rate(n, as_density_matrix=False,
+                                  theta=theta, phi=phi)
+    y_rates = y_rates[0, :, -1]  # Remove angle and time axes
 
     rho = inter.master(t, delta)  # Master equation, 0.2 us
-    y_master = li7.scattering_rate(rho, theta, phi)
+    y_master = li7.scattering_rate(rho, theta=theta, phi=phi)
+    y_master = y_master[0, :, -1]
 
     rho = inter.master(0.4, delta)  # Master equation, 0.4 us
-    y4_master = li7.scattering_rate(rho, theta, phi)
+    y4_master = li7.scattering_rate(rho, theta=theta, phi=phi)
+    y4_master = y4_master[0, :, -1]
 
     sr = sim.ScatteringRate(li7, laser=laser)
-    y_brown = sr.generate_y(delta, theta, phi)[:, 0, 0]  # Brown et al.
+    y_brown = sr.generate_y(delta, theta, phi)  # Brown et al.
+    y_brown = y_brown[:, 0, 0]  # Remove (theta, phi) axes
 
     import matplotlib.pyplot as plt
 
@@ -211,18 +216,18 @@ def example_4():
 
     m.plot(delta, y_brown * scale, '-k',
            label=r'Brown $et\,al.$', zorder=20)
-    m.plot(delta, y_rates[:, -1] * scale, '-C0',
+    m.plot(delta, y_rates * scale, '-C0',
            label=r'rates, $t = 0.2\,\mu$s', zorder=0)
-    m.plot(delta, y_master[:, -1] * scale, '-C1',
+    m.plot(delta, y_master * scale, '-C1',
            label=r'master, $t = 0.2\,\mu$s', zorder=60)
-    m.plot(delta, y4_master[:, -1] * scale, '--C3',
+    m.plot(delta, y4_master * scale, '--C3',
            label=r'master, $t = 0.4\,\mu$s', linewidth=1.5, zorder=30)
 
-    r.plot(delta, (y_brown - y_rates[:, -1]) * scale,
+    r.plot(delta, (y_brown - y_rates) * scale,
            '-k', zorder=20)
-    r.plot(delta, (y_master[:, -1] - y_rates[:, -1]) * scale,
+    r.plot(delta, (y_master - y_rates) * scale,
            '-C1', zorder=60)
-    r.plot(delta, (y4_master[:, -1] - y_rates[:, -1]) * scale,
+    r.plot(delta, (y4_master - y_rates) * scale,
            '--C3', linewidth=1.5, zorder=10)
     r.hlines(0, *x_lim, 'C0', '-', zorder=0)
 
@@ -346,4 +351,4 @@ if __name__ == '__main__':
     # gen_pycode_css()
     # gen_example(0)
     gen_example(5)
-    # example_5()
+    example_5()

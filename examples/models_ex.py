@@ -120,4 +120,5 @@ def example(n=None):
 
 
 if __name__ == '__main__':
-    example({3})
+    # example({0, 1, 2, 3})
+    example({0})

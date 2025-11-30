@@ -44,7 +44,8 @@ from qspec.physics import me_u, me_u_d, mass_factor
 from qspec.analyze._analyze_cpp import generate_collinear_points_cpp
 
 __all__ = ['poly', 'const', 'straight', 'straight_direction', 'straight_std', 'straight_x_std',
-           'draw_straight_unc_area', 'ellipse2d', 'draw_sigma2d', 'weight', 'york_fit', 'linear_nd_fit', 'linear_fit',
+           'draw_straight_unc_area', 'ellipse2d', 'draw_sigma2d', 'weight', 'york_fit', 'covariance_matrix',
+           'linear_nd_fit', 'linear_fit',
            'generate_collinear_points_py', 'linear_nd_monte_carlo', 'linear_monte_carlo', 'linear_alpha_fit',
            'odr_fit', 'curve_fit', 'King']
 
@@ -84,69 +85,80 @@ def _wrap_func(func, xdata, ydata, transform):
 
 
 def poly(x, *args):
-    """
-    :param x: The x values.
-    :param args: The coefficients of the polynomial.
-    :returns: args[0] + args[1] * x + args[2] / 2 * x ** 2 + args[3] / 6 * x ** 3 + ...
+    r"""
+    A polynomial
+
+    $$f(x) = \sum\limits_{k=0}^n \frac{a_k}{k!}x^k$$
+
+    of order `n = len(args)` with coefficients `args`.
+
+    :param x: The $x$ values.
+    :param args: The coefficients of the polynomial $a_k$.
+    :returns: (y) The function value $f(x)$.
     """
     return np.sum([args[n] / tools.factorial(n) * x ** n for n in range(len(args))], axis=0)
 
 
 def const(x: array_like, a: array_like) -> ndarray:
-    """
-    :param x: The x values.
-    :param a: The y-intercept.
-    :returns: A constant function with value 'a'.
+    r"""
+    A constant
+
+    $$f(x) = a.$$
+
+    :param x: The $x$ values.
+    :param a: The y-intercept $a$.
+    :returns: (y) The function value $f(x)$.
     """
     return np.full_like(x, a)
 
 
 def straight(x: array_like, a: array_like, b: array_like) -> ndarray:
-    """
-    :param x: The x values.
-    :param a: The y-intercept.
-    :param b: The slope.
-    :returns: The y values resulting from the 'x' values via the given linear relation.
+    r"""
+    A straight
+
+    $$f(x) = a + bx.$$
+
+    :param x: The $x$ values.
+    :param a: The y-intercept $a$.
+    :param b: The slope $b$.
+    :returns: (y) The function value $f(x)$.
     """
     x, a, b = np.asarray(x), np.asarray(a), np.asarray(b)
     return a + b * x
 
 
-def straight_direction(p_0: array_iter, p_1: array_iter, axis=-1) -> ndarray:
-    """
-    :param p_0: The first point(s).
-    :param p_1: The second point(s).
-    :param axis: The axis along which the vector components are aligned.
-    :returns: The direction of a straight line in n dimensions.
-    """
-    p_0, p_1 = np.asarray(p_0), np.asarray(p_1)
-    dr = p_1 - p_0
-    return dr / np.expand_dims(tools.absolute(dr, axis=axis), axis=axis)
-
-
 def straight_std(x: array_like, sigma_a: array_like, sigma_b: array_like, corr_ab: array_like) -> ndarray:
+    r"""
+    The standard deviation of a <a href="{{ '/doc/functions/analyze/straight.html' | relative_url }}">
+    `straight`</a>
+
+    $$\sigma_f(x) = \sqrt{\sigma_a^2 + (x\sigma_b)^2 + 2x\sigma_a\sigma_b\rho_{ab}}.$$
+
+    :param x: The $x$ values.
+    :param sigma_a: The standard deviation $\sigma_a$ of the y-intercept.
+    :param sigma_b: The standard deviation $\sigma_b$ of the slope.
+    :param corr_ab: The correlation coefficient $\rho_{ab}$ between the slope and the y-intercept.
+    :returns: (sigma_f) The standard deviation $\sigma_f$ of a straight line.
     """
-    :param x: The x values.
-    :param sigma_a: The standard deviation of the y-intercept.
-    :param sigma_b: The standard deviation of the slope.
-    :param corr_ab: The correlation coefficient between the slope and y-intercept.
-    :returns: The standard deviation of a straight line where the x values do not have uncertainties.
-    """
-    x = np.asarray(x)
-    sigma_a, sigma_b, corr_ab = np.asarray(sigma_a), np.asarray(sigma_b), np.asarray(corr_ab)
-    return np.sqrt(sigma_a ** 2 + (x * sigma_b) ** 2 + 2 * x * sigma_a * sigma_b * corr_ab)
+    return straight_x_std(x, 0., 0., sigma_a, sigma_b, corr_ab)
 
 
 def straight_x_std(x: array_like, b: array_like, sigma_x: array_like,
                    sigma_a: array_like, sigma_b: array_like, corr_ab: array_like) -> ndarray:
-    """
-    :param x: The x values.
-    :param b: The slope.
-    :param sigma_x: The standard deviation of the x values.
-    :param sigma_a: The standard deviation of the y-intercept.
-    :param sigma_b: The standard deviation of the slope.
-    :param corr_ab: The correlation coefficient between the slope and y-intercept.
-    :returns: The standard deviation of a straight line where all input values have uncertainties.
+    r"""
+    The standard deviation of a <a href="{{ '/doc/functions/analyze/straight.html' | relative_url }}">
+    `straight`</a>
+
+    $$\sigma_f(x) = \sqrt{\sigma_a^2 + (x\sigma_b)^2 + 2x\sigma_a\sigma_b\rho_{ab}
+    + (b\sigma_x)^2 + (\sigma_b\sigma_x)^2}.$$
+
+    :param x: The $x$ values.
+    :param b: The slope $b$.
+    :param sigma_x: The standard deviation $\sigma_x$ of the `x` values.
+    :param sigma_a: The standard deviation $\sigma_a$ of the y-intercept.
+    :param sigma_b: The standard deviation $\sigma_b$ of the slope `b`.
+    :param corr_ab: The correlation coefficient $\rho_{ab}$ between the slope `b` and the y-intercept.
+    :returns: (sigma_f) The standard deviation $\sigma_f$ of a straight line.
     """
     x, sigma_x = np.asarray(x), np.asarray(sigma_x)
     b, sigma_a, sigma_b, corr_ab = np.asarray(b), np.asarray(sigma_a), np.asarray(sigma_b), np.asarray(corr_ab)
@@ -154,32 +166,61 @@ def straight_x_std(x: array_like, b: array_like, sigma_x: array_like,
                    + (b * sigma_x) ** 2 + (sigma_b * sigma_x) ** 2)
 
 
-def draw_straight_unc_area(x: array_like, y: array_like, sigma_a: array_like, sigma_b: array_like,
-                           corr_ab: array_like, **kwargs):
+def straight_direction(p_0: array_iter, p_1: array_iter, axis: int = -1) -> ndarray:
+    r"""
+    The normalized directional vector of a straight through two points
+
+    $$\vec{r} = \frac{\vec{p}_1 - \vec{p}_0}{|\vec{p}_1 - \vec{p}_0|}.$$
+
+    :param p_0: The first point(s) $\vec{p}_0$.
+    :param p_1: The second point(s) $\vec{p}_1$.
+    :param axis: The axis along which the vector components are aligned.
+    :returns: (r) The direction $\vec{r}$ of a straight line.
     """
-    :param x: The x values.
-    :param y: The y values.
-    :param sigma_a: The standard deviation of the y-intercept.
-    :param sigma_b: The standard deviation of the slope.
-    :param corr_ab: The correlation coefficient between the slope and y-intercept.
-    :param kwargs: The keyword arguments for the fill_between function.
-    :returns: The standard deviation of a straight line where the x values do not have uncertainties.
+    p_0, p_1 = np.asarray(p_0), np.asarray(p_1)
+    dr = p_1 - p_0
+    return dr / np.expand_dims(tools.absolute(dr, axis=axis), axis=axis)
+
+
+def draw_straight_unc_area(x: array_like, a: array_like, b: array_like,
+                           sigma_a: array_like, sigma_b: array_like, corr_ab: array_like, **kwargs):
+    r"""
+    Draws the $1\sigma_f$ standard deviation area of a
+    <a href="{{ '/doc/functions/analyze/straight.html' | relative_url }}">
+    `straight`</a> $f$ enclosed by
+
+    $$[f(x) - \sigma_f(x), f(x) + \sigma_f(x)].$$
+
+    :param x: The $x$ values.
+    :param a: The y-intercept $a$.
+    :param b: The slope $b$.
+    :param sigma_a: The standard deviation $\sigma_a$ of the y-intercept `a`.
+    :param sigma_b: The standard deviation $\sigma_b$ of the slope `b`.
+    :param corr_ab: The correlation coefficient $\rho_{ab}$ between the y-intercept `a` and the slope `b`.
+    :param kwargs: The keyword arguments for the `fill_between` function.
     """
+    y = straight(x, a, b)
     unc = straight_std(x, sigma_a, sigma_b, corr_ab)
     plt.fill_between(x, y - unc, y + unc, **kwargs)
 
 
 def ellipse2d(x: array_like, y: array_like, scale_x: array_like, scale_y: array_like,
               phi: array_like, corr: array_like) -> (ndarray, ndarray):
-    """
-    :param x: The x-component of the position of the ellipse.
-    :param y: The y-component of the position of the ellipse.
-    :param scale_x: The amplitude of the x-component.
-    :param scale_y: The amplitude of the y-component.
-    :param phi: The angle between the vector to the point on the ellipse and the x-axis.
-    :param corr: The correlation coefficient between the x and y data.
-    :returns: A point on an ellipse in 2d-space with amplitudes 'x', 'y'
-     and correlation 'corr' between x- and y-component.
+    r"""
+    A point on an ellipse in 2d-space
+
+    $$\vec{p}(x, y) = \begin{pmatrix}
+    x + \sigma_x\cos(\phi) \\
+    y + \sigma_y\left[\rho_{xy}\cos(\phi) + \sqrt{1 - \rho_{xy}^2}\sin(\phi)\right]
+    \end{pmatrix}.$$
+
+    :param x: The $x$-component of the position of the ellipse.
+    :param y: The $y$-component of the position of the ellipse.
+    :param scale_x: The amplitude $\sigma_x$ of the $x$-component.
+    :param scale_y: The amplitude $\sigma_y$ of the $y$-component.
+    :param phi: The angle $\phi$ between the vector to the point on the ellipse and the $x$-axis.
+    :param corr: The correlation coefficient $\rho_{xy}$ between the `x` and `y` data.
+    :returns: (p_x, p_y) A point $\vec{p}(x, y)$ on an ellipse.
     """
     x, y, scale_x, scale_y, corr = np.asarray(x), np.asarray(y), \
         np.asarray(scale_x), np.asarray(scale_y), np.asarray(corr)
@@ -188,16 +229,18 @@ def ellipse2d(x: array_like, y: array_like, scale_x: array_like, scale_y: array_
 
 def draw_sigma2d(x: array_iter, y: array_iter, sigma_x: array_iter, sigma_y: array_iter,
                  corr: array_iter, n: int = 1, **kwargs):
-    """
-    :param x: The x data.
-    :param y: The y data.
-    :param sigma_x: The 1-sigma uncertainties of the x data.
-    :param sigma_y: The 1-sigma uncertainties of the y data.
-    :param corr: The correlation coefficients between the x and y data.
-    :param n: The maximum sigma region to draw
-    :param kwargs: Additional keyword arguments are passed to plt.plot().
-     Use key 'fmt' to specify the third argument of plt.plot().
-    :returns: Draws the sigma-bounds of the given data points (x, y) until the n-sigma region.
+    r"""
+    Draws the $n\sigma$ bounds of the given data points $(x, y)$ with standard deviations $(\sigma_x, \sigma_y)$
+    and correlation $\rho_{xy}$.
+
+    :param x: The $x$ data.
+    :param y: The $y$ data.
+    :param sigma_x: The standard deviation $\sigma_x$ of the `x` data.
+    :param sigma_y: The standard deviation $\sigma_y$ of the `y` data.
+    :param corr: The correlation coefficients $\rho_{xy}$ between the `x` and `y` data.
+    :param n: The maximum sigma region $n$ to draw.
+    :param kwargs: Additional keyword arguments are passed to `plt.plot()`.
+     Use key `fmt` to specify the third argument of `plt.plot()`.
     """
     fmt = '-k'
     if 'fmt' in list(kwargs.keys()):
@@ -209,30 +252,48 @@ def draw_sigma2d(x: array_iter, y: array_iter, sigma_x: array_iter, sigma_y: arr
 
 
 def weight(sigma):
+    r"""
+    The weight
+
+    $$w = \frac{1}{\sigma^2},$$
+
+    corresponding to the $1\sigma$ uncertainty `sigma`.
+
+    :param sigma: The $1\sigma$ uncertainty.
+    :returns: (w) The weight $w$.
     """
-    :param sigma: The 1-sigma uncertainty.
-    :returns: The weight corresponding to the 1-sigma uncertainty 'sigma'
-    """
+    sigma = np.asarray(sigma)
     return 1. / sigma ** 2
 
 
 def york_fit(x: array_iter, y: array_iter, sigma_x: array_iter = None, sigma_y: array_iter = None,
-             corr: array_iter = None, iter_max: int = 200, report: bool = False, show: bool = False, **kwargs):
-    """
-    A linear regression algorithm to find the best straight line, given normally distributed errors for x and y
-    and correlation coefficients between errors in x and y. The algorithm is described in
-    ['Unified equations for the slope, intercept, and standard errors of the best straight line',
-    York et al., American Journal of Physics 72, 367 (2004)]. See the comments to compare the individual steps.
+             corr: array_iter = None, iter_max: int = 200, report: bool = False, show: bool = False, **kwargs) \
+        -> (ndarray, ndarray):
+    r"""
+    A linear regression algorithm to find the best straight line through points $\vec{\mu}_i\in\mathbb{R}^2$
+    with covariances $\mathbf{\Sigma}_i\in\mathbb{R}^{2\times 2}$,
+    assuming $2$-dimensional multivariate normal distributions $\mathcal{N}(\vec{\mu}_i, \mathbf{\Sigma}_i)$.
+    The data points and covariances are given by
 
-    :param x: The x data.
-    :param y: The y data.
-    :param sigma_x: The 1-sigma uncertainties of the x data.
-    :param sigma_y: The 1-sigma uncertainties of the y data.
-    :param corr: The correlation coefficients between the x and y data.
+    $$\vec{\mu} = \begin{pmatrix}x\\y\end{pmatrix},\quad
+    \mathbf{\Sigma} = \begin{pmatrix}
+    \sigma_x^2 & \rho_{xy}\sigma_x\sigma_y \\
+    \rho_{xy}\sigma_x\sigma_y & \sigma_y^2
+    \end{pmatrix}.$$
+
+    The algorithm is described in
+    [<a href="https://doi.org/10.1119/1.1632486">York et al., Am. J. Phys. 72, 367 (2004)</a>].
+
+    :param x: The $x$ data.
+    :param y: The $y$ data.
+    :param sigma_x: The standard deviation $\sigma_x$ of the `x` data.
+    :param sigma_y: The standard deviation $\sigma_y$ of the `y` data.
+    :param corr: The correlation coefficients $\rho_{xy}$ between the `x` and `y` data.
     :param iter_max: The maximum number of iterations to find the best slope.
     :param report: Whether to print the result of the fit.
     :param show: Whether to plot the fit result.
-    :returns: popt, pcov. The best y-intercept and slope, their covariance matrix and the used alpha.
+    :param kwargs: Additional keyword arguments.
+    :returns: (popt, pcov) The best y-intercept and slope and their covariance matrix.
     """
     x, y = np.asarray(x), np.asarray(y)
     if sigma_x is None:
@@ -312,18 +373,22 @@ def york_fit(x: array_iter, y: array_iter, sigma_x: array_iter = None, sigma_y: 
 
 
 def covariance_matrix(cov: array_iter = None, sigma: array_iter = None, corr: array_iter = None,
-                      k: int = None, n: int = None):
-    """
-    :param cov: The covariance matrices. Must have shape (k, n, n), where k is the number of data points
-     and n the number of dimensions of each data point. If None, the other parameters are used.
-     If not None, all other parameters are ignored.
-    :param sigma: The standard deviations of the data vectors. Must have shape (k, n).
-     If None, all diagonal elements of the covariance matrix are 1.
-    :param corr: The correlation matrices of the data vectors. Must have shape (k, n, n).
-     If n == 2 it can have shape (k, ). If None, all off-diagonal elements of the covariance matrix are 0.
-    :param k: The number of data points. It is omitted if 'sigma' or 'corr' is specified.
-    :param n: The number of dimensions of each data point. It is omitted if 'sigma' or 'corr' is specified.
-    :returns: A covariance matrix constructed from 'sigma' and 'corr'.
+                      k: int = None, n: int = None) -> ndarray:
+    r"""
+    Helper function to construct covariance matrices $\mathbf{\Sigma}_i\in\mathbb{R}^{n\times n}$
+    from standard deviations $\vec{\sigma}_i\in\mathbb{R}^n$
+    and correlation matrices $\mathbf{\rho}_i\in\mathbb{R}^{n\times n}$.
+
+    :param cov: The covariance matrices $\mathbf{\Sigma}_i$. Must have shape `(k, n, n)`,
+     where `k` is the number of data points and `n` the number of dimensions of each data point.
+     If `None`, the other parameters are used. Else, all other parameters are ignored.
+    :param sigma: The standard deviations of the data vectors. Must have shape `(k, n)`.
+     If `None`, all diagonal elements of the covariance matrix equal 1.
+    :param corr: The correlation matrices of the data vectors. Must have shape `(k, n, n)`.
+     If `n == 2` it can have shape `(k, )`. If `None`, all off-diagonal elements of the covariance matrix are 0.
+    :param k: The number of data points. It is omitted if `sigma` or `corr` is specified.
+    :param n: The number of dimensions $n$ of each data point. It is omitted if `sigma` or `corr` is specified.
+    :returns: (cov) Covariance matrices $\mathbf{\Sigma}_i$ constructed from `sigma` and `corr`.
     """
     cov = tools.asarray_optional(cov, dtype=float)
     sigma, corr = tools.asarray_optional(sigma, dtype=float), tools.asarray_optional(corr, dtype=float)
@@ -388,7 +453,15 @@ def _linear_nd_func(p, x, cov_inv):
     return 0.5 * np.sum(tx - t0 ** 2 / var_t, axis=-1)  # ()
 
 
-def _linear_nd_jac(p, x, cov_inv):
+def _linear_nd_jac(p, x, cov_inv) -> ndarray:
+    r"""
+    The gradient vector / Jacobian.
+
+    :param p: The optimized parameters vector $\vec{p}$.
+    :param x: The data vector $\vec{x}$.
+    :param cov_inv: The inverse covariance matrix $\mathbf{\Sigma}_i^{-1}$.
+    :returns: The gradient vector / Jacobian $\vec{J}$.
+    """
     x0, r = _x0_r_from_p(p)  # (dim, ), (dim, )
     xi = x0[None, :] - x  # (size, dim)
     ax = np.sum(cov_inv * r[None, None, :], axis=-1)  # = da/dx = 0.5 * db/dr, (size, dim)
@@ -402,7 +475,15 @@ def _linear_nd_jac(p, x, cov_inv):
     return np.concatenate([xx, rr], axis=0)  # (2 * dim, )
 
 
-def _linear_nd_hess(p, x, cov_inv):
+def _linear_nd_hess(p, x, cov_inv) -> ndarray:
+    r"""
+    The Hesse matrix.
+
+    :param p: The optimized parameters vector $\vec{p}$.
+    :param x: The data vector $\vec{x}$.
+    :param cov_inv: The inverse covariance matrix $\mathbf{\Sigma}_i^{-1}$.
+    :returns: The Hesse matrix $\mathbf{H}$.
+    """
     x0, r = _x0_r_from_p(p)  # (dim, ), (dim, )
     xi = x0[None, :] - x  # (size, dim)
     ax = np.sum(cov_inv * r[None, None, :], axis=-1)  # = da/dx, (size, dim)
@@ -434,21 +515,30 @@ def _get_linear_nd_reduced(x, cov_inv, p0, mask, method):
 
 
 def linear_nd_fit(x: array_iter, cov: array_iter = None, p0: array_iter = None, axis: int = None,
-                  optimize_cov: bool = False, **kwargs):
-    """
-    :param x: The data vectors. Must have shape (k, n), where k is the number of data points
-     and n is the number of dimensions of each point.
-    :param cov: The covariance matrices of the data vectors. Must have shape (k, n, n).
-     Use 'covariance_matrix' to construct covariance matrices.
-    :param p0: The start parameters for the linear fit. Must have shape (2n, ).
-     The first n elements specify the origin vector of the straight,
-     the second n elements specify the direction of the straight.
-    :param axis: The component of the n-dimensional vectors which are fixed for fitting.
-     This is required since a straight in n dimensions is fully described by 2 (n - 1) parameters.
-     If None, the best axis is determined from the data and the direction vector of the straight is normalized.
-    :param optimize_cov: If True, the origin vector of the straight is optimized to yield the smallest covariances.
+                  optimize_cov: bool = False, **kwargs) -> (ndarray, ndarray):
+    r"""
+    Maximum likelihood fit for a straight line through points $\vec{\mu}_i\in\mathbb{R}^n$
+    with covariances $\mathbf{\Sigma}_i\in\mathbb{R}^{n\times n}$,
+    assuming $n$-dimensional multivariate normal distributions $\mathcal{N}(\vec{\mu}_i, \mathbf{\Sigma}_i)$.
+
+    The algorithm is described in <a href="https://doi.org/10.1016/j.cpc.2025.109550">
+    qspec's publication</a>.
+
+    :param x: The data vectors $\vec{\mu}_i$. Must have shape `(k, n)`, where `k` is the number of data points
+     and `n` is the number of dimensions of each point.
+    :param cov: The covariance matrices $\mathbf{\Sigma}_i$ of the data vectors. Must have shape `(k, n, n)`.
+     Use <a href="{{ '/doc/functions/analyze/covariance_matrix.html' | relative_url }}">
+    `covariance_matrix`</a> to construct covariance matrices.
+    :param p0: The start parameters for the linear fit. Must have shape `(2 * n, )`.
+     The first `n` elements specify the origin vector of the straight,
+     the second `n` elements specify the direction of the straight.
+    :param axis: The index of the vector component of the n-dimensional vectors that are fixed for fitting.
+     This is required since a straight in `n` dimensions is fully described by `2 * (n - 1)` parameters.
+     If `None`, the best axis is determined from the data, and the direction vector of the straight is normalized.
+    :param optimize_cov: If `True`, the origin vector of the straight is optimized to yield the smallest covariances.
     :param kwargs: Additional keyword arguments.
-    :returns: popt, pcov. The optimized parameters and their covariances. The resulting shapes are (2n, ) and (2n, 2n).
+    :returns: (popt, pcov) The optimized parameters and their covariances.
+     The resulting shapes are `(2 * n, )` and `(2 * n, 2 * n)`.
     """
     x_temp = np.array(x, dtype=float)
     size, dim = x_temp.shape
@@ -554,18 +644,32 @@ def linear_nd_fit(x: array_iter, cov: array_iter = None, p0: array_iter = None, 
 
 
 def linear_fit(x: array_iter, y: array_iter, sigma_x: array_iter = None, sigma_y: array_iter = None,
-               corr: array_iter = None, report: bool = False, **kwargs):
-    """
-    Maximum likelihood fit for a straight line in 2d. This is a wrapper for the more general 'linear_nd_fit' function.
+               corr: array_iter = None, report: bool = False, **kwargs) -> (ndarray, ndarray):
+    r"""
+    Maximum likelihood fit for a straight line through points $\vec{\mu}_i\in\mathbb{R}^2$
+    with covariances $\mathbf{\Sigma}_i\in\mathbb{R}^{2\times 2}$,
+    assuming $2$-dimensional multivariate normal distributions $\mathcal{N}(\vec{\mu}_i, \mathbf{\Sigma}_i)$.
+    The data points and covariances are given by
 
-    :param x: The x data.
-    :param y: The y data.
-    :param sigma_x: The 1-sigma uncertainties of the x data.
-    :param sigma_y: The 1-sigma uncertainties of the y data.
-    :param corr: The correlation coefficients between the x and y data.
+    $$\vec{\mu} = \begin{pmatrix}x\\y\end{pmatrix},\quad
+    \mathbf{\Sigma} = \begin{pmatrix}
+    \sigma_x^2 & \rho_{xy}\sigma_x\sigma_y \\
+    \rho_{xy}\sigma_x\sigma_y & \sigma_y^2
+    \end{pmatrix}.$$
+
+    This is a wrapper for the more general <a href="{{ '/doc/functions/analyze/linear_nd_fit.html' | relative_url }}">
+    `linear_nd_fit`</a> function.
+    The algorithm is described in <a href="https://doi.org/10.1016/j.cpc.2025.109550">
+    qspec's publication</a>.
+
+    :param x: The $x$ data.
+    :param y: The $y$ data.
+    :param sigma_x: The standard deviation $\sigma_x$ of the `x` data.
+    :param sigma_y: The standard deviation $\sigma_y$ of the `y` data.
+    :param corr: The correlation coefficients $\rho_{xy}$ between the `x` and `y` data.
     :param report: Whether to print the result of the fit.
     :param kwargs: Additional keyword arguments.
-    :returns: popt, pcov. The best y-intercept and slope and their covariance matrix.
+    :returns: (popt, pcov) The best y-intercept and slope and their covariance matrix.
     """
 
     x, y = np.asarray(x), np.asarray(y)
@@ -588,21 +692,27 @@ def linear_fit(x: array_iter, y: array_iter, sigma_x: array_iter = None, sigma_y
     return popt, pcov
 
 
-def _test_order_linear_nd_monte_carlo(x: ndarray, cov: ndarray, n_samples: int = 100000,
-                                      method: str = 'py', report: bool = False, **kwargs):
-    """
-    :param x: The data vectors. Must have shape (k, n), where k is the number of data points
-     and n is the number of dimensions of each point.
-    :param cov: The covariance matrices of the data vectors. Must have shape (k, n, n).
-     Use 'covariance_matrix' to construct covariance matrices.
+def _test_order_linear_nd_monte_carlo(x: ndarray, cov: ndarray, n_samples: int = 100000, n_accepted: int = 100000,
+                                      method: str = 'py', report: bool = False, **kwargs) -> ndarray:
+    r"""
+    Test which data points should be used as boundary conditions for the generated lines.
+
+    :param x: The data vectors $\vec{\mu}_i$. Must have shape `(k, n)`, where `k` is the number of data points
+     and `n` is the number of dimensions of each point.
+    :param cov: The covariance matrices $\mathbf{\Sigma}_i$ of the data vectors. Must have shape `(k, n, n)`.
+     Use <a href="{{ '/doc/functions/analyze/covariance_matrix.html' | relative_url }}">
+    `covariance_matrix`</a> to construct covariance matrices.
     :param n_samples: Maximum number of generated samples.
-     If None and method == 'cpp', samples are generated until 'n_accepted' samples get accepted.
-    :param method: The method to generate the collinear points. Can be one of {'py', 'cpp'}.
-     The 'py' version is faster but only allows to specify 'n_samples'.
-     The 'cpp' version is slower but allows to specify both 'n_accepted' and 'n_samples'.
+     If `None` and `method == 'cpp'`, samples are generated until `n_accepted` samples get accepted,
+     see <a href="{{ '/doc/functions/analyze/generate_collinear_points_cpp.html' | relative_url }}">
+     `generate_collinear_points_cpp`</a>.
+    :param n_accepted: The number of samples to be accepted for each data point. Only available if `method == 'cpp'`.
+    :param method: The method to generate the collinear points. Can be one of `{'py', 'cpp'}`.
+     The `'py'` version is faster but only allows to specify `n_samples`.
+     The `'cpp'` version is slower but allows to specify both `n_accepted` and `n_samples`.
     :param report: Whether to report the number of samples.
-    :param kwargs: Additional keyword arguments to be passed to the chosen method. 'py': {}. 'cpp': {seed=None}.
-    :returns: The order of axis 0 of 'x' which yields the most accepted samples.
+    :param kwargs: Additional keyword arguments to be passed to the chosen method. `'py': {}`, `'cpp': {seed: None}`.
+    :returns: (order) The order of 'x', with respect to axis 0, that yields the most accepted samples.
     """
     indices = [(i, j) for i in range(x.shape[0]) for j in range(x.shape[0]) if j > i]
     best_n = 0
@@ -612,23 +722,30 @@ def _test_order_linear_nd_monte_carlo(x: ndarray, cov: ndarray, n_samples: int =
         order = np.array([i, ] + [k for k in range(x.shape[0]) if k != i and k != j] + [j, ])
         _x, _cov = np.ascontiguousarray(x[order]), np.ascontiguousarray(cov[order])
         _, n_accepted, n_samples = \
-            generate_collinear_points(_x, _cov, n_samples=n_samples, method=method, report=report, **kwargs)
+            generate_collinear_points(_x, _cov, n_samples=n_samples, n_accepted=n_accepted,
+                                      method=method, report=report, **kwargs)
         if n_accepted > best_n:
             best_n = n_accepted
             best_order = order
     return best_order
 
 
-def generate_collinear_points_py(mean: ndarray, cov: ndarray, n_samples: int = 100000, report: bool = False, **kwargs):
-    """
-    :param mean: The data vectors. Must have shape (k, n), where k is the number of data points
-     and n is the number of dimensions of each point.
-    :param cov: The covariance matrices of the data vectors. Must have shape (k, n, n).
-     Use 'covariance_matrix' to construct covariance matrices.
+def generate_collinear_points_py(mean: ndarray, cov: ndarray, n_samples: int = 100000, report: bool = False, **kwargs) \
+        -> (ndarray, int, int):
+    r"""
+    Randomly generate points $\vec{p}_i$ according to the given data vectors $\vec{\mu}_i\in\mathbb{R}^n$
+    and covariance matrices $\mathbf{\Sigma}_i\in\mathbb{R}^{n\times n}$,
+    under the condition that they are aligned on a straight line. This function uses pure Python.
+
+    :param mean: The data vectors $\vec{\mu}_i$. Must have shape `(k, n)`, where `k` is the number of data points
+     and `n` is the number of dimensions of each point.
+    :param cov: The covariance matrices $\mathbf{\Sigma}_i$ of the data vectors. Must have shape `(k, n, n)`.
+     Use <a href="{{ '/doc/functions/analyze/covariance_matrix.html' | relative_url }}">
+    `covariance_matrix`</a> to construct covariance matrices.
     :param n_samples: The number of samples generated for each data point.
     :param report: Whether to report the number of samples.
     :param kwargs: Additional keyword arguments.
-    :returns: The randomly generated data vectors p with shape (n_accepted, k ,n) aligned along a straight line
+    :returns: (p, n_accepted, n_samples) The generated data vectors $\vec{p}_i$ with shape `(n_accepted, k ,n)`
      and the number of accepted and generated samples.
     """
     if n_samples is None:
@@ -657,7 +774,7 @@ def generate_collinear_points_py(mean: ndarray, cov: ndarray, n_samples: int = 1
         accepted = np.full(n_samples, True, dtype=bool)
         p = np.concatenate((np.expand_dims(p_0, 0), np.expand_dims(p_1, 0)), axis=0)
 
-    n_accepted = np.sum(accepted)
+    n_accepted = int(np.sum(accepted))
     if report:
         tools.print_colored('OKGREEN', f'Accepted samples: {n_accepted} / {n_samples}')
 
@@ -666,23 +783,28 @@ def generate_collinear_points_py(mean: ndarray, cov: ndarray, n_samples: int = 1
 
 
 def generate_collinear_points(x: ndarray, cov: ndarray, n_samples: int = None, n_accepted: int = None,
-                              method: str = 'py', report: bool = True, **kwargs):
-    """
-    :param x: The data vectors. Must have shape (k, n), where k is the number of data points
-     and n is the number of dimensions of each point.
-    :param cov: The covariance matrices of the data vectors. Must have shape (k, n, n).
-     Use 'covariance_matrix' to construct covariance matrices.
-    :param n_samples: Maximum number of generated samples.
-     If None and method == 'cpp', samples are generated until 'n_accepted' samples get accepted.
-    :param n_accepted: The number of samples to be accepted for each data point. Only available if method == 'cpp'.
-    :param method: The method to generate the collinear points. Can be one of {'py', 'cpp'}.
-     The 'py' version is faster but only allows to specify 'n_samples'.
-     The 'cpp' version is slower but allows to specify both 'n_accepted' and 'n_samples'.
+                              method: str = 'py', report: bool = True, **kwargs) -> (ndarray, int, int):
+    r"""
+    Randomly generate points $\vec{p}_i$ according to the given data vectors $\vec{\mu}_i\in\mathbb{R}^n$
+    and covariance matrices $\mathbf{\Sigma}_i\in\mathbb{R}^{n\times n}$,
+    under the condition that they are aligned on a straight line. Specify `method` to switch between Python and C++.
+
+    :param x: The data vectors $\vec{\mu}_i$. Must have shape `(k, n)`, where `k` is the number of data points
+     and `n` is the number of dimensions of each point.
+    :param cov: The covariance matrices $\mathbf{\Sigma}_i$ of the data vectors. Must have shape `(k, n, n)`.
+     Use <a href="{{ '/doc/functions/analyze/covariance_matrix.html' | relative_url }}">
+    `covariance_matrix`</a> to construct covariance matrices.
+    :param n_samples: The number of samples generated for each data point.
+     If `None` and `method == 'cpp'`, samples are generated until `n_accepted` samples get accepted.
+    :param n_accepted: The number of samples to be accepted for each data point. Only available if `method == 'cpp'`.
+    :param method: The method to generate the collinear points. Can be one of `{'py', 'cpp'}`.
+     The `'py'` version is faster but only allows to specify `n_samples`.
+     The `'cpp'` version is slower but allows to specify both `n_accepted` and `n_samples`.
     :param report: Whether to report the number of samples.
-    :param kwargs: Additional keyword arguments to be passed to the chosen method. 'py': {}. 'cpp': {seed=None}.
-    :returns: The randomly generated data vectors p with shape (n_accepted, k ,n) aligned along a straight line
+    :param kwargs: Additional keyword arguments to be passed to the chosen method. `'py': {}`, `'cpp': {seed: None}`.
+    :returns: (p, n_accepted, n_samples) The generated data vectors $\vec{p}_i$ with shape `(n_accepted, k ,n)`
      and the number of accepted and generated samples.
-    :raises ValueError: 'method' must be in {'py', 'cpp'}.
+    :raises ValueError: `method` must be in `{'py', 'cpp'}`.
     """
     m = {'py', 'cpp'}
     if method.lower() not in m:
@@ -696,31 +818,39 @@ def generate_collinear_points(x: ndarray, cov: ndarray, n_samples: int = None, n
 
 def linear_nd_monte_carlo(x: array_iter, cov: array_iter = None, axis: int = None, optimize_cov: bool = False,
                           n_samples: int = None, n_accepted: int = None, optimize_sampling: bool = True,
-                          return_samples: bool = False, method: str = 'py', report: bool = False, **kwargs):
-    """
-    A Monte-Carlo fitter that finds a straight line in n-dimensional space.
+                          return_samples: bool = False, method: str = 'py', report: bool = False, **kwargs) \
+        -> (ndarray, ndarray, Optional[ndarray]):
+    r"""
+    Maximum likelihood Monte-Carlo sampling of a straight line through points $\vec{\mu}_i\in\mathbb{R}^n$
+    with covariances $\mathbf{\Sigma}_i\in\mathbb{R}^{n\times n}$,
+    assuming $n$-dimensional multivariate normal distributions $\mathcal{N}(\vec{\mu}_i, \mathbf{\Sigma}_i)$.
 
-    :param x: The data vectors. Must have shape (k, n), where k is the number of data points
-     and n is the number of dimensions of each point.
-    :param cov: The covariance matrices of the data vectors. Must have shape (k, n, n).
-     Use 'covariance_matrix' to construct covariance matrices.
-     If None, samples are generated until n samples get accepted.
-    :param axis: The component of the n-dimensional vectors which are fixed for fitting.
-     This is required since a straight in n dimensions is fully described by 2 (n - 1) parameters.
-    :param optimize_cov: If True, the origin vector of the straight is optimized to yield the smallest covariances.
-    :param n_samples: Maximum number of generated samples.
-     If None and method == 'cpp', samples are generated until 'n_accepted' samples get accepted.
-    :param n_accepted: The number of samples to be accepted for each data point. Only available if method == 'cpp'.
-    :param optimize_sampling: Whether to optimize the sampling from the data.
-    :param return_samples: Whether to also return the generated points 'p'. 'p' has shape (n_samples, k ,n).
-    :param method: The method to generate the collinear points. Can be one of {'py', 'cpp'}.
-     The 'py' version is faster but only allows to specify 'n_samples'.
-     The 'cpp' version is slower but allows to specify both 'n_accepted' and 'n_samples'.
+    The algorithm is described in the supplementary material of
+    [<a href="https://doi.org/10.1103/PhysRevLett.115.053003">Gebert et al., Phys. Rev. Lett. 115, 053003 (2015)</a>].
+
+    :param x: The data vectors $\vec{\mu}_i$. Must have shape `(k, n)`, where `k` is the number of data points
+     and `n` is the number of dimensions of each point.
+    :param cov: The covariance matrices $\mathbf{\Sigma}_i$ of the data vectors. Must have shape `(k, n, n)`.
+     Use <a href="{{ '/doc/functions/analyze/covariance_matrix.html' | relative_url }}">
+    `covariance_matrix`</a> to construct covariance matrices.
+     If `None`, samples are generated until `n_accepted` samples get accepted.
+    :param axis: The index of the vector component of the n-dimensional vectors that are fixed for fitting.
+     This is required since a straight in `n` dimensions is fully described by `2 * (n - 1)` parameters.
+     If `None`, the best axis is determined from the data, and the direction vector of the straight is normalized.
+    :param optimize_cov: If `True`, the origin vector of the straight is optimized to yield the smallest covariances.
+    :param n_samples: The number of samples generated for each data point.
+     If `None` and `method == 'cpp'`, samples are generated until `n_accepted` samples get accepted.
+    :param n_accepted: The number of samples to be accepted for each data point. Only available if `method == 'cpp'`.
+    :param optimize_sampling: Whether to optimize the data sampling for acceptance efficiency.
+    :param return_samples: Whether to also return the generated points $\vec{p}_i$ with shape `(n_samples, k ,n)`.
+    :param method: The method to generate the collinear points. Can be one of `{'py', 'cpp'}`.
+     The `'py'` version is faster but only allows to specify `n_samples`.
+     The `'cpp'` version is slower but allows to specify both `n_accepted` and `n_samples`.
     :param report: Whether to print the result of the fit.
-    :param kwargs: Additional keyword arguments to be passed to the chosen method. 'py': {}. 'cpp': {seed=None}.
-    :returns: popt, pcov (, p). The optimized parameters and their covariances.
-     If 'return_samples' is True, also returns the generated points 'p'.
-     The resulting shapes are (2n, ), (2n, 2n) and (n_samples, k ,n).
+    :param kwargs: Additional keyword arguments to be passed to the chosen method. `'py': {}`, `'cpp': {seed: None}`.
+    :returns: (popt, pcov, p) The optimized parameters and their covariances.
+     If `return_samples == True`, also the generated points $\vec{p}_i$ are returned.
+     The resulting shapes are `(2 * n, )`, `(2 * n, 2 * n)` and `(n_samples, k, n)`.
     """
     x = np.asarray(x, dtype=float)
     size, dim = x.shape
@@ -791,28 +921,36 @@ def linear_nd_monte_carlo(x: array_iter, cov: array_iter = None, axis: int = Non
 def linear_monte_carlo(x: array_iter, y: array_iter, sigma_x: array_iter = None, sigma_y: array_iter = None,
                        corr: array_iter = None, optimize_cov: bool = True, n_samples: int = None,
                        n_accepted: int = None, optimize_sampling: bool = True, return_samples: bool = False,
-                       method: str = 'py', report: bool = True, **kwargs):
-    """
-    Wrapper for linear_nd_monte_carlo.
+                       method: str = 'py', report: bool = True, **kwargs) -> (ndarray, ndarray, Optional[ndarray]):
+    r"""
+    Maximum likelihood Monte-Carlo sampling of a straight line through points $\vec{\mu}_i\in\mathbb{R}^2$
+    with covariances $\mathbf{\Sigma}_i\in\mathbb{R}^{2\times 2}$,
+    assuming $2$-dimensional multivariate normal distributions $\mathcal{N}(\vec{\mu}_i, \mathbf{\Sigma}_i)$.
 
-    :param x: The x data. Must be a 1-d array.
-    :param y: The y data. Must be a 1-d array.
-    :param sigma_x: The 1-sigma uncertainties of the x data. Must be a 1-d array.
-    :param sigma_y: The 1-sigma uncertainties of the y data. Must be a 1-d array.
-    :param corr: The correlation coefficients between the x and y data. Must be a 1-d array.
-    :param optimize_cov: If True, the origin vector of the straight is optimized to yield the smallest covariances.
-    :param n_samples: Maximum number of generated samples.
-     If None and method == 'cpp', samples are generated until 'n_accepted' samples get accepted.
-    :param n_accepted: The number of samples to be accepted for each data point. Only available if method == 'cpp'.
-    :param optimize_sampling: Whether to optimize the sampling from the data.
-    :param return_samples: Whether to also return the generated points 'p'. 'p' has shape (n_samples, k ,2).
-    :param method: The method to generate the collinear points. Can be one of {'py', 'cpp'}.
-     The 'py' version is faster but only allows to specify 'n_samples'.
-     The 'cpp' version is slower but allows to specify both 'n_accepted' and 'n_samples'.
+    TThis is a wrapper for the more general
+    <a href="{{ '/doc/functions/analyze/linear_nd_monte_carlo.html' | relative_url }}">
+    `linear_nd_monte_carlo`</a> function. The algorithm is described in the supplementary material of
+    [<a href="https://doi.org/10.1103/PhysRevLett.115.053003">Gebert et al., Phys. Rev. Lett. 115, 053003 (2015)</a>].
+
+    :param x: The $x$ data.
+    :param y: The $y$ data.
+    :param sigma_x: The standard deviation $\sigma_x$ of the `x` data.
+    :param sigma_y: The standard deviation $\sigma_y$ of the `y` data.
+    :param corr: The correlation coefficients $\rho_{xy}$ between the `x` and `y` data.
+    :param optimize_cov: If `True`, the origin vector of the straight is optimized to yield the smallest covariances.
+    :param n_samples: The number of samples generated for each data point.
+     If `None` and `method == 'cpp'`, samples are generated until `n_accepted` samples get accepted.
+    :param n_accepted: The number of samples to be accepted for each data point. Only available if `method == 'cpp'`.
+    :param optimize_sampling: Whether to optimize the data sampling for acceptance efficiency.
+    :param return_samples: Whether to also return the generated points $\vec{p}_i$ with shape `(n_samples, k ,n)`.
+    :param method: The method to generate the collinear points. Can be one of `{'py', 'cpp'}`.
+     The `'py'` version is faster but only allows to specify `n_samples`.
+     The `'cpp'` version is slower but allows to specify both `n_accepted` and `n_samples`.
     :param report: Whether to print the result of the fit.
-    :param kwargs: Additional keyword arguments.
-    :returns: a, b, sigma_a, sigma_b, corr_ab. The best y-intercept and slope,
-     their respective 1-sigma uncertainties and their correlation coefficient.
+    :param kwargs: Additional keyword arguments to be passed to the chosen method. `'py': {}`, `'cpp': {seed: None}`.
+    :returns: (popt, pcov, p) The optimized parameters and their covariances.
+     If `return_samples == True`, also the generated points $\vec{p}_i$ are returned.
+     The resulting shapes are `(2, )`, `(2, 2)` and `(n_samples, k, 2)`.
     """
     x, y = np.asarray(x), np.asarray(y)
     sigma_x, sigma_y = tools.asarray_optional(sigma_x, dtype=float), tools.asarray_optional(sigma_y, dtype=float)
@@ -834,21 +972,32 @@ def linear_monte_carlo(x: array_iter, y: array_iter, sigma_x: array_iter = None,
 
 def linear_alpha_fit(x: array_iter, y: array_iter, sigma_x: array_like = None, sigma_y: array_like = None,
                      corr: array_iter = None, func: Union[Callable, str] = york_fit, alpha: scalar = 0,
-                     find_alpha: bool = True, report: bool = False, show: bool = False, **kwargs):
-    """
-    :param x: The x data.
-    :param y: The y data.
-    :param sigma_x: The 1-sigma uncertainty of the x data.
-    :param sigma_y: The 1-sigma uncertainty of the y data.
-    :param corr: The correlation coefficients between the x and y data.
-    :param func: The fitting routine. Supports {'york_fit', 'linear_fit', 'linear_monte_carlo'}.
-    :param alpha: An x-axis offset to reduce the correlation coefficient between the y-intercept and the slope.
-    :param find_alpha: Whether to search for the best 'alpha'. Uses the given 'alpha' as a starting point.
-     May not give the desired result if 'alpha' was initialized too far from its optimal value.
+                     find_alpha: bool = True, report: bool = False, show: bool = False, **kwargs) \
+        -> (ndarray, ndarray, float):
+    r"""
+    Wrapper for the $2$-dimensional linear regression algorithms
+    <a href="{{ '/doc/functions/analyze/york_fit.html' | relative_url }}">
+    `york_fit`</a>,
+     <a href="{{ '/doc/functions/analyze/linear_fit.html' | relative_url }}">
+    `linear_fit`</a> and
+    <a href="{{ '/doc/functions/analyze/linear_monte_carlo.html' | relative_url }}">
+    `linear_monte_carlo`</a> that optimizes an additional $x$-axis shift $\alpha$
+     for the minimum correlation coefficient between $y$-intercept and slope.
+
+    :param x: The $x$ data.
+    :param y: The $y$ data.
+    :param sigma_x: The standard deviation $\sigma_x$ of the `x` data.
+    :param sigma_y: The standard deviation $\sigma_y$ of the `y` data.
+    :param corr: The correlation coefficients $\rho_{xy}$ between the `x` and `y` data.
+    :param func: The fitting routine. Supports any of `{'york_fit', 'linear_fit', 'linear_monte_carlo'}`.
+    :param alpha: An $x$-axis offset $\alpha$ to reduce the correlation coefficient
+     between the $y$-intercept and the slope.
+    :param find_alpha: Whether to search for the best `alpha`. Uses the given `alpha` as a starting point.
+     May not give the desired result if `alpha` was initialized too far from its optimal value.
     :param report: Whether to print the result of the fit.
     :param show: Whether to plot the fit result.
     :param kwargs: Additional keyword arguments are passed to the fitting routine.
-    :returns: popt, pcov, alpha. The best y-intercept and slope, their covariance matrix and the used alpha.
+    :returns: (popt, pcov, alpha). The best y-intercept and slope, their covariance matrix and the final `alpha`.
     """
     #  TODO: minimize tolerances.
     n = tools.floor_log10(alpha)
@@ -872,28 +1021,36 @@ def linear_alpha_fit(x: array_iter, y: array_iter, sigma_x: array_like = None, s
     popt, pcov = func(x - alpha, y, sigma_x=sigma_x, sigma_y=sigma_y, corr=corr, report=report, show=show, **kwargs)
     if report:
         print('alpha: {}'.format(alpha))
-    return popt, pcov, alpha
+    return popt, pcov, float(alpha)
 
 
 def odr_fit(f: Callable, x: array_iter, y: array_iter, sigma_x: array_iter = None, sigma_y: array_iter = None,
             p0: array_iter = None, p0_d: array_iter = None, p0_fixed: array_iter = None,
             report: bool = False, **kwargs) -> (ndarray, ndarray):
-    """
-    :param f: The model function to fit to the data.
-    :param x: The x data.
-    :param y: The y data.
-    :param sigma_x: The 1-sigma uncertainty of the x data.
-    :param sigma_y: The 1-sigma uncertainty of the y data.
+    r"""
+    This function encapsulates the orthogonal distance regression (ODR) routine
+    <a href="https://docs.scipy.org/doc/scipy-1.14.1/reference/generated/odr-function.html">
+    `scipy.odr.odr`</a> with the syntax of
+    <a href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.curve_fit.html">
+    `scipy.optimize.curve_fit`</a>.
+
+    :param f: The model function $f$ to fit to the data.
+    :param x: The $x$ data.
+    :param y: The $y$ data.
+    :param sigma_x: The $1\sigma$ uncertainty of the `x` data.
+    :param sigma_y: The $1\sigma$ uncertainty of the `y` data.
     :param p0: A numpy array or an Iterable of the initial guesses for the parameters.
-     Must have at least the same length as the minimum number of parameters required by the function 'f'.
-     If 'p0' is None, 1 is taken as an initial guess for all non-keyword parameters.
-    :param p0_d: A numpy array or an Iterable of the uncertainties of the initial guesses for the parameters.
-     Must have the same length as p0.
-    :param p0_fixed: A numpy array or an Iterable of bool values specifying, whether to fix a parameter.
-     Must have the same length as p0.
+     Must have at least the same length as the minimum number of parameters required by the function `f`.
+     If `p0` is `None`, 1 is taken as an initial guess for all non-keyword parameters.
+    :param p0_d: A numpy array or an Iterable of the standard deviations of the initial guesses for the parameters.
+     Must have the same length as `p0`.
+    :param p0_fixed: A numpy array or an Iterable of `bool` values specifying whether to fix a parameter.
+     Must have the same length as `p0`.
     :param report: Whether to print the result of the fit.
-    :param kwargs: Additional keyword arguments are passed to odr.ODR.
-    :returns: popt, pcov. The optimal parameters and their covariance matrix.
+    :param kwargs: Additional keyword arguments are passed to
+     <a href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.odr.ODR.html">
+     `scipy.odr.ODR`</a>.
+    :returns: (popt, pcov) The optimal parameters and their covariance matrix.
     """
     x, y = np.asarray(x), np.asarray(y)
     sx, sy, covx, covy = None, None, None, None
@@ -939,28 +1096,52 @@ def odr_fit(f: Callable, x: array_iter, y: array_iter, sigma_x: array_iter = Non
 def curve_fit(f: Callable, x: Union[array_like, object], y: array_like, p0: array_iter = None,
               p0_fixed: array_iter = None, sigma: Union[array_iter, Callable] = None, absolute_sigma: bool = False,
               check_finite: bool = True, bounds: (ndarray, ndarray) = (-np.inf, np.inf), method: str = None,
-              jac: Union[Callable, str] = None, full_output: bool = False, report: bool = False, **kwargs):
+              jac: Union[Callable, str] = None, full_output: bool = False, report: bool = False, **kwargs) \
+        -> (ndarray, ndarray, Optional[dict], Optional[str], Optional[int]):
     r"""
-    :param f: The model function to fit to the data.
-    :param x: The x data.
-    :param y: The y data.
+    Use non-linear least squares to fit a function, $f$, to data. Assumes `ydata = f(xdata, *params) + eps`.
+    This is a reimplementation of
+    <a href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.curve_fit.html">
+    `scipy.optimize.curve_fit`</a> with the additional features of fixing parameters with `p0_fixed`
+    and the option to use the parameter `sigma` dynamically as a function `g(x, y, f(x, *params), *params) -> sigma`.
+
+    :param f: The model function $f$ to fit to the data.
+    :param x: The $x$ data.
+    :param y: The $y$ data.
     :param p0: A numpy array or an Iterable of the initial guesses for the parameters.
-     Must have at least the same length as the minimum number of parameters required by the function 'f'.
-     If 'p0' is None, 1 is taken as an initial guess for all non-keyword parameters.
-    :param p0_fixed: A numpy array or an Iterable of bool values specifying, whether to fix a parameter.
-     Must have the same length as p0.
-    :param sigma: The 1-sigma uncertainty of the y data.
-     This can also be a function g such that 'g(x, y, f(x, *params), *params) -> sigma'.
-    :param absolute_sigma: See scipy.optimize.curve_fit.
-    :param check_finite: See scipy.optimize.curve_fit.
-    :param bounds: See scipy.optimize.curve_fit.
-    :param method: See scipy.optimize.curve_fit.
-    :param jac: See scipy.optimize.curve_fit. Must not be callable if 'sigma' is callable.
-    :param full_output: See scipy.optimize.curve_fit.
+     Must have at least the same length as the minimum number of parameters required by the function `f`.
+     If `p0` is `None`, 1 is taken as an initial guess for all non-keyword parameters.
+    :param p0_fixed: A numpy array or an Iterable of `bool` values specifying whether to fix a parameter.
+     Must have the same length as `p0`.
+    :param sigma: The $1\sigma$ uncertainty of the `y` data.
+     This can also be a function $g$ such that `g(x, y, f(x, *params), *params) -> sigma`.
+    :param absolute_sigma: Assumes ydata = f(xdata, *params) + eps
+    :param check_finite: See
+     <a href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.curve_fit.html">
+     `scipy.optimize.curve_fit`</a>.
+    :param bounds: See
+     <a href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.curve_fit.html">
+     `scipy.optimize.curve_fit`</a>.
+    :param method: See
+     <a href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.curve_fit.html">
+     `scipy.optimize.curve_fit`</a>.
+    :param jac: See
+     <a href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.curve_fit.html">
+     `scipy.optimize.curve_fit`</a>. Must not be callable if `sigma` is callable.
+    :param full_output: See
+     <a href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.curve_fit.html">
+     `scipy.optimize.curve_fit`</a>.
     :param report: Whether to print the result of the fit.
-    :param kwargs: See scipy.optimize.curve_fit.
-    :returns: popt, pcov. The optimal parameters and their covariance matrix. Additional output if full_output is True.
-     See scipy.optimize.curve_fit.
+    :param kwargs: See
+     <a href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.curve_fit.html">
+     `scipy.optimize.curve_fit`</a>.
+    :returns: (popt, pcov) The optimal parameters and their covariance matrix.
+     Additional output if `full_output == True`.
+     See <a href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.curve_fit.html">
+     `scipy.optimize.curve_fit`</a>.
+    :raises (ValueError, RuntimeError, OptimizeWarning):
+     If either `x` or `y` contain NaNs, or if incompatible options are used.
+     If the least-squares minimization fails. If covariance of the parameters can not be estimated.
     """
 
     if p0 is None:
@@ -1148,16 +1329,24 @@ def _mass_factor_array(m0, m1, m0_d, m1_d):
 class King:
     def __init__(self, a: array_iter, m: array_iter, x_abs: array_iter = None,
                  subtract_electrons: scalar = 0., n_samples: int = 100000, element_label: str = None):
-        """
-        :param a: An iterable of the mass numbers of the considered isotopes with shape (k, ),
-         where k is the number of isotopes.
-        :param m: The masses and their uncertainties of the isotopes 'a' (u). 'm' must have shape (k, 2).
-        :param x_abs: The absolute values of the data vectors and their uncertainties
-         corresponding to the mass numbers 'a'. If given, the 'x' and 'y' parameters can be omitted when fitting
-         (in 'fit' and 'fit_nd') and is determined automatically as the difference between the mass numbers 'a'
-         and 'a_ref'. Must have shape (k, n, 2) where n is the number of dimensions of the king plot.
+        r"""
+        A class for $n$-dimensional King plots, encapsulating the linear regression algorithms of the
+        <a href="{{ '/doc/modules/analyze.html' | relative_url }}">
+        `qspec.analyze`</a> module. Call <a href="{{ '/doc/functions/analyze/King/fit.html' | relative_url }}">
+        `King.fit`</a> or <a href="{{ '/doc/functions/analyze/King/fit_nd.html' | relative_url }}">
+        `King.fit_nd`</a> for $2$- or $n$-dimensional fitting.
+
+        :param a: An iterable of the mass numbers $A$ of the considered isotopes with shape `(k, )`,
+         where `k` is the number of isotopes.
+        :param m: The masses and their uncertainties of the isotopes `a` (u). `m` must have shape `(k, 2)`.
+        :param x_abs: The absolute values of the data vectors and their standard deviations
+         corresponding to the mass numbers `a`. If given, the `x` and `y` parameters can be omitted in
+         <a href="{{ '/doc/functions/analyze/King/fit.html' | relative_url }}">
+        `King.fit`</a> and <a href="{{ '/doc/functions/analyze/King/fit_nd.html' | relative_url }}">
+        `King.fit_nd`</a>, and are determined automatically as the shift between the mass numbers `a`
+         and `a_ref`. Must have shape `(k, n, 2)` where `n` is the number of dimensions of the King plot.
         :param subtract_electrons: The number of electron masses that should be subtracted from the specified isotope
-         masses. 'subtract_electrons' does not have to be an integer if the ionization energy must be considered.
+         masses. `subtract_electrons` can be a `float` if the ionization energy shall be considered.
         :param n_samples: The number of generated samples for the monte-carlo routines.
         :param element_label: The label of the element to enhance the printed and plotted information.
         """
@@ -1235,27 +1424,37 @@ class King:
 
     def fit(self, a: array_iter, a_ref: array_iter, x: array_iter = None, y: array_iter = None,
             xy: Iterable[int] = None, func: Union[str, Callable] = york_fit, alpha: scalar = 0,
-            find_alpha: bool = False, show: bool = True, **kwargs):
-        """
-        :param a: An Iterable of the mass numbers of the used isotopes.
-        :param a_ref: An Iterable of the mass numbers of the used reference isotopes.
-        :param x: The x-values and their uncertainties of the King-fit to be performed. If 'mode' is "radii",
-         this must contain the differences of mean square nuclear charge radii or the Lambda-factor.
-         'x' must have shape (len(a), 2). Units: (fm ** 2) or (MHz).
-        :param y: The isotope shifts and their uncertainties of the King-fit to be performed.
-         'y' must have shape (len(a), 2). If None, 'y' is tried to be inherited from 'self.f'. Units: (MHz).
-        :param xy: A 2-tuple of indices (ix, iy) which select the axes to use for the King-fit from 'King.x_abs'
-         if x or y is not specified. The default value is (0, 1), fitting the second against the first axis.
-        :param func: The fitting routine. Must be one of {'york_fit' (default), 'linear_fit', 'linear_monte_carlo'}.
-        :param alpha: An x-axis offset to reduce the correlation coefficient between the y-intercept and the slope.
-         Unit: (u fm ** 2) or (u MHz).
-        :param find_alpha: Whether to search for the best 'alpha'. Uses the given 'alpha' as a starting point.
-         May not give the desired result if 'alpha' was initialized to far from its optimal value.
+            find_alpha: bool = False, show: bool = True, **kwargs) -> (ndarray, ndarray):
+        r"""
+        Perform $2$-dimensional linear regression to create a King plot.
+        Choose between `{'york_fit' (default), 'linear_fit', 'linear_monte_carlo'}` for the fit routine.
+        Use a parameter `alpha` to optimize the correlation coefficient between the $y$-intercept and the slope.
+
+        :param a: An Iterable of the mass numbers $A$ of the used isotopes.
+        :param a_ref: An Iterable of the mass numbers $A_\mathrm{ref}$ of the used reference isotopes.
+        :param x: The $x$ data and their standard deviations as shape `(len(a), 2)` arrays.
+         If plotted with `mode == 'radii'`,
+         the differences of mean-square nuclear charge radii $\delta\langle r^2\rangle^{A,A_\mathrm{ref}}$
+         or $\Lambda^{A,A_\mathrm{ref}}$ are expected, else isotope shifts $\delta\nu_x^{A,A_\mathrm{ref}}$
+         are expected. Expected units: (fm$^2$) or (MHz).
+         If `x` is `None`, `y` is tried to be inherited from `King.x_abs`.
+        :param y: The isotope shifts  $\delta\nu_y^{A,A_\mathrm{ref}}$ and their standard deviations
+         as shape `(len(a), 2)` arrays. Expected units: (MHz).
+         If `None`, `y` is tried to be inherited from `King.x_abs`.
+        :param xy: A 2-tuple of indices `(ix, iy)`, used to select the two plot axes from `King.x_abs`.
+         Only used if `x` or `y` is not specified. The default value is `(0, 1)`,
+         fitting the second against the first axis.
+        :param func: The fitting routine. Must be one of `{'york_fit' (default), 'linear_fit', 'linear_monte_carlo'}`.
+        :param alpha: An $x$-axis offset $\alpha$ to reduce the correlation coefficient
+         between the $y$-intercept and the slope. Expected unit: (u fm$^2$) or (u MHz).
+        :param find_alpha: Whether to search for the best `alpha`. Uses the given `alpha` as a starting point.
+         May not give the desired result if `alpha` was initialized too far from its optimal value.
         :param show: Whether to plot the fit result.
-        :param kwargs: Additional keyword arguments are passed to 'self.plot'.
-        :returns: A list of results as defined by the routine 'linear_alpha':
-         a, b, sigma_a, sigma_b, corr_ab, alpha. The best y-intercept and slope,
-         their respective 1-sigma uncertainties, their correlation coefficient and the used alpha.
+        :param kwargs: Additional keyword arguments are passed to
+         <a href="{{ '/doc/functions/analyze/King/plot.html' | relative_url }}">
+         `King.plot`</a>.
+        :returns: (popt, pcov) The best y-intercept and slope and their covariance matrix.
+         The final `alpha` can be accessed through `King.alpha`.
         """
         self.nd = False
         self.a_fit, self.a_ref = np.asarray(a, dtype=int), np.asarray(a_ref, dtype=int)
@@ -1295,20 +1494,27 @@ class King:
 
     def fit_nd(self, a: array_iter, a_ref: array_iter, x: array_iter = None,
                axis: int = 0, optimize_cov: bool = False, func: Union[Callable, str] = linear_nd_fit,
-               show: bool = True, **kwargs):
-        """
-        :param a: An Iterable of the mass numbers of the used isotopes with shape (k, ).
-        :param a_ref: An Iterable of the mass numbers of the used reference isotopes with shape (k, ).
-        :param x: The x data as an iterable of vectors with uncertainties of shape (k, n, 2), where k is the
-         number of data points and n is the number of dimensions of each point.
-        :param axis: The axis to use for the parametrization. For example, a King plot with the isotope shifts
-         of two transitions ['D1', 'D2'] yields the slope F_D2 / F_D1 if 'axis' == 0.
-        :param optimize_cov: If True, the origin vector of the straight is optimized to yield the smallest covariances.
-        :param func: The fitting routine. Must be one of {'linear_nd_fit', 'linear_nd_monte_carlo'}.
+               show: bool = True, **kwargs) -> (ndarray, ndarray):
+        r"""
+        Perform $n$-dimensional linear regression to create a King plot.
+        Choose between `{'linear_nd_fit' (default), 'linear_nd_monte_carlo'}` for the fit routine.
+
+        :param a: An Iterable of the mass numbers $A$ of the used isotopes.
+        :param a_ref: An Iterable of the mass numbers $A_\mathrm{ref}$ of the used reference isotopes.
+        :param x: The $x$ data as an iterable of vectors with standard deviations of shape `(k, n, 2)`, where k is the
+         number of data points/isotopes and `n` is the dimension of each vector.
+        :param axis: The vector component to use for the parameterization.
+         For example, a King plot with the isotope shifts of two transitions `['D1', 'D2']`
+         yields the slope $F_\mathrm{D2} / F_\mathrm{D1}$ if `axis == 0`.
+        :param optimize_cov: If `True`, the origin vector of the straight is optimized
+         to yield the smallest covariances.
+        :param func: The fitting routine. Must be one of `{'linear_nd_fit' (default), 'linear_nd_monte_carlo'}`.
         :param show: Whether to plot the fit result.
-        :param kwargs: Additional keyword arguments are passed to 'func' and 'self.plot_nd'.
-        :returns: popt, pcov. The optimized parameters and their covariances. The resulting shapes are (2n, )
-         and (2n, 2n).
+        :param kwargs: Additional keyword arguments are passed to `func` and
+         <a href="{{ '/doc/functions/analyze/King/plot.html' | relative_url }}">
+         `King.plot`</a>.
+        :returns: (popt, pcov) The optimized parameters and their covariances.
+         The resulting shapes are `(2 * n, )` and `(2 * n, 2 * n)`.
         """
         self.nd = True
         self.a_fit, self.a_ref = np.asarray(a, dtype=int), np.asarray(a_ref, dtype=int)
@@ -1370,15 +1576,26 @@ class King:
         return np.array(ai + bi + yi, dtype=float)
 
     def get_unmodified(self, a: array_iter, a_ref: array_iter, x: array_iter, axis: int = 0,
-                       show: bool = False, **kwargs):
-        """
-        :param a: An Iterable of mass numbers corresponding to the isotopes of the given 'y' values.
-        :param a_ref: An Iterable of mass numbers corresponding to reference isotopes of the given 'y' values.
-        :param x: The unmodified input values of the given mass numbers. Must have shape (len(a), 2).
-        :param axis: The axis of the input values.
-        :param show: Whether to draw the King plot with the specified values.
-        :param kwargs: Additional keyword arguments are passed to 'self.plot'.
-        :returns: The unmodified x values calculated with the fit results and the given 'y' values.
+                       show: bool = False, **kwargs) -> (ndarray, ndarray, ndarray):
+        r"""
+        Calculate unknown isotope shifts/charge radii by using the King plot results.
+
+        :param a: An Iterable of mass numbers $A$, corresponding to the isotopes of the given `x` values.
+        :param a_ref: An Iterable of mass numbers $A_\mathrm{ref}$,
+         corresponding to reference isotopes of the given `x` values.
+        :param x: The unmodified input values for the given mass numbers `a` and `a_ref`.
+         These could be the unmodified isotope shifts $\delta\nu_x^{A,A_\mathrm{ref}}$. Must have shape `(len(a), 2)`.
+        :param axis: The vector component corresponding to the given input values.
+         For example, in a $2$-dimensional fit with components `['D1', 'D2']`,
+         set `axis=0` to use the isotope shifts of the D1-line to calculate those of the D2-line.
+        :param show: Whether to draw the calculated values in the King plot.
+        :param kwargs: Additional keyword arguments are passed to
+         <a href="{{ '/doc/functions/analyze/King/plot.html' | relative_url }}">
+         `King.plot`</a>.
+        :returns: (y, cov, cov_stat) The unmodified $y$ values calculated with the fit results and the given `x` values.
+         `y` has shape `(k, n)` and includes the given `x` values, where `k` is the number of data points/isotopes
+         and `n` is the dimension of te King plot.
+         Also returns the total and the statistical covariance matrix of the results.
         """
         if self.popt is None:
             print('There are no results yet. Please use one of the fitting options {\'fit\' or \'fit_nd\'}.')
@@ -1533,7 +1750,7 @@ class King:
 
     def _plot_2d(self, mode: str = '', sigma2d: int = 1, scale: tuple = None, add_xy: array_like = None,
                  add_a: array_like = None, show: bool = True, **kwargs):
-        """
+        r"""
         :param mode: The mode of the King-fit. If mode='radii', the x-axis must contain the differences of
          mean square nuclear charge radii or the Lambda-factor. For every other value,
          the x-axis is assumed to be an isotope shift such that the slope corresponds to
@@ -1624,23 +1841,26 @@ class King:
 
     def plot(self, mode: str = '', sigma2d: int = 1, scale: tuple = None, add_xy: array_like = None,
              add_a: array_like = None, font_dict: dict = None, show: bool = True, **kwargs):
-        """
-        :param mode: The mode of the King-fit. If mode='radii', the x-axis must contain the differences of
-         mean square nuclear charge radii or the Lambda-factor. For every other value,
-         the x-axis is assumed to be an isotope shift such that the slope corresponds to
-         a field-shift ratio F(y_i) / F(x).
-        :param sigma2d: Whether to draw the actual two-dimensional uncertainty bounds or the classical errorbars.
-         The integer number corresponds to the number of drawn sigma regions.
-        :param scale: Factors to scale the x and the y-axis.
-        :param add_xy: Additional x and y data to plot. Must have shape (n - 1, k, 5),
+        r"""
+        Show the King plot using <a href="https://matplotlib.org/">
+        `matplotlib`</a>. The King plot is based on the modified axes `King.x_mod_nd` and `King.y_mod_nd`
+         as well as the fit results `King.results_nd`.
+
+        :param mode: The mode of the King plot. If `mode == 'radii'`,
+         the differences of mean-square nuclear charge radii $\delta\langle r^2\rangle^{A,A_\mathrm{ref}}$
+         or $\Lambda^{A,A_\mathrm{ref}}$ are expected for the $x$-axis,
+         else isotope shifts $\delta\nu_x^{A,A_\mathrm{ref}}$ are expected.
+        :param sigma2d: Whether to draw actual 2-dimensional uncertainty bounds or classical errorbars.
+         An integer number corresponds to the number of drawn sigma regions.
+        :param scale: Factors to scale the $x$ and the $y$-axis.
+        :param add_xy: Additional $x$ and $y$ data to plot. Must have shape `(n - 1, k, 5)`,
          where n is the dimension of the data vectors, k is the number of additional data points and the five entries
-         in the last axis correspond to arrays of the form [x, x_d, y, y_d, corr_xy].
-        :param add_a: Additional mass numbers for the additional data. Must have shape (k, 2),
-         where each row is a tuple [A, A_ref].
-        :param font_dict: The font_dict passed to matplotlib.rc('font', font_dict).
-        :param show: Whether to show the plot.
-        :returns: Generates a King-Plot based on the modified axes 'self.x_mod_nd' and 'self.y_mod_nd'
-         as well as the fit results 'self.results_nd'.
+         in the last axis correspond to arrays of the form `[x, x_d, y, y_d, corr_xy]`.
+        :param add_a: Additional mass numbers for the additional data. Must have shape `(k, 2)`,
+         where each row is a tuple `(A, A_ref)`.
+        :param font_dict: The font_dict passed to `matplotlib.rc('font', font_dict)`.
+        :param show: Whether to call `plt.show()`.
+        :param kwargs: Additional keyword arguments.
         """
         if font_dict is None:
             font_dict = {}

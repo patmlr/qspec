@@ -44,6 +44,9 @@ class COLORS:
     UNDERLINE = '\033[4m'
     PYPLOT = ['C{}'.format(i) for i in range(10)]
 
+    def __init__(self):
+        pass
+
 
 def get_rgb_print_command(r, g, b):
     """

@@ -8,8 +8,8 @@
     <div class="bd-content-table-content">
       <ol class="extern-ol">
         {% for item in site.data.tutorials %}
-        <li class="spaced">
-          <a href="{{ item.link | relative_url }}" {% if page.url contains item.identifier %} class="table-current" {% endif %}>
+        <li class="spaced-tut">
+          <a href="{{ item.link | relative_url }}" {% if page.url contains item.identifier %} class="table-current-tut" {% endif %}>
             {{ item.title }}
           </a>
         </li>
