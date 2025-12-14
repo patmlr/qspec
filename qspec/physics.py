@@ -1,59 +1,149 @@
-# -*- coding: utf-8 -*-
 """
 qspec.physics
 =============
 
-Module for physical functions useful for CLS.
+Module for physical functions useful for laser-atom interactions.
 """
 
 import string
+
 import numpy as np
 import scipy.constants as sc
-import scipy.stats as st
 import scipy.special as sp
+import scipy.stats as st
 
-from qspec.qtypes import *
 from qspec import tools
 from qspec.algebra import mu_j_m1, mu_jj_m1
+from qspec.qtypes import (
+    array_like,
+    asarray,
+    cast,
+    has_getitem,
+    has_shape,
+    is_scalar,
+    ndarray,
+    quant,
+    quant_iter,
+    quant_like,
+    scalar_like,
+)
 
-__all__ = ['L_LABEL', 'E_NORM', 'pi', 'LEMNISCATE', 'h', 'kB', 'mu_N', 'mu_B', 'g_s', 'me_u', 'me_u_d', 'gp_s', 'gn_s',
-           'inv_cm_to_freq', 'freq_to_inv_cm', 'wavelength_to_freq', 'freq_to_wavelength', 'inv_cm_to_wavelength',
-           'wavelength_to_inv_cm', 'beta', 'gamma', 'gamma_e', 'gamma_e_kin', 'e_rest', 'e_kin', 'e_total', 'e_el',
-           'v_e', 'v_e_d1', 'v_el', 'v_el_d1', 'p_v', 'p_e', 'p_el', 'doppler', 'doppler_d1', 'doppler_e_d1',
-           'doppler_el_d1', 'inverse_doppler', 'inverse_doppler_d1', 'alpha_atom', 'v_recoil', 'f_recoil',
-           'f_recoil_v', 'get_f', 'get_m', 'lande_n', 'lande_j', 'lande_jj', 'g_j', 'lande_f',
-           'cast_hyper_const', 'hyperfine', 'zeeman_linear', 'hyper_zeeman_linear',
-           'hyper_zeeman_ij', 'hyper_zeeman_num', 'hyper_zeeman_12', 'hyper_zeeman_12_d', 'a_hyper_mu',
-           'a_einstein_m1',  # 'a_einstein_m1_fm',
-           'temperature_doppler', 'saturation_intensity', 'saturation', 'rabi_s', 'scattering_rate', 'mass_factor',
-           'delta_r2', 'delta_r4', 'delta_r6', 'lambda_r', 'lambda_rn', 'schmidt_line', 'sellmeier',
-           'gamma_3d', 'boost', 'doppler_3d', 'gaussian_beam_3d', 'gaussian_doppler_3d',
-           'sigma_v', 't_sigma', 't_xi', 'normal_vx_pdf',
-           'normal_vx_rvs', 'chi2_ex_pdf', 'chi2_ex_rvs', 'normal_chi2_convolved_ex_pdf',
-           'normal_chi2_convolved_vx_pdf', 'normal_chi2_convolved_f_pdf', 'normal_chi2_convolved_f_xi_pdf',
-           'source_energy_pdf']
+__all__ = [
+    "E_NORM",
+    "LEMNISCATE",
+    "L_LABEL",
+    "a_einstein_m1",  # 'a_einstein_m1_fm',
+    "a_hyper_mu",
+    "alpha_atom",
+    "beta",
+    "boost",
+    "cast_hyper_const",
+    "chi2_ex_pdf",
+    "chi2_ex_rvs",
+    "delta_r2",
+    "delta_r4",
+    "delta_r6",
+    "doppler",
+    "doppler_3d",
+    "doppler_d1",
+    "doppler_e_d1",
+    "doppler_el_d1",
+    "e_el",
+    "e_kin",
+    "e_rest",
+    "e_total",
+    "f_recoil",
+    "f_recoil_v",
+    "freq_to_inv_cm",
+    "freq_to_wavelength",
+    "g_j",
+    "g_s",
+    "gamma",
+    "gamma_3d",
+    "gamma_e",
+    "gamma_e_kin",
+    "gaussian_beam_3d",
+    "gaussian_doppler_3d",
+    "get_f",
+    "get_m",
+    "gn_s",
+    "gp_s",
+    "h",
+    "hyper_zeeman_12",
+    "hyper_zeeman_12_d",
+    "hyper_zeeman_ij",
+    "hyper_zeeman_linear",
+    "hyper_zeeman_num",
+    "hyperfine",
+    "inv_cm_to_freq",
+    "inv_cm_to_wavelength",
+    "inverse_doppler",
+    "inverse_doppler_d1",
+    "kB",
+    "lambda_r",
+    "lambda_rn",
+    "lande_f",
+    "lande_j",
+    "lande_jj",
+    "lande_n",
+    "mass_factor",
+    "me_u",
+    "me_u_d",
+    "mu_B",
+    "mu_N",
+    "normal_chi2_convolved_ex_pdf",
+    "normal_chi2_convolved_f_pdf",
+    "normal_chi2_convolved_f_xi_pdf",
+    "normal_chi2_convolved_vx_pdf",
+    "normal_vx_pdf",
+    "normal_vx_rvs",
+    "p_e",
+    "p_el",
+    "p_v",
+    "pi",
+    "rabi_s",
+    "saturation",
+    "saturation_intensity",
+    "scattering_rate",
+    "schmidt_line",
+    "sellmeier",
+    "sigma_v",
+    "source_energy_pdf",
+    "t_sigma",
+    "t_xi",
+    "temperature_doppler",
+    "v_e",
+    "v_e_d1",
+    "v_el",
+    "v_el_d1",
+    "v_recoil",
+    "wavelength_to_freq",
+    "wavelength_to_inv_cm",
+    "zeeman_linear",
+]
 
 max_float64_value = np.finfo(np.float64).max
 max_exp_input = np.log(max_float64_value) - 0.1
 
-L_LABEL = ['S', 'P', 'D', ] + list(string.ascii_uppercase[5:])
+L_LABEL = ["S", "P", "D", *list(string.ascii_uppercase[5:])]
 E_NORM = sc.e
-pi = np.pi
 LEMNISCATE = 2.6220575543
+pi = np.pi
 h = sc.h
 kB = sc.k
-mu_N = sc.physical_constants['nuclear magneton'][0]
-mu_B = sc.physical_constants['Bohr magneton'][0]
-g_s = sc.physical_constants['electron g factor'][0]
-me_u = sc.physical_constants['electron mass in u'][0]
-me_u_d = sc.physical_constants['electron mass in u'][2]
-gp_s = sc.physical_constants['proton g factor'][0]
-gn_s = sc.physical_constants['neutron g factor'][0]
+mu_N = sc.physical_constants["nuclear magneton"][0]
+mu_B = sc.physical_constants["Bohr magneton"][0]
+g_s = sc.physical_constants["electron g factor"][0]
+me_u = sc.physical_constants["electron mass in u"][0]
+me_u_d = sc.physical_constants["electron mass in u"][2]
+gp_s = sc.physical_constants["proton g factor"][0]
+gn_s = sc.physical_constants["neutron g factor"][0]
 
 
 """ Units """
 
 # --- freq <-> cm ---
+
 
 def cm1_to_freq(k: array_like) -> ndarray:
     r"""
@@ -73,6 +163,7 @@ def freq_to_cm1(f: array_like) -> ndarray:
     :returns: (k) The wavenumber $k$ corresponding to the frequency `f` (1/cm).
     """
     return np.asarray(f, dtype=float) / sc.c * 1e4
+
 
 def inv_cm_to_freq(k: array_like) -> ndarray:
     r"""
@@ -96,6 +187,7 @@ def freq_to_inv_cm(f: array_like) -> ndarray:
 
 # --- wav <-> freq ---
 
+
 def wavelength_to_freq(lam: array_like) -> ndarray:
     r"""
     Convert &mu;m into MHz using $f = c / \lambda$.
@@ -117,6 +209,7 @@ def freq_to_wavelength(f: array_like) -> ndarray:
 
 
 # --- cm <-> wav ---
+
 
 def cm1_to_wavelength(k: array_like) -> ndarray:
     r"""
@@ -178,7 +271,7 @@ def gamma_beta(b: array_like) -> ndarray:
     :param b: The relativistic velocity $\beta$ of a body.
     :returns: (gamma) The time-dilation/Lorentz factor $\gamma$ corresponding to the relativistic velocity `b`.
     """
-    return 1. / np.sqrt(1. - np.asarray(b, dtype=float) ** 2)
+    return 1.0 / np.sqrt(1.0 - np.asarray(b, dtype=float) ** 2)
 
 
 def gamma(v: array_like) -> ndarray:
@@ -197,7 +290,8 @@ def gamma_e(e: array_like, m: array_like) -> ndarray:
 
     :param e: The total energy $E$ of a body, including the energy of the rest mass (eV).
     :param m: The mass $m$ of the body (u).
-    :returns: (gamma) The time-dilation/Lorentz factor $\gamma$ corresponding to the total energy `e` of a body with mass `m`.
+    :returns: (gamma) The time-dilation/Lorentz factor $\gamma$ corresponding to
+     the total energy `e` of a body with mass `m`.
     """
     return np.asarray(e, dtype=float) / e_rest(m)
 
@@ -208,9 +302,10 @@ def gamma_e_kin(e: array_like, m: array_like) -> ndarray:
 
     :param e: The kinetic energy $E_\mathrm{kin}$ of a body (eV).
     :param m: The mass $m$ of the body (u).
-    :returns: (gamma) The time-dilation/Lorentz factor $\gamma$ corresponding to the kinetic energy `e` of a body with mass `m`.
+    :returns: (gamma) The time-dilation/Lorentz factor $\gamma$ corresponding to
+     the kinetic energy `e` of a body with mass `m`.
     """
-    return 1. + gamma_e(e, m)
+    return 1.0 + gamma_e(e, m)
 
 
 def e_rest(m: array_like) -> ndarray:
@@ -220,7 +315,7 @@ def e_rest(m: array_like) -> ndarray:
     :param m: The mass $m$ of a body (u).
     :returns: (E_rest) The resting energy $E_\mathrm{rest}$ of the body with mass `m` (eV).
     """
-    return np.asarray(m, dtype=float) * sc.atomic_mass * sc.c ** 2 / E_NORM
+    return np.asarray(m, dtype=float) * sc.atomic_mass * sc.c**2 / E_NORM
 
 
 def e_kin(v: array_like, m: array_like, relativistic: bool = True) -> ndarray:
@@ -235,10 +330,10 @@ def e_kin(v: array_like, m: array_like, relativistic: bool = True) -> ndarray:
     :returns: (E_kin) The kinetic energy $E_\mathrm{kin}$ of a body with velocity `v` and mass `m` (eV).
     """
     if relativistic:
-        return (gamma(v) - 1.) * e_rest(m)
-    else:
-        v, m = np.asarray(v, dtype=float), np.asarray(m, dtype=float)
-        return 0.5 * m * sc.atomic_mass * v ** 2 / E_NORM
+        return (gamma(v) - 1.0) * e_rest(m)
+
+    v, m = np.asarray(v, dtype=float), np.asarray(m, dtype=float)
+    return 0.5 * m * sc.atomic_mass * v**2 / E_NORM
 
 
 def e_total(v: array_like, m: array_like) -> ndarray:
@@ -279,10 +374,10 @@ def v_e(e: array_like, m: array_like, v0: array_like = 0, relativistic: bool = T
      after the addition of the energy `e` (m/s).
     """
     if relativistic:
-        return sc.c * np.sqrt(1. - (1. / (gamma(v0) + gamma_e(e, m))) ** 2)
-    else:
-        v0, e, m = np.asarray(v0, dtype=float), np.asarray(e, dtype=float), np.asarray(m, dtype=float)
-        return np.sqrt(v0 ** 2 + 2. * e * E_NORM / (m * sc.atomic_mass))
+        return sc.c * np.sqrt(1.0 - (1.0 / (gamma(v0) + gamma_e(e, m))) ** 2)
+
+    v0, e, m = np.asarray(v0, dtype=float), np.asarray(e, dtype=float), np.asarray(m, dtype=float)
+    return np.sqrt(v0**2 + 2.0 * e * E_NORM / (m * sc.atomic_mass))
 
 
 def v_e_d1(e: array_like, m: array_like, v0: array_like = 0, relativistic: bool = True) -> ndarray:
@@ -299,7 +394,7 @@ def v_e_d1(e: array_like, m: array_like, v0: array_like = 0, relativistic: bool 
      and velocity `v0` with respect to the added energy `e` (m/(s eV)).
     """
     m = np.asarray(m, dtype=float)
-    dv = 1. / (m * sc.atomic_mass * v_e(e, m, v0=v0, relativistic=relativistic))
+    dv = 1.0 / (m * sc.atomic_mass * v_e(e, m, v0=v0, relativistic=relativistic))
     if relativistic:
         dv /= (gamma(v0) + gamma_e(e, m)) ** 3
     return dv * E_NORM
@@ -354,8 +449,7 @@ def p_v(v: array_like, m: array_like, relativistic: bool = True) -> ndarray:
     v, m = np.asarray(v, dtype=float), np.asarray(m, dtype=float)
     if relativistic:
         return gamma(v) * m * v
-    else:
-        return m * v
+    return m * v
 
 
 def p_e(e: array_like, m: array_like, p0: array_like = 0, relativistic: bool = True) -> ndarray:
@@ -373,12 +467,11 @@ def p_e(e: array_like, m: array_like, p0: array_like = 0, relativistic: bool = T
     e, p0 = np.asarray(e, dtype=float), np.asarray(p0, dtype=float)
 
     if relativistic:
-        pc_square = (p0 * sc.atomic_mass * sc.c) ** 2 / E_NORM ** 2
-        return np.sqrt(e ** 2 + pc_square + 2 * e * np.sqrt(pc_square + e_rest(m) ** 2)) / (sc.c * sc.atomic_mass)
+        pc_square = (p0 * sc.atomic_mass * sc.c) ** 2 / E_NORM**2
+        return np.sqrt(e**2 + pc_square + 2 * e * np.sqrt(pc_square + e_rest(m) ** 2)) / (sc.c * sc.atomic_mass)
 
-    else:
-        m = np.asarray(m, dtype=float)
-        return np.sqrt((p0 * sc.atomic_mass) ** 2 + 2 * m * sc.atomic_mass * e * E_NORM) / sc.atomic_mass
+    m = np.asarray(m, dtype=float)
+    return np.sqrt((p0 * sc.atomic_mass) ** 2 + 2 * m * sc.atomic_mass * e * E_NORM) / sc.atomic_mass
 
 
 def p_el(u: array_like, q: array_like, m: array_like, p0: array_like = 0, relativistic: bool = True) -> ndarray:
@@ -397,7 +490,7 @@ def p_el(u: array_like, q: array_like, m: array_like, p0: array_like = 0, relati
     return p_e(e_el(u, q), m, p0, relativistic=relativistic)
 
 
-def doppler(f: array_like, v: array_like, alpha: array_like, return_frame: str = 'atom') -> ndarray:
+def doppler(f: array_like, v: array_like, alpha: array_like, return_frame: str = "atom") -> ndarray:
     r"""
     The Doppler-shifted frequency $f^\prime = \begin{cases}f\gamma(v)(1 - \frac{v}{c}\cos(\alpha)), & \mathrm{atom}\\
     f[\gamma(v)(1 - \frac{v}{c}\cos(\alpha))]^{-1}, & \mathrm{lab}\end{cases}$
@@ -412,19 +505,18 @@ def doppler(f: array_like, v: array_like, alpha: array_like, return_frame: str =
     """
     f, alpha = np.asarray(f, dtype=float), np.asarray(alpha, dtype=float)
 
-    if return_frame == 'atom':
+    if return_frame == "atom":
         # Return freq in the atomic system, alpha=0 == Col, alpha in laboratory system
-        return f * gamma(v) * (1. - beta(v) * np.cos(alpha))
+        return f * gamma(v) * (1.0 - beta(v) * np.cos(alpha))
 
-    elif return_frame == 'lab':
+    if return_frame == "lab":
         # Return freq in the laboratory system, alpha=0 == Col, alpha in laboratory system
-        return f / (gamma(v) * (1. - beta(v) * np.cos(alpha)))
+        return f / (gamma(v) * (1.0 - beta(v) * np.cos(alpha)))
 
-    else:
-        raise ValueError('return_frame must be either \'atom\' or \'lab\'.')
+    raise ValueError("`return_frame` must be either 'atom' or 'lab'.")
 
 
-def doppler_d1(f: array_like, v: array_like, alpha: array_like, return_frame: str = 'atom') -> ndarray:
+def doppler_d1(f: array_like, v: array_like, alpha: array_like, return_frame: str = "atom") -> ndarray:
     r"""
     The first derivative $\frac{\partial f^\prime}{\partial v} = a\frac{f^\prime}{c}\gamma^3(v)(\frac{v}{c}
      - \cos(\alpha))$ with $a = \begin{cases}f / f^\prime, & \mathrm{atom}\\
@@ -440,21 +532,27 @@ def doppler_d1(f: array_like, v: array_like, alpha: array_like, return_frame: st
     """
     f = np.asarray(f, dtype=float)
 
-    if return_frame == 'atom':
+    if return_frame == "atom":
         # Return df/dv in the atomic system, alpha=0 == Col, alpha in laboratory system.
         return f * gamma(v) ** 3 * (beta(v) - np.cos(alpha)) / sc.c
 
-    elif return_frame == 'lab':
+    if return_frame == "lab":
         # Return df/dv in the laboratory system, alpha=0 == Col, alpha in laboratory system.
-        f_lab = doppler(f, v, alpha, return_frame='lab')
-        return -f_lab / f * doppler_d1(f_lab, v, alpha, return_frame='atom')
+        f_lab = doppler(f, v, alpha, return_frame="lab")
+        return -f_lab / f * doppler_d1(f_lab, v, alpha, return_frame="atom")
 
-    else:
-        raise ValueError('return_frame must be either \'atom\' or \'lab\'.')
+    raise ValueError("return_frame must be either 'atom' or 'lab'.")
 
 
-def doppler_e_d1(f: array_like, alpha: array_like, e: array_like, m: array_like,
-                 v0: array_like = 0, return_frame: str = 'atom', relativistic: bool = True) -> ndarray:
+def doppler_e_d1(
+    f: array_like,
+    alpha: array_like,
+    e: array_like,
+    m: array_like,
+    v0: array_like = 0,
+    return_frame: str = "atom",
+    relativistic: bool = True,
+) -> ndarray:
     r"""
     The first derivative $\frac{\partial f^\prime}{\partial E} =
      \frac{\partial f^\prime}{\partial v}\frac{\partial v}{\partial E}$.
@@ -476,8 +574,16 @@ def doppler_e_d1(f: array_like, alpha: array_like, e: array_like, m: array_like,
     return doppler_d1(f, v, alpha, return_frame=return_frame) * v_e_d1(e, m, v0=v0, relativistic=relativistic)
 
 
-def doppler_el_d1(f: array_like, alpha: array_like, u: array_like, q: array_like, m: array_like,
-                  v0: array_like = 0., return_frame: str = 'atom', relativistic: bool = True) -> ndarray:
+def doppler_el_d1(
+    f: array_like,
+    alpha: array_like,
+    u: array_like,
+    q: array_like,
+    m: array_like,
+    v0: array_like = 0.0,
+    return_frame: str = "atom",
+    relativistic: bool = True,
+) -> ndarray:
     r"""
     The first derivative $\frac{\partial f^\prime}{\partial U} =
      \frac{\partial f^\prime}{\partial v}\frac{\partial v}{\partial U}$.
@@ -500,8 +606,9 @@ def doppler_el_d1(f: array_like, alpha: array_like, u: array_like, q: array_like
     return doppler_d1(f, v, alpha, return_frame=return_frame) * v_el_d1(u, q, m, v0=v0, relativistic=relativistic)
 
 
-def inverse_doppler(f_atom: array_like, f_lab: array_like, alpha: array_like,
-                    mode: str = 'raise-raise', return_mask: bool = False) -> (ndarray, Optional[ndarray]):
+def inverse_doppler(
+    f_atom: array_like, f_lab: array_like, alpha: array_like, mode: str = "raise-raise", return_mask: bool = False
+) -> ndarray | tuple[ndarray, ndarray]:
     r"""
     The velocity
     $$\begin{aligned}v &= \frac{c}{s}\left[\cos(\alpha) \pm (f_\mathrm{atom}/f_\mathrm{lab})\sqrt{s - 1}\right]\\[2ex]
@@ -528,47 +635,50 @@ def inverse_doppler(f_atom: array_like, f_lab: array_like, alpha: array_like,
     :raises ValueError: `mode` must be `'raise-raise'`, `'raise-small'`, `'raise-large'`, `'isnan-raise'`,
      `'isnan-small'`, or `'isnan-large'`. For additionally raised errors, see the description of the `mode` parameter.
     """
-    modes = {'raise-raise', 'raise-small', 'raise-large', 'isnan-raise', 'isnan-small', 'isnan-large'}
+    modes = {"raise-raise", "raise-small", "raise-large", "isnan-raise", "isnan-small", "isnan-large"}
     if mode not in modes:
-        raise ValueError('mode must be in {}.'.format(modes))
+        raise ValueError(f"`mode` must be in {modes}.")
 
-    f_atom, f_lab, alpha = \
-        np.asarray(f_atom, dtype=float), np.asarray(f_lab, dtype=float), np.asarray(alpha, dtype=float)
+    f_atom, f_lab, alpha = (
+        np.asarray(f_atom, dtype=float),
+        np.asarray(f_lab, dtype=float),
+        np.asarray(alpha, dtype=float),
+    )
     scalar_true = tools.check_shape((), f_atom, f_lab, alpha, return_mode=True)
     if scalar_true:  # To make array masking work, scalars need to be converted to 1d-arrays.
         alpha = np.array([alpha])
 
     cos = np.cos(alpha)
-    square_sum = (f_atom / f_lab) ** 2 + cos ** 2
-    nan = square_sum < 1.
-    np.seterr(invalid='ignore')
-    bet1 = (cos + f_atom / f_lab * np.sqrt(square_sum - 1.)) / square_sum
-    bet2 = (cos - f_atom / f_lab * np.sqrt(square_sum - 1.)) / square_sum
-    np.seterr(invalid='warn')
+    square_sum = (f_atom / f_lab) ** 2 + cos**2
+    nan = square_sum < 1.0
+    np.seterr(invalid="ignore")
+    bet1 = (cos + f_atom / f_lab * np.sqrt(square_sum - 1.0)) / square_sum
+    bet2 = (cos - f_atom / f_lab * np.sqrt(square_sum - 1.0)) / square_sum
+    np.seterr(invalid="warn")
 
-    bet1[nan] = 2.
-    bet2[nan] = 2.
+    bet1[nan] = 2.0
+    bet2[nan] = 2.0
     mask1 = np.abs(0.5 - bet1) < 0.5
-    mask1 += bet1 == 0.
+    mask1 += bet1 == 0.0
     mask2 = np.abs(0.5 - bet2) < 0.5
-    mask2 += bet2 == 0.
+    mask2 += bet2 == 0.0
     ambiguous = ~(~mask1 + ~mask2)
     nan = ~(mask1 + mask2)
     bet = np.zeros_like(square_sum)
     bet[nan] = np.nan
 
-    if mode[6:] in ['small', 'raise']:
+    if mode[6:] in ["small", "raise"]:
         bet[mask1] = bet1[mask1]
         bet[mask2] = bet2[mask2]
-    elif mode[6:] == 'large':
+    elif mode[6:] == "large":
         bet[mask2] = bet2[mask2]
         bet[mask1] = bet1[mask1]
-    if np.any(nan):
-        if mode[:5] == 'raise':
-            raise ValueError('Situation is physically impossible for at least one argument.')
-    if np.any(ambiguous):
-        if mode[6:] == 'raise':
-            raise ValueError('Situation allows two different velocities.')
+
+    if np.any(nan) and mode[:5] == "raise":
+        raise ValueError("Situation is physically impossible for at least one argument.")
+
+    if np.any(ambiguous) and mode[6:] == "raise":
+        raise ValueError("Situation allows two different velocities.")
 
     if return_mask:
         if scalar_true:
@@ -579,8 +689,9 @@ def inverse_doppler(f_atom: array_like, f_lab: array_like, alpha: array_like,
     return bet * sc.c
 
 
-def inverse_doppler_d1(f_atom: array_like, f_lab: array_like, alpha: array_like,
-                       mode: str = 'raise-raise', return_mask: bool = False) -> (ndarray, Optional[ndarray]):
+def inverse_doppler_d1(
+    f_atom: array_like, f_lab: array_like, alpha: array_like, mode: str = "raise-raise", return_mask: bool = False
+) -> ndarray | tuple[ndarray, ndarray]:
     r"""
     The first derivative
     $$\begin{aligned}\frac{\partial v}{\partial f_\mathrm{atom}} &=
@@ -608,25 +719,28 @@ def inverse_doppler_d1(f_atom: array_like, f_lab: array_like, alpha: array_like,
     :returns: (dv_df) The first derivative $\partial v / \partial f_\mathrm{atom}$ of the velocity $v$ required to shift
      `f_lab` to `f_atom`. Optionally returns the mask where the velocity is ambiguous (m/(s MHz)).
     """
-    modes = ['raise-raise', 'raise-small', 'raise-large', 'isnan-raise', 'isnan-small', 'isnan-large']
+    modes = ["raise-raise", "raise-small", "raise-large", "isnan-raise", "isnan-small", "isnan-large"]
     if mode not in modes:
-        raise ValueError('mode must be in {}.'.format(modes))
+        raise ValueError(f"`mode` must be in {modes}.")
 
-    f_atom, f_lab, alpha = \
-        np.asarray(f_atom, dtype=float), np.asarray(f_lab, dtype=float), np.asarray(alpha, dtype=float)
+    f_atom, f_lab, alpha = (
+        np.asarray(f_atom, dtype=float),
+        np.asarray(f_lab, dtype=float),
+        np.asarray(alpha, dtype=float),
+    )
     scalar_true = tools.check_shape((), f_atom, f_lab, alpha, return_mode=True)
     if scalar_true:  # To make array masking work, scalars need to be converted to 1d-arrays.
         alpha = np.array([alpha])
 
     v, ambiguous = inverse_doppler(f_atom, f_lab, alpha, mode=mode, return_mask=True)
     cos = np.cos(alpha)
-    square_sum = (f_atom / f_lab) ** 2 + cos ** 2
-    np.seterr(invalid='ignore')
-    bet = np.sqrt(square_sum - 1.) + (f_atom / f_lab) ** 2 / np.sqrt(square_sum - 1.)
-    np.seterr(invalid='warn')
-    if mode[6:] in ['small', 'raise']:
+    square_sum = (f_atom / f_lab) ** 2 + cos**2
+    np.seterr(invalid="ignore")
+    bet = np.sqrt(square_sum - 1.0) + (f_atom / f_lab) ** 2 / np.sqrt(square_sum - 1.0)
+    np.seterr(invalid="warn")
+    if mode[6:] in ["small", "raise"]:
         bet[ambiguous] = -bet[ambiguous]
-    bet += -2. * v * (f_atom / f_lab) / sc.c
+    bet += -2.0 * v * (f_atom / f_lab) / sc.c
     bet /= f_lab * square_sum
 
     if return_mask:
@@ -650,7 +764,7 @@ def alpha_atom(alpha: array_like, v: array_like) -> ndarray:
     """
     alpha = np.asarray(alpha, dtype=float)
     cos = np.cos(alpha)
-    arg = (beta(v) + cos) / (1. + beta(v) * cos)
+    arg = (beta(v) + cos) / (1.0 + beta(v) * cos)
     return np.arccos(arg)
 
 
@@ -677,7 +791,7 @@ def f_recoil(f: array_like, m: array_like) -> ndarray:
     :returns: (df_rec) The change of the transition frequency $\delta f$ (MHz).
     """
     f, m = np.asarray(f, dtype=float), np.asarray(m, dtype=float)
-    return (sc.h * (f * 1e6) ** 2) / (2 * m * sc.atomic_mass * sc.c ** 2) * 1e-6
+    return (sc.h * (f * 1e6) ** 2) / (2 * m * sc.atomic_mass * sc.c**2) * 1e-6
 
 
 def f_recoil_v(v: array_like, alpha: array_like, f_lab: array_like, m: array_like) -> ndarray:
@@ -692,7 +806,7 @@ def f_recoil_v(v: array_like, alpha: array_like, f_lab: array_like, m: array_lik
     :param m: The mass $m$ of the atom (u).
     :returns: (df_rec) The change of the transition frequency $\delta f$ (MHz).
     """
-    f = doppler(f_lab, v, alpha, return_frame='atom')
+    f = doppler(f_lab, v, alpha, return_frame="atom")
     return f_recoil(f, m)
 
 
@@ -749,9 +863,13 @@ def lande_j(s: quant_like, l: quant_like, j: quant_like, approx_g_s: bool = Fals
      The default is `False`.
     :returns: (g_J) The electronic g-factor $g_J$.
     """
+    s, l, j = cast(s, l, j, dtype=quant)
+
     if j == 0:
-        return 0.
-    g = -2 if approx_g_s else g_s
+        return 0.0
+
+    g = -2.0 if approx_g_s else g_s
+
     jj = j * (j + 1)
     ls = l * (l + 1) - s * (s + 1)
     val = -(jj + ls) / (2 * jj)
@@ -759,12 +877,13 @@ def lande_j(s: quant_like, l: quant_like, j: quant_like, approx_g_s: bool = Fals
     return val
 
 
-def lande_jj(j0: quant_like, j1: quant_like, j: quant_like, g0: array_like, g1: array_like) -> float:
+def lande_jj(j0: quant_like, j1: quant_like, j: quant_like, g0: scalar_like, g1: scalar_like) -> float:
     r"""
     The electronic g-factor of a state with angular momentum $\vec{J} = \vec{J}_0 + \vec{J}_1$
 
     $$
-    g_J = g_0\frac{J(J + 1) + J_0(J_0 + 1) - J_1(J_1 + 1)}{2J(J + 1)} + g_1\frac{J(J + 1) - J_0(J_0 + 1) + J_1(J_1 + 1)}{2J(J + 1)}.
+    g_J = g_0\frac{J(J + 1) + J_0(J_0 + 1) - J_1(J_1 + 1)}{2J(J + 1)}
+    + g_1\frac{J(J + 1) - J_0(J_0 + 1) + J_1(J_1 + 1)}{2J(J + 1)}.
     $$
 
     :param j0: The angular momentum quantum number $J_0$.
@@ -774,12 +893,17 @@ def lande_jj(j0: quant_like, j1: quant_like, j: quant_like, g0: array_like, g1: 
     :param g1: The g-factor $g_{J_1}$.
     :returns: (g_J) The g-factor $g_J$.
     """
+    j0, j1, j = cast(j0, j1, j, dtype=quant)
+    g0, g1 = cast(g0, g1, dtype=float)
+
     jj = j * (j + 1)
     jj01 = j0 * (j0 + 1) - j1 * (j1 + 1)
     return 0.5 * g0 * (jj + jj01) / jj + 0.5 * g1 * (jj - jj01) / jj
 
 
-def g_j(j: quant_like = 0, ls: quant_iter = None, jj: quant_iter = None, gj: array_like = None) -> float:
+def g_j(
+    j: quant_like = 0, ls: quant_iter | None = None, jj: quant_iter | None = None, gj: array_like | None = None
+) -> float:
     r"""
     The electronic g-factor of a state with angular momentum $\vec{J}$ in the LS- or jj-coupling scheme.
     See `lande_j` and `lande_jj`.
@@ -787,7 +911,7 @@ def g_j(j: quant_like = 0, ls: quant_iter = None, jj: quant_iter = None, gj: arr
     :param j: The angular momentum quantum number $J$.
     :param ls: A list or a single pair of electronic angular momentum and spin quantum numbers $(l_i, s_i)$
      used to calculate the electronic g-factor in the LS-coupling scheme. If this is a list of LS-pairs,
-     A list of $j_i$ quantum numbers needs to specified for the parameter `jj`. It is overwritten if `gj` is specified.
+     A list of $j_i$ quantum numbers needs to specified for the parameter `jj`. The parameter `gj` overwrites `ls`.
     :param jj: A list of two electronic total angular momentum quantum numbers $(j_0, j_1)$
      used to calculate the electronic g-factor in the jj-coupling scheme.
      Either a list of two $(l_i, s_i)$ pairs needs to be specified for the parameter `ls`
@@ -797,18 +921,39 @@ def g_j(j: quant_like = 0, ls: quant_iter = None, jj: quant_iter = None, gj: arr
      and `ls` is overwritten. If `gj` is a scalar, both `ls` and `jj` are overwritten.
     :returns: (g_J) The g-factor $g_J$.
     """
+    error = False
+    _gj = 0.0
     if ls is None and gj is None:
-        raise ValueError('The parameter \'ls\' needs to be specified if \'gj\' is not given.')
-    if gj is None:
-        if jj is None:
-            gj = lande_j(ls[1], ls[0], j)
+        error = True
+
+    elif gj is None:
+        if jj is None and has_getitem(ls):
+            if has_getitem(ls[0]):
+                l, s = ls[0][0], ls[0][1]
+            else:
+                l, s = ls[0], ls[1]
+            _gj = lande_j(s, l, j)
+
+        elif has_getitem(ls) and has_getitem(ls[0]) and has_getitem(jj):
+            l0, s0 = ls[0][0], ls[0][1]
+            l1, s1 = ls[0][0], ls[0][1]
+            g0 = lande_j(s0, l0, j)
+            g1 = lande_j(s1, l1, j)
+            _gj = lande_jj(jj[0], jj[1], j, g0, g1)
+
         else:
-            g0 = lande_j(ls[0][1], ls[0][0], j)
-            g1 = lande_j(ls[1][1], ls[1][0], j)
-            gj = lande_jj(jj[0], jj[1], j, g0, g1)
-    elif hasattr(gj, '__getitem__'):
-        gj = lande_jj(jj[0], jj[1], j, gj[0], gj[1])
-    return gj
+            error = True
+
+    elif has_getitem(gj) and has_getitem(jj):
+        _gj = lande_jj(jj[0], jj[1], j, gj[0], gj[1])
+
+    else:
+        error = True
+
+    if error:
+        raise ValueError("If `gj` is None, both `ls` and `jj` (if needed) need to be specified as lists.")
+
+    return _gj
 
 
 def lande_f(i: quant_like, j: quant_like, f: quant_like, gi: array_like, gj: array_like) -> ndarray:
@@ -832,33 +977,41 @@ def lande_f(i: quant_like, j: quant_like, f: quant_like, gi: array_like, gj: arr
     :returns: (g_F) The total atomic g-factor $g_F$.
     """
     gi, gj = np.asarray(gi, dtype=float), np.asarray(gj, dtype=float)
-    ff = f * (f + 1.)
-    ji = j * (j + 1.) - i * (i + 1.)
+    ff = f * (f + 1.0)
+    ji = j * (j + 1.0) - i * (i + 1.0)
     val = (ff + ji) / (2 * ff) * gj
     val += (ff - ji) / (2 * ff) * gi * mu_N / mu_B
     return val
 
 
-def cast_hyper_const(hyper_const: array_like) -> ndarray:
+def cast_hyper_const(hyper_const: array_like | None = None) -> ndarray:
     """
     Preprocess the hyperfine-structure constants.
 
-    :param hyper_const: The hyperfine-structure constants. Currently, constants up to the magnetic octupole order are
-     supported (A, B, C). If 'hyper_const' is a scalar,
+    :param hyper_const: The hyperfine-structure constants (A, B, C).
+     Currently, constants up to the magnetic octupole order are supported. If `hyper_const` is a scalar,
      it is assumed to be the constant A and the other orders are 0 (MHz).
     :returns: The hyperfine-structure constants as a 3d-vector.
     """
     if hyper_const is None or not hyper_const:
-        hyper_const = [0., 0., 0.]
-    elif not np.asarray(hyper_const, dtype=float).shape:
-        hyper_const = [float(hyper_const), 0., 0.]
-    hyper_const = list(hyper_const)
+        hyper_const = [0.0] * 3
+
+    elif is_scalar(hyper_const):
+        hyper_const = [float(hyper_const), 0.0, 0.0]
+
+    else:
+        hyper_const = list(np.asarray(hyper_const, dtype=float))
+
     while len(hyper_const) < 3:
-        hyper_const.append(np.zeros_like(hyper_const[0]))
-    return np.asarray(hyper_const, dtype=float)[:3]
+        b = hyper_const[0]
+        b = np.zeros(b.shape, dtype=float) if has_shape(b) else 0.0
+
+        hyper_const.append(b) # type: ignore
+
+    return np.array(hyper_const[:3], dtype=float)
 
 
-def hyperfine(i: quant_like, j: quant_like, f: quant_like, hyper_const: array_like = 0.) -> ndarray:
+def hyperfine(i: quant_like, j: quant_like, f: quant_like, hyper_const: array_like = 0.0) -> ndarray:
     r"""
     The hyperfine structure (HFS) shift of an atomic state $|IJF\rangle$
 
@@ -882,12 +1035,12 @@ def hyperfine(i: quant_like, j: quant_like, f: quant_like, hyper_const: array_li
     """
     a_hyper, b_hyper, c_hyper = cast_hyper_const(hyper_const)
 
-    if i < 0. or j < 0. or f < 0.:
-        raise ValueError('All quantum numbers must be >= 0.')
+    if i < 0.0 or j < 0.0 or f < 0.0:
+        raise ValueError("All quantum numbers must be >= 0.")
     if f < abs(i - j) or f > i + j:
-        raise ValueError('f does not fulfill |i - j| <= f <= i + j.')
+        raise ValueError("f does not fulfill |i - j| <= f <= i + j.")
 
-    if i == 0. or j == 0.:
+    if i == 0.0 or j == 0.0:
         return np.zeros_like(a_hyper)
 
     k = f * (f + 1) - i * (i + 1) - j * (j + 1)
@@ -899,15 +1052,19 @@ def hyperfine(i: quant_like, j: quant_like, f: quant_like, hyper_const: array_li
         shift += 0.25 * b_hyper * k_2
 
     if i > 1 and j > 1:
-        k_3 = k ** 3 + 4 * k ** 2 + 0.8 * k * (-3 * i * (i + 1) * j * (j + 1) + i * (i + 1) + j * (j + 1) + 3) \
+        k_3 = (
+            k**3
+            + 4 * k**2
+            + 0.8 * k * (-3 * i * (i + 1) * j * (j + 1) + i * (i + 1) + j * (j + 1) + 3)
             - 4 * i * (i + 1) * j * (j + 1)
+        )
         k_3 /= i * (i - 1) * (2 * i - 1) * j * (j - 1) * (2 * j - 1)
         shift += 1.25 * c_hyper * k_3
 
     return shift
 
 
-def zeeman_linear(m: quant_like, g: array_like, b_field: array_like = 0., as_freq: bool = True) -> ndarray:
+def zeeman_linear(m: quant_like, g: array_like, b_field: array_like = 0.0, as_freq: bool = True) -> ndarray:
     r"""
     The shift of an atomic state with magnetic quantum number $m$ due to the linear Zeeman effect
 
@@ -921,14 +1078,22 @@ def zeeman_linear(m: quant_like, g: array_like, b_field: array_like = 0., as_fre
     :returns: (dnu_zeeman) The linear Zeeman shift $\Delta_\mathrm{Zeeman}$
      in energy or frequency units (MHz if `as_freq` else eV).
     """
-    g, b_field = np.asarray(g, dtype=float), np.asarray(b_field, dtype=float)
+    g, _b_field = np.asarray(g, dtype=float), np.asarray(b_field, dtype=float)
 
     z_unit = 1e-6 / sc.h if as_freq else 1 / E_NORM
-    return -g * m * mu_B * b_field * z_unit
+    return -g * m * mu_B * _b_field * z_unit
 
 
-def hyper_zeeman_linear(i: quant_like, j: quant_like, f: quant_like, m: quant_like, hyper_const: array_like = 0.,
-                        g_f: array_like = 0., b_field: array_like = 0., as_freq: bool = True) -> ndarray:
+def hyper_zeeman_linear(
+    i: quant_like,
+    j: quant_like,
+    f: quant_like,
+    m: quant_like,
+    hyper_const: array_like = 0.0,
+    g_f: array_like = 0.0,
+    b_field: array_like = 0.0,
+    as_freq: bool = True,
+) -> ndarray:
     r"""
     The total energy shift of an atomic state $|Fm\rangle$ due to the hyperfine structure splitting
      and the linear Zeeman effect
@@ -952,72 +1117,19 @@ def hyper_zeeman_linear(i: quant_like, j: quant_like, f: quant_like, m: quant_li
     return hyperfine(i, j, f, hyper_const) + zeeman_linear(m, g_f, b_field, as_freq=as_freq)
 
 
-def _hyper_zeeman_ij_old(mi0: quant_like, mj0: quant_like, mi1: quant_like, mj1: quant_like,
-                         i: quant_like, j: quant_like,
-                         a_hyper: array_like = 0., b_hyper: array_like = 0.,
-                         gi: array_like = 0., gj: array_like = 0., b_field: array_like = 0.,
-                         as_freq: bool = True) -> ndarray:
-    r"""
-    The matrix element $\langle m_{i, 0} m_{j, 0}| H_\mathrm{hfs} + H_\mathrm{Zeeman} |m_{i, 1} m_{j, 1}\rangle$.
-
-    :param mi0: The first magnetic quantum number $m_{i, 0}$ of the nuclear spin $I$.
-    :param mj0: The first magnetic quantum number $m_{j, 0}$ of the total electronic angular momentum $J$.
-    :param mi1: The second magnetic quantum number $m_{i, 1}$ of the nuclear spin $I$.
-    :param mj1: The second magnetic quantum number $m_{j, 1}$ of the total electronic angular momentum $J$.
-    :param i: The nuclear spin quantum number $I$.
-    :param j: The electronic total angular momentum quantum number $J$.
-    :param a_hyper: The magnetic dipole hyperfine constant $A = \mu_I \mathcal{B}_J / (IJ)$ (MHz if `as_freq` else eV).
-    :param b_hyper: The electric quadrupole hyperfine constant $B = eQ_I (\partial^2 V_J / \partial z^2)$ ([`a_hyper`]).
-    :param gi: The nuclear g-factor $g_I$ or the gyromagnetic ratio $\gamma_I$ if `g_n_as_gyro == True`.
-    :param gj: The electronic g-factor $g_J$.
-    :param b_field: The B-field $\mathcal{B}$ (T).
-    :param as_freq: The matrix element can be returned in energy (`False`, eV) or frequency units (`True`, MHz).
-     The default is `True`
-    :returns: (h_ij) One matrix element of the hyperfine-structure + Zeeman-effect hamiltonian.
-    """
-    a_hyper, b_hyper = np.asarray(a_hyper, dtype=float), np.asarray(b_hyper, dtype=float)
-    gi, gj = np.asarray(gi, dtype=float), np.asarray(gj, dtype=float)
-
-    z_unit = 1e-6 / sc.h if as_freq else 1 / E_NORM
-    b_field = (np.asarray(b_field, dtype=float) + np.zeros_like(a_hyper) + np.zeros_like(b_hyper)
-               + np.zeros_like(gi) + np.zeros_like(gj)) * z_unit
-
-    b_hyper_n = b_hyper / (2 * i * (2 * i - 1) * j * (2 * j - 1)) if i > 0.5 and j > 0.5 else 0.
-
-    if mi0 + mj0 != mi1 + mj1:
-        return np.zeros_like(b_field, dtype=float)
-
-    elif mi0 == mi1 and mj0 == mj1:
-        ret = a_hyper * mi0 * mj0 - (mi0 * gi * mu_N + mj0 * gj * mu_B) * b_field
-        ret += b_hyper_n * (3 * (mi0 * mj0) ** 2 - i * (i + 1) * j * (j + 1) + 1.5 * mi0 * mj0
-                            + 0.75 * (j - mj0) * (j + mj0 + 1) * (i + mi0) * (i - mi0 + 1)
-                            + 0.75 * (i - mi0) * (i + mi0 + 1) * (j + mj0) * (j - mj0 + 1))
-        return ret
-
-    elif mi0 == mi1 + 1 and mj0 == mj1 - 1:
-        return np.full_like(b_field, (0.5 * a_hyper + 1.5 * b_hyper_n * (0.5 + mi0 * mj0 + mi1 * mj1))
-                            * np.sqrt((i - mi1) * (i + mi1 + 1) * (j + mj1) * (j - mj1 + 1)))
-
-    elif mi0 == mi1 - 1 and mj0 == mj1 + 1:
-        return np.full_like(b_field, (0.5 * a_hyper + 1.5 * b_hyper_n * (0.5 + mi0 * mj0 + mi1 * mj1))
-                            * np.sqrt((i + mi1) * (i - mi1 + 1) * (j - mj1) * (j + mj1 + 1)))
-
-    elif mi0 == mi1 + 2 and mj0 == mj1 - 2:
-        return np.full_like(b_field,
-                            0.75 * b_hyper_n * np.sqrt((j + mj1) * (j - mj1 + 1) * (j + mj1 - 1) * (j - mj1 + 2)
-                                                       * (i - mi1) * (i + mi1 + 1) * (i - mi1 - 1) * (i + mi1 + 2)))
-
-    elif mi0 == mi1 - 2 and mj0 == mj1 + 2:
-        return np.full_like(b_field,
-                            0.75 * b_hyper_n * np.sqrt((i + mi1) * (i - mi1 + 1) * (i + mi1 - 1) * (i - mi1 + 2)
-                                                       * (j - mj1) * (j + mj1 + 1) * (j - mj1 - 1) * (j + mj1 + 2)))
-
-    return np.zeros_like(b_field, dtype=float)
-
-
-def hyper_zeeman_ij(mi0: quant_like, mj0: quant_like, mi1: quant_like, mj1: quant_like, i: quant_like, j: quant_like,
-                    hyper_const: array_like = 0., gi: array_like = 0., gj: array_like = 0., b_field: array_like = 0.,
-                    as_freq: bool = True) -> ndarray:
+def hyper_zeeman_ij(
+    mi0: quant_like,
+    mj0: quant_like,
+    mi1: quant_like,
+    mj1: quant_like,
+    i: quant_like,
+    j: quant_like,
+    hyper_const: array_like = 0.0,
+    gi: array_like = 0.0,
+    gj: array_like = 0.0,
+    b_field: array_like = 0.0,
+    as_freq: bool = True,
+) -> ndarray:
     r"""
     The matrix element
 
@@ -1053,136 +1165,233 @@ def hyper_zeeman_ij(mi0: quant_like, mj0: quant_like, mi1: quant_like, mj1: quan
     gi, gj = np.asarray(gi, dtype=float), np.asarray(gj, dtype=float)
 
     z_unit = 1e-6 / sc.h if as_freq else 1 / E_NORM
-    b_field = (np.asarray(b_field, dtype=float) + np.zeros_like(a_hyper) + np.zeros_like(b_hyper)
-               + np.zeros_like(gi) + np.zeros_like(gj)) * z_unit
+    _b_field = (
+        np.asarray(b_field, dtype=float)
+        + np.zeros_like(a_hyper)
+        + np.zeros_like(b_hyper)
+        + np.zeros_like(gi)
+        + np.zeros_like(gj)
+    ) * z_unit
 
-    b_hyper_n = b_hyper / (4 * i * (2 * i - 1) * j * (2 * j - 1)) if i > 0.5 and j > 0.5 else 0.
-    c_hyper_n = c_hyper / (i * (2 * i - 1) * (i - 1) * j * (2 * j - 1) * (j - 1)) if i > 1. and j > 1. else 0.
+    b_hyper_n = b_hyper / (4 * i * (2 * i - 1) * j * (2 * j - 1)) if i > 0.5 and j > 0.5 else 0.0
+    c_hyper_n = c_hyper / (i * (2 * i - 1) * (i - 1) * j * (2 * j - 1) * (j - 1)) if i > 1.0 and j > 1.0 else 0.0
 
     if mi0 + mj0 != mi1 + mj1:
-        return np.zeros_like(b_field, dtype=float)
+        return np.zeros_like(_b_field, dtype=float)
 
-    elif mi0 == mi1 and mj0 == mj1:
-        ret = -(mi1 * gi * mu_N + mj1 * gj * mu_B) * b_field
+    if mi0 == mi1 and mj0 == mj1:
+        ret = -(mi1 * gi * mu_N + mj1 * gj * mu_B) * _b_field
         ret += a_hyper * mi1 * mj1
-        ret += b_hyper_n * (i * j
-                            + i ** 2 * j
-                            + i * j ** 2
-                            + i ** 2 * j ** 2
-                            - 3 * j * mi1 ** 2
-                            - 3 * i * mj1 ** 2
-                            - 3 * j ** 2 * mi1 ** 2
-                            - 3 * i ** 2 * mj1 ** 2
-                            + 9 * mi1 ** 2 * mj1 ** 2)
-        ret += c_hyper_n * (mi1 * mj1 * (1
-                                         - 3 * i
-                                         - 3 * j
-                                         - 3 * i ** 2
-                                         - 3 * j ** 2
-                                         + 9 * i * j
-                                         + 9 * i ** 2 * j
-                                         + 9 * i * j ** 2
-                                         + 9 * i ** 2 * j ** 2
-                                         + 5 * mi1 ** 2
-                                         + 5 * mj1 ** 2
-                                         - 15 * i * mj1 ** 2
-                                         - 15 * j * mi1 ** 2
-                                         - 15 * i ** 2 * mj1 ** 2
-                                         - 15 * j ** 2 * mi1 ** 2
-                                         + 25 * mi1 ** 2 * mj1 ** 2))
+        ret += b_hyper_n * (
+            i * j
+            + i**2 * j
+            + i * j**2
+            + i**2 * j**2
+            - 3 * j * mi1**2
+            - 3 * i * mj1**2
+            - 3 * j**2 * mi1**2
+            - 3 * i**2 * mj1**2
+            + 9 * mi1**2 * mj1**2
+        )
+        ret += c_hyper_n * (
+            mi1
+            * mj1
+            * (
+                1
+                - 3 * i
+                - 3 * j
+                - 3 * i**2
+                - 3 * j**2
+                + 9 * i * j
+                + 9 * i**2 * j
+                + 9 * i * j**2
+                + 9 * i**2 * j**2
+                + 5 * mi1**2
+                + 5 * mj1**2
+                - 15 * i * mj1**2
+                - 15 * j * mi1**2
+                - 15 * i**2 * mj1**2
+                - 15 * j**2 * mi1**2
+                + 25 * mi1**2 * mj1**2
+            )
+        )
         return ret
 
-    elif mi0 == mi1 + 1 and mj0 == mj1 - 1:
-        ret = (a_hyper
-               * np.sqrt((i - mi1) * (i + mi1 + 1))
-               * np.sqrt((j + mj1) * (j - mj1 + 1)) / 2)
-        ret += (b_hyper_n * 3
-                * np.sqrt(i ** 2 + i - mi1 ** 2 - mi1)
-                * np.sqrt(j ** 2 + j - mj1 ** 2 + mj1)
-                * (2 * mi1 * mj1 - mi1 + mj1 - 1 / 2))
-        ret += (c_hyper_n * 3
-                * np.sqrt(i ** 2 + i - mi1 ** 2 - mi1)
-                * np.sqrt(j ** 2 + j - mj1 ** 2 + mj1)
-                * (i ** 2 * j ** 2 + i ** 2 * j - 5 * i ** 2 * mj1 ** 2 + 5 * i ** 2 * mj1 - 2 * i ** 2 + i * j ** 2
-                   + i * j - 5 * i * mj1 ** 2 + 5 * i * mj1 - 2 * i - 5 * j ** 2 * mi1 ** 2 - 5 * j ** 2 * mi1
-                   - 2 * j ** 2 - 5 * j * mi1 ** 2 - 5 * j * mi1 - 2 * j + 25 * mi1 ** 2 * mj1 ** 2
-                   - 25 * mi1 ** 2 * mj1 + 10 * mi1 ** 2 + 25 * mi1 * mj1 ** 2 - 25 * mi1 * mj1 + 10 * mi1
-                   + 10 * mj1 ** 2 - 10 * mj1 + 4) / 4)
-        return np.full_like(b_field, ret)
+    if mi0 == mi1 + 1 and mj0 == mj1 - 1:
+        ret = a_hyper * np.sqrt((i - mi1) * (i + mi1 + 1)) * np.sqrt((j + mj1) * (j - mj1 + 1)) / 2
+        ret += (
+            b_hyper_n
+            * 3
+            * np.sqrt(i**2 + i - mi1**2 - mi1)
+            * np.sqrt(j**2 + j - mj1**2 + mj1)
+            * (2 * mi1 * mj1 - mi1 + mj1 - 1 / 2)
+        )
+        ret += (
+            c_hyper_n
+            * 3
+            * np.sqrt(i**2 + i - mi1**2 - mi1)
+            * np.sqrt(j**2 + j - mj1**2 + mj1)
+            * (
+                i**2 * j**2
+                + i**2 * j
+                - 5 * i**2 * mj1**2
+                + 5 * i**2 * mj1
+                - 2 * i**2
+                + i * j**2
+                + i * j
+                - 5 * i * mj1**2
+                + 5 * i * mj1
+                - 2 * i
+                - 5 * j**2 * mi1**2
+                - 5 * j**2 * mi1
+                - 2 * j**2
+                - 5 * j * mi1**2
+                - 5 * j * mi1
+                - 2 * j
+                + 25 * mi1**2 * mj1**2
+                - 25 * mi1**2 * mj1
+                + 10 * mi1**2
+                + 25 * mi1 * mj1**2
+                - 25 * mi1 * mj1
+                + 10 * mi1
+                + 10 * mj1**2
+                - 10 * mj1
+                + 4
+            )
+            / 4
+        )
+        return np.full_like(_b_field, ret)
 
-    elif mi0 == mi1 - 1 and mj0 == mj1 + 1:
-        ret = (a_hyper
-               * np.sqrt((i + mi1) * (i - mi1 + 1))
-               * np.sqrt((j - mj1) * (j + mj1 + 1)) / 2)
-        ret += (b_hyper_n * 3
-                * np.sqrt(i ** 2 + i - mi1 ** 2 + mi1)
-                * np.sqrt(j ** 2 + j - mj1 ** 2 - mj1)
-                * (2 * mi1 * mj1 + mi1 - mj1 - 1 / 2))
-        ret += (c_hyper_n * 3
-                * np.sqrt(i ** 2 + i - mi1 ** 2 + mi1)
-                * np.sqrt(j ** 2 + j - mj1 ** 2 - mj1)
-                * (i ** 2 * j ** 2 + i ** 2 * j - 5 * i ** 2 * mj1 ** 2 - 5 * i ** 2 * mj1 - 2 * i ** 2 + i * j ** 2
-                   + i * j - 5 * i * mj1 ** 2 - 5 * i * mj1 - 2 * i - 5 * j ** 2 * mi1 ** 2 + 5 * j ** 2 * mi1
-                   - 2 * j ** 2 - 5 * j * mi1 ** 2 + 5 * j * mi1 - 2 * j + 25 * mi1 ** 2 * mj1 ** 2
-                   + 25 * mi1 ** 2 * mj1 + 10 * mi1 ** 2 - 25 * mi1 * mj1 ** 2 - 25 * mi1 * mj1 - 10 * mi1
-                   + 10 * mj1 ** 2 + 10 * mj1 + 4) / 4)
-        return np.full_like(b_field, ret)
+    if mi0 == mi1 - 1 and mj0 == mj1 + 1:
+        ret = a_hyper * np.sqrt((i + mi1) * (i - mi1 + 1)) * np.sqrt((j - mj1) * (j + mj1 + 1)) / 2
+        ret += (
+            b_hyper_n
+            * 3
+            * np.sqrt(i**2 + i - mi1**2 + mi1)
+            * np.sqrt(j**2 + j - mj1**2 - mj1)
+            * (2 * mi1 * mj1 + mi1 - mj1 - 1 / 2)
+        )
+        ret += (
+            c_hyper_n
+            * 3
+            * np.sqrt(i**2 + i - mi1**2 + mi1)
+            * np.sqrt(j**2 + j - mj1**2 - mj1)
+            * (
+                i**2 * j**2
+                + i**2 * j
+                - 5 * i**2 * mj1**2
+                - 5 * i**2 * mj1
+                - 2 * i**2
+                + i * j**2
+                + i * j
+                - 5 * i * mj1**2
+                - 5 * i * mj1
+                - 2 * i
+                - 5 * j**2 * mi1**2
+                + 5 * j**2 * mi1
+                - 2 * j**2
+                - 5 * j * mi1**2
+                + 5 * j * mi1
+                - 2 * j
+                + 25 * mi1**2 * mj1**2
+                + 25 * mi1**2 * mj1
+                + 10 * mi1**2
+                - 25 * mi1 * mj1**2
+                - 25 * mi1 * mj1
+                - 10 * mi1
+                + 10 * mj1**2
+                + 10 * mj1
+                + 4
+            )
+            / 4
+        )
+        return np.full_like(_b_field, ret)
 
-    elif mi0 == mi1 + 2 and mj0 == mj1 - 2:
-        ret = (b_hyper_n * 3
-               * np.sqrt((i - mi1) * (i + mi1 + 1))
-               * np.sqrt((j + mj1) * (j - mj1 + 1))
-               * np.sqrt((j - mj1 + 2) * (j + mj1 - 1))
-               * np.sqrt(-(-i + mi1 + 1) * (i + mi1 + 2)) / 2)
-        ret += (c_hyper_n * 15
-                * np.sqrt(i ** 2 + i - mi1 ** 2 - mi1)
-                * np.sqrt(j ** 2 + j - mj1 ** 2 + mj1)
-                * np.sqrt(i ** 2 + i - mi1 ** 2 - 3 * mi1 - 2)
-                * np.sqrt(j ** 2 + j - mj1 ** 2 + 3 * mj1 - 2)
-                * (mi1 * mj1 - mi1 + mj1 - 1) / 2)
-        return np.full_like(b_field, ret)
+    if mi0 == mi1 + 2 and mj0 == mj1 - 2:
+        ret = (
+            b_hyper_n
+            * 3
+            * np.sqrt((i - mi1) * (i + mi1 + 1))
+            * np.sqrt((j + mj1) * (j - mj1 + 1))
+            * np.sqrt((j - mj1 + 2) * (j + mj1 - 1))
+            * np.sqrt(-(-i + mi1 + 1) * (i + mi1 + 2))
+            / 2
+        )
+        ret += (
+            c_hyper_n
+            * 15
+            * np.sqrt(i**2 + i - mi1**2 - mi1)
+            * np.sqrt(j**2 + j - mj1**2 + mj1)
+            * np.sqrt(i**2 + i - mi1**2 - 3 * mi1 - 2)
+            * np.sqrt(j**2 + j - mj1**2 + 3 * mj1 - 2)
+            * (mi1 * mj1 - mi1 + mj1 - 1)
+            / 2
+        )
+        return np.full_like(_b_field, ret)
 
-    elif mi0 == mi1 - 2 and mj0 == mj1 + 2:
-        ret = (b_hyper_n * 3
-               * np.sqrt((i + mi1) * (i - mi1 + 1))
-               * np.sqrt((j - mj1) * (j + mj1 + 1))
-               * np.sqrt((i - mi1 + 2) * (i + mi1 - 1))
-               * np.sqrt(-(-j + mj1 + 1) * (j + mj1 + 2)) / 2)
-        ret += (c_hyper_n * 15
-                * np.sqrt(i ** 2 + i - mi1 ** 2 + mi1)
-                * np.sqrt(j ** 2 + j - mj1 ** 2 - mj1)
-                * np.sqrt(i ** 2 + i - mi1 ** 2 + 3 * mi1 - 2)
-                * np.sqrt(j ** 2 + j - mj1 ** 2 - 3 * mj1 - 2)
-                * (mi1 * mj1 + mi1 - mj1 - 1) / 2)
-        return np.full_like(b_field, ret)
+    if mi0 == mi1 - 2 and mj0 == mj1 + 2:
+        ret = (
+            b_hyper_n
+            * 3
+            * np.sqrt((i + mi1) * (i - mi1 + 1))
+            * np.sqrt((j - mj1) * (j + mj1 + 1))
+            * np.sqrt((i - mi1 + 2) * (i + mi1 - 1))
+            * np.sqrt(-(-j + mj1 + 1) * (j + mj1 + 2))
+            / 2
+        )
+        ret += (
+            c_hyper_n
+            * 15
+            * np.sqrt(i**2 + i - mi1**2 + mi1)
+            * np.sqrt(j**2 + j - mj1**2 - mj1)
+            * np.sqrt(i**2 + i - mi1**2 + 3 * mi1 - 2)
+            * np.sqrt(j**2 + j - mj1**2 - 3 * mj1 - 2)
+            * (mi1 * mj1 + mi1 - mj1 - 1)
+            / 2
+        )
+        return np.full_like(_b_field, ret)
 
-    elif mi0 == mi1 + 3 and mj0 == mj1 - 3:
-        ret = (c_hyper_n * 5
-               * np.sqrt((i - mi1) * (i + mi1 + 1))
-               * np.sqrt((j + mj1) * (j - mj1 + 1))
-               * np.sqrt((j - mj1 + 2) * (j + mj1 - 1))
-               * np.sqrt((j - mj1 + 3) * (j + mj1 - 2))
-               * np.sqrt(-(-i + mi1 + 1) * (i + mi1 + 2))
-               * np.sqrt(-(-i + mi1 + 2) * (i + mi1 + 3)) / 4)
-        return np.full_like(b_field, ret)
+    if mi0 == mi1 + 3 and mj0 == mj1 - 3:
+        ret = (
+            c_hyper_n
+            * 5
+            * np.sqrt((i - mi1) * (i + mi1 + 1))
+            * np.sqrt((j + mj1) * (j - mj1 + 1))
+            * np.sqrt((j - mj1 + 2) * (j + mj1 - 1))
+            * np.sqrt((j - mj1 + 3) * (j + mj1 - 2))
+            * np.sqrt(-(-i + mi1 + 1) * (i + mi1 + 2))
+            * np.sqrt(-(-i + mi1 + 2) * (i + mi1 + 3))
+            / 4
+        )
+        return np.full_like(_b_field, ret)
 
-    elif mi0 == mi1 - 3 and mj0 == mj1 + 3:
-        ret = (c_hyper_n * 5
-               * np.sqrt((i + mi1) * (i - mi1 + 1))
-               * np.sqrt((j - mj1) * (j + mj1 + 1))
-               * np.sqrt((i - mi1 + 2) * (i + mi1 - 1))
-               * np.sqrt((i - mi1 + 3) * (i + mi1 - 2))
-               * np.sqrt(-(-j + mj1 + 1) * (j + mj1 + 2))
-               * np.sqrt(-(-j + mj1 + 2) * (j + mj1 + 3)) / 4)
-        return np.full_like(b_field, ret)
+    if mi0 == mi1 - 3 and mj0 == mj1 + 3:
+        ret = (
+            c_hyper_n
+            * 5
+            * np.sqrt((i + mi1) * (i - mi1 + 1))
+            * np.sqrt((j - mj1) * (j + mj1 + 1))
+            * np.sqrt((i - mi1 + 2) * (i + mi1 - 1))
+            * np.sqrt((i - mi1 + 3) * (i + mi1 - 2))
+            * np.sqrt(-(-j + mj1 + 1) * (j + mj1 + 2))
+            * np.sqrt(-(-j + mj1 + 2) * (j + mj1 + 3))
+            / 4
+        )
+        return np.full_like(_b_field, ret)
 
-    return np.zeros_like(b_field, dtype=float)
+    return np.zeros_like(_b_field, dtype=float)
 
 
-def hyper_zeeman_num(i: quant_like, j: quant_like, hyper_const: array_like = 0.,
-                     gi: array_like = 0., gj: array_like = 0., b_field: array_like = 0.,
-                     g_n_as_gyro: bool = False, as_freq: bool = True) \
-        -> (list[ndarray], list[quant], list[list[quant]], list[list[tuple[quant, quant]]]):
+def hyper_zeeman_num(
+    i: quant_like,
+    j: quant_like,
+    hyper_const: array_like = 0.0,
+    gi: scalar_like = 0.0,
+    gj: scalar_like = 0.0,
+    b_field: array_like = 0.0,
+    g_n_as_gyro: bool = False,
+    as_freq: bool = True,
+) -> tuple[list[ndarray], list[quant], list[list[quant]], list[list[tuple[quant, quant]]]]:
     r"""
     The shifted energies/frequencies of the hyperfine structure states generated by the quantum numbers $I$ and $J$.
     This function numerically calculates the full diagonalization of the Hyperfine-structure + Zeeman-effect Hamiltonian
@@ -1211,7 +1420,8 @@ def hyper_zeeman_num(i: quant_like, j: quant_like, hyper_const: array_like = 0.,
     # if hasattr(b_field, '__getitem__'):
     #     is_scalar = False
 
-    b_field = np.asarray(b_field, dtype=float).flatten()
+    _b_field = np.asarray(b_field, dtype=float).flatten()
+    gi, gj = cast(gi, gj, dtype=float)
 
     gi = lande_n(gi) if g_n_as_gyro else gi
 
@@ -1224,10 +1434,19 @@ def hyper_zeeman_num(i: quant_like, j: quant_like, hyper_const: array_like = 0.,
     fm_list = [[_f for _f in f_list if abs(_m) <= _f] for _m in m_list]
     mi_mj_list = [[(_mi, _m - _mi) for _mi in mi_list if _m - _mi in mj_list] for _m in m_list]
 
-    h_list = [np.array([[hyper_zeeman_ij(_mi0, _mj0, _mi1, _mj1, i, j, hyper_const, gi, gj, b_field,
-                                         as_freq=as_freq)
-                         for (_mi1, _mj1) in _mi_mj_list] for (_mi0, _mj0) in _mi_mj_list], dtype=float)
-              for _m, _mi_mj_list in zip(m_list, mi_mj_list)]
+    h_list = [
+        np.array(
+            [
+                [
+                    hyper_zeeman_ij(_mi0, _mj0, _mi1, _mj1, i, j, hyper_const, gi, gj, _b_field, as_freq=as_freq)
+                    for (_mi1, _mj1) in _mi_mj_list
+                ]
+                for (_mi0, _mj0) in _mi_mj_list
+            ],
+            dtype=float,
+        )
+        for _m, _mi_mj_list in zip(m_list, mi_mj_list)
+    ]
     h_list = [np.transpose(_h, axes=[2, 0, 1]) for _h in h_list]
 
     h_eig = [np.linalg.eigh(_h) for _h in h_list]
@@ -1235,27 +1454,40 @@ def hyper_zeeman_num(i: quant_like, j: quant_like, hyper_const: array_like = 0.,
     e_eig = [_h_eig[0] for _h_eig in h_eig]
     # v_eig = [_h_eig[1] for _h_eig in h_eig]
 
-    e_0 = [np.array([hyperfine(i, j, _f, hyper_const)
-                     for _f in _f_list], dtype=float) for _f_list in fm_list]
+    e_0 = [np.array([hyperfine(i, j, _f, hyper_const) for _f in _f_list], dtype=float) for _f_list in fm_list]
     inv_order_fm = [list(np.argsort(_e_0)) for _e_0 in e_0]
-    order_fm = [np.array([_inv_order.index(k) for k in range(len(_inv_order))], dtype=int)
-                for _inv_order in inv_order_fm]
+    order_fm = [
+        np.array([_inv_order.index(k) for k in range(len(_inv_order))], dtype=int) for _inv_order in inv_order_fm
+    ]
     e_eig = [_e_eig[:, _order] for _e_eig, _order in zip(e_eig, order_fm)]
 
-    e_b = [np.array([-(mi * gi * mu_N + mj * gj * mu_B) * 100. / sc.h * 1e-6  # B = 100. can be any positive number.
-                     for (mi, mj) in _mi_mj_list], dtype=float) for _mi_mj_list in mi_mj_list]
+    e_b = [
+        np.array(
+            [
+                -(mi * gi * mu_N + mj * gj * mu_B) * 100.0 / sc.h * 1e-6  # B = 100. can be any positive number.
+                for (mi, mj) in _mi_mj_list
+            ],
+            dtype=float,
+        )
+        for _mi_mj_list in mi_mj_list
+    ]
     inv_order_ij = [list(np.argsort(_e_b)) for _e_b in e_b]
-    mi_mj_list = [[_mi_mj_list[k] for k in _inv_order]
-                  for _inv_order, _mi_mj_list in zip(inv_order_ij, mi_mj_list)]
-    mi_mj_list = [[_mi_mj_list[k] for k in _order]
-                  for _order, _mi_mj_list in zip(order_fm, mi_mj_list)]
+    mi_mj_list = [[_mi_mj_list[k] for k in _inv_order] for _inv_order, _mi_mj_list in zip(inv_order_ij, mi_mj_list)]
+    mi_mj_list = [[_mi_mj_list[k] for k in _order] for _order, _mi_mj_list in zip(order_fm, mi_mj_list)]
 
     return e_eig, m_list, fm_list, mi_mj_list
 
 
-def hyper_zeeman_12(j: quant_like, m: quant_like, a_hyper: array_like = 0.,
-                    gi: array_like = 0., gj: array_like = 0., b_field: array_like = 0.,
-                    g_n_as_gyro: bool = False, as_freq: bool = True) -> (ndarray, ndarray):
+def hyper_zeeman_12(
+    j: quant_like,
+    m: quant_like,
+    a_hyper: array_like = 0.0,
+    gi: array_like = 0.0,
+    gj: array_like = 0.0,
+    b_field: array_like = 0.0,
+    g_n_as_gyro: bool = False,
+    as_freq: bool = True,
+) -> tuple[ndarray, ndarray]:
     r"""
     The two eigenvalues of the hyperfine structure + Zeeman effect Hamiltonian for a nuclear spin of $I=1/2$
     and the magnetic quantum number `m`, calculated analytically using the Breit-Rabi equation.
@@ -1278,12 +1510,12 @@ def hyper_zeeman_12(j: quant_like, m: quant_like, a_hyper: array_like = 0.,
     gi = lande_n(gi) if g_n_as_gyro else gi
 
     z_unit = 1e-6 / sc.h if as_freq else 1 / E_NORM
-    b_field = np.asarray(b_field, dtype=float) * z_unit
+    _b_field: ndarray = np.asarray(b_field, dtype=float) * z_unit
 
     x_b0 = a_hyper * (j + 0.5)
-    _x = b_field * (mu_B * gj - mu_N * gi) / x_b0
+    _x = _b_field * (mu_B * gj - mu_N * gi) / x_b0
 
-    x = -x_b0 / (2 * (2 * j + 1)) - mu_B * gj * m * b_field
+    x = -x_b0 / (2 * (2 * j + 1)) - mu_B * gj * m * _b_field
 
     if m == j + 0.5:
         x0 = x + 0.5 * x_b0 * (1 + _x)
@@ -1292,15 +1524,22 @@ def hyper_zeeman_12(j: quant_like, m: quant_like, a_hyper: array_like = 0.,
         x0 = x + 0.5 * x_b0 * (1 - _x)
         x1 = x + 0.5 * x_b0 * (1 - _x)
     else:
-        x0 = x - 0.5 * x_b0 * np.sqrt(1 + 2 * m * _x / (j + 0.5) + _x ** 2)
-        x1 = x + 0.5 * x_b0 * np.sqrt(1 + 2 * m * _x / (j + 0.5) + _x ** 2)
+        x0 = x - 0.5 * x_b0 * np.sqrt(1 + 2 * m * _x / (j + 0.5) + _x**2)
+        x1 = x + 0.5 * x_b0 * np.sqrt(1 + 2 * m * _x / (j + 0.5) + _x**2)
 
     return x0, x1
 
 
-def hyper_zeeman_12_d(j: quant_like, m: quant_like, a_hyper: array_like = 0.,
-                      gi: array_like = 0., gj: array_like = 0., b_field: array_like = 0.,
-                      g_n_as_gyro: bool = False, as_freq: bool = True) -> (ndarray, ndarray):
+def hyper_zeeman_12_d(
+    j: quant_like,
+    m: quant_like,
+    a_hyper: array_like = 0.0,
+    gi: array_like = 0.0,
+    gj: array_like = 0.0,
+    b_field: array_like = 0.0,
+    g_n_as_gyro: bool = False,
+    as_freq: bool = True,
+) -> tuple[ndarray, ndarray]:
     r"""
     The first derivative of the two eigenvalues of the hyperfine structure + Zeeman effect Hamiltonian,
     with respect to the `b-field`, for a nuclear spin of $I=1/2$ and the magnetic quantum number `m`,
@@ -1324,11 +1563,11 @@ def hyper_zeeman_12_d(j: quant_like, m: quant_like, a_hyper: array_like = 0.,
     gi = lande_n(gi) if g_n_as_gyro else gi
 
     z_unit = 1e-6 / sc.h if as_freq else 1 / E_NORM
-    b_field = np.asarray(b_field, dtype=float) * z_unit
+    _b_field = np.asarray(b_field, dtype=float) * z_unit
 
     x_b0 = a_hyper * (j + 0.5)
 
-    _x = b_field * (mu_B * gj - mu_N * gi) / x_b0
+    _x = _b_field * (mu_B * gj - mu_N * gi) / x_b0
     _dx = (mu_B * gj - mu_N * gi) / x_b0 * z_unit
 
     dx = -mu_B * gj * m * z_unit
@@ -1340,8 +1579,8 @@ def hyper_zeeman_12_d(j: quant_like, m: quant_like, a_hyper: array_like = 0.,
         x0 = dx - 0.5 * x_b0 * _dx
         x1 = dx - 0.5 * x_b0 * _dx
     else:
-        x0 = dx - 0.25 * x_b0 / np.sqrt(1 + 2 * m * _x / (j + 0.5) + _x ** 2) * (2 * m / (j + 0.5) + 2 * _x) * _dx
-        x1 = dx + 0.25 * x_b0 / np.sqrt(1 + 2 * m * _x / (j + 0.5) + _x ** 2) * (2 * m / (j + 0.5) + 2 * _x) * _dx
+        x0 = dx - 0.25 * x_b0 / np.sqrt(1 + 2 * m * _x / (j + 0.5) + _x**2) * (2 * m / (j + 0.5) + 2 * _x) * _dx
+        x1 = dx + 0.25 * x_b0 / np.sqrt(1 + 2 * m * _x / (j + 0.5) + _x**2) * (2 * m / (j + 0.5) + 2 * _x) * _dx
 
     return x0, x1
 
@@ -1357,14 +1596,21 @@ def a_hyper_mu(i: quant_like, j: quant_like, mu: array_like, b_field: array_like
     :param b_field: The B-field $\mathcal{B}$ of the atomic electrons at the nucleus (T).
     :returns: (a_hyper) The hyperfine structure constant $A$ (MHz).
     """
-    mu, b = np.asarray(mu, dtype=float), np.asarray(b_field, dtype=float)
+    mu, _b_field = np.asarray(mu, dtype=float), np.asarray(b_field, dtype=float)
     if i == 0 or j == 0:
-        return np.zeros_like(mu * b)
-    return mu * mu_N * b / (i * j * sc.h) * 1e-6
+        return np.zeros_like(mu * _b_field)
+    return mu * mu_N * _b_field / (i * j * sc.h) * 1e-6
 
 
-def a_einstein_m1(f: array_like, mu: array_like = None, j_l: quant_like = 0, j_u: quant_like = 0,
-                  ls: quant_iter = (0, 0), jj_l: quant_iter = None, jj_u: quant_iter = None) -> ndarray:
+def a_einstein_m1(
+    f: array_like,
+    mu: array_like | None = None,
+    j_l: quant_like = 0,
+    j_u: quant_like = 0,
+    ls: quant_iter = (0, 0),
+    jj_l: quant_iter | None = None,
+    jj_u: quant_iter | None = None,
+) -> ndarray:
     r"""
     The Einstein coefficient of an M1 transition
 
@@ -1397,16 +1643,26 @@ def a_einstein_m1(f: array_like, mu: array_like = None, j_l: quant_like = 0, j_u
     :returns: (A_ul) The Einstein coefficient $A_\mathrm{ul}$ of an M1 transition (MHz).
     """
     f = np.asarray(f, dtype=float)
-
+    _mu = mu
     if mu is None:
-        if jj_l is None or jj_u is None:
-            mu = mu_j_m1(ls[1], ls[0], j_l, j_u)
-        else:
-            mu = mu_jj_m1(ls[0][1], ls[0][0], jj_l[0], jj_l[1], j_l, ls[1][1], ls[1][0], jj_u[0], jj_u[1], j_u)
+        if (jj_l is None or jj_u is None) and has_getitem(ls):
+            if has_getitem(ls[0]):
+                l, s = ls[0][0], ls[0][1]
+            else:
+                l, s = ls[0], ls[1]
+            _mu = mu_j_m1(s, l, j_l, j_u, as_sympy=False)
 
-    mu = np.asarray(mu, dtype=float)
-    mu = (mu * mu_B) ** 2 / (2 * j_u + 1)
-    return 8 * mu * np.pi ** 2 * sc.mu_0 * f ** 3 / (3 * sc.hbar * sc.c ** 3) * 1e12
+        elif has_getitem(ls) and has_getitem(ls[0]) and has_getitem(jj_l) and has_getitem(jj_u):
+            l0, s0 = ls[0][0], ls[0][1]
+            l1, s1 = ls[0][0], ls[0][1]
+            _mu = mu_jj_m1(s0, l0, jj_l[0], jj_l[1], j_l, s1, l1, jj_u[0], jj_u[1], j_u)
+
+        else:
+            raise ValueError("If `mu` is None, both `ls` and all `jj` need to be specified as lists.")
+
+    _mu = np.asarray(_mu, dtype=float)
+    _mu = (_mu * mu_B) ** 2 / (2 * j_u + 1)
+    return 8 * _mu * np.pi**2 * sc.mu_0 * f**3 / (3 * sc.hbar * sc.c**3) * 1e12
 
 
 # def a_einstein_m1_fm(f: array_like, mu: array_like = None, f_l: quant_like = 0, f_u: quant_like = 0,
@@ -1449,7 +1705,7 @@ def saturation_intensity(f: array_like, a: array_like) -> ndarray:
     :returns: (sat_intensity) The saturation intensity $I_0$.
     """
     f, a = np.asarray(f, dtype=float), np.asarray(a, dtype=float)
-    return np.pi * (f * 1e6) ** 3 * sc.h * a * 1e6 / (3 * sc.c ** 2)
+    return np.pi * (f * 1e6) ** 3 * sc.h * a * 1e6 / (3 * sc.c**2)
 
 
 def saturation(intensity: array_like, f: array_like, a: array_like) -> ndarray:
@@ -1474,7 +1730,7 @@ def rabi_s(a: array_like, s: array_like) -> ndarray:
     :returns: (omega) The Rabi frequency $\Omega$.
     """
     a, s = np.asarray(a), np.asarray(s)
-    return a * np.sqrt(s / 2.)
+    return a * np.sqrt(s / 2.0)
 
 
 def scattering_rate(df: array_like, a: array_like, s: array_like) -> ndarray:
@@ -1494,10 +1750,10 @@ def scattering_rate(df: array_like, a: array_like, s: array_like) -> ndarray:
      of a closed two-level transition (MHz).
     """
     df, a, s = np.asarray(df), np.asarray(a), np.asarray(s)
-    return 0.125 * s * a ** 3 / (0.25 * (1 + s) * a ** 2 + (2 * np.pi * df) ** 2)
+    return 0.125 * s * a**3 / (0.25 * (1 + s) * a**2 + (2 * np.pi * df) ** 2)
 
 
-def mass_factor(m0: array_like, m1: array_like, m0_d: array_like, m1_d: array_like) -> (ndarray, ndarray):
+def mass_factor(m0: array_like, m1: array_like, m0_d: array_like, m1_d: array_like) -> tuple[ndarray, ndarray]:
     r"""
     The specific mass factor required to calculate modified isotope shifts or charge radii and its uncertainty
 
@@ -1518,8 +1774,12 @@ def mass_factor(m0: array_like, m1: array_like, m0_d: array_like, m1_d: array_li
     :returns: (mu, mu_d) The mass factor $\mu$ and its uncertainty $\Delta\mu$
      required to calculate modified isotope shifts or charge radii.
     """
-    m0, m1, m0_d, m1_d = (np.asarray(m0, dtype=float), np.asarray(m1, dtype=float),
-                          np.asarray(m0_d, dtype=float), np.asarray(m1_d, dtype=float))
+    m0, m1, m0_d, m1_d = (
+        np.asarray(m0, dtype=float),
+        np.asarray(m1, dtype=float),
+        np.asarray(m0_d, dtype=float),
+        np.asarray(m1_d, dtype=float),
+    )
     scalar_true = tools.check_shape((), m0, m1, return_mode=True)
     if scalar_true:
         m0 = np.array([m0])
@@ -1541,9 +1801,16 @@ def mass_factor(m0: array_like, m1: array_like, m0_d: array_like, m1_d: array_li
     return mu, mu_d
 
 
-def delta_r2(r: array_like, r_d: array_like, r_ref: array_like, r_ref_d: array_like,
-             dr: array_like = None, dr_d: array_like = None, v2: array_like = 1., v2_ref: array_like = 1.) \
-        -> (ndarray, ndarray):
+def delta_r2(
+    r: array_like,
+    r_d: array_like,
+    r_ref: array_like,
+    r_ref_d: array_like,
+    dr: array_like | None = None,
+    dr_d: array_like | None = None,
+    v2: array_like = 1.0,
+    v2_ref: array_like = 1.0,
+) -> tuple[ndarray, ndarray]:
     r"""
     The difference of the mean square nuclear charge radius between two isotopes and its uncertainty
     calculated from the Barrett radii and elastic electron scattering form factors
@@ -1587,27 +1854,33 @@ def delta_r2(r: array_like, r_d: array_like, r_ref: array_like, r_ref_d: array_l
     dr, dr_d = tools.asarray_optional(dr, dtype=float), tools.asarray_optional(dr_d, dtype=float)
     v2, v2_ref = np.asarray(v2, dtype=float), np.asarray(v2_ref, dtype=float)
 
-    if dr is None and dr_d is not None:
-        dr = r - r_ref
-
     if dr_d is None:
         val = (r / v2) ** 2 - (r_ref / v2_ref) ** 2
-        err = np.sqrt((2 * r * r_d / v2 ** 2) ** 2 + (2 * r_ref * r_ref_d / v2_ref ** 2) ** 2)
+        err = np.sqrt((2 * r * r_d / v2**2) ** 2 + (2 * r_ref * r_ref_d / v2_ref**2) ** 2)
     else:
+        if dr is None:
+            dr = r - r_ref
         sum_term = (r / v2 + r_ref / v2_ref) / v2
-        delta_term = dr + r_ref * (1. - v2 / v2_ref)
+        delta_term = dr + r_ref * (1.0 - v2 / v2_ref)
         val = sum_term * delta_term
 
         err = (sum_term * dr_d) ** 2
-        err += (delta_term * r_d / (v2 ** 2)) ** 2
-        err += ((delta_term / (v2 * v2_ref) + sum_term * (1. - v2 / v2_ref)) * r_ref_d) ** 2
+        err += (delta_term * r_d / (v2**2)) ** 2
+        err += ((delta_term / (v2 * v2_ref) + sum_term * (1.0 - v2 / v2_ref)) * r_ref_d) ** 2
 
     return val, np.sqrt(err)
 
 
-def delta_r4(r: array_like, r_d: array_like, r_ref: array_like, r_ref_d: array_like,
-             dr: array_like = None, dr_d: array_like = None, v4: array_like = 1., v4_ref: array_like = 1.) \
-        -> (ndarray, ndarray):
+def delta_r4(
+    r: array_like,
+    r_d: array_like,
+    r_ref: array_like,
+    r_ref_d: array_like,
+    dr: array_like | None = None,
+    dr_d: array_like | None = None,
+    v4: array_like = 1.0,
+    v4_ref: array_like = 1.0,
+) -> tuple[ndarray, ndarray]:
     r"""
     The difference of the mean square nuclear charge radius between two isotopes and its uncertainty
     calculated from the Barrett radii and elastic electron scattering form factors
@@ -1658,22 +1931,29 @@ def delta_r4(r: array_like, r_d: array_like, r_ref: array_like, r_ref_d: array_l
 
     if dr_d is None:
         val = (r / v4) ** 4 - (r_ref / v4_ref) ** 4
-        err = np.sqrt((4 * r ** 3 * r_d / v4 ** 4) ** 2 + (4 * r_ref ** 3 * r_ref_d / v4_ref ** 4) ** 2)
+        err = np.sqrt((4 * r**3 * r_d / v4**4) ** 2 + (4 * r_ref**3 * r_ref_d / v4_ref**4) ** 2)
     else:
         sum_term = (r / v4) ** 2 + (r_ref / v4_ref) ** 2
         delta_term = delta_r2(r, r_d, r_ref, r_ref_d, dr, dr_d, v4, v4_ref)
         val = sum_term * delta_term[0]
 
         err = (sum_term * delta_term[1]) ** 2
-        err += (2. * delta_term[0] * r * r_d / (v4 ** 2)) ** 2
-        err += (2. * delta_term[0] * r_ref * r_ref_d / (v4_ref ** 2)) ** 2
+        err += (2.0 * delta_term[0] * r * r_d / (v4**2)) ** 2
+        err += (2.0 * delta_term[0] * r_ref * r_ref_d / (v4_ref**2)) ** 2
 
     return val, np.sqrt(err)
 
 
-def delta_r6(r: array_like, r_d: array_like, r_ref: array_like, r_ref_d: array_like,
-             dr: array_like = None, dr_d: array_like = None, v6: array_like = 1., v6_ref: array_like = 1.) \
-        -> (ndarray, ndarray):
+def delta_r6(
+    r: array_like,
+    r_d: array_like,
+    r_ref: array_like,
+    r_ref_d: array_like,
+    dr: array_like | None = None,
+    dr_d: array_like | None = None,
+    v6: array_like = 1.0,
+    v6_ref: array_like = 1.0,
+) -> tuple[ndarray, ndarray]:
     r"""
     The difference of the mean square nuclear charge radius between two isotopes and its uncertainty
     calculated from the Barrett radii and elastic electron scattering form factors
@@ -1729,27 +2009,45 @@ def delta_r6(r: array_like, r_d: array_like, r_ref: array_like, r_ref_d: array_l
 
     if dr_d is None:
         val = (r / v6) ** 6 - (r_ref / v6_ref) ** 6
-        err = np.sqrt((6 * r ** 5 * r_d / v6 ** 6) ** 2 + (6 * r_ref ** 5 * r_ref_d / v6_ref ** 6) ** 2)
+        err = np.sqrt((6 * r**5 * r_d / v6**6) ** 2 + (6 * r_ref**5 * r_ref_d / v6_ref**6) ** 2)
     else:
         sum_term = (v6 / r) * ((r / v6) ** 3 + (r_ref / v6_ref) ** 3)
         delta = delta_r4(r, r_d, r_ref, r_ref_d, dr, dr_d, v6, v6_ref)
-        delta_term = delta[0] + (r_ref / v6_ref) ** 4 * (1. - (r / v6) * (v6_ref / r_ref))
+        delta_term = delta[0] + (r_ref / v6_ref) ** 4 * (1.0 - (r / v6) * (v6_ref / r_ref))
         val = sum_term * delta_term
 
         err = (sum_term * delta[1]) ** 2
-        err += ((-(r_ref / v6_ref) ** 3 * sum_term / v6
-                 + delta_term * (-sum_term / r + 3. * r / (v6 ** 2))) * r_d) ** 2
-        err += (((4 * r_ref ** 3 / (v6_ref ** 4) * (1. - (r / v6) * (v6_ref / r_ref))
-                  + (r / v6) * r_ref ** 2 / (v6_ref ** 3)) * sum_term
-                 + delta_term * 3. * (v6 / r) * r_ref ** 2 / (v6_ref ** 3)) * r_ref_d) ** 2
+        err += (
+            (-((r_ref / v6_ref) ** 3) * sum_term / v6 + delta_term * (-sum_term / r + 3.0 * r / (v6**2))) * r_d
+        ) ** 2
+        err += (
+            (
+                (4 * r_ref**3 / (v6_ref**4) * (1.0 - (r / v6) * (v6_ref / r_ref)) + (r / v6) * r_ref**2 / (v6_ref**3))
+                * sum_term
+                + delta_term * 3.0 * (v6 / r) * r_ref**2 / (v6_ref**3)
+            )
+            * r_ref_d
+        ) ** 2
 
     return val, np.sqrt(err)
 
 
-def lambda_r(r: array_like, r_d: array_like, r_ref: array_like, r_ref_d: array_like,
-             dr: array_like = None, dr_d: array_like = None, v2: array_like = 1., v2_ref: array_like = 1.,
-             v4: array_like = 1., v4_ref: array_like = 1., v6: array_like = 1., v6_ref: array_like = 1.,
-             c2c1: array_like = 1., c3c1: array_like = 1.) -> (ndarray, ndarray):
+def lambda_r(
+    r: array_like,
+    r_d: array_like,
+    r_ref: array_like,
+    r_ref_d: array_like,
+    dr: array_like | None = None,
+    dr_d: array_like | None = None,
+    v2: array_like = 1.0,
+    v2_ref: array_like = 1.0,
+    v4: array_like = 1.0,
+    v4_ref: array_like = 1.0,
+    v6: array_like = 1.0,
+    v6_ref: array_like = 1.0,
+    c2c1: array_like = 1.0,
+    c3c1: array_like = 1.0,
+) -> tuple[ndarray, ndarray]:
     r"""
     The differential nuclear charge radius series up to $\mathcal{O}(r^6)$ between two isotopes and its uncertainty
     calculated from the Barrett radii, elastic electron scattering form factors and the Seltzer coefficients
@@ -1761,7 +2059,7 @@ def lambda_r(r: array_like, r_d: array_like, r_ref: array_like, r_ref_d: array_l
     + \left(\frac{C_2}{C_1}\Delta\delta\!\langle r^4\rangle\right)^2
     + \left(\frac{C_3}{C_1}\Delta\delta\!\langle r^6\rangle\right)^2}
     \end{aligned}$$
-    
+
     The moments of the differential nuclear charge radii and their uncertainties are calculated with the functions
     `delta_r2`, `delta_r4` and `delta_r6`.
 
@@ -1790,8 +2088,16 @@ def lambda_r(r: array_like, r_d: array_like, r_ref: array_like, r_ref_d: array_l
     return lambda_rn(r2[0], r2[1], r4[0], r4[1], r6[0], r6[1], c2c1, c3c1)
 
 
-def lambda_rn(r2: array_like, r2_d: array_like, r4: array_like, r4_d: array_like,
-              r6: array_like, r6_d: array_like, c2c1: array_like = 1., c3c1: array_like = 1.) -> (ndarray, ndarray):
+def lambda_rn(
+    r2: array_like,
+    r2_d: array_like,
+    r4: array_like,
+    r4_d: array_like,
+    r6: array_like,
+    r6_d: array_like,
+    c2c1: array_like = 1.0,
+    c3c1: array_like = 1.0,
+) -> tuple[ndarray, ndarray]:
     r"""
     The differential nuclear charge radius series up to $\mathcal{O}(r^6)$ between two isotopes and its uncertainty
     calculated from the moments of the nuclear charge radii and the Seltzer coefficients
@@ -1803,7 +2109,7 @@ def lambda_rn(r2: array_like, r2_d: array_like, r4: array_like, r4_d: array_like
     + \left(\frac{C_2}{C_1}\Delta\delta\!\langle r^4\rangle\right)^2
     + \left(\frac{C_3}{C_1}\Delta\delta\!\langle r^6\rangle\right)^2}
     \end{aligned}$$
-    
+
     :param r2: The difference of the mean-square nuclear charge radius between two isotopes
     $\delta\!\langle r^2\rangle$.
     :param r2_d: The uncertainty of the difference of the mean-square nuclear charge radius
@@ -1826,7 +2132,7 @@ def lambda_rn(r2: array_like, r2_d: array_like, r4: array_like, r4_d: array_like
     r6, r6_d = np.asarray(r6, dtype=float), np.asarray(r6_d, dtype=float)
     c2c1, c3c1 = np.asarray(c2c1, dtype=float), np.asarray(c3c1, dtype=float)
     val = r2 + c2c1 * r4 + c3c1 * r6
-    err = r2_d ** 2
+    err = r2_d**2
     err += (c2c1 * r4_d) ** 2
     err += (c3c1 * r6_d) ** 2
     return val, np.sqrt(err)
@@ -1849,10 +2155,7 @@ def schmidt_line(l: quant_like, i: quant_like, is_proton: bool) -> ndarray:
     _g_s = gp_s if is_proton else gn_s
     _g_l = 1 if is_proton else 0
 
-    if i < l:
-        ret = i / (i + 1) * ((l + 1) * _g_l - 0.5 * _g_s)
-    else:
-        ret = l * _g_l + 0.5 * _g_s
+    ret = i / (i + 1) * ((l + 1) * _g_l - 0.5 * _g_s) if i < l else l * _g_l + 0.5 * _g_s
 
     return np.array(ret, dtype=float)
 
@@ -1876,7 +2179,7 @@ def sellmeier(w: array_like, a: array_like, b: array_like) -> ndarray:
     """
     w, a, b = np.asarray(w, dtype=float), np.asarray(a, dtype=float), np.asarray(b, dtype=float)
     tools.check_dimension(a.shape[0], 0, b)
-    sum_term = np.sum([a_i * w ** 2 / (w ** 2 - b_i) for a_i, b_i in zip(a, b)], axis=0)
+    sum_term = np.sum([a_i * w**2 / (w**2 - b_i) for a_i, b_i in zip(a, b)], axis=0)
     return np.sqrt(1 + sum_term)
 
 
@@ -1930,14 +2233,30 @@ def boost(x: array_like, v: array_like, axis: int = -1) -> ndarray:
     bet_abs[bet_abs == 0] = 1
 
     gam = gamma_3d(v, axis=axis)
-    b_xyz = np.array([[1. + (gam - 1.) * np.take(bet, i, axis=axis) * np.take(bet, j, axis=axis) / (bet_abs ** 2)
-                       if i == j else (gam - 1.) * np.take(bet, i, axis=axis) * np.take(bet, j, axis=axis)
-                       / (bet_abs ** 2) for j in range(3)] for i in range(3)])
-    b = np.array([[gam, -gam * np.take(bet, 0, axis=axis), -gam * np.take(bet, 1, axis=axis),
-                   -gam * np.take(bet, 2, axis=axis)],
-                  [-gam * np.take(bet, 0, axis=axis), b_xyz[0, 0], b_xyz[0, 1], b_xyz[0, 2]],
-                  [-gam * np.take(bet, 1, axis=axis), b_xyz[1, 0], b_xyz[1, 1], b_xyz[1, 2]],
-                  [-gam * np.take(bet, 2, axis=axis), b_xyz[2, 0], b_xyz[2, 1], b_xyz[2, 2]]])
+    b_xyz = np.array(
+        [
+            [
+                1.0 + (gam - 1.0) * np.take(bet, i, axis=axis) * np.take(bet, j, axis=axis) / (bet_abs**2)
+                if i == j
+                else (gam - 1.0) * np.take(bet, i, axis=axis) * np.take(bet, j, axis=axis) / (bet_abs**2)
+                for j in range(3)
+            ]
+            for i in range(3)
+        ]
+    )
+    b = np.array(
+        [
+            [
+                gam,
+                -gam * np.take(bet, 0, axis=axis),
+                -gam * np.take(bet, 1, axis=axis),
+                -gam * np.take(bet, 2, axis=axis),
+            ],
+            [-gam * np.take(bet, 0, axis=axis), b_xyz[0, 0], b_xyz[0, 1], b_xyz[0, 2]],
+            [-gam * np.take(bet, 1, axis=axis), b_xyz[1, 0], b_xyz[1, 1], b_xyz[1, 2]],
+            [-gam * np.take(bet, 2, axis=axis), b_xyz[2, 0], b_xyz[2, 1], b_xyz[2, 2]],
+        ]
+    )
     axes = list(range(len(v.shape)))
     axes.insert(0, axes.pop(axis))
     x = np.transpose(x, axes=axes)
@@ -1947,7 +2266,7 @@ def boost(x: array_like, v: array_like, axis: int = -1) -> ndarray:
     return np.transpose(y, axes=axes)
 
 
-def doppler_3d(k: array_like, v: array_like, return_frame='atom', axis=-1) -> ndarray:
+def doppler_3d(k: array_like, v: array_like, return_frame: str = "atom", axis: int = -1) -> ndarray:
     r"""
     The 3D Doppler shift of the 3-vector $\vec{k}$
 
@@ -1969,22 +2288,24 @@ def doppler_3d(k: array_like, v: array_like, return_frame='atom', axis=-1) -> nd
     tools.check_dimension(3, axis, k, v)
     k_0 = tools.absolute(k, axis=axis)
     k_4 = np.concatenate([np.expand_dims(k_0, axis=axis), k], axis=axis)
-    if return_frame == 'atom':
+    if return_frame == "atom":
         """ Return k in the atomic system. """
         ret = boost(k_4, v)
-    elif return_frame == 'lab':
+    elif return_frame == "lab":
         """ Return k in the laboratory system. """
         ret = boost(k_4, -v)
     else:
-        raise ValueError('rest_frame must be either \'atom\' or \'lab\'.')
+        ret = []
+        raise ValueError("`rest_frame` must be either 'atom' or 'lab'.")
 
     i = [slice(None)] * len(ret.shape)
     i[axis] = slice(1, None)
-    return ret[i]
+    return ret[tuple(i)]
 
 
-def gaussian_beam_3d(r: array_like, k: array_like, w0: array_like, p0: array_like,
-                     r0: array_like = None, axis: int = -1) -> ndarray:
+def gaussian_beam_3d(
+    r: array_like, k: array_like, w0: array_like, p0: array_like, r0: array_like | None = None, axis: int = -1
+) -> ndarray:
     r"""
     The Gaussian beam intensity at the position $\vec{r} - \vec{r}_0$
 
@@ -2009,10 +2330,15 @@ def gaussian_beam_3d(r: array_like, k: array_like, w0: array_like, p0: array_lik
      The shapes of `r`, `k`, `w0`, `r0` and `p0` must be compatible.
     """
     if r0 is None:
-        r0 = 0.
+        r0 = 0.0
 
-    r, k, w0, p0, r0 = (np.asarray(r, dtype=float), np.asarray(k, dtype=float), np.asarray(w0, dtype=float),
-                        np.asarray(p0, dtype=float), np.asarray(r0, dtype=float))
+    r, k, w0, p0, r0 = (
+        np.asarray(r, dtype=float),
+        np.asarray(k, dtype=float),
+        np.asarray(w0, dtype=float),
+        np.asarray(p0, dtype=float),
+        np.asarray(r0, dtype=float),
+    )
     # tools.check_dimension(3, axis, r, k)
     # tools.check_shape_like(np.sum(r, axis=axis), np.sum(k, axis=axis), w0, np.sum(r0, axis=axis), p0)
 
@@ -2022,13 +2348,14 @@ def gaussian_beam_3d(r: array_like, k: array_like, w0: array_like, p0: array_lik
     rho = np.sqrt(np.sum((r - r0) * e_theta, axis=axis) ** 2 + np.sum((r - r0) * e_phi, axis=axis) ** 2)
     z = np.sum((r - r0) * e_r, axis=axis)
 
-    z0 = 0.5 * w0 ** 2 * k_abs
-    w_z = w0 * np.sqrt(1. + (z / z0) ** 2)
-    return 2. * p0 / (np.pi * w_z ** 2) * np.exp(-2. * (rho / w_z) ** 2)
+    z0 = 0.5 * w0**2 * k_abs
+    w_z = w0 * np.sqrt(1.0 + (z / z0) ** 2)
+    return 2.0 * p0 / (np.pi * w_z**2) * np.exp(-2.0 * (rho / w_z) ** 2)
 
 
-def gaussian_doppler_3d(r: array_like, k: array_like, w0: array_like, v: array_like, r0: array_like = None,
-                        axis: int = -1) -> ndarray:
+def gaussian_doppler_3d(
+    r: array_like, k: array_like, w0: array_like, v: array_like, r0: array_like | None = None, axis: int = -1
+) -> ndarray:
     r"""
     The length |$\vec{k}^\prime$| of the Doppler-shifted 3-vector `k` in the rest frame of the atom
 
@@ -2041,7 +2368,7 @@ def gaussian_doppler_3d(r: array_like, k: array_like, w0: array_like, v: array_l
     \rho &= \sqrt{\left[(\vec{r} - \vec{r}_0)\cdot\hat{x}\right]^2
     + \left[(\vec{r} - \vec{r}_0)\cdot\hat{y}\right]^2},
     \end{aligned}$$
-    
+
     where $\beta = |\vec{v}| / c$ is the relativistic velocity, $\gamma$ the time-dilation factor and $\alpha$ the angle
     between $\vec{k}$ and $\vec{v}$.
 
@@ -2055,26 +2382,31 @@ def gaussian_doppler_3d(r: array_like, k: array_like, w0: array_like, v: array_l
     :raises ValueError: `r`, `k`, `v` and `r0` must have 3 components along the specified `axis`.
      The shapes of `r`, `k`, `w0`, `v` and `r0` must be compatible.
     """
-    r, k, v = np.asarray(r, dtype=float), np.asarray(k, dtype=float), np.asarray(v, dtype=float)
+    r, k, w0, v = asarray(r, k, w0, v, dtype=float)
     if r0 is None:
         r0 = np.zeros_like(r, dtype=float)
     r0 = np.asarray(r0, dtype=float)
 
     tools.check_dimension(3, axis, r, r0, k, v)
-    tools.check_shape_like(np.sum(r, axis=axis), np.sum(k, axis=axis), np.array(w0),
-                           np.sum(v, axis=axis), np.sum(r0, axis=axis))
+    tools.check_shape_like(np.sum(r, axis=axis), np.sum(k, axis=axis), w0, np.sum(v, axis=axis), np.sum(r0, axis=axis))
     k_abs = tools.absolute(k, axis=axis)
     e_r, e_theta, e_phi = tools.orthonormal(k)
     rho = np.sqrt(np.sum((r - r0) * e_theta, axis=axis) ** 2 + np.sum((r - r0) * e_phi, axis=axis) ** 2)
     z = np.sum((r - r0) * e_r, axis=axis)
-    z_0 = 0.5 * w0 ** 2 * k_abs
-    z_plus = z ** 2 + z_0 ** 2
-    z_minus = z ** 2 - z_0 ** 2
+    z_0 = 0.5 * w0**2 * k_abs
+    z_plus = z**2 + z_0**2
+    z_minus = z**2 - z_0**2
     alpha = tools.angle(v, k, axis=axis)
     bet_abs = beta(tools.absolute(v, axis=axis))
-    return k_abs * gamma_3d(v) * (1. - bet_abs * np.cos(alpha) * (1. - 0.5 * w0 ** 2 / z_plus
-                                                                  - 0.5 * rho ** 2 * z_minus / (z_plus ** 2))
-                                  - bet_abs * np.sin(alpha) * rho * z / z_plus)
+    return (
+        k_abs
+        * gamma_3d(v)
+        * (
+            1.0
+            - bet_abs * np.cos(alpha) * (1.0 - 0.5 * w0**2 / z_plus - 0.5 * rho**2 * z_minus / (z_plus**2))
+            - bet_abs * np.sin(alpha) * rho * z / z_plus
+        )
+    )
 
 
 """ Probability distributions """
@@ -2110,7 +2442,7 @@ def t_sigma(sigma: array_like, m: array_like) -> ndarray:
     :returns: The temperature $T$ of the environment (K).
     """
     sigma, m = np.asarray(sigma, dtype=float), np.asarray(m, dtype=float)
-    return m * sc.atomic_mass * sigma ** 2 / sc.k
+    return m * sc.atomic_mass * sigma**2 / sc.k
 
 
 def t_xi(xi: array_like, f: array_like, u: array_like, q: array_like, m: array_like) -> ndarray:
@@ -2130,10 +2462,15 @@ def t_xi(xi: array_like, f: array_like, u: array_like, q: array_like, m: array_l
     :param m: The mass of the ions (u).
     :returns: (T) The temperature $T$ (K).
     """
-    xi, f, u, q, m = (np.asarray(xi, dtype=float), np.asarray(f, dtype=float), np.asarray(u, dtype=float),
-                      np.asarray(q, dtype=float), np.asarray(m, dtype=float))
+    xi, f, u, q, m = (
+        np.asarray(xi, dtype=float),
+        np.asarray(f, dtype=float),
+        np.asarray(u, dtype=float),
+        np.asarray(q, dtype=float),
+        np.asarray(m, dtype=float),
+    )
 
-    return xi * np.sqrt(8 * q * sc.e * u * m * sc.u * sc.c ** 2) / (sc.k * f * gamma_e_kin(q * u, m))
+    return xi * np.sqrt(8 * q * sc.e * u * m * sc.u * sc.c**2) / (sc.k * f * gamma_e_kin(q * u, m))
 
 
 def xi_t(t: array_like, f: array_like, u: array_like, q: array_like, m: array_like) -> ndarray:
@@ -2154,7 +2491,7 @@ def xi_t(t: array_like, f: array_like, u: array_like, q: array_like, m: array_li
     :returns: (xi) The asymmetry parameter $\xi$ ([`f`]).
     """
     t = np.asarray(t, dtype=float)
-    return t / t_xi(1., f, u, q, m)
+    return t / t_xi(1.0, f, u, q, m)
 
 
 def normal_vx_pdf(vx: array_like, m: array_like, t: array_like) -> ndarray:
@@ -2178,7 +2515,7 @@ def normal_vx_pdf(vx: array_like, m: array_like, t: array_like) -> ndarray:
     return st.norm.pdf(vx, scale=scale)
 
 
-def normal_vx_rvs(m: array_like, t: array_like, size: Union[int, tuple] = 1) -> ndarray:
+def normal_vx_rvs(m: array_like, t: array_like, size: int | tuple[int] = 1) -> ndarray:
     r"""
     Random sample velocity components $v_x$ from the Gaussian probability density function
 
@@ -2197,7 +2534,7 @@ def normal_vx_rvs(m: array_like, t: array_like, size: Union[int, tuple] = 1) -> 
     m, t = np.asarray(m, dtype=float), np.asarray(t, dtype=float)
 
     scale = np.sqrt(sc.k * t / (m * sc.atomic_mass))
-    return st.norm.rvs(scale=scale, size=size)
+    return st.norm.rvs(scale=scale, size=size)  # type: ignore
 
 
 def chi2_ex_pdf(ex: array_like, t: array_like) -> ndarray:
@@ -2220,7 +2557,7 @@ def chi2_ex_pdf(ex: array_like, t: array_like) -> ndarray:
     return st.chi2.pdf(ex, 1, scale=scale)
 
 
-def chi2_ex_rvs(t: array_like, size: Union[int, tuple] = 1) -> ndarray:
+def chi2_ex_rvs(t: array_like, size: int | tuple[int] = 1) -> ndarray:
     r"""
     Random sample energy components $E_x$ from the $\chi^2_1$ probability density function
 
@@ -2237,7 +2574,7 @@ def chi2_ex_rvs(t: array_like, size: Union[int, tuple] = 1) -> ndarray:
     """
     t = np.asarray(t, dtype=float)
     scale = 0.5 * sc.k * t / E_NORM
-    return st.chi2.rvs(1, scale=scale, size=size)
+    return st.chi2.rvs(1, scale=scale, size=size)  # type: ignore
 
 
 def normal_chi2_convolved_ex_pdf(ex: array_like, t: array_like, scale_e: array_like, e0: array_like = 0) -> ndarray:
@@ -2268,9 +2605,12 @@ def normal_chi2_convolved_ex_pdf(ex: array_like, t: array_like, scale_e: array_l
     :param e0: The mean energy $E_0$ of the normal distribution (eV).
     :returns: (rho_ex) The probability density in thermal equilibrium at the energy `ex` (1/eV).
     """
-    ex, t, scale_e, e0 = (np.asarray(ex, dtype=float), np.asarray(t, dtype=float),
-                          np.asarray(scale_e, dtype=float), np.asarray(e0, dtype=float))
-
+    ex, t, scale_e, e0 = (
+        np.asarray(ex, dtype=float),
+        np.asarray(t, dtype=float),
+        np.asarray(scale_e, dtype=float),
+        np.asarray(e0, dtype=float),
+    )
 
     scalar_true = tools.check_shape((), ex, t, scale_e, e0, return_mode=True)
     if scalar_true:
@@ -2278,29 +2618,29 @@ def normal_chi2_convolved_ex_pdf(ex: array_like, t: array_like, scale_e: array_l
 
     t /= E_NORM
     scale = scale_e / (sc.k * t)
-    loc = (ex - e0) / (sc.k * t) - scale ** 2
+    loc = (ex - e0) / (sc.k * t) - scale**2
 
-    norm = np.exp(-0.5 * scale ** 2) / (np.sqrt(2.) * np.pi * scale * sc.k * t)
+    norm = np.exp(-0.5 * scale**2) / (np.sqrt(2.0) * np.pi * scale * sc.k * t)
 
-    isnan = norm > 0.
+    isnan = norm > 0.0
     isnan += np.abs(loc) <= max_exp_input
     isnan = ~isnan
 
     nonzero = loc.astype(bool)
     loc = loc[nonzero]
-    x = (loc / (2. * scale)) ** 2
+    x = (loc / (2.0 * scale)) ** 2
 
     main = np.full(ex.shape, norm * np.sqrt(LEMNISCATE * np.sqrt(np.pi) * scale), dtype=float)
-    main[isnan] = 0.
+    main[isnan] = 0.0
 
     main_nonzero = np.empty_like(ex[nonzero], dtype=float)
-    mask0 = loc < 0.
-    mask1 = loc > 0.
+    mask0 = loc < 0.0
+    mask1 = loc > 0.0
 
-    main_nonzero[mask0] = np.sqrt(-loc[mask0] / 2.) * np.exp(-loc[mask0]) \
-        * sp.kv(0.25, x[mask0]) * np.exp(-x[mask0])
-    main_nonzero[mask1] = np.pi / 2. * np.sqrt(loc[mask1]) * np.exp(-loc[mask1]) \
-        * (sp.ive(0.25, x[mask1]) + sp.ive(-0.25, x[mask1]))
+    main_nonzero[mask0] = np.sqrt(-loc[mask0] / 2.0) * np.exp(-loc[mask0]) * sp.kv(0.25, x[mask0]) * np.exp(-x[mask0])
+    main_nonzero[mask1] = (
+        np.pi / 2.0 * np.sqrt(loc[mask1]) * np.exp(-loc[mask1]) * (sp.ive(0.25, x[mask1]) + sp.ive(-0.25, x[mask1]))
+    )
     main[nonzero] = main_nonzero * norm
 
     if scalar_true:
@@ -2308,8 +2648,9 @@ def normal_chi2_convolved_ex_pdf(ex: array_like, t: array_like, scale_e: array_l
     return main
 
 
-def normal_chi2_convolved_vx_pdf(vx: array_like, m: array_like, t: array_like,
-                                 scale_e: array_like, e0: array_like = 0, relativistic: bool = True) -> ndarray:
+def normal_chi2_convolved_vx_pdf(
+    vx: array_like, m: array_like, t: array_like, scale_e: array_like, e0: array_like = 0, relativistic: bool = True
+) -> ndarray:
     r"""
     The probability density at the velocity $v_x$ of particles with kinetic energy $E_x$, distributed according
     to a convolution of a normal and a $\chi^2_1$ distribution
@@ -2330,8 +2671,13 @@ def normal_chi2_convolved_vx_pdf(vx: array_like, m: array_like, t: array_like,
     :param relativistic: Kinetic energies are calculated either relativistically (`True`) or classically (`False`).
     :returns: (rho_vx) The probability density in thermal equilibrium at the velocity `vx` (s/m).
     """
-    vx, m, t, scale_e, e0 = (np.asarray(vx, dtype=float), np.asarray(m, dtype=float), np.asarray(t, dtype=float),
-                             np.asarray(scale_e, dtype=float), np.asarray(e0, dtype=float))
+    vx, m, t, scale_e, e0 = (
+        np.asarray(vx, dtype=float),
+        np.asarray(m, dtype=float),
+        np.asarray(t, dtype=float),
+        np.asarray(scale_e, dtype=float),
+        np.asarray(e0, dtype=float),
+    )
 
     # if np.any(vx < 0.) and np.any(vx > 0.):
     #     raise ValueError('This pdf can only describe the case where all velocities have the same sign.')
@@ -2344,8 +2690,16 @@ def normal_chi2_convolved_vx_pdf(vx: array_like, m: array_like, t: array_like,
     return normal_chi2_convolved_ex_pdf(energy, t, scale_e, e0=e0) * tr / E_NORM
 
 
-def normal_chi2_convolved_f_pdf(f: array_like, f_lab: array_like, alpha: array_like, m: array_like, t: array_like,
-                                scale_e: array_like, e0: array_like = 0, relativistic: bool = True) -> ndarray:
+def normal_chi2_convolved_f_pdf(
+    f: array_like,
+    f_lab: array_like,
+    alpha: array_like,
+    m: array_like,
+    t: array_like,
+    scale_e: array_like,
+    e0: array_like = 0,
+    relativistic: bool = True,
+) -> ndarray:
     r"""
     The probability density at the frequency $f$ in the rest frame of an atom with kinetic energy $E_x$,
     determined through the Doppler shift of $f_\text{lab}$,
@@ -2372,19 +2726,24 @@ def normal_chi2_convolved_f_pdf(f: array_like, f_lab: array_like, alpha: array_l
     :returns: (rho_f) The probability density in thermal equilibrium at the frequency `f` ([`1/f`]).
     """
     f, f_lab = np.asarray(f, dtype=float), np.asarray(f_lab, dtype=float)
-    m, t, scale_e, e0 = (np.asarray(m, dtype=float), np.asarray(t, dtype=float),
-                         np.asarray(scale_e, dtype=float), np.asarray(e0, dtype=float))
+    m, t, scale_e, e0 = (
+        np.asarray(m, dtype=float),
+        np.asarray(t, dtype=float),
+        np.asarray(scale_e, dtype=float),
+        np.asarray(e0, dtype=float),
+    )
 
-    v = inverse_doppler(f, f_lab, alpha, mode='isnan-small')
-    tr = np.abs(inverse_doppler_d1(f, f_lab, alpha, mode='isnan-small'))
+    v = inverse_doppler(f, f_lab, alpha, mode="isnan-small")
+    tr = np.abs(inverse_doppler_d1(f, f_lab, alpha, mode="isnan-small"))
     mask = np.isnan(v)
     ret = np.zeros(f.shape)
     ret[~mask] = normal_chi2_convolved_vx_pdf(v[~mask], m, t, scale_e, e0=e0, relativistic=relativistic) * tr[~mask]
     return ret
 
 
-def normal_chi2_convolved_f_xi_pdf(f: array_like, f0: array_like, xi: array_like, sigma_f: array_like,
-                                   col: bool = True) -> ndarray:
+def normal_chi2_convolved_f_xi_pdf(
+    f: array_like, f0: array_like, xi: array_like, sigma_f: array_like, col: bool = True
+) -> ndarray:
     r"""
     The probability density at the frequency $f$ in the rest frame of an atom with kinetic energy $E_x$,
     determined through the parameter $\xi$,
@@ -2414,7 +2773,7 @@ def normal_chi2_convolved_f_xi_pdf(f: array_like, f0: array_like, xi: array_like
     :param col: The laser can be aligned collinearly (`True`) or anticollinearly (`False`) to the velocity of the atom.
     :returns: (rho_f) The probability density in thermal equilibrium at the frequency `f` (1/[`f`]).
     """
-    f, xi, sigma_f = np.asarray(f, dtype=float), np.asarray(xi, dtype=float), np.asarray(sigma_f, dtype=float)
+    f, f0, xi, sigma_f = asarray(f, f0, xi, sigma_f, dtype=float)
 
     scalar_true = tools.check_shape((), f, f0, xi, sigma_f, return_mode=True)
     if scalar_true:
@@ -2427,7 +2786,9 @@ def normal_chi2_convolved_f_xi_pdf(f: array_like, f0: array_like, xi: array_like
     return r
 
 
-def source_energy_pdf(f, f0, sigma, xi, collinear: bool = True) -> ndarray:
+def source_energy_pdf(
+    f: array_like, f0: float | ndarray, sigma: float | ndarray, xi: float | ndarray, collinear: bool = True
+) -> ndarray:
     r"""
     This is the same function as
     <a href="{{ '/doc/functions/physics/normal_chi2_convolved_f_xi_pdf.html' | relative_url }}">
@@ -2441,31 +2802,36 @@ def source_energy_pdf(f, f0, sigma, xi, collinear: bool = True) -> ndarray:
      or anticollinearly (`False`) to the velocity of the atom.
     :returns: (rho_f) The probability density in thermal equilibrium at the frequency `f` (1/[`f`]).
     """
-    pm = 1. if collinear else -1.
+    pm = 1.0 if collinear else -1.0
     f = np.asarray(f, dtype=float)
 
-    sig = (sigma / (2. * xi)) ** 2
-    mu = -pm * (f - f0) / (2. * xi) - sig
-    norm = np.exp(-0.5 * sig) / (sigma * np.sqrt(2. * np.pi))
+    sig = (sigma / (2.0 * xi)) ** 2
+    mu = -pm * (f - f0) / (2.0 * xi) - sig
+    norm = np.exp(-0.5 * sig) / (sigma * np.sqrt(2.0 * np.pi))
 
-    isnan = norm > 0.
+    isnan = norm > 0.0
     isnan += np.abs(mu) <= max_exp_input
     isnan = ~isnan
 
     nonzero = mu.astype(bool)
     mu = mu[nonzero]
-    b_arg = mu ** 2 / (4. * sig)
+    b_arg = mu**2 / (4.0 * sig)
 
     main = np.full(f.shape, norm * np.sqrt(LEMNISCATE * np.sqrt(sig / np.pi)), dtype=float)
-    main[isnan] = 0.
+    main[isnan] = 0.0
 
     main_nonzero = np.empty_like(f[nonzero], dtype=float)
-    mask0 = mu < 0.
-    mask1 = mu > 0.
+    mask0 = mu < 0.0
+    mask1 = mu > 0.0
 
-    main_nonzero[mask0] = np.sqrt(-0.5 * mu[mask0] / np.pi) * np.exp(-mu[mask0]) \
-        * np.exp(-b_arg[mask0]) * sp.kv(0.25, b_arg[mask0])
-    main_nonzero[mask1] = 0.5 * np.sqrt(mu[mask1] * np.pi) * np.exp(-mu[mask1]) \
+    main_nonzero[mask0] = (
+        np.sqrt(-0.5 * mu[mask0] / np.pi) * np.exp(-mu[mask0]) * np.exp(-b_arg[mask0]) * sp.kv(0.25, b_arg[mask0])
+    )
+    main_nonzero[mask1] = (
+        0.5
+        * np.sqrt(mu[mask1] * np.pi)
+        * np.exp(-mu[mask1])
         * (sp.ive(0.25, b_arg[mask1]) + sp.ive(-0.25, b_arg[mask1]))
+    )
     main[nonzero] = main_nonzero
     return main * norm

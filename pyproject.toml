@@ -7,10 +7,10 @@ requires = [
 
 [project]
 name = 'qspec'
-version = '0.4.3'
+version = '0.5.0'
 description = 'Physics toolbox for laser spectroscopy'
 readme = 'README.md'
-requires-python = '>=3.9'
+requires-python = '>=3.10'
 license = 'MIT'
 license-files = ['LICENSE']
 # license = {file = 'LICENSE'}
@@ -48,3 +48,39 @@ packages = ['qspec']
 
 [tool.setuptools.package-data]
 '*' = ['*.dll']
+
+[tool.ruff]
+extend-exclude = [
+    "__pycache__",
+    "docs/*",
+]
+line-length = 120
+target-version = "py312"
+
+[tool.ruff.lint]
+select = [
+    "ANN",
+    "E",
+    "F",
+    "I",
+    "ICN",
+    "ISC",
+    "NPY",
+    "Q",
+    "RET",
+    "RUF",
+    "SIM",
+    "TC",
+    "TID",
+    "UP",
+]
+
+ignore = [
+    "ANN003",
+    "ANN401",
+    "E741",
+    "RUF012",
+]
+
+[tool.ruff.lint.isort]
+known-first-party = ["qspec"]

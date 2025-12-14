@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 qspec._simulate
 ===============
@@ -7,34 +6,32 @@ Module for simulations of laser-atom interaction.
 """
 
 from time import time
+from typing import TYPE_CHECKING
+
+import matplotlib as mpl
+import matplotlib.pyplot as plt
 import numpy as np
 import scipy.integrate as si
-import matplotlib
-import matplotlib.pyplot as plt
+from matplotlib.figure import Figure
 from mpl_toolkits.axes_grid1 import make_axes_locatable
-# noinspection PyUnresolvedReferences
 from mpl_toolkits.mplot3d.axes3d import Axes3D
 
-from qspec.qtypes import *
-from qspec import tools
 import qspec.algebra as al
+from qspec import tools
 from qspec.physics import f_recoil, saturation
-from qspec.simulate._simulate_cpp import sr_generate_y, Polarization, Environment, Atom, Laser
+from qspec.qtypes import Callable, array_like, int_like, is_scalar, ndarray, scalar_like
+from qspec.simulate._simulate_cpp import Atom, Environment, Laser, Polarization, sr_generate_y
 
-__all__ = ['ct_markov_analytic', 'ct_markov_dgl', 'lambda_states', 'lambda_ge_rec', 'Geometry', 'ScatteringRate']
+if TYPE_CHECKING:
+    from matplotlib.axes import Axes
 
-
-try:
-    matplotlib.use('Qt5Agg')
-except ImportError:
-    pass
-# config = tools.get_config_dict()
-# plt.rcParams['animation.ffmpeg_path'] = config['ffmpeg']
-
-LINESTYLES = ['-', ':', '--', '-.']
+__all__ = ["Geometry", "ScatteringRate", "ct_markov_analytic", "ct_markov_dgl", "lambda_ge_rec", "lambda_states"]
 
 
-def ct_markov_analytic(t: array_like, n: array_like, rates: array_like, r: array_like = 1.):
+LINESTYLES = ["-", ":", "--", "-."]
+
+
+def ct_markov_analytic(t: array_like, n: array_like, rates: array_like, r: array_like = 1.0) -> ndarray:
     """
     Computes the analytic solution of the evolution of a linear continuous-time markov chain.
 
@@ -54,7 +51,7 @@ def ct_markov_analytic(t: array_like, n: array_like, rates: array_like, r: array
      If 't' and 'n' are Iterables, a 2-d array is returned
      with shape (t.size, n.size), containing all probabilities P(t, n).
     """
-    t = np.asarray(t)
+    t = np.asarray(t, dtype=float)
     t_scalar = False
     if len(t.shape) == 0:
         t_scalar = True
@@ -69,33 +66,35 @@ def ct_markov_analytic(t: array_like, n: array_like, rates: array_like, r: array
         # return np.array([ct_markov(t, n_i, rates[:(int(n_i)+1)], r=r) for n_i in n.flatten()]).T
     n = np.expand_dims(n.flatten(), axis=(0, 1))
 
-    rates = np.asarray(rates)
+    rates = np.asarray(rates, dtype=float)
     r = np.asarray(r)
     if len(r.shape) > 0 or np.abs(r - 0.5) > 0.5:
-        raise ValueError('\'r\' must be a scalar between 0 and 1.')
+        raise ValueError("'r' must be a scalar between 0 and 1.")
 
-    if len(rates.shape) == 0:
+    if is_scalar(rates):
         ret = (r * rates * t[:, 0, :]) ** n[:, 0, :] / tools.factorial(n[:, 0, :]) * np.exp(-rates * t[:, 0, :])
     else:
         b = np.full((n_max, n_max), np.nan)
 
-        def _b(_i, _n):
+        def _b(_i: int, _n: int, _rates: ndarray = rates) -> float:
             _b_k = b[_i, _n - 1]
             if not np.isnan(_b_k):
                 return _b_k
+
             if _i == _n - 1:
                 if _n == 1:
-                    return r * rates[0] / (rates[1] - rates[0])
-                return r * rates[_i] / (rates[_i] - rates[_n]) * np.sum([_b(_j, _i) for _j in range(_n - 1)])
-            elif _i <= _n - 2:
-                return r * rates[_n - 1] / (rates[_n] - rates[_i]) * _b(_i, _n - 1)
-            return 0.
+                    return r * _rates[0] / (_rates[1] - _rates[0])
+                return r * _rates[_i] / (_rates[_i] - _rates[_n]) * np.sum([_b(_j, _i) for _j in range(_n - 1)])
+
+            if _i <= _n - 2:
+                return r * _rates[_n - 1] / (_rates[_n] - _rates[_i]) * _b(_i, _n - 1)
+            return 0.0
 
         for n_i in range(1, n_max + 1, 1):
             for i_i in range(n_i):
                 b[i_i, n_i - 1] = _b(i_i, n_i)
 
-        b[np.isnan(b)] = 0.
+        b[np.isnan(b)] = 0.0
         b = np.expand_dims(b, axis=0)
         b_map = n.flatten()[~n_zero] - 1
 
@@ -103,9 +102,9 @@ def ct_markov_analytic(t: array_like, n: array_like, rates: array_like, r: array
         ret[:, n_zero] = np.exp(-rates[0] * t[:, 0, :])
         rates = np.expand_dims(rates, axis=(0, 2))
 
-        ret[:, ~n_zero] = np.sum(b[:, :, b_map] * np.exp(-rates[:, :-1, :] * t), axis=1) \
-            - np.sum(b[:, :, b_map], axis=1) \
-            * np.exp(-np.transpose(rates[:, b_map + 1, :], axes=[0, 2, 1]) * t[:, 0, :])
+        ret[:, ~n_zero] = np.sum(b[:, :, b_map] * np.exp(-rates[:, :-1, :] * t), axis=1) - np.sum(
+            b[:, :, b_map], axis=1
+        ) * np.exp(-np.transpose(rates[:, b_map + 1, :], axes=[0, 2, 1]) * t[:, 0, :])
 
     if t_scalar:
         if n_scalar:
@@ -116,8 +115,15 @@ def ct_markov_analytic(t: array_like, n: array_like, rates: array_like, r: array
     return ret
 
 
-def ct_markov_dgl(t: array_like, n: int, rates: array_like, r: array_like = 1., p0: array_like = None,
-                  time_resolved: bool = False, show: bool = False):
+def ct_markov_dgl(
+    t: array_like,
+    n: int_like,
+    rates: array_like,
+    r: array_like = 1.0,
+    p0: array_like | None = None,
+    time_resolved: bool = False,
+    show: bool = False,
+) -> ndarray | tuple[ndarray, ndarray]:
     """
     Computes the evolution of a linear continuous-time markov chain numerically by solving the underlying ODE system.
 
@@ -140,30 +146,37 @@ def ct_markov_dgl(t: array_like, n: int, rates: array_like, r: array_like = 1., 
     """
     t = np.asarray(t, dtype=float)
     if len(t.shape) > 0:
-        raise ValueError('\'t\' must be a scalar.')
+        raise ValueError("'t' must be a scalar.")
+
     n_dim = int(n) + 1
+
     rates = np.asarray(rates)
     if len(rates.shape) == 0:
         rates = np.full(n_dim, rates)
     else:
         rates = rates.flatten()
         if rates.size != n_dim:
-            raise ValueError('\'rates\' must have size max(\'n\') + 1, but has size {}.'.format(rates.size))
+            raise ValueError(f"'rates' must have size max('n') + 1, but has size {rates.size}.")
+
     r = np.asarray(r)
     if len(r.shape) > 0 or np.abs(r - 0.5) > 0.5:
-        raise ValueError('\'r\' must be a scalar between 0 and 1.')
+        raise ValueError("'r' must be a scalar between 0 and 1.")
 
     if p0 is None:
         p0 = np.zeros(n + 1)
-        p0[0] = 1.
+        p0[0] = 1.0
     else:
         p0 = np.asarray(p0, dtype=float).flatten()
         if p0.size != n_dim:
-            raise ValueError('\'p0\' must have size max(\'n\') + 1, but has size {}.'.format(p0.size))
+            raise ValueError(f"'p0' must have size max('n') + 1, but has size {p0.size}.")
 
-    def _f(_t, _y):
-        return np.array([-rates[0] * _y[0], ] + [r * _ri * _yi - _rj * _yj for _ri, _yi, _rj, _yj
-                                                 in zip(rates[:-1], _y[:-1], rates[1:], _y[1:])])
+    def _f(_t: scalar_like, _y: ndarray) -> ndarray:
+        return np.array(
+            [
+                -rates[0] * _y[0],
+            ]
+            + [r * _ri * _yi - _rj * _yj for _ri, _yi, _rj, _yj in zip(rates[:-1], _y[:-1], rates[1:], _y[1:])]
+        )
 
     jac = np.zeros((n_dim, n_dim))
     for i, ri in enumerate(rates):
@@ -171,23 +184,28 @@ def ct_markov_dgl(t: array_like, n: int, rates: array_like, r: array_like = 1., 
         if i > 0:
             jac[i, i - 1] = r * rates[i - 1]
 
-    def _df(_t, _y):
+    def _df(_t: scalar_like, _y: ndarray) -> ndarray:
         return jac
 
     dt = 0.05 / np.max(rates)
-    t_array = np.linspace(0., t, tools.odd(t / dt))
+    t_array = np.linspace(0.0, t, tools.odd(t / dt))
     ode = si.ode(_f, jac=_df)
-    ode.set_initial_value(p0, 0.)
+    ode.set_initial_value(p0, 0.0)
     # noinspection PyTypeChecker
-    y_array = np.array([p0, ] + [ode.integrate(ti) for ti in t_array[1:]])
+    y_array = np.array(
+        [
+            p0,
+        ]
+        + [ode.integrate(ti) for ti in t_array[1:]]
+    )
     # result = si.solve_ivp(_f, (0., t), p0, method='RK45', max_step=dt, t_eval=t_array, vectorized=True)
     # # noinspection PyUnresolvedReferences
     # t_array, y_array = result.t, result.y.T
 
     if show:
         for ni, yi in enumerate(y_array.T):
-            plt.plot(t_array, yi, label='n={}'.format(ni))
-        plt.plot(t_array, np.sum(y_array, axis=1), 'k--', label=r'$N$')
+            plt.plot(t_array, yi, label=f"n={ni}")
+        plt.plot(t_array, np.sum(y_array, axis=1), "k--", label=r"$N$")
         if y_array.shape[1] < 10:
             plt.legend()
         plt.show()
@@ -197,9 +215,20 @@ def ct_markov_dgl(t: array_like, n: int, rates: array_like, r: array_like = 1., 
     return y_array[-1, :]
 
 
-def lambda_states(t: array_like, delta_1: array_like, delta_2: array_like, a_ge: array_like, a_me: array_like,
-                  s_1: array_like, s_2: array_like, lw_1: array_like = 0., lw_2: array_like = 0., p0: array_like = None,
-                  time_resolved: bool = False, show: bool = False):
+def lambda_states(
+    t: array_like,
+    delta_1: scalar_like,
+    delta_2: scalar_like,
+    a_ge: scalar_like,
+    a_me: scalar_like,
+    s_1: scalar_like,
+    s_2: scalar_like,
+    lw_1: scalar_like = 0.0,
+    lw_2: scalar_like = 0.0,
+    p0: array_like | None = None,
+    time_resolved: bool = False,
+    show: bool = False,
+) -> ndarray | tuple[ndarray, ndarray]:
     """
     Computes the evolution of Lambda-systems such as the alkali metals or the singly-charged alkaline-earth metals.
     The state vector is defined as (g, m, e), where g is the first end of the Lambda,
@@ -225,22 +254,22 @@ def lambda_states(t: array_like, delta_1: array_like, delta_2: array_like, a_ge:
     """
     t = np.asarray(t, dtype=float)
     if len(t.shape) > 0:
-        raise ValueError('\'t\' must be a scalar.')
+        raise ValueError("'t' must be a scalar.")
 
     if p0 is None:
         p0 = np.zeros(6, dtype=complex)
-        p0[0] = 1.
+        p0[0] = 1.0
     else:
         p0 = np.asarray(p0, dtype=complex).flatten()
         if p0.size != 6:
-            raise ValueError('\'p0\' must have size 6, but has size {}.'.format(p0.size))
+            raise ValueError(f"'p0' must have size 6, but has size {p0.size}.")
 
     _delta_1 = 2 * np.pi * delta_1
     _delta_2 = 2 * np.pi * delta_2
-    rabi_1 = a_ge * np.sqrt(s_1 / 2.)
-    rabi_2 = a_me * np.sqrt(s_2 / 2.)
+    rabi_1 = a_ge * np.sqrt(s_1 / 2.0)
+    rabi_2 = a_me * np.sqrt(s_2 / 2.0)
 
-    def _f(_t, _y):
+    def _f(_t: scalar_like, _y: ndarray) -> ndarray:
         i_gg = _y[0]
         i_mm = _y[1]
         i_ee = _y[2]
@@ -249,33 +278,50 @@ def lambda_states(t: array_like, delta_1: array_like, delta_2: array_like, a_ge:
         i_eg = _y[4]
         i_em = _y[5]
 
-        gg = a_ge * i_ee + 1j * rabi_1 * (np.conj(i_eg) - i_eg) / 2.
-        mm = a_me * i_ee + 1j * rabi_2 * (np.conj(i_em) - i_em) / 2.
-        ee = -(a_ge + a_me) * i_ee - 1j * rabi_1 * (np.conj(i_eg) - i_eg) / 2. \
-            - 1j * rabi_2 * (np.conj(i_em) - i_em) / 2.
+        gg = a_ge * i_ee + 1j * rabi_1 * (np.conj(i_eg) - i_eg) / 2.0
+        mm = a_me * i_ee + 1j * rabi_2 * (np.conj(i_em) - i_em) / 2.0
+        ee = (
+            -(a_ge + a_me) * i_ee
+            - 1j * rabi_1 * (np.conj(i_eg) - i_eg) / 2.0
+            - 1j * rabi_2 * (np.conj(i_em) - i_em) / 2.0
+        )
 
-        gm = (1j * (_delta_2 - _delta_1) - (lw_1 + lw_2) / 2.) * i_gm \
-            + 1j * rabi_2 * np.conj(i_eg) / 2. - 1j * rabi_1 * i_em / 2.
-        eg = (1j * _delta_1 - (a_ge + a_me + lw_1) / 2.) * i_eg \
-            + 1j * rabi_1 * (i_ee - i_gg) / 2. - 1j * rabi_2 * np.conj(i_gm) / 2.
-        em = (1j * _delta_2 - (a_ge + a_me + lw_2) / 2.) * i_em \
-            + 1j * rabi_2 * (i_ee - i_mm) / 2. - 1j * rabi_1 * i_gm / 2.
+        gm = (
+            (1j * (_delta_2 - _delta_1) - (lw_1 + lw_2) / 2.0) * i_gm
+            + 1j * rabi_2 * np.conj(i_eg) / 2.0
+            - 1j * rabi_1 * i_em / 2.0
+        )
+        eg = (
+            (1j * _delta_1 - (a_ge + a_me + lw_1) / 2.0) * i_eg
+            + 1j * rabi_1 * (i_ee - i_gg) / 2.0
+            - 1j * rabi_2 * np.conj(i_gm) / 2.0
+        )
+        em = (
+            (1j * _delta_2 - (a_ge + a_me + lw_2) / 2.0) * i_em
+            + 1j * rabi_2 * (i_ee - i_mm) / 2.0
+            - 1j * rabi_1 * i_gm / 2.0
+        )
 
         return np.array([gg, mm, ee, gm, eg, em], dtype=complex)
 
     dt = 0.1 / np.max([a_ge + rabi_1 + lw_1, a_me + rabi_2 + lw_2])
-    t_array = np.linspace(0., t, tools.odd(t / dt))
+    t_array = np.linspace(0.0, t, tools.odd(t / dt))
     ode = si.complex_ode(_f)
-    ode.set_initial_value(p0, 0.).set_integrator('vode', method='bdf')
+    ode.set_initial_value(p0, 0.0).set_integrator("vode", method="bdf")
     # noinspection PyTypeChecker
-    y_array = np.array([p0, ] + [ode.integrate(ti) for ti in t_array[1:]])
+    y_array = np.array(
+        [
+            p0,
+        ]
+        + [ode.integrate(ti) for ti in t_array[1:]]
+    )
     # result = si.solve_ivp(_f, (0., t), p0, method='RK45', max_step=dt, t_eval=t_array, vectorized=True)
     # # noinspection PyUnresolvedReferences
     # t_array, y_array = result.t, result.y.T
     if show:
-        plt.plot(t_array, y_array[:, 0].real, label=r'$\rho_\mathrm{gg}$')
-        plt.plot(t_array, y_array[:, 1].real, label=r'$\rho_\mathrm{mm}$')
-        plt.plot(t_array, y_array[:, 2].real, label=r'$\rho_\mathrm{ee}$')
+        plt.plot(t_array, y_array[:, 0].real, label=r"$\rho_\mathrm{gg}$")
+        plt.plot(t_array, y_array[:, 1].real, label=r"$\rho_\mathrm{mm}$")
+        plt.plot(t_array, y_array[:, 2].real, label=r"$\rho_\mathrm{ee}$")
         plt.legend(loc=5)
         plt.show()
 
@@ -284,9 +330,20 @@ def lambda_states(t: array_like, delta_1: array_like, delta_2: array_like, a_ge:
     return y_array[-1, :]
 
 
-def lambda_ge_rec(t: array_like, n: array_like, delta: array_like, a_ge: array_like, a_me: array_like, s: array_like,
-                  f: array_like, m: array_like, p0: array_like = None, dt: float = None, time_resolved: bool = False,
-                  show: bool = False):
+def lambda_ge_rec(
+    t: array_like,
+    n: int_like,
+    delta: scalar_like,
+    a_ge: scalar_like,
+    a_me: scalar_like,
+    s: scalar_like,
+    f: scalar_like,
+    m: scalar_like,
+    p0: array_like | None = None,
+    dt: scalar_like | None = None,
+    time_resolved: bool = False,
+    show: bool = False,
+) -> ndarray | tuple[ndarray, ndarray]:
     """
     Computes the evolution of Lambda-systems such as the alkali metals or the singly-charged alkaline-earth metals,
     taking into account photon recoils. The system is driven by a single laser.
@@ -307,7 +364,7 @@ def lambda_ge_rec(t: array_like, n: array_like, delta: array_like, a_ge: array_l
     :param a_me: The Einstein coefficient of the e->m transition (MHz).
     :param s: The saturation parameter of the g->e transition.
     :param f: The transition frequency of the g->e transition (MHz).
-    :param m: The mass number of the element (u).
+    :param m: The mass number of the atom (u).
     :param p0: The initial density matrix. Must have shape (6, ), containing the elements [gg, mm, ee, gm, eg, em](0)
      or be the full density matrix with all the recoil information.
     :param dt: The width of the time steps.
@@ -319,10 +376,13 @@ def lambda_ge_rec(t: array_like, n: array_like, delta: array_like, a_ge: array_l
     """
     t = np.asarray(t, dtype=float)
     if len(t.shape) > 0:
-        raise ValueError('\'t\' must be a scalar.')
+        raise ValueError("'t' must be a scalar.")
+
+    n = int(n)
+
     if p0 is None:
         y0 = np.zeros(int(3 * (n + 1) * (3 * (n + 1) + 1) / 2), dtype=complex)
-        y0[0] = 1. + 0.j
+        y0[0] = 1.0 + 0.0j
     else:
         p0 = np.asarray(p0, dtype=float).flatten()
         if p0.size == 6:
@@ -331,90 +391,118 @@ def lambda_ge_rec(t: array_like, n: array_like, delta: array_like, a_ge: array_l
         elif p0.size == int(3 * (n + 1) * (3 * (n + 1) + 1) / 2):
             y0 = p0
         else:
-            raise ValueError('\'p0\' must have size {}, but has size {}.'
-                             .format(int(3 * (n + 1) * (3 * (n + 1) + 1) / 2), p0.size))
+            raise ValueError(f"'p0' must have size {int(3 * (n + 1) * (3 * (n + 1) + 1) / 2)}, but has size {p0.size}.")
 
     _delta = 2 * np.pi * delta
-    rabi = a_ge * np.sqrt(s / 2.)
+    rabi = a_ge * np.sqrt(s / 2.0)
     f_rec = 2 * np.pi * f_recoil(f, m)
 
-    def hamiltonian(_t, n1, n2) -> ndarray:  # without hbar
-        gg, mm, ee = 0. + 0.j, 0. + 0.j, 0. + 0.j
-        gm, eg, me = 0. + 0.j, 0. + 0.j, 0. + 0.j
-        mg, ge, em = 0. + 0.j, 0. + 0.j, 0. + 0.j
+    def hamiltonian(_t: scalar_like, n1: int, n2: int) -> ndarray:  # without hbar
+        gg, mm, ee = 0.0 + 0.0j, 0.0 + 0.0j, 0.0 + 0.0j
+        gm, eg, me = 0.0 + 0.0j, 0.0 + 0.0j, 0.0 + 0.0j
+        mg, ge, em = 0.0 + 0.0j, 0.0 + 0.0j, 0.0 + 0.0j
         if n1 == n2:
-            _e_kin = n1 ** 2 * f_rec
+            _e_kin = n1**2 * f_rec
             # _delta includes one recoil, _delta := (w_eg - w_L +- k*v + k*v_recoil)
             gg = -(_delta + 2 * n1 * f_rec) + _e_kin
             mm, ee = _e_kin, _e_kin
         elif n1 == n2 - 1:
-            ge = rabi / 2.
+            ge = rabi / 2.0
         elif n1 == n2 + 1:
-            eg = rabi / 2.
+            eg = rabi / 2.0
         else:
             return np.zeros((3, 3), dtype=complex)
         return np.array([[gg, gm, ge], [mg, mm, me], [eg, em, ee]], dtype=complex)
 
-    def rho(_y):
+    def rho(_y: ndarray) -> ndarray:
         ret = np.zeros((3 * (n + 1), 3 * (n + 1)), dtype=complex)
-        np.fill_diagonal(ret, _y[:(3 * (n + 1))])
+        np.fill_diagonal(ret, _y[: (3 * (n + 1))])
         for _i in range(3 * (n + 1) - 1):
             i_start = 3 * (n + 1) + sum([3 * (n + 1) - _j - 1 for _j in range(_i)])
             i_end = i_start + sum([3 * (n + 1) - _j - 1 for _j in range(_i + 1)])
-            np.fill_diagonal(ret[(_i+1):], _y[i_start:i_end].conjugate())
-            np.fill_diagonal(ret[:, (_i+1):], _y[i_start:i_end])
+            np.fill_diagonal(ret[(_i + 1) :], _y[i_start:i_end].conjugate())
+            np.fill_diagonal(ret[:, (_i + 1) :], _y[i_start:i_end])
         return ret
 
-    def _f(_t, _y):
+    def _f(_t: scalar_like, _y: ndarray) -> ndarray:
         _rho = rho(_y)
         h = np.block(np.array([[hamiltonian(_t, n1, n2) for n2 in range(n + 1)] for n1 in range(n + 1)]))
-        ret = -1.j * (h @ _rho - _rho @ h)
+        ret = -1.0j * (h @ _rho - _rho @ h)
 
         zero = np.zeros((3, 3))
-        sigma = np.array([[0., 0., 0.], [0., 0., 0.], [1., 0., 0.]])
+        sigma = np.array([[0.0, 0.0, 0.0], [0.0, 0.0, 0.0], [1.0, 0.0, 0.0]])
         sigma_eg = np.block(np.array([[sigma if _i == _j else zero for _j in range(n + 1)] for _i in range(n + 1)]))
-        sigma = np.array([[0., 0., 0.], [0., 0., 0.], [0., 1., 0.]])
+        sigma = np.array([[0.0, 0.0, 0.0], [0.0, 0.0, 0.0], [0.0, 1.0, 0.0]])
         sigma_em = np.block(np.array([[sigma if _i == _j else zero for _j in range(n + 1)] for _i in range(n + 1)]))
-        lindbladian_ge = sigma_eg.T @ _rho @ sigma_eg \
-            - 0.5 * (sigma_eg @ sigma_eg.T @ _rho + _rho @ sigma_eg @ sigma_eg.T)
-        lindbladian_me = sigma_em.T @ _rho @ sigma_em \
-            - 0.5 * (sigma_em @ sigma_em.T @ _rho + _rho @ sigma_em @ sigma_em.T)
+        lindbladian_ge = sigma_eg.T @ _rho @ sigma_eg - 0.5 * (
+            sigma_eg @ sigma_eg.T @ _rho + _rho @ sigma_eg @ sigma_eg.T
+        )
+        lindbladian_me = sigma_em.T @ _rho @ sigma_em - 0.5 * (
+            sigma_em @ sigma_em.T @ _rho + _rho @ sigma_em @ sigma_em.T
+        )
         lindbladian_ge *= a_ge
         lindbladian_me *= a_me
         ret += lindbladian_ge + lindbladian_me
         return np.concatenate(tuple(np.diagonal(ret, offset=_i) for _i in range(3 * (n + 1))), axis=0)
 
-    dt = 0.1 / (a_ge + rabi) if dt is None else dt
-    t_array = np.linspace(0., t, tools.odd(t / dt))
+    dt = float(0.1 / a_ge + rabi) if dt is None else float(dt)
+    t_array = np.linspace(0.0, t, tools.odd(t / dt))
     ode = si.complex_ode(_f)
-    ode.set_initial_value(y0, 0.).set_integrator('vode', method='bdf')
+    ode.set_initial_value(y0, 0.0).set_integrator("vode", method="bdf")
+
     # noinspection PyTypeChecker
-    y_array = np.array([y0, ] + [ode.integrate(ti) for ti in t_array[1:]])
+    y_array = np.array(
+        [
+            y0,
+        ]
+        + [ode.integrate(ti) for ti in t_array[1:]]
+    )
     # result = si.solve_ivp(_f, (0., t), y0, method='RK45', max_step=dt, t_eval=t_array, vectorized=True)
     # # noinspection PyUnresolvedReferences
     # t_array, y_array = result.t, result.y.T
+
     if show:
-        plt.plot(t_array, np.sum([y_array[:, 3 * i].real for i in range(n + 1)], axis=0),
-                 'C0--', label=r'$N_\mathrm{gg}$')
-        plt.plot(t_array, np.sum([y_array[:, 3 * i + 1].real for i in range(n + 1)], axis=0),
-                 'C1--', label=r'$N_\mathrm{mm}$')
-        plt.plot(t_array, np.sum([y_array[:, 3 * i + 2].real for i in range(n + 1)], axis=0),
-                 'C2--', label=r'$N_\mathrm{ee}$')
-        plt.plot(t_array, np.sum([y_array[:, 3 * i].real + y_array[:, 3 * i + 1].real + y_array[:, 3 * i + 2].real
-                                  for i in range(n + 1)], axis=0), 'k--', label=r'$N$')
+        plt.plot(
+            t_array, np.sum([y_array[:, 3 * i].real for i in range(n + 1)], axis=0), "C0--", label=r"$N_\mathrm{gg}$"
+        )
+        plt.plot(
+            t_array,
+            np.sum([y_array[:, 3 * i + 1].real for i in range(n + 1)], axis=0),
+            "C1--",
+            label=r"$N_\mathrm{mm}$",
+        )
+        plt.plot(
+            t_array,
+            np.sum([y_array[:, 3 * i + 2].real for i in range(n + 1)], axis=0),
+            "C2--",
+            label=r"$N_\mathrm{ee}$",
+        )
+        plt.plot(
+            t_array,
+            np.sum(
+                [
+                    y_array[:, 3 * i].real + y_array[:, 3 * i + 1].real + y_array[:, 3 * i + 2].real
+                    for i in range(n + 1)
+                ],
+                axis=0,
+            ),
+            "k--",
+            label=r"$N$",
+        )
         pg, pm, pe = None, None, None
-        for ni, yi in enumerate(y_array.T[:(3 * (n + 1))]):
+        for ni, yi in enumerate(y_array.T[: (3 * (n + 1))]):
             if ni % 3 == 0:
-                pg, = plt.plot(t_array, yi.real, 'b-')
+                (pg,) = plt.plot(t_array, yi.real, "b-")
             if ni % 3 == 1:
-                pm, = plt.plot(t_array, yi.real, 'r-')
+                (pm,) = plt.plot(t_array, yi.real, "r-")
             if ni % 3 == 2:
-                pe, = plt.plot(t_array, yi.real, 'g-')
-        pg.set_label(r'$\rho_\mathrm{gg}^n$')
-        pm.set_label(r'$\rho_\mathrm{mm}^n$')
-        pe.set_label(r'$\rho_\mathrm{ee}^n$')
-        plt.xlabel('Time (us)')
-        plt.xlabel('Population')
+                (pe,) = plt.plot(t_array, yi.real, "g-")
+        if pg is not None and pm is not None and pe is not None:
+            pg.set_label(r"$\rho_\mathrm{gg}^n$")
+            pm.set_label(r"$\rho_\mathrm{mm}^n$")
+            pe.set_label(r"$\rho_\mathrm{ee}^n$")
+        plt.xlabel("Time (us)")
+        plt.xlabel("Population")
         plt.legend(loc=7)
         plt.show()
 
@@ -422,12 +510,12 @@ def lambda_ge_rec(t: array_like, n: array_like, delta: array_like, a_ge: array_l
         plt.show()
 
     if time_resolved:
-        return t_array, y_array[:, :(3 * (n + 1))].real
-    return y_array[-1, :(3 * (n + 1))].real
+        return t_array, y_array[:, : (3 * (n + 1))].real
+    return y_array[-1, : (3 * (n + 1))].real
 
 
 class Geometry:
-    def __init__(self):
+    def __init__(self) -> None:
         r"""
         Class representing a fluorescence detection geometry. The solid angle over which fluorescence light is detected
         can be defined through intervals of the two angles $\theta$ and $\phi$.
@@ -448,31 +536,32 @@ class Geometry:
         A rotation matrix can be defined to rotate the entire coordinate systems/detection geometry.
         A sample of angle pairs from the defined intervals can be generated using the 'integration_sample' method.
         """
-        self.theta_intervals = np.array([[-np.pi / 2., np.pi / 2.]])
-        self.phi_intervals = np.array([[0., 2. * np.pi]])
+        self.theta_intervals = np.array([[-np.pi / 2.0, np.pi / 2.0]])
+        self.phi_intervals = np.array([[0.0, 2.0 * np.pi]])
         self.solid_angle = 4 * np.pi
-        self.step = np.pi / 32.
+        self.step = np.pi / 32.0
         self.pdf = None
         self.weights = None
         self.rotation = tools.Rotation()
 
-    def set_intervals(self, theta: array_iter, phi: array_iter):
+    def set_intervals(self, theta: array_like, phi: array_like) -> None:
         """
         :param theta: An interval or a list of intervals for the angle 'theta'.
         :param phi: An interval or a list of intervals for the angle 'phi'.
         :returns: Merges overlapping intervals and calculates the solid angle
          corresponding to the defined intervals.
         """
-        theta, phi = np.asarray(theta), np.asarray(phi)
+        theta, phi = np.asarray(theta, dtype=float), np.asarray(phi, dtype=float)
         if len(theta.shape) == 1:
             theta = np.expand_dims(theta, axis=0)
         if len(phi.shape) == 1:
             phi = np.expand_dims(phi, axis=0)
         if len(theta.shape) != 2 or len(phi.shape) != 2:
-            raise ValueError('theta and phi must be intervals or lists of intervals.')
+            raise ValueError("theta and phi must be intervals or lists of intervals.")
         self.theta_intervals = tools.merge_intervals(theta)
         self.phi_intervals = tools.merge_intervals(phi)
-        y_int = 0.
+
+        y_int = 0.0
         theta_int, phi_int = self.integration_sample()
         for t in theta_int:
             y = np.cos(t)
@@ -480,7 +569,7 @@ class Geometry:
         y_int *= np.sum([p[-1] - p[0] for p in phi_int])
         self.solid_angle = y_int
 
-    def set_weights(self, weights: Union[array_iter, None]):
+    def set_weights(self, weights: array_like | None) -> None:
         """
         :param weights: None or a matrix of weights for the defined disjoint intervals.
          The shape of the weights must fulfill weights.shape == (len(self.theta_intervals), len(self.phi_intervals)).
@@ -490,10 +579,10 @@ class Geometry:
             weights = np.asarray(weights)
             shape = (self.theta_intervals.shape[0], self.phi_intervals.shape[0])
             if weights.shape != shape:
-                raise ValueError('Weights must have shape {}, but have shape {}.'.format(shape, weights.shape))
+                raise ValueError(f"Weights must have shape {shape}, but have shape {weights.shape}.")
         self.weights = weights
 
-    def set_pdf(self, pdf: Union[Callable, None]):
+    def set_pdf(self, pdf: Callable | None) -> None:
         """
         :param pdf: None or a callable which accepts two arguments (theta, phi).
         :returns: Sets the 'pdf' attribute of the Geometry object.
@@ -502,10 +591,10 @@ class Geometry:
             try:
                 pdf(self.theta_intervals[0, 0], self.phi_intervals[0, 0])
             except AttributeError:
-                raise AttributeError('The pdf must be a callable which takes two arguments *(theta, phi).')
+                raise AttributeError("The pdf must be a callable which takes two arguments *(theta, phi).")
         self.pdf = pdf
 
-    def set_rotation(self, r: tools.Rotation = None):
+    def set_rotation(self, r: tools.Rotation | None = None) -> None:
         """
         :param r: None or a 3x3 matrix defining a rotation.Therefore, dot(r, r.T) = I and Det(r) = 1 must be fulfilled.
          If r == None, the Identity matrix is used.
@@ -514,10 +603,10 @@ class Geometry:
         if r is None:
             r = tools.Rotation()
         elif not isinstance(r, tools.Rotation):
-            raise TypeError('r must be a \'Rotation\' object but is of type {}'.format(type(r)))
+            raise TypeError(f"r must be a 'Rotation' object but is of type {type(r)}")
         self.rotation = r
 
-    def integration_sample(self, step: scalar = None) -> (list, list):
+    def integration_sample(self, step: scalar_like | None = None) -> tuple[list[ndarray], list[ndarray]]:
         """
         :param step: None or a scalar which defines the approximate spacing
          between the equidistant values of the integration sample.
@@ -529,31 +618,31 @@ class Geometry:
         """
         if step is None:
             step = self.step
-        theta = [np.linspace(t[0], t[1], tools.odd((t[1] - t[0]) / step + 1.)) for t in self.theta_intervals]
-        phi = [np.linspace(p[0], p[1], tools.odd((p[1] - p[0]) / step + 1.)) for p in self.phi_intervals]
+        theta = [np.linspace(t[0], t[1], tools.odd((t[1] - t[0]) / step + 1.0)) for t in self.theta_intervals]
+        phi = [np.linspace(p[0], p[1], tools.odd((p[1] - p[0]) / step + 1.0)) for p in self.phi_intervals]
         return theta, phi
 
-    def plot(self, show: bool = True):
+    def plot(self, show: bool = True) -> tuple[Figure, Axes3D]:
         """
         Shows a 3d plot of the angular range covered by the geometry object.
         :returns: The axes object.
         """
 
         fig = plt.figure(num=1, figsize=(8, 8), clear=True)
-        ax = fig.add_subplot(111, projection='3d')
-        plt.xlabel(r'$x$ / arb. units')
-        plt.ylabel(r'$y$ / arb. units')
-        ax.set_zlabel(r'$z$ / arb. units')
+        ax: Axes3D = fig.add_subplot(111, projection="3d")  # type: ignore
+        plt.xlabel(r"$x$ / arb. units")
+        plt.ylabel(r"$y$ / arb. units")
+        ax.set_zlabel(r"$z$ / arb. units")
 
         lim = 1.1
         ax.set_xlim(-lim, lim)
         ax.set_ylim(-lim, lim)
         ax.set_zlim(-lim, lim)
-        ticks = [-1., -0.5, 0., 0.5, 1.]
+        ticks = [-1.0, -0.5, 0.0, 0.5, 1.0]
         ax.set_xticks(ticks)
         ax.set_yticks(ticks)
-        ax.set_zticks(ticks)
-        ax.pbaspect = [1., 1., 1.]
+        ax.set_zticks(ticks)  # type: ignore
+        ax.set_box_aspect([1.0, 1.0, 1.0])
 
         radius = 0.9
         theta, phi = self.integration_sample(step=0.02)
@@ -562,9 +651,18 @@ class Geometry:
                 r = np.array([[tools.e_r(t, p) for p in p_arr] for t in t_arr])
                 r = tools.transform(np.expand_dims(self.rotation.R, axis=(0, 1)), r)
                 r *= radius
-                surf = ax.plot_surface(r[:, :, 0], r[:, :, 1], r[:, :, 2], zorder=2, rcount=40, ccount=40,
-                                       cmap=plt.get_cmap('cividis'), antialiased=False, alpha=0.5)
-                surf.set_clim([-radius, radius])
+                surf = ax.plot_surface(
+                    r[:, :, 0],
+                    r[:, :, 1],
+                    r[:, :, 2],
+                    zorder=2,
+                    rcount=40,
+                    ccount=40,
+                    cmap=plt.get_cmap("cividis"),
+                    antialiased=False,
+                    alpha=0.5,
+                )
+                surf.set_clim(-radius, radius)
         # cb = plt.colorbar(surf, ax=ax, shrink=0.5)
         # cb.set_label('z / arb. units')
         # cb.set_ticks([-1, 0, 1])
@@ -573,7 +671,7 @@ class Geometry:
         # plt.tight_layout()
         if show:
             plt.show()
-            plt.style.use('default')
+            plt.style.use("default")
 
         return fig, ax
 
@@ -584,8 +682,15 @@ class ScatteringRate:
     The spectrum is excited by a laser with the specified 'polarization'
     and recorded with a FDR defined by 'geometry'. An external magnetic field can be defined through 'b'.
     """
-    def __init__(self, atom: Atom, laser: Laser = None, i_decay: int = 0, geometry: Geometry = None,
-                 b: array_like = None):
+
+    def __init__(
+        self,
+        atom: Atom,
+        laser: Laser | None = None,
+        i_decay: int = 0,
+        geometry: Geometry | None = None,
+        b: array_like | None = None,
+    ) -> None:
         """
         :param atom: The investigated atom.
         :param laser: The incident laser beam.
@@ -595,84 +700,116 @@ class ScatteringRate:
          In the latter case, the magnetic field is aligned with the z-axis.
         """
         self.environment = Environment()
-        self.atom = atom
-        self.freq_0 = 0.
-        self.laser, self.geometry, self.polarization = None, None, None
+        self.atom: Atom = atom
+        self.freq_0 = 0.0
+
+        self.laser: Laser = Laser(self.freq_0, intensity=1.0, polarization=Polarization())
+        self.geometry: Geometry = Geometry()
+        self.polarization: Polarization = Polarization([0, 0, 1])
+
         self.i_decay = i_decay
-        self.state_l, self.state_u = None, None
+        self.state_l: list = []
+        self.state_u: list = []
         self.i_state_l, self.i_state_u = None, None
-        self.v = None
-        self.s = 1.
-        self.gamma = None
-        self.A, self.a_const = None, None
-        self.x0 = None
-        self.indices = None
-        self.x0_array, self.A_i, self.A_f, self.counts = None, None, None, None
-        self.b, self.b_abs = np.array([0., 0., 0.]), 0.
-        self.e_r_b = np.array([0., 0., 1.])
-        self.e_l = np.array([0., 0., 1.])
+
+        self.v: ndarray = np.array([0.0, 0.0, 0.0], dtype=float)
+        self.s = 1.0
+        self.gamma = 0.0
+        self.a_const: list = []
+        self.A: list = []
+
+        self.indices: list = []
+        self.x0: list = []
+        self.x0_array: ndarray = np.array([], dtype=float)
+        self.A_i: ndarray = np.array([], dtype=complex)
+        self.A_f: ndarray = np.array([], dtype=complex)
+        self.counts: ndarray = np.array([], dtype=int)
+
+        self.b: ndarray = np.array([0.0, 0.0, 0.0])
+        self.b_abs: float = 0.0
+        self.e_r_b = np.array([0.0, 0.0, 1.0])
+        self.e_l = np.array([0.0, 0.0, 1.0])
         self.R_b, self.R = np.identity(3, dtype=float), np.identity(3, dtype=float)
+
         self.set_states()
         self.check_atom()
         self.set_laser(laser)
         self.set_geometry(geometry)
+        self.set_velocity(self.v)
         self.generate_dipoles()
         self.set_b(b)  # TODO: Implement Environments in C++.
-    
-    def check_atom(self):
+
+    def check_atom(self) -> None:
         """
         Check whether the structure of the atom fulfills all requirements to calculate the scattering rate.
 
         :raises ValueError: The atom has to consist of a single closed transition between two fine-structure states.
          Their common nucleus can have an arbitrary spin.
         """
+        if len(self.state_l) == 0 or len(self.state_u) == 0:
+            raise ValueError("The atom must have at least one lower and one upper state defined.")
+
         j, i = self.state_l[0].j, self.state_l[0].i
         if any(state_l.j != j or state_l.i != i for state_l in self.state_l):
-            raise ValueError('All lower states must be part of the same fine-structure state.')
+            raise ValueError("All lower states must be part of the same fine-structure state.")
+
         j, i = self.state_u[0].j, self.state_u[0].i
         if any(state_u.j != j or state_u.i != i for state_u in self.state_u):
-            raise ValueError('All upper states must be part of the same fine-structure state.')
-        if self.state_l[0].i != self.state_u[0].i:
-            raise ValueError('The lower and upper states must be part of the same nuclear state.')
+            raise ValueError("All upper states must be part of the same fine-structure state.")
 
-    def set_geometry(self, geometry: Geometry = None):
+        if self.state_l[0].i != self.state_u[0].i:
+            raise ValueError("The lower and upper states must be part of the same nuclear state.")
+
+    def set_geometry(self, geometry: Geometry | None = None) -> None:
         """
         :param geometry: The geometry object. If None, the entire solid angle is covered by the detector.
         :return: None. Sets the geometry object.
         """
+        if geometry is None:
+            geometry = Geometry()
         self.geometry = geometry
-        if self.geometry is None:
-            self.geometry = Geometry()
+
         self.R = np.dot(self.geometry.rotation.R, self.R_b)
 
-    def set_polarization(self, polarization: Polarization = None):
+    def set_polarization(self, polarization: Polarization | None = None) -> None:
         """
         :param polarization: The polarization object. If None, the light is linearly polarized along the z-axis.
         :returns: Sets the polarization object and the local polarization vector 'e_l'.
         """
+        if polarization is None:
+            polarization = Polarization([0, 0, 1])
         self.polarization = polarization
-        if self.polarization is None:
-            self.polarization = Polarization([0, 0, 1])
+
         self.e_l = np.dot(self.R_b, self.polarization.x)
         self.polarization.def_q_axis(self.e_r_b)
 
-    def set_laser(self, laser: Laser = None):
+    def set_laser(self, laser: Laser | None = None) -> None:
+        if laser is None:
+            laser = Laser(self.freq_0, intensity=1.0, polarization=Polarization())
         self.laser = laser
-        if self.laser is None:
-            self.laser = Laser(self.freq_0, intensity=1., polarization=Polarization())
+
         labels = self.atom.decay_map.labels[self.i_decay]
-        self.s = saturation(
-            self.laser.intensity, self.laser.freq, self.atom.decay_map.get_ae(labels[0], labels[1], 1))
+        self.s = saturation(self.laser.intensity, self.laser.freq, self.atom.decay_map.get_ae(labels[0], labels[1], 1))
         self.set_polarization(self.laser.polarization)
 
-    def set_states(self):
+    def set_velocity(self, v: array_like = 0.0) -> None:
+        """
+        :param v: The velocity vector of the atom.
+        :returns: Sets the new velocity for all states and updates the resonance positions.
+        """
+        if is_scalar(v):
+            v = np.array([0.0, 0.0, v], dtype=float)
+        self.v = np.asarray(v, dtype=float)
+        self.set_x0()
+
+    def set_states(self) -> None:
         """
         Define lower and upper states.
 
         :returns:
         """
-        state_l = np.array([state for state in self.atom if state.label == self.atom.decay_map.labels[self.i_decay][0]])
-        state_u = np.array([state for state in self.atom if state.label == self.atom.decay_map.labels[self.i_decay][1]])
+        state_l = [state for state in self.atom if state.label == self.atom.decay_map.labels[self.i_decay][0]]
+        state_u = [state for state in self.atom if state.label == self.atom.decay_map.labels[self.i_decay][1]]
         self.freq_0 = np.mean([s_u.freq_j for s_u in state_u]) - np.mean([s_l.freq_j for s_l in state_l])
         if self.freq_0 > 0:
             self.state_u = state_u
@@ -682,15 +819,16 @@ class ScatteringRate:
             self.state_u = state_l
             self.state_l = state_u
 
-    def set_x0(self):
+    def set_x0(self) -> None:
         """
         :returns: Updates the resonance positions.
         """
-        self.x0 = [[state_u.freq - state_l.freq - self.laser.freq
-                    for state_u in self.state_u] for state_l in self.state_l]
+        self.x0 = [
+            [state_u.freq - state_l.freq - self.laser.freq for state_u in self.state_u] for state_l in self.state_l
+        ]
         self.x0_array = np.array([self.x0[col[0]][col[1]] for row in self.indices for col in row], dtype=float)
 
-    def generate_dipoles(self):
+    def generate_dipoles(self) -> None:
         """
         :returns: Generates an array of frequencies which cover the entire spectrum
          and saves it to the x attribute of the Spectrum object.
@@ -701,43 +839,64 @@ class ScatteringRate:
         j_l = self.state_l[0].j
         j_u = self.state_u[0].j
 
-        self.A = [[np.zeros(3, dtype=complex) if abs(u.f - ll.f) > 1 or abs(u.m - ll.m) > 1
-                   else al.a_dipole_cart(i, j_l, ll.f, ll.m, j_u, u.f, u.m)
-                   for u in self.state_u] for ll in self.state_l]
+        self.A = [
+            [
+                np.zeros(3, dtype=complex)
+                if abs(u.f - ll.f) > 1 or abs(u.m - ll.m) > 1
+                else al.a_dipole_cart(i, j_l, ll.f, ll.m, j_u, u.f, u.m)
+                for u in self.state_u
+            ]
+            for ll in self.state_l
+        ]
 
-        self.a_const = [[0. if abs(u.f - ll.f) > 1 or abs(u.m - ll.m) > 1
-                         else al.a_dipole(i, j_l, ll.f, ll.m, j_u, u.f, u.m, u.m - ll.m, as_sympy=False)
-                         for u in self.state_u] for ll in self.state_l]
+        self.a_const = [
+            [
+                0.0
+                if abs(u.f - ll.f) > 1 or abs(u.m - ll.m) > 1
+                else al.a_dipole(i, j_l, ll.f, ll.m, j_u, u.f, u.m, u.m - ll.m, as_sympy=False)
+                for u in self.state_u
+            ]
+            for ll in self.state_l
+        ]
 
-        self.indices = [[[i_i, i_u, i_f] for i_u, u in enumerate(self.state_u)
-                         if abs(u.f - i.f) <= 1 and abs(u.m - i.m) <= 1
-                         and abs(u.f - f.f) <= 1 and abs(u.m - f.m) <= 1]
-                        for i_i, i in enumerate(self.state_l) for i_f, f in enumerate(self.state_l)]
+        self.indices = [
+            [
+                [i_i, i_u, i_f]
+                for i_u, u in enumerate(self.state_u)
+                if abs(u.f - i.f) <= 1 and abs(u.m - i.m) <= 1 and abs(u.f - f.f) <= 1 and abs(u.m - f.m) <= 1
+            ]
+            for i_i, i in enumerate(self.state_l)
+            for i_f, f in enumerate(self.state_l)
+        ]
         self.indices = [arg for arg in self.indices if arg]
         self.A_i = np.array([self.A[col[0]][col[1]] for row in self.indices for col in row], dtype=complex)
         self.A_f = np.array([self.A[col[2]][col[1]] for row in self.indices for col in row], dtype=complex)
         self.counts = np.array([len(row) for row in self.indices], dtype=int)
         self.set_x0()
 
-    def set_b(self, b: array_like):
+    def set_b(self, b: array_like | None) -> None:
         """
         :param b: The magnetic field vector.
         :returns: Sets the new magnetic field for all states
          and updates the quantization axis and the resonance positions.
         """
         if b is None:
-            self.b = np.array([0., 0., 0.])
-            self.b_abs = 0.
-            self.e_r_b = np.array([0., 0., 1.])
+            self.b = np.array([0.0, 0.0, 0.0])
+            self.b_abs = 0.0
+            self.e_r_b = np.array([0.0, 0.0, 1.0])
         else:
-            self.b = np.asarray(b)
-            if len(self.b.shape) == 0:
-                self.b = np.array([0., 0., self.b])
-            self.b_abs = tools.absolute(self.b)
-            self.e_r_b = np.array([0., 0., 1.])
-            if not self.b_abs == 0.:
+            self.b = np.asarray(b, dtype=float)
+            tools.check_dimension(3, 0, self.b)
+            if is_scalar(b):
+                self.b = np.array([0.0, 0.0, self.b])
+
+            self.b_abs = float(tools.absolute(self.b))
+
+            self.e_r_b = np.array([0.0, 0.0, 1.0])
+            if self.b_abs != 0.0:
                 self.e_r_b = self.b / self.b_abs
-        z_axis = np.array([0., 0., 1.])
+
+        z_axis = np.array([0.0, 0.0, 1.0])
         self.R_b = tools.rotation_to_vector(self.e_r_b, z_axis).R
         self.R = np.dot(self.geometry.rotation.R, self.R_b)
         self.e_l = np.dot(self.R_b, self.polarization.x)
@@ -746,19 +905,22 @@ class ScatteringRate:
         self.atom.update(self.environment)
         self.set_x0()
 
-    def generate_x(self, width: scalar = 20., step: scalar = None):
+    def generate_x(self, width: scalar_like = 20.0, step: scalar_like | None = None) -> array_like:
         """
         :param width: The covered width around resonances in natural linewidths.
         :param step: The step size between generated x values.
          Note that between resonances, there might be a larger step.
         :returns: An array of frequencies which covers the entire spectrum.
         """
+        width = float(width)
         intervals = [[x0 - width * self.gamma / 2, x0 + width * self.gamma / 2] for x0 in self.x0_array]
         intervals = tools.merge_intervals(intervals)
         if step is None:
-            step = self.gamma / 30.
-        return np.concatenate([np.linspace(i[0], i[1], tools.odd((i[1] - i[0]) / step + 1.))
-                               for i in intervals], axis=0)
+            step = self.gamma / 30.0
+
+        return np.concatenate(
+            [np.linspace(i[0], i[1], tools.odd((i[1] - i[0]) / step + 1.0)) for i in intervals], axis=0
+        )
 
     def generate_y0(self, x: array_like) -> array_like:
         """
@@ -769,11 +931,12 @@ class ScatteringRate:
         y0 = np.zeros_like(x, dtype=float)
         for x0_list, a_const_list in zip(self.x0, self.a_const):
             for x0, a_const in zip(x0_list, a_const_list):
-                denominator = (x - x0) ** 2 + 0.25 * self.gamma ** 2
-                y0 += a_const ** 2 / denominator
-        return y0 * (self.gamma / 2.) ** 3 / len(self.x0) / 3 * 2 * np.pi * self.s
+                denominator = (x - x0) ** 2 + 0.25 * self.gamma**2
+                y0 += a_const**2 / denominator
 
-    def generate_y_4pi(self, x: array_like) -> array_like:
+        return y0 * (self.gamma / 2.0) ** 3 / len(self.x0) / 3 * 2 * np.pi * self.s
+
+    def generate_y_4pi(self, x: array_like) -> ndarray:
         """
         :param x: The frequency of light in an atoms rest frame (MHz).
         :returns: The spectrum for the detection of the complete solid angle (4 pi).
@@ -783,11 +946,13 @@ class ScatteringRate:
             for x0, a_const, u in zip(x0_list, a_const_list, self.state_u):
                 if abs(u.f - ll.f) > 1 or abs(u.m - ll.m) > 1:
                     continue
-                denominator = (x - x0) ** 2 + 0.25 * self.gamma ** 2
-                y0 += a_const ** 2 / denominator * tools.absolute_complex(self.polarization.q[int(u.m - ll.m) + 1]) ** 2
-        return y0 * (self.gamma / 2.) ** 3 / len(self.x0) * 2 * np.pi * self.s
 
-    def generate_y(self, x: array_like, theta: array_like, phi: array_like, decimals: int = 8):
+                denominator = (x - x0) ** 2 + 0.25 * self.gamma**2
+                y0 += a_const**2 / denominator * tools.absolute_complex(self.polarization.q[int(u.m - ll.m) + 1]) ** 2
+
+        return y0 * (self.gamma / 2.0) ** 3 / len(self.x0) * 2 * np.pi * self.s
+
+    def generate_y(self, x: array_like, theta: array_like, phi: array_like, decimals: int = 8) -> ndarray:
         """
         :param x: The frequency of light in an atoms rest frame (MHz).
         :param theta: The angle between the emission direction of the fluorescence light and the x-axis + 90 deg.
@@ -797,7 +962,7 @@ class ScatteringRate:
          for the direction of emission defined by 'theta' and 'phi'.
         """
         x, theta, phi = np.asarray(x).flatten(), np.asarray(theta).flatten(), np.asarray(phi).flatten()
-        t, p = np.meshgrid(theta, phi, indexing='ij')
+        t, p = np.meshgrid(theta, phi, indexing="ij")
         t, p = t.flatten(), p.flatten()
         e_theta = np.around(tools.transform(np.expand_dims(self.R, axis=0), tools.e_theta(t, p)), decimals=decimals)
         e_phi = np.around(tools.transform(np.expand_dims(self.R, axis=0), tools.e_phi(t, p)), decimals=decimals)
@@ -810,16 +975,16 @@ class ScatteringRate:
         #     e_theta /= tools.absolute(e_theta)
         #     e_phi /= tools.absolute(e_phi)
 
-        norm = 3. / (8. * np.pi) * (self.gamma / 2.) ** 3 / len(self.x0) * 2 * np.pi * self.s
-        denominator = 1. / (-np.expand_dims(x, axis=1) + self.x0_array + 0.5j * self.gamma)
+        norm = 3.0 / (8.0 * np.pi) * (self.gamma / 2.0) ** 3 / len(self.x0) * 2 * np.pi * self.s
+        denominator = 1.0 / (-np.expand_dims(x, axis=1) + self.x0_array + 0.5j * self.gamma)
 
         i_l = np.around(np.sum(self.e_l * self.A_i, axis=-1), decimals=decimals)
-        f_theta = np.around(np.sum(np.expand_dims(e_theta, axis=1)
-                                   * np.expand_dims(self.A_f, axis=0), axis=-1) * i_l,
-                            decimals=decimals)
-        f_phi = np.around(np.sum(np.expand_dims(e_phi, axis=1)
-                                 * np.expand_dims(self.A_f, axis=0), axis=-1) * i_l,
-                          decimals=decimals)
+        f_theta = np.around(
+            np.sum(np.expand_dims(e_theta, axis=1) * np.expand_dims(self.A_f, axis=0), axis=-1) * i_l, decimals=decimals
+        )
+        f_phi = np.around(
+            np.sum(np.expand_dims(e_phi, axis=1) * np.expand_dims(self.A_f, axis=0), axis=-1) * i_l, decimals=decimals
+        )
         shape = np.array([denominator.shape[0], f_theta.shape[0], self.counts.shape[0]], dtype=int)
         denominator, f_theta, f_phi = denominator.flatten(), f_theta.flatten(), f_phi.flatten()
         t0 = time()
@@ -828,7 +993,7 @@ class ScatteringRate:
         # print('Time: {}s'.format(t0))
         return ret * norm
 
-    def integrate_y(self, x: array_like, step: scalar = None):
+    def integrate_y(self, x: array_like, step: scalar_like | None = None) -> ndarray:
         """
         :param x: The frequency of light in an atoms rest frame (MHz).
         :param step: The step size used for the integration over the angles theta and phi.
@@ -837,20 +1002,25 @@ class ScatteringRate:
         """
         x = np.asarray(x)
         theta, phi = self.geometry.integration_sample(step=step)
+
         y_int = np.zeros(x.shape)
         for i, t in enumerate(theta):
             for j, p in enumerate(phi):
                 y = self.generate_y(x, t, p) * np.expand_dims(np.expand_dims(np.cos(t), axis=0), axis=-1)
+
                 if self.geometry.pdf is not None:
                     y *= np.expand_dims(self.geometry.pdf(t, p), axis=0)
+
                 y = si.simpson(y, x=t, axis=1)
                 y = si.simpson(y, x=p)
+
                 if self.geometry.weights is not None:
                     y *= self.geometry.weights[i, j]
                 y_int += y
+
         return y_int
 
-    def plot_spectrum(self, norm_to_4pi: bool = False, step: scalar = None):
+    def plot_spectrum(self, norm_to_4pi: bool = False, step: scalar_like | None = None) -> None:
         """
 
         :param norm_to_4pi: Whether to renormalize the spectrum defined by geometry to have the same maximum
@@ -861,23 +1031,34 @@ class ScatteringRate:
          and that for the detection with the complete solid angle 4 pi.
         """
         plt.figure(figsize=(8, 4))
+
         x = self.generate_x()
         y_4pi = self.generate_y_4pi(x)
         y = self.integrate_y(x, step=step)
         if norm_to_4pi:
             y *= np.max(y_4pi) / np.max(y)
-        plt.xlabel(r'$\nu - \nu_0$ (MHz)')
-        plt.ylabel(r'Scattering rate (MHz / sat. parameter)')
-        plt.plot(x, y_4pi, label=r'$y(4\pi)$')
-        plt.plot(x, y, label=r'$y($Geometry$)$')
+
+        plt.xlabel(r"$\nu - \nu_0$ (MHz)")
+        plt.ylabel(r"Scattering rate (MHz / sat. parameter)")
+        plt.plot(x, y_4pi, label=r"$y(4\pi)$")
+        plt.plot(x, y, label=r"$y($Geometry$)$")
         if norm_to_4pi:
-            plt.plot(x, y - y_4pi, label='Residuals')
+            plt.plot(x, y - y_4pi, label="Residuals")
+
         plt.legend()
         plt.tight_layout()
         plt.show()
 
-    def plot_angular_distribution(self, x: scalar = None, n: int = 5, theta: array_iter = None, phi: array_iter = None,
-                                  mode: str = None, show: bool = True, save: str = None):
+    def plot_angular_distribution(
+        self,
+        x: scalar_like | None = None,
+        n: int = 5,
+        theta: array_like | None = None,
+        phi: array_like | None = None,
+        mode: str | None = None,
+        show: bool = True,
+        save: str | None = None,
+    ) -> tuple[ndarray, ndarray, ndarray]:
         """
         :param x: The frequency of light in an atoms rest frame (MHz).
          If None, the position of the first maximum is taken (self.x0[0][0]).
@@ -890,80 +1071,96 @@ class ScatteringRate:
         :param show: Whether to show the plot.
         :returns: theta, phi and z. Optionally, a plot is drawn and saved.
         """
-        if theta is not None:
-            theta = np.asarray(theta)
-        else:
-            theta = np.linspace(-np.pi / 2., np.pi / 2., 2 ** n + 1)
-        if phi is not None:
-            phi = np.asarray(phi)
-        else:
-            phi = np.linspace(0., 2. * np.pi, 2 ** (n + 1) + 1)
+        theta = np.linspace(-np.pi / 2.0, np.pi / 2.0, 2**n + 1) if theta is None else np.asarray(theta, dtype=float)
+        phi = np.linspace(0.0, 2.0 * np.pi, 2 ** (n + 1) + 1) if phi is None else np.asarray(phi, dtype=float)
         y = np.squeeze(self.generate_y(self.x0[0][0] if x is None else x, theta, phi))
 
         if mode is None:
-            mode = '2d'
-        if mode == '3d':
+            mode = "2d"
+
+        if mode == "3d":
             r = np.array([[tools.transform(self.geometry.rotation.R, tools.e_r(t, p)) for p in phi] for t in theta])
             fig = plt.figure(num=1, figsize=(8, 8), clear=True)
-            ax = fig.add_subplot(111, projection='3d', label='Surface')
+            ax3d: Axes3D = fig.add_subplot(111, projection="3d", label="Surface")  # type: ignore
+
             rad = y[:, :]
             rad = np.expand_dims(rad, axis=-1)
             r *= rad
             r -= np.min(tools.absolute(r, axis=-1)) * (r / np.expand_dims(tools.absolute(r, axis=-1), axis=-1))
             r /= np.max(tools.absolute(r, axis=-1))
-            plt.xlabel(r'$I_x$ (arb. units)')
-            plt.ylabel(r'$I_y$ (arb. units)')
-            ax.set_zlabel(r'$I_z$ (arb. units)')
+
+            plt.xlabel(r"$I_x$ (arb. units)")
+            plt.ylabel(r"$I_y$ (arb. units)")
+            ax3d.set_zlabel(r"$I_z$ (arb. units)")
+
             lim = 1.1
-            ax.set_xlim(-lim, lim)
-            ax.set_ylim(-lim, lim)
-            ax.set_zlim(-lim, lim)
-            ticks = [-1., -0.5, 0., 0.5, 1.]
-            ax.set_xticks(ticks)
-            ax.set_yticks(ticks)
-            ax.set_zticks(ticks)
-            ax.pbaspect = [1., 1., 1.]
-            
+            ax3d.set_xlim(-lim, lim)
+            ax3d.set_ylim(-lim, lim)
+            ax3d.set_zlim(-lim, lim)
+
+            ticks = [-1.0, -0.5, 0.0, 0.5, 1.0]
+            ax3d.set_xticks(ticks)
+            ax3d.set_yticks(ticks)
+            ax3d.set_zticks(ticks)  # type: ignore
+            ax3d.set_box_aspect([1.0, 1.0, 1.0])
+
             x_color = tools.absolute(r, axis=-1)
-            cm = plt.cm.ScalarMappable(cmap='viridis')
+            cm = plt.cm.ScalarMappable(cmap="viridis")
             facecolors = cm.to_rgba(x_color)
-            surf = ax.plot_surface(r[:, :, 0], r[:, :, 1], r[:, :, 2], rcount=80, ccount=80,
-                                   facecolors=facecolors, antialiased=True, alpha=1)
-            surf.set_clim([-1, 1])
-            cb = plt.colorbar(cm, ax=ax, shrink=0.5)
-            cb.set_label('Intensity (arb. units)')
-            cb.set_ticks(np.arange(0., 1.1, 0.2))
-            plt.gca().axis('off')
-            plt.style.use('seaborn')
+
+            surf = ax3d.plot_surface(
+                r[:, :, 0],
+                r[:, :, 1],
+                r[:, :, 2],
+                rcount=80,
+                ccount=80,
+                facecolors=facecolors,
+                antialiased=True,
+                alpha=1,
+            )
+            surf.set_clim(-1.0, 1.0)
+
+            cb = plt.colorbar(cm, ax=ax3d, shrink=0.5)
+            cb.set_label("Intensity (arb. units)")
+            cb.set_ticks(np.arange(0.0, 1.1, 0.2))  # type: ignore
+
+            plt.gca().axis("off")
+            plt.style.use("seaborn")
             plt.tight_layout()
         else:
-            # import matplotlib
-            font = {'family': 'Arial',
-                    'size': 12}
-            matplotlib.rc('font', **font)
+            font = {"family": "Arial", "size": 12}
+            mpl.rc("font", **font)
+
             plt.figure(figsize=(3, 4.5))
-            theta, phi = np.meshgrid(theta, phi, indexing='ij')
-            ax = plt.gca()
-            ax.set_aspect('equal')
-            plt.xlabel(r'$\theta$ / rad')
-            plt.ylabel(r'$\varphi$ / rad')
-            cmesh = plt.pcolormesh(theta, phi, y[:, :], cmap='viridis')
+            theta, phi = np.meshgrid(theta, phi, indexing="ij")
+            ax: Axes = plt.gca()
+
+            ax.set_aspect("equal")
+
+            plt.xlabel(r"$\theta$ / rad")
+            plt.ylabel(r"$\varphi$ / rad")
+
+            cmesh = plt.pcolormesh(theta, phi, y[:, :], cmap="viridis")
             divider = make_axes_locatable(ax)
-            cax = divider.append_axes('right', size='4%', pad=0.05)
+            cax = divider.append_axes("right", size="4%", pad=0.05)
             cbar = plt.colorbar(cmesh, cax=cax)
-            cbar.set_label(label='Intensity (arb. units)')
+            cbar.set_label(label="Intensity (arb. units)")
 
         if save is not None:
             plt.savefig(save, dpi=300)
         if show:
             plt.show()
+
         plt.cla()
         plt.clf()
         plt.close()
-        plt.style.use('default')
+        plt.style.use("default")
+
         return theta, phi, y
 
-    def plot_mixed_distribution(self, n: int = 5, mode: str = None, show: bool = True, save: str = None):
+    def plot_mixed_distribution(
+        self, n: int = 5, mode: str | None = None, show: bool = True, save: str | None = None
+    ) -> None:
         """
         :param n: 2 ** n + 1 samples for 'theta' and 2 ** (n + 1) + 1 samples for 'phi' are drawn,
          giving a total of (2 ** n + 1) * len(self.x) and (2 ** (n + 1) + 1) * len(self.x)
@@ -974,71 +1171,100 @@ class ScatteringRate:
         :returns: Optionally, two plots are drawn for theta and phi as the y-axes and saved.
         """
         x = self.generate_x()
-        theta = np.linspace(-np.pi / 2., np.pi / 2., 2 ** n + 1)
-        phi = np.linspace(0., 2. * np.pi, 2 ** (n + 1) + 1)
+        theta = np.linspace(-np.pi / 2.0, np.pi / 2.0, 2**n + 1)
+        phi = np.linspace(0.0, 2.0 * np.pi, 2 ** (n + 1) + 1)
+
         y = self.generate_y(x, theta, phi)
-        x_theta, theta = np.meshgrid(x, theta, indexing='ij')
-        x_phi, phi = np.meshgrid(x, phi, indexing='ij')
-        plt.xlabel(r'$\nu - \nu_0$ / MHz')
-        plt.ylabel(r'$\theta$ / rad')
+
+        x_theta, theta = np.meshgrid(x, theta, indexing="ij")
+        x_phi, phi = np.meshgrid(x, phi, indexing="ij")
+
+        plt.xlabel(r"$\nu - \nu_0$ / MHz")
+        plt.ylabel(r"$\theta$ / rad")
 
         if mode is None:
-            mode = '2d'
-        if mode == '3d':
+            mode = "2d"
+
+        if mode == "3d":
             fig = plt.figure(num=1, figsize=(16, 9), clear=True)
-            ax = fig.add_subplot(111, projection='3d', label='Surface')
-            ax.set_zlabel(r'$I$ / arb. units')
-            ax.plot_surface(x_theta, theta, y[:, :, 0], rcount=200/2, ccount=200/2, cmap=plt.get_cmap('viridis'),
-                            antialiased=True, alpha=1)
+            ax3d: Axes3D = fig.add_subplot(111, projection="3d", label="Surface")  # type: ignore
+            ax3d.set_zlabel(r"$I$ / arb. units")
+
+            ax3d.plot_surface(
+                x_theta,
+                theta,
+                y[:, :, 0],
+                rcount=200 / 2,
+                ccount=200 / 2,
+                cmap=plt.get_cmap("viridis"),
+                antialiased=True,
+                alpha=1,
+            )
+
             if save is not None:
                 plt.savefig(save, dpi=300)
                 plt.close()
             if show:
                 plt.show()
+
             fig = plt.figure(num=1, figsize=(16, 9), clear=True)
-            ax = fig.add_subplot(111, projection='3d', label='Surface')
-            plt.xlabel(r'$\nu - \nu_0$ / MHz')
-            plt.ylabel(r'$\phi$ / rad')
-            ax.set_zlabel(r'$I$ / arb. units')
-            ax.plot_surface(x_phi, phi, y[:, 2 ** (n - 1), :], rcount=200/2, ccount=200/2, cmap=plt.get_cmap('viridis'),
-                            antialiased=True, alpha=1)
+            ax3d: Axes3D = fig.add_subplot(111, projection="3d", label="Surface")  # type: ignore
+
+            plt.xlabel(r"$\nu - \nu_0$ / MHz")
+            plt.ylabel(r"$\phi$ / rad")
+            ax3d.set_zlabel(r"$I$ / arb. units")
+
+            ax3d.plot_surface(
+                x_phi,
+                phi,
+                y[:, 2 ** (n - 1), :],
+                rcount=200 / 2,
+                ccount=200 / 2,
+                cmap=plt.get_cmap("viridis"),
+                antialiased=True,
+                alpha=1,
+            )
             if save is not None:
                 plt.savefig(save, dpi=300)
                 plt.close()
             if show:
                 plt.show()
         else:
-            ax = plt.gca()
-            cmesh = plt.pcolormesh(x_theta, theta, y[:, :, 0], cmap='viridis')
+            ax: Axes = plt.gca()
+            cmesh = plt.pcolormesh(x_theta, theta, y[:, :, 0], cmap="viridis")
             divider = make_axes_locatable(ax)
             cax = divider.append_axes("right", size="4%", pad=0.1)
             cbar = plt.colorbar(cmesh, cax=cax)
-            cbar.set_label(label=r'$I$ / arb. units')
-            if save is not None:
-                plt.savefig(save, dpi=300)
-                plt.close()
-            if show:
-                plt.show()
-            plt.xlabel(r'$\nu - \nu_0$ / MHz')
-            plt.ylabel(r'$\phi$ / rad')
-            cmesh = plt.pcolormesh(x_phi,  phi, y[:, 2 ** (n - 1), :], cmap='viridis')
-            divider = make_axes_locatable(ax)
-            cax = divider.append_axes("right", size="4%", pad=0.1)
-            cbar = plt.colorbar(cmesh, cax=cax)
-            cbar.set_label(label=r'$I$ / arb. units')
+            cbar.set_label(label=r"$I$ / arb. units")
+
             if save is not None:
                 plt.savefig(save, dpi=300)
                 plt.close()
             if show:
                 plt.show()
 
-    def plot_setup(self):
+            plt.xlabel(r"$\nu - \nu_0$ / MHz")
+            plt.ylabel(r"$\phi$ / rad")
+
+            cmesh = plt.pcolormesh(x_phi, phi, y[:, 2 ** (n - 1), :], cmap="viridis")
+            divider = make_axes_locatable(ax)
+            cax = divider.append_axes("right", size="4%", pad=0.1)
+            cbar = plt.colorbar(cmesh, cax=cax)
+            cbar.set_label(label=r"$I$ / arb. units")
+
+            if save is not None:
+                plt.savefig(save, dpi=300)
+                plt.close()
+            if show:
+                plt.show()
+
+    def plot_setup(self) -> None:
         """
         :returns: Creates a 3D-plot of the physical situation, including the axis
          of the magnetic field (quantization axis), the real and imaginary axis of the polarization
          and the are which is covered by the detector geometry.
         """
-        fig, ax = self.geometry.plot(show=False)
+        _, ax = self.geometry.plot(show=False)
         x, y, z = np.zeros(1), np.zeros(1), np.zeros(1)
 
         # Laser
@@ -1046,25 +1272,24 @@ class ScatteringRate:
         # Polarization
         # Real
         u, v, w = self.polarization.x.real[:, 0], self.polarization.x.real[:, 1], self.polarization.x.real[:, 2]
-        ax.quiver(x, y, z, u, v, w, zorder=3, color='b', length=1.,
-                  arrow_length_ratio=0.1, label='Real(Pol.)')
+        ax.quiver(x, y, z, u, v, w, zorder=3, color="b", length=1, arrow_length_ratio=0.1, label="Real(Pol.)")
         # Imag
-        u, v, w = np.meshgrid(self.polarization.x.imag[:, 0], self.polarization.x.imag[:, 1],
-                              self.polarization.x.imag[:, 2])
-        ax.quiver(x, y, z, u, v, w, zorder=3, color='tab:orange', length=1.,
-                  arrow_length_ratio=0.1, label='Imag(Pol.)')
+        u, v, w = np.meshgrid(
+            self.polarization.x.imag[:, 0], self.polarization.x.imag[:, 1], self.polarization.x.imag[:, 2]
+        )
+        ax.quiver(x, y, z, u, v, w, zorder=3, color="tab:orange", length=1, arrow_length_ratio=0.1, label="Imag(Pol.)")
 
         # B-field / Quantization axis
         u, v, w = np.meshgrid(self.e_r_b[0], self.e_r_b[1], self.e_r_b[2])
-        ax.quiver(x, y, z, u, v, w, zorder=2, color='g', length=1.,
-                  arrow_length_ratio=0.1, label='B-field /\nQuant. axis')
+        ax.quiver(
+            x, y, z, u, v, w, zorder=2, color="g", length=1, arrow_length_ratio=0.1, label="B-field /\nQuant. axis"
+        )
 
         # Velocity
         if self.v is not None:
             u, v, w = np.meshgrid(self.v[0], self.v[1], self.v[2])
-            ax.quiver(x, y, z, u, v, w, zorder=10, color='r', length=1.,
-                      arrow_length_ratio=0.1, label='Velocity')
+            ax.quiver(x, y, z, u, v, w, zorder=10, color="r", length=1, arrow_length_ratio=0.1, label="Velocity")
 
         plt.legend()
         plt.show()
-        plt.style.use('default')
+        plt.style.use("default")

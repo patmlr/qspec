@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 PyCLS.tests.test_algebra
 
@@ -10,19 +9,21 @@ Module including unittests for the algebra module.
 """
 
 import unittest as ut
+
 from sympy import S
 from sympy.core.numbers import Integer
+
 import qspec.algebra as al
 
 
 class TestAlgebra(ut.TestCase):
 
-    def test_cast_sympy(self):
+    def test_cast_sympy(self) -> None:
         self.assertIsInstance(al.cast_sympy(S(0), as_sympy=False, dtype=int), int)
         self.assertIsInstance(al.cast_sympy(S(0), as_sympy=False, dtype=float), float)
         self.assertIsInstance(al.cast_sympy(S(0), as_sympy=True), Integer)
 
-    def test_a(self):
+    def test_a(self) -> None:
         self.assertEqual(al.a(3.5, 0.5, 3, 1.5, 2, as_sympy=True), S(5) / 48)
         self.assertEqual(al.a(3.5, 0.5, 3, 1.5, 3, as_sympy=True), S(7) / 64)
         self.assertEqual(al.a(3.5, 0.5, 3, 1.5, 4, as_sympy=True), S(5) / 64)
@@ -30,7 +31,7 @@ class TestAlgebra(ut.TestCase):
         self.assertEqual(al.a(3.5, 0.5, 4, 1.5, 4, as_sympy=True), S(7) / 64)
         self.assertEqual(al.a(3.5, 0.5, 4, 1.5, 5, as_sympy=True), S(11) / 48)
 
-    def test_b(self):
+    def test_b(self) -> None:
         self.assertEqual(al.b(3.5, 0.5, 3, 1.5, 2, as_sympy=True), -S(1) / 336)
         self.assertEqual(al.b(3.5, 0.5, 3, 1.5, 3, as_sympy=True), -S(7) / 256)
         self.assertEqual(al.b(3.5, 0.5, 3, 1.5, 4, as_sympy=True), S(11) / 1792)
@@ -38,7 +39,7 @@ class TestAlgebra(ut.TestCase):
         self.assertEqual(al.b(3.5, 0.5, 4, 1.5, 4, as_sympy=True), -S(77) / 6400)
         self.assertEqual(al.b(3.5, 0.5, 4, 1.5, 5, as_sympy=True), -S(143) / 3600)
 
-    def test_c(self):
+    def test_c(self) -> None:
         self.assertEqual(al.c(3.5, 0.5, 3, 1.5, 2, 3, as_sympy=True), -S(1) / 64)
         self.assertEqual(al.c(3.5, 0.5, 3, 1.5, 3, 4, as_sympy=True), -S(3) / 256)
         self.assertEqual(al.c(3.5, 0.5, 3, 1.5, 4, 2, as_sympy=True), -S(15) / 448)

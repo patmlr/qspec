@@ -1,7 +1,9 @@
 /build/
 /dist/
 /qspec.egg-info/
-/.idea/
+.idea
+__pycache__
+.ruff_cache
 /qspec/_cpp/src/qspec_cpp/x64/Release/*
 /qspec/_cpp/src/qspec_cpp/Release/*
 !qspec/_cpp/src/qspec_cpp/x64/Release/__init__.py

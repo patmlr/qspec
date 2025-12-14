@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 qspec.stats
 ===========
@@ -6,30 +5,66 @@ qspec.stats
 Module for doing statistical analysis.
 """
 
-import numpy as np
-import scipy.stats as st
-import scipy.integrate as si
-from scipy.optimize import root, minimize
 import matplotlib.pyplot as plt
+import numpy as np
+import scipy.integrate as si
+import scipy.stats as st
+from scipy.optimize import curve_fit, minimize, root
 
-from qspec.qtypes import *
 from qspec import tools
-from qspec.analyze import curve_fit
+from qspec.qtypes import (
+    Any,
+    Callable,
+    SupportsFloat,
+    SupportsIndex,
+    array_iter,
+    array_like,
+    asarray,
+    cast,
+    int_like,
+    ndarray,
+    scalar_like,
+)
 
-__all__ = ['Observable', 'add', 'mul', 'average', 'median', 'mode_lognormal', 'estimate_skewnorm', 'propagate',
-           'propagate_fit', 'combined_pdf', 'relevant_interval', 'uniform', 'uniform_pumped', 'info']
+__all__ = [
+    "Observable",
+    "add",
+    "average",
+    "combined_pdf",
+    "estimate_skewnorm",
+    "info",
+    "median",
+    "mode_lognormal",
+    "mul",
+    "propagate",
+    "propagate_fit",
+    "relevant_interval",
+    "uniform",
+    "uniform_pumped",
+]
 
 
 class Observable(float):
     """
     A float object which has a 'label' and optionally both a left- and right-sided or a symmetric uncertainty.
     """
-    def __new__(cls, x: Union[SupportsFloat, SupportsIndex, str, bytes, bytearray],
-                std: scalar = None, std_2: scalar = None, label: str = None):
-        return super(Observable, cls).__new__(cls, x)
 
-    def __init__(self, x: Union[SupportsFloat, SupportsIndex, str, bytes, bytearray],
-                 std: scalar = None, std_2: scalar = None, label: str = None):
+    def __new__(
+        cls,
+        x: SupportsFloat | SupportsIndex | str | bytes | bytearray,
+        std: scalar_like = 0.0,
+        std_2: scalar_like = 0.0,
+        label: str | None = None,
+    ) -> "Observable":
+        return super().__new__(cls, x)
+
+    def __init__(
+        self,
+        x: SupportsFloat | SupportsIndex | str | bytes | bytearray,
+        std: scalar_like = 0.0,
+        std_2: scalar_like = 0.0,
+        label: str | None = None,
+    ) -> None:
         """
         :param x: The value of the observable.
         :param label: The label of the observable.
@@ -40,50 +75,52 @@ class Observable(float):
         """
         float.__init__(float(x))
         self.label = label
-        self.std = std if std is not None else std_2
-        self.std_2 = std_2 if std is not None else std
-        self.popt: Union[array_iter, None] = None
-        self.est: Union[array_iter, None] = None
+        self.std = float(std)
+        self.std_2 = float(std_2)
+        self.popt: array_iter | None = None
+        self.est: array_iter | None = None
         if std_2 is not None:
             try:
                 self.est = estimate_skewnorm(float(self), self.std, self.std_2)
             except ValueError as e:
                 tools.printw(repr(e))
-                tools.printw('The real PDF might not be sufficiently described by a skew normal distribution.')
+                tools.printw("The real PDF might not be sufficiently described by a skew normal distribution.")
 
-    def __repr__(self):
-        return 'Observable({}, {}, {}, \'{}\')'.format(super().__repr__(), self.std, self.std_2, self.label)
+    def __repr__(self) -> str:
+        return f"Observable({super().__repr__()}, {self.std}, {self.std_2}, '{self.label}')"
 
-    def __str__(self):
+    def __str__(self) -> str:
         if self.std is None:
-            return '{}'.format(super().__repr__())
-        elif self.std_2 is None:
-            return '{}(+-{})'.format(super().__repr__(), self.std)
-        else:
-            return '{}(-{}+{})'.format(super().__repr__(), self.std, self.std_2)
+            return f"{super().__repr__()}"
 
-    def __add__(self, other):
-        return propagate(add, [self, other])
+        if self.std_2 is None:
+            return f"{super().__repr__()}(+-{self.std})"
 
-    def __radd__(self, other):
-        return propagate(add, [other, self])
+        return f"{super().__repr__()}(-{self.std}+{self.std_2})"
 
-    def __mul__(self, other):
-        return propagate(mul, [self, other])
+    def __add__(self, other: Any) -> "Observable":
+        return propagate(add, [self, other], full_output=False)  # type: ignore
 
-    def __rmul__(self, other):
-        return propagate(mul, [other, self])
+    def __radd__(self, other: Any) -> "Observable":
+        return propagate(add, [other, self], full_output=False)  # type: ignore
 
-    def __pow__(self, power, modulo=None):
-        return propagate(pow, [self, power])
+    def __mul__(self, other: Any) -> "Observable":
+        return propagate(mul, [self, other], full_output=False)  # type: ignore
 
-    def __rpow__(self, power, modulo=None):
-        return propagate(pow, [power, self])
+    def __rmul__(self, other: Any) -> "Observable":
+        return propagate(mul, [other, self], full_output=False)  # type: ignore
 
-    def set_popt(self, popt: array_like = None):
+    def __pow__(self, power: Any, mod: None = None) -> "Observable":
+        return propagate(pow, [self, power], full_output=False)  # type: ignore
+
+    def __rpow__(self, power: Any, mod: None = None) -> "Observable":
+        return propagate(pow, [power, self], full_output=False)  # type: ignore
+
+    def set_popt(self, popt: array_like | None = None) -> None:
         """
-        :param popt: The new value of 'popt'.
-        :returns: Sets the 'popt' attribute.
+        Set the `popt` attribute.
+
+        :param popt: The new value of `popt`.
         """
         if popt is None:
             self.popt = popt
@@ -98,42 +135,46 @@ class Observable(float):
          must not exceed 1.5.
         """
         if self.std_2 is None:
-            return st.norm.rvs(loc=self, scale=0. if self.std is None else self.std, size=size)
-        elif self.popt is not None:
-            return st.skewnorm.rvs(*self.popt, size=size)
-        elif self.est is not None:
-            return st.skewnorm.rvs(*self.est, size=size)
-        else:
-            return np.full(size, np.nan)
+            return st.norm.rvs(loc=self, scale=0.0 if self.std is None else self.std, size=size)  # type: ignore
+
+        if self.popt is not None:
+            return st.skewnorm.rvs(*self.popt, size=size)  # type: ignore
+
+        if self.est is not None:
+            return st.skewnorm.rvs(*self.est, size=size)  # type: ignore
+
+        return np.full(size, np.nan)
 
     def pdf(self) -> Callable:
         """
         :returns: The probability distribution function (pdf) of the observable.
         """
         if self.std_2 is None:
-            return np.zeros_like if self.std is None else st.norm(loc=self, scale=self.std).pdf
-        elif self.popt is not None:
-            return st.skewnorm(*self.popt).pdf
-        elif self.est is not None:
-            return st.skewnorm(*self.est).pdf
-        else:
-            return lambda x: np.full_like(x, np.nan)
+            return np.zeros_like if self.std is None else lambda x: st.norm.pdf(x, loc=self, scale=self.std)
 
-    def hist(self, size: int = 1000000, n_bins: int = 200):
+        if self.popt is not None:
+            return lambda x: st.skewnorm.pdf(x, *np.asarray(self.popt))
+
+        if self.est is not None:
+            return lambda x: st.skewnorm.pdf(x, *np.asarray(self.est))
+
+        return lambda x: np.full_like(x, np.nan)
+
+    def hist(self, size: int_like = 1000000, n_bins: int_like = 200) -> None:
         """
         :param size: The defining number of random variates (default is 1,000,000).
         :param n_bins: The number of bins.
         :returns: Plots a histogram of the observable.
         """
-        y = self.rvs(size)
-        n, bins, _ = plt.hist(y, bins=n_bins, density=True, label='Sample data', facecolor='lightgray')
+        y = self.rvs(int(size))
+        _, bins, _ = plt.hist(y, bins=int(n_bins), density=True, label="Sample data", facecolor="lightgray")
         bins = bins[:-1] + 0.5 * (bins[-1] - bins[0]) / n_bins
-        plt.plot(bins, self.pdf()(bins), 'C0', label='Est. PDF')
+        plt.plot(bins, self.pdf()(bins), "C0", label="Est. PDF")
         plt.legend(loc=1)
         plt.show()
 
 
-def add(a, b):
+def add(a: Any, b: Any) -> Any:
     """
     :param a: The first summand.
     :param b: The second summand.
@@ -142,7 +183,7 @@ def add(a, b):
     return a + b
 
 
-def mul(a, b):
+def mul(a: Any, b: Any) -> Any:
     """
     :param a: The first factor.
     :param b: The second factor.
@@ -151,7 +192,9 @@ def mul(a, b):
     return a * b
 
 
-def average(a: array_like, std: array_like = None, cov: array_iter = None, axis: int = None) -> (ndarray, ndarray):
+def average(
+    a: array_like, std: array_like | None = None, cov: array_iter | None = None, axis: int_like | None = None
+) -> tuple[ndarray, ndarray]:
     """
     :param a: The sample data.
     :param axis: The axis along which the average is computed.
@@ -169,61 +212,79 @@ def average(a: array_like, std: array_like = None, cov: array_iter = None, axis:
     if std is None and cov is None:  # The average and its standard error.
         av = np.average(a, axis=axis)
         av_d = np.std(a, axis=axis, ddof=1)
+
         if axis is None:  # The shape of 'a' is ignored ('a' is flattened).
             av_d /= np.sqrt(a.size)
         else:
             av_d /= np.sqrt(a.shape[axis])
+
     elif std is not None and cov is None:  # The weighted average of uncorrelated data and its standard error.
         std = np.asarray(std, dtype=float)
-        av, sum_of_weights = np.average(a, axis=axis, weights=1. / (std ** 2), returned=True)
-        av_d = np.sqrt(1. / sum_of_weights)
+        av, sum_of_weights = np.average(a, axis=axis, weights=1.0 / (std**2), returned=True)
+        av_d = np.sqrt(1.0 / sum_of_weights)
+
     else:  # The weighted average of correlated data and its standard error.
         cov = np.asarray(cov, dtype=float)
         if axis is None:  # The shape of 'a' is ignored ('a' is flattened).
             if cov.shape != (a.size, a.size):
-                raise ValueError('Shape mismatch between \'a\' {} and \'cov\' {}.'
-                                 .format(a.shape, cov.shape))
-            av, sum_of_weights = np.average(a, weights=1. / np.diag(cov), returned=True)
-            av_d = np.sum([1. / cov[i, i] + 2. * np.sum([cov[i, j] / (cov[i, i] * cov[j, j])
-                                                         for j in range(a.size) if i < j])
-                           for i in range(a.size)])
+                raise ValueError(f"Shape mismatch between 'a' {a.shape} and 'cov' {cov.shape}.")
+            av, sum_of_weights = np.average(a, weights=1.0 / np.diag(cov), returned=True)
+            av_d = np.sum(
+                [
+                    1.0 / cov[i, i]
+                    + 2.0 * np.sum([cov[i, j] / (cov[i, i] * cov[j, j]) for j in range(a.size) if i < j])
+                    for i in range(a.size)
+                ]
+            )
+
         else:
             if a.size != a.shape[0] and cov.shape == (a.size, a.size):
-                raise ValueError('Shape mismatch between \'a\' {} and \'cov\' {} for specified axis {}.'
-                                 .format(a.shape, cov.shape, axis))
-            elif cov.shape == (a.shape[axis], a.shape[axis]):
-                av, sum_of_weights = np.average(a, axis=axis, weights=1. / np.diag(cov), returned=True)
-                av_d = np.sum([1. / cov[i, i] + 2. * np.sum([cov[i, j] / (cov[i, i] * cov[j, j])
-                                                             for j in range(a.shape[axis]) if i < j])
-                               for i in range(a.shape[axis])])
+                raise ValueError(
+                    f"Shape mismatch between 'a' {a.shape} and 'cov' {cov.shape} for specified axis {axis}."
+                )
+
+            if cov.shape == (a.shape[axis], a.shape[axis]):
+                av, sum_of_weights = np.average(a, axis=axis, weights=1.0 / np.diag(cov), returned=True)
+                av_d = np.sum(
+                    [
+                        1.0 / cov[i, i]
+                        + 2.0 * np.sum([cov[i, j] / (cov[i, i] * cov[j, j]) for j in range(a.shape[axis]) if i < j])
+                        for i in range(a.shape[axis])
+                    ]
+                )
+
             else:
                 var = np.diagonal(cov, axis1=axis, axis2=axis + 1)
                 axes = [ax for ax in range(len(var.shape))]
                 i = axes.pop(-1)
                 axes.insert(axis, i)
                 var = np.transpose(var, axes=axes)
-                sum_of_weights = np.sum(1. / var, axis=axis)
+                sum_of_weights = np.sum(1.0 / var, axis=axis)
                 av = np.sum(a / var, axis=axis) / sum_of_weights
-                av_d = np.sum(cov / (np.expand_dims(var, axis=axis + 1) * np.expand_dims(var, axis=axis)),
-                              axis=(axis + 1, axis))
+                av_d = np.sum(
+                    cov / (np.expand_dims(var, axis=axis + 1) * np.expand_dims(var, axis=axis)), axis=(axis + 1, axis)
+                )
+
         av_d = np.sqrt(av_d) / sum_of_weights
-    return av, av_d
+
+    return np.asarray(av, dtype=float), np.asarray(av_d, dtype=float)
 
 
-def median(a: array_like, axis: int = None) -> (ndarray, ndarray, ndarray):
+def median(a: array_like, axis: int_like | None = None) -> tuple[ndarray, ndarray, ndarray]:
     """
     :param a: The sample data.
     :param axis: The axis along which the three percentiles are computed.
     :returns: The median (0.5-percentile) as well as the left- (~0.1587) and right-sided (~0.8413) 1-sigma percentile
      of a given sample 'a' along the specified 'axis'.
     """
+    a = np.asarray(a, dtype=float)
     med = np.nanmedian(a, axis=axis)
     neg = np.nanpercentile(a, 15.8655254, axis=axis)
     pos = np.nanpercentile(a, 84.1344746, axis=axis)
     return med, neg, pos
 
 
-def estimate_skewnorm(med: scalar, per_0: scalar, per_1: scalar):
+def estimate_skewnorm(med: scalar_like, per_0: scalar_like, per_1: scalar_like) -> ndarray | None:
     """
     :param med: The median (0.5-percentile) of a random variable.
     :param per_0: The left-sided 1-sigma percentile (~0.1587-percentile) relative to 'med'.
@@ -235,27 +296,30 @@ def estimate_skewnorm(med: scalar, per_0: scalar, per_1: scalar):
     if per_0 == 0 or per_1 == 0:
         return None
     if per_0 / per_1 > 1.5 or per_1 / per_0 > 1.5:
-        raise ValueError('The ratio between the left-(right-) and right-(left-)sided uncertainty must not exceed 1.5.')
+        raise ValueError("The ratio between the left-(right-) and right-(left-)sided uncertainty must not exceed 1.5.")
     per = np.array([med, med - per_0, med + per_1])
     y = np.array([0.5, 0.158655254, 0.841344746])
 
-    def f(x):
+    def f(x: ndarray) -> ndarray:
         return st.skewnorm.cdf(per, *x) - y
 
-    def df(x):
-        xi0 = -np.exp(-0.5 * ((per - x[1]) / x[2]) ** 2 * (1. + x[0] ** 2)) / (np.pi * (1. + x[0] ** 2))
+    def df(x: ndarray) -> ndarray:
+        xi0 = -np.exp(-0.5 * ((per - x[1]) / x[2]) ** 2 * (1.0 + x[0] ** 2)) / (np.pi * (1.0 + x[0] ** 2))
         xi1 = -st.skewnorm.pdf(per, *x)
         xi2 = -st.skewnorm.pdf(per, *x) * (per - x[1]) / x[2]
         return np.array([xi0, xi1, xi2]).T
 
-    return root(f, x0=np.array([0., med, per_0]), jac=df).x
+    return root(f, x0=np.array([0.0, med, per_0]), jac=df).x
 
 
-def lognormal(x, s=0., loc=0., scale=1., a=1.):
+def lognormal(
+    x: array_like, s: array_like = 0.0, loc: array_like = 0.0, scale: array_like = 1.0, a: array_like = 1.0
+) -> ndarray:
+    x, s, loc, scale, a = asarray(x, s, loc, scale, a, dtype=float)
     return a * st.lognorm.pdf(x, s=s, loc=loc, scale=scale)
 
 
-def mode_lognormal(x, bins=100):
+def mode_lognormal(x: array_like, bins: array_like = 100) -> float:
     y, edges = np.histogram(x, bins=bins)
     delta = np.mean(edges[1:] - edges[:-1])
     x = edges[:-1] + 0.5 * delta
@@ -266,21 +330,31 @@ def mode_lognormal(x, bins=100):
     a = scale * np.max(y)
     p0 = [s, loc, scale, a]
 
-    popt, pcov = curve_fit(lognormal, x, y, p0=p0)
-    mode = popt[1] + popt[2] * np.exp(-popt[0] ** 2)
-    mode = p0[1] + p0[2] * np.exp(-p0[0] ** 2)
+    popt, _ = curve_fit(lognormal, x, y, p0=p0)
+    mode = popt[1] + popt[2] * np.exp(-(popt[0] ** 2))
+    mode = p0[1] + p0[2] * np.exp(-(p0[0] ** 2))
 
     plt.bar(x, y, width=delta)
-    plt.plot(x, lognormal(x, *p0), '-C1')
-    plt.plot(x, lognormal(x, *popt), '-C2')
-    plt.vlines(mode, 0, np.max(y), colors='k')
+    plt.plot(x, lognormal(x, *p0), "-C1")
+    plt.plot(x, lognormal(x, *popt), "-C2")
+    plt.vlines(mode, 0, np.max(y), colors="k")
     plt.show()
     return mode
 
 
-def propagate(f: Callable, x: array_like, x_d: array_like = None, cov: array_iter = None,
-              unc_places: int = None, sample_size: int = 1000000, rtol: float = 1e-3, atol: float = None,
-              force_sym: bool = False, full_output: bool = False, show: bool = False) -> (Observable, list, ndarray):
+def propagate(
+    f: Callable,
+    x: array_like,
+    x_d: array_like | None = None,
+    cov: array_iter | None = None,
+    unc_places: int_like | None = None,
+    sample_size: int_like = 1000000,
+    rtol: float = 1e-3,
+    atol: float | None = None,
+    force_sym: bool = False,
+    full_output: bool = False,
+    show: bool = False,
+) -> Observable | tuple[Observable, ndarray, ndarray]:
     """
     :param f: The function to compute. 'f' needs to be vectorized.
     :param x: The input values. If 'x_d' is None, the sample data will be generated with the 'Observable.rvs' function
@@ -308,6 +382,9 @@ def propagate(f: Callable, x: array_like, x_d: array_like = None, cov: array_ite
      the mean and the standard deviation of the sampled data. If 'full_output' is True, a list of the input samples
      as well as the output sample are returned along with the observable.
     """
+    x = np.asarray(x, dtype=float)
+    sample_size = int(sample_size)
+
     label = f.__name__
     n_bins = 200
     if cov is None:
@@ -317,12 +394,15 @@ def propagate(f: Callable, x: array_like, x_d: array_like = None, cov: array_ite
             x = np.asarray(x, dtype=float)
             x_d = np.asarray(x_d, dtype=float)
             if x.size != x_d.size:
-                raise ValueError('x and x_d must have the same size but have sizes {} and {}.'.format(x.size, x_d.size))
-            rand_x = [x_i if x_d_i == 0. else st.norm.rvs(loc=x_i, scale=x_d_i, size=sample_size)
-                      for x_i, x_d_i in zip(x, x_d)]
+                raise ValueError(f"x and x_d must have the same size but have sizes {x.size} and {x_d.size}.")
+            rand_x = [
+                x_i if x_d_i == 0.0 else st.norm.rvs(loc=x_i, scale=x_d_i, size=sample_size)
+                for x_i, x_d_i in zip(x, x_d)
+            ]
     else:
         cov = np.asarray(cov)
-        rand_x = st.multivariate_normal.rvs(mean=[float(x_i) for x_i in x], cov=cov, size=sample_size).T
+        rand_x = st.multivariate_normal.rvs(mean=[float(x_i) for x_i in x], cov=cov, size=sample_size).T  # type: ignore
+
     rand_y = np.asarray(f(*rand_x))
 
     med, per_0, per_1 = median(rand_y)
@@ -330,11 +410,14 @@ def propagate(f: Callable, x: array_like, x_d: array_like = None, cov: array_ite
     std = np.std(rand_y, ddof=1)
 
     plt.figure(num=1, dpi=96)
-    n, bins, _ = plt.hist(rand_y, bins=n_bins, density=True, label='Sample data', facecolor='lightgray')
+    n, bins, _ = plt.hist(rand_y, bins=n_bins, density=True, label="Sample data", facecolor="lightgray")
     bins = bins[:-1] + 0.5 * (bins[-1] - bins[0]) / n_bins
 
-    if force_sym or (atol is None and abs(per_1 - per_0) / med <= rtol) \
-            or (atol is not None and abs(per_1 - per_0) <= atol):
+    if (
+        force_sym
+        or (atol is None and abs(per_1 - per_0) / med <= rtol)
+        or (atol is not None and abs(per_1 - per_0) <= atol)
+    ):
         if unc_places is not None:
             std, dec = tools.round_to_n(std, unc_places)
             mean = np.around(mean, decimals=dec)
@@ -347,34 +430,37 @@ def propagate(f: Callable, x: array_like, x_d: array_like = None, cov: array_ite
             med = np.around(med, decimals=dec)
         ob = Observable(med, label=label, std=float(med - per_0), std_2=float(per_1 - med))
         try:
-            popt, _ = curve_fit(st.skewnorm.pdf, bins, n, p0=[0., mean, std])
+            popt, _ = curve_fit(st.skewnorm.pdf, bins, n, p0=[0.0, mean, std])
             ob.set_popt(popt)
         except RuntimeError:
-            print('Optimal parameters for a skew normal distribution could not be found through fitting.'
-                  ' Using an estimation if possible.')
-    
+            print(
+                "Optimal parameters for a skew normal distribution could not be found through fitting."
+                " Using an estimation if possible."
+            )
+
     if show:
-        print('Median(sample data): {} (-{} +{})'.format(med, med - per_0, per_1 - med))
-        plt.plot(bins, st.norm.pdf(bins, loc=mean, scale=std), 'C0', label='Est. normal')
+        print(f"Median(sample data): {med} (-{med - per_0} +{per_1 - med})")
+        plt.plot(bins, st.norm.pdf(bins, loc=mean, scale=std), "C0", label="Est. normal")
         if ob.popt is not None:
             med, per_0, per_1 = median(st.skewnorm.rvs(*ob.popt, size=sample_size))
-            print('Median(Fit. skew normal): {} (-{} +{})'.format(med, med - per_0, per_1 - med))
-            plt.plot(bins, st.skewnorm.pdf(bins, *ob.popt), 'C1', label='Fit. skew normal')
+            print(f"Median(Fit. skew normal): {med} (-{med - per_0} +{per_1 - med})")
+            plt.plot(bins, st.skewnorm.pdf(bins, *ob.popt), "C1", label="Fit. skew normal")
         if ob.est is not None:
             med, per_0, per_1 = median(st.skewnorm.rvs(*ob.est, size=sample_size))
-            print('Median(Est. skew normal): {} (-{} +{})'.format(med, med - per_0, per_1 - med))
-            plt.plot(bins, st.skewnorm.pdf(bins, *ob.est), 'C2', label='Est. skew normal')
+            print(f"Median(Est. skew normal): {med} (-{med - per_0} +{per_1 - med})")
+            plt.plot(bins, st.skewnorm.pdf(bins, *ob.est), "C2", label="Est. skew normal")
         plt.legend(loc=1)
         plt.show()
     plt.close()
 
     if full_output:
-        return ob, rand_x, rand_y
-    else:
-        return ob
+        return ob, np.asarray(rand_x, dtype=float), rand_y
+    return ob
 
 
-def propagate_fit(f: Callable, x: array_like, popt: array_like, pcov: array_like, sample_size: int = 1000000):
+def propagate_fit(
+    f: Callable, x: array_like, popt: array_like, pcov: array_like, sample_size: int = 1000000
+) -> tuple[ndarray, ndarray, ndarray]:
     """
     :param f: The function to compute. $f$ needs to be vectorized.
     :param x: The input values.
@@ -383,17 +469,25 @@ def propagate_fit(f: Callable, x: array_like, popt: array_like, pcov: array_like
     :param sample_size: The number of random variates used for the calculation. The default is 1,000,000.
     :returns: The median and the $1\\sigma$ percentiles of the sampled function $f$.
     """
-    x = np.asarray(x)
+    x, popt, pcov = asarray(x, popt, pcov, dtype=float)
     _x = np.expand_dims(x, axis=-1)
-    _popt = st.multivariate_normal.rvs(mean=popt, cov=pcov, size=sample_size).T
+    _popt = st.multivariate_normal.rvs(mean=popt, cov=pcov, size=sample_size).T  # type: ignore
     _popt = [np.expand_dims(p, axis=tuple(range(len(x.shape)))) for p in _popt]
     med, per_0, per_1 = median(f(_x, *_popt), axis=-1)
     return med, per_0, per_1
 
 
-def combined_pdf(z: array_like, pdf_1: Callable = st.norm.pdf, pdf_2: Callable = st.norm.pdf,
-                 loc_1: float = 0., scale_1: float = 1., loc_2: float = 0., scale_2: float = 1.,
-                 operator: str = '+', n: int = 10) -> ndarray:
+def combined_pdf(
+    z: array_like,
+    pdf_1: Callable = st.norm.pdf,
+    pdf_2: Callable = st.norm.pdf,
+    loc_1: float = 0.0,
+    scale_1: float = 1.0,
+    loc_2: float = 0.0,
+    scale_2: float = 1.0,
+    operator: str = "+",
+    n: int = 10,
+) -> ndarray:
     """
     :param z: The quantiles of the combined probability density function (pdf).
     :param pdf_1: The pdf of the first random variate.
@@ -413,32 +507,32 @@ def combined_pdf(z: array_like, pdf_1: Callable = st.norm.pdf, pdf_2: Callable =
         arg = np.expand_dims(arg, axis=0)
     arg = np.expand_dims(arg, axis=-1)
 
-    if operator == '*':
-        left = loc_1 * loc_2 - 5. * (loc_1 * loc_2 - (loc_1 - scale_1) * (loc_2 - scale_2))
-        right = loc_1 * loc_2 + 5. * (loc_1 * loc_2 - (loc_1 - scale_1) * (loc_2 - scale_2))
+    if operator == "*":
+        left = loc_1 * loc_2 - 5.0 * (loc_1 * loc_2 - (loc_1 - scale_1) * (loc_2 - scale_2))
+        right = loc_1 * loc_2 + 5.0 * (loc_1 * loc_2 - (loc_1 - scale_1) * (loc_2 - scale_2))
 
-        def kernel(x):
+        def kernel(x: ndarray) -> ndarray:
             return pdf_1(x, loc=loc_1, scale=scale_1) * pdf_2(arg / x, loc=loc_2, scale=scale_2) / abs(x)
 
-    elif operator == '+':
-        left = loc_1 + loc_2 - 10. * np.sqrt(scale_1 ** 2 + scale_2 ** 2)
-        right = loc_1 + loc_2 + 10. * np.sqrt(scale_1 ** 2 + scale_2 ** 2)
+    elif operator == "+":
+        left = loc_1 + loc_2 - 10.0 * np.sqrt(scale_1**2 + scale_2**2)
+        right = loc_1 + loc_2 + 10.0 * np.sqrt(scale_1**2 + scale_2**2)
 
-        def kernel(x):
+        def kernel(x: ndarray) -> ndarray:
             return pdf_1(x, loc=loc_1, scale=scale_1) * pdf_2(arg - x, loc=loc_2, scale=scale_2)
 
     else:
-        raise ValueError('Operator \'{}\' not supported.'.format(operator))
+        raise ValueError(f"Operator '{operator}' not supported.")
 
-    x_range = np.linspace(left, right, 2 ** n + 1)
+    x_range = np.linspace(left, right, 2**n + 1)
     dx = x_range[1] - x_range[0]
     x_range = np.expand_dims(x_range, axis=0)
     y = kernel(x_range)
-    result = si.romb(y, dx, axis=1)
-    return result
+
+    return si.romb(y, dx, axis=1)
 
 
-def relevant_interval(dist: Callable, *args, show: bool = False, **kwargs):
+def relevant_interval(dist: Callable, *args: scalar_like, show: bool = False, **kwargs) -> tuple[float, float]:
     """
     :param dist: The probability distribution function (pdf).
     :param args: Additional arguments for the pdf.
@@ -447,42 +541,42 @@ def relevant_interval(dist: Callable, *args, show: bool = False, **kwargs):
     :returns: An estimation of the interval where most of the probability lies in.
     """
     k = 10
-    scale = 1.
+    scale = 1.0
 
-    def cost(_x):
+    def cost(_x: ndarray) -> ndarray:
         if _x[0] > _x[1]:
-            _y = dist(np.linspace(_x[1], _x[0], 2 ** k + 1), *args, **kwargs)
+            _y = dist(np.linspace(_x[1], _x[0], 2**k + 1), *args, **kwargs)
         else:
-            _y = dist(np.linspace(_x[0], _x[1], 2 ** k + 1), *args, **kwargs)
-        c = (1. - si.romb(_y, abs(_x[1] - _x[0]) / (2 ** k))) * scale
+            _y = dist(np.linspace(_x[0], _x[1], 2**k + 1), *args, **kwargs)
+        c = (1.0 - si.romb(_y, abs(_x[1] - _x[0]) / (2**k))) * scale
         if show:
             print(_x, c / scale)
         return c
 
-    def d_cost(_x):
+    def d_cost(_x: ndarray) -> ndarray:
         _y = np.array([dist(_x[0], *args, **kwargs), -dist(_x[1], *args, **kwargs)])
         if _x[0] > _x[1]:
             _y = -_y
         return _y * scale
 
-    x0 = np.array([-1., 1.])
+    x0 = np.array([-1.0, 1.0])
     while cost(x0) < 0.1:
-        if show:
-            print('x0: ', x0)
         x0 *= 0.5
+
     while cost(x0) > 0.9:
-        if show:
-            print('x0: ', x0)
-        x0 *= 2.
+        x0 *= 2.0
+
     scale = x0[1]
-    ret = minimize(cost, x0, jac=d_cost).x
+    x_min, x_max = minimize(cost, x0, jac=d_cost).x
+
     if show:
-        x = np.linspace(*ret, 2 ** k + 1)
+        x = np.linspace(x_min, x_max, 2**k + 1)
         y = dist(x, *args, **kwargs)
         plt.plot(x, y, label=dist.__name__)
         plt.legend()
         plt.show()
-    return ret
+
+    return float(x_min), float(x_max)
 
 
 """ Probability density functions """
@@ -494,10 +588,11 @@ def uniform(x: array_like, width: array_like) -> ndarray:
     :param width: The width of the uniform distribution.
     :returns: The probability density at 'x'.
     """
+    x, width = asarray(x, width, dtype=float)
     return st.uniform.pdf(x, loc=-0.5 * width, scale=width)
 
 
-def _uniform_pumped(x, width, gamma_u, depth) -> ndarray:
+def _uniform_pumped(x: array_like, width: scalar_like, gamma_u: scalar_like, depth: scalar_like) -> ndarray:
     """
     :param x: The x quantiles.
     :param width: The width of the uniform distribution.
@@ -505,20 +600,23 @@ def _uniform_pumped(x, width, gamma_u, depth) -> ndarray:
     :param depth: The depth of the pump dip in parts of the height of the underlying uniform distribution.
     :returns: A not normalized uniform distribution with a Lorentz shaped dip.
     """
-    x = np.asarray(x)
+    x = np.asarray(x, dtype=float)
+    width, gamma_u, depth = cast(width, gamma_u, depth, dtype=float)
     scalar_true = tools.check_shape((), x, return_mode=True)
     if scalar_true:
         x = np.array([x])
     uni = uniform(x, width)
     nonzero = np.nonzero(uni)
     ret = np.zeros_like(x)
-    ret[nonzero] = uni[nonzero] - depth / width * (np.pi * gamma_u / 2.) * st.cauchy.pdf(x[nonzero], scale=gamma_u / 2.)
+    ret[nonzero] = uni[nonzero] - depth / width * (np.pi * gamma_u / 2.0) * st.cauchy.pdf(
+        x[nonzero], scale=gamma_u / 2.0
+    )
     if scalar_true:
         return ret[0]
     return ret
 
 
-def uniform_pumped(x, width, gamma_u, depth) -> ndarray:
+def uniform_pumped(x: array_like, width: scalar_like, gamma_u: scalar_like, depth: scalar_like) -> ndarray:
     """
     :param x: The x quantiles.
     :param width: The width of the uniform distribution.
@@ -526,13 +624,15 @@ def uniform_pumped(x, width, gamma_u, depth) -> ndarray:
     :param depth: The depth of the pump dip in parts of the height of the underlying uniform distribution.
     :returns: A uniform distribution with a Lorentz-shaped dip.
     """
-    _x = np.linspace(-0.5 * width, 0.5 * width, 2 ** 10 + 1)
+    x = np.asarray(x, dtype=float)
+    width, gamma_u, depth = cast(width, gamma_u, depth, dtype=float)
+    _x = np.linspace(-0.5 * width, 0.5 * width, 2**10 + 1)
     _y = _uniform_pumped(_x, width, gamma_u, depth)
-    norm = si.romb(_y, width / (2 ** 10))
+    norm = si.romb(_y, float(width) / 1024.0)
     return _uniform_pumped(x, width, gamma_u, depth) / norm
 
 
-def info():
+def info() -> None:
     """
     Plots the 1-sigma percentiles (and their ratio) of a skew normal distribution relative to its median
     for different values of the parameter alpha.
@@ -549,13 +649,13 @@ def info():
         neg.append(med - np.percentile(dist, 15.8655254))
         pos.append(np.percentile(dist, 84.1344746) - med)
     neg, pos = np.array(neg), np.array(pos)
-    plt.title('Properties of the skew normal distribution')
-    plt.xlabel(r'Parameter $\alpha$')
-    plt.ylabel(r'Percentiles ($\sigma$) / Ratio of Percentiles')
-    plt.ylim(0., 1.75)
-    plt.plot(a, neg, label='left 1-sigma')
-    plt.plot(a, pos, label='right 1-sigma')
-    plt.plot(a, pos / neg, label='Ratio right/left')
-    plt.plot(a, neg / pos, label='Ratio left/right')
-    plt.legend(loc='lower center')
+    plt.title("Properties of the skew normal distribution")
+    plt.xlabel(r"Parameter $\alpha$")
+    plt.ylabel(r"Percentiles ($\sigma$) / Ratio of Percentiles")
+    plt.ylim(0.0, 1.75)
+    plt.plot(a, neg, label="left 1-sigma")
+    plt.plot(a, pos, label="right 1-sigma")
+    plt.plot(a, pos / neg, label="Ratio right/left")
+    plt.plot(a, neg / pos, label="Ratio left/right")
+    plt.legend(loc="lower center")
     plt.show()

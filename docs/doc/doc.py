@@ -21,12 +21,12 @@ def type_to_str(_type):
     ret = str(_type)
     ret = ret.replace(str(sympy_like), 'sympy_like')
     ret = ret.replace(str(sympy_quant), 'sympy_quant')
-    ret = ret.replace(str(Union[sympy_core, float]), 'Union[sympy_core, float]')
+    ret = ret.replace(str(sympy_core | float), 'sympy_core | float')
     ret = ret.replace(str(sympy_core), 'sympy_core')
-    ret = ret.replace(str(Union[array_like, object]), 'Union[array_like, object]')
+    ret = ret.replace(str(array_like | object), 'array_like | object')
     for t in QSPEC_SIM_TYPES:
         if t.__name__ in ret:
-            ret = ret.replace(str(Union[array_like, t]), f'Union[array_like, {t}]')
+            ret = ret.replace(str(array_like | t), f'array_like | {t}')
             ret = ret.replace(f'_simulate_cpp.{t.__name__}', t.__name__)
             ret = ret.replace(f'ForwardRef(\'{t.__name__}\')', f'qspec.simulate.{t.__name__}')
             if ret == t.__name__:
@@ -61,7 +61,7 @@ def type_to_str(_type):
 
 
 def rest_to_html(rest):
-    html = publish_parts(rest, writer_name='html')['html_body']
+    html = publish_parts(rest, writer_name='html')['html_body'] # type: ignore
     return html
 
 
