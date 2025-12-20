@@ -14,10 +14,10 @@ from qspec.analyze import curve_fit, odr_fit
 from qspec.models import _base, _helper
 from qspec.models._base import _val_fix_to_val, _fix_to_unc
 
-__all__ = ['ROUTINES', 'sigma_poisson', 'residuals', 'reduced_chi2', 'fit']
+__all__ = ["ROUTINES", "sigma_poisson", "residuals", "reduced_chi2", "fit"]
 
 
-ROUTINES = {'curve_fit', 'odr_fit'}
+ROUTINES = {"curve_fit", "odr_fit"}
 
 
 class Xlist:  # Custom list to trick 'curve_fit' for linked fitting of files with different x-axis sizes.
@@ -40,6 +40,7 @@ def _wrap_sigma_y(sigma_y, uncs):
 
     def func(x, y, y_fit, *params):
         return np.concatenate([sigma_y(x, y, y_fit, *params)[:i], uncs], axis=0)
+
     return func
 
 
@@ -50,7 +51,7 @@ def _sqrt_zero_free(x: array_like):
 
 
 # noinspection PyUnusedLocal
-def sigma_poisson(x: array_like, y: array_like, y_model: array_like, *params: array_iter) -> ndarray:
+def sigma_poisson(x: array_like, y: array_like, y_model: array_like, *params: scalar_nd) -> ndarray:
     return _sqrt_zero_free(y_model)
 
 
@@ -61,12 +62,21 @@ def residuals(model: _base.Model, x: ndarray, y: ndarray):
 def reduced_chi2(model: _base.Model, x: ndarray, y: ndarray, sigma_y: ndarray):
     fixed, bounds = model.fit_prepare()
     n_free = sum(int(not f) for f in fixed)
-    return np.sum(residuals(model, x, y) ** 2 / sigma_y ** 2) / (y.size - n_free)
+    return np.sum(residuals(model, x, y) ** 2 / sigma_y**2) / (y.size - n_free)
 
 
-def fit(model: _base.Model, x: Any, y: array_iter, sigma_x: array_iter = None,
-        sigma_y: Union[array_iter, Callable] = None, report: bool = False, routine: Union[Callable, str] = None,
-        guess_offset: bool = False, mc_sigma: int = 0, **kwargs) -> (ndarray, ndarray, dict):
+def fit(
+    model: _base.Model,
+    x: Any,
+    y: scalar_nd,
+    sigma_x: scalar_nd = None,
+    sigma_y: Union[scalar_nd, Callable] = None,
+    report: bool = False,
+    routine: Union[Callable, str] = None,
+    guess_offset: bool = False,
+    mc_sigma: int = 0,
+    **kwargs,
+) -> (ndarray, ndarray, dict):
     """
     Fit a `Model` from `qspec.models` to data. This fit routine encapsulates the `qspec.curve_fit`
     and the `qspec.odr_fit` routines to facilitate the use of all modular fit model features,
@@ -102,25 +112,25 @@ def fit(model: _base.Model, x: Any, y: array_iter, sigma_x: array_iter = None,
     if isinstance(routine, str) and routine in ROUTINES:
         routine = eval(routine)
     if routine.__name__ not in ROUTINES:
-        raise ValueError('Specified routine \'{}\' is not supported.'.format(routine.__name__))
+        raise ValueError("Specified routine '{}' is not supported.".format(routine.__name__))
 
     if not isinstance(model, _base.Model):
-        raise TypeError('\'model\' must have or inherit type qspec.models.Model but has type {}.'.format(type(model)))
+        raise TypeError("'model' must have or inherit type qspec.models.Model but has type {}.".format(type(model)))
     if model.error:
         raise ValueError(model.error)
 
-    sigma = kwargs.get('sigma', None)
+    sigma = kwargs.get("sigma", None)
     if sigma_y is None:
         sigma_y = sigma
     elif sigma is not None:
-        print_colored('WARNING', 'Parameter \'sigma\' is redundant. \'sigma_y\' will be used.')
+        print_colored("WARNING", "Parameter 'sigma' is redundant. 'sigma_y' will be used.")
 
     if callable(sigma_y) and mc_sigma:
         raise ValueError("'sigma(_y)' must not be callable if 'mc_sigma' > 0.")
 
     if isinstance(model, _base.Linked):
         if mc_sigma != 0:
-            raise TypeError('Linked models are currently not supported with Monte-Carlo sampling.')
+            raise TypeError("Linked models are currently not supported with Monte-Carlo sampling.")
         models_offset = _helper.find_models(model, _base.Offset)
         for _offset, _x, _y in zip(models_offset, x, y):
             if _offset is not None:
@@ -162,37 +172,46 @@ def fit(model: _base.Model, x: Any, y: array_iter, sigma_x: array_iter = None,
 
     p0_fixed, bounds = model.fit_prepare()
 
-    kwargs.update({'report': False})
-    if routine.__name__ == 'curve_fit':
-        kwargs.update({'bounds': bounds, 'sigma': sigma_y})
-    if routine.__name__ == 'odr_fit':
-        kwargs.update({'sigma_x': sigma_x, 'sigma_y': sigma_y})
+    kwargs.update({"report": False})
+    if routine.__name__ == "curve_fit":
+        kwargs.update({"bounds": bounds, "sigma": sigma_y})
+    if routine.__name__ == "odr_fit":
+        kwargs.update({"sigma_x": sigma_x, "sigma_y": sigma_y})
 
     err = False
     warn = False
     e = None
     try:
         if mc_sigma:
-            kwargs['sigma'] = None
-            kwargs['absolute_sigma'] = False
-            kwargs['sigma_x'] = None
-            kwargs['sigma_y'] = None
-            if routine.__name__ == 'curve_fit':
-                del kwargs['sigma_x'], kwargs['sigma_y']
-            if routine.__name__ == 'odr_fit':
-                del kwargs['sigma'], kwargs['absolute_sigma']
+            kwargs["sigma"] = None
+            kwargs["absolute_sigma"] = False
+            kwargs["sigma_x"] = None
+            kwargs["sigma_y"] = None
+            if routine.__name__ == "curve_fit":
+                del kwargs["sigma_x"], kwargs["sigma_y"]
+            if routine.__name__ == "odr_fit":
+                del kwargs["sigma"], kwargs["absolute_sigma"]
 
             if sigma_x is None:
-                x_samples = [x, ] * mc_sigma
+                x_samples = [
+                    x,
+                ] * mc_sigma
             else:
-                x_samples = np.random.normal(loc=x, scale=sigma_x, size=(mc_sigma, ) + x.shape)
+                x_samples = np.random.normal(loc=x, scale=sigma_x, size=(mc_sigma,) + x.shape)
             if sigma_y is None:
-                y_samples = [y, ] * mc_sigma
+                y_samples = [
+                    y,
+                ] * mc_sigma
             else:
-                y_samples = np.random.normal(loc=y, scale=sigma_y, size=(mc_sigma, ) + y.shape)
+                y_samples = np.random.normal(loc=y, scale=sigma_y, size=(mc_sigma,) + y.shape)
 
-            pt = np.array([routine(model, x_sample, y_sample, p0=model.vals, p0_fixed=p0_fixed, **kwargs)[0]
-                           for x_sample, y_sample in zip(x_samples, y_samples)], dtype=float)
+            pt = np.array(
+                [
+                    routine(model, x_sample, y_sample, p0=model.vals, p0_fixed=p0_fixed, **kwargs)[0]
+                    for x_sample, y_sample in zip(x_samples, y_samples)
+                ],
+                dtype=float,
+            )
             popt = np.mean(pt, axis=0)
             pcov = np.zeros((popt.size, popt.size))
             indices = np.array([i for i, fix in enumerate(p0_fixed) if not fix])
@@ -203,7 +222,7 @@ def fit(model: _base.Model, x: Any, y: array_iter, sigma_x: array_iter = None,
         popt = np.array(model.update_args(popt))
         model.set_vals(popt, force=True)
         if sigma_y is None:
-            chi2 = 0.
+            chi2 = 0.0
         elif callable(sigma_y):
             chi2 = reduced_chi2(model, x, y, sigma_y(x, y, model(x, *popt), *popt))
         else:
@@ -211,26 +230,26 @@ def fit(model: _base.Model, x: Any, y: array_iter, sigma_x: array_iter = None,
     except (ValueError, RuntimeError) as _e:
         warn = True
         err = True
-        chi2 = 0.
+        chi2 = 0.0
         popt = np.array(model.vals, dtype=float)
         pcov = np.zeros((popt.size, popt.size))
         e = _e
     if report:
         digits = int(np.floor(np.log10(np.abs(model.size)))) + 1
-        print('Optimized parameters:')
+        print("Optimized parameters:")
         for j, (name, val, unc) in enumerate(zip(model.names, popt, np.sqrt(np.diag(pcov)))):
-            print('{}:   {} = {} +/- {}'.format(str(j).zfill(digits), name, val, unc))
-        print('\nCov. Matrix:')
+            print("{}:   {} = {} +/- {}".format(str(j).zfill(digits), name, val, unc))
+        print("\nCov. Matrix:")
         print_cov(pcov, normalize=True, decimals=2)
-        print('\nRed. chi2 = {}'.format(np.around(chi2, decimals=2)))
+        print("\nRed. chi2 = {}".format(np.around(chi2, decimals=2)))
 
         if err:
-            print_colored('FAIL', 'Error while fitting: {}\n'.format(e))
+            print_colored("FAIL", "Error while fitting: {}\n".format(e))
         elif np.any(np.isinf(pcov)):
             warn = True
-            print_colored('WARNING', 'Failed to estimate uncertainties.\n')
+            print_colored("WARNING", "Failed to estimate uncertainties.\n")
         else:
-            print_colored('OKGREEN', 'Fit successful.\n')
+            print_colored("OKGREEN", "Fit successful.\n")
 
     if discard_y_pars:
         model = model.model  # Discard the YPars model.

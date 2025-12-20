@@ -166,7 +166,7 @@ def straight_x_std(x: array_like, b: array_like, sigma_x: array_like,
                    + (b * sigma_x) ** 2 + (sigma_b * sigma_x) ** 2)
 
 
-def straight_direction(p_0: array_iter, p_1: array_iter, axis: int = -1) -> ndarray:
+def straight_direction(p_0: scalar_nd, p_1: scalar_nd, axis: int = -1) -> ndarray:
     r"""
     The normalized directional vector of a straight through two points
 
@@ -227,8 +227,8 @@ def ellipse2d(x: array_like, y: array_like, scale_x: array_like, scale_y: array_
     return x + scale_x * np.cos(phi), y + scale_y * (corr * np.cos(phi) + np.sqrt(1 - corr ** 2) * np.sin(phi))
 
 
-def draw_sigma2d(x: array_iter, y: array_iter, sigma_x: array_iter, sigma_y: array_iter,
-                 corr: array_iter, n: int = 1, **kwargs):
+def draw_sigma2d(x: scalar_nd, y: scalar_nd, sigma_x: scalar_nd, sigma_y: scalar_nd,
+                 corr: scalar_nd, n: int = 1, **kwargs):
     r"""
     Draws the $n\sigma$ bounds of the given data points $(x, y)$ with standard deviations $(\sigma_x, \sigma_y)$
     and correlation $\rho_{xy}$.
@@ -266,8 +266,8 @@ def weight(sigma):
     return 1. / sigma ** 2
 
 
-def york_fit(x: array_iter, y: array_iter, sigma_x: array_iter = None, sigma_y: array_iter = None,
-             corr: array_iter = None, iter_max: int = 200, report: bool = False, show: bool = False, **kwargs) \
+def york_fit(x: scalar_nd, y: scalar_nd, sigma_x: scalar_nd = None, sigma_y: scalar_nd = None,
+             corr: scalar_nd = None, iter_max: int = 200, report: bool = False, show: bool = False, **kwargs) \
         -> (ndarray, ndarray):
     r"""
     A linear regression algorithm to find the best straight line through points $\vec{\mu}_i\in\mathbb{R}^2$
@@ -372,7 +372,7 @@ def york_fit(x: array_iter, y: array_iter, sigma_x: array_iter = None, sigma_y: 
     return popt, pcov
 
 
-def covariance_matrix(cov: array_iter = None, sigma: array_iter = None, corr: array_iter = None,
+def covariance_matrix(cov: scalar_nd = None, sigma: scalar_nd = None, corr: scalar_nd = None,
                       k: int = None, n: int = None) -> ndarray:
     r"""
     Helper function to construct covariance matrices $\mathbf{\Sigma}_i\in\mathbb{R}^{n\times n}$
@@ -514,7 +514,7 @@ def _get_linear_nd_reduced(x, cov_inv, p0, mask, method):
     return func
 
 
-def linear_nd_fit(x: array_iter, cov: array_iter = None, p0: array_iter = None, axis: int = None,
+def linear_nd_fit(x: scalar_nd, cov: scalar_nd = None, p0: scalar_nd = None, axis: int = None,
                   optimize_cov: bool = False, **kwargs) -> (ndarray, ndarray):
     r"""
     Maximum likelihood fit for a straight line through points $\vec{\mu}_i\in\mathbb{R}^n$
@@ -643,8 +643,8 @@ def linear_nd_fit(x: array_iter, cov: array_iter = None, p0: array_iter = None, 
     return popt, pcov
 
 
-def linear_fit(x: array_iter, y: array_iter, sigma_x: array_iter = None, sigma_y: array_iter = None,
-               corr: array_iter = None, report: bool = False, **kwargs) -> (ndarray, ndarray):
+def linear_fit(x: scalar_nd, y: scalar_nd, sigma_x: scalar_nd = None, sigma_y: scalar_nd = None,
+               corr: scalar_nd = None, report: bool = False, **kwargs) -> (ndarray, ndarray):
     r"""
     Maximum likelihood fit for a straight line through points $\vec{\mu}_i\in\mathbb{R}^2$
     with covariances $\mathbf{\Sigma}_i\in\mathbb{R}^{2\times 2}$,
@@ -816,7 +816,7 @@ def generate_collinear_points(x: ndarray, cov: ndarray, n_samples: int = None, n
                                              **kwargs)
 
 
-def linear_nd_monte_carlo(x: array_iter, cov: array_iter = None, axis: int = None, optimize_cov: bool = False,
+def linear_nd_monte_carlo(x: scalar_nd, cov: scalar_nd = None, axis: int = None, optimize_cov: bool = False,
                           n_samples: int = None, n_accepted: int = None, optimize_sampling: bool = True,
                           return_samples: bool = False, method: str = 'py', report: bool = False, **kwargs) \
         -> (ndarray, ndarray, Optional[ndarray]):
@@ -918,8 +918,8 @@ def linear_nd_monte_carlo(x: array_iter, cov: array_iter = None, axis: int = Non
     return popt, pcov
 
 
-def linear_monte_carlo(x: array_iter, y: array_iter, sigma_x: array_iter = None, sigma_y: array_iter = None,
-                       corr: array_iter = None, optimize_cov: bool = True, n_samples: int = None,
+def linear_monte_carlo(x: scalar_nd, y: scalar_nd, sigma_x: scalar_nd = None, sigma_y: scalar_nd = None,
+                       corr: scalar_nd = None, optimize_cov: bool = True, n_samples: int = None,
                        n_accepted: int = None, optimize_sampling: bool = True, return_samples: bool = False,
                        method: str = 'py', report: bool = True, **kwargs) -> (ndarray, ndarray, Optional[ndarray]):
     r"""
@@ -970,8 +970,8 @@ def linear_monte_carlo(x: array_iter, y: array_iter, sigma_x: array_iter = None,
     return popt, pcov
 
 
-def linear_alpha_fit(x: array_iter, y: array_iter, sigma_x: array_like = None, sigma_y: array_like = None,
-                     corr: array_iter = None, func: Union[Callable, str] = york_fit, alpha: scalar = 0,
+def linear_alpha_fit(x: scalar_nd, y: scalar_nd, sigma_x: array_like = None, sigma_y: array_like = None,
+                     corr: scalar_nd = None, func: Union[Callable, str] = york_fit, alpha: scalar = 0,
                      find_alpha: bool = True, report: bool = False, show: bool = False, **kwargs) \
         -> (ndarray, ndarray, float):
     r"""
@@ -1024,8 +1024,8 @@ def linear_alpha_fit(x: array_iter, y: array_iter, sigma_x: array_like = None, s
     return popt, pcov, float(alpha)
 
 
-def odr_fit(f: Callable, x: array_iter, y: array_iter, sigma_x: array_iter = None, sigma_y: array_iter = None,
-            p0: array_iter = None, p0_d: array_iter = None, p0_fixed: array_iter = None,
+def odr_fit(f: Callable, x: scalar_nd, y: scalar_nd, sigma_x: scalar_nd = None, sigma_y: scalar_nd = None,
+            p0: scalar_nd = None, p0_d: scalar_nd = None, p0_fixed: scalar_nd = None,
             report: bool = False, **kwargs) -> (ndarray, ndarray):
     r"""
     This function encapsulates the orthogonal distance regression (ODR) routine
@@ -1093,8 +1093,8 @@ def odr_fit(f: Callable, x: array_iter, y: array_iter, sigma_x: array_iter = Non
     return out.beta, out.cov_beta
 
 
-def curve_fit(f: Callable, x: Union[array_like, object], y: array_like, p0: array_iter = None,
-              p0_fixed: array_iter = None, sigma: Union[array_iter, Callable] = None, absolute_sigma: bool = False,
+def curve_fit(f: Callable, x: Union[array_like, object], y: array_like, p0: scalar_nd = None,
+              p0_fixed: scalar_nd = None, sigma: Union[scalar_nd, Callable] = None, absolute_sigma: bool = False,
               check_finite: bool = True, bounds: (ndarray, ndarray) = (-np.inf, np.inf), method: str = None,
               jac: Union[Callable, str] = None, full_output: bool = False, report: bool = False, **kwargs) \
         -> (ndarray, ndarray, Optional[dict], Optional[str], Optional[int]):
@@ -1327,7 +1327,7 @@ def _mass_factor_array(m0, m1, m0_d, m1_d):
 
 
 class King:
-    def __init__(self, a: array_iter, m: array_iter, x_abs: array_iter = None,
+    def __init__(self, a: scalar_nd, m: scalar_nd, x_abs: scalar_nd = None,
                  subtract_electrons: scalar = 0., n_samples: int = 100000, element_label: str = None):
         r"""
         A class for $n$-dimensional King plots, encapsulating the linear regression algorithms of the
@@ -1422,7 +1422,7 @@ class King:
     def _corr(self):
         return np.array([_cov / np.sqrt(np.diag(_cov)[:, None] * np.diag(_cov)[None, :]) for _cov in self._cov()])
 
-    def fit(self, a: array_iter, a_ref: array_iter, x: array_iter = None, y: array_iter = None,
+    def fit(self, a: scalar_nd, a_ref: scalar_nd, x: scalar_nd = None, y: scalar_nd = None,
             xy: Iterable[int] = None, func: Union[str, Callable] = york_fit, alpha: scalar = 0,
             find_alpha: bool = False, show: bool = True, **kwargs) -> (ndarray, ndarray):
         r"""
@@ -1492,7 +1492,7 @@ class King:
         
         return self.popt, self.pcov
 
-    def fit_nd(self, a: array_iter, a_ref: array_iter, x: array_iter = None,
+    def fit_nd(self, a: scalar_nd, a_ref: scalar_nd, x: scalar_nd = None,
                axis: int = 0, optimize_cov: bool = False, func: Union[Callable, str] = linear_nd_fit,
                show: bool = True, **kwargs) -> (ndarray, ndarray):
         r"""
@@ -1575,7 +1575,7 @@ class King:
         bi = [_ai * t for _ai in ai]
         return np.array(ai + bi + yi, dtype=float)
 
-    def get_unmodified(self, a: array_iter, a_ref: array_iter, x: array_iter, axis: int = 0,
+    def get_unmodified(self, a: scalar_nd, a_ref: scalar_nd, x: scalar_nd, axis: int = 0,
                        show: bool = False, **kwargs) -> (ndarray, ndarray, ndarray):
         r"""
         Calculate unknown isotope shifts/charge radii by using the King plot results.
@@ -1663,7 +1663,7 @@ class King:
 
         return y, cov, cov_stat
 
-    # def _get_unmodified_mc(self, a: array_iter, a_ref: array_iter, x: array_iter, axis: int = 0,
+    # def _get_unmodified_mc(self, a: scalar_nd, a_ref: scalar_nd, x: scalar_nd, axis: int = 0,
     #                        show: bool = False, **kwargs):
     #     a, a_ref, x = np.asarray(a), np.asarray(a_ref), np.asarray(x)
     #     i, i_ref = self._get_i(a, a_ref)
@@ -1706,7 +1706,7 @@ class King:
     #
     #     return y, y_d, ys_d
     #
-    # def _get_unmodified_nd_mc(self, a: array_iter, a_ref: array_iter, x: array_iter, axis: int = 0,
+    # def _get_unmodified_nd_mc(self, a: scalar_nd, a_ref: scalar_nd, x: scalar_nd, axis: int = 0,
     #                           show: bool = False, **kwargs):
     #     a, a_ref, x = np.asarray(a), np.asarray(a_ref), np.asarray(x)
     #     i, i_ref = self._get_i(a, a_ref)

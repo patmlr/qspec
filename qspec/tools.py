@@ -14,7 +14,6 @@ from qspec.qtypes import (
     Callable,
     Iterable,
     Rational,
-    array_iter,
     array_like,
     asarray,
     floating,
@@ -22,7 +21,7 @@ from qspec.qtypes import (
     integer,
     ndarray,
     scalar,
-    scalar_like,
+    scalar_nd,
 )
 
 __all__ = [
@@ -185,7 +184,7 @@ def printf(*values: object, **kwargs) -> None:
     print("{}{}{}".format(*_values), **kwargs)
 
 
-def map_corr_coeff_to_color(val: scalar_like, clip: bool = True) -> tuple[int, int, int]:
+def map_corr_coeff_to_color(val: scalar, clip: bool = True) -> tuple[int, int, int]:
     """
     Maps a value between -1 and 1 to a red-to-green colormap.
 
@@ -259,7 +258,7 @@ def fraction(r: Rational | str) -> tuple[int, int]:
     return num, denom
 
 
-def check_half_integer(*args: scalar_like) -> None:
+def check_half_integer(*args: scalar) -> None:
     """
     :param args: Scalar arguments.
     :returns: Checks whether the given arguments are multiples of 1/2.
@@ -269,7 +268,7 @@ def check_half_integer(*args: scalar_like) -> None:
         raise ValueError("The numbers must be multiples of 1/2.")
 
 
-def half_integer_to_fraction(val: scalar_like) -> tuple[int, int]:
+def half_integer_to_fraction(val: scalar) -> tuple[int, int]:
     """
     :param val: A scalar value.
     :returns: The numerator and denominator of the half-integer.
@@ -280,7 +279,7 @@ def half_integer_to_fraction(val: scalar_like) -> tuple[int, int]:
     return int(val), 1
 
 
-def half_integer_to_str(val: scalar_like, symbol: str = "/") -> str:
+def half_integer_to_str(val: scalar, symbol: str = "/") -> str:
     """
     :param val: A scalar value.
     :param symbol: The symbol to use for the fraction.
@@ -347,7 +346,7 @@ def roman_to_int(roman: str) -> int:
 """ numeral -> numeral operations """
 
 
-def odd(x: scalar_like) -> int:
+def odd(x: scalar) -> int:
     """
     :param x: A scalar value.
     :returns: The closest odd integer value.
@@ -355,7 +354,7 @@ def odd(x: scalar_like) -> int:
     return int(x) if int(x) % 2 else int(x) + 1
 
 
-def even(x: scalar_like) -> int:
+def even(x: scalar) -> int:
     """
     :param x: A scalar value.
     :returns: The closest even integer value.
@@ -405,7 +404,7 @@ def floor_log10(x: array_like) -> ndarray:
     return np.floor(np.log10(np.abs(x))).astype(int)
 
 
-def round_to_n(x: scalar_like, n: int_like) -> tuple[scalar, int]:
+def round_to_n(x: scalar, n: int_like) -> tuple[scalar, int]:
     """
     :param x: The input data.
     :param n: The number of significant decimal places to round to.
@@ -631,7 +630,7 @@ def list_to_dict(values: array_like, keys: array_like | None = None) -> dict:
 
 
 def list_to_excel(
-    *args: array_iter, save: str | None = None, delimiter: str = "\t", header: str = "", align: str = "top"
+    *args: scalar_nd, save: str | None = None, delimiter: str = "\t", header: str = "", align: str = "top"
 ) -> str:
     """
 
@@ -788,7 +787,7 @@ def combine_dicts(dicts: list, key_lists: Iterable, operator: str = "+", short_k
     }
 
 
-def merge_intervals(intervals: Iterable[Iterable[scalar_like]]) -> ndarray:
+def merge_intervals(intervals: Iterable[Iterable[scalar]]) -> ndarray:
     """
     :param intervals: An iterable of intervals.
      An interval i is itself an iterable of two scalar values. If `i[1] < i[0]`, the interval is reversed.
@@ -1030,7 +1029,7 @@ def orthonormal(r: array_like, axis: int = -1) -> tuple[ndarray, ndarray, ndarra
     return r1, r2, r3
 
 
-def rotation_matrix(alpha: array_like, dr: array_iter) -> ndarray:
+def rotation_matrix(alpha: array_like, dr: scalar_nd) -> ndarray:
     """
     :param alpha: The angle to rotate.
     :param dr: The vector to rotate about.
@@ -1051,7 +1050,7 @@ class Rotation:
     Additional instance attributes are the angle in degree 'alpha_deg' and the rotational matrix 'R'.
     """
 
-    def __init__(self, alpha: scalar_like = 0.0, dr: array_iter | None = None) -> None:
+    def __init__(self, alpha: scalar = 0.0, dr: scalar_nd | None = None) -> None:
         """
         :param alpha: The angle of the rotation (rad).
         :param dr: The rotational axis of the rotation.
@@ -1068,7 +1067,7 @@ class Rotation:
         self.R = rotation_matrix(self.alpha, self.dr)
 
 
-def rotation_to_vector(x: array_iter, y: array_iter) -> Rotation:
+def rotation_to_vector(x: scalar_nd, y: scalar_nd) -> Rotation:
     """
     :param x: The first vector.
     :param y: The second vector.

@@ -17,13 +17,13 @@ from qspec.qtypes import (
     Callable,
     SupportsFloat,
     SupportsIndex,
-    array_iter,
     array_like,
     asarray,
     cast,
     int_like,
     ndarray,
-    scalar_like,
+    scalar,
+    scalar_nd,
 )
 
 __all__ = [
@@ -52,8 +52,8 @@ class Observable(float):
     def __new__(
         cls,
         x: SupportsFloat | SupportsIndex | str | bytes | bytearray,
-        std: scalar_like = 0.0,
-        std_2: scalar_like = 0.0,
+        std: scalar = 0.0,
+        std_2: scalar = 0.0,
         label: str | None = None,
     ) -> "Observable":
         return super().__new__(cls, x)
@@ -61,8 +61,8 @@ class Observable(float):
     def __init__(
         self,
         x: SupportsFloat | SupportsIndex | str | bytes | bytearray,
-        std: scalar_like = 0.0,
-        std_2: scalar_like = 0.0,
+        std: scalar = 0.0,
+        std_2: scalar = 0.0,
         label: str | None = None,
     ) -> None:
         """
@@ -77,8 +77,8 @@ class Observable(float):
         self.label = label
         self.std = float(std)
         self.std_2 = float(std_2)
-        self.popt: array_iter | None = None
-        self.est: array_iter | None = None
+        self.popt: scalar_nd | None = None
+        self.est: scalar_nd | None = None
         if std_2 is not None:
             try:
                 self.est = estimate_skewnorm(float(self), self.std, self.std_2)
@@ -193,7 +193,7 @@ def mul(a: Any, b: Any) -> Any:
 
 
 def average(
-    a: array_like, std: array_like | None = None, cov: array_iter | None = None, axis: int_like | None = None
+    a: array_like, std: array_like | None = None, cov: scalar_nd | None = None, axis: int_like | None = None
 ) -> tuple[ndarray, ndarray]:
     """
     :param a: The sample data.
@@ -284,7 +284,7 @@ def median(a: array_like, axis: int_like | None = None) -> tuple[ndarray, ndarra
     return med, neg, pos
 
 
-def estimate_skewnorm(med: scalar_like, per_0: scalar_like, per_1: scalar_like) -> ndarray | None:
+def estimate_skewnorm(med: scalar, per_0: scalar, per_1: scalar) -> ndarray | None:
     """
     :param med: The median (0.5-percentile) of a random variable.
     :param per_0: The left-sided 1-sigma percentile (~0.1587-percentile) relative to 'med'.
@@ -346,7 +346,7 @@ def propagate(
     f: Callable,
     x: array_like,
     x_d: array_like | None = None,
-    cov: array_iter | None = None,
+    cov: scalar_nd | None = None,
     unc_places: int_like | None = None,
     sample_size: int_like = 1000000,
     rtol: float = 1e-3,
@@ -532,7 +532,7 @@ def combined_pdf(
     return si.romb(y, dx, axis=1)
 
 
-def relevant_interval(dist: Callable, *args: scalar_like, show: bool = False, **kwargs) -> tuple[float, float]:
+def relevant_interval(dist: Callable, *args: scalar, show: bool = False, **kwargs) -> tuple[float, float]:
     """
     :param dist: The probability distribution function (pdf).
     :param args: Additional arguments for the pdf.
@@ -592,7 +592,7 @@ def uniform(x: array_like, width: array_like) -> ndarray:
     return st.uniform.pdf(x, loc=-0.5 * width, scale=width)
 
 
-def _uniform_pumped(x: array_like, width: scalar_like, gamma_u: scalar_like, depth: scalar_like) -> ndarray:
+def _uniform_pumped(x: array_like, width: scalar, gamma_u: scalar, depth: scalar) -> ndarray:
     """
     :param x: The x quantiles.
     :param width: The width of the uniform distribution.
@@ -616,7 +616,7 @@ def _uniform_pumped(x: array_like, width: scalar_like, gamma_u: scalar_like, dep
     return ret
 
 
-def uniform_pumped(x: array_like, width: scalar_like, gamma_u: scalar_like, depth: scalar_like) -> ndarray:
+def uniform_pumped(x: array_like, width: scalar, gamma_u: scalar, depth: scalar) -> ndarray:
     """
     :param x: The x quantiles.
     :param width: The width of the uniform distribution.

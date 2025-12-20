@@ -1,4 +1,3 @@
-# type: ignore
 """
 qspec.algebra
 =============
@@ -13,11 +12,11 @@ from sympy import cos, nsimplify, pi, sin, sqrt
 from sympy.vector import CoordSys3D, Vector
 
 from qspec.qtypes import (
+    Any,
     cast_sympy,
     ndarray,
-    sympy_core,
-    sympy_like,
-    sympy_quant,
+    sympy_expr,
+    sympy_scalar,
 )
 
 __all__ = [
@@ -44,14 +43,14 @@ __all__ = [
 
 
 def clebsch_gordan(
-    j1: sympy_quant,
-    j2: sympy_quant,
-    j3: sympy_quant,
-    m1: sympy_quant,
-    m2: sympy_quant,
-    m3: sympy_quant,
+    j1: sympy_scalar,
+    j2: sympy_scalar,
+    j3: sympy_scalar,
+    m1: sympy_scalar,
+    m2: sympy_scalar,
+    m3: sympy_scalar,
     as_sympy: bool = False,
-) -> sympy_core | float:
+) -> sympy_expr | float:
     r"""
     Calculates the Clebsch-Gordan coefficient
     $$C_{J_1 m_1, J_2 m_2}^{J_3 m_3} \coloneqq \langle J_1, m_1, J_2, m_2\, |\, J_3, m_3\rangle.$$
@@ -70,14 +69,14 @@ def clebsch_gordan(
 
 
 def wigner_3j(
-    j1: sympy_quant,
-    j2: sympy_quant,
-    j3: sympy_quant,
-    m1: sympy_quant,
-    m2: sympy_quant,
-    m3: sympy_quant,
+    j1: sympy_scalar,
+    j2: sympy_scalar,
+    j3: sympy_scalar,
+    m1: sympy_scalar,
+    m2: sympy_scalar,
+    m3: sympy_scalar,
     as_sympy: bool = False,
-) -> sympy_core | float:
+) -> sympy_expr | float:
     r"""
     Calculate the Wigner-3j symbol
 
@@ -102,14 +101,14 @@ def wigner_3j(
 
 
 def wigner_6j(
-    j1: sympy_quant,
-    j2: sympy_quant,
-    j3: sympy_quant,
-    j4: sympy_quant,
-    j5: sympy_quant,
-    j6: sympy_quant,
+    j1: sympy_scalar,
+    j2: sympy_scalar,
+    j3: sympy_scalar,
+    j4: sympy_scalar,
+    j5: sympy_scalar,
+    j6: sympy_scalar,
     as_sympy: bool = False,
-) -> sympy_core | float:
+) -> sympy_expr | float:
     r"""
     Calculate the Wigner-6j symbol
 
@@ -137,8 +136,8 @@ def wigner_6j(
 
 
 def a(
-    i: sympy_quant, j_l: sympy_quant, f_l: sympy_quant, j_u: sympy_quant, f_u: sympy_quant, as_sympy: bool = False
-) -> sympy_core | float:
+    i: sympy_scalar, j_l: sympy_scalar, f_l: sympy_scalar, j_u: sympy_scalar, f_u: sympy_scalar, as_sympy: bool = False
+) -> sympy_expr | float:
     r"""
     The coefficient $A_F^{F^\prime}$, parameterizing the isotropic part of
     the perturbative differential scattering rate, as described in
@@ -160,8 +159,8 @@ def a(
 
 
 def b(
-    i: sympy_quant, j_l: sympy_quant, f_l: sympy_quant, j_u: sympy_quant, f_u: sympy_quant, as_sympy: bool = False
-) -> sympy_core | float:
+    i: sympy_scalar, j_l: sympy_scalar, f_l: sympy_scalar, j_u: sympy_scalar, f_u: sympy_scalar, as_sympy: bool = False
+) -> Any | float:
     r"""
     The coefficient $B_F^{F^\prime}$, parameterizing the classical angle-dependent part of
     the perturbative differential scattering rate, as described in
@@ -180,8 +179,8 @@ def b(
 
 
 def ab(
-    i: sympy_quant, j_l: sympy_quant, f_l: sympy_quant, j_u: sympy_quant, f_u: sympy_quant, as_sympy: bool = False
-) -> tuple[sympy_core | float, sympy_core | float]:
+    i: sympy_scalar, j_l: sympy_scalar, f_l: sympy_scalar, j_u: sympy_scalar, f_u: sympy_scalar, as_sympy: bool = False
+) -> tuple[sympy_expr | float, sympy_expr | float]:
     r"""
     The coefficients $A_F^{F^\prime}$ and $B_F^{F^\prime}$, parameterizing the isotropic and the classical
     angle-dependent part of the perturbative differential scattering rate, respectively, as described in
@@ -199,14 +198,14 @@ def ab(
 
 
 def c(
-    i: sympy_quant,
-    j_l: sympy_quant,
-    f_l: sympy_quant,
-    j_u: sympy_quant,
-    f1_u: sympy_quant,
-    f2_u: sympy_quant,
+    i: sympy_scalar,
+    j_l: sympy_scalar,
+    f_l: sympy_scalar,
+    j_u: sympy_scalar,
+    f1_u: sympy_scalar,
+    f2_u: sympy_scalar,
     as_sympy: bool = False,
-) -> sympy_core | float:
+) -> sympy_expr | float:
     r"""
     The coefficient $C_F^{F^{\prime}F^{\prime\prime}}$, parameterizing the quantum interference part of
     the perturbative differential scattering rate, as described in
@@ -226,14 +225,14 @@ def c(
 
 
 def abc(
-    i: sympy_quant,
-    j_l: sympy_quant,
-    f_l: sympy_quant,
-    j_u: sympy_quant,
-    f1_u: sympy_quant,
-    f2_u: sympy_quant,
+    i: sympy_scalar,
+    j_l: sympy_scalar,
+    f_l: sympy_scalar,
+    j_u: sympy_scalar,
+    f1_u: sympy_scalar,
+    f2_u: sympy_scalar,
     as_sympy: bool = False,
-) -> tuple[sympy_core | float, sympy_core | float, sympy_core | float]:
+) -> tuple[sympy_expr | float, sympy_expr | float, sympy_expr | float]:
     r"""
     The coefficients $A_F^{F^\prime}$, $B_F^{F^\prime}$ and $C_F^{F^{\prime}F^{\prime\prime}}$,
     parameterizing the isotropic, classical angle-dependent and quantum interference part of
@@ -257,14 +256,14 @@ def abc(
 
 
 def f_0(
-    i: sympy_quant,
-    j_l: sympy_quant,
-    f_l: sympy_quant,
-    j_u: sympy_quant,
-    f_u: sympy_quant,
-    theta_l: sympy_like,
+    i: sympy_scalar,
+    j_l: sympy_scalar,
+    f_l: sympy_scalar,
+    j_u: sympy_scalar,
+    f_u: sympy_scalar,
+    theta_l: sympy_scalar,
     as_sympy: bool = False,
-) -> sympy_core | float:
+) -> sympy_expr | float:
     r"""
     The $f$ function, parameterizing the classical part of the perturbative differential scattering rate,
     as described in
@@ -302,15 +301,15 @@ def f_0(
 
 
 def g_0(
-    i: sympy_quant,
-    j_l: sympy_quant,
-    f_l: sympy_quant,
-    j_u: sympy_quant,
-    f1_u: sympy_quant,
-    f2_u: sympy_quant,
-    theta_l: sympy_like,
+    i: sympy_scalar,
+    j_l: sympy_scalar,
+    f_l: sympy_scalar,
+    j_u: sympy_scalar,
+    f1_u: sympy_scalar,
+    f2_u: sympy_scalar,
+    theta_l: sympy_scalar,
     as_sympy: bool = False,
-) -> sympy_core | float:
+) -> sympy_expr | float:
     r"""
     The $g$ function, parameterizing the quantum interference part of the perturbative differential scattering rate,
     as described in
@@ -351,19 +350,19 @@ def g_0(
 
 
 def c_dipole(
-    i: sympy_quant,
-    j_i: sympy_quant,
-    f_i: sympy_quant,
-    m_i: sympy_quant,
-    j_u: sympy_quant,
-    f_u: sympy_quant,
-    j_f: sympy_quant,
-    f_f: sympy_quant,
-    m_f: sympy_quant,
-    theta_l: sympy_like,
+    i: sympy_scalar,
+    j_i: sympy_scalar,
+    f_i: sympy_scalar,
+    m_i: sympy_scalar,
+    j_u: sympy_scalar,
+    f_u: sympy_scalar,
+    j_f: sympy_scalar,
+    f_f: sympy_scalar,
+    m_f: sympy_scalar,
+    theta_l: sympy_scalar,
     scatter_pol: str,
     as_sympy: bool = False,
-) -> sympy_core | float:
+) -> sympy_expr | float:
     r"""
     The transition dipole element $C_{i\rightarrow f}^{F^\prime}$, as described in
     [<a href="https://doi.org/10.1103/PhysRevA.87.032504">R. C. Brown et al., Phys. Rev. A 87, 032504 (2013)</a>].
@@ -388,7 +387,7 @@ def c_dipole(
         i, j_i, f_i, m_i, j_u, f_u, j_f, f_f, m_f, theta_l, as_sympy=as_sympy
     )
     c_element = cast_sympy(0.0j, as_sympy=as_sympy, dtype=complex)[0]
-    sqrt_2 = 1 / sqrt(2) if as_sympy else 1 / np.sqrt(2)
+    sqrt_2 = 1 / sqrt(2) if as_sympy else 1 / np.sqrt(2)  # type: ignore
     c1 = nsimplify(1j * sqrt_2) if as_sympy else 1j * sqrt_2
     sin_t = sin(theta_l) if as_sympy else np.sin(theta_l)
     cos_t = cos(theta_l) if as_sympy else np.cos(theta_l)
@@ -399,7 +398,7 @@ def c_dipole(
         a_l_element = -c1 * sin_t * (
             a_dipole(i, j_i, f_i, m_i, j_u, f_u, m_u, 1, as_sympy)
             + a_dipole(i, j_i, f_i, m_i, j_u, f_u, m_u, -1, as_sympy)
-        ) + cos_t * a_dipole(i, j_i, f_i, m_i, j_u, f_u, m_u, 0, as_sympy)
+        ) + cos_t * a_dipole(i, j_i, f_i, m_i, j_u, f_u, m_u, 0, as_sympy)  # type: ignore
         if scatter_pol == "x":
             c_element += (
                 -sqrt_2
@@ -422,16 +421,16 @@ def c_dipole(
 
 
 def a_dipole(
-    i: sympy_quant,
-    j_l: sympy_quant,
-    f_l: sympy_quant,
-    m_l: sympy_quant,
-    j_u: sympy_quant,
-    f_u: sympy_quant,
-    m_u: sympy_quant,
-    q: sympy_quant,
+    i: sympy_scalar,
+    j_l: sympy_scalar,
+    f_l: sympy_scalar,
+    m_l: sympy_scalar,
+    j_u: sympy_scalar,
+    f_u: sympy_scalar,
+    m_u: sympy_scalar,
+    q: sympy_scalar,
     as_sympy: bool = False,
-) -> sympy_core | float:
+) -> sympy_expr | float:
     r"""
     The spherical transition dipole element $(A_{Fm}^{F^\prime m^\prime})_q$, as described in
     [<a href="https://doi.org/10.1103/PhysRevA.87.032504">R. C. Brown et al., Phys. Rev. A 87, 032504 (2013)</a>].
@@ -463,13 +462,13 @@ def a_dipole(
 
 
 def a_dipole_cart(
-    i: sympy_quant,
-    j_l: sympy_quant,
-    f_l: sympy_quant,
-    m_l: sympy_quant,
-    j_u: sympy_quant,
-    f_u: sympy_quant,
-    m_u: sympy_quant,
+    i: sympy_scalar,
+    j_l: sympy_scalar,
+    f_l: sympy_scalar,
+    m_l: sympy_scalar,
+    j_u: sympy_scalar,
+    f_u: sympy_scalar,
+    m_u: sympy_scalar,
     as_sympy: bool = False,
 ) -> Vector | ndarray:
     r"""
@@ -495,7 +494,7 @@ def a_dipole_cart(
     :returns: (a_dipole_cart) The cartesian transition dipole element vector $\vec{A}_{Fm}^{F^\prime m^\prime}$.
     """
     i, j_l, f_l, m_l, j_u, f_u, m_u = cast_sympy(i, j_l, f_l, m_l, j_u, f_u, m_u, as_sympy=as_sympy)
-    sqrt_2 = nsimplify(1 / sqrt(2)) if as_sympy else 1 / np.sqrt(2)
+    sqrt_2 = nsimplify(1 / sqrt(2)) if as_sympy else 1 / np.sqrt(2)  # type: ignore
     x = sqrt_2 * (
         a_dipole(i, j_l, f_l, m_l, j_u, f_u, m_u, -1, as_sympy) - a_dipole(i, j_l, f_l, m_l, j_u, f_u, m_u, 1, as_sympy)
     )
@@ -510,13 +509,13 @@ def a_dipole_cart(
     z = a_dipole(i, j_l, f_l, m_l, j_u, f_u, m_u, 0, as_sympy)
     if as_sympy:
         a3 = CoordSys3D("a3")
-        return x * a3.i + y * a3.j + z * a3.k
+        return x * a3.i + y * a3.j + z * a3.k  # type: ignore
     return np.array([x, y, z], dtype=complex)
 
 
 def reduced_f_root(
-    i: sympy_quant, j_l: sympy_quant, f_l: sympy_quant, j_u: sympy_quant, f_u: sympy_quant, as_sympy: bool = False
-) -> sympy_core | float:
+    i: sympy_scalar, j_l: sympy_scalar, f_l: sympy_scalar, j_u: sympy_scalar, f_u: sympy_scalar, as_sympy: bool = False
+) -> sympy_expr | float:
     r"""
     The geometric coefficient
 
@@ -545,8 +544,8 @@ def reduced_f_root(
 
 
 def reduced_f(
-    i: sympy_quant, j_l: sympy_quant, f_l: sympy_quant, j_u: sympy_quant, f_u: sympy_quant, as_sympy: bool = False
-) -> sympy_core | float:
+    i: sympy_scalar, j_l: sympy_scalar, f_l: sympy_scalar, j_u: sympy_scalar, f_u: sympy_scalar, as_sympy: bool = False
+) -> sympy_expr | float:
     r"""
     The geometric coefficient
 
@@ -574,8 +573,8 @@ def reduced_f(
 
 
 def a_tilda(
-    i: sympy_quant, j_l: sympy_quant, f_l: sympy_quant, j_u: sympy_quant, f_u: sympy_quant, as_sympy: bool = False
-) -> sympy_core | float:
+    i: sympy_scalar, j_l: sympy_scalar, f_l: sympy_scalar, j_u: sympy_scalar, f_u: sympy_scalar, as_sympy: bool = False
+) -> sympy_expr | float:
     r"""
     The relative peak strength in a hyperfine structure spectrum
 
@@ -600,15 +599,15 @@ def a_tilda(
 
 
 def a_m_tilda(
-    i: sympy_quant,
-    j_l: sympy_quant,
-    f_l: sympy_quant,
-    m_l: sympy_quant,
-    j_u: sympy_quant,
-    f_u: sympy_quant,
-    m_u: sympy_quant,
+    i: sympy_scalar,
+    j_l: sympy_scalar,
+    f_l: sympy_scalar,
+    m_l: sympy_scalar,
+    j_u: sympy_scalar,
+    f_u: sympy_scalar,
+    m_u: sympy_scalar,
     as_sympy: bool = False,
-) -> sympy_core | float:
+) -> sympy_expr | float:
     r"""
     The relative peak strength in a hyperfine structure Zeeman spectrum
 
@@ -638,8 +637,8 @@ def a_m_tilda(
 
 
 def mu_j_m1(
-    s: sympy_quant, l: sympy_quant, j_l: sympy_quant, j_u: sympy_quant, as_sympy: bool = False
-) -> sympy_core | float:
+    s: sympy_scalar, l: sympy_scalar, j_l: sympy_scalar, j_u: sympy_scalar, as_sympy: bool = False
+) -> sympy_expr | float:
     r"""
     The reduced magnetic dipole transition matrix element
 
@@ -665,28 +664,28 @@ def mu_j_m1(
     exp_j = cast_sympy(j_u + 1, as_sympy=as_sympy, dtype=float)[0]
 
     return (
-        (-1) ** exp_sl
-        * sqrt_j
+        (-1) ** exp_sl  # type: ignore
+        * sqrt_j  # type: ignore
         * (
-            (-1) ** exp_j * sqrt_l * wigner_6j(l, j_l, s, j_u, l, 1, as_sympy)
-            + g_s * (-1) ** j_l * sqrt_s * wigner_6j(s, j_l, l, j_u, s, 1, as_sympy)
+            (-1) ** exp_j * sqrt_l * wigner_6j(l, j_l, s, j_u, l, 1, as_sympy)  # type: ignore
+            + g_s * (-1) ** j_l * sqrt_s * wigner_6j(s, j_l, l, j_u, s, 1, as_sympy) # type: ignore
         )
     )
 
 
 def mu_jj_m1(
-    sc: sympy_quant,
-    lc: sympy_quant,
-    jc_l: sympy_quant,
-    jo_l: sympy_quant,
-    j_l: sympy_quant,
-    so: sympy_quant,
-    lo: sympy_quant,
-    jc_u: sympy_quant,
-    jo_u: sympy_quant,
-    j_u: sympy_quant,
+    sc: sympy_scalar,
+    lc: sympy_scalar,
+    jc_l: sympy_scalar,
+    jo_l: sympy_scalar,
+    j_l: sympy_scalar,
+    so: sympy_scalar,
+    lo: sympy_scalar,
+    jc_u: sympy_scalar,
+    jo_u: sympy_scalar,
+    j_u: sympy_scalar,
     as_sympy: bool = False,
-) -> sympy_core | float:
+) -> sympy_expr | float:
     r"""
     The reduced magnetic dipole transition matrix element
 
@@ -718,8 +717,8 @@ def mu_jj_m1(
     if jo_l == jo_u:
         exp = cast_sympy(jc_l + jo_l + j_u + 1, as_sympy=as_sympy, dtype=float)[0]
         ret += (
-            (-1) ** exp
-            * sqrt_j
+            (-1) ** exp  # type: ignore
+            * sqrt_j  # type: ignore
             * wigner_6j(jc_l, j_l, jo_l, j_u, jc_u, 1, as_sympy)
             * mu_j_m1(sc, lc, jc_l, jc_u, as_sympy)
         )
@@ -727,8 +726,8 @@ def mu_jj_m1(
     if jc_l == jc_u:
         exp = cast_sympy(jc_l + jo_u + j_l + 1, as_sympy=as_sympy, dtype=float)[0]
         ret += (
-            (-1) ** exp
-            * sqrt_j
+            (-1) ** exp  # type: ignore
+            * sqrt_j  # type: ignore
             * wigner_6j(jo_l, j_l, jc_l, j_u, jo_u, 1, as_sympy)
             * mu_j_m1(so, lo, jo_l, jo_u, as_sympy)
         )

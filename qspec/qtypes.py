@@ -5,86 +5,20 @@ qspec.qtypes
 Module including types for the docstrings.
 """
 
-from collections.abc import Callable, Generator, Iterable, Sized
+from collections.abc import Callable, Generator, Iterable, Sized, Buffer, Sequence
 from types import CodeType
-from typing import Any, Optional, Protocol, SupportsFloat, SupportsIndex, TypeGuard, TypeVar
+from typing import Any, Optional, Protocol, SupportsComplex, SupportsFloat, SupportsIndex, TypeGuard, TypeVar, runtime_checkable
+from typing_extensions import Self
 
 from numpy import asarray as np_asarray
-from numpy import complexfloating, floating, integer, number
+from numpy import ndarray as np_ndarray
+from numpy import bool_, complexfloating, floating, generic, integer, number, str_
 from numpy.typing import ArrayLike, NDArray
-from sympy import nsimplify
-from sympy.core.add import Add
-from sympy.core.mul import Mul
-from sympy.core.numbers import Float, Integer, Rational
+from sympy import AtomicExpr, Rational, nsimplify
 
-__all__ = [
-    "Add",
-    "Any",
-    "Callable",
-    "CodeType",
-    "Float",
-    "Generator",
-    "Integer",
-    "Iterable",
-    "Mul",
-    "Optional",
-    "Rational",
-    "Sized",
-    "SupportsFloat",
-    "SupportsIndex",
-    "array_iter",
-    "array_like",
-    "asarray",
-    "cast",
-    "cast_sympy",
-    "complex_like",
-    "complexfloating",
-    "complexscalar",
-    "complexscalar_like",
-    "float_like",
-    "has_getitem",
-    "has_shape",
-    "int_like",
-    "is_scalar",
-    "ndarray",
-    "quant",
-    "quant_iter",
-    "quant_like",
-    "scalar",
-    "scalar_like",
-    "sympy_complexscalar",
-    "sympy_core",
-    "sympy_like",
-    "sympy_number",
-    "sympy_quant",
-    "sympy_scalar",
-]
+# __all__ = []
 
-
-T = TypeVar("T")
-
-
-def cast[T](*args: object, dtype: Callable[[Any], T]) -> tuple[T, ...]:
-    return tuple(dtype(arg) for arg in args)
-
-
-class HasGetItem(Protocol):
-    def __getitem__(self, i: Any) -> Any: ...
-
-
-def has_getitem(a: object) -> TypeGuard[HasGetItem]:
-    return hasattr(a, "__getitem__")
-
-
-class HasShape(Protocol):
-    @property
-    def shape(self) -> tuple[int, ...]: ...
-
-
-def has_shape(a: object) -> TypeGuard[HasShape]:
-    return hasattr(a, "shape")
-
-
+""" Scalar types """
 class quant(float):
     """
     Convert a string or a number to a floating-point quantum number, if possible.
@@ -140,42 +74,80 @@ class quant(float):
     def s(self) -> Rational:
         return Rational(self)
 
+type int_like = NDArray[integer] | integer | int
+type float_like = NDArray[floating] | floating | float
+type complex_like = NDArray[complexfloating] | complexfloating | complex
 
-int_like = NDArray[integer] | integer | int
-float_like = NDArray[floating] | floating | float
-complex_like = NDArray[complexfloating] | complexfloating | complex
+type scalar = int | integer | float | floating | quant | NDArray[integer | floating]
+type complexscalar = number | scalar | complex | NDArray[number | complexfloating]
 
-scalar = number | integer | floating | int | float
-complexscalar = number | int | float | complex
-quantscalar = quant | scalar
-scalar_like = NDArray[integer | floating] | scalar
-complexscalar_like = NDArray[number] | complexscalar
-quant_like = quant | scalar_like
-
+""" Array types """
 ndarray = NDArray
-array_like = ArrayLike
-array_iter = NDArray | Iterable[complexscalar_like] | HasGetItem
-quant_iter = quant_like | Iterable[quant_like] | HasGetItem
+type array_like = ArrayLike
 
-sympy_core = Integer | Float | Rational | Add | Mul
-sympy_scalar = sympy_core | scalar
-sympy_complexscalar = sympy_core | complexscalar
-sympy_number = sympy_core | scalar | complexscalar
-sympy_like = sympy_core | scalar_like
-sympy_quant = sympy_core | quant_like
+type object_1d = ndarray | Sequence[object]
+type object_nd = Sequence[object_nd] | object_1d
+
+type scalar_1d = ndarray[integer | floating] | Sequence[scalar]
+type scalar_nd = Sequence[scalar_nd] | scalar_1d
+
+type complexscalar_1d = ndarray[integer | floating | complexfloating] | Sequence[complexscalar]
+type complexscalar_nd = Sequence[complexscalar_nd] | complexscalar_1d
+
+type bool_1d = ndarray[bool_] | Sequence[bool_]
+type bool_nd = Sequence[bool_nd] | bool_1d
+
+type str_1d = ndarray[str_] | Sequence[str_]
+type str_nd = Sequence[str_nd] | str_1d
+
+""" qspec.algebra types """
+type sympy_expr = Any
+type sympy_scalar = sympy_expr | scalar
+type sympy_complexscalar = sympy_expr | complexscalar
+
+""" qspec.models types """
+type fix_type = str | bool | scalar | list
+type fix_type_1d = ndarray | tuple[fix_type, ...] | list[fix_type]
 
 
-def is_scalar(a: object) -> TypeGuard[scalar_like]:
-    return isinstance(a, scalar) or (has_shape(a) and a.shape == ())
+""" type guarding methods """
+
+class HasGetItem(Protocol):
+    def __getitem__(self, i: Any) -> Any: ...
 
 
-def is_sympy_core(a: object) -> TypeGuard[sympy_core]:
-    return isinstance(a, sympy_core)
+class HasShape(Protocol):
+    @property
+    def shape(self) -> tuple[int, ...]: ...
+
+
+def has_getitem(a: object) -> TypeGuard[HasGetItem]:
+    return hasattr(a, "__getitem__")
+
+
+def has_shape(a: object) -> TypeGuard[HasShape]:
+    return hasattr(a, "shape")
+
+
+def is_scalar(a: object) -> TypeGuard[scalar]:
+    return hasattr(a, "__float__") and not (has_shape(a) and a.shape)
+
+
+def is_sympy_expr(a: object) -> TypeGuard[sympy_expr]:
+    return isinstance(a, AtomicExpr)
+
+
+""" Type conversion methods """
+T = TypeVar("T")
+
+
+def cast[T](*args: object, dtype: Callable[[Any], T]) -> tuple[T, ...]:
+    return tuple(dtype(arg) for arg in args)
 
 
 def cast_sympy[T](
-    *args: sympy_like, as_sympy: bool = True, dtype: Callable[[Any], T] = float
-) -> tuple[T | sympy_core, ...]:
+    *args: sympy_scalar, as_sympy: bool = True, dtype: Callable[[Any], T] = float
+) -> tuple[T, ...]:
     r"""
     Cast the arguments `args` to a <a href="https://www.sympy.org/en/index.html">
     `sympy`</a> type (symbol) or the specified `dtype`.

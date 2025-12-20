@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 examples.simulate_ex
 ====================
@@ -9,16 +8,17 @@ Example script / Guide for the qspec.simulate module.
 - Einstein coefficients taken from [NIST Atomic Spectra Database, https://doi.org/10.18434/T4W30F].
 - Frequencies of 40Ca+ taken from [P. Mueller et pc., Phys. Rev. Research 2, 043351 (2020),
                                   https://doi.org/10.1103/PhysRevResearch.2.043351].
-- Hyperfine-structure constants [A, B] of 40Ca+ taken from [Noertershaeuser et pc., Eur. Phys. J. D 2, 33–39 (1998),
+- Hyperfine-structure constants [A, B] of 40Ca+ taken from [Noertershaeuser et pc., Eur. Phys. J. D 2, 33-39 (1998),
                                                             https://doi.org/10.1007/s100530050107]
 """
 
+import matplotlib.pyplot as plt
 import numpy as np
 import scipy.constants as sc
-import matplotlib.pyplot as plt
 
 import qspec as qs
 import qspec.simulate as sim
+
 # from qspec import a_einstein_m1, a_einstein_m1_fm
 
 
@@ -684,6 +684,6 @@ def example(n=None):
 
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     example({0, 1, 2, 3, 4, 5, 6, 7, 8, 9})
     # example({0})

@@ -30,9 +30,9 @@ from qspec.qtypes import (
     int_like,
     is_scalar,
     ndarray,
-    quant_iter,
-    quant_like,
-    scalar_like,
+    scalar,
+    scalar_1d,
+    scalar_nd,
 )
 
 __all__ = [
@@ -198,8 +198,8 @@ def _cast_laser_polarization(polarization: Polarization | array_like | None) -> 
 class Laser(CppClass):
     def __init__(
         self,
-        freq: scalar_like = 0.0,
-        intensity: scalar_like = 1.0,
+        freq: scalar = 0.0,
+        intensity: scalar = 1.0,
         polarization: Polarization | array_like | None = None,
         k: array_like | None = None,
         instance: "Laser | C.LaserHandler.value | None" = None,
@@ -250,7 +250,7 @@ class Laser(CppClass):
         return dll.laser_get_freq(self.instance)
 
     @freq.setter
-    def freq(self, value: scalar_like) -> None:
+    def freq(self, value: scalar) -> None:
         r"""
         :param value: The new frequency of the laser $\nu$.
         """
@@ -264,7 +264,7 @@ class Laser(CppClass):
         return dll.laser_get_intensity(self.instance)
 
     @intensity.setter
-    def intensity(self, value: scalar_like) -> None:
+    def intensity(self, value: scalar) -> None:
         r"""
         :param value: The new intensity of the laser $I = \frac{1}{2}\varepsilon_0c\vec{E}^2$.
         """
@@ -388,17 +388,17 @@ class Environment(CppClass):
 class State(CppClass):
     def __init__(
         self,
-        freq_j: quant_like,
+        freq_j: scalar,
         parity: str | bool,
-        j: quant_like,
-        i: quant_like,
-        f: quant_like,
-        m: quant_like,
-        ls: quant_iter | None = None,
-        jj: quant_iter | None = None,
+        j: scalar,
+        i: scalar,
+        f: scalar,
+        m: scalar,
+        ls: scalar_nd | None = None,
+        jj: scalar_1d | None = None,
         hyper_const: array_like | None = None,
-        gj: scalar_like = 0.0,
-        gi: scalar_like = 0.0,
+        gj: scalar = 0.0,
+        gi: scalar = 0.0,
         label: str | None = None,
         instance: "State | C.StateHandler.value | None" = None,
     ) -> None:
@@ -512,7 +512,7 @@ class State(CppClass):
         return dll.state_get_freq_j(self.instance)
 
     @freq_j.setter
-    def freq_j(self, value: scalar_like) -> None:
+    def freq_j(self, value: scalar) -> None:
         dll.state_set_freq_j(self.instance, c_double(float(value)))
 
     @property
@@ -523,7 +523,7 @@ class State(CppClass):
         return dll.state_get_freq(self.instance)
 
     @freq.setter
-    def freq(self, value: scalar_like) -> None:
+    def freq(self, value: scalar) -> None:
         dll.state_set_freq(self.instance, c_double(float(value)))
 
     @property
@@ -580,7 +580,7 @@ class State(CppClass):
         return dll.state_get_gj(self.instance)
 
     @gj.setter
-    def gj(self, value: scalar_like) -> None:
+    def gj(self, value: scalar) -> None:
         r"""
         :param value: The new electronic g-factor.
         :returns:
@@ -595,7 +595,7 @@ class State(CppClass):
         return dll.state_get_gi(self.instance)
 
     @gi.setter
-    def gi(self, value: scalar_like) -> None:
+    def gi(self, value: scalar) -> None:
         r"""
         :param value: The new nuclear g-factor.
         :returns:
@@ -621,7 +621,7 @@ class DecayMap(CppClass):
     def __init__(
         self,
         labels: Iterable[tuple] | None = None,
-        a: Iterable[scalar_like | dict] | None = None,
+        a: Iterable[scalar | dict] | None = None,
         k_max: int = 1,
         instance: "DecayMap | C.DecayMapHandler.value | None" = None,
     ) -> None:
@@ -776,7 +776,7 @@ class Atom(CppClass):
         self,
         states: Iterable[State] | None = None,
         decay_map: DecayMap | None = None,
-        mass: scalar_like = 0,
+        mass: scalar = 0,
         instance: "Atom | C.AtomHandler.value | None" = None,
     ) -> None:
         r"""
@@ -868,7 +868,7 @@ class Atom(CppClass):
         return dll.atom_get_mass(self.instance)
 
     @mass.setter
-    def mass(self, value: scalar_like) -> None:
+    def mass(self, value: scalar) -> None:
         dll.atom_set_mass(self.instance, c_double(float(value)))
 
     @property
@@ -1000,7 +1000,7 @@ class Atom(CppClass):
             y0[i * batch : (i + 1) * batch, index] = np.exp(np.random.Generator.random(size=batch) * 2 * np.pi * 1j)  # type: ignore
         return y0
 
-    def get_y0_thermal(self, temperature: scalar_like) -> ndarray:
+    def get_y0_thermal(self, temperature: scalar) -> ndarray:
         r"""
 
         :param temperature: The temperature $T$ of the ensemble.
@@ -1017,8 +1017,8 @@ class Atom(CppClass):
     def get_state_indexes(
         self,
         labels: Iterable[str] | str | None = None,
-        f: quant_iter | None = None,
-        m: quant_iter | None = None,
+        f: array_like | None = None,
+        m: array_like | None = None,
     ) -> ndarray:
         """
         :param labels: The labels of the states whose indexes are to be returned.
@@ -1642,7 +1642,7 @@ class Interaction(CppClass):
         atom: Atom | None = None,
         lasers: Iterable[Laser] | None = None,
         environment: Environment | None = None,
-        delta_max: scalar_like = 1e3,
+        delta_max: scalar = 1e3,
         controlled: bool = True,
         instance: "Interaction | C.InteractionHandler.value | None" = None,
     ) -> None:
@@ -1778,7 +1778,7 @@ class Interaction(CppClass):
         return dll.interaction_get_delta_max(self.instance)
 
     @delta_max.setter
-    def delta_max(self, value: scalar_like) -> None:
+    def delta_max(self, value: scalar) -> None:
         dll.interaction_set_delta_max(self.instance, c_double(float(value)))
 
     @property
@@ -1818,7 +1818,7 @@ class Interaction(CppClass):
         return dll.interaction_get_dt(self.instance)
 
     @dt.setter
-    def dt(self, value: scalar_like) -> None:
+    def dt(self, value: scalar) -> None:
         dll.interaction_set_dt(self.instance, c_double(float(value)))
 
     @property
@@ -1829,7 +1829,7 @@ class Interaction(CppClass):
         return dll.interaction_get_dt_max(self.instance)
 
     @dt_max.setter
-    def dt_max(self, value: scalar_like) -> None:
+    def dt_max(self, value: scalar) -> None:
         dll.interaction_set_dt_max(self.instance, c_double(float(value)))
 
     @property
@@ -1840,7 +1840,7 @@ class Interaction(CppClass):
         return dll.interaction_get_atol(self.instance)
 
     @atol.setter
-    def atol(self, value: scalar_like) -> None:
+    def atol(self, value: scalar) -> None:
         dll.interaction_set_atol(self.instance, c_double(float(value)))
 
     @property
@@ -1851,7 +1851,7 @@ class Interaction(CppClass):
         return dll.interaction_get_rtol(self.instance)
 
     @rtol.setter
-    def rtol(self, value: scalar_like) -> None:
+    def rtol(self, value: scalar) -> None:
         dll.interaction_set_rtol(self.instance, c_double(float(value)))
 
     @property
@@ -2541,13 +2541,13 @@ def _define_colors(n: int, label_map: dict, colormap: str | None = None) -> list
 
 
 def construct_electronic_state(
-    freq_0: quant_like,
-    s: quant_like,
-    l: quant_like,
-    j: quant_like,
-    i: quant_like = 0,
+    freq_0: scalar,
+    s: scalar,
+    l: scalar,
+    j: scalar,
+    i: scalar = 0,
     hyper_const: array_like | None = None,
-    g: scalar_like = 0,
+    g: scalar = 0,
     label: str | None = None,
 ) -> list[State]:
     r"""
@@ -2576,13 +2576,13 @@ def construct_electronic_state(
 
 
 def gen_electronic_ls_state(
-    freq_j: quant_like,
-    s: quant_like,
-    l: quant_like,
-    j: quant_like,
-    i: quant_like = 0,
+    freq_j: scalar,
+    s: scalar,
+    l: scalar,
+    j: scalar,
+    i: scalar = 0,
     hyper_const: array_like | None = None,
-    gi: scalar_like = 0,
+    gi: scalar = 0,
     label: str | None = None,
 ) -> list[State]:
     r"""
@@ -2612,14 +2612,14 @@ def gen_electronic_ls_state(
 
 
 def construct_hyperfine_state(
-    freq_0: quant_like,
-    s: quant_like,
-    l: quant_like,
-    j: quant_like,
-    i: quant_like,
-    f: quant_like,
+    freq_0: scalar,
+    s: scalar,
+    l: scalar,
+    j: scalar,
+    i: scalar,
+    f: scalar,
     hyper_const: array_like | None = None,
-    g: scalar_like = 0,
+    g: scalar = 0,
     label: str | None = None,
 ) -> list[State]:
     r"""
@@ -2650,14 +2650,14 @@ def construct_hyperfine_state(
 
 
 def gen_hyperfine_ls_state(
-    freq_j: quant_like,
-    s: quant_like,
-    l: quant_like,
-    j: quant_like,
-    i: quant_like,
-    f: quant_like,
+    freq_j: scalar,
+    s: scalar,
+    l: scalar,
+    j: scalar,
+    i: scalar,
+    f: scalar,
     hyper_const: array_like | None = None,
-    gi: scalar_like = 0,
+    gi: scalar = 0,
     label: str | None = None,
 ) -> list[State]:
     r"""
@@ -2686,15 +2686,15 @@ def gen_hyperfine_ls_state(
 
 
 def gen_electronic_state(
-    freq_j: quant_like = 0.0,
+    freq_j: scalar = 0.0,
     parity: bool | str | None = None,
-    j: quant_like = 0,
-    i: quant_like = 0,
-    ls: quant_iter | None = None,
-    jj: quant_iter | None = None,
+    j: scalar = 0,
+    i: scalar = 0,
+    ls: scalar_nd | None = None,
+    jj: scalar_1d | None = None,
     hyper_const: array_like | None = None,
-    gj: scalar_like | None = None,
-    gi: scalar_like = 0,
+    gj: scalar | None = None,
+    gi: scalar = 0,
     label: str | None = None,
 ) -> list[State]:
     r"""
@@ -2730,6 +2730,8 @@ def gen_electronic_state(
             "Could not infer the state `parity` from `ls`.Please use only one (L, S) pair or specify the parity."
         )
 
+    ls = np.asarray(ls, dtype=float)
+
     f = get_f(i, j)
     m = [get_m(_f) for _f in f]
     fm = [(_f, _m) for _f, m_f in zip(f, m) for _m in m_f]
@@ -2741,16 +2743,16 @@ def gen_electronic_state(
 
 
 def gen_hyperfine_state(
-    freq_j: quant_like = 0.0,
+    freq_j: scalar = 0.0,
     parity: bool | str | None = None,
-    j: quant_like = 0,
-    i: quant_like = 0,
-    f: quant_like = 0,
-    ls: quant_iter | None = None,
-    jj: quant_iter | None = None,
+    j: scalar = 0,
+    i: scalar = 0,
+    f: scalar = 0,
+    ls: scalar_nd | None = None,
+    jj: scalar_1d | None = None,
     hyper_const: array_like | None = None,
-    gj: scalar_like | None = None,
-    gi: scalar_like = 0,
+    gj: scalar | None = None,
+    gi: scalar = 0,
     label: str | None = None,
 ) -> list[State]:
     r"""
@@ -2786,6 +2788,8 @@ def gen_hyperfine_state(
         raise ValueError(
             "Could not infer the state `parity` from `ls`.Please use only one (L, S) pair or specify the parity."
         )
+
+    ls = np.asarray(ls, dtype=float)
 
     gj = g_j(j, ls, jj, gj)
     return [

@@ -19,7 +19,7 @@ from mpl_toolkits.mplot3d.axes3d import Axes3D
 import qspec.algebra as al
 from qspec import tools
 from qspec.physics import f_recoil, saturation
-from qspec.qtypes import Callable, array_like, int_like, is_scalar, ndarray, scalar_like
+from qspec.qtypes import Callable, array_like, cast, int_like, is_scalar, ndarray, scalar
 from qspec.simulate._simulate_cpp import Atom, Environment, Laser, Polarization, sr_generate_y
 
 if TYPE_CHECKING:
@@ -170,7 +170,7 @@ def ct_markov_dgl(
         if p0.size != n_dim:
             raise ValueError(f"'p0' must have size max('n') + 1, but has size {p0.size}.")
 
-    def _f(_t: scalar_like, _y: ndarray) -> ndarray:
+    def _f(_t: scalar, _y: ndarray) -> ndarray:
         return np.array(
             [
                 -rates[0] * _y[0],
@@ -184,7 +184,7 @@ def ct_markov_dgl(
         if i > 0:
             jac[i, i - 1] = r * rates[i - 1]
 
-    def _df(_t: scalar_like, _y: ndarray) -> ndarray:
+    def _df(_t: scalar, _y: ndarray) -> ndarray:
         return jac
 
     dt = 0.05 / np.max(rates)
@@ -217,14 +217,14 @@ def ct_markov_dgl(
 
 def lambda_states(
     t: array_like,
-    delta_1: scalar_like,
-    delta_2: scalar_like,
-    a_ge: scalar_like,
-    a_me: scalar_like,
-    s_1: scalar_like,
-    s_2: scalar_like,
-    lw_1: scalar_like = 0.0,
-    lw_2: scalar_like = 0.0,
+    delta_1: scalar,
+    delta_2: scalar,
+    a_ge: scalar,
+    a_me: scalar,
+    s_1: scalar,
+    s_2: scalar,
+    lw_1: scalar = 0.0,
+    lw_2: scalar = 0.0,
     p0: array_like | None = None,
     time_resolved: bool = False,
     show: bool = False,
@@ -264,12 +264,14 @@ def lambda_states(
         if p0.size != 6:
             raise ValueError(f"'p0' must have size 6, but has size {p0.size}.")
 
-    _delta_1 = 2 * np.pi * delta_1
-    _delta_2 = 2 * np.pi * delta_2
-    rabi_1 = a_ge * np.sqrt(s_1 / 2.0)
-    rabi_2 = a_me * np.sqrt(s_2 / 2.0)
+    a_ge, a_me, lw_1, lw_2 = cast(a_ge, a_me, lw_1, lw_2, dtype=float)
 
-    def _f(_t: scalar_like, _y: ndarray) -> ndarray:
+    _delta_1 = 2 * np.pi * float(delta_1)
+    _delta_2 = 2 * np.pi * float(delta_2)
+    rabi_1 = float(a_ge) * np.sqrt(s_1 / 2.0)
+    rabi_2 = float(a_me) * np.sqrt(s_2 / 2.0)
+
+    def _f(_t: scalar, _y: ndarray) -> ndarray:
         i_gg = _y[0]
         i_mm = _y[1]
         i_ee = _y[2]
@@ -333,14 +335,14 @@ def lambda_states(
 def lambda_ge_rec(
     t: array_like,
     n: int_like,
-    delta: scalar_like,
-    a_ge: scalar_like,
-    a_me: scalar_like,
-    s: scalar_like,
-    f: scalar_like,
-    m: scalar_like,
+    delta: scalar,
+    a_ge: scalar,
+    a_me: scalar,
+    s: scalar,
+    f: scalar,
+    m: scalar,
     p0: array_like | None = None,
-    dt: scalar_like | None = None,
+    dt: scalar | None = None,
     time_resolved: bool = False,
     show: bool = False,
 ) -> ndarray | tuple[ndarray, ndarray]:
@@ -397,7 +399,7 @@ def lambda_ge_rec(
     rabi = a_ge * np.sqrt(s / 2.0)
     f_rec = 2 * np.pi * f_recoil(f, m)
 
-    def hamiltonian(_t: scalar_like, n1: int, n2: int) -> ndarray:  # without hbar
+    def hamiltonian(_t: scalar, n1: int, n2: int) -> ndarray:  # without hbar
         gg, mm, ee = 0.0 + 0.0j, 0.0 + 0.0j, 0.0 + 0.0j
         gm, eg, me = 0.0 + 0.0j, 0.0 + 0.0j, 0.0 + 0.0j
         mg, ge, em = 0.0 + 0.0j, 0.0 + 0.0j, 0.0 + 0.0j
@@ -424,7 +426,7 @@ def lambda_ge_rec(
             np.fill_diagonal(ret[:, (_i + 1) :], _y[i_start:i_end])
         return ret
 
-    def _f(_t: scalar_like, _y: ndarray) -> ndarray:
+    def _f(_t: scalar, _y: ndarray) -> ndarray:
         _rho = rho(_y)
         h = np.block(np.array([[hamiltonian(_t, n1, n2) for n2 in range(n + 1)] for n1 in range(n + 1)]))
         ret = -1.0j * (h @ _rho - _rho @ h)
@@ -606,7 +608,7 @@ class Geometry:
             raise TypeError(f"r must be a 'Rotation' object but is of type {type(r)}")
         self.rotation = r
 
-    def integration_sample(self, step: scalar_like | None = None) -> tuple[list[ndarray], list[ndarray]]:
+    def integration_sample(self, step: scalar | None = None) -> tuple[list[ndarray], list[ndarray]]:
         """
         :param step: None or a scalar which defines the approximate spacing
          between the equidistant values of the integration sample.
@@ -905,7 +907,7 @@ class ScatteringRate:
         self.atom.update(self.environment)
         self.set_x0()
 
-    def generate_x(self, width: scalar_like = 20.0, step: scalar_like | None = None) -> array_like:
+    def generate_x(self, width: scalar = 20.0, step: scalar | None = None) -> array_like:
         """
         :param width: The covered width around resonances in natural linewidths.
         :param step: The step size between generated x values.
@@ -993,7 +995,7 @@ class ScatteringRate:
         # print('Time: {}s'.format(t0))
         return ret * norm
 
-    def integrate_y(self, x: array_like, step: scalar_like | None = None) -> ndarray:
+    def integrate_y(self, x: array_like, step: scalar | None = None) -> ndarray:
         """
         :param x: The frequency of light in an atoms rest frame (MHz).
         :param step: The step size used for the integration over the angles theta and phi.
@@ -1020,7 +1022,7 @@ class ScatteringRate:
 
         return y_int
 
-    def plot_spectrum(self, norm_to_4pi: bool = False, step: scalar_like | None = None) -> None:
+    def plot_spectrum(self, norm_to_4pi: bool = False, step: scalar | None = None) -> None:
         """
 
         :param norm_to_4pi: Whether to renormalize the spectrum defined by geometry to have the same maximum
@@ -1051,7 +1053,7 @@ class ScatteringRate:
 
     def plot_angular_distribution(
         self,
-        x: scalar_like | None = None,
+        x: scalar | None = None,
         n: int = 5,
         theta: array_like | None = None,
         phi: array_like | None = None,

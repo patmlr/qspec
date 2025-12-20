@@ -23,9 +23,9 @@ from qspec.qtypes import (
     is_scalar,
     ndarray,
     quant,
-    quant_iter,
-    quant_like,
-    scalar_like,
+    scalar,
+    scalar_1d,
+    scalar_nd,
 )
 
 __all__ = [
@@ -813,7 +813,7 @@ def f_recoil_v(v: array_like, alpha: array_like, f_lab: array_like, m: array_lik
 """ Atomic physics """
 
 
-def get_f(i: quant_like, j: quant_like) -> list[quant]:
+def get_f(i: scalar, j: scalar) -> list[quant]:
     r"""
     All quantum numbers fulfilling $|I - J| \leq F \leq I + J$, where $F\in\mathbb{N}_0$.
 
@@ -824,7 +824,7 @@ def get_f(i: quant_like, j: quant_like) -> list[quant]:
     return [quant(k + abs(i - j)) for k in range(int(i + j - abs(i - j) + 1))]
 
 
-def get_m(f: quant_like) -> list[quant]:
+def get_m(f: scalar) -> list[quant]:
     r"""
     All quantum numbers fulfilling $-F \leq m \leq F$, where $m\in\mathbb{Z}$.
 
@@ -845,7 +845,7 @@ def lande_n(gyro: array_like) -> ndarray:
     return gyro * sc.h / mu_N
 
 
-def lande_j(s: quant_like, l: quant_like, j: quant_like, approx_g_s: bool = False) -> float:
+def lande_j(s: scalar, l: scalar, j: scalar, approx_g_s: bool = False) -> float:
     r"""
     The electronic g-factor in the LS-coupling scheme
 
@@ -877,7 +877,7 @@ def lande_j(s: quant_like, l: quant_like, j: quant_like, approx_g_s: bool = Fals
     return val
 
 
-def lande_jj(j0: quant_like, j1: quant_like, j: quant_like, g0: scalar_like, g1: scalar_like) -> float:
+def lande_jj(j0: scalar, j1: scalar, j: scalar, g0: scalar, g1: scalar) -> float:
     r"""
     The electronic g-factor of a state with angular momentum $\vec{J} = \vec{J}_0 + \vec{J}_1$
 
@@ -902,7 +902,7 @@ def lande_jj(j0: quant_like, j1: quant_like, j: quant_like, g0: scalar_like, g1:
 
 
 def g_j(
-    j: quant_like = 0, ls: quant_iter | None = None, jj: quant_iter | None = None, gj: array_like | None = None
+    j: scalar = 0, ls: scalar_nd | None = None, jj: scalar_1d | None = None, gj: array_like | None = None
 ) -> float:
     r"""
     The electronic g-factor of a state with angular momentum $\vec{J}$ in the LS- or jj-coupling scheme.
@@ -956,7 +956,7 @@ def g_j(
     return _gj
 
 
-def lande_f(i: quant_like, j: quant_like, f: quant_like, gi: array_like, gj: array_like) -> ndarray:
+def lande_f(i: scalar, j: scalar, f: scalar, gi: array_like, gj: array_like) -> ndarray:
     r"""
     The total atomic g-factor in the IJ-coupling scheme
 
@@ -1011,7 +1011,7 @@ def cast_hyper_const(hyper_const: array_like | None = None) -> ndarray:
     return np.array(hyper_const[:3], dtype=float)
 
 
-def hyperfine(i: quant_like, j: quant_like, f: quant_like, hyper_const: array_like = 0.0) -> ndarray:
+def hyperfine(i: scalar, j: scalar, f: scalar, hyper_const: array_like = 0.0) -> ndarray:
     r"""
     The hyperfine structure (HFS) shift of an atomic state $|IJF\rangle$
 
@@ -1064,7 +1064,7 @@ def hyperfine(i: quant_like, j: quant_like, f: quant_like, hyper_const: array_li
     return shift
 
 
-def zeeman_linear(m: quant_like, g: array_like, b_field: array_like = 0.0, as_freq: bool = True) -> ndarray:
+def zeeman_linear(m: scalar, g: array_like, b_field: array_like = 0.0, as_freq: bool = True) -> ndarray:
     r"""
     The shift of an atomic state with magnetic quantum number $m$ due to the linear Zeeman effect
 
@@ -1085,10 +1085,10 @@ def zeeman_linear(m: quant_like, g: array_like, b_field: array_like = 0.0, as_fr
 
 
 def hyper_zeeman_linear(
-    i: quant_like,
-    j: quant_like,
-    f: quant_like,
-    m: quant_like,
+    i: scalar,
+    j: scalar,
+    f: scalar,
+    m: scalar,
     hyper_const: array_like = 0.0,
     g_f: array_like = 0.0,
     b_field: array_like = 0.0,
@@ -1118,12 +1118,12 @@ def hyper_zeeman_linear(
 
 
 def hyper_zeeman_ij(
-    mi0: quant_like,
-    mj0: quant_like,
-    mi1: quant_like,
-    mj1: quant_like,
-    i: quant_like,
-    j: quant_like,
+    mi0: scalar,
+    mj0: scalar,
+    mi1: scalar,
+    mj1: scalar,
+    i: scalar,
+    j: scalar,
     hyper_const: array_like = 0.0,
     gi: array_like = 0.0,
     gj: array_like = 0.0,
@@ -1383,11 +1383,11 @@ def hyper_zeeman_ij(
 
 
 def hyper_zeeman_num(
-    i: quant_like,
-    j: quant_like,
+    i: scalar,
+    j: scalar,
     hyper_const: array_like = 0.0,
-    gi: scalar_like = 0.0,
-    gj: scalar_like = 0.0,
+    gi: scalar = 0.0,
+    gj: scalar = 0.0,
     b_field: array_like = 0.0,
     g_n_as_gyro: bool = False,
     as_freq: bool = True,
@@ -1479,8 +1479,8 @@ def hyper_zeeman_num(
 
 
 def hyper_zeeman_12(
-    j: quant_like,
-    m: quant_like,
+    j: scalar,
+    m: scalar,
     a_hyper: array_like = 0.0,
     gi: array_like = 0.0,
     gj: array_like = 0.0,
@@ -1531,8 +1531,8 @@ def hyper_zeeman_12(
 
 
 def hyper_zeeman_12_d(
-    j: quant_like,
-    m: quant_like,
+    j: scalar,
+    m: scalar,
     a_hyper: array_like = 0.0,
     gi: array_like = 0.0,
     gj: array_like = 0.0,
@@ -1585,7 +1585,7 @@ def hyper_zeeman_12_d(
     return x0, x1
 
 
-def a_hyper_mu(i: quant_like, j: quant_like, mu: array_like, b_field: array_like) -> ndarray:
+def a_hyper_mu(i: scalar, j: scalar, mu: array_like, b_field: array_like) -> ndarray:
     r"""
     The magnetic dipole hyperfine structure constant as a function of the nuclear magnetic moment `mu`
     and the magnetic field `b_field` of the electrons at the nucleus $A = \mu\mathcal{B} / (IJ)$.
@@ -1605,11 +1605,11 @@ def a_hyper_mu(i: quant_like, j: quant_like, mu: array_like, b_field: array_like
 def a_einstein_m1(
     f: array_like,
     mu: array_like | None = None,
-    j_l: quant_like = 0,
-    j_u: quant_like = 0,
-    ls: quant_iter = (0, 0),
-    jj_l: quant_iter | None = None,
-    jj_u: quant_iter | None = None,
+    j_l: scalar = 0,
+    j_u: scalar = 0,
+    ls: scalar_nd = (0, 0),
+    jj_l: scalar_1d | None = None,
+    jj_u: scalar_1d | None = None,
 ) -> ndarray:
     r"""
     The Einstein coefficient of an M1 transition
@@ -1665,9 +1665,9 @@ def a_einstein_m1(
     return 8 * _mu * np.pi**2 * sc.mu_0 * f**3 / (3 * sc.hbar * sc.c**3) * 1e12
 
 
-# def a_einstein_m1_fm(f: array_like, mu: array_like = None, f_l: quant_like = 0, f_u: quant_like = 0,
-#                      m_l: quant_like = 0, m_u: quant_like = 0, j: quant_like = 0,
-#                      i: quant_like = 0, ls: quant_iter = (0, 0), jj: quant_iter = None) -> ndarray:
+# def a_einstein_m1_fm(f: array_like, mu: array_like = None, f_l: scalar = 0, f_u: scalar = 0,
+#                      m_l: scalar = 0, m_u: scalar = 0, j: scalar = 0,
+#                      i: scalar = 0, ls: quant_iter = (0, 0), jj: quant_iter = None) -> ndarray:
 #     if mu is None:
 #         mu = g_j(j, ls, jj) * np.sqrt(j * (j + 1))
 #     # mu *= a_dipole(i, j, f_l, m_l, j, f_u, m_u, m_u - m_l, as_sympy=False) ** 2
@@ -2138,7 +2138,7 @@ def lambda_rn(
     return val, np.sqrt(err)
 
 
-def schmidt_line(l: quant_like, i: quant_like, is_proton: bool) -> ndarray:
+def schmidt_line(l: scalar, i: scalar, is_proton: bool) -> ndarray:
     r"""
     Calculate the single-particle Schmidt value of the nuclear magnetic moment
 
@@ -2787,7 +2787,7 @@ def normal_chi2_convolved_f_xi_pdf(
 
 
 def source_energy_pdf(
-    f: array_like, f0: float | ndarray, sigma: float | ndarray, xi: float | ndarray, collinear: bool = True
+    f: array_like, f0: scalar, sigma: scalar, xi: scalar, collinear: bool = True
 ) -> ndarray:
     r"""
     This is the same function as
