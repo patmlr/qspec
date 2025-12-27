@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 examples.physics_ex
 ===================
@@ -6,14 +5,14 @@ examples.physics_ex
 Example script / Guide for the qspec.physics module.
 """
 
+import matplotlib.pyplot as plt
 import numpy as np
 import scipy.constants as sc
-import matplotlib.pyplot as plt
 
 import qspec as qs
 
 
-def example(n=None):
+def example(n: int | set[int] | None = None) -> None:
     """
     Run one or several of the available examples. Scroll to the end for the function call.
 
@@ -36,7 +35,9 @@ def example(n=None):
     if n is None:
         n = {0, 1, 2, 3, 4, 5}
     if isinstance(n, int):
-        n = {n, }
+        n = {
+            n,
+        }
 
     if 0 in n:
         """
@@ -57,14 +58,14 @@ def example(n=None):
         v = qs.v_el(U, q, m, v0=0, relativistic=True)  # The velocity of the accelerated carbon ions (m/s).
         gamma = qs.gamma(v)  # The Lorentzian time-dilation factor.
 
-        f_col = qs.doppler(f0, v, alpha=0, return_frame='lab')
+        f_col = qs.doppler(f0, v, alpha=0, return_frame="lab")
         # The resonant laser frequency in collinear direction (MHz) and ...
-        f_acol = qs.doppler(f0, v, alpha=np.pi, return_frame='lab')  # ... in anticollinear direction (MHz).
+        f_acol = qs.doppler(f0, v, alpha=np.pi, return_frame="lab")  # ... in anticollinear direction (MHz).
 
-        f_div_col = qs.doppler_el_d1(f_col, 0, U, q, m, 0, return_frame='atom')
+        f_div_col = qs.doppler_el_d1(f_col, 0, U, q, m, 0, return_frame="atom")
         # The differential Doppler factors in the atoms rest frame (MHz / V).
         # == The changes of the laser frequencies in the atoms rest frame with the voltage.
-        f_div_acol = qs.doppler_el_d1(f_acol, np.pi, U, q, m, 0, return_frame='atom')
+        f_div_acol = qs.doppler_el_d1(f_acol, np.pi, U, q, m, 0, return_frame="atom")
 
         # b) Inverse calculation.
         v = qs.inverse_doppler(f0, f_col, alpha=0)  # The velocity of the carbon ions (m/s).
@@ -72,7 +73,7 @@ def example(n=None):
         e_kin = qs.e_kin(v, m, relativistic=True)  # The kinetic energy of the carbon ions (eV).
 
         for k, v in locals().items():  # Print all local variables.
-            print('{} = {}'.format(k, v))
+            print(f"{k} = {v}")
 
     if 1 in n:
         """
@@ -100,7 +101,11 @@ def example(n=None):
         gamma3d = np.mean(qs.gamma_3d(v_vec, axis=-1), axis=0)
         # The mean Lorentzian time-dilation factor for the 3d vectors.
 
-        f_vec = np.array([[f_col, f_col, 0, 0], ])  # The collinear frequency 4-vector.
+        f_vec = np.array(
+            [
+                [f_col, f_col, 0, 0],
+            ]
+        )  # The collinear frequency 4-vector.
         # Note that it was expanded along axis 0 to match the shape of v_vec.
 
         f_vec_atom = qs.boost(f_vec, v_vec, axis=-1)  # The Lorentz boosts of the frequency 4-vector.
@@ -116,15 +121,15 @@ def example(n=None):
         # plt.show()
 
         for k, v in locals().items():
-            print('{} = {}'.format(k, v))
+            print(f"{k} = {v}")
 
-        plt.xlabel('Laser freq. in the ion system relative to the resonance (MHz)')
-        plt.ylabel('Abundance')
+        plt.xlabel("Laser freq. in the ion system relative to the resonance (MHz)")
+        plt.ylabel("Abundance")
         plt.hist((f_atom - f0), bins=200)
         plt.show()
 
-        plt.xlabel('Laser freq. in the ion system relative to its x-component (MHz)')
-        plt.ylabel('Abundance')
+        plt.xlabel("Laser freq. in the ion system relative to its x-component (MHz)")
+        plt.ylabel("Abundance")
         plt.hist(f_atom - f_vec_atom[:, 1], bins=200)
         plt.show()
 
@@ -136,31 +141,30 @@ def example(n=None):
         w = np.linspace(0.2, 1, 1001)
 
         # Thorlabs UV fused silica
-        mat0 = [[0.6961663, 0.4079426, 0.8974794],
-                [4.67914826e-3, 1.35120631e-2, 97.9340025]]
+        mat0 = [[0.6961663, 0.4079426, 0.8974794], [4.67914826e-3, 1.35120631e-2, 97.9340025]]
         n0 = qs.sellmeier(w, mat0[0], mat0[1])
 
         # EdmundOptics UV fused silica
-        mat1 = [[0.683740494, 0.420323613, 0.58502748],
-                [0.00460352869, 0.01339688560, 64.49327320000]]
+        mat1 = [[0.683740494, 0.420323613, 0.58502748], [0.00460352869, 0.01339688560, 64.49327320000]]
         n1 = qs.sellmeier(w, mat1[0], mat1[1])
 
         # Suprasil-family, Spectrosil
-        mat2 = [[0.473115591, 0.631038719, 0.906404498],
-                [0.0129957170, 4.12809220e-3, 98.7685322]]
+        mat2 = [[0.473115591, 0.631038719, 0.906404498], [0.0129957170, 4.12809220e-3, 98.7685322]]
         n2 = qs.sellmeier(w, mat2[0], mat2[1])
 
         # HPFS Grade 8655 Corning Fused Silica @ 22°C
-        mat3 = [[3.550277875e-2, 7.353314507e-1, 3.334560303e-1, 9.269506614e-1],
-                [-4.826183477e-3, 5.808687673e-3, 1.399572492e-2, 1.012182926e2]]
+        mat3 = [
+            [3.550277875e-2, 7.353314507e-1, 3.334560303e-1, 9.269506614e-1],
+            [-4.826183477e-3, 5.808687673e-3, 1.399572492e-2, 1.012182926e2],
+        ]
         n3 = qs.sellmeier(w, mat3[0], mat3[1])
 
-        plt.plot(w, n0, 'r-', label='Thorlabs')
-        plt.plot(w, n1, 'y-', label='EdmundOptics')
-        plt.plot(w, n2, 'b-', label='Suprasil')
-        plt.plot(w, n3, 'm-', label='HPFS 8655')
-        plt.xlabel(r'Wavelength ($\mu$m)')
-        plt.ylabel('Refractive index')
+        plt.plot(w, n0, "r-", label="Thorlabs")
+        plt.plot(w, n1, "y-", label="EdmundOptics")
+        plt.plot(w, n2, "b-", label="Suprasil")
+        plt.plot(w, n3, "m-", label="HPFS 8655")
+        plt.xlabel(r"Wavelength ($\mu$m)")
+        plt.ylabel("Refractive index")
         plt.legend()
         plt.show()
 
@@ -171,9 +175,13 @@ def example(n=None):
         a = [134, 135, 136, 137, 138]  # The mass numbers
         barrett = [6.1782, 6.1747, 6.1825, 6.1818, 6.1906]  # The barret radii
         barrett_d = [0.0015, 0.0014, 0.0015, 0.0014, 0.0015]  # The uncertainties of the barret radii.
-        delta_barret = [-0.0124, -0.0142, -0.008, -0.0084, 0.]   # Differences between barret radii as specified
+        delta_barret = [-0.0124, -0.0142, -0.008, -0.0084, 0.0]  # Differences between barret radii as specified
         # Fricke et al., ...
-        delta_barret_d = [0.0005, ] * 4 + [0., ]  # ... these have smaller uncertainties.
+        delta_barret_d = [
+            0.0005,
+        ] * 4 + [
+            0.0,
+        ]  # ... these have smaller uncertainties.
         v2, v4, v6 = 1.27976, 1.1974, 1.1370  # The shape factors.
         c2c1, c3c1 = -7.03e-3, 2.04e-6  # The Seltzer coefficients.
 
@@ -183,24 +191,24 @@ def example(n=None):
         lambda_rn, lambda_rn_d = qs.lambda_rn(dr2, dr2_d, dr4, dr4_d, dr6, dr6_d, c2c1, c3c1)
 
         for k, v in locals().items():
-            print('{} = {}'.format(k, v))
+            print(f"{k} = {v}")
 
     if 4 in n:
         """
         Example 4: The velocity distribution of accelerated thermal ions. 
         """
-        m = 88.  # u, The mass of the ions.
+        m = 88.0  # u, The mass of the ions.
         q = 1  # e  # The electric charge of the ions.
         u = 2e4  # V, The acceleration voltage.
-        t = 2000.  # K, The temperature in the source.
+        t = 2000.0  # K, The temperature in the source.
         scale_e = 0.4  # eV, The sigma of the gaussian energy distribution in the source.
 
         v0 = qs.v_el(u, q, m)  # m/s  # The expected ion velocity.
         v = np.linspace(-20, 20, 1001, dtype=float)  # m/s
         y = qs.normal_chi2_convolved_vx_pdf(v0 + v, m, t, 0.4, u)  # The distribution of the ion velocities.
 
-        plt.xlabel('$v - v_0$ (m/s)')
-        plt.ylabel('Abundance')
+        plt.xlabel("$v - v_0$ (m/s)")
+        plt.ylabel("Abundance")
         plt.plot(v, y)
         plt.show()
 
@@ -216,44 +224,60 @@ def example(n=None):
         g_j = qs.lande_j(0.5, 2, 2.5)
         a_hyper = 2.1743
         b_hyper = 49.11
-        c_hyper = 5.
-        b = np.linspace(0., 4e-3, 4000)
+        c_hyper = 5.0
+        b = np.linspace(0.0, 4e-3, 4000)
         e_eig, m_list, fm_list, mi_mj_list = qs.hyper_zeeman_num(i, j, [a_hyper, b_hyper, c_hyper], g_n, g_j, b)
         e_th = [qs.hyperfine(i, j, f, [a_hyper, b_hyper, c_hyper]) for f in qs.get_f(i, j)]
 
         f_plotted = set()
         m_plotted = set()
-        cmap = plt.get_cmap('inferno')
+        cmap = plt.get_cmap("inferno")
         f_colored = False
         for im, (_e_eig, _f_list, _m, mi_mj) in enumerate(zip(e_eig, fm_list, m_list, mi_mj_list)):
             for k in range(_e_eig.shape[1]):
                 if f_colored:
                     c_val = (_f_list[k] - abs(i - j)) / (i + j - abs(i - j) + 1)
                     c = cmap(c_val)
-                    plt.plot(b * 1e3, _e_eig[:, k], color=c, ls='-', lw=0.85, alpha=0.8,
-                             label=rf'$F = {int(_f_list[k])}$' if c not in f_plotted else None, zorder=10 * c_val)
+                    plt.plot(
+                        b * 1e3,
+                        _e_eig[:, k],
+                        color=c,
+                        ls="-",
+                        lw=0.85,
+                        alpha=0.8,
+                        label=rf"$F = {int(_f_list[k])}$" if c not in f_plotted else None,
+                        zorder=10 * c_val,
+                    )
                     f_plotted.add(c)
                     handles, labels = plt.gca().get_legend_handles_labels()
                 else:
                     mj = mi_mj[k][1]
                     c_val = (mj + j) / (2 * j + 1)
                     c = cmap(c_val)
-                    plt.plot(b * 1e3, _e_eig[:, k], color=c, ls='-', lw=0.85, alpha=0.8,
-                             label=rf'$m_J = {mj}$' if mj not in m_plotted else None, zorder=10 * c_val)
+                    plt.plot(
+                        b * 1e3,
+                        _e_eig[:, k],
+                        color=c,
+                        ls="-",
+                        lw=0.85,
+                        alpha=0.8,
+                        label=rf"$m_J = {mj}$" if mj not in m_plotted else None,
+                        zorder=10 * c_val,
+                    )
                     handles, labels = plt.gca().get_legend_handles_labels()
                     handles, labels = handles[::-1], labels[::-1]
                     m_plotted.add(mj)
 
         # plt.hlines(e_th, 0., 4., colors='grey', ls='--')
 
-        plt.xlabel('Magnetic field (mT)')
-        plt.ylabel('Frequency shift (MHz)')
+        plt.xlabel("Magnetic field (mT)")
+        plt.ylabel("Frequency shift (MHz)")
         # plt.legend(handles, labels)
-        plt.xlim(0., 4.)
+        plt.xlim(0.0, 4.0)
         plt.subplots_adjust(left=0.11, bottom=0.1, right=0.98, top=0.99)
         plt.show()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     example({0, 1, 2, 3, 4, 5})
     # example({0})

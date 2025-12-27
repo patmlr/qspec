@@ -7,6 +7,7 @@ Python/C++ interface.
 
 import ctypes
 import os
+from _ctypes import CFuncPtr
 from enum import Enum
 from typing import Any
 
@@ -40,11 +41,11 @@ __all__ = [
 ]
 
 
-def set_argtypes(func: ctypes._NamedFuncPointer, argtypes: tuple[Any, ...]) -> None:
+def set_argtypes(func: CFuncPtr, argtypes: tuple[Any, ...]) -> None:
     func.argtypes = argtypes
 
 
-def set_restype(func: ctypes._NamedFuncPointer, restype: Any) -> None:
+def set_restype(func: CFuncPtr, restype: Any) -> None:
     func.restype = restype
 
 
@@ -96,6 +97,7 @@ vector3d_p = ctypeslib.ndpointer(dtype=float, shape=(3,))
 vector3cd_p = ctypeslib.ndpointer(dtype=complex, shape=(3,))
 matrix3cd_p = ctypeslib.ndpointer(dtype=complex, shape=(3, 3))
 
+
 class C(Enum):
     CppClassHandler = POINTER(ctypes.c_char)
     PolarizationHandler = POINTER(ctypes.c_char)
@@ -106,6 +108,7 @@ class C(Enum):
     AtomHandler = POINTER(ctypes.c_char)
     InteractionHandler = POINTER(ctypes.c_char)
     MultivariateNormalHandler = POINTER(ctypes.c_char)
+
 
 dll_path = os.path.abspath(os.path.dirname(__file__))
 x64 = r"\x64" if ctypes.sizeof(c_void_p) == 8 else ""

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 qspec.analyze
 =============
@@ -24,13 +23,34 @@ Classes:
 
 LICENSE NOTES:
     The method curve_fit is a modified version of scipy.optimize.curve_fit.
-    Therefore, it is licensed under the 'BSD 3-Clause "New" or "Revised" License' provided with scipy.
+    Therefore, it is licensed under the 'BSD 3-Clause New or Revised License' provided with scipy.
 """
 
-from qspec.analyze import _analyze_cpp
-from qspec.analyze import _analyze
-from qspec.analyze._analyze_cpp import *
-from qspec.analyze._analyze import *
+from qspec.analyze import _analyze, _analyze_cpp
+from qspec.analyze._analyze import (
+    King,
+    const,
+    covariance_matrix,
+    curve_fit,
+    draw_sigma2d,
+    draw_straight_unc_area,
+    ellipse2d,
+    generate_collinear_points_py,
+    linear_alpha_fit,
+    linear_fit,
+    linear_monte_carlo,
+    linear_nd_fit,
+    linear_nd_monte_carlo,
+    odr_fit,
+    poly,
+    straight,
+    straight_direction,
+    straight_std,
+    straight_x_std,
+    weight,
+    york_fit,
+)
+from qspec.analyze._analyze_cpp import generate_collinear_points_cpp
 
 __all__ = []
 __all__.extend(_analyze_cpp.__all__)

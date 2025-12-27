@@ -9,7 +9,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib import cm
 
-from qspec import cast_hyper_const, g_j, get_f, get_m, h, kB, tools
+from qspec import tools
 from qspec._cpp import (
     C,
     c_bool,
@@ -22,10 +22,13 @@ from qspec._cpp import (
     dll,
     set_restype,
 )
+from qspec.physics import cast_hyper_const, g_j, get_f, get_m, h, kB
 from qspec.qtypes import (
     Generator,
     Iterable,
     array_like,
+    complexfloating,
+    floating,
     has_getitem,
     int_like,
     is_scalar,
@@ -51,6 +54,9 @@ __all__ = [
     "gen_hyperfine_ls_state",
     "gen_hyperfine_state",
 ]
+
+
+LS_FORMAT_ERROR = "`ls` needs to be a pair (L, S) or a list of pairs [(l1, s1), (l2, s2)]."
 
 
 def sr_generate_y(
@@ -166,14 +172,14 @@ class Polarization(CppClass):
         return dll.polarization_get_q_axis(self.instance)
 
     @property
-    def x(self) -> ndarray:
+    def x(self) -> ndarray[complexfloating]:
         r"""
         :returns: The complex polarization in cartesian coordinates $(\vec{x}, \vec{y}, \vec{z})$.
         """
         return dll.polarization_get_x(self.instance)
 
     @property
-    def q(self) -> ndarray:
+    def q(self) -> ndarray[complexfloating]:
         r"""
         :returns: The complex polarization in the helicity basis $(\vec{\sigma}^-, \vec{\pi}, \vec{\sigma}^+)$.
         """
@@ -431,21 +437,19 @@ class State(CppClass):
         if self.instance is None:
             tools.check_half_integer(j, i, f, m)
 
-            if ls is None:
-                ls = []
-
-            if not has_getitem(ls):
-                raise ValueError("The parameter 'ls' must be a list of or a single (l_i, s_i) pair.")
-
-            if not ls:
+            if ls is None or not list(ls):
                 s = np.array([], dtype=float)
                 l = np.array([], dtype=float)
+            elif not has_getitem(ls):
+                raise ValueError(LS_FORMAT_ERROR)
+            elif has_getitem(ls) and not has_getitem(ls[0]):
+                s = np.array([ls[1]], dtype=float)
+                l = np.array([ls[0]], dtype=float)
             elif has_getitem(ls[0]):
                 s = np.array([_ls[1] for _ls in ls], dtype=float, order="C")
                 l = np.array([_ls[0] for _ls in ls], dtype=float, order="C")
             else:
-                s = np.array([ls[1]], dtype=float)
-                l = np.array([ls[0]], dtype=float)
+                raise ValueError(LS_FORMAT_ERROR)
             _s, _l = s.ctypes.data_as(c_double_p), l.ctypes.data_as(c_double_p)
 
             jj = np.full_like(s, -1.0, dtype=float) if jj is None else np.array(jj, dtype=float, order="C").flatten()
@@ -997,7 +1001,7 @@ class Atom(CppClass):
 
         batch = int(n_samples / indices.size)
         for i, index in enumerate(indices):
-            y0[i * batch : (i + 1) * batch, index] = np.exp(np.random.Generator.random(size=batch) * 2 * np.pi * 1j)  # type: ignore
+            y0[i * batch : (i + 1) * batch, index] = np.exp(np.random.default_rng().random(size=batch) * 2 * np.pi * 1j)
         return y0
 
     def get_y0_thermal(self, temperature: scalar) -> ndarray:
@@ -1534,7 +1538,7 @@ def _cast_y0(y0: array_like | None, i_solver: int, atom: Atom) -> tuple[ndarray,
 
         if (
             not y0.shape
-            or (len(y0.shape) <= 2 and y0.shape[-1] != size)
+            or (1 <= len(y0.shape) <= 2 and y0.shape[-1] != size)
             or (len(y0.shape) > 2 and y0.shape[-2:] != (size, size))
         ):
             raise ValueError(
@@ -2230,7 +2234,7 @@ class Interaction(CppClass):
         m: int | None = 0,
         v: array_like | None = None,
         y0: array_like | None = None,
-    ) -> ndarray:
+    ) -> ndarray[complexfloating]:
         r"""
         Solver for the master equation
 
@@ -2505,7 +2509,7 @@ class Interaction(CppClass):
         )
 
 
-def density_matrix_diagonal(rho: array_like, axis: int = 1) -> ndarray:
+def density_matrix_diagonal(rho: array_like, axis: int = 1) -> ndarray[floating]:
     r"""
     The diagonal of the density matrix $\operatorname{diag}(\rho)$.
 
@@ -2514,7 +2518,22 @@ def density_matrix_diagonal(rho: array_like, axis: int = 1) -> ndarray:
      expecting `rho` as an array with shape `(n, Atom.size, Atom.size, ... )`.
     :returns: the diagonal of the density matrix as an array with shape `(n, Atom.size, ...)`.
     """
-    return np.transpose(np.diagonal(rho, axis1=axis, axis2=axis + 1).real, axes=[0, 2, 1])
+    rho = np.asarray(rho, dtype=complex)
+    if len(rho.shape) < axis + 2:
+        raise ValueError(
+            f"The density matrix `rho` with shape {rho.shape} must have at least `axis` + 2 = {axis + 2} dimensions."
+        )
+    if rho.shape[axis] != rho.shape[axis + 1]:
+        raise ValueError(
+            f"The density matrix `rho` with shape {rho.shape} must have the same size in `axis` {axis} and {axis + 1}."
+        )
+
+    diag: ndarray[complexfloating] = np.diagonal(rho, axis1=axis, axis2=axis + 1)
+
+    _axes = list(range(len(rho.shape) - 1))
+    axes = [*_axes[:axis], _axes[-1], *_axes[axis:-1]]
+
+    return np.transpose(diag.real, axes=axes)
 
 
 def _define_colors(n: int, label_map: dict, colormap: str | None = None) -> list[str | tuple[float, ...]]:
@@ -2730,7 +2749,7 @@ def gen_electronic_state(
             "Could not infer the state `parity` from `ls`.Please use only one (L, S) pair or specify the parity."
         )
 
-    ls = np.asarray(ls, dtype=float)
+    ls = tools.asarray_optional(ls, dtype=float)
 
     f = get_f(i, j)
     m = [get_m(_f) for _f in f]
@@ -2789,7 +2808,7 @@ def gen_hyperfine_state(
             "Could not infer the state `parity` from `ls`.Please use only one (L, S) pair or specify the parity."
         )
 
-    ls = np.asarray(ls, dtype=float)
+    ls = tools.asarray_optional(ls, dtype=float)
 
     gj = g_j(j, ls, jj, gj)
     return [

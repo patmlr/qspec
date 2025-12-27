@@ -12,7 +12,6 @@ from sympy import cos, nsimplify, pi, sin, sqrt
 from sympy.vector import CoordSys3D, Vector
 
 from qspec.qtypes import (
-    Any,
     cast_sympy,
     ndarray,
     sympy_expr,
@@ -160,7 +159,7 @@ def a(
 
 def b(
     i: sympy_scalar, j_l: sympy_scalar, f_l: sympy_scalar, j_u: sympy_scalar, f_u: sympy_scalar, as_sympy: bool = False
-) -> Any | float:
+) -> sympy_expr | float:
     r"""
     The coefficient $B_F^{F^\prime}$, parameterizing the classical angle-dependent part of
     the perturbative differential scattering rate, as described in
@@ -668,7 +667,7 @@ def mu_j_m1(
         * sqrt_j  # type: ignore
         * (
             (-1) ** exp_j * sqrt_l * wigner_6j(l, j_l, s, j_u, l, 1, as_sympy)  # type: ignore
-            + g_s * (-1) ** j_l * sqrt_s * wigner_6j(s, j_l, l, j_u, s, 1, as_sympy) # type: ignore
+            + g_s * (-1) ** j_l * sqrt_s * wigner_6j(s, j_l, l, j_u, s, 1, as_sympy)  # type: ignore
         )
     )
 

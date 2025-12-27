@@ -1,42 +1,54 @@
-# -*- coding: utf-8 -*-
 """
 qspec._analyze_cpp
 ==================
 
-Classes and methods for the 'analyze' module using the Python/C++ interface.
+Classes and methods for the `analyze` module using the Python/C++ interface.
 """
 
 import numpy as np
 
-from qspec.qtypes import *
-from qspec._cpp import *
+from qspec._cpp import C, c_bool, c_double_p, c_size_t, c_size_t_p, dll
+from qspec.qtypes import array_like, floating, int_like, ndarray
 
-__all__ = ['generate_collinear_points_cpp']
+__all__ = ["generate_collinear_points_cpp"]
 
 
 class MultivariateNormal:
-    def __init__(self, mean: array_like, cov: array_like, instance=None):
+    def __init__(
+        self,
+        mean: array_like,
+        cov: array_like,
+        instance: "MultivariateNormal | C.MultivariateNormalHandler.value | None" = None,
+    ) -> None:
         self.instance = instance
         if self.instance is None:
             mean, cov = np.ascontiguousarray(mean, dtype=float), np.ascontiguousarray(cov, dtype=float)
             self.instance = dll.multivariatenormal_construct(
-                mean.ctypes.data_as(c_double_p), cov.ctypes.data_as(c_double_p), c_size_t(mean.size))
+                mean.ctypes.data_as(c_double_p), cov.ctypes.data_as(c_double_p), c_size_t(mean.size)
+            )
 
-    def __del__(self):
+    def __del__(self) -> None:
         dll.multivariatenormal_destruct(self.instance)
 
     @property
-    def size(self):
+    def size(self) -> int:
         return dll.multivariatenormal_size(self.instance)
 
-    def rvs(self):
+    def rvs(self) -> ndarray[floating]:
         ret = np.zeros(self.size, dtype=float)
         dll.multivariatenormal_rvs(self.instance, ret.ctypes.data_as(c_double_p))
         return ret
 
 
-def generate_collinear_points_cpp(mean: ndarray, cov: ndarray, n_samples: int = None, n_accepted: int = None,
-                                  seed: int = None, report: bool = None, **kwargs) -> (ndarray, int, int):
+def generate_collinear_points_cpp(
+    mean: ndarray,
+    cov: ndarray,
+    n_samples: int_like | None = None,
+    n_accepted: int_like | None = None,
+    seed: int | None = None,
+    report: bool | None = None,
+    **kwargs,
+) -> tuple[ndarray, int, int]:
     r"""
     Randomly generate points $\vec{p}_i$ according to the given data vectors $\vec{\mu}_i\in\mathbb{R}^n$
     and covariance matrices $\mathbf{\Sigma}_i\in\mathbb{R}^{n\times n}$,
@@ -60,25 +72,31 @@ def generate_collinear_points_cpp(mean: ndarray, cov: ndarray, n_samples: int = 
     size = mean.shape[0]
     dim = mean.shape[1]
 
-    if n_samples is None and n_accepted is None:
-        n_samples, n_accepted = 100000, 100000
-    elif n_samples is None:
-        n_samples = 0
-    elif n_accepted is None:
-        n_accepted = max(100000, n_samples)
+    n_samples = n_samples or 100000
+    n_accepted = n_accepted or max(100000, n_samples)
+    _n_samples, _n_accepted = int(n_samples), int(n_accepted)
 
     if seed is None:
         user_seed, seed = False, 0
     else:
         user_seed, seed = True, int(seed)
 
-    n_target = n_accepted
-    x = np.zeros((n_accepted, size, dim), dtype=float)
-    n_accepted = c_size_t(n_accepted)
-    n_samples = c_size_t(n_samples)
-    dll.gen_collinear(x.ctypes.data_as(c_double_p), mean.ctypes.data_as(c_double_p), cov.ctypes.data_as(c_double_p),
-                      c_size_t_p(n_accepted), c_size_t(size), c_size_t(dim),
-                      c_size_t_p(n_samples), c_bool(user_seed), c_size_t(seed), c_bool(report))
-    if n_accepted.value < n_target:
-        x = x[:n_accepted.value]
-    return x, n_accepted.value, n_samples.value
+    n_target = _n_accepted
+    x = np.zeros((_n_accepted, size, dim), dtype=float)
+    n_accepted_c = c_size_t(_n_accepted)
+    n_samples_c = c_size_t(_n_samples)
+    dll.gen_collinear(
+        x.ctypes.data_as(c_double_p),
+        mean.ctypes.data_as(c_double_p),
+        cov.ctypes.data_as(c_double_p),
+        c_size_t_p(n_accepted_c),
+        c_size_t(size),
+        c_size_t(dim),
+        c_size_t_p(n_samples_c),
+        c_bool(user_seed),
+        c_size_t(seed),
+        c_bool(report),
+    )
+    if n_accepted_c.value < n_target:
+        x = x[: n_accepted_c.value]
+    return x, n_accepted_c.value, n_samples_c.value

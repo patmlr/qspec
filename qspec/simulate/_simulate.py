@@ -19,7 +19,7 @@ from mpl_toolkits.mplot3d.axes3d import Axes3D
 import qspec.algebra as al
 from qspec import tools
 from qspec.physics import f_recoil, saturation
-from qspec.qtypes import Callable, array_like, cast, int_like, is_scalar, ndarray, scalar
+from qspec.qtypes import Callable, array_like, cast, complexfloating, int_like, is_scalar, ndarray, scalar
 from qspec.simulate._simulate_cpp import Atom, Environment, Laser, Polarization, sr_generate_y
 
 if TYPE_CHECKING:
@@ -311,12 +311,7 @@ def lambda_states(
     ode = si.complex_ode(_f)
     ode.set_initial_value(p0, 0.0).set_integrator("vode", method="bdf")
     # noinspection PyTypeChecker
-    y_array = np.array(
-        [
-            p0,
-        ]
-        + [ode.integrate(ti) for ti in t_array[1:]]
-    )
+    y_array: ndarray[complexfloating] = np.array([p0] + [ode.integrate(ti) for ti in t_array[1:]], dtype=complex)
     # result = si.solve_ivp(_f, (0., t), p0, method='RK45', max_step=dt, t_eval=t_array, vectorized=True)
     # # noinspection PyUnresolvedReferences
     # t_array, y_array = result.t, result.y.T
@@ -453,12 +448,7 @@ def lambda_ge_rec(
     ode.set_initial_value(y0, 0.0).set_integrator("vode", method="bdf")
 
     # noinspection PyTypeChecker
-    y_array = np.array(
-        [
-            y0,
-        ]
-        + [ode.integrate(ti) for ti in t_array[1:]]
-    )
+    y_array: ndarray[complexfloating] = np.array([y0] + [ode.integrate(ti) for ti in t_array[1:]], dtype=complex)
     # result = si.solve_ivp(_f, (0., t), y0, method='RK45', max_step=dt, t_eval=t_array, vectorized=True)
     # # noinspection PyUnresolvedReferences
     # t_array, y_array = result.t, result.y.T

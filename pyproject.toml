@@ -53,6 +53,7 @@ packages = ['qspec']
 extend-exclude = [
     "__pycache__",
     "docs/*",
+    "__init__.py",
 ]
 line-length = 120
 target-version = "py312"

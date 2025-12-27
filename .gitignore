@@ -2,6 +2,7 @@
 /dist/
 /qspec.egg-info/
 .idea
+.vscode
 __pycache__
 .ruff_cache
 /qspec/_cpp/src/qspec_cpp/x64/Release/*

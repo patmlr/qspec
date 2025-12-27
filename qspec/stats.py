@@ -15,6 +15,7 @@ from qspec import tools
 from qspec.qtypes import (
     Any,
     Callable,
+    Iterable,
     SupportsFloat,
     SupportsIndex,
     array_like,
@@ -90,10 +91,10 @@ class Observable(float):
         return f"Observable({super().__repr__()}, {self.std}, {self.std_2}, '{self.label}')"
 
     def __str__(self) -> str:
-        if self.std is None:
+        if self.std == 0.0:
             return f"{super().__repr__()}"
 
-        if self.std_2 is None:
+        if self.std_2 == 0.0:
             return f"{super().__repr__()}(+-{self.std})"
 
         return f"{super().__repr__()}(-{self.std}+{self.std_2})"
@@ -134,8 +135,8 @@ class Observable(float):
          a skew normal distribution is assumed. However, the ratio between the left- and right-sided uncertainty
          must not exceed 1.5.
         """
-        if self.std_2 is None:
-            return st.norm.rvs(loc=self, scale=0.0 if self.std is None else self.std, size=size)  # type: ignore
+        if self.std_2 == 0.0:
+            return st.norm.rvs(loc=self, scale=self.std, size=size)  # type: ignore
 
         if self.popt is not None:
             return st.skewnorm.rvs(*self.popt, size=size)  # type: ignore
@@ -209,6 +210,8 @@ def average(
     :returns: The average and its standard error for a given sample 'a' along the specified 'axis'.
     """
     a = np.asarray(a, dtype=float)
+    axis = None if axis is None else int(axis)
+
     if std is None and cov is None:  # The average and its standard error.
         av = np.average(a, axis=axis)
         av_d = np.std(a, axis=axis, ddof=1)
@@ -344,7 +347,7 @@ def mode_lognormal(x: array_like, bins: array_like = 100) -> float:
 
 def propagate(
     f: Callable,
-    x: array_like,
+    x: Iterable[scalar],
     x_d: array_like | None = None,
     cov: scalar_nd | None = None,
     unc_places: int_like | None = None,
@@ -382,7 +385,6 @@ def propagate(
      the mean and the standard deviation of the sampled data. If 'full_output' is True, a list of the input samples
      as well as the output sample are returned along with the observable.
     """
-    x = np.asarray(x, dtype=float)
     sample_size = int(sample_size)
 
     label = f.__name__

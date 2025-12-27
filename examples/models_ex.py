@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 examples.models_ex
 ==================
@@ -6,14 +5,14 @@ examples.models_ex
 Example script / Guide for the qspec.models module.
 """
 
-import numpy as np
 import matplotlib.pyplot as plt
+import numpy as np
 
 import qspec as qs
 import qspec.models as mod
 
 
-def example(n=None):
+def example(n: int | set[int] | None = None) -> None:
     """
     Run one or several of the available examples. Scroll to the end for the function call.
 
@@ -28,7 +27,9 @@ def example(n=None):
     if n is None:
         n = {0, 1, 2, 3}
     if isinstance(n, int):
-        n = {n, }
+        n = {
+            n,
+        }
 
     if 0 in n:
         model = mod.Offset(mod.NPeak(mod.Gauss()))
@@ -40,8 +41,8 @@ def example(n=None):
         # model.names >>> ['sigma__0', 'sigma__1', 'center__0', 'int__0', 'center__1', 'int__1', 'off0e0']
         # model.fixes >>> ['5.0(0.9)', '2 * sigma__0', False, False, False, False, False]
         print(model.names)
-        model.set_fix(0, '5(0.9)')
-        model.set_fix(1, '2 * sigma__0')
+        model.set_fix(0, "5(0.9)")
+        model.set_fix(1, "2 * sigma__0")
         print(model.fixes)
 
         p0 = [4, 90, -10, 0.8, 15, 1, 0]
@@ -67,7 +68,7 @@ def example(n=None):
         plt.show()
 
     if 3 in n:
-        i, jl, ju = 0.5, 6., 6.
+        i, jl, ju = 0.5, 6.0, 6.0
         mu = -0.2310
         gj = -1.165
         gi, gj_l, gj_u = mu / i, gj, gj
@@ -83,17 +84,33 @@ def example(n=None):
         # rho_ml = [[8.74141443e-06, 1.90481794e-04, 8.38033358e-04, 1.90855185e-03, 3.52054361e-03, 5.88331253e-03,
         #            9.21553518e-03, 1.38322805e-02, 2.07207003e-02, 3.21888520e-02, 5.40292143e-02, 1.02873158e-01,
         #            2.25612578e-01, 5.29178017e-01]]
-        models = [mod.HyperfineZeeman(
-            mod.Lorentz(), i, jl, ju, gi, gj_l, gj_u, f_l=6.5, f_u=5.5, q=_q - 1, rho_ml=rho_ml, rho_as_par=True,
-            linear=linear, label=f'{_q - 1}') for _q in range(3)]
+        models = [
+            mod.HyperfineZeeman(
+                mod.Lorentz(),
+                i,
+                jl,
+                ju,
+                gi,
+                gj_l,
+                gj_u,
+                f_l=6.5,
+                f_u=5.5,
+                q=_q - 1,
+                rho_ml=rho_ml,
+                rho_as_par=True,
+                linear=linear,
+                label=f"{_q - 1}",
+            )
+            for _q in range(3)
+        ]
 
         x_min, x_max = [], []
         for model in models:
-            model.set_val('Gamma', gamma)
-            model.set_val('Al', al)
-            model.set_val('Au', au)
-            model.set_val('B_field', b_field)
-            qs.printh(f'{model.label}:')
+            model.set_val("Gamma", gamma)
+            model.set_val("Al", al)
+            model.set_val("Au", au)
+            model.set_val("B_field", b_field)
+            qs.printh(f"{model.label}:")
             print(model.names)
             print(model.vals)
             print(model.fixes)
@@ -104,21 +121,21 @@ def example(n=None):
         x_max = np.max(x_max)
 
         x = np.linspace(x_min, x_max, 6001)
-        
+
         y = [model(x, *model.vals) for model in models]
 
         c = [0, 1, 4]
-        labels = [r'$\sigma^-$', r'$\pi$', r'$\sigma^+$']
+        labels = [r"$\sigma^-$", r"$\pi$", r"$\sigma^+$"]
         for iq, _y in enumerate(y):
-            plt.plot(x, _y, f'-C{c[iq]}', label=labels[iq], zorder=-100 * abs(iq - 1))
+            plt.plot(x, _y, f"-C{c[iq]}", label=labels[iq], zorder=-100 * abs(iq - 1))
 
         plt.legend()
-        plt.xlabel('Relative frequency (MHz)')
-        plt.ylabel('Intensity (arb. units)')
+        plt.xlabel("Relative frequency (MHz)")
+        plt.ylabel("Intensity (arb. units)")
         plt.subplots_adjust(left=0.12, bottom=0.11, right=0.99, top=0.99)
         plt.show()
 
 
-if __name__ == '__main__':
-    # example({0, 1, 2, 3})
-    example({0})
+if __name__ == "__main__":
+    example({0, 1, 2, 3})
+    # example({0})

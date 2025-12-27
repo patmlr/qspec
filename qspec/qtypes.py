@@ -5,20 +5,72 @@ qspec.qtypes
 Module including types for the docstrings.
 """
 
-from collections.abc import Callable, Generator, Iterable, Sized, Buffer, Sequence
+from collections.abc import Callable, Generator, Iterable, Sequence
 from types import CodeType
-from typing import Any, Optional, Protocol, SupportsComplex, SupportsFloat, SupportsIndex, TypeGuard, TypeVar, runtime_checkable
-from typing_extensions import Self
+from typing import (
+    Any,
+    Protocol,
+    SupportsFloat,
+    SupportsIndex,
+    TypeGuard,
+)
 
 from numpy import asarray as np_asarray
-from numpy import ndarray as np_ndarray
-from numpy import bool_, complexfloating, floating, generic, integer, number, str_
+from numpy import bool_, complexfloating, floating, integer, number, str_
 from numpy.typing import ArrayLike, NDArray
 from sympy import AtomicExpr, Rational, nsimplify
 
-# __all__ = []
+__all__ = [
+    "Any",
+    "Callable",
+    "CodeType",
+    "Generator",
+    "Iterable",
+    "Protocol",
+    "Sequence",
+    "SupportsFloat",
+    "SupportsIndex",
+    "TypeGuard",
+    "array_like",
+    "asarray",
+    "asarray_none",
+    "bool_1d",
+    "bool_nd",
+    "cast",
+    "cast_sympy",
+    "complex_like",
+    "complexfloating",
+    "complexscalar",
+    "complexscalar_1d",
+    "complexscalar_nd",
+    "fix_type",
+    "fix_type_1d",
+    "float_like",
+    "floating",
+    "has_getitem",
+    "has_shape",
+    "int_like",
+    "integer",
+    "is_scalar",
+    "is_sympy_expr",
+    "ndarray",
+    "object_1d",
+    "object_nd",
+    "quant",
+    "scalar",
+    "scalar_1d",
+    "scalar_nd",
+    "str_1d",
+    "str_nd",
+    "sympy_complexscalar",
+    "sympy_expr",
+    "sympy_scalar",
+]
+
 
 """ Scalar types """
+
+
 class quant(float):
     """
     Convert a string or a number to a floating-point quantum number, if possible.
@@ -74,6 +126,7 @@ class quant(float):
     def s(self) -> Rational:
         return Rational(self)
 
+
 type int_like = NDArray[integer] | integer | int
 type float_like = NDArray[floating] | floating | float
 type complex_like = NDArray[complexfloating] | complexfloating | complex
@@ -112,42 +165,42 @@ type fix_type_1d = ndarray | tuple[fix_type, ...] | list[fix_type]
 
 """ type guarding methods """
 
-class HasGetItem(Protocol):
-    def __getitem__(self, i: Any) -> Any: ...
-
 
 class HasShape(Protocol):
     @property
     def shape(self) -> tuple[int, ...]: ...
 
 
-def has_getitem(a: object) -> TypeGuard[HasGetItem]:
-    return hasattr(a, "__getitem__")
+class HasGetItem(Protocol):
+    def __getitem__(self, i: Any) -> Any: ...
 
 
-def has_shape(a: object) -> TypeGuard[HasShape]:
+def has_shape(a: Any) -> TypeGuard[HasShape]:
     return hasattr(a, "shape")
 
 
-def is_scalar(a: object) -> TypeGuard[scalar]:
+def has_getitem(a: Any) -> TypeGuard[HasGetItem]:
+    if has_shape(a):
+        return bool(a.shape)
+    return bool(hasattr(a, "__getitem__"))
+
+
+def is_scalar(a: Any) -> TypeGuard[scalar]:
     return hasattr(a, "__float__") and not (has_shape(a) and a.shape)
 
 
-def is_sympy_expr(a: object) -> TypeGuard[sympy_expr]:
+def is_sympy_expr(a: Any) -> TypeGuard[sympy_expr]:
     return isinstance(a, AtomicExpr)
 
 
 """ Type conversion methods """
-T = TypeVar("T")
 
 
-def cast[T](*args: object, dtype: Callable[[Any], T]) -> tuple[T, ...]:
+def cast[T](*args: Any, dtype: Callable[[Any], T]) -> tuple[T, ...]:
     return tuple(dtype(arg) for arg in args)
 
 
-def cast_sympy[T](
-    *args: sympy_scalar, as_sympy: bool = True, dtype: Callable[[Any], T] = float
-) -> tuple[T, ...]:
+def cast_sympy[T](*args: sympy_scalar, as_sympy: bool = True, dtype: Callable[[Any], T] = float) -> tuple[T, ...]:
     r"""
     Cast the arguments `args` to a <a href="https://www.sympy.org/en/index.html">
     `sympy`</a> type (symbol) or the specified `dtype`.
@@ -160,5 +213,21 @@ def cast_sympy[T](
     return cast(*args, dtype=(nsimplify if as_sympy else dtype))
 
 
-def asarray(*args: object, **kwargs) -> tuple[ndarray, ...]:
+def asarray(*args: Any, **kwargs: Any) -> tuple[ndarray, ...]:
+    r"""
+    Cast the arguments `args` to `np.ndarray`'s of the specified `dtype`.
+
+    :param args: The arguments to cast.
+    :param kwargs: Additional keywords are passed to `np.asarray`.
+    :returns: (a_tuple) A tuple of `np.ndarray`'s.
+    """
     return tuple(np_asarray(a, **kwargs) for a in args)
+
+
+def asarray_none(*args: Any | None, **kwargs: Any) -> tuple[ndarray | None, ...]:
+    """
+    :param args: The arguments to cast.
+    :param kwargs: Additional keywords are passed to `np.asarray`.
+    :returns: (a_tuple) A tuple of `np.ndarray`'s and `None`'s.
+    """
+    return tuple(None if a is None else np_asarray(a, **kwargs) for a in args)

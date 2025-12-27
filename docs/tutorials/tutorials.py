@@ -7,7 +7,7 @@ from pygments.formatters import HtmlFormatter
 from pygments.styles import get_style_by_name
 
 
-STYLE = 'tango'
+STYLE = "tango"
 
 
 def example_0():
@@ -24,26 +24,27 @@ def example_0():
     # Resonance frequency from NIST database
     f0 = qs.inv_cm_to_freq(24516.65)  # (MHz) [2]
     # >>> 734990676.5 MHz
-    print(f'f0: {f0} MHz')
+    print(f"f0: {f0} MHz")
 
     # Relativistic velocity of 88Sr+
     v = qs.v_el(U, q, m)  # (m/s)
     # >>> 209533.6 m/s
-    print(f'v: {v} MHz')
+    print(f"v: {v} MHz")
 
     # The anti-collinear lab. frequency
-    f_laser = qs.doppler(f0, v, qs.pi, return_frame='lab')  # (MHz)
+    f_laser = qs.doppler(f0, v, qs.pi, return_frame="lab")  # (MHz)
     # >>> 734477149.8 MHz
-    print(f'f_laser: {f_laser} MHz')
+    print(f"f_laser: {f_laser} MHz")
 
     # The differential Doppler shift
     df_atom = qs.doppler_el_d1(f_laser, qs.pi, U, q, m)  # (MHz / V)
     # >>> +12.84 MHz / V
-    print(f'df_atom: {df_atom} MHz')
+    print(f"df_atom: {df_atom} MHz")
 
 
 def example_1():
     import numpy as np
+
     import qspec as qs
 
     I = 4.5  # Total nuclear spin quantum number of 87Sr+
@@ -62,9 +63,10 @@ def example_1():
 
 
 def example_2():
-    import numpy as np
-    import qspec.models as mod
     import matplotlib.pyplot as plt
+    import numpy as np
+
+    import qspec.models as mod
 
     # Generate the model used in this tutorial
     model = mod.Offset(  # Add a y-axis shift (off0e0)
@@ -75,17 +77,17 @@ def example_2():
             mod.Voigt(), n_peaks=1)) # Add a Voigt lineshape
             # with Lorentzian (Gamma) and Gaussian (sigma) widths
 
-    print(f'\nParameter names: {model.names}\n')
-    # >>> Parameter names: ['Gamma', 'sigma', 'x0', 'p0', 'off0e0']
+    print(f"\nParameter names: {model.names}\n")
+    # >>> Parameter names: ["Gamma", "sigma", "x0", "p0", "off0e0"]
 
     # Change all parameter values and if they stay fixed during fitting at once
     model.set_vals([20., 6., 0., 10., 3.])
-    model.set_fixes([False, '5(0.7)', False, False, False])
+    model.set_fixes([False, "5(0.7)", False, False, False])
 
     # Generate some random data for this tutorial
     x = np.linspace(-80., 80., 81)  # x-values
     sigma_y = np.full_like(x, 0.5)  # y-uncertainties
-    y = np.random.normal(model(x, *model.vals), sigma_y)
+    y = np.random.default_rng().normal(model(x, *model.vals), sigma_y)
     # Random y-values around the model
 
     # Change the initial value of the peak position and intensity
@@ -98,13 +100,13 @@ def example_2():
         model, x, y, sigma_y=sigma_y, report=True)
 
     # We plot the data, the initial model and the fitted model
-    plt.errorbar(x, y, yerr=sigma_y, fmt='.k', label='Data')
-    plt.plot(x, model(x, *p_init), '-C0', label='Initial model')
-    plt.plot(x, model(x, *popt), '-C1', label='Fitted model')
+    plt.errorbar(x, y, yerr=sigma_y, fmt=".k", label="Data")
+    plt.plot(x, model(x, *p_init), "-C0", label="Initial model")
+    plt.plot(x, model(x, *popt), "-C1", label="Fitted model")
 
     # Improve the plot
     plt.legend()
-    plt.xlabel('x'), plt.ylabel('y')
+    plt.xlabel("x"), plt.ylabel("y")
     plt.subplots_adjust(left=0.08, bottom=0.09, top=0.99, right=0.99)
     plt.show()
 
@@ -132,7 +134,7 @@ def example_3():
              [(        0.  , 0.  ), (        0.  , 0.  )],  # 50Ca
              [(        0.  , 0.  ), (        0.  , 0.  )]]  # 52Ca
 
-    # Construct a King object. Optionally specify 'x_abs' here
+    # Construct a King object. Optionally specify `x_abs` here
     # to omit isotope shifts when fitting. 20 electron masses are subtracted
     # to perform the King plot analysis with the nuclear masses.
     king = qs.King(a=a, m=m, x_abs=x_abs, subtract_electrons=20)
@@ -141,8 +143,8 @@ def example_3():
     a_ref = [40, 48, 42, 40, 44]  # Choose individual reference isotopes.
 
     # Do a simple 2d King plot.
-    # The 'mode' keyword is only used for the axis labels.
-    popt, pcov = king.fit(a_fit, a_ref, mode='shifts')
+    # The `mode` keyword is only used for the axis labels.
+    popt, pcov = king.fit(a_fit, a_ref, mode="shifts")
     # >>> f(x) = (177.3 u MHz) + 1.00068 * x
 
     a_unknown = [50, 52]  # Specify the unknown isotopes
@@ -153,15 +155,16 @@ def example_3():
 
     # Calculate the isotope shifts of the D1 line and their covariances.
     x, cov, cov_stat = king.get_unmodified(
-        a_unknown, a_unknown_ref, y, axis=1, show=True, mode='shifts')
+        a_unknown, a_unknown_ref, y, axis=1, show=True, mode="shifts")
 
     for iso, c in zip(a_unknown, cov):
-        qs.printh(f'\n{iso}Ca+:')  # Print colored headline.
+        qs.printh(f"\n{iso}Ca+:")  # Print colored headline.
         qs.print_cov(c)  # Print color-coded covariance matrix.
 
 
 def example_4():
     import numpy as np
+
     import qspec.simulate as sim
 
     f_sp = 446810183.163  # Transition frequency (MHz)
@@ -171,11 +174,11 @@ def example_4():
     p_hyper = [-3.055038, -0.29670]
 
     s = sim.gen_electronic_ls_state(
-        0., s=0.5, l=0, j=0.5, i=1.5, hyper_const=s_hyper, label='s')
+        0., s=0.5, l=0, j=0.5, i=1.5, hyper_const=s_hyper, label="s")
     p = sim.gen_electronic_ls_state(
-        f_sp, s=0.5, l=1, j=1.5, i=1.5, hyper_const=p_hyper, label='p')
+        f_sp, s=0.5, l=1, j=1.5, i=1.5, hyper_const=p_hyper, label="p")
 
-    decay = sim.DecayMap(labels=[('s', 'p')], a=[a_sp])
+    decay = sim.DecayMap(labels=[("s", "p")], a=[a_sp])
     li7 = sim.Atom(s + p, decay)
 
     intensity = 1.  # uW /mm**2
@@ -212,30 +215,30 @@ def example_4():
     x_lim = delta[0], delta[-1]
 
     fig, (m, r) = plt.subplots(
-        2, 1, sharex='all', height_ratios=[3, 1], figsize=(6, 5))
+        2, 1, sharex="all", height_ratios=[3, 1], figsize=(6, 5))
 
-    m.plot(delta, y_brown * scale, '-k',
-           label=r'Brown $et\,al.$', zorder=20)
-    m.plot(delta, y_rates * scale, '-C0',
-           label=r'rates, $t = 0.2\,\mu$s', zorder=0)
-    m.plot(delta, y_master * scale, '-C1',
-           label=r'master, $t = 0.2\,\mu$s', zorder=60)
-    m.plot(delta, y4_master * scale, '--C3',
-           label=r'master, $t = 0.4\,\mu$s', linewidth=1.5, zorder=30)
+    m.plot(delta, y_brown * scale, "-k",
+           label=r"Brown $et\,al.$", zorder=20)
+    m.plot(delta, y_rates * scale, "-C0",
+           label=r"rates, $t = 0.2\,\mu$s", zorder=0)
+    m.plot(delta, y_master * scale, "-C1",
+           label=r"master, $t = 0.2\,\mu$s", zorder=60)
+    m.plot(delta, y4_master * scale, "--C3",
+           label=r"master, $t = 0.4\,\mu$s", linewidth=1.5, zorder=30)
 
     r.plot(delta, (y_brown - y_rates) * scale,
-           '-k', zorder=20)
+           "-k", zorder=20)
     r.plot(delta, (y_master - y_rates) * scale,
-           '-C1', zorder=60)
+           "-C1", zorder=60)
     r.plot(delta, (y4_master - y_rates) * scale,
-           '--C3', linewidth=1.5, zorder=10)
-    r.hlines(0, *x_lim, 'C0', '-', zorder=0)
+           "--C3", linewidth=1.5, zorder=10)
+    r.hlines(0, *x_lim, "C0", "-", zorder=0)
 
     m.legend()
-    m.set_ylabel(r'$\mathrm{d}\Gamma / \mathrm{d}\Omega$ (kHz)')
+    m.set_ylabel(r"$\mathrm{d}\Gamma / \mathrm{d}\Omega$ (kHz)")
     m.set_xlim(*x_lim)
-    r.set_xlabel('Relative frequency (MHz)')
-    r.set_ylabel('Residuals (kHz)')
+    r.set_xlabel("Relative frequency (MHz)")
+    r.set_ylabel("Residuals (kHz)")
 
     y_lim = m.get_ylim()
     r.set_ylim(-(y_lim[1] - y_lim[0]) / 6, (y_lim[1] - y_lim[0]) / 6)
@@ -245,10 +248,11 @@ def example_4():
 
 
 def example_5():
+    import matplotlib.pyplot as plt
     import numpy as np
+
     import qspec as qs
     import qspec.simulate as sim
-    import matplotlib.pyplot as plt
 
     f_eg = 7e8  # Transition frequency
     a_eg = 10.  # Einstein coefficient
@@ -259,16 +263,16 @@ def example_5():
     i, jg, je = 0., 2., 5.
     dm = 1  # The change of the m quantum number
 
-    g = sim.State(0., parity='e', j=jg, i=i, f=jg + i, m=jg + i,
-                  hyper_const=g_hyper, label='g')
-    e = sim.State(f_eg, parity='o', j=je, i=i, f=je + i, m=jg + i + dm,
-                  hyper_const=e_hyper, label='e')
+    g = sim.State(0., parity="e", j=jg, i=i, f=jg + i, m=jg + i,
+                  hyper_const=g_hyper, label="g")
+    e = sim.State(f_eg, parity="o", j=je, i=i, f=je + i, m=jg + i + dm,
+                  hyper_const=e_hyper, label="e")
 
     states = [g, e]
-    decay = sim.DecayMap(labels=[('g', 'e')], a=[a_eg], k_max=int(je - jg))
+    decay = sim.DecayMap(labels=[("g", "e")], a=[a_eg], k_max=int(je - jg))
     atom = sim.Atom(states=states, decay_map=decay)
-    print(atom.get_multipole_types('g', 'e'))
-    # >>> {'e3'}
+    print(atom.get_multipole_types("g", "e"))
+    # >>> {"e3"}
 
     intensity = 1e3
     pol_eg = sim.Polarization([1., 0, 1j], vec_as_q=False)
@@ -290,14 +294,14 @@ def example_5():
     plt.plot(t, y[0], label=g.label)
     plt.plot(t, y[1], label=e.label)
     plt.legend()
-    plt.xlabel(r'Time ($\mu$s)')
-    plt.ylabel('Population')
+    plt.xlabel(r"Time ($\mu$s)")
+    plt.ylabel("Population")
     plt.show()
 
     n_theta, n_phi = 128, 256
     theta = np.linspace(0., np.pi, n_theta)
     phi = np.linspace(0., 2 * np.pi, n_phi)
-    theta, phi = np.meshgrid(theta, phi, indexing='ij')
+    theta, phi = np.meshgrid(theta, phi, indexing="ij")
 
     r = atom.scattering_rate(rho[0, :, :, -1], theta=theta, phi=phi,
                              x_vec=None, axis=0)
@@ -308,9 +312,9 @@ def example_5():
     y = r * np.sin(theta) * np.sin(phi)
     z = r * np.cos(theta)
 
-    fig, ax = plt.subplots(subplot_kw={'projection': '3d'})
+    fig, ax = plt.subplots(subplot_kw={"projection": "3d"})
 
-    cm = plt.get_cmap('plasma')
+    cm = plt.get_cmap("plasma")
     ax.plot_surface(x, y, z, facecolors=cm(r), rcount=128, ccount=256,
                     linewidth=0, antialiased=False)
 
@@ -326,29 +330,28 @@ def example_5():
 
 def pycode_to_html(code):
     style = get_style_by_name(STYLE)
-    lexer = get_lexer_by_name('python', stripall=True)
-    formatter = HtmlFormatter(linenos=False, cssclass='py-source', style=style)
+    lexer = get_lexer_by_name("python", stripall=True)
+    formatter = HtmlFormatter(linenos=False, cssclass="py-source", style=style)
     html = highlight(code, lexer, formatter)
     print(html)
 
 
 def gen_pycode_css():
     style = get_style_by_name(STYLE)
-    formatter = HtmlFormatter(cssclass='py-source', style=style)
+    formatter = HtmlFormatter(cssclass="py-source", style=style)
     css = formatter.get_style_defs()
-    with open(os.path.join(os.pardir, '_sass', 'pycode.scss'), 'w') as css_file:
+    with open(os.path.join(os.pardir, "_sass", "pycode.scss"), "w") as css_file:
         css_file.write(css)
 
 
 def gen_example(n):
-    # with open(os.path.join(os.pardir, os.pardir, 'examples', 'overview_tut.py'), 'r') as py_file:
+    # with open(os.path.join(os.pardir, os.pardir, "examples", "overview_tut.py"), "r") as py_file:
     #     code = py_file.read()
-    code = inspect.getsource(eval(f'example_{n}'))
+    code = inspect.getsource(eval(f"example_{n}"))
     pycode_to_html(code)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     # gen_pycode_css()
-    # gen_example(0)
-    gen_example(5)
-    example_5()
+    gen_example(0)
+    example_0()

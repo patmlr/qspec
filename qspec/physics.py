@@ -901,9 +901,7 @@ def lande_jj(j0: scalar, j1: scalar, j: scalar, g0: scalar, g1: scalar) -> float
     return 0.5 * g0 * (jj + jj01) / jj + 0.5 * g1 * (jj - jj01) / jj
 
 
-def g_j(
-    j: scalar = 0, ls: scalar_nd | None = None, jj: scalar_1d | None = None, gj: array_like | None = None
-) -> float:
+def g_j(j: scalar = 0, ls: scalar_nd | None = None, jj: scalar_1d | None = None, gj: array_like | None = None) -> float:
     r"""
     The electronic g-factor of a state with angular momentum $\vec{J}$ in the LS- or jj-coupling scheme.
     See `lande_j` and `lande_jj`.
@@ -923,6 +921,7 @@ def g_j(
     """
     error = False
     _gj = 0.0
+
     if ls is None and gj is None:
         error = True
 
@@ -944,6 +943,9 @@ def g_j(
         else:
             error = True
 
+    elif is_scalar(gj):
+        _gj = float(gj)
+
     elif has_getitem(gj) and has_getitem(jj):
         _gj = lande_jj(jj[0], jj[1], j, gj[0], gj[1])
 
@@ -951,7 +953,7 @@ def g_j(
         error = True
 
     if error:
-        raise ValueError("If `gj` is None, both `ls` and `jj` (if needed) need to be specified as lists.")
+        raise ValueError("If `gj` is `None`, both `ls` and `jj` (if needed) need to be specified as lists.")
 
     return _gj
 
@@ -1006,7 +1008,7 @@ def cast_hyper_const(hyper_const: array_like | None = None) -> ndarray:
         b = hyper_const[0]
         b = np.zeros(b.shape, dtype=float) if has_shape(b) else 0.0
 
-        hyper_const.append(b) # type: ignore
+        hyper_const.append(b)  # type: ignore
 
     return np.array(hyper_const[:3], dtype=float)
 
@@ -2515,7 +2517,7 @@ def normal_vx_pdf(vx: array_like, m: array_like, t: array_like) -> ndarray:
     return st.norm.pdf(vx, scale=scale)
 
 
-def normal_vx_rvs(m: array_like, t: array_like, size: int | tuple[int] = 1) -> ndarray:
+def normal_vx_rvs(m: array_like, t: array_like, size: int | tuple[int, ...] = 1) -> ndarray:
     r"""
     Random sample velocity components $v_x$ from the Gaussian probability density function
 
@@ -2557,7 +2559,7 @@ def chi2_ex_pdf(ex: array_like, t: array_like) -> ndarray:
     return st.chi2.pdf(ex, 1, scale=scale)
 
 
-def chi2_ex_rvs(t: array_like, size: int | tuple[int] = 1) -> ndarray:
+def chi2_ex_rvs(t: array_like, size: int | tuple[int, ...] = 1) -> ndarray:
     r"""
     Random sample energy components $E_x$ from the $\chi^2_1$ probability density function
 
@@ -2786,9 +2788,7 @@ def normal_chi2_convolved_f_xi_pdf(
     return r
 
 
-def source_energy_pdf(
-    f: array_like, f0: scalar, sigma: scalar, xi: scalar, collinear: bool = True
-) -> ndarray:
+def source_energy_pdf(f: array_like, f0: scalar, sigma: scalar, xi: scalar, collinear: bool = True) -> ndarray:
     r"""
     This is the same function as
     <a href="{{ '/doc/functions/physics/normal_chi2_convolved_f_xi_pdf.html' | relative_url }}">

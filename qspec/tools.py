@@ -11,6 +11,7 @@ import sqlite3
 import numpy as np
 
 from qspec.qtypes import (
+    Any,
     Callable,
     Iterable,
     Rational,
@@ -446,7 +447,7 @@ def factorial(n: array_like) -> ndarray:
 """ Iterable operations """
 
 
-def asarray_optional(a: array_like | None, **kwargs) -> ndarray | None:
+def asarray_optional(a: Any | None, **kwargs) -> ndarray | None:
     """
     :param a: Input data, see numpy docs.
     :param kwargs: The keyword arguments are passed to `numpy.asarray`.

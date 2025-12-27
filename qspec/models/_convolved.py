@@ -20,7 +20,7 @@ CONVOLVE = ["None", "Gauss", "Lorentz", "GaussChi2"]
 
 
 class Convolved(Model):
-    def __init__(self, model: Model | None, model_1: Model | None) -> None:
+    def __init__(self, model: Model | None = None, model_1: Model | None = None) -> None:
         """
         A generic numerical convolution model.
 
@@ -51,7 +51,7 @@ class Convolved(Model):
             if model is None:
                 raise ValueError(CONVOLVE_IS_NONE_ERROR)
             return model.evaluate(x, *args)
-        
+
         if self.model_1 is None:
             return self.model.evaluate(x, *args)
 

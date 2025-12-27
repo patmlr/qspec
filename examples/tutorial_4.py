@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 examples.tutorial_4
 ===================
@@ -28,7 +27,7 @@ x_abs = [[(755222765.66, 0.10), (761905012.53, 0.11)],  # 40Ca
          [(0., 0.), (0., 0.)],  # 50Ca
          [(0., 0.), (0., 0.)]]  # 52Ca
 
-# Construct a King object. Optionally specify 'x_abs' here
+# Construct a King object. Optionally specify `x_abs` here
 # to omit isotope shifts when fitting. 20 electron masses are subtracted
 # to perform the King plot analysis with the nuclear masses.
 king = qs.King(a=a, m=m, x_abs=x_abs, subtract_electrons=20)
@@ -37,8 +36,8 @@ a_fit = [42, 43, 44, 46, 48]  # Choose the isotopes to fit.
 a_ref = [40, 48, 42, 40, 44]  # Choose individual reference isotopes.
 
 # Do a simple 2d King plot.
-# The 'mode' keyword is only used for the axis labels.
-popt, pcov = king.fit(a_fit, a_ref, mode='shifts')
+# The `mode` keyword is only used for the axis labels.
+popt, pcov = king.fit(a_fit, a_ref, mode="shifts")
 # >>> f(x) = (177.3 u MHz) + 1.00068 * x
 
 a_unknown = [50, 52]  # Specify the unknown isotopes
@@ -49,8 +48,8 @@ y = [(1969.2, 5.6), (2219.2, 7.0)]
 
 # Calculate the isotope shifts of the D1 line and their covariances.
 x, cov, cov_stat = king.get_unmodified(
-    a_unknown, a_unknown_ref, y, axis=1, show=True, mode='shifts')
+    a_unknown, a_unknown_ref, y, axis=1, show=True, mode="shifts")
 
 for iso, c in zip(a_unknown, cov):
-    qs.printh(f'\n{iso}Ca+:')  # Print colored headline.
+    qs.printh(f"\n{iso}Ca+:")  # Print colored headline.
     qs.print_cov(c)  # Print color-coded covariance matrix.

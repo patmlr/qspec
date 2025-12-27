@@ -194,7 +194,9 @@ def hf_int(i: scalar, j_l: scalar, j_u: scalar, transitions: Iterable) -> list[n
 
 
 class Splitter(Model):
-    def __init__(self, model: Model, i: scalar, j_l: scalar, j_u: scalar, label: str | None = None) -> None:
+    def __init__(
+        self, model: Model, i: scalar, j_l: scalar, j_u: scalar, label: str | None = None, **kwargs: Any
+    ) -> None:
         r"""
         The abstract base class for Hyperfine structure models.
 
@@ -203,13 +205,14 @@ class Splitter(Model):
         :param j_l: The total lower state electron angular momentum $J$.
         :param j_u: The total upper state electron angular momentum $J^\prime$.
         :param label: A label for the `Splitter` (isotope / isomer / transition).
+        :param kwargs: Additional `kwargs` are passed to the the specific `Splitter` model.
         """
         super().__init__(model=model)
         self.type = "Splitter"
 
-        self.i = i
-        self.j_l = j_l
-        self.j_u = j_u
+        self.i = float(i)
+        self.j_l = float(j_l)
+        self.j_u = float(j_u)
         if label is None:
             label = "None"
         self.label = label
@@ -572,11 +575,7 @@ class HyperfineMixed(Splitter):
         self.mask_J = {
             s: [
                 np.array(
-                    [
-                        i
-                        for i, j in enumerate(self.config[f"J{s}"])
-                        if abs(self.i - j) - 0.1 < f < self.i + j + 0.1
-                    ],
+                    [i for i, j in enumerate(self.config[f"J{s}"]) if abs(self.i - j) - 0.1 < f < self.i + j + 0.1],
                     dtype=int,
                 )
                 for f in self.F[s]
@@ -653,9 +652,7 @@ class HyperfineMixed(Splitter):
 
         for i, (t, intensity) in enumerate(zip(self.transitions, self.racah_intensities)):
             self.racah_indices.append(self._index)
-            self._add_arg(
-                f"int{i}([{t[1][0]}, {t[2][0]}] -> [{t[1][1]}, {t[2][1]}])", intensity, i == 0, False
-            )
+            self._add_arg(f"int{i}([{t[1][0]}, {t[2][0]}] -> [{t[1][1]}, {t[2][1]}])", intensity, i == 0, False)
 
     def x0(self, *args: scalar) -> ndarray:
         """

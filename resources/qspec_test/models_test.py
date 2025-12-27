@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 PyCLS.tests.test_lineshapes
 
@@ -10,14 +9,15 @@ Module including unittests for the lineshapes module.
 """
 
 import unittest as ut
+
 import qspec.models as mod
 
 
 class TestLineshapes(ut.TestCase):
 
-    def test_lineshapes(self):
-        shapes = ['lorentz', 'gauss', 'voigt']
-        qi = [False, True]
+    def test_lineshapes(self) -> None:
+        shapes = ["lorentz", "gauss", "voigt"]
+        _qi = [False, True]
         quantum_numbers = [[0, 0.5, 1.5], [3.5, 0.5, 1.5], [2, 3, 4]]
         for shape in shapes:
             for qn in quantum_numbers:

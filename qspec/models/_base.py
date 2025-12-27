@@ -64,26 +64,26 @@ def _is_unc(fix: fix_type) -> bool:
     return True
 
 
-def _val_fix_to_val(val: scalar, fix: str | scalar) -> float:
+def _val_fix_to_val(val: scalar, fix: fix_type) -> float:
     if isinstance(fix, str):
         j = fix.find("(")
         return float(fix[:j])
 
     if is_scalar(fix):
         return float(val)
-    
-    raise TypeError("`fix` must be `str` or `scalar`")
+
+    raise TypeError("`fix` must be `str` or `scalar`.")
 
 
-def _fix_to_unc(fix: str | scalar) -> float:
+def _fix_to_unc(fix: fix_type) -> float:
     if isinstance(fix, str):
         j, k = fix.find("("), fix.find(")")
         return float(fix[j + 1 : k])
 
     if is_scalar(fix):
         return float(fix)
-    
-    raise TypeError("`fix` must be `str` or `scalar`")
+
+    raise TypeError("`fix` must be `str` or `scalar`.")
 
 
 def _args_ordered(args: scalar_nd, order: Iterable[int_like]) -> list[ndarray[floating]]:
@@ -95,7 +95,6 @@ def _poly(x: ndarray, *args: scalar) -> ndarray:
 
 
 class Model:
-
     def __init__(self, model: "Model | None" = None) -> None:
         """
         Base class for all models.
@@ -512,6 +511,10 @@ class NPeak(Model):
         self.model: Model
         super().__init__(model=model)
         self.type = "NPeak"
+
+        if self.model is None:
+            raise ValueError(MODEL_IS_NONE_ERROR.format(type(self)))
+
         self.n_peaks = int(n_peaks)
         for n in range(self.n_peaks):
             self._add_arg(f"x{n}", 0.0, n == 0, False)
@@ -556,7 +559,7 @@ class NPeak(Model):
 
 class Offset(Model):
     def __init__(
-        self, model: Model | None = None, x_cuts: array_like | None = None, offsets: Iterable[scalar] | None = None
+        self, model: Model | None = None, x_cuts: array_like | None = None, offsets: array_like | None = None
     ) -> None:
         """
         Cuts the x-axis and adds y-axis offsets to every segment.
@@ -571,10 +574,14 @@ class Offset(Model):
 
         if x_cuts is None:
             x_cuts = []
-        self.x_cuts = sorted(np.asarray(x_cuts, dtype=float).tolist())
+
+        x_cuts = np.asarray(x_cuts, dtype=float).flatten()
+        self.x_cuts: list[float] = sorted(x_cuts.tolist())
 
         if offsets is None:
             offsets = [0]
+
+        offsets = np.asarray(offsets, dtype=int).flatten()
         self.offsets: list[int] = list(int(o) for o in offsets)
 
         if len(self.offsets) != len(self.x_cuts) + 1:
@@ -757,6 +764,7 @@ class YPars(Model):
 
         :param model: A submodel whose parameters are adopted by this model.
         """
+        self.model: Model
         super().__init__(model=model)
         self.type = "YPars"
 
