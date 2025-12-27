@@ -413,7 +413,7 @@ class State(CppClass):
 
         :param freq_j: The absolute frequency of the state without the hyperfine structure or the environment (MHz).
         :param parity: The parity $\pi$ of the state is used to check the selection rules.
-         It can be either `'even'` (`'e'`, `False`) or `'odd'` (`'o'`, `True`).
+         It can be either `"even"` (`"e"`, `False`) or `"odd"` (`"o"`, `True`).
         :param j: The electronic total angular momentum quantum number $J$.
         :param i: The nuclear spin quantum number $I$.
         :param f: The total angular momentum quantum number $F$.
@@ -638,8 +638,8 @@ class DecayMap(CppClass):
         :param a: An Iterable of Einstein-A coefficients $A_{if}$, where the states $|i\rangle$ and $|f\rangle$
          have the labels specified in the list of `labels`. If `a[i]` is a single value,
          only the lowest allowed (not necessarily the dominant!) multipole transition will be used.
-         Each `a[i]` can also be a `dict` with keys `'e'` or `'m'` to use either first allowed multipole order, or
-          `f'e{k}'` or `f'm{k}'` to define specific rank-$k$ multipole transitions. (MHz).
+         Each `a[i]` can also be a `dict` with keys `"e"` or `"m"` to use either first allowed multipole order, or
+          `f'e{k}"` or `f'm{k}"` to define specific rank-$k$ multipole transitions. (MHz).
         :param k_max: The maximum considered multipole order $k_\mathrm{max}$. The default value is 1 (dipole).
         :param instance: An existing `DecayMap` instance. If this is specified, the other parameters are omitted.
         """
@@ -896,7 +896,7 @@ class Atom(CppClass):
         :param label_0: The label of the first state.
         :param label_1: The label of the second state.
         :returns: (multipole_orders) A set of multipole orders contributing to the transition
-         between the specified labels in the format `f'e{k}'` and `f'm{k}'`.
+         between the specified labels in the format `f'e{k}"` and `f'm{k}"`.
         """
         indexes = [
             [i, j]
@@ -2722,7 +2722,7 @@ def gen_electronic_state(
     :param freq_j: The energetic position of the state without the hyperfine structure or the magnetic field (MHz).
     :param parity: The parity $\pi$ of the state is used to check the selection rules.
      If None, it is inferred from `ls` if possible.
-     It can be either `'even'` (`'e'`, `False`) or `'odd'` (`'o'`, `True`).
+     It can be either `"even"` (`"e"`, `False`) or `"odd"` (`"o"`, `True`).
     :param j: The electronic total angular momentum quantum number $J$.
     :param i: The nuclear spin quantum number $I$.
     :param ls: A list or a single pair of electronic angular momentum and spin quantum numbers $(l_i, s_i)$
@@ -2781,7 +2781,7 @@ def gen_hyperfine_state(
     :param freq_j: The energetic position of the state without the hyperfine structure or the magnetic field (MHz).
     :param parity: The parity $\pi$ of the state is used to check the selection rules.
      If None, it is inferred from `ls` if possible.
-     It can be either `'even'` (`'e'`, `False`) or `'odd'` (`'o'`, `True`).
+     It can be either `"even"` (`"e"`, `False`) or `"odd"` (`"o"`, `True`).
     :param j: The electronic total angular momentum quantum number $J$.
     :param i: The nuclear spin quantum number $I$.
     :param f: The total angular momentum quantum number $F$.

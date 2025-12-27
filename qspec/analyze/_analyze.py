@@ -828,15 +828,15 @@ def _test_order_linear_nd_monte_carlo(
      Use <a href="{{ '/doc/functions/analyze/covariance_matrix.html' | relative_url }}">
     `covariance_matrix`</a> to construct covariance matrices.
     :param n_samples: Maximum number of generated samples.
-     If `None` and `method == 'cpp'`, samples are generated until `n_accepted` samples get accepted,
+     If `None` and `method == 'cpp"`, samples are generated until `n_accepted` samples get accepted,
      see <a href="{{ '/doc/functions/analyze/generate_collinear_points_cpp.html' | relative_url }}">
      `generate_collinear_points_cpp`</a>.
-    :param n_accepted: The number of samples to be accepted for each data point. Only available if `method == 'cpp'`.
+    :param n_accepted: The number of samples to be accepted for each data point. Only available if `method == 'cpp"`.
     :param method: The method to generate the collinear points. Can be one of `{'py', 'cpp'}`.
-     The `'py'` version is faster but only allows to specify `n_samples`.
-     The `'cpp'` version is slower but allows to specify both `n_accepted` and `n_samples`.
+     The `"py"` version is faster but only allows to specify `n_samples`.
+     The `"cpp"` version is slower but allows to specify both `n_accepted` and `n_samples`.
     :param report: Whether to report the number of samples.
-    :param kwargs: Additional keyword arguments to be passed to the chosen method. `'py': {}`, `'cpp': {seed: None}`.
+    :param kwargs: Additional keyword arguments to be passed to the chosen method. `"py': {}`, `"cpp': {seed: None}`.
     :returns: (order) The order of 'x', with respect to axis 0, that yields the most accepted samples.
     """
     indices = [(i, j) for i in range(x.shape[0]) for j in range(x.shape[0]) if j > i]
@@ -940,13 +940,13 @@ def generate_collinear_points(
      Use <a href="{{ '/doc/functions/analyze/covariance_matrix.html' | relative_url }}">
     `covariance_matrix`</a> to construct covariance matrices.
     :param n_samples: The number of samples generated for each data point.
-     If `None` and `method == 'cpp'`, samples are generated until `n_accepted` samples get accepted.
-    :param n_accepted: The number of samples to be accepted for each data point. Only available if `method == 'cpp'`.
+     If `None` and `method == 'cpp"`, samples are generated until `n_accepted` samples get accepted.
+    :param n_accepted: The number of samples to be accepted for each data point. Only available if `method == 'cpp"`.
     :param method: The method to generate the collinear points. Can be one of `{'py', 'cpp'}`.
-     The `'py'` version is faster but only allows to specify `n_samples`.
-     The `'cpp'` version is slower but allows to specify both `n_accepted` and `n_samples`.
+     The `"py"` version is faster but only allows to specify `n_samples`.
+     The `"cpp"` version is slower but allows to specify both `n_accepted` and `n_samples`.
     :param report: Whether to report the number of samples.
-    :param kwargs: Additional keyword arguments to be passed to the chosen method. `'py': {}`, `'cpp': {seed: None}`.
+    :param kwargs: Additional keyword arguments to be passed to the chosen method. `"py': {}`, `"cpp': {seed: None}`.
     :returns: (p, n_accepted, n_samples) The generated data vectors $\vec{p}_i$ with shape `(n_accepted, k ,n)`
      and the number of accepted and generated samples.
     :raises ValueError: `method` must be in `{'py', 'cpp'}`.
@@ -992,15 +992,15 @@ def linear_nd_monte_carlo(
      If `None`, the best axis is determined from the data, and the direction vector of the straight is normalized.
     :param optimize_cov: If `True`, the origin vector of the straight is optimized to yield the smallest covariances.
     :param n_samples: The number of samples generated for each data point.
-     If `None` and `method == 'cpp'`, samples are generated until `n_accepted` samples get accepted.
-    :param n_accepted: The number of samples to be accepted for each data point. Only available if `method == 'cpp'`.
+     If `None` and `method == 'cpp"`, samples are generated until `n_accepted` samples get accepted.
+    :param n_accepted: The number of samples to be accepted for each data point. Only available if `method == 'cpp"`.
     :param optimize_sampling: Whether to optimize the data sampling for acceptance efficiency.
     :param return_samples: Whether to also return the generated points $\vec{p}_i$ with shape `(n_samples, k ,n)`.
     :param method: The method to generate the collinear points. Can be one of `{'py', 'cpp'}`.
-     The `'py'` version is faster but only allows to specify `n_samples`.
-     The `'cpp'` version is slower but allows to specify both `n_accepted` and `n_samples`.
+     The `"py"` version is faster but only allows to specify `n_samples`.
+     The `"cpp"` version is slower but allows to specify both `n_accepted` and `n_samples`.
     :param report: Whether to print the result of the fit.
-    :param kwargs: Additional keyword arguments to be passed to the chosen method. `'py': {}`, `'cpp': {seed: None}`.
+    :param kwargs: Additional keyword arguments to be passed to the chosen method. `"py': {}`, `"cpp': {seed: None}`.
     :returns: (popt, pcov, p) The optimized parameters and their covariances.
      If `return_samples == True`, also the generated points $\vec{p}_i$ are returned.
      The resulting shapes are `(2 * n, )`, `(2 * n, 2 * n)` and `(n_samples, k, n)`.
@@ -1109,15 +1109,15 @@ def linear_monte_carlo(
     :param corr: The correlation coefficients $\rho_{xy}$ between the `x` and `y` data.
     :param optimize_cov: If `True`, the origin vector of the straight is optimized to yield the smallest covariances.
     :param n_samples: The number of samples generated for each data point.
-     If `None` and `method == 'cpp'`, samples are generated until `n_accepted` samples get accepted.
-    :param n_accepted: The number of samples to be accepted for each data point. Only available if `method == 'cpp'`.
+     If `None` and `method == 'cpp"`, samples are generated until `n_accepted` samples get accepted.
+    :param n_accepted: The number of samples to be accepted for each data point. Only available if `method == 'cpp"`.
     :param optimize_sampling: Whether to optimize the data sampling for acceptance efficiency.
     :param return_samples: Whether to also return the generated points $\vec{p}_i$ with shape `(n_samples, k ,n)`.
     :param method: The method to generate the collinear points. Can be one of `{'py', 'cpp'}`.
-     The `'py'` version is faster but only allows to specify `n_samples`.
-     The `'cpp'` version is slower but allows to specify both `n_accepted` and `n_samples`.
+     The `"py"` version is faster but only allows to specify `n_samples`.
+     The `"cpp"` version is slower but allows to specify both `n_accepted` and `n_samples`.
     :param report: Whether to print the result of the fit.
-    :param kwargs: Additional keyword arguments to be passed to the chosen method. `'py': {}`, `'cpp': {seed: None}`.
+    :param kwargs: Additional keyword arguments to be passed to the chosen method. `"py': {}`, `"cpp': {seed: None}`.
     :returns: (popt, pcov, p) The optimized parameters and their covariances.
      If `return_samples == True`, also the generated points $\vec{p}_i$ are returned.
      The resulting shapes are `(2, )`, `(2, 2)` and `(n_samples, k, 2)`.
@@ -1685,7 +1685,7 @@ class King:
         :param a: An Iterable of the mass numbers $A$ of the used isotopes.
         :param a_ref: An Iterable of the mass numbers $A_\mathrm{ref}$ of the used reference isotopes.
         :param x: The $x$ data and their standard deviations as shape `(len(a), 2)` arrays.
-         If plotted with `mode == 'radii'`,
+         If plotted with `mode == 'radii"`,
          the differences of mean-square nuclear charge radii $\delta\langle r^2\rangle^{A,A_\mathrm{ref}}$
          or $\Lambda^{A,A_\mathrm{ref}}$ are expected, else isotope shifts $\delta\nu_x^{A,A_\mathrm{ref}}$
          are expected. Expected units: (fm$^2$) or (MHz).
@@ -2236,7 +2236,7 @@ class King:
         `matplotlib`</a>. The King plot is based on the modified axes `King.x_mod_nd` and `King.y_mod_nd`
          as well as the fit results `King.results_nd`.
 
-        :param mode: The mode of the King plot. If `mode == 'radii'`,
+        :param mode: The mode of the King plot. If `mode == 'radii"`,
          the differences of mean-square nuclear charge radii $\delta\langle r^2\rangle^{A,A_\mathrm{ref}}$
          or $\Lambda^{A,A_\mathrm{ref}}$ are expected for the $x$-axis,
          else isotope shifts $\delta\nu_x^{A,A_\mathrm{ref}}$ are expected.

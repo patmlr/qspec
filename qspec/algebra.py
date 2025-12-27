@@ -378,7 +378,7 @@ def c_dipole(
     :param theta_l: The angle $\theta_\mathrm{L}$ between the electric field of the linearly polarized incoming photon
      and the direction of detection.
     :param scatter_pol: The label for the two orthogonal polarizations of the scattered light.
-     Can be either `'x'` or anything else.
+     Can be either `"x"` or anything else.
     :param as_sympy: Return the result as a symbol (`True`) or as a `float` (`False`).
     :returns: (c_dipole) The transition dipole element $C_{i\rightarrow f}^{F^\prime}$.
     """

@@ -60,7 +60,7 @@ def generate_collinear_points_cpp(
      Use <a href="{{ '/doc/functions/analyze/covariance_matrix.html' | relative_url }}">
     `covariance_matrix`</a> to construct covariance matrices.
     :param n_samples: The number of samples generated for each data point.
-     If `None` and `method == 'cpp'`, samples are generated until `n_accepted` samples get accepted.
+     If `None` and `method == 'cpp"`, samples are generated until `n_accepted` samples get accepted.
     :param n_accepted: The number of samples to be accepted for each data point.
     :param seed: A seed for the random number generator.
     :param report: Whether to report the number of samples.

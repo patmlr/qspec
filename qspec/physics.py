@@ -32,7 +32,7 @@ __all__ = [
     "E_NORM",
     "LEMNISCATE",
     "L_LABEL",
-    "a_einstein_m1",  # 'a_einstein_m1_fm',
+    "a_einstein_m1",  # "a_einstein_m1_fm",
     "a_hyper_mu",
     "alpha_atom",
     "beta",
@@ -498,10 +498,10 @@ def doppler(f: array_like, v: array_like, alpha: array_like, return_frame: str =
     :param f: The frequency $f$ of light (arb. units).
     :param v: The velocity $v$ of a body (m/s).
     :param alpha: The angle $\alpha$ between the velocity- and the light-vector in the laboratory frame (rad).
-    :param return_frame: The coordinate system for which the frequency is returned. Can be either `'atom'` or `'lab'`.
+    :param return_frame: The coordinate system for which the frequency is returned. Can be either `"atom"` or `"lab"`.
     :returns: (f_doppler) the Doppler-shifted frequency $f^\prime$ in either the rest frame of the atom
      or the laboratory frame ([`f`]).
-    :raises ValueError: `return_frame` must be either `'atom'` or `'lab'`.
+    :raises ValueError: `return_frame` must be either `"atom"` or `"lab"`.
     """
     f, alpha = np.asarray(f, dtype=float), np.asarray(alpha, dtype=float)
 
@@ -525,10 +525,10 @@ def doppler_d1(f: array_like, v: array_like, alpha: array_like, return_frame: st
     :param f: The frequency $f$ of light (arb. units).
     :param v: The velocity $v$ of a body (m/s).
     :param alpha: The angle $\alpha$ between the velocity- and the light-vector in the laboratory frame (rad).
-    :param return_frame: The coordinate system for which the frequency is returned. Can be either `'atom'` or `'lab'`.
+    :param return_frame: The coordinate system for which the frequency is returned. Can be either `"atom"` or `"lab"`.
     :returns: (df_dv) the first derivative $\partial f^\prime / \partial v$ of the Doppler-shifted frequency
      $f^\prime$ with respect to `v` in either the rest frame of the atom or the laboratory frame ([`f`] s/m).
-    :raises ValueError: `return_frame` must be either `'atom'` or `'lab'`.
+    :raises ValueError: `return_frame` must be either `"atom"` or `"lab"`.
     """
     f = np.asarray(f, dtype=float)
 
@@ -563,12 +563,12 @@ def doppler_e_d1(
     :param e: The energy $E$ added to the kinetic energy of a body with velocity `v0` (eV).
     :param m: The mass $m$ of the body (u).
     :param v0: The initial velocity $v_0$ of the body (m/s).
-    :param return_frame: The coordinate system for which the frequency is returned. Can be either `'atom'` or `'lab'`.
+    :param return_frame: The coordinate system for which the frequency is returned. Can be either `"atom"` or `"lab"`.
     :param relativistic: The calculation is performed either relativistically (`True`) or classically (`False`).
      The default is `True`.
     :returns: (df_dE) The first derivative $\partial f^\prime / \partial E$ of the Doppler-shifted frequency
      $f^\prime$ with respect to `e` in either the rest frame of the atom or the laboratory frame ([`f`] / eV).
-    :raises ValueError: `return_frame` must be either `'atom'` or `'lab'`.
+    :raises ValueError: `return_frame` must be either `"atom"` or `"lab"`.
     """
     v = v_e(e, m, v0=v0, relativistic=relativistic)
     return doppler_d1(f, v, alpha, return_frame=return_frame) * v_e_d1(e, m, v0=v0, relativistic=relativistic)
@@ -595,12 +595,12 @@ def doppler_el_d1(
     :param q: The electric charge $q$ of the body (e).
     :param m: The mass $m$ of the body (u).
     :param v0: The initial velocity $v_0$ of the body (m/s).
-    :param return_frame: The coordinate system for which the frequency is returned. Can be either `'atom'` or `'lab'`.
+    :param return_frame: The coordinate system for which the frequency is returned. Can be either `"atom"` or `"lab"`.
     :param relativistic: The calculation is performed either relativistically (`True`) or classically (`False`).
      The default is `True`.
     :returns: (df_dU) The first derivative $\partial f^\prime / \partial U$ of the Doppler-shifted frequency
      $f^\prime$ with respect to `u` in either the rest frame of the atom or the laboratory frame ([`f`] / V).
-    :raises ValueError: `return_frame` must be either `'atom'` or `'lab'`.
+    :raises ValueError: `return_frame` must be either `"atom"` or `"lab"`.
     """
     v = v_el(u, q, m, v0=v0, relativistic=relativistic)
     return doppler_d1(f, v, alpha, return_frame=return_frame) * v_el_d1(u, q, m, v0=v0, relativistic=relativistic)
@@ -622,18 +622,18 @@ def inverse_doppler(
     :param alpha: The angle $\alpha$ between the velocity- and the light-vector in the laboratory frame (rad).
     :param mode: The mode how to handle `nan` values and ambiguous velocities. Available options are:
     <ul>
-    <li> `'raise-raise'`: Raise an error if there are `nan` values or if the velocity is ambiguous.</li>
-    <li> `'raise-small'`: Raise an error if there are `nan` values and return the smaller velocity.</li>
-    <li> `'raise-large'`: Raise an error if there are `nan` values and return the larger velocity.</li>
-    <li> `'isnan-raise'`: Ignore `nan` values and raise an error if the velocity is ambiguous.</li>
-    <li> `'isnan-small'`: Ignore `nan` values and return the smaller velocity.</li>
-    <li> `'isnan-large'`: Ignore `nan` values and return the larger velocity.</li>
+    <li> `"raise-raise"`: Raise an error if there are `nan` values or if the velocity is ambiguous.</li>
+    <li> `"raise-small"`: Raise an error if there are `nan` values and return the smaller velocity.</li>
+    <li> `"raise-large"`: Raise an error if there are `nan` values and return the larger velocity.</li>
+    <li> `"isnan-raise"`: Ignore `nan` values and raise an error if the velocity is ambiguous.</li>
+    <li> `"isnan-small"`: Ignore `nan` values and return the smaller velocity.</li>
+    <li> `"isnan-large"`: Ignore `nan` values and return the larger velocity.</li>
     </ul>
     :param return_mask: Whether the mask where the velocity is ambiguous is returned as a second argument.
     :returns: (v) The velocity $v$ required to shift `f_lab` to `f_atom`.
      Optionally returns the mask where the velocity is ambiguous (m/s).
-    :raises ValueError: `mode` must be `'raise-raise'`, `'raise-small'`, `'raise-large'`, `'isnan-raise'`,
-     `'isnan-small'`, or `'isnan-large'`. For additionally raised errors, see the description of the `mode` parameter.
+    :raises ValueError: `mode` must be `"raise-raise"`, `"raise-small"`, `"raise-large"`, `"isnan-raise"`,
+     `"isnan-small"`, or `"isnan-large"`. For additionally raised errors, see the description of the `mode` parameter.
     """
     modes = {"raise-raise", "raise-small", "raise-large", "isnan-raise", "isnan-small", "isnan-large"}
     if mode not in modes:
@@ -708,12 +708,12 @@ def inverse_doppler_d1(
     :param alpha: The angle $\alpha$ between the velocity- and the light-vector in the laboratory frame (rad).
     :param mode: The mode how to handle `nan` values and ambiguous velocities. Available options are:
     <ul>
-    <li>`'raise-raise'`: Raise an error if there are `nan` values or if the velocity is ambiguous.</li>
-    <li>`'raise-small'`: Raise an error if there are `nan` values and return the smaller velocity.</li>
-    <li>`'raise-large'`: Raise an error if there are `nan` values and return the larger velocity.</li>
-    <li>`'isnan-raise'`: Ignore `nan` values and raise an error if the velocity is ambiguous.</li>
-    <li>`'isnan-small'`: Ignore `nan` values and return the smaller velocity.</li>
-    <li>`'isnan-large'`: Ignore `nan` values and return the larger velocity.</li>
+    <li>`"raise-raise"`: Raise an error if there are `nan` values or if the velocity is ambiguous.</li>
+    <li>`"raise-small"`: Raise an error if there are `nan` values and return the smaller velocity.</li>
+    <li>`"raise-large"`: Raise an error if there are `nan` values and return the larger velocity.</li>
+    <li>`"isnan-raise"`: Ignore `nan` values and raise an error if the velocity is ambiguous.</li>
+    <li>`"isnan-small"`: Ignore `nan` values and return the smaller velocity.</li>
+    <li>`"isnan-large"`: Ignore `nan` values and return the larger velocity.</li>
     </ul>
     :param return_mask: Whether the mask where the velocity is ambiguous is returned as a second argument.
     :returns: (dv_df) The first derivative $\partial v / \partial f_\mathrm{atom}$ of the velocity $v$ required to shift
@@ -2280,11 +2280,11 @@ def doppler_3d(k: array_like, v: array_like, return_frame: str = "atom", axis: i
 
     :param k: The 3-vector $\vec{k}$ of light. Must have size 3 in the specified `axis (arb. units)`.
     :param v: The velocity 3-vector $\vec{v}$. Must have size 3 in the specified `axis` (m/s).
-    :param return_frame: The coordinate system in which the frequency is returned. Can be either `'atom'` or `'lab'`.
+    :param return_frame: The coordinate system in which the frequency is returned. Can be either `"atom"` or `"lab"`.
     :param axis: The axis along which the vector components are aligned.
     :returns: (k_boosted) the Doppler-shifted 3-vector $\vec{k}^{\prime}$ in either the rest frame of the atom
      or the laboratory frame ([`k`]).
-    :raises ValueError: `rest_frame` must be either `'atom'` or `'lab'`. The shapes of `k` and `v` must be compatible.
+    :raises ValueError: `rest_frame` must be either `"atom"` or `"lab"`. The shapes of `k` and `v` must be compatible.
     """
     k, v = np.asarray(k), np.asarray(v)
     tools.check_dimension(3, axis, k, v)

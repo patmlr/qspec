@@ -765,7 +765,7 @@ class HyperfineZeeman(Splitter):
         :param rho_ml: The lower state population. Must be an Iterable of arrays.
          If `None`, the default list is given by `rho_ml = [np.ones(2 * f + 1) for f in f_l]`.
         :param scale_par_with_shift: Choose a parameter that is scaled with the Zeeman shift
-         such as the Lorentz width `'Gamma'`.
+         such as the Lorentz width `"Gamma"`.
         :param linear: Whether the Zeeman shift is linear (`True`) or nonlinear (`False`). If nonlinear,
          the Zeeman shift is calculated numerically, decreasing computing speed.
         :param label: A label for the `Splitter` (isotope / isomer / transition).

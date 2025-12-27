@@ -1,4 +1,3 @@
-
 import importlib
 import os
 import inspect
@@ -8,8 +7,8 @@ from qspec.simulate import *
 
 QSPEC_SIM_TYPES = [Polarization, Laser, Environment, State, DecayMap, Atom, Interaction]
 
-FOLDER_FILES = {'models', 'simulate', 'analyze'}
-FILES = sorted(['physics', 'algebra', 'models', 'analyze', 'simulate', 'tools', 'stats'])
+FOLDER_FILES = {"models", "simulate", "analyze"}
+FILES = sorted(["qtypes", "physics", "algebra", "models", "analyze", "simulate", "tools", "stats"])
 # FILES = sorted(['algebra'])
 
 
@@ -17,7 +16,7 @@ def is_num(val):
     return isinstance(val, int) or isinstance(val, float)
 
 
-def type_to_str(_type):
+""" def type_to_str(_type):
     ret = str(_type)
     ret = ret.replace(str(sympy_like), 'sympy_like')
     ret = ret.replace(str(sympy_quant), 'sympy_quant')
@@ -57,11 +56,52 @@ def type_to_str(_type):
         ret = ret[:i] + ret[i+6:j].replace(', ', ' | ') + ret[j+1:]
     ret = (str('None' if _type is inspect._empty else ret).replace('typing.', '').replace('<class ', '')
            .replace('>', '').replace("'", ""))
+    return ret """
+
+
+def type_to_str(_type):
+    ret = str(_type)
+    ret = ret.replace(str(array_like | object), "array_like | object")
+    for t in QSPEC_SIM_TYPES:
+        if t.__name__ in ret:
+            ret = ret.replace(str(array_like | t), f"array_like | {t}")
+            ret = ret.replace(f"_simulate_cpp.{t.__name__}", t.__name__)
+            ret = ret.replace(f"ForwardRef('{t.__name__}')", f"qspec.simulate.{t.__name__}")
+            if ret == t.__name__:
+                ret = ret.replace(t.__name__, f"qspec.simulate.{t.__name__}")
+    ret = ret.replace(str(array_like), "array_like")
+    ret = ret.replace(f"{quant.__module__}.{quant.__name__}", "quant")
+    ret = ret.replace(str(scalar), "scalar")
+    ret = ret.replace(str(ndarray), "ndarray")
+    while True:
+        i = ret.find("Union[")
+        if i == -1:
+            break
+
+        j = -1
+        k = 1
+        for _j, s in enumerate(ret[i + 6 :]):
+            if s == "]":
+                k -= 1
+                if k == 0:
+                    j = i + 6 + _j
+                    break
+            elif s == "[":
+                k += 1
+
+        ret = ret[:i] + ret[i + 6 : j].replace(", ", " | ") + ret[j + 1 :]
+    ret = (
+        str("None" if _type is inspect._empty else ret)
+        .replace("typing.", "")
+        .replace("<class ", "")
+        .replace(">", "")
+        .replace("'", "")
+    )
     return ret
 
 
 def rest_to_html(rest):
-    html = publish_parts(rest, writer_name='html')['html_body'] # type: ignore
+    html = publish_parts(rest, writer_name="html")["html_body"]  # type: ignore
     return html
 
 
@@ -74,327 +114,340 @@ def docstring_to_html(rest):
     #         break
     #     j = i + 7 + html[i+7:].find('`')
     #     html = html[:i] + '$' + html[i+7:j] + '$' + html[j+1:]
-    if rest and rest[0] == '`':
-        rest = '<code>' + rest[1:]
-    html = rest.replace(' `', ' <code>').replace('(`', '(<code>').replace('[`', '[<code>').replace('`', '</code>')
+    if rest and rest[0] == "`":
+        rest = "<code>" + rest[1:]
+    html = rest.replace(" `", " <code>").replace("(`", "(<code>").replace("[`", "[<code>").replace("`", "</code>")
     return html
 
 
 def load_table_template():
-    with open('_template-table.html', 'r') as f:
+    with open("_template-table.html", "r") as f:
         ret = f.readlines()
     return ret
 
 
 def load_table():
-    with open('table.html', 'r') as f:
+    with open("table.html", "r") as f:
         ret = f.readlines()
     return ret
 
 
 def load_module(file):
-    with open(os.path.join('modules', f'_{file}.html'), 'r') as f:
+    with open(os.path.join("modules", f"_{file}.html"), "r") as f:
         ret = f.readlines()
     return ret
 
 
 def load_doc():
-    with open('_doc.html', 'r') as f:
+    with open("_doc.html", "r") as f:
         ret = f.readlines()
     return ret
 
 
 def load_functions_template():
-    with open(os.path.join('functions', '_template.html'), 'r') as f:
+    with open(os.path.join("functions", "_template.html"), "r") as f:
         ret = f.readlines()
     return ret
 
 
 def gen_table():
     temp = [t.strip() for t in load_table_template()]
-    i = temp.index('<!--p>tab-module</p-->') + 1
-    html = '\n'.join(temp[:i-1])
+    i = temp.index("<!--p>tab-module</p-->") + 1
+    html = "\n".join(temp[: i - 1])
     for file in FILES:
-        directory = os.path.join('functions', file)
+        directory = os.path.join("functions", file)
         if not os.path.exists(directory):
             os.makedirs(directory)
 
-        namespace = f'qspec{f".{file}" if file in FOLDER_FILES else ""}'
-        mod = importlib.import_module(f'qspec.{file}')
-        func_str = sorted(f for f in mod.__all__ if callable(eval(f'mod.{f}', {'mod': mod})))
-        funcs = {f: eval(f'mod.{f}') for f in func_str}
+        namespace = f"qspec{f'.{file}' if file in FOLDER_FILES else ''}"
+        mod = importlib.import_module(f"qspec.{file}")
+        func_str = sorted(f for f in mod.__all__ if callable(eval(f"mod.{f}", {"mod": mod})))
+        funcs = {f: eval(f"mod.{f}") for f in func_str}
 
-        j = temp.index('<!--p>tab-func</p-->') + 1
-        html += '\n'.join(temp[i:j-1]).replace('_title_', f'qspec.{file}').replace('_file_', file)
+        j = temp.index("<!--p>tab-func</p-->") + 1
+        html += "\n".join(temp[i : j - 1]).replace("_title_", f"qspec.{file}").replace("_file_", file)
         for f in func_str:
             if f[0].isupper():
-                i = temp.index('<!--p>tab-class</p-->') + 1
-                j = temp.index('<!--p>tab-class-func</p-->') + 1
-                html += ('\n'.join(temp[i:j-1]).replace('_file_', file).replace('_class_', f)
-                         .replace('_namespace-class_', f'{namespace}.{f}'))
+                i = temp.index("<!--p>tab-class</p-->") + 1
+                j = temp.index("<!--p>tab-class-func</p-->") + 1
+                html += (
+                    "\n".join(temp[i : j - 1])
+                    .replace("_file_", file)
+                    .replace("_class_", f)
+                    .replace("_namespace-class_", f"{namespace}.{f}")
+                )
 
-                directory = os.path.join('functions', file, f)
+                directory = os.path.join("functions", file, f)
                 if not os.path.exists(directory):
                     os.makedirs(directory)
 
-                class_funcs = [m[0] for m in inspect.getmembers(funcs[f], inspect.isfunction)
-                               if not m[0].startswith('_')]
+                class_funcs = [
+                    m[0] for m in inspect.getmembers(funcs[f], inspect.isfunction) if not m[0].startswith("_")
+                ]
 
                 for cf in class_funcs:
-                    html += ('\n' + temp[j].replace('_file_', file).replace('_class_', f).replace('_class-func_', cf)
-                             .replace('_namespace-class-func_', f'{namespace}.{f}.{cf}'))
-                i = temp.index('<!--p>tab-func-end</p-->')
-                html += '\n'.join(temp[j+1:i])
-                j = temp.index('<!--p>tab-func</p-->') + 1
+                    html += "\n" + temp[j].replace("_file_", file).replace("_class_", f).replace(
+                        "_class-func_", cf
+                    ).replace("_namespace-class-func_", f"{namespace}.{f}.{cf}")
+                i = temp.index("<!--p>tab-func-end</p-->")
+                html += "\n".join(temp[j + 1 : i])
+                j = temp.index("<!--p>tab-func</p-->") + 1
             else:
-                html += ('\n' + temp[j].replace('_file_', file).replace('_func_', f)
-                         .replace('_namespace-func_', f'{namespace}.{f}'))
-                
-        i = temp.index('<!--p>tab-func-end</p-->') + 1
-        html += '\n'.join(temp[i:-1])
-        i = temp.index('<!--p>tab-module</p-->') + 1
-    html += '\n' + temp[-1]
+                html += "\n" + temp[j].replace("_file_", file).replace("_func_", f).replace(
+                    "_namespace-func_", f"{namespace}.{f}"
+                )
 
-    with open('table.html', 'w') as html_file:
+        i = temp.index("<!--p>tab-func-end</p-->") + 1
+        html += "\n".join(temp[i:-1])
+        i = temp.index("<!--p>tab-module</p-->") + 1
+    html += "\n" + temp[-1]
+
+    with open("table.html", "w") as html_file:
         html_file.write(html)
 
 
 def gen_modules():
-    html_table = ''.join(load_table())
+    html_table = "".join(load_table())
     for file in FILES:
-        html = '\n'.join([t.strip() for t in load_module(file)])
-        html = html.replace('_table_', html_table)
-        i = html.find(f'/modules/{file}.html')
+        html = "\n".join([t.strip() for t in load_module(file)])
+        html = html.replace("_table_", html_table)
+        i = html.find(f"/modules/{file}.html")
 
-        i = html[:i].rfind('<li')
-        j = i + html[i + 1:].find('>') + 2
-        html = (html[:i] + f'<li class="has-children spaced table-current">' + html[j:])
+        i = html[:i].rfind("<li")
+        j = i + html[i + 1 :].find(">") + 2
+        html = html[:i] + f'<li class="has-children spaced table-current">' + html[j:]
 
-        j += html[j:].find('<details')
-        html = html[:j + 8] + ' open=""' + html[j + 8:]
+        j += html[j:].find("<details")
+        html = html[: j + 8] + ' open=""' + html[j + 8 :]
 
-        html = '\n'.join(['---', 'layout: default', f'title: qspec.{file}', '---', '']) + html
+        html = "\n".join(["---", "layout: default", f"title: qspec.{file}", "---", ""]) + html
 
-        with open(os.path.join('modules', f'{file}.html'), 'w') as html_file:
+        with open(os.path.join("modules", f"{file}.html"), "w") as html_file:
             html_file.write(html)
 
 
 def gen_doc():
-    html_table = ''.join(load_table())
-    html = '\n'.join([t.strip() for t in load_doc()])
-    html = html.replace('_table_', html_table)
-    html = '\n'.join(['---', 'layout: default', f'title: API Doc', '---', '']) + html
+    html_table = "".join(load_table())
+    html = "\n".join([t.strip() for t in load_doc()])
+    html = html.replace("_table_", html_table)
+    html = "\n".join(["---", "layout: default", f"title: API Doc", "---", ""]) + html
 
-    with open('doc.html', 'w') as html_file:
+    with open("doc.html", "w") as html_file:
         html_file.write(html)
 
 
 def _gen_func(f, file, temp, namespace, funcs, func_sig, func_doc):
-    j = namespace.rfind('.')
-    class_flag = 1 if f[0].isupper() else 2 if namespace[j+1:][0].isupper() else 0
+    j = namespace.rfind(".")
+    class_flag = 1 if f[0].isupper() else 2 if namespace[j + 1 :][0].isupper() else 0
 
-    i = temp.index('<!--p>sig</p-->')
-    html = '\n'.join(temp[:i])
-    html += '\n'.join(temp[i+1:i+3])
+    i = temp.index("<!--p>sig</p-->")
+    html = "\n".join(temp[:i])
+    html += "\n".join(temp[i + 1 : i + 3])
 
     if class_flag == 1:
         namespace_part = namespace
         _class = f
     elif class_flag == 2:
         namespace_part = namespace[:j]
-        _class = namespace[j+1:]
-        html += '\n' + temp[i+3]
+        _class = namespace[j + 1 :]
+        html += "\n" + temp[i + 3]
     else:
         namespace_part = namespace
-        _class = ''
+        _class = ""
 
-    html += '\n'.join(temp[i+4:i+6])
-    html = (html.replace('_title_', f'{namespace}.{f}')
-            .replace('_namespace_', namespace_part)
-            .replace('_class_', _class).replace('_func_', f)
-            .replace('sig-name', 'sig-classname' if class_flag == 1 else 'sig-name'))
+    html += "\n".join(temp[i + 4 : i + 6])
+    html = (
+        html.replace("_title_", f"{namespace}.{f}")
+        .replace("_namespace_", namespace_part)
+        .replace("_class_", _class)
+        .replace("_func_", f)
+        .replace("sig-name", "sig-classname" if class_flag == 1 else "sig-name")
+    )
 
     # Signature
-    i = temp.index('<!--p>sig-pars</p-->') + 1
+    i = temp.index("<!--p>sig-pars</p-->") + 1
     for p, p_sig in func_sig[f].parameters.items():
-        if p == 'self':
+        if p == "self":
             continue
         p_str = p_sig.__str__()
-        html += '\n' + temp[i]
+        html += "\n" + temp[i]
 
-        if '**' in p_str:
-            html += '\n' + temp[i + 4]
+        if "**" in p_str:
+            html += "\n" + temp[i + 4]
 
-        elif '*' in p_str:
-            html += '\n' + temp[i + 2]
-        html += '\n' + temp[i + 6].replace('_par_', p)
+        elif "*" in p_str:
+            html += "\n" + temp[i + 2]
+        html += "\n" + temp[i + 6].replace("_par_", p)
 
-        if '=' in p_str:
+        if "=" in p_str:
             default = p_sig.default
             if callable(default):
                 default = default.__name__
             if isinstance(default, str):
                 default = f"'{default}'"
 
-            color_class = ''
+            color_class = ""
             if isinstance(default, bool):
-                color_class = ' bool'
+                color_class = " bool"
             elif isinstance(default, str):
-                color_class = ' string'
+                color_class = " string"
             elif is_num(default) or isinstance(default, tuple):
-                color_class = ' num'
+                color_class = " num"
 
-            html += ('\n' + temp[i + 8] + '\n' + temp[i + 10].replace('_default_', str(default))
-                     .replace('_colorclass_', color_class))
+            html += (
+                "\n"
+                + temp[i + 8]
+                + "\n"
+                + temp[i + 10].replace("_default_", str(default)).replace("_colorclass_", color_class)
+            )
 
-        html += f'\n{temp[i + 11]}\n,&nbsp;'
+        html += f"\n{temp[i + 11]}\n,&nbsp;"
     lines, i_start = inspect.getsourcelines(funcs[f])
     i_stop = i_start + len(lines) - 1
     if file in FOLDER_FILES:
         file_py = os.path.join(file, os.path.splitext(os.path.basename(inspect.getfile(funcs[f])))[0])
     else:
         file_py = file
-    del_comma_flag = bool(len([p for p in func_sig[f].parameters.keys() if p != 'self']))
-    html = (html[:(-7 if del_comma_flag else None)] + '\n'
-            .join(temp[i+12:i+14]).replace('_file_', file_py)
-            .replace('_start_', str(i_start)).replace('_stop_', str(i_stop)))
+    del_comma_flag = bool(len([p for p in func_sig[f].parameters.keys() if p != "self"]))
+    html = html[: (-7 if del_comma_flag else None)] + "\n".join(temp[i + 12 : i + 14]).replace(
+        "_file_", file_py
+    ).replace("_start_", str(i_start)).replace("_stop_", str(i_stop))
 
     # Description
-    i = temp.index('<!--p>desc</p-->') + 1
+    i = temp.index("<!--p>desc</p-->") + 1
     desc = func_doc[f]
-    if f == 'LorentzQI':
+    if f == "LorentzQI":
         print()
     if desc is None:
-        desc = ''
+        desc = ""
     else:
-        j = desc.find(':param')
+        j = desc.find(":param")
         if j == -1:
-            j = desc.find(':return')
+            j = desc.find(":return")
             if j == -1:
-                j = desc.find(':raise')
-        desc = desc[:j].strip().strip('\n')
-    html += '\n' + temp[i].replace('_description_', docstring_to_html(desc))
+                j = desc.find(":raise")
+        desc = desc[:j].strip().strip("\n")
+    html += "\n" + temp[i].replace("_description_", docstring_to_html(desc))
 
-    html += '\n' + temp[i + 1]
+    html += "\n" + temp[i + 1]
 
     # Parameters
-    if len([k for k in func_sig[f].parameters.keys() if k != 'self']):
-        i = temp.index('<!--p>pars-h</p-->') + 1
+    if len([k for k in func_sig[f].parameters.keys() if k != "self"]):
+        i = temp.index("<!--p>pars-h</p-->") + 1
         if func_sig[f].parameters:
-            html += '\n' + temp[i]
-        i = temp.index('<!--p>pars</p-->') + 1
-        html += '\n' + '\n'.join(temp[i:i+2])
+            html += "\n" + temp[i]
+        i = temp.index("<!--p>pars</p-->") + 1
+        html += "\n" + "\n".join(temp[i : i + 2])
         for p, p_sig in func_sig[f].parameters.items():
-            if p == 'self':
+            if p == "self":
                 continue
             p_desc = func_doc[f]
             if p_desc is None:
-                p_desc = ''
+                p_desc = ""
             else:
-                j = p_desc.find(f':param {p}:') + len(f':param {p}:')
+                j = p_desc.find(f":param {p}:") + len(f":param {p}:")
                 if j == -1:
-                    p_desc = ''
+                    p_desc = ""
                 else:
-                    k = p_desc[j:].find(':param')
+                    k = p_desc[j:].find(":param")
                     if k != -1:
                         k += j
                     else:
-                        k = p_desc[j:].find(':return')
+                        k = p_desc[j:].find(":return")
                         if k != -1:
                             k += j
                         else:
-                            k = p_desc[j:].find(':raise')
+                            k = p_desc[j:].find(":raise")
                             if k != -1:
                                 k += j
-                    p_desc = p_desc[j:k].strip().strip('\n')
+                    p_desc = p_desc[j:k].strip().strip("\n")
             anno = p_sig.annotation
-            html += ('\n' + '\n'.join(temp[i+2:i+4])
-                     .replace('_par_', p)
-                     .replace('_par-type_', type_to_str(anno))
-                     .replace('_par-description_', docstring_to_html(p_desc)))
-        html += '\n'.join(temp[i+4:i+6])
+            html += "\n" + "\n".join(temp[i + 2 : i + 4]).replace("_par_", p).replace(
+                "_par-type_", type_to_str(anno)
+            ).replace("_par-description_", docstring_to_html(p_desc))
+        html += "\n".join(temp[i + 4 : i + 6])
 
     # Returns
     if class_flag != 1:
-        i = temp.index('<!--p>rets-h</p-->') + 1
+        i = temp.index("<!--p>rets-h</p-->") + 1
         html += temp[i]
-        i = temp.index('<!--p>rets</p-->') + 1
-        html += '\n' + '\n'.join(temp[i:i+2])
+        i = temp.index("<!--p>rets</p-->") + 1
+        html += "\n" + "\n".join(temp[i : i + 2])
         r_desc = func_doc[f]
         if r_desc is None:
-            r_desc = ''
+            r_desc = ""
         else:
-            k = r_desc.find(':return')
+            k = r_desc.find(":return")
             if k != -1:
-                k += r_desc[k+1:].find(':') + 2
-                r_desc = r_desc[k:].strip().strip('\n')
+                k += r_desc[k + 1 :].find(":") + 2
+                r_desc = r_desc[k:].strip().strip("\n")
             else:
-                r_desc = ''
+                r_desc = ""
 
-        if r_desc and r_desc[0] == '(':
-            j = r_desc.find(')') + 1
+        if r_desc and r_desc[0] == "(":
+            j = r_desc.find(")") + 1
             ret = r_desc[:j]
-            if ',' not in ret:
+            if "," not in ret:
                 ret = ret[1:-1]
             r_desc = r_desc[j:]
         else:
-            ret = 'out'
+            ret = "out"
 
-        i_raise = r_desc.find(':raise')
+        i_raise = r_desc.find(":raise")
         if i_raise == -1:
             i_raise = None
         r_desc = r_desc[:i_raise]
 
         anno = func_sig[f].return_annotation
-        html += ('\n' + '\n'.join(temp[i+2:i+4])
-                 .replace('_ret_', ret)
-                 .replace('_ret-type_', type_to_str(anno))
-                 .replace('_ret-description_', docstring_to_html(r_desc)))
-        html += '\n'.join(temp[i+4:i+6])
+        html += "\n" + "\n".join(temp[i + 2 : i + 4]).replace("_ret_", ret).replace(
+            "_ret-type_", type_to_str(anno)
+        ).replace("_ret-description_", docstring_to_html(r_desc))
+        html += "\n".join(temp[i + 4 : i + 6])
 
     # Raises
-    if func_doc[f] is None or ':raise' not in func_doc[f]:
-        i = temp.index('<!--p>raises</p-->') + 1
+    if func_doc[f] is None or ":raise" not in func_doc[f]:
+        i = temp.index("<!--p>raises</p-->") + 1
     else:
-        i = temp.index('<!--p>raises-h</p-->') + 1
+        i = temp.index("<!--p>raises-h</p-->") + 1
         html += temp[i]
-        i = temp.index('<!--p>raises</p-->') + 1
-        html += '\n' + '\n'.join(temp[i:i+2])
+        i = temp.index("<!--p>raises</p-->") + 1
+        html += "\n" + "\n".join(temp[i : i + 2])
 
         r_desc = func_doc[f]
-        k = r_desc.find(':raise')
-        l = k + r_desc[k+1:].find(':') + 2
-        k += r_desc[k:].find(' ')
-        err = r_desc[k:l-1].strip()
-        r_desc = r_desc[l:].strip().strip('\n')
+        k = r_desc.find(":raise")
+        l = k + r_desc[k + 1 :].find(":") + 2
+        k += r_desc[k:].find(" ")
+        err = r_desc[k : l - 1].strip()
+        r_desc = r_desc[l:].strip().strip("\n")
 
-        html += ('\n' + '\n'.join(temp[i+2:i+4])
-                 .replace('_err_', err)
-                 .replace('_raise-description_', docstring_to_html(r_desc)))
-        html += '\n'.join(temp[i+4:i+6])
+        html += "\n" + "\n".join(temp[i + 2 : i + 4]).replace("_err_", err).replace(
+            "_raise-description_", docstring_to_html(r_desc)
+        )
+        html += "\n".join(temp[i + 4 : i + 6])
 
-
-    html += '\n' + temp[i+6]
-    html += '\n'.join(temp[i+8:])
+    html += "\n" + temp[i + 6]
+    html += "\n".join(temp[i + 8 :])
 
     # Content table
-    html_table = ''.join(load_table())
-    i = html_table.find(f'{namespace}.{f}<')
-    i = html_table[:i].rfind('<li')
-    j = i + html_table[i+1:].find('>') + 2
-    html_table = (html_table[:i] + f'<li class="{'has-children ' if class_flag == 1 else ''}'
-                                   f'{'spaced ' if class_flag != 2 else ''}table-current">' + html_table[j:])
+    html_table = "".join(load_table())
+    i = html_table.find(f"{namespace}.{f}<")
+    i = html_table[:i].rfind("<li")
+    j = i + html_table[i + 1 :].find(">") + 2
+    html_table = (
+        html_table[:i] + f'<li class="{"has-children " if class_flag == 1 else ""}'
+        f'{"spaced " if class_flag != 2 else ""}table-current">' + html_table[j:]
+    )
     if class_flag == 2:
-        j = html_table[:i].rfind('<details')
-        html_table = html_table[:j+8] + ' open=""' + html_table[j+8:]
+        j = html_table[:i].rfind("<details")
+        html_table = html_table[: j + 8] + ' open=""' + html_table[j + 8 :]
     if class_flag == 1:
-        j = i + html_table[i:].find('<details')
-        html_table = html_table[:j+8] + ' open=""' + html_table[j+8:]
+        j = i + html_table[i:].find("<details")
+        html_table = html_table[: j + 8] + ' open=""' + html_table[j + 8 :]
 
-    j = html_table[:j].rfind(f'modules/{file}.html')
-    j += html_table[j:].find('<details')
-    html_table = html_table[:j + 8] + ' open=""' + html_table[j + 8:]
-    html = html.replace('_table_', html_table)
+    j = html_table[:j].rfind(f"modules/{file}.html")
+    j += html_table[j:].find("<details")
+    html_table = html_table[: j + 8] + ' open=""' + html_table[j + 8 :]
+    html = html.replace("_table_", html_table)
     return html
 
 
@@ -407,22 +460,22 @@ def _gen_class_functions(directory, file, f, class_funcs, namespace):
     func_doc = {f: funcs[f].__doc__ for f in func_str}
 
     for cf in func_str:
-        html = _gen_func(cf, file, temp, f'{namespace}.{f}', funcs, func_sig, func_doc)
-        with open(os.path.join(directory, f'{os.path.join(f, cf)}.html'), 'w') as html_file:
+        html = _gen_func(cf, file, temp, f"{namespace}.{f}", funcs, func_sig, func_doc)
+        with open(os.path.join(directory, f"{os.path.join(f, cf)}.html"), "w") as html_file:
             html_file.write(html)
 
 
 def gen_functions():
     unused_functions = []
     for file in FILES:
-        directory = os.path.join('functions', file)
+        directory = os.path.join("functions", file)
         if not os.path.exists(directory):
             os.makedirs(directory)
 
-        namespace = f'qspec{f".{file}" if file in FOLDER_FILES else ""}'
-        mod = importlib.import_module(f'qspec.{file}')
-        func_str = sorted(f for f in mod.__all__ if callable(eval(f'mod.{f}', {'mod': mod})))
-        funcs = {f: eval(f'mod.{f}') for f in func_str}
+        namespace = f"qspec{f'.{file}' if file in FOLDER_FILES else ''}"
+        mod = importlib.import_module(f"qspec.{file}")
+        func_str = sorted(f for f in mod.__all__ if callable(eval(f"mod.{f}", {"mod": mod})))
+        funcs = {f: eval(f"mod.{f}") for f in func_str}
         func_sig = {f: inspect.signature(funcs[f]) for f in func_str}
         func_doc = {f: funcs[f].__init__.__doc__ if f[0].isupper() else funcs[f].__doc__ for f in func_str}
 
@@ -431,35 +484,35 @@ def gen_functions():
         for f in func_str:
             html = _gen_func(f, file, temp, namespace, funcs, func_sig, func_doc)
             if f[0].isupper():
-                class_funcs = [m for m in inspect.getmembers(funcs[f], inspect.isfunction)
-                               if not m[0].startswith('_')]
+                class_funcs = [m for m in inspect.getmembers(funcs[f], inspect.isfunction) if not m[0].startswith("_")]
                 _gen_class_functions(directory, file, f, class_funcs, namespace)
 
                 f_path = os.path.join(f, f)
             else:
                 f_path = f
-            with open(os.path.join(directory, f'{f_path}.html'), 'w', encoding='utf-8') as html_file:
+            with open(os.path.join(directory, f"{f_path}.html"), "w", encoding="utf-8") as html_file:
                 html_file.write(html)
-            print(f'Function \'{f}\' done.')
+            print(f"Function '{f}' done.")
 
         func_str_set = set(func_str)
         for f in os.listdir(directory):
-            if not 'html' in f:
+            if not "html" in f:
                 if f not in func_str_set:
                     unused_functions.append(f)
-                class_funcs = set(m[0] for m in inspect.getmembers(funcs[f], inspect.isfunction)
-                                  if not m[0].startswith('_'))
+                class_funcs = set(
+                    m[0] for m in inspect.getmembers(funcs[f], inspect.isfunction) if not m[0].startswith("_")
+                )
                 for _f in os.listdir(os.path.join(directory, f)):
                     if _f[:-5] not in class_funcs and _f[:-5] != f:
-                        unused_functions.append(f'{f}.{_f[:-5]}')
+                        unused_functions.append(f"{f}.{_f[:-5]}")
             else:
                 if f[:-5] not in func_str_set:
                     unused_functions.append(f[:-5])
 
-    print(f'Unused functions: {unused_functions}')
+    print(f"Unused functions: {unused_functions}")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     gen_table()
     gen_doc()
     gen_modules()

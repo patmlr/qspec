@@ -17,9 +17,10 @@ title: Tutorials.Models
 </p>
 
 <div class="py-source"><pre>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">qspec.models</span> <span class="k">as</span> <span class="nn">mod</span>
-<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">qspec.models</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">mod</span>
 
 <span class="c1"># Generate the model used in this tutorial</span>
 <span class="n">model</span> <span class="o">=</span> <span class="n">mod</span><span class="o">.</span><span class="n">Offset</span><span class="p">(</span>  <span class="c1"># Add a y-axis shift (off0e0)</span>
@@ -30,12 +31,12 @@ title: Tutorials.Models
         <span class="n">mod</span><span class="o">.</span><span class="n">Voigt</span><span class="p">(),</span> <span class="n">n_peaks</span><span class="o">=</span><span class="mi">1</span><span class="p">))</span> <span class="c1"># Add a Voigt lineshape</span>
         <span class="c1"># with Lorentzian (Gamma) and Gaussian (sigma) widths</span>
 
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">Parameter names: </span><span class="si">{</span><span class="n">model</span><span class="o">.</span><span class="n">names</span><span class="si">}</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
-<span class="c1"># &gt;&gt;&gt; Parameter names: [&#39;Gamma&#39;, &#39;sigma&#39;, &#39;x0&#39;, &#39;p0&#39;, &#39;off0e0&#39;]</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Parameter names: </span><span class="si">{</span><span class="n">model</span><span class="o">.</span><span class="n">names</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="c1"># &gt;&gt;&gt; Parameter names: [&quot;Gamma&quot;, &quot;sigma&quot;, &quot;x0&quot;, &quot;p0&quot;, &quot;off0e0&quot;]</span>
 
 <span class="c1"># Change all parameter values and if they stay fixed during fitting at once</span>
 <span class="n">model</span><span class="o">.</span><span class="n">set_vals</span><span class="p">([</span><span class="mf">20.</span><span class="p">,</span> <span class="mf">6.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">10.</span><span class="p">,</span> <span class="mf">3.</span><span class="p">])</span>
-<span class="n">model</span><span class="o">.</span><span class="n">set_fixes</span><span class="p">([</span><span class="kc">False</span><span class="p">,</span> <span class="s1">&#39;5(0.7)&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">False</span><span class="p">])</span>
+<span class="n">model</span><span class="o">.</span><span class="n">set_fixes</span><span class="p">([</span><span class="kc">False</span><span class="p">,</span> <span class="s2">&quot;5(0.7)&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">False</span><span class="p">])</span>
 </pre></div>
 
 <p>
@@ -46,7 +47,7 @@ title: Tutorials.Models
 <span class="c1"># Generate some random data for this tutorial</span>
 <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-</span><span class="mf">80.</span><span class="p">,</span> <span class="mf">80.</span><span class="p">,</span> <span class="mi">81</span><span class="p">)</span>  <span class="c1"># x-values</span>
 <span class="n">sigma_y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full_like</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">)</span>  <span class="c1"># y-uncertainties</span>
-<span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">model</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="o">*</span><span class="n">model</span><span class="o">.</span><span class="n">vals</span><span class="p">),</span> <span class="n">sigma_y</span><span class="p">)</span>
+<span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">()</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">model</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="o">*</span><span class="n">model</span><span class="o">.</span><span class="n">vals</span><span class="p">),</span> <span class="n">sigma_y</span><span class="p">)</span>    
 <span class="c1"># Random y-values around the model</span>
 </pre></div>
 
@@ -75,14 +76,14 @@ title: Tutorials.Models
 </p>
 
 <div class="py-source"><pre>
-<span class="c1"># Plot the data, the initial model and the fitted model</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">errorbar</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">yerr</span><span class="o">=</span><span class="n">sigma_y</span><span class="p">,</span> <span class="n">fmt</span><span class="o">=</span><span class="s1">&#39;.k&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Data&#39;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">model</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="o">*</span><span class="n">p_init</span><span class="p">),</span> <span class="s1">&#39;-C0&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Initial model&#39;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">model</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="o">*</span><span class="n">popt</span><span class="p">),</span> <span class="s1">&#39;-C1&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Fitted model&#39;</span><span class="p">)</span>
+<span class="c1"># We plot the data, the initial model and the fitted model</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">errorbar</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">yerr</span><span class="o">=</span><span class="n">sigma_y</span><span class="p">,</span> <span class="n">fmt</span><span class="o">=</span><span class="s2">&quot;.k&quot;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Data&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">model</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="o">*</span><span class="n">p_init</span><span class="p">),</span> <span class="s2">&quot;-C0&quot;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Initial model&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">model</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="o">*</span><span class="n">popt</span><span class="p">),</span> <span class="s2">&quot;-C1&quot;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Fitted model&quot;</span><span class="p">)</span>
 
 <span class="c1"># Improve the plot</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;x&#39;</span><span class="p">),</span> <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;y&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&quot;x&quot;</span><span class="p">),</span> <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&quot;y&quot;</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">subplots_adjust</span><span class="p">(</span><span class="n">left</span><span class="o">=</span><span class="mf">0.08</span><span class="p">,</span> <span class="n">bottom</span><span class="o">=</span><span class="mf">0.09</span><span class="p">,</span> <span class="n">top</span><span class="o">=</span><span class="mf">0.99</span><span class="p">,</span> <span class="n">right</span><span class="o">=</span><span class="mf">0.99</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>

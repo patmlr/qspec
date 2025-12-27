@@ -272,7 +272,7 @@ def example_5():
     decay = sim.DecayMap(labels=[("g", "e")], a=[a_eg], k_max=int(je - jg))
     atom = sim.Atom(states=states, decay_map=decay)
     print(atom.get_multipole_types("g", "e"))
-    # >>> {"e3"}
+    # >>> {'e3'}
 
     intensity = 1e3
     pol_eg = sim.Polarization([1., 0, 1j], vec_as_q=False)
@@ -353,5 +353,5 @@ def gen_example(n):
 
 if __name__ == "__main__":
     # gen_pycode_css()
-    gen_example(0)
-    example_0()
+    gen_example(5)
+    example_5()
