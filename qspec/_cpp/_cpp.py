@@ -7,6 +7,7 @@ Python/C++ interface.
 
 import ctypes
 import os
+import platform
 from _ctypes import CFuncPtr
 from enum import Enum
 from typing import Any
@@ -39,6 +40,63 @@ __all__ = [
     "vector3cd_p",
     "vector3d_p",
 ]
+
+
+def _get_architecture() -> str:
+    """"""
+    machine = platform.machine().lower()
+
+    if machine in {"x86_64", "amd64"}:
+        return "x64"
+    if machine in {"arm64", "aarch64"}:
+        return "arm64"
+
+    raise OSError(f"Unsupported Python architecture: {machine}")
+
+
+def _get_platform() -> str:
+    """"""
+    system = platform.system()
+    if system.lower() == "windows":
+        return "windows"
+    if system.lower() == "linux":
+        return "linux"
+    if system.lower() == "darwin":
+        raise OSError(f"Unsupported platform: {system}")
+        return "macos"
+
+    raise OSError(f"Unsupported platform: {system}")
+
+
+def _load_dll() -> ctypes.CDLL:
+    dll_path = os.path.abspath(os.path.dirname(__file__))
+
+    arch = _get_architecture()
+    plat = _get_platform()
+    config = "Debug" if False else "Release"
+
+    dll_path = os.path.join(dll_path, "qspec_cpp", "build")
+
+    if plat == "windows":
+        dll_path = os.path.join(dll_path, f"windows-{arch}", config)
+        prefix = ""
+        suffix = ".dll"
+
+    elif plat == "linux":
+        if arch == "arm64":
+            raise OSError(f"Python architecture {arch} not supported on Linux.")
+
+        dll_path = os.path.join(dll_path, f"linux-{arch}")
+        prefix = "lib"
+        suffix = ".so"
+
+    else:
+        raise OSError(f"Unsupported platform: {plat}")
+
+    dll_name = f"{prefix}qspec_cpp{suffix}"
+
+    print(f"Loading from: {dll_path}")
+    return ctypes.CDLL(os.path.join(dll_path, dll_name))
 
 
 def set_argtypes(func: CFuncPtr, argtypes: tuple[Any, ...]) -> None:
@@ -110,12 +168,7 @@ class C(Enum):
     MultivariateNormalHandler = POINTER(ctypes.c_char)
 
 
-dll_path = os.path.abspath(os.path.dirname(__file__))
-x64 = r"\x64" if ctypes.sizeof(c_void_p) == 8 else ""
-debug = "Debug" if False else "Release"
-dll_path = os.path.join(dll_path, rf"src\qspec_cpp{x64}\{debug}")
-dll_name = "qspec_cpp.dll"
-dll = ctypes.CDLL(os.path.join(dll_path, dll_name))
+dll = _load_dll()
 
 
 """ simulate """

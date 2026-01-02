@@ -33,7 +33,7 @@ title: qspec.analyze.King.fit
 <em class="sig-param">
 <span class="n"><span class="pre">xy</span></span>
 <span class="o"><span class="pre">=</span></span>
-<span class="default_value"><span class="pre">None</span></span>
+<span class="default_value"><span class="pre num">(0, 1)</span></span>
 </em>
 ,&nbsp;
 <em class="sig-param">
@@ -64,36 +64,36 @@ title: qspec.analyze.King.fit
 <span class="o"><span class="pre">**</span></span>
 <span class="n"><span class="pre">kwargs</span></span>
 </em>
-<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/dev-jekyll/qspec/analyze\_analyze.py#L1425-L1493' }}"><span class="sig-source">[source]</span></a>
+<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/dev-jekyll/qspec/analyze\_analyze.py#L1667-L1767' }}"><span class="sig-source">[source]</span></a>
 </dt>
 <dd class="field-body"><p>Perform $2$-dimensional linear regression to create a King plot.
-        Choose between <code>{'york_fit' (default), 'linear_fit', 'linear_monte_carlo'}</code> for the fit routine.
+        Choose between <code>{"york_fit" (default), "linear_fit", "linear_monte_carlo"}</code> for the fit routine.
         Use a parameter <code>alpha</code> to optimize the correlation coefficient between the $y$-intercept and the slope.</p>
 <dl class="field-list">
 <dt class="field-head">Parameters<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>a<span class="classifier"><em>ndarray | Iterable</em></span></dt>
+<dt>a<span class="classifier"><em>array_like</em></span></dt>
 <dd class="field-desc"><p>An Iterable of the mass numbers $A$ of the used isotopes.</p></dd>
-<dt>a_ref<span class="classifier"><em>ndarray | Iterable</em></span></dt>
+<dt>a_ref<span class="classifier"><em>array_like</em></span></dt>
 <dd class="field-desc"><p>An Iterable of the mass numbers $A_\mathrm{ref}$ of the used reference isotopes.</p></dd>
-<dt>x<span class="classifier"><em>ndarray | Iterable</em></span></dt>
+<dt>x<span class="classifier"><em>array_like | None</em></span></dt>
 <dd class="field-desc"><p>The $x$ data and their standard deviations as shape <code>(len(a), 2)</code> arrays.
-         If plotted with <code>mode == 'radii'</code>,
+         If plotted with <code>mode == "radii"</code>,
          the differences of mean-square nuclear charge radii $\delta\langle r^2\rangle^{A,A_\mathrm{ref}}$
          or $\Lambda^{A,A_\mathrm{ref}}$ are expected, else isotope shifts $\delta\nu_x^{A,A_\mathrm{ref}}$
          are expected. Expected units: (fm$^2$) or (MHz).
          If <code>x</code> is <code>None</code>, <code>y</code> is tried to be inherited from <code>King.x_abs</code>.</p></dd>
-<dt>y<span class="classifier"><em>ndarray | Iterable</em></span></dt>
+<dt>y<span class="classifier"><em>array_like | None</em></span></dt>
 <dd class="field-desc"><p>The isotope shifts  $\delta\nu_y^{A,A_\mathrm{ref}}$ and their standard deviations
          as shape <code>(len(a), 2)</code> arrays. Expected units: (MHz).
          If <code>None</code>, <code>y</code> is tried to be inherited from <code>King.x_abs</code>.</p></dd>
-<dt>xy<span class="classifier"><em>Iterable[int]</em></span></dt>
+<dt>xy<span class="classifier"><em>tuple[int, int]</em></span></dt>
 <dd class="field-desc"><p>A 2-tuple of indices <code>(ix, iy)</code>, used to select the two plot axes from <code>King.x_abs</code>.
          Only used if <code>x</code> or <code>y</code> is not specified. The default value is <code>(0, 1)</code>,
          fitting the second against the first axis.</p></dd>
 <dt>func<span class="classifier"><em>str | Callable</em></span></dt>
-<dd class="field-desc"><p>The fitting routine. Must be one of <code>{'york_fit' (default), 'linear_fit', 'linear_monte_carlo'}</code>.</p></dd>
+<dd class="field-desc"><p>The fitting routine. Must be one of <code>{"york_fit" (default), "linear_fit", "linear_monte_carlo"}</code>.</p></dd>
 <dt>alpha<span class="classifier"><em>scalar</em></span></dt>
 <dd class="field-desc"><p>An $x$-axis offset $\alpha$ to reduce the correlation coefficient
          between the $y$-intercept and the slope. Expected unit: (u fm$^2$) or (u MHz).</p></dd>
@@ -109,7 +109,7 @@ title: qspec.analyze.King.fit
 </dd><dt class="field-head">Returns<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>(popt, pcov)<span class="classifier"><em>(ndarray, ndarray)</em></span></dt>
+<dt>(popt, pcov)<span class="classifier"><em>tuple[ndarray, ndarray]</em></span></dt>
 <dd class="field-desc"><p> The best y-intercept and slope and their covariance matrix.
          The final <code>alpha</code> can be accessed through <code>King.alpha</code>.</p></dd></dl>
 </dd>
@@ -144,13 +144,11 @@ title: qspec.analyze.King.fit
 <li class="spaced"><a href="{{ '/doc/functions/algebra/b.html' | relative_url }}">qspec.b</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/algebra/c.html' | relative_url }}">qspec.c</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/algebra/c_dipole.html' | relative_url }}">qspec.c_dipole</a></li>
-<li class="spaced"><a href="{{ '/doc/functions/algebra/cast_sympy.html' | relative_url }}">qspec.cast_sympy</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/algebra/clebsch_gordan.html' | relative_url }}">qspec.clebsch_gordan</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/algebra/f_0.html' | relative_url }}">qspec.f_0</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/algebra/g_0.html' | relative_url }}">qspec.g_0</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/algebra/mu_j_m1.html' | relative_url }}">qspec.mu_j_m1</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/algebra/mu_jj_m1.html' | relative_url }}">qspec.mu_jj_m1</a></li>
-<li class="spaced"><a href="{{ '/doc/functions/algebra/quant.html' | relative_url }}">qspec.quant</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/algebra/reduced_f.html' | relative_url }}">qspec.reduced_f</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/algebra/reduced_f_root.html' | relative_url }}">qspec.reduced_f_root</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/algebra/wigner_3j.html' | relative_url }}">qspec.wigner_3j</a></li>
@@ -1015,6 +1013,22 @@ title: qspec.analyze.King.fit
 <li class="spaced"><a href="{{ '/doc/functions/physics/zeeman_linear.html' | relative_url }}">qspec.zeeman_linear</a></li></ul>
 </details>
 </li><li class="has-children">
+<a href="{{ '/doc/modules/qtypes.html' | relative_url }}">qspec.qtypes</a>
+<details>
+<summary>
+<span class="toctree-toggle" role="presentation"><img src="{{ '/assets/img/chevron-down.svg' | relative_url }}" class="chevron"/></span>
+</summary>
+<ul class="extern-a">
+<li class="spaced"><a href="{{ '/doc/functions/qtypes/asarray.html' | relative_url }}">qspec.asarray</a></li>
+<li class="spaced"><a href="{{ '/doc/functions/qtypes/asarray_none.html' | relative_url }}">qspec.asarray_none</a></li>
+<li class="spaced"><a href="{{ '/doc/functions/qtypes/cast.html' | relative_url }}">qspec.cast</a></li>
+<li class="spaced"><a href="{{ '/doc/functions/qtypes/cast_sympy.html' | relative_url }}">qspec.cast_sympy</a></li>
+<li class="spaced"><a href="{{ '/doc/functions/qtypes/has_getitem.html' | relative_url }}">qspec.has_getitem</a></li>
+<li class="spaced"><a href="{{ '/doc/functions/qtypes/has_shape.html' | relative_url }}">qspec.has_shape</a></li>
+<li class="spaced"><a href="{{ '/doc/functions/qtypes/is_scalar.html' | relative_url }}">qspec.is_scalar</a></li>
+<li class="spaced"><a href="{{ '/doc/functions/qtypes/is_sympy_expr.html' | relative_url }}">qspec.is_sympy_expr</a></li></ul>
+</details>
+</li><li class="has-children">
 <a href="{{ '/doc/modules/simulate.html' | relative_url }}">qspec.simulate</a>
 <details>
 <summary>
@@ -1120,6 +1134,7 @@ title: qspec.analyze.King.fit
 <li class="indent-a"><a href="{{ '/doc/functions/simulate/ScatteringRate/set_laser.html' | relative_url }}">qspec.simulate.ScatteringRate.set_laser</a></li>
 <li class="indent-a"><a href="{{ '/doc/functions/simulate/ScatteringRate/set_polarization.html' | relative_url }}">qspec.simulate.ScatteringRate.set_polarization</a></li>
 <li class="indent-a"><a href="{{ '/doc/functions/simulate/ScatteringRate/set_states.html' | relative_url }}">qspec.simulate.ScatteringRate.set_states</a></li>
+<li class="indent-a"><a href="{{ '/doc/functions/simulate/ScatteringRate/set_velocity.html' | relative_url }}">qspec.simulate.ScatteringRate.set_velocity</a></li>
 <li class="indent-a"><a href="{{ '/doc/functions/simulate/ScatteringRate/set_x0.html' | relative_url }}">qspec.simulate.ScatteringRate.set_x0</a></li></ul>
 </details>
 </li><li class="has-children spaced"><a href="{{ '/doc/functions/simulate/State/State.html' | relative_url }}">qspec.simulate.State</a>
@@ -1210,8 +1225,6 @@ title: qspec.analyze.King.fit
 <li class="spaced"><a href="{{ '/doc/functions/tools/check_shape_like.html' | relative_url }}">qspec.check_shape_like</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/tools/combine_dicts.html' | relative_url }}">qspec.combine_dicts</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/tools/convolve_dict.html' | relative_url }}">qspec.convolve_dict</a></li>
-<li class="spaced"><a href="{{ '/doc/functions/tools/create_data_dir.html' | relative_url }}">qspec.create_data_dir</a></li>
-<li class="spaced"><a href="{{ '/doc/functions/tools/create_doc_link.html' | relative_url }}">qspec.create_doc_link</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/tools/dict_to_list.html' | relative_url }}">qspec.dict_to_list</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/tools/e_phi.html' | relative_url }}">qspec.e_phi</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/tools/e_r.html' | relative_url }}">qspec.e_r</a></li>
@@ -1221,9 +1234,7 @@ title: qspec.analyze.King.fit
 <li class="spaced"><a href="{{ '/doc/functions/tools/floor_log10.html' | relative_url }}">qspec.floor_log10</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/tools/floor_log2.html' | relative_url }}">qspec.floor_log2</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/tools/fraction.html' | relative_url }}">qspec.fraction</a></li>
-<li class="spaced"><a href="{{ '/doc/functions/tools/get_config_dict.html' | relative_url }}">qspec.get_config_dict</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/tools/get_decimals.html' | relative_url }}">qspec.get_decimals</a></li>
-<li class="spaced"><a href="{{ '/doc/functions/tools/get_default_path.html' | relative_url }}">qspec.get_default_path</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/tools/get_rgb_print_command.html' | relative_url }}">qspec.get_rgb_print_command</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/tools/get_val_with_unc.html' | relative_url }}">qspec.get_val_with_unc</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/tools/half_integer_to_fraction.html' | relative_url }}">qspec.half_integer_to_fraction</a></li>

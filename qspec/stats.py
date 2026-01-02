@@ -47,7 +47,7 @@ __all__ = [
 
 class Observable(float):
     """
-    A float object which has a 'label' and optionally both a left- and right-sided or a symmetric uncertainty.
+    A float object which has a `label` and optionally both a left- and right-sided or a symmetric uncertainty.
     """
 
     def __new__(
@@ -69,9 +69,9 @@ class Observable(float):
         """
         :param x: The value of the observable.
         :param label: The label of the observable.
-        :param std: The left-sided 1-sigma percentile relative to 'x' if 'std_2' is specified,
+        :param std: The left-sided 1-sigma percentile relative to `x` if `std_2` is specified,
          else the standard deviation of the observable.
-        :param std_2: The right-sided 1-sigma percentile relative to 'x' if 'std' is specified,
+        :param std_2: The right-sided 1-sigma percentile relative to `x` if `std` is specified,
          else the standard deviation of the observable.
         """
         float.__init__(float(x))
@@ -131,7 +131,7 @@ class Observable(float):
     def rvs(self, size: int = 1) -> ndarray:
         """
         :param size: The defining number of random variates (default is 1).
-        :returns: Random variates of the observable of given 'size'. If asymmetric uncertainties are specified,
+        :returns: Random variates of the observable of given `size`. If asymmetric uncertainties are specified,
          a skew normal distribution is assumed. However, the ratio between the left- and right-sided uncertainty
          must not exceed 1.5.
         """
@@ -199,15 +199,15 @@ def average(
     """
     :param a: The sample data.
     :param axis: The axis along which the average is computed.
-    :param std: An array of standard deviations associated with the values in 'a'.
+    :param std: An array of standard deviations associated with the values in `a`.
      If specified, the weighted average of the uncorrelated sample data and its standard error is returned.
-    :param cov: The covariance matrix associated with the values in 'a'.
-     If specified, it overrides 'std' and the weighted average of the correlated sample data
-     and its standard error is returned. If no axis is specified, 'cov' must have shape (a.size, a.size)
-     with elements associated with the values in the flattened 'a',
+    :param cov: The covariance matrix associated with the values in `a`.
+     If specified, it overrides `std` and the weighted average of the correlated sample data
+     and its standard error is returned. If no axis is specified, `cov` must have shape (a.size, a.size)
+     with elements associated with the values in the flattened `a`,
      otherwise cov must have either shape (a.shape[axis], a.shape[axis])
      or (..., a.shape[axis - 1], a.shape[axis], a.shape[axis], a.shape[axis + 1], ...).
-    :returns: The average and its standard error for a given sample 'a' along the specified 'axis'.
+    :returns: The average and its standard error for a given sample `a` along the specified `axis`.
     """
     a = np.asarray(a, dtype=float)
     axis = None if axis is None else int(axis)
@@ -216,7 +216,7 @@ def average(
         av = np.average(a, axis=axis)
         av_d = np.std(a, axis=axis, ddof=1)
 
-        if axis is None:  # The shape of 'a' is ignored ('a' is flattened).
+        if axis is None:  # The shape of `a` is ignored (`a` is flattened).
             av_d /= np.sqrt(a.size)
         else:
             av_d /= np.sqrt(a.shape[axis])
@@ -228,9 +228,9 @@ def average(
 
     else:  # The weighted average of correlated data and its standard error.
         cov = np.asarray(cov, dtype=float)
-        if axis is None:  # The shape of 'a' is ignored ('a' is flattened).
+        if axis is None:  # The shape of `a` is ignored (`a` is flattened).
             if cov.shape != (a.size, a.size):
-                raise ValueError(f"Shape mismatch between 'a' {a.shape} and 'cov' {cov.shape}.")
+                raise ValueError(f"Shape mismatch between `a` {a.shape} and `cov` {cov.shape}.")
             av, sum_of_weights = np.average(a, weights=1.0 / np.diag(cov), returned=True)
             av_d = np.sum(
                 [
@@ -243,7 +243,7 @@ def average(
         else:
             if a.size != a.shape[0] and cov.shape == (a.size, a.size):
                 raise ValueError(
-                    f"Shape mismatch between 'a' {a.shape} and 'cov' {cov.shape} for specified axis {axis}."
+                    f"Shape mismatch between `a` {a.shape} and `cov` {cov.shape} for specified axis {axis}."
                 )
 
             if cov.shape == (a.shape[axis], a.shape[axis]):
@@ -278,7 +278,7 @@ def median(a: array_like, axis: int_like | None = None) -> tuple[ndarray, ndarra
     :param a: The sample data.
     :param axis: The axis along which the three percentiles are computed.
     :returns: The median (0.5-percentile) as well as the left- (~0.1587) and right-sided (~0.8413) 1-sigma percentile
-     of a given sample 'a' along the specified 'axis'.
+     of a given sample `a` along the specified `axis`.
     """
     a = np.asarray(a, dtype=float)
     med = np.nanmedian(a, axis=axis)
@@ -290,8 +290,8 @@ def median(a: array_like, axis: int_like | None = None) -> tuple[ndarray, ndarra
 def estimate_skewnorm(med: scalar, per_0: scalar, per_1: scalar) -> ndarray | None:
     """
     :param med: The median (0.5-percentile) of a random variable.
-    :param per_0: The left-sided 1-sigma percentile (~0.1587-percentile) relative to 'med'.
-    :param per_1: The right-sided 1-sigma percentile (~0.8413-percentile) relative to 'med'.
+    :param per_0: The left-sided 1-sigma percentile (~0.1587-percentile) relative to `med`.
+    :param per_1: The right-sided 1-sigma percentile (~0.8413-percentile) relative to `med`.
     :returns: A size-3-array of the estimated parameters (alpha, mean, std.)
      of a skew normal distribution that matches the given percentiles.
     :raises ValueError: If the ratio between the left-(right-) and right-(left-)sided uncertainty exceeds 1.5.
@@ -359,30 +359,30 @@ def propagate(
     show: bool = False,
 ) -> Observable | tuple[Observable, ndarray, ndarray]:
     """
-    :param f: The function to compute. 'f' needs to be vectorized.
-    :param x: The input values. If 'x_d' is None, the sample data will be generated with the 'Observable.rvs' function
-     which considers asymmetric uncertainties. If an element is not an 'Observable', its uncertainty is assumed to be 0.
+    :param f: The function to compute. `f` needs to be vectorized.
+    :param x: The input values. If `x_d` is None, the sample data will be generated with the `Observable.rvs` function
+     which considers asymmetric uncertainties. If an element is not an `Observable`, its uncertainty is assumed to be 0.
     :param x_d: The uncertainties of the input values.
-    :param cov: The covariance matrix of the x values. If not None, 'x' are assumed to be distributed according to
-     a multivariate normal distribution with covariance 'cov'.
+    :param cov: The covariance matrix of the x values. If not None, `x` are assumed to be distributed according to
+     a multivariate normal distribution with covariance `cov`.
     :param unc_places: The number of significant decimal places the result will be rounded to.
      If None, the result is not rounded.
     :param sample_size: The number of random variates used for the calculation. The default is 1,000,000.
     :param rtol: The relative tolerance, with respect to the median of the resulting sample,
      with which the left- and right-sided uncertainties can deviate before asymmetric uncertainties are used.
     :param atol: The absolute tolerance with which the left- and right-sided uncertainties can deviate,
-     before asymmetric uncertainties are used. Overrides 'rtol'.
+     before asymmetric uncertainties are used. Overrides `rtol`.
     :param force_sym: Whether to force symmetric uncertainties. If so, a normal distribution is assumed.
     :param full_output: Whether to return the randomly generated data samples.
     :param show: Whether to show a histogram and estimated PDFs of the computed sample data.
-    :returns: An 'Observable' whose uncertainties result from the propagation of the uncertainties
-     of the input values 'x' by function 'f'.
+    :returns: An `Observable` whose uncertainties result from the propagation of the uncertainties
+     of the input values `x` by function `f`.
      If the uncertainties are asymmetric, the parameters of a skew normal distribution
      are estimated using least-square fitting and are stored to the observable. The value and the two uncertainties are
      the median and the left- (~0.1587) and right-sided (~0.8413) 1-sigma percentiles
      relative to the median, respectively. If the uncertainties are symmetric the observable
      is assumed to be normally distributed. The value and the single uncertainty is then calculated using
-     the mean and the standard deviation of the sampled data. If 'full_output' is True, a list of the input samples
+     the mean and the standard deviation of the sampled data. If `full_output` is True, a list of the input samples
      as well as the output sample are returned along with the observable.
     """
     sample_size = int(sample_size)
@@ -494,15 +494,15 @@ def combined_pdf(
     :param z: The quantiles of the combined probability density function (pdf).
     :param pdf_1: The pdf of the first random variate.
     :param pdf_2: The pdf of the second random variate.
-    :param loc_1: The 'loc' parameter of the first pdf.
-    :param scale_1: The 'scale' parameter of the first pdf.
-    :param loc_2: The 'loc' parameter of the second pdf.
-    :param scale_2: The 'scale' parameter of the second pdf.
+    :param loc_1: The `loc` parameter of the first pdf.
+    :param scale_1: The `scale` parameter of the first pdf.
+    :param loc_2: The `loc` parameter of the second pdf.
+    :param scale_2: The `scale` parameter of the second pdf.
     :param operator: The operator that defines the new random variate given by Z = X <operator> Y.
-     Currently supported operators are {'+', '*'}.
+     Currently supported operators are {"+", "*"}.
     :param n: The precision of the numerical integration.
      The integration uses 2 ** n intervals to evaluate the integral.
-    :returns: The value of the pdf at the given 'z' quantiles.
+    :returns: The value of the pdf at the given `z` quantiles.
     """
     arg = np.asarray(z)
     if arg.shape == ():
@@ -588,7 +588,7 @@ def uniform(x: array_like, width: array_like) -> ndarray:
     """
     :param x: The x quantiles.
     :param width: The width of the uniform distribution.
-    :returns: The probability density at 'x'.
+    :returns: The probability density at `x`.
     """
     x, width = asarray(x, width, dtype=float)
     return st.uniform.pdf(x, loc=-0.5 * width, scale=width)

@@ -21,12 +21,15 @@
     --navigation-indent: 12px;
     --navigation-indent-margin: 10px;
     --topnav-bg-color: #281d42;
-    --infobox-bg-color: #624491;
+    --infobox-bg-color: #fefefe;
+    --infobox-bg-gradient-color: #f5f5f5;
+    --infobox-bg-gradient-angle: 169deg;
+    --infobox-header-color: #624491;
     --code-prose-bg-color: #f3f4f5;
     --code-prose-border-color: #d1d5da;
-    --code-block-bg-color: hsl(0, 0%, 96.5%);
+    --code-block-bg-color: #f3f4f5;
     --bash-code-color: #912583;
-    --py-class-color: #b200b2;
+    --py-class-color: #833ab4; //#b200b2
     --py-func-color: #4169e1;
     --py-num-color: #05967c;
     --py-str-color: #197a01;
@@ -508,7 +511,18 @@ div.infobox {
     }
 
 div.infobox-body {
-    background-color: var(--code-block-bg-color);
+    // background-color: var(--infobox-bg-color);
+    background: var(--infobox-bg-color);
+    background: -webkit-linear-gradient(var(--infobox-bg-gradient-angle), var(--infobox-bg-color) 0%, var(--infobox-bg-gradient-color) 100%);
+    background: -moz-linear-gradient(var(--infobox-bg-gradient-angle), var(--infobox-bg-color) 0%, var(--infobox-bg-gradient-color) 100%);
+    background: linear-gradient(var(--infobox-bg-gradient-angle), var(--infobox-bg-color) 0%, var(--infobox-bg-gradient-color) 100%);
+
+    filter: progid:DXImageTransform.Microsoft.gradient(
+    startColorstr="#fefefe",
+    endColorstr="#f5f5f5",
+    GradientType=0
+    );
+
     min-height: 140px;
     border: 1px solid darkgrey;
     border-radius: 6px;
@@ -516,7 +530,7 @@ div.infobox-body {
     }
 
 div.infobox-title {
-    color: var(--infobox-bg-color);
+    color: var(--infobox-header-color);
     font-weight: 700 !important;
     font-size: 1.2em;
     margin-bottom: 6px;

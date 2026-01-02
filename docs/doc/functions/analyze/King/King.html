@@ -40,7 +40,7 @@ title: qspec.analyze.King
 <span class="o"><span class="pre">=</span></span>
 <span class="default_value"><span class="pre">None</span></span>
 </em>
-<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/dev-jekyll/qspec/analyze\_analyze.py#L1329-L1960' }}"><span class="sig-source">[source]</span></a>
+<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/dev-jekyll/qspec/analyze\_analyze.py#L1542-L2390' }}"><span class="sig-source">[source]</span></a>
 </dt>
 <dd class="field-body"><p>A class for $n$-dimensional King plots, encapsulating the linear regression algorithms of the
         <a href="{{ '/doc/modules/analyze.html' | relative_url }}">
@@ -51,12 +51,12 @@ title: qspec.analyze.King
 <dt class="field-head">Parameters<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>a<span class="classifier"><em>ndarray | Iterable</em></span></dt>
+<dt>a<span class="classifier"><em>array_like</em></span></dt>
 <dd class="field-desc"><p>An iterable of the mass numbers $A$ of the considered isotopes with shape <code>(k, )</code>,
          where <code>k</code> is the number of isotopes.</p></dd>
-<dt>m<span class="classifier"><em>ndarray | Iterable</em></span></dt>
+<dt>m<span class="classifier"><em>array_like</em></span></dt>
 <dd class="field-desc"><p>The masses and their uncertainties of the isotopes <code>a</code> (u). <code>m</code> must have shape <code>(k, 2)</code>.</p></dd>
-<dt>x_abs<span class="classifier"><em>ndarray | Iterable</em></span></dt>
+<dt>x_abs<span class="classifier"><em>array_like | None</em></span></dt>
 <dd class="field-desc"><p>The absolute values of the data vectors and their standard deviations
          corresponding to the mass numbers <code>a</code>. If given, the <code>x</code> and <code>y</code> parameters can be omitted in
          <a href="{{ '/doc/functions/analyze/King/fit.html' | relative_url }}">
@@ -68,7 +68,7 @@ title: qspec.analyze.King
          masses. <code>subtract_electrons</code> can be a <code>float</code> if the ionization energy shall be considered.</p></dd>
 <dt>n_samples<span class="classifier"><em>int</em></span></dt>
 <dd class="field-desc"><p>The number of generated samples for the monte-carlo routines.</p></dd>
-<dt>element_label<span class="classifier"><em>str</em></span></dt>
+<dt>element_label<span class="classifier"><em>str | None</em></span></dt>
 <dd class="field-desc"><p>The label of the element to enhance the printed and plotted information.</p></dd></dl>
 </dd>
 </dl></dd>
@@ -102,13 +102,11 @@ title: qspec.analyze.King
 <li class="spaced"><a href="{{ '/doc/functions/algebra/b.html' | relative_url }}">qspec.b</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/algebra/c.html' | relative_url }}">qspec.c</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/algebra/c_dipole.html' | relative_url }}">qspec.c_dipole</a></li>
-<li class="spaced"><a href="{{ '/doc/functions/algebra/cast_sympy.html' | relative_url }}">qspec.cast_sympy</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/algebra/clebsch_gordan.html' | relative_url }}">qspec.clebsch_gordan</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/algebra/f_0.html' | relative_url }}">qspec.f_0</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/algebra/g_0.html' | relative_url }}">qspec.g_0</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/algebra/mu_j_m1.html' | relative_url }}">qspec.mu_j_m1</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/algebra/mu_jj_m1.html' | relative_url }}">qspec.mu_jj_m1</a></li>
-<li class="spaced"><a href="{{ '/doc/functions/algebra/quant.html' | relative_url }}">qspec.quant</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/algebra/reduced_f.html' | relative_url }}">qspec.reduced_f</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/algebra/reduced_f_root.html' | relative_url }}">qspec.reduced_f_root</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/algebra/wigner_3j.html' | relative_url }}">qspec.wigner_3j</a></li>
@@ -973,6 +971,22 @@ title: qspec.analyze.King
 <li class="spaced"><a href="{{ '/doc/functions/physics/zeeman_linear.html' | relative_url }}">qspec.zeeman_linear</a></li></ul>
 </details>
 </li><li class="has-children">
+<a href="{{ '/doc/modules/qtypes.html' | relative_url }}">qspec.qtypes</a>
+<details>
+<summary>
+<span class="toctree-toggle" role="presentation"><img src="{{ '/assets/img/chevron-down.svg' | relative_url }}" class="chevron"/></span>
+</summary>
+<ul class="extern-a">
+<li class="spaced"><a href="{{ '/doc/functions/qtypes/asarray.html' | relative_url }}">qspec.asarray</a></li>
+<li class="spaced"><a href="{{ '/doc/functions/qtypes/asarray_none.html' | relative_url }}">qspec.asarray_none</a></li>
+<li class="spaced"><a href="{{ '/doc/functions/qtypes/cast.html' | relative_url }}">qspec.cast</a></li>
+<li class="spaced"><a href="{{ '/doc/functions/qtypes/cast_sympy.html' | relative_url }}">qspec.cast_sympy</a></li>
+<li class="spaced"><a href="{{ '/doc/functions/qtypes/has_getitem.html' | relative_url }}">qspec.has_getitem</a></li>
+<li class="spaced"><a href="{{ '/doc/functions/qtypes/has_shape.html' | relative_url }}">qspec.has_shape</a></li>
+<li class="spaced"><a href="{{ '/doc/functions/qtypes/is_scalar.html' | relative_url }}">qspec.is_scalar</a></li>
+<li class="spaced"><a href="{{ '/doc/functions/qtypes/is_sympy_expr.html' | relative_url }}">qspec.is_sympy_expr</a></li></ul>
+</details>
+</li><li class="has-children">
 <a href="{{ '/doc/modules/simulate.html' | relative_url }}">qspec.simulate</a>
 <details>
 <summary>
@@ -1078,6 +1092,7 @@ title: qspec.analyze.King
 <li class="indent-a"><a href="{{ '/doc/functions/simulate/ScatteringRate/set_laser.html' | relative_url }}">qspec.simulate.ScatteringRate.set_laser</a></li>
 <li class="indent-a"><a href="{{ '/doc/functions/simulate/ScatteringRate/set_polarization.html' | relative_url }}">qspec.simulate.ScatteringRate.set_polarization</a></li>
 <li class="indent-a"><a href="{{ '/doc/functions/simulate/ScatteringRate/set_states.html' | relative_url }}">qspec.simulate.ScatteringRate.set_states</a></li>
+<li class="indent-a"><a href="{{ '/doc/functions/simulate/ScatteringRate/set_velocity.html' | relative_url }}">qspec.simulate.ScatteringRate.set_velocity</a></li>
 <li class="indent-a"><a href="{{ '/doc/functions/simulate/ScatteringRate/set_x0.html' | relative_url }}">qspec.simulate.ScatteringRate.set_x0</a></li></ul>
 </details>
 </li><li class="has-children spaced"><a href="{{ '/doc/functions/simulate/State/State.html' | relative_url }}">qspec.simulate.State</a>
@@ -1168,8 +1183,6 @@ title: qspec.analyze.King
 <li class="spaced"><a href="{{ '/doc/functions/tools/check_shape_like.html' | relative_url }}">qspec.check_shape_like</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/tools/combine_dicts.html' | relative_url }}">qspec.combine_dicts</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/tools/convolve_dict.html' | relative_url }}">qspec.convolve_dict</a></li>
-<li class="spaced"><a href="{{ '/doc/functions/tools/create_data_dir.html' | relative_url }}">qspec.create_data_dir</a></li>
-<li class="spaced"><a href="{{ '/doc/functions/tools/create_doc_link.html' | relative_url }}">qspec.create_doc_link</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/tools/dict_to_list.html' | relative_url }}">qspec.dict_to_list</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/tools/e_phi.html' | relative_url }}">qspec.e_phi</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/tools/e_r.html' | relative_url }}">qspec.e_r</a></li>
@@ -1179,9 +1192,7 @@ title: qspec.analyze.King
 <li class="spaced"><a href="{{ '/doc/functions/tools/floor_log10.html' | relative_url }}">qspec.floor_log10</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/tools/floor_log2.html' | relative_url }}">qspec.floor_log2</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/tools/fraction.html' | relative_url }}">qspec.fraction</a></li>
-<li class="spaced"><a href="{{ '/doc/functions/tools/get_config_dict.html' | relative_url }}">qspec.get_config_dict</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/tools/get_decimals.html' | relative_url }}">qspec.get_decimals</a></li>
-<li class="spaced"><a href="{{ '/doc/functions/tools/get_default_path.html' | relative_url }}">qspec.get_default_path</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/tools/get_rgb_print_command.html' | relative_url }}">qspec.get_rgb_print_command</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/tools/get_val_with_unc.html' | relative_url }}">qspec.get_val_with_unc</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/tools/half_integer_to_fraction.html' | relative_url }}">qspec.half_integer_to_fraction</a></li>

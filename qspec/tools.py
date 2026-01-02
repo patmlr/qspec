@@ -243,8 +243,8 @@ def print_cov(cov: array_like, normalize: bool = False, decimals: int = 2) -> No
 
 def fraction(r: Rational | str) -> tuple[int, int]:
     """
-    :param r: A sympy.Rational or a str with the signature "'num'/'denom'".
-    :returns: the numerator and denominator of 'r'.
+    :param r: A sympy.Rational or a str with the signature "num/denom".
+    :returns: the numerator and denominator of `r`.
     """
     if not isinstance(r, Rational) and not isinstance(r, str):
         raise TypeError(f"Argument must be a sympy.Rational or str, but is {type(r)}: {r}.")
@@ -294,7 +294,7 @@ def half_integer_to_str(val: scalar, symbol: str = "/") -> str:
 
 def get_val_with_unc(val_string: str) -> tuple[float, float]:
     """
-    :param val_string: The str representation of a number with uncertainty of the format '1.234(56)'.
+    :param val_string: The `str` representation of a number with uncertainty of the format `"1.234(56)"`.
      Decimal separators can be used or spared arbitrarily.
     :returns: The value and its uncertainty.
     """
@@ -326,10 +326,10 @@ def get_val_with_unc(val_string: str) -> tuple[float, float]:
 
 def roman_to_int(roman: str) -> int:
     """
-    Convert from Roman numerals to an integer
-    [jonrsharpe, https://codereview.stackexchange.com/questions/68297/convert-roman-to-int].
+    Convert from Roman numerals to an integer.
 
-    :param roman: The str representation of a roman number.
+    :param roman: The `str` representation of a roman number.
+    :returns: The integer value of a `roman` number.
     """
     numbers = []
     for char in roman.upper():

@@ -1,0 +1,45 @@
+#pragma once
+
+#include "Utility.h"
+#include "wignerSymbols-cpp.h"
+
+#include <stdlib.h>
+#include <complex>
+#include <vector>
+#include <cmath>
+#include <algorithm>
+#include <Eigen/Dense>
+
+using namespace Eigen;
+
+
+struct EigenReturn
+{
+    std::vector<double> values;
+    std::vector<VectorXd> vectors;
+};
+
+
+double wigner_d_qm(size_t j, int q, int m, double theta);
+std::complex<double> wigner_D_qm(size_t j, int q, int m, double theta, double phi);
+VectorXcd spherical_tensor(bool electric, size_t k, Vector3cd qk, double theta, double phi);
+
+double d_e1(double a, double freq_0, double freq_1);
+double d_m1(double a, double freq_0, double freq_1);
+double a_dipole(double i, double j_l, double f_l, double m_l, double j_u, double f_u, double m_u, double q);
+
+double d_emk(size_t k, bool parity_equal, double a, double freq_0, double freq_1);
+double a_multipole(double k, double i, double j_l, double f_l, double m_l, double j_u, double f_u, double m_u, double q);
+
+double lande_n(double g_n);
+double lande_j(double s, double l, double j);
+double lande_f(double i, double j, double f, double g_n, double g_j);
+double hyperfine(double i, double j, double f, double* hyper_const);
+double zeeman(double m, double b, double g);
+double hyper_zeeman_linear(double i, double j, double f, double m, double g_j, double g_n, double* hyper_const, double b, bool g_n_as_gyro);
+double hyper_zeeman_ij(double mi0, double mj0, double mi1, double mj1, double i, double j, double g_j, double g_n, double* hyper_const, double b);
+EigenReturn hyper_zeeman_num(double i, double j, double m, double g_j, double g_n, double* hyper_const, double b);
+double lorentz(double w, double w0, double a, double rabi_square);
+double gamma(double v);
+double doppler(double x, double v, double angle);
+double recoil(double freq, double mass);

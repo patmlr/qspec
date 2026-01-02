@@ -7,9 +7,21 @@ from qspec.simulate import *
 
 QSPEC_SIM_TYPES = [Polarization, Laser, Environment, State, DecayMap, Atom, Interaction]
 
+MODULE_INCLUDE = {
+    "qtypes": {
+        "asarray",
+        "asarray_none",
+        "cast",
+        "cast_sympy",
+        "has_getitem",
+        "has_shape",
+        "is_scalar",
+        "is_sympy_expr"
+        }
+    }
 FOLDER_FILES = {"models", "simulate", "analyze"}
 FILES = sorted(["qtypes", "physics", "algebra", "models", "analyze", "simulate", "tools", "stats"])
-# FILES = sorted(['algebra'])
+# FILES = sorted(["qtypes"])
 
 
 def is_num(val):
@@ -61,7 +73,10 @@ def is_num(val):
 
 def type_to_str(_type):
     ret = str(_type)
+    ret = ret.replace(str(sympy_scalar), "sympy_expr | scalar")
     ret = ret.replace(str(array_like | object), "array_like | object")
+    ret = ret.replace("collections.abc.Iterable", "Iterable")
+    ret = ret.replace("collections.abc.Callable", "Callable")
     for t in QSPEC_SIM_TYPES:
         if t.__name__ in ret:
             ret = ret.replace(str(array_like | t), f"array_like | {t}")
@@ -69,6 +84,8 @@ def type_to_str(_type):
             ret = ret.replace(f"ForwardRef('{t.__name__}')", f"qspec.simulate.{t.__name__}")
             if ret == t.__name__:
                 ret = ret.replace(t.__name__, f"qspec.simulate.{t.__name__}")
+            if f"{t.__name__} | " in ret and f"qspec.simulate.{t.__name__}" not in ret:
+                ret = ret.replace(f"{t.__name__} | ", f"qspec.simulate.{t.__name__} | ")
     ret = ret.replace(str(array_like), "array_like")
     ret = ret.replace(f"{quant.__module__}.{quant.__name__}", "quant")
     ret = ret.replace(str(scalar), "scalar")
@@ -98,6 +115,14 @@ def type_to_str(_type):
         .replace("'", "")
     )
     return ret
+
+
+def include_func(module: str, func: str) -> bool:
+    if module in MODULE_INCLUDE:
+        if func in MODULE_INCLUDE[module]:
+            return True
+        return False
+    return True
 
 
 def rest_to_html(rest):
@@ -161,7 +186,9 @@ def gen_table():
 
         namespace = f"qspec{f'.{file}' if file in FOLDER_FILES else ''}"
         mod = importlib.import_module(f"qspec.{file}")
-        func_str = sorted(f for f in mod.__all__ if callable(eval(f"mod.{f}", {"mod": mod})))
+        func_str = sorted(
+            f for f in mod.__all__ if callable(eval(f"mod.{f}", {"mod": mod})) and include_func(file, f)
+        )
         funcs = {f: eval(f"mod.{f}") for f in func_str}
 
         j = temp.index("<!--p>tab-func</p-->") + 1
@@ -302,6 +329,7 @@ def _gen_func(f, file, temp, namespace, funcs, func_sig, func_doc):
             )
 
         html += f"\n{temp[i + 11]}\n,&nbsp;"
+
     lines, i_start = inspect.getsourcelines(funcs[f])
     i_stop = i_start + len(lines) - 1
     if file in FOLDER_FILES:
@@ -474,7 +502,9 @@ def gen_functions():
 
         namespace = f"qspec{f'.{file}' if file in FOLDER_FILES else ''}"
         mod = importlib.import_module(f"qspec.{file}")
-        func_str = sorted(f for f in mod.__all__ if callable(eval(f"mod.{f}", {"mod": mod})))
+        func_str = sorted(
+            f for f in mod.__all__ if callable(eval(f"mod.{f}", {"mod": mod})) and include_func(file, f)
+        )
         funcs = {f: eval(f"mod.{f}") for f in func_str}
         func_sig = {f: inspect.signature(funcs[f]) for f in func_str}
         func_doc = {f: funcs[f].__init__.__doc__ if f[0].isupper() else funcs[f].__doc__ for f in func_str}

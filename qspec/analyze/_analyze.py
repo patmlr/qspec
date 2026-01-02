@@ -373,12 +373,12 @@ def york_fit(
     if sigma_x is None:
         sigma_x = np.full_like(x, 1.0)
         if report:
-            print("\nNo uncertainties for 'x' were given. Assuming 'sigma_x'=1.")
+            print("\nNo uncertainties for `x` were given. Assuming `sigma_x` = 1.")
 
     if sigma_y is None:
         sigma_y = np.full_like(y, 1.0)
         if report:
-            print("\nNo uncertainties for 'y' were given. Assuming 'sigma_y'=1.")
+            print("\nNo uncertainties for `y` were given. Assuming `sigma_y` = 1.")
 
     sigma_2d = True
     if corr is None:
@@ -662,7 +662,7 @@ def linear_nd_fit(
     try:
         cov_inv = np.linalg.inv(cov_temp)
     except np.linalg.LinAlgError as e:
-        raise np.linalg.LinAlgError(f'Unable to invert covariance matrix ("{e}")')
+        raise np.linalg.LinAlgError(f"Unable to invert covariance matrix ('{e}')")
 
     if p0 is None:
         popt = np.zeros(2 * dim, dtype=float)
@@ -828,16 +828,16 @@ def _test_order_linear_nd_monte_carlo(
      Use <a href="{{ '/doc/functions/analyze/covariance_matrix.html' | relative_url }}">
     `covariance_matrix`</a> to construct covariance matrices.
     :param n_samples: Maximum number of generated samples.
-     If `None` and `method == 'cpp"`, samples are generated until `n_accepted` samples get accepted,
+     If `None` and `method == "cpp"`, samples are generated until `n_accepted` samples get accepted,
      see <a href="{{ '/doc/functions/analyze/generate_collinear_points_cpp.html' | relative_url }}">
      `generate_collinear_points_cpp`</a>.
-    :param n_accepted: The number of samples to be accepted for each data point. Only available if `method == 'cpp"`.
-    :param method: The method to generate the collinear points. Can be one of `{'py', 'cpp'}`.
+    :param n_accepted: The number of samples to be accepted for each data point. Only available if `method == "cpp"`.
+    :param method: The method to generate the collinear points. Can be one of `{"py", "cpp"}`.
      The `"py"` version is faster but only allows to specify `n_samples`.
      The `"cpp"` version is slower but allows to specify both `n_accepted` and `n_samples`.
     :param report: Whether to report the number of samples.
-    :param kwargs: Additional keyword arguments to be passed to the chosen method. `"py': {}`, `"cpp': {seed: None}`.
-    :returns: (order) The order of 'x', with respect to axis 0, that yields the most accepted samples.
+    :param kwargs: Additional keyword arguments to be passed to the chosen method. `"py": {}`, `"cpp": {seed: None}`.
+    :returns: (order) The order of `x`, with respect to axis 0, that yields the most accepted samples.
     """
     indices = [(i, j) for i in range(x.shape[0]) for j in range(x.shape[0]) if j > i]
     best_n = 0
@@ -940,20 +940,20 @@ def generate_collinear_points(
      Use <a href="{{ '/doc/functions/analyze/covariance_matrix.html' | relative_url }}">
     `covariance_matrix`</a> to construct covariance matrices.
     :param n_samples: The number of samples generated for each data point.
-     If `None` and `method == 'cpp"`, samples are generated until `n_accepted` samples get accepted.
-    :param n_accepted: The number of samples to be accepted for each data point. Only available if `method == 'cpp"`.
-    :param method: The method to generate the collinear points. Can be one of `{'py', 'cpp'}`.
+     If `None` and `method == "cpp"`, samples are generated until `n_accepted` samples get accepted.
+    :param n_accepted: The number of samples to be accepted for each data point. Only available if `method == "cpp"`.
+    :param method: The method to generate the collinear points. Can be one of `{"py", "cpp"}`.
      The `"py"` version is faster but only allows to specify `n_samples`.
      The `"cpp"` version is slower but allows to specify both `n_accepted` and `n_samples`.
     :param report: Whether to report the number of samples.
-    :param kwargs: Additional keyword arguments to be passed to the chosen method. `"py': {}`, `"cpp': {seed: None}`.
+    :param kwargs: Additional keyword arguments to be passed to the chosen method. `"py": {}`, `"cpp": {seed: None}`.
     :returns: (p, n_accepted, n_samples) The generated data vectors $\vec{p}_i$ with shape `(n_accepted, k ,n)`
      and the number of accepted and generated samples.
-    :raises ValueError: `method` must be in `{'py', 'cpp'}`.
+    :raises ValueError: `method` must be in `{"py", "cpp"}`.
     """
     m = {"py", "cpp"}
     if method.lower() not in m:
-        raise ValueError(f"'method' ({method}) must be in {m}.")
+        raise ValueError(f"`method` ({method}) must be in {m}.")
     if method == "py":
         return generate_collinear_points_py(x, cov, n_samples=n_samples, report=report)
 
@@ -992,15 +992,15 @@ def linear_nd_monte_carlo(
      If `None`, the best axis is determined from the data, and the direction vector of the straight is normalized.
     :param optimize_cov: If `True`, the origin vector of the straight is optimized to yield the smallest covariances.
     :param n_samples: The number of samples generated for each data point.
-     If `None` and `method == 'cpp"`, samples are generated until `n_accepted` samples get accepted.
-    :param n_accepted: The number of samples to be accepted for each data point. Only available if `method == 'cpp"`.
+     If `None` and `method == "cpp"`, samples are generated until `n_accepted` samples get accepted.
+    :param n_accepted: The number of samples to be accepted for each data point. Only available if `method == "cpp"`.
     :param optimize_sampling: Whether to optimize the data sampling for acceptance efficiency.
     :param return_samples: Whether to also return the generated points $\vec{p}_i$ with shape `(n_samples, k ,n)`.
-    :param method: The method to generate the collinear points. Can be one of `{'py', 'cpp'}`.
+    :param method: The method to generate the collinear points. Can be one of `{"py", "cpp"}`.
      The `"py"` version is faster but only allows to specify `n_samples`.
      The `"cpp"` version is slower but allows to specify both `n_accepted` and `n_samples`.
     :param report: Whether to print the result of the fit.
-    :param kwargs: Additional keyword arguments to be passed to the chosen method. `"py': {}`, `"cpp': {seed: None}`.
+    :param kwargs: Additional keyword arguments to be passed to the chosen method. `"py": {}`, `"cpp": {seed: None}`.
     :returns: (popt, pcov, p) The optimized parameters and their covariances.
      If `return_samples == True`, also the generated points $\vec{p}_i$ are returned.
      The resulting shapes are `(2 * n, )`, `(2 * n, 2 * n)` and `(n_samples, k, n)`.
@@ -1109,15 +1109,15 @@ def linear_monte_carlo(
     :param corr: The correlation coefficients $\rho_{xy}$ between the `x` and `y` data.
     :param optimize_cov: If `True`, the origin vector of the straight is optimized to yield the smallest covariances.
     :param n_samples: The number of samples generated for each data point.
-     If `None` and `method == 'cpp"`, samples are generated until `n_accepted` samples get accepted.
-    :param n_accepted: The number of samples to be accepted for each data point. Only available if `method == 'cpp"`.
+     If `None` and `method == "cpp"`, samples are generated until `n_accepted` samples get accepted.
+    :param n_accepted: The number of samples to be accepted for each data point. Only available if `method == "cpp"`.
     :param optimize_sampling: Whether to optimize the data sampling for acceptance efficiency.
     :param return_samples: Whether to also return the generated points $\vec{p}_i$ with shape `(n_samples, k ,n)`.
-    :param method: The method to generate the collinear points. Can be one of `{'py', 'cpp'}`.
+    :param method: The method to generate the collinear points. Can be one of `{"py", "cpp"}`.
      The `"py"` version is faster but only allows to specify `n_samples`.
      The `"cpp"` version is slower but allows to specify both `n_accepted` and `n_samples`.
     :param report: Whether to print the result of the fit.
-    :param kwargs: Additional keyword arguments to be passed to the chosen method. `"py': {}`, `"cpp': {seed: None}`.
+    :param kwargs: Additional keyword arguments to be passed to the chosen method. `"py": {}`, `"cpp": {seed: None}`.
     :returns: (popt, pcov, p) The optimized parameters and their covariances.
      If `return_samples == True`, also the generated points $\vec{p}_i$ are returned.
      The resulting shapes are `(2, )`, `(2, 2)` and `(n_samples, k, 2)`.
@@ -1185,7 +1185,7 @@ def linear_alpha_fit(
     :param sigma_x: The standard deviation $\sigma_x$ of the `x` data.
     :param sigma_y: The standard deviation $\sigma_y$ of the `y` data.
     :param corr: The correlation coefficients $\rho_{xy}$ between the `x` and `y` data.
-    :param func: The fitting routine. Supports any of `{'york_fit', 'linear_fit', 'linear_monte_carlo'}`.
+    :param func: The fitting routine. Supports any of `{"york_fit", "linear_fit", "linear_monte_carlo"}`.
     :param alpha: An $x$-axis offset $\alpha$ to reduce the correlation coefficient
      between the $y$-intercept and the slope.
     :param find_alpha: Whether to search for the best `alpha`. Uses the given `alpha` as a starting point.
@@ -1276,7 +1276,7 @@ def odr_fit(
         arg_spec = inspect.getfullargspec(f)
         n = len(arg_spec.args) - 1
         if (n < 1 and arg_spec.defaults is None) or (arg_spec.defaults is not None and n - len(arg_spec.defaults) < 1):
-            raise ValueError("'f' must have at least one parameter that can be optimized.")
+            raise ValueError("`f` must have at least one parameter that can be optimized.")
         p0 = [
             1.0,
         ] * n
@@ -1290,7 +1290,7 @@ def odr_fit(
     if p0_fixed is not None:
         ifixb = (~np.asarray(p0_fixed)).astype(int)
         if ifixb.shape != p0.shape:
-            raise ValueError("'p0_fixed' must have the same shape as 'p0'.")
+            raise ValueError("`p0_fixed` must have the same shape as `p0`.")
 
     data = odr.RealData(x, y, sx=sx, sy=sy, covx=covx, covy=covy)
     # noinspection PyTypeChecker
@@ -1679,13 +1679,13 @@ class King:
     ) -> tuple[ndarray, ndarray]:
         r"""
         Perform $2$-dimensional linear regression to create a King plot.
-        Choose between `{'york_fit' (default), 'linear_fit', 'linear_monte_carlo'}` for the fit routine.
+        Choose between `{"york_fit" (default), "linear_fit", "linear_monte_carlo"}` for the fit routine.
         Use a parameter `alpha` to optimize the correlation coefficient between the $y$-intercept and the slope.
 
         :param a: An Iterable of the mass numbers $A$ of the used isotopes.
         :param a_ref: An Iterable of the mass numbers $A_\mathrm{ref}$ of the used reference isotopes.
         :param x: The $x$ data and their standard deviations as shape `(len(a), 2)` arrays.
-         If plotted with `mode == 'radii"`,
+         If plotted with `mode == "radii"`,
          the differences of mean-square nuclear charge radii $\delta\langle r^2\rangle^{A,A_\mathrm{ref}}$
          or $\Lambda^{A,A_\mathrm{ref}}$ are expected, else isotope shifts $\delta\nu_x^{A,A_\mathrm{ref}}$
          are expected. Expected units: (fm$^2$) or (MHz).
@@ -1696,7 +1696,7 @@ class King:
         :param xy: A 2-tuple of indices `(ix, iy)`, used to select the two plot axes from `King.x_abs`.
          Only used if `x` or `y` is not specified. The default value is `(0, 1)`,
          fitting the second against the first axis.
-        :param func: The fitting routine. Must be one of `{'york_fit' (default), 'linear_fit', 'linear_monte_carlo'}`.
+        :param func: The fitting routine. Must be one of `{"york_fit" (default), "linear_fit", "linear_monte_carlo"}`.
         :param alpha: An $x$-axis offset $\alpha$ to reduce the correlation coefficient
          between the $y$-intercept and the slope. Expected unit: (u fm$^2$) or (u MHz).
         :param find_alpha: Whether to search for the best `alpha`. Uses the given `alpha` as a starting point.
@@ -1779,18 +1779,18 @@ class King:
     ) -> tuple[ndarray, ndarray]:
         r"""
         Perform $n$-dimensional linear regression to create a King plot.
-        Choose between `{'linear_nd_fit' (default), 'linear_nd_monte_carlo'}` for the fit routine.
+        Choose between `{"linear_nd_fit" (default), "linear_nd_monte_carlo"}` for the fit routine.
 
         :param a: An Iterable of the mass numbers $A$ of the used isotopes.
         :param a_ref: An Iterable of the mass numbers $A_\mathrm{ref}$ of the used reference isotopes.
         :param x: The $x$ data as an iterable of vectors with standard deviations of shape `(k, n, 2)`, where k is the
          number of data points/isotopes and `n` is the dimension of each vector.
         :param axis: The vector component to use for the parameterization.
-         For example, a King plot with the isotope shifts of two transitions `['D1', 'D2']`
+         For example, a King plot with the isotope shifts of two transitions `["D1", "D2"]`
          yields the slope $F_\mathrm{D2} / F_\mathrm{D1}$ if `axis == 0`.
         :param optimize_cov: If `True`, the origin vector of the straight is optimized
          to yield the smallest covariances.
-        :param func: The fitting routine. Must be one of `{'linear_nd_fit' (default), 'linear_nd_monte_carlo'}`.
+        :param func: The fitting routine. Must be one of `{"linear_nd_fit" (default), "linear_nd_monte_carlo"}`.
         :param show: Whether to plot the fit result.
         :param kwargs: Additional keyword arguments are passed to `func` and
          <a href="{{ '/doc/functions/analyze/King/plot.html' | relative_url }}">
@@ -1889,7 +1889,7 @@ class King:
         :param x: The unmodified input values for the given mass numbers `a` and `a_ref`.
          These could be the unmodified isotope shifts $\delta\nu_x^{A,A_\mathrm{ref}}$. Must have shape `(len(a), 2)`.
         :param axis: The vector component corresponding to the given input values.
-         For example, in a $2$-dimensional fit with components `['D1', 'D2']`,
+         For example, in a $2$-dimensional fit with components `["D1", "D2"]`,
          set `axis=0` to use the isotope shifts of the D1-line to calculate those of the D2-line.
         :param show: Whether to draw the calculated values in the King plot.
         :param kwargs: Additional keyword arguments are passed to
@@ -2088,7 +2088,7 @@ class King:
         **kwargs,
     ) -> None:
         r"""
-        :param mode: The mode of the King-fit. If mode='radii', the x-axis must contain the differences of
+        :param mode: The mode of the King-fit. If mode="radii", the x-axis must contain the differences of
          mean square nuclear charge radii or the Lambda-factor. For every other value,
          the x-axis is assumed to be an isotope shift such that the slope corresponds to
          a field-shift ratio F(y_i) / F(x).
@@ -2099,11 +2099,11 @@ class King:
          where the additional k data points are arrays of the form [x, x_d, y, y_d, corr_xy].
         :param add_a: Additional mass numbers for the additional data. Must have shape (k, 2),
          where each row is a tuple [A, A_ref].
-        :param font_dict: The font_dict passed to matplotlib.rc('font', font_dict).
+        :param font_dict: The font_dict passed to matplotlib.rc("font", font_dict).
         :param show: Whether to show the plot.
         :param kwargs: Additional keyword arguments.
-        :returns: Generates a King-Plot based on the modified axes 'self.x_mod' and 'self.y_mod'
-         as well as the fit results 'self.results'.
+        :returns: Generates a King-Plot based on the modified axes `self.x_mod` and `self.y_mod`
+         as well as the fit results `self.results`.
         """
         if (
             self.popt is None
@@ -2236,7 +2236,7 @@ class King:
         `matplotlib`</a>. The King plot is based on the modified axes `King.x_mod_nd` and `King.y_mod_nd`
          as well as the fit results `King.results_nd`.
 
-        :param mode: The mode of the King plot. If `mode == 'radii"`,
+        :param mode: The mode of the King plot. If `mode == "radii"`,
          the differences of mean-square nuclear charge radii $\delta\langle r^2\rangle^{A,A_\mathrm{ref}}$
          or $\Lambda^{A,A_\mathrm{ref}}$ are expected for the $x$-axis,
          else isotope shifts $\delta\nu_x^{A,A_\mathrm{ref}}$ are expected.
@@ -2248,7 +2248,7 @@ class King:
          in the last axis correspond to arrays of the form `[x, x_d, y, y_d, corr_xy]`.
         :param add_a: Additional mass numbers for the additional data. Must have shape `(k, 2)`,
          where each row is a tuple `(A, A_ref)`.
-        :param font_dict: The font_dict passed to `matplotlib.rc('font', font_dict)`.
+        :param font_dict: The font_dict passed to `matplotlib.rc("font", font_dict)`.
         :param show: Whether to call `plt.show()`.
         :param kwargs: Additional keyword arguments.
         """

@@ -70,7 +70,7 @@ title: qspec.propagate
 <span class="o"><span class="pre">=</span></span>
 <span class="default_value"><span class="pre bool">False</span></span>
 </em>
-<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/dev-jekyll/qspec/stats.py#L281-L374' }}"><span class="sig-source">[source]</span></a>
+<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/dev-jekyll/qspec/stats.py#L348-L460' }}"><span class="sig-source">[source]</span></a>
 </dt>
 <dd class="field-body"><p></p>
 <dl class="field-list">
@@ -78,26 +78,26 @@ title: qspec.propagate
 <dd class="field-par">
 <dl>
 <dt>f<span class="classifier"><em>Callable</em></span></dt>
-<dd class="field-desc"><p>The function to compute. 'f' needs to be vectorized.</p></dd>
-<dt>x<span class="classifier"><em>array_like</em></span></dt>
-<dd class="field-desc"><p>The input values. If 'x_d' is None, the sample data will be generated with the 'Observable.rvs' function
-     which considers asymmetric uncertainties. If an element is not an 'Observable', its uncertainty is assumed to be 0.</p></dd>
-<dt>x_d<span class="classifier"><em>array_like</em></span></dt>
+<dd class="field-desc"><p>The function to compute. <code>f</code> needs to be vectorized.</p></dd>
+<dt>x<span class="classifier"><em>Iterable[scalar]</em></span></dt>
+<dd class="field-desc"><p>The input values. If <code>x_d</code> is None, the sample data will be generated with the <code>Observable.rvs</code> function
+     which considers asymmetric uncertainties. If an element is not an <code>Observable</code>, its uncertainty is assumed to be 0.</p></dd>
+<dt>x_d<span class="classifier"><em>array_like | None</em></span></dt>
 <dd class="field-desc"><p>The uncertainties of the input values.</p></dd>
-<dt>cov<span class="classifier"><em>ndarray | Iterable</em></span></dt>
-<dd class="field-desc"><p>The covariance matrix of the x values. If not None, 'x' are assumed to be distributed according to
-     a multivariate normal distribution with covariance 'cov'.</p></dd>
-<dt>unc_places<span class="classifier"><em>int</em></span></dt>
+<dt>cov<span class="classifier"><em>scalar_nd | None</em></span></dt>
+<dd class="field-desc"><p>The covariance matrix of the x values. If not None, <code>x</code> are assumed to be distributed according to
+     a multivariate normal distribution with covariance <code>cov</code>.</p></dd>
+<dt>unc_places<span class="classifier"><em>int_like | None</em></span></dt>
 <dd class="field-desc"><p>The number of significant decimal places the result will be rounded to.
      If None, the result is not rounded.</p></dd>
-<dt>sample_size<span class="classifier"><em>int</em></span></dt>
+<dt>sample_size<span class="classifier"><em>int_like</em></span></dt>
 <dd class="field-desc"><p>The number of random variates used for the calculation. The default is 1,000,000.</p></dd>
 <dt>rtol<span class="classifier"><em>float</em></span></dt>
 <dd class="field-desc"><p>The relative tolerance, with respect to the median of the resulting sample,
      with which the left- and right-sided uncertainties can deviate before asymmetric uncertainties are used.</p></dd>
-<dt>atol<span class="classifier"><em>float</em></span></dt>
+<dt>atol<span class="classifier"><em>float | None</em></span></dt>
 <dd class="field-desc"><p>The absolute tolerance with which the left- and right-sided uncertainties can deviate,
-     before asymmetric uncertainties are used. Overrides 'rtol'.</p></dd>
+     before asymmetric uncertainties are used. Overrides <code>rtol</code>.</p></dd>
 <dt>force_sym<span class="classifier"><em>bool</em></span></dt>
 <dd class="field-desc"><p>Whether to force symmetric uncertainties. If so, a normal distribution is assumed.</p></dd>
 <dt>full_output<span class="classifier"><em>bool</em></span></dt>
@@ -107,15 +107,15 @@ title: qspec.propagate
 </dd><dt class="field-head">Returns<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>out<span class="classifier"><em>(qspec.stats.Observable, list, ndarray)</em></span></dt>
-<dd class="field-desc"><p>An 'Observable' whose uncertainties result from the propagation of the uncertainties
-     of the input values 'x' by function 'f'.
+<dt>out<span class="classifier"><em>qspec.stats.Observable | tuple[qspec.stats.Observable, ndarray, ndarray]</em></span></dt>
+<dd class="field-desc"><p>An <code>Observable</code> whose uncertainties result from the propagation of the uncertainties
+     of the input values <code>x</code> by function <code>f</code>.
      If the uncertainties are asymmetric, the parameters of a skew normal distribution
      are estimated using least-square fitting and are stored to the observable. The value and the two uncertainties are
      the median and the left- (~0.1587) and right-sided (~0.8413) 1-sigma percentiles
      relative to the median, respectively. If the uncertainties are symmetric the observable
      is assumed to be normally distributed. The value and the single uncertainty is then calculated using
-     the mean and the standard deviation of the sampled data. If 'full_output' is True, a list of the input samples
+     the mean and the standard deviation of the sampled data. If <code>full_output</code> is True, a list of the input samples
      as well as the output sample are returned along with the observable.</p></dd></dl>
 </dd>
 </dl></dd>
@@ -149,13 +149,11 @@ title: qspec.propagate
 <li class="spaced"><a href="{{ '/doc/functions/algebra/b.html' | relative_url }}">qspec.b</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/algebra/c.html' | relative_url }}">qspec.c</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/algebra/c_dipole.html' | relative_url }}">qspec.c_dipole</a></li>
-<li class="spaced"><a href="{{ '/doc/functions/algebra/cast_sympy.html' | relative_url }}">qspec.cast_sympy</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/algebra/clebsch_gordan.html' | relative_url }}">qspec.clebsch_gordan</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/algebra/f_0.html' | relative_url }}">qspec.f_0</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/algebra/g_0.html' | relative_url }}">qspec.g_0</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/algebra/mu_j_m1.html' | relative_url }}">qspec.mu_j_m1</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/algebra/mu_jj_m1.html' | relative_url }}">qspec.mu_jj_m1</a></li>
-<li class="spaced"><a href="{{ '/doc/functions/algebra/quant.html' | relative_url }}">qspec.quant</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/algebra/reduced_f.html' | relative_url }}">qspec.reduced_f</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/algebra/reduced_f_root.html' | relative_url }}">qspec.reduced_f_root</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/algebra/wigner_3j.html' | relative_url }}">qspec.wigner_3j</a></li>
@@ -1020,6 +1018,22 @@ title: qspec.propagate
 <li class="spaced"><a href="{{ '/doc/functions/physics/zeeman_linear.html' | relative_url }}">qspec.zeeman_linear</a></li></ul>
 </details>
 </li><li class="has-children">
+<a href="{{ '/doc/modules/qtypes.html' | relative_url }}">qspec.qtypes</a>
+<details>
+<summary>
+<span class="toctree-toggle" role="presentation"><img src="{{ '/assets/img/chevron-down.svg' | relative_url }}" class="chevron"/></span>
+</summary>
+<ul class="extern-a">
+<li class="spaced"><a href="{{ '/doc/functions/qtypes/asarray.html' | relative_url }}">qspec.asarray</a></li>
+<li class="spaced"><a href="{{ '/doc/functions/qtypes/asarray_none.html' | relative_url }}">qspec.asarray_none</a></li>
+<li class="spaced"><a href="{{ '/doc/functions/qtypes/cast.html' | relative_url }}">qspec.cast</a></li>
+<li class="spaced"><a href="{{ '/doc/functions/qtypes/cast_sympy.html' | relative_url }}">qspec.cast_sympy</a></li>
+<li class="spaced"><a href="{{ '/doc/functions/qtypes/has_getitem.html' | relative_url }}">qspec.has_getitem</a></li>
+<li class="spaced"><a href="{{ '/doc/functions/qtypes/has_shape.html' | relative_url }}">qspec.has_shape</a></li>
+<li class="spaced"><a href="{{ '/doc/functions/qtypes/is_scalar.html' | relative_url }}">qspec.is_scalar</a></li>
+<li class="spaced"><a href="{{ '/doc/functions/qtypes/is_sympy_expr.html' | relative_url }}">qspec.is_sympy_expr</a></li></ul>
+</details>
+</li><li class="has-children">
 <a href="{{ '/doc/modules/simulate.html' | relative_url }}">qspec.simulate</a>
 <details>
 <summary>
@@ -1125,6 +1139,7 @@ title: qspec.propagate
 <li class="indent-a"><a href="{{ '/doc/functions/simulate/ScatteringRate/set_laser.html' | relative_url }}">qspec.simulate.ScatteringRate.set_laser</a></li>
 <li class="indent-a"><a href="{{ '/doc/functions/simulate/ScatteringRate/set_polarization.html' | relative_url }}">qspec.simulate.ScatteringRate.set_polarization</a></li>
 <li class="indent-a"><a href="{{ '/doc/functions/simulate/ScatteringRate/set_states.html' | relative_url }}">qspec.simulate.ScatteringRate.set_states</a></li>
+<li class="indent-a"><a href="{{ '/doc/functions/simulate/ScatteringRate/set_velocity.html' | relative_url }}">qspec.simulate.ScatteringRate.set_velocity</a></li>
 <li class="indent-a"><a href="{{ '/doc/functions/simulate/ScatteringRate/set_x0.html' | relative_url }}">qspec.simulate.ScatteringRate.set_x0</a></li></ul>
 </details>
 </li><li class="has-children spaced"><a href="{{ '/doc/functions/simulate/State/State.html' | relative_url }}">qspec.simulate.State</a>
@@ -1215,8 +1230,6 @@ title: qspec.propagate
 <li class="spaced"><a href="{{ '/doc/functions/tools/check_shape_like.html' | relative_url }}">qspec.check_shape_like</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/tools/combine_dicts.html' | relative_url }}">qspec.combine_dicts</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/tools/convolve_dict.html' | relative_url }}">qspec.convolve_dict</a></li>
-<li class="spaced"><a href="{{ '/doc/functions/tools/create_data_dir.html' | relative_url }}">qspec.create_data_dir</a></li>
-<li class="spaced"><a href="{{ '/doc/functions/tools/create_doc_link.html' | relative_url }}">qspec.create_doc_link</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/tools/dict_to_list.html' | relative_url }}">qspec.dict_to_list</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/tools/e_phi.html' | relative_url }}">qspec.e_phi</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/tools/e_r.html' | relative_url }}">qspec.e_r</a></li>
@@ -1226,9 +1239,7 @@ title: qspec.propagate
 <li class="spaced"><a href="{{ '/doc/functions/tools/floor_log10.html' | relative_url }}">qspec.floor_log10</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/tools/floor_log2.html' | relative_url }}">qspec.floor_log2</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/tools/fraction.html' | relative_url }}">qspec.fraction</a></li>
-<li class="spaced"><a href="{{ '/doc/functions/tools/get_config_dict.html' | relative_url }}">qspec.get_config_dict</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/tools/get_decimals.html' | relative_url }}">qspec.get_decimals</a></li>
-<li class="spaced"><a href="{{ '/doc/functions/tools/get_default_path.html' | relative_url }}">qspec.get_default_path</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/tools/get_rgb_print_command.html' | relative_url }}">qspec.get_rgb_print_command</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/tools/get_val_with_unc.html' | relative_url }}">qspec.get_val_with_unc</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/tools/half_integer_to_fraction.html' | relative_url }}">qspec.half_integer_to_fraction</a></li>

@@ -60,35 +60,35 @@ title: qspec.models.gen_model
 <span class="o"><span class="pre">=</span></span>
 <span class="default_value"><span class="pre">None</span></span>
 </em>
-<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/dev-jekyll/qspec/models\_helper.py#L18-L90' }}"><span class="sig-source">[source]</span></a>
+<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/dev-jekyll/qspec/models\_helper.py#L16-L111' }}"><span class="sig-source">[source]</span></a>
 </dt>
 <dd class="field-body"><p>Create a lineshape model to fit arbitrary atomic fluorescence spectra.</p>
 <dl class="field-list">
 <dt class="field-head">Parameters<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>ijj<span class="classifier"><em>None</em></span></dt>
+<dt>ijj<span class="classifier"><em>scalar_nd</em></span></dt>
 <dd class="field-desc"><p>The three or an Iterable of three quantum numbers $I$, $J_l$ and $J_u$.
      Must be a list with the format <code>[I, J_l, J_u]</code> or <code>[[I0, J0_l, J0_u], [I1, J1_l, J1_u], ...]</code>.</p></dd>
-<dt>shape<span class="classifier"><em>str | type | qspec.models._spectrum.Spectrum</em></span></dt>
+<dt>shape<span class="classifier"><em>str | type | qspec.models._spectrum.Spectrum | None</em></span></dt>
 <dd class="field-desc"><p>A str representation of or a <code>Spectrum</code> type.</p></dd>
 <dt>qi<span class="classifier"><em>bool</em></span></dt>
 <dd class="field-desc"><p>Whether to use a quantum interference model.</p></dd>
 <dt>hf_mixing<span class="classifier"><em>bool</em></span></dt>
 <dd class="field-desc"><p>Whether to use a hyperfine-induced mixing model. Not implemented for <code>qi=True</code>.</p></dd>
-<dt>hf_config<span class="classifier"><em>dict</em></span></dt>
+<dt>hf_config<span class="classifier"><em>dict | None</em></span></dt>
 <dd class="field-desc"><p>A <code>dict</code> containing the configuration for the hf mixing. Only used if <code>hf_mixing=True</code>.</p></dd>
-<dt>n_peaks<span class="classifier"><em>int</em></span></dt>
+<dt>n_peaks<span class="classifier"><em>int | None</em></span></dt>
 <dd class="field-desc"><p>The number of "peaks per resonance" or "lineshape duplicates".</p></dd>
-<dt>offsets<span class="classifier"><em>int | list</em></span></dt>
+<dt>offsets<span class="classifier"><em>array_like | None</em></span></dt>
 <dd class="field-desc"><p>The orders of the offset polynomials of the separate x-axis intervals.
      Must be a list or a single value. In the former case <code>len(offsets) == len(x_cuts) + 1</code> must hold.
      If <code>offsets</code> is <code>None</code>, a single constant offset is assumed.</p></dd>
-<dt>x_cuts<span class="classifier"><em>int | float | list</em></span></dt>
+<dt>x_cuts<span class="classifier"><em>array_like | None</em></span></dt>
 <dd class="field-desc"><p>The x values where to cut the x-axis. Must be a list or a single value.
      In the former case <code>len(offsets) == len(x_cuts) + 1</code> must hold.
      If <code>x_cuts</code> is <code>None</code>, the x-axis will not be cut.</p></dd>
-<dt>convolve<span class="classifier"><em>str | type | qspec.models._spectrum.Spectrum</em></span></dt>
+<dt>convolve<span class="classifier"><em>str | type | qspec.models._convolved.Convolved | None</em></span></dt>
 <dd class="field-desc"><p>A str representation of or a <code>Convolved</code> type.</p></dd></dl>
 </dd><dt class="field-head">Returns<span class="colon">:</span></dt>
 <dd class="field-par">
@@ -127,13 +127,11 @@ title: qspec.models.gen_model
 <li class="spaced"><a href="{{ '/doc/functions/algebra/b.html' | relative_url }}">qspec.b</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/algebra/c.html' | relative_url }}">qspec.c</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/algebra/c_dipole.html' | relative_url }}">qspec.c_dipole</a></li>
-<li class="spaced"><a href="{{ '/doc/functions/algebra/cast_sympy.html' | relative_url }}">qspec.cast_sympy</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/algebra/clebsch_gordan.html' | relative_url }}">qspec.clebsch_gordan</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/algebra/f_0.html' | relative_url }}">qspec.f_0</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/algebra/g_0.html' | relative_url }}">qspec.g_0</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/algebra/mu_j_m1.html' | relative_url }}">qspec.mu_j_m1</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/algebra/mu_jj_m1.html' | relative_url }}">qspec.mu_jj_m1</a></li>
-<li class="spaced"><a href="{{ '/doc/functions/algebra/quant.html' | relative_url }}">qspec.quant</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/algebra/reduced_f.html' | relative_url }}">qspec.reduced_f</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/algebra/reduced_f_root.html' | relative_url }}">qspec.reduced_f_root</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/algebra/wigner_3j.html' | relative_url }}">qspec.wigner_3j</a></li>
@@ -998,6 +996,22 @@ title: qspec.models.gen_model
 <li class="spaced"><a href="{{ '/doc/functions/physics/zeeman_linear.html' | relative_url }}">qspec.zeeman_linear</a></li></ul>
 </details>
 </li><li class="has-children">
+<a href="{{ '/doc/modules/qtypes.html' | relative_url }}">qspec.qtypes</a>
+<details>
+<summary>
+<span class="toctree-toggle" role="presentation"><img src="{{ '/assets/img/chevron-down.svg' | relative_url }}" class="chevron"/></span>
+</summary>
+<ul class="extern-a">
+<li class="spaced"><a href="{{ '/doc/functions/qtypes/asarray.html' | relative_url }}">qspec.asarray</a></li>
+<li class="spaced"><a href="{{ '/doc/functions/qtypes/asarray_none.html' | relative_url }}">qspec.asarray_none</a></li>
+<li class="spaced"><a href="{{ '/doc/functions/qtypes/cast.html' | relative_url }}">qspec.cast</a></li>
+<li class="spaced"><a href="{{ '/doc/functions/qtypes/cast_sympy.html' | relative_url }}">qspec.cast_sympy</a></li>
+<li class="spaced"><a href="{{ '/doc/functions/qtypes/has_getitem.html' | relative_url }}">qspec.has_getitem</a></li>
+<li class="spaced"><a href="{{ '/doc/functions/qtypes/has_shape.html' | relative_url }}">qspec.has_shape</a></li>
+<li class="spaced"><a href="{{ '/doc/functions/qtypes/is_scalar.html' | relative_url }}">qspec.is_scalar</a></li>
+<li class="spaced"><a href="{{ '/doc/functions/qtypes/is_sympy_expr.html' | relative_url }}">qspec.is_sympy_expr</a></li></ul>
+</details>
+</li><li class="has-children">
 <a href="{{ '/doc/modules/simulate.html' | relative_url }}">qspec.simulate</a>
 <details>
 <summary>
@@ -1103,6 +1117,7 @@ title: qspec.models.gen_model
 <li class="indent-a"><a href="{{ '/doc/functions/simulate/ScatteringRate/set_laser.html' | relative_url }}">qspec.simulate.ScatteringRate.set_laser</a></li>
 <li class="indent-a"><a href="{{ '/doc/functions/simulate/ScatteringRate/set_polarization.html' | relative_url }}">qspec.simulate.ScatteringRate.set_polarization</a></li>
 <li class="indent-a"><a href="{{ '/doc/functions/simulate/ScatteringRate/set_states.html' | relative_url }}">qspec.simulate.ScatteringRate.set_states</a></li>
+<li class="indent-a"><a href="{{ '/doc/functions/simulate/ScatteringRate/set_velocity.html' | relative_url }}">qspec.simulate.ScatteringRate.set_velocity</a></li>
 <li class="indent-a"><a href="{{ '/doc/functions/simulate/ScatteringRate/set_x0.html' | relative_url }}">qspec.simulate.ScatteringRate.set_x0</a></li></ul>
 </details>
 </li><li class="has-children spaced"><a href="{{ '/doc/functions/simulate/State/State.html' | relative_url }}">qspec.simulate.State</a>
@@ -1193,8 +1208,6 @@ title: qspec.models.gen_model
 <li class="spaced"><a href="{{ '/doc/functions/tools/check_shape_like.html' | relative_url }}">qspec.check_shape_like</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/tools/combine_dicts.html' | relative_url }}">qspec.combine_dicts</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/tools/convolve_dict.html' | relative_url }}">qspec.convolve_dict</a></li>
-<li class="spaced"><a href="{{ '/doc/functions/tools/create_data_dir.html' | relative_url }}">qspec.create_data_dir</a></li>
-<li class="spaced"><a href="{{ '/doc/functions/tools/create_doc_link.html' | relative_url }}">qspec.create_doc_link</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/tools/dict_to_list.html' | relative_url }}">qspec.dict_to_list</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/tools/e_phi.html' | relative_url }}">qspec.e_phi</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/tools/e_r.html' | relative_url }}">qspec.e_r</a></li>
@@ -1204,9 +1217,7 @@ title: qspec.models.gen_model
 <li class="spaced"><a href="{{ '/doc/functions/tools/floor_log10.html' | relative_url }}">qspec.floor_log10</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/tools/floor_log2.html' | relative_url }}">qspec.floor_log2</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/tools/fraction.html' | relative_url }}">qspec.fraction</a></li>
-<li class="spaced"><a href="{{ '/doc/functions/tools/get_config_dict.html' | relative_url }}">qspec.get_config_dict</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/tools/get_decimals.html' | relative_url }}">qspec.get_decimals</a></li>
-<li class="spaced"><a href="{{ '/doc/functions/tools/get_default_path.html' | relative_url }}">qspec.get_default_path</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/tools/get_rgb_print_command.html' | relative_url }}">qspec.get_rgb_print_command</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/tools/get_val_with_unc.html' | relative_url }}">qspec.get_val_with_unc</a></li>
 <li class="spaced"><a href="{{ '/doc/functions/tools/half_integer_to_fraction.html' | relative_url }}">qspec.half_integer_to_fraction</a></li>

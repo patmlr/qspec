@@ -176,20 +176,44 @@ class HasGetItem(Protocol):
 
 
 def has_shape(a: Any) -> TypeGuard[HasShape]:
+    r"""
+    Check if `a` has the `shape` property and `TypeGuard` it.
+
+    :param a: The object to check.
+    :returns: (has_shape) if `a` has the `shape` property.
+    """
     return hasattr(a, "shape")
 
 
 def has_getitem(a: Any) -> TypeGuard[HasGetItem]:
+    r"""
+    Check if `a` implements `__getitem__` so that `a[i]` can be used and `TypeGuard` it.
+
+    :param a: The object to check.
+    :returns: (has_getitem) if `a` implements `__getitem__`.
+    """
     if has_shape(a):
         return bool(a.shape)
     return bool(hasattr(a, "__getitem__"))
 
 
 def is_scalar(a: Any) -> TypeGuard[scalar]:
+    r"""
+    Check if `a` is a scalar object and `TypeGuard` it.
+
+    :param a: The object to check.
+    :returns: (is_scalar) if `a` is a `scalar`.
+    """
     return hasattr(a, "__float__") and not (has_shape(a) and a.shape)
 
 
 def is_sympy_expr(a: Any) -> TypeGuard[sympy_expr]:
+    r"""
+    Check if `a` is a `sympy.AtomExpr` instance and `TypeGuard` it.
+
+    :param a: The object to check.
+    :returns: (is_sympy_expr) if `a` is a `sympy.AtomExpr` instance.
+    """
     return isinstance(a, AtomicExpr)
 
 
@@ -197,6 +221,13 @@ def is_sympy_expr(a: Any) -> TypeGuard[sympy_expr]:
 
 
 def cast[T](*args: Any, dtype: Callable[[Any], T]) -> tuple[T, ...]:
+    r"""
+    Cast the arguments `args` to the specified `dtype`.
+
+    :param args: The arguments.
+    :param dtype: The type of the cast arguments.
+    :returns: (args_cast) The cast arguments.
+    """
     return tuple(dtype(arg) for arg in args)
 
 
@@ -208,26 +239,32 @@ def cast_sympy[T](*args: sympy_scalar, as_sympy: bool = True, dtype: Callable[[A
     :param args: The arguments.
     :param as_sympy: Return the result as a symbol (`True`) or as a `float` (`False`).
     :param dtype: The type to use if `as_sympy == False`.
-    :returns: (cast_args) The cast arguments.
+    :returns: (args_cast) The cast arguments.
     """
     return cast(*args, dtype=(nsimplify if as_sympy else dtype))
 
 
 def asarray(*args: Any, **kwargs: Any) -> tuple[ndarray, ...]:
     r"""
-    Cast the arguments `args` to `np.ndarray`'s of the specified `dtype`.
+    Cast the arguments `args` to a tuple of `ndarray` of the specified `dtype`.
 
     :param args: The arguments to cast.
-    :param kwargs: Additional keywords are passed to `np.asarray`.
-    :returns: (a_tuple) A tuple of `np.ndarray`'s.
+    :param kwargs: Additional keywords are passed to
+     <a href="https://numpy.org/doc/stable/reference/generated/numpy.asarray.html">
+     `numpy.asarray`</a>.
+    :returns: (a_tuple) A tuple of `ndarray`.
     """
     return tuple(np_asarray(a, **kwargs) for a in args)
 
 
 def asarray_none(*args: Any | None, **kwargs: Any) -> tuple[ndarray | None, ...]:
     """
+    Cast the arguments `args` to a tuple of `ndarray` of the specified `dtype` or `None`.
+
     :param args: The arguments to cast.
-    :param kwargs: Additional keywords are passed to `np.asarray`.
-    :returns: (a_tuple) A tuple of `np.ndarray`'s and `None`'s.
+    :param kwargs: Additional keywords are passed to
+     <a href="https://numpy.org/doc/stable/reference/generated/numpy.asarray.html">
+     `numpy.asarray`</a>.
+    :returns: (a_tuple) A tuple of `ndarray` or `None`.
     """
     return tuple(None if a is None else np_asarray(a, **kwargs) for a in args)

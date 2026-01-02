@@ -25,7 +25,6 @@ from qspec.qtypes import (
 from qspec.tools import merge_intervals
 
 __all__ = [
-    "MODEL_IS_NONE_ERROR",
     "Amplifier",
     "Custom",
     "Empty",
