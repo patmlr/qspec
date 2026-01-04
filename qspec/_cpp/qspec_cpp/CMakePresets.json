@@ -105,7 +105,7 @@
       "name": "windows-msvc-x64-release",
       "configurePreset": "windows-msvc-x64",
       "configuration": "Release",
-      "verbose": false
+      "verbose": true
     },
     {
       "name": "windows-msvc-arm64-release",

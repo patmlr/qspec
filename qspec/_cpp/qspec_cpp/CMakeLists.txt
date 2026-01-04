@@ -33,9 +33,36 @@ add_compile_definitions(QSPEC_EXPORTS)
 add_library(qspec_cpp SHARED ${QSPEC_SOURCES})
 target_include_directories(qspec_cpp PRIVATE ${QSPEC_INCLUDES})
 
-# MSVC: UTF-8 source encoding
+target_compile_definitions(qspec_cpp PRIVATE
+    $<$<CONFIG:Release>:EIGEN_NO_DEBUG>
+    $<$<CONFIG:Release>:EIGEN_DONT_PARALLELIZE>
+    $<$<CONFIG:Release>:EIGEN_FAST_MATH>
+)
+
 if(MSVC)
-    target_compile_options(qspec_cpp PRIVATE /utf-8)
+    target_compile_options(qspec_cpp PRIVATE
+        # MSVC: UTF-8 source encoding
+        /utf-8
+
+        # MSVC
+        $<$<AND:$<CXX_COMPILER_ID:MSVC>,$<CONFIG:Release>,$<STREQUAL:${CMAKE_VS_PLATFORM_NAME},x64>>:/arch:AVX2>
+
+        # MSVC ARM64 (no SIMD flag for now)
+        $<$<AND:$<CXX_COMPILER_ID:MSVC>,$<CONFIG:Release>,$<STREQUAL:${CMAKE_VS_PLATFORM_NAME},ARM64>>:/arch:ARM64>
+    )
+
+else()
+    if(CMAKE_SYSTEM_PROCESSOR STREQUAL "x86_64")
+        # x86 SIMD flags
+        target_compile_options(qspec_cpp PRIVATE
+            $<$<CONFIG:Release>:-msse4.2>
+        )
+    elseif(CMAKE_SYSTEM_PROCESSOR STREQUAL "aarch64")
+        # ARM64 NEON SIMD flags
+        target_compile_options(qspec_cpp PRIVATE
+            $<$<CONFIG:Release>:-mfpu=neon>
+        )
+    endif()
 endif()
 
 # GCC/G++: Force static runtime on GCC/G++ (no GCC/G++ SO dependencies)

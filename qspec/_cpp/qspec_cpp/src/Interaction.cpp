@@ -83,14 +83,14 @@ struct push_back_VectorXcd_as_MatrixXcd
 	}
 };
 
-struct f_rate_equations
+/* struct f_rate_equations_full
 {
 	MatrixXd& R;
 	VectorXd& R_sum;
 	MatrixXd& L0;
 	VectorXd& L_sum;
 
-	f_rate_equations(MatrixXd& _R, VectorXd& _R_sum, MatrixXd& _L0, VectorXd& _L_sum)
+	f_rate_equations_full(MatrixXd& _R, VectorXd& _R_sum, MatrixXd& _L0, VectorXd& _L_sum)
 		: R(_R), R_sum(_R_sum), L0(_L0), L_sum(_L_sum) { }
 
 	void operator()(const VectorXd& x, VectorXd& dxdt, double t)
@@ -99,16 +99,11 @@ struct f_rate_equations
 	}
 };
 
-VectorXd rate_exponential(double t, VectorXd x0, MatrixXd R)
-{
-	return (R * t).exp() * x0;
-}
-
-struct f_schroedinger
+struct f_schroedinger_full
 {
 	MatrixXcd& H;
 
-	f_schroedinger(MatrixXcd& _H) : H(_H) { }
+	f_schroedinger_full(MatrixXcd& _H) : H(_H) { }
 
 	void operator()(const VectorXcd& x, VectorXcd& dxdt, double t)
 	{
@@ -116,14 +111,14 @@ struct f_schroedinger
 	}
 };
 
-struct f_schroedinger_t
+struct f_schroedinger_t_full
 {
 	MatrixXcd& H;
 	VectorXd& w0;
 	VectorXd& w;
 	Interaction& interaction;
 
-	f_schroedinger_t(MatrixXcd& _H, VectorXd& _w0, VectorXd& _w, Interaction& _interaction)
+	f_schroedinger_t_full(MatrixXcd& _H, VectorXd& _w0, VectorXd& _w, Interaction& _interaction)
 		: H(_H), w0(_w0), w(_w), interaction(_interaction) { }
 
 	void operator()(const VectorXcd& x, VectorXcd& dxdt, double t)
@@ -151,7 +146,7 @@ struct f_schroedinger_leaky_t
 };
 
 
-struct f_master
+struct f_master_full
 {
 	MatrixXcd& H;
 	MatrixXd& L0;
@@ -159,100 +154,224 @@ struct f_master
 	// size_t size;
 	// std::complex<double> sum;
 
-	f_master(MatrixXcd& _H, MatrixXd& _L0, MatrixXd& _L1) : H(_H), L0(_L0), L1(_L1) { }
+	f_master_full(MatrixXcd& _H, MatrixXd& _L0, MatrixXd& _L1) : H(_H), L0(_L0), L1(_L1) { }
 
 	void operator()(const VectorXcd& x, VectorXcd& dxdt, double t)
 	{
-		Eigen::Map<const Eigen::MatrixXcd> X(x.data(), H.rows(), H.cols());
-    	Eigen::Map<Eigen::MatrixXcd> dXdt(dxdt.data(), H.rows(), H.cols());
+		Map<const MatrixXcd> X(x.data(), H.rows(), H.cols());
+    	Map<MatrixXcd> dXdt(dxdt.data(), H.rows(), H.cols());
 
 		dXdt = -sc::i * (H * X - X * H) + L1.cwiseProduct(X);
 		dXdt.diagonal() += L0 * X.diagonal();
 	}
+};
+
+struct f_master_t_full
+{
+	MatrixXcd& H;
+	MatrixXd& L0;
+	MatrixXd& L1;
+	VectorXd& w0;
+	VectorXd& w;
+	Interaction& interaction;
+
+	f_master_t_full(MatrixXcd& _H, MatrixXd& _L0, MatrixXd& _L1, VectorXd& _w0, VectorXd& _w, Interaction& _interaction) 
+		: H(_H), L0(_L0), L1(_L1), w0(_w0), w(_w), interaction(_interaction) { }
+
+	void operator()(const VectorXcd& x, VectorXcd& dxdt, double t)
+	{
+		Map<const MatrixXcd> X(x.data(), H.rows(), H.cols());
+    	Map<MatrixXcd> dXdt(dxdt.data(), H.rows(), H.cols());
+
+		interaction.update_hamiltonian(H, w0, w, t);
+		dXdt = -sc::i * (H * X - X * H) + L1.cwiseProduct(X);
+		dXdt.diagonal() += L0 * X.diagonal();
+	}
+}; */
+
+
+VectorXd rate_exponential(double t, VectorXd x0, MatrixXd R)
+{
+	return (R * t).exp() * x0;
+}
+
+struct RateExponential
+{
+    Eigen::RealSchur<MatrixXd> schur;
+    VectorXd tmp;
+
+    RateExponential(const MatrixXd& R_exp) : schur(R_exp), tmp(R_exp.rows()) {}
+
+    VectorXd operator()(double t, const VectorXd& x0)
+    {
+        tmp.noalias() = schur.matrixU().transpose() * x0;
+        tmp = (schur.matrixT() * t).exp() * tmp;
+
+        return schur.matrixU() * tmp;
+    }
+};
+
+struct f_rate_equations
+{
+    const MatrixXd& R;
+    const MatrixXd& L0;
+    const VectorXd& R_sum;
+    const VectorXd& L_sum;
+
+    MatrixXd A;
+    VectorXd D;
+    VectorXd Ax;
+
+    f_rate_equations(const MatrixXd& _R, const VectorXd& _R_sum, const MatrixXd& _L0, const VectorXd& _L_sum)
+        : R(_R), L0(_L0), R_sum(_R_sum), L_sum(_L_sum), A(_R.rows(), _R.cols()), D(_R_sum.size()), Ax(_R_sum.size())
+    {
+        A.noalias() = R + L0;
+        D.noalias() = R_sum + L_sum;
+    }
+
+    void operator()(const VectorXd& x, VectorXd& dxdt, double t)
+    {
+        Ax.noalias() = A * x;
+
+        dxdt.noalias() = Ax;
+        dxdt.array() -= D.array() * x.array();
+    }
+};
+
+struct f_schroedinger
+{
+    const MatrixXcd& H;
+
+    VectorXcd Hx;
+
+    f_schroedinger(const MatrixXcd& _H) 
+		: H(_H), Hx(_H.rows()) {}
+
+    void operator()(const VectorXcd& x, VectorXcd& dxdt, double t)
+    {
+        Hx.noalias() = H.selfadjointView<Lower>() * x;
+        dxdt.noalias() = -sc::i * Hx;
+    }
+};
+
+struct f_schroedinger_t
+{
+	MatrixXcd& H;
+	const VectorXd& w0;
+	const VectorXd& w;
+	Interaction& interaction;
+
+    VectorXcd Hx;
+
+	f_schroedinger_t(MatrixXcd& _H, const VectorXd& _w0, const VectorXd& _w, Interaction& _interaction)
+		: H(_H), w0(_w0), w(_w), interaction(_interaction), Hx(_H.rows()) { }
+
+	void operator()(const VectorXcd& x, VectorXcd& dxdt, double t)
+	{
+		interaction.update_hamiltonian(H, w0, w, t);
+
+        Hx.noalias() = H.selfadjointView<Lower>() * x;
+        dxdt.noalias() = -sc::i * Hx;
+	}
+};
+
+struct f_schroedinger_leaky
+{
+    MatrixXcd& H;
+
+    f_schroedinger_leaky(MatrixXcd& _H)
+		: H(_H) {}
+
+    void operator()(const VectorXcd& x, VectorXcd& dxdt, double t)
+    {
+		dxdt = -sc::i * (H * x);
+    }
+};
+
+struct f_schroedinger_leaky_t
+{
+	MatrixXcd& H;
+	VectorXd& w0;
+	VectorXd& w;
+	Interaction& interaction;
+
+	f_schroedinger_leaky_t(MatrixXcd& _H, VectorXd& _w0, VectorXd& _w, Interaction& _interaction)
+		: H(_H), w0(_w0), w(_w), interaction(_interaction) { }
+
+	void operator()(const VectorXcd& x, VectorXcd& dxdt, double t)
+	{
+		interaction.update_hamiltonian_leaky(H, w0, w, t);
+		dxdt = -sc::i * (H * x);
+	}
+};
+
+struct f_master
+{
+    const MatrixXcd& H;
+    const MatrixXd&  L0;
+    const MatrixXd&  L1;
+
+    MatrixXcd HX;
+    MatrixXcd XH;
+
+    f_master(const MatrixXcd& _H, const MatrixXd&  _L0, const MatrixXd&  _L1) 
+		: H(_H), L0(_L0), L1(_L1), HX(_H.rows(), _H.cols()), XH(_H.rows(), _H.cols()) {}
+
+    void operator()(const VectorXcd& x, VectorXcd& dxdt, double t)
+    {
+        const size_t n = H.rows();
+
+        Map<const MatrixXcd> X(x.data(), n, n);
+        Map<MatrixXcd> dXdt(dxdt.data(), n, n);
+
+        HX.noalias() = H.selfadjointView<Lower>() * X;
+        XH.noalias() = X * H.selfadjointView<Lower>();
+
+        dXdt.noalias() = -sc::i * (HX - XH);
+
+        dXdt.array() += L1.array() * X.array();
+
+        dXdt.diagonal().noalias() += L0 * X.diagonal();
+    }
 };
 
 struct f_master_t
 {
-	MatrixXcd& H;
-	MatrixXd& L0;
-	MatrixXd& L1;
-	VectorXd& w0;
-	VectorXd& w;
-	Interaction& interaction;
+    MatrixXcd& H;
+    const MatrixXd& L0;
+    const MatrixXd& L1;
+    const VectorXd& w0;
+    const VectorXd& w;
+    Interaction& interaction;
 
-	f_master_t(MatrixXcd& _H, MatrixXd& _L0, MatrixXd& _L1, VectorXd& _w0, VectorXd& _w, Interaction& _interaction) 
-		: H(_H), L0(_L0), L1(_L1), w0(_w0), w(_w), interaction(_interaction) { }
+    MatrixXcd HX;
+    MatrixXcd XH;
 
-	void operator()(const VectorXcd& x, VectorXcd& dxdt, double t)
-	{
-		Eigen::Map<const Eigen::MatrixXcd> X(x.data(), H.rows(), H.cols());
-    	Eigen::Map<Eigen::MatrixXcd> dXdt(dxdt.data(), H.rows(), H.cols());
+    f_master_t(
+		MatrixXcd& _H, const MatrixXd& _L0,const MatrixXd& _L1, const
+		VectorXd& _w0, const VectorXd& _w, Interaction& _interaction
+	) 
+	: H(_H), L0(_L0), L1(_L1), w0(_w0), w(_w), interaction(_interaction),
+	  HX(_H.rows(), _H.cols()), XH(_H.rows(), _H.cols()) {}
 
-		interaction.update_hamiltonian(H, w0, w, t);
-		dXdt = -sc::i * (H * X - X * H) + L1.cwiseProduct(X);
-		dXdt.diagonal() += L0 * X.diagonal();
-	}
-};
+    void operator()(const VectorXcd& x, VectorXcd& dxdt, double t)
+    {
+        const int n = H.rows();
 
+        Map<const MatrixXcd> X(x.data(), n, n);
+        Map<MatrixXcd> dXdt(dxdt.data(), n, n);
 
-struct f_master_old
-{
-	MatrixXcd& H;
-	MatrixXd& L0;
-	MatrixXd& L1;
-	// size_t size;
-	// std::complex<double> sum;
+        interaction.update_hamiltonian(H, w0, w, t);
 
-	f_master_old(MatrixXcd& _H, MatrixXd& _L0, MatrixXd& _L1) : H(_H), L0(_L0), L1(_L1) { }
+        HX.noalias() = H.selfadjointView<Lower>() * X;
+        XH.noalias() = X * H.selfadjointView<Lower>();
 
-	void operator()(const MatrixXcd& x, MatrixXcd& dxdt, double t)
-	{
+        dXdt.noalias() = -sc::i * (HX - XH);
 
-		dxdt = -sc::i * (H * x - x * H) + L1.cwiseProduct(x);
-		dxdt.diagonal() += L0 * x.diagonal();
+        dXdt.array() += L1.array() * X.array();
 
-		/*size = H.outerSize();
-		dxdt.fill(0);
-		for (size_t j = 0; j < size; ++j)
-		{
-			for (size_t i = 0; i < j; ++i)
-			{
-				sum = 0;
-				for (size_t k = 0; k < size; ++k)
-				{
-					sum += -sc::i * (std::conj(H(k, i)) * x(k, j) - std::conj(x(k, i)) * H(k, j));
-				}
-				dxdt(i, j) = sum + L1(i, j) * x(i, j);
-				dxdt(j, i) = std::conj(dxdt(i, j));
-			}
-			sum = 0;
-			for (size_t k = 0; k < size; ++k)
-			{
-				sum += -sc::i * (std::conj(H(k, j)) * x(k, j) - std::conj(x(k, j)) * H(k, j)) + L0(j, k) * x(k, k);
-			}
-			dxdt(j, j) = sum + L1(j, j) * x(j, j);
-		}*/
-	}
-};
-
-struct f_master_t_old
-{
-	MatrixXcd& H;
-	MatrixXd& L0;
-	MatrixXd& L1;
-	VectorXd& w0;
-	VectorXd& w;
-	Interaction& interaction;
-
-	f_master_t_old(MatrixXcd& _H, MatrixXd& _L0, MatrixXd& _L1, VectorXd& _w0, VectorXd& _w, Interaction& _interaction) 
-		: H(_H), L0(_L0), L1(_L1), w0(_w0), w(_w), interaction(_interaction) { }
-
-	void operator()(const MatrixXcd& x, MatrixXcd& dxdt, double t)
-	{
-		interaction.update_hamiltonian(H, w0, w, t);
-		dxdt = -sc::i * (H * x - x * H) + L1.cwiseProduct(x);
-		dxdt.diagonal() += L0 * x.diagonal();
-	}
+        dXdt.diagonal().noalias() += L0 * X.diagonal();
+    }
 };
 
 
@@ -795,11 +914,14 @@ void Interaction::update_w(VectorXd& w, const VectorXd& delta, const Vector3d& v
 	}
 }
 
-VectorXd Interaction::gen_delta(const VectorXd& w0, const VectorXd& w)
+VectorXd Interaction::get_delta(const VectorXd& w0, const VectorXd& w)
 {
-	VectorXd delta_diag(atom->get_size());
-	delta_diag = (atommap * w0) + (deltamap * w);
-	return delta_diag;
+	return (atommap * w0) + (deltamap * w);
+}
+
+void Interaction::update_delta(VectorXd& delta_diag, const VectorXd& w0, const VectorXd& w)
+{
+	delta_diag = get_delta(w0, w);
 }
 
 std::vector<MatrixXd> Interaction::gen_R_k(VectorXd& w0, VectorXd& w)
@@ -888,21 +1010,21 @@ Vector3d Interaction::gen_velocity_change(std::mt19937& gen, VectorXd& w0, Vecto
 	return sc::h / (atom->get_mass() * sc::amu) * (k_up - k_down) * 1e6;
 }
 
-MatrixXd Interaction::gen_rates(VectorXd& w0, VectorXd& w)
+MatrixXd Interaction::gen_rates(const VectorXd& w0, const VectorXd& w)
 {
 	MatrixXd R = MatrixXd::Zero(atom->get_size(), atom->get_size());
 	update_rates(R, w0, w);
 	return R;
 }
 
-VectorXd Interaction::gen_rates_sum(MatrixXd& R)
+VectorXd Interaction::gen_rates_sum(const MatrixXd& R)
 {
 	VectorXd R_sum = VectorXd::Zero(atom->get_size());
 	update_rates_sum(R_sum, R);
 	return R_sum;
 }
 
-void Interaction::update_rates(MatrixXd& R, VectorXd& w0, VectorXd& w)
+void Interaction::update_rates(MatrixXd& R, const VectorXd& w0, const VectorXd& w)
 {
 	R.setZero();
 	double _w0;
@@ -930,17 +1052,24 @@ void Interaction::update_rates(MatrixXd& R, VectorXd& w0, VectorXd& w)
 	}
 }
 
-void Interaction::update_rates_sum(VectorXd& R_sum, MatrixXd& R)
+void Interaction::update_rates_sum(VectorXd& R_sum, const MatrixXd& R)
 {
 	R_sum = R.colwise().sum();
 }
 
-MatrixXcd Interaction::gen_hamiltonian(VectorXd& w0, VectorXd& w)
+MatrixXcd Interaction::gen_hamiltonian(const VectorXd& w0, const VectorXd& w)
 {
 	MatrixXcd H = MatrixXcd::Zero(atom->get_size(), atom->get_size());
-	H.diagonal() = gen_delta(w0, w);
+	H.diagonal() = get_delta(w0, w);
 	update_hamiltonian_off(H);
 	return H;
+}
+
+void Interaction::update_hamiltonian(MatrixXcd& H, const VectorXd& w0, const VectorXd& w)
+{
+	H.setZero();
+	update_hamiltonian_diag(H, w0, w);
+	update_hamiltonian_off(H);
 }
 
 void Interaction::update_hamiltonian_off(MatrixXcd& H)
@@ -951,14 +1080,19 @@ void Interaction::update_hamiltonian_off(MatrixXcd& H)
 	}
 }
 
-void Interaction::update_hamiltonian(MatrixXcd& H, VectorXd& w0, VectorXd& w, double t)
+void Interaction::update_hamiltonian_diag(MatrixXcd& H, const VectorXd& w0, const VectorXd& w)
 {
-	H.fill(0);
-	H.diagonal() = gen_delta(w0, w);
+	H.diagonal() = get_delta(w0, w);
+}
+
+void Interaction::update_hamiltonian(MatrixXcd& H, const VectorXd& w0, const VectorXd& w, double t)
+{
+	H.setZero();
+	update_hamiltonian_diag(H, w0, w);
 	update_hamiltonian_off(H, w, t);
 }
 
-void Interaction::update_hamiltonian_off(MatrixXcd& H, VectorXd& w, double t)
+void Interaction::update_hamiltonian_off(MatrixXcd& H, const VectorXd& w, double t)
 {
 	VectorXd delta(atom->get_size());
 	delta = deltamap * w;
@@ -982,247 +1116,319 @@ void Interaction::update_hamiltonian_off(MatrixXcd& H, VectorXd& w, double t)
 	}
 }
 
-void Interaction::update_hamiltonian_diag(MatrixXcd& H, VectorXd& w0, VectorXd& w)
-{
-	H.diagonal() = gen_delta(w0, w);
-}
-
-MatrixXcd Interaction::gen_hamiltonian_leaky(VectorXd& w0, VectorXd& w)
+MatrixXcd Interaction::gen_hamiltonian_leaky(const VectorXd& w0, const VectorXd& w)
 {
 	MatrixXcd H = MatrixXcd::Zero(atom->get_size(), atom->get_size());
-	H.diagonal() = gen_delta(w0, w) - sc::i * 0.5 * (*atom->get_Lsum());
+	update_hamiltonian_leaky_diag(H, w0, w);
 	update_hamiltonian_off(H);
 	return H;
 }
 
-void Interaction::update_hamiltonian_leaky(MatrixXcd& H, VectorXd& w0, VectorXd& w, double t)
+void Interaction::update_hamiltonian_leaky(MatrixXcd& H, const VectorXd& w0, const VectorXd& w, double t)
 {
-	H.fill(0);
-	H.diagonal() = gen_delta(w0, w) - sc::i * 0.5 * (*atom->get_Lsum());
+	H.setZero();
+	update_hamiltonian_leaky_diag(H, w0, w);
 	update_hamiltonian_off(H, w, t);
 }
 
-void Interaction::update_hamiltonian_leaky_diag(MatrixXcd& H, VectorXd& w0, VectorXd& w)
+void Interaction::update_hamiltonian_leaky_diag(MatrixXcd& H, const VectorXd& w0, const VectorXd& w)
 {
-	H.diagonal() = gen_delta(w0, w) - sc::i * 0.5 * (*atom->get_Lsum());
+	H.diagonal() = get_delta(w0, w) - sc::i * 0.5 * (*atom->get_Lsum());
 }
 
 std::vector<std::vector<VectorXd>> Interaction::rates(
 	const std::vector<double>& t, const std::vector<VectorXd>& delta, const std::vector<Vector3d>& v, std::vector<VectorXd>& x0, const bool analytic)
 {
-	std::vector<std::vector<VectorXd>> results = std::vector<std::vector<VectorXd>>(x0.size());
+	std::vector<std::vector<VectorXd>> results(x0.size());
+	for (auto& vec : results) vec.reserve(t.size());
 
 	VectorXd w0 = *atom->get_w0();
 
 	std::vector<size_t> n_vec(x0.size());
-	std::vector<float> progress(x0.size());
 	for (size_t i = 0; i < x0.size(); ++i)
 	{
 		n_vec.at(i) = i;
-		progress.at(i) = 0;
 	}
 
-	std::for_each(std::execution::par_unseq, n_vec.begin(), n_vec.end(),
-		[this, &t, &x0, &delta, &v, &analytic, &w0, &results, &progress](size_t i)
-		{
-			VectorXd w = gen_w(delta.at(i), v.at(i));
-			MatrixXd R = gen_rates(w0, w);
-			VectorXd R_sum = gen_rates_sum(R);
-			size_t n = 0;
+	std::atomic<size_t> progress{0};
+	std::thread worker([this, &t, &x0, &delta, &v, &analytic, &w0, &results, &progress, &n_vec]
+	{
+		std::for_each(std::execution::par, n_vec.begin(), n_vec.end(),
+			[this, &t, &x0, &delta, &v, &analytic, &w0, &results, &progress](size_t i)
+			{
+				thread_local VectorXd w;
+				thread_local MatrixXd R;
+				thread_local VectorXd R_sum;
 
-			if (analytic)
-			{
-				MatrixXd R_diag = (R_sum + *atom->get_Lsum()).asDiagonal();
-				MatrixXd R_exp = (R + *atom->get_L0()) - R_diag;
-				for (auto it = t.cbegin(); it != t.cend(); ++it)
+				const Index w_size = lasers.size();
+				const Index H_size = atom->get_size();
+
+				if (w.size() != w_size)
+					w.resize(w_size);
+
+				if (R.rows() != H_size || R.cols() != H_size)
+					R.resize(H_size, H_size);
+
+				if (R_sum.size() != H_size)
+					R_sum.resize(H_size);
+
+				update_w(w, delta.at(i), v.at(i));
+				update_rates(R, w0, w);
+				update_rates_sum(R_sum, R);
+
+				size_t n = 0;
+
+				if (analytic)
 				{
-					results.at(i).push_back(rate_exponential(*it, x0.at(i), R_exp));
-				}
-			}
-			else
-			{
-				if (dense)
-				{
-					d_dopri5_vd_type dopri5 = make_dense_output(atol, rtol, dt_max, dopri5_vd_type());
-					n = integrate_times(dopri5, f_rate_equations(R, R_sum, *atom->get_L0(), *atom->get_Lsum()),
-						x0.at(i), t.begin(), t.end(), dt, push_back_VectorXd(results.at(i)));
-				}
-				else if (controlled)
-				{
-					c_dopri5_vd_type dopri5 = make_controlled(atol, rtol, dt_max, dopri5_vd_type());
-					n = integrate_times(dopri5, f_rate_equations(R, R_sum, *atom->get_L0(), *atom->get_Lsum()),
-						x0.at(i), t.begin(), t.end(), dt, push_back_VectorXd(results.at(i)));
+					MatrixXd R_diag = (R_sum + *atom->get_Lsum()).asDiagonal();
+					MatrixXd R_exp = (R + *atom->get_L0()) - R_diag;
+
+					RateExponential rate_op(R_exp);
+					for (auto it = t.cbegin(); it != t.cend(); ++it)
+					{
+						results.at(i).push_back(rate_op(*it, x0.at(i)));
+					}
 				}
 				else
 				{
-					n = integrate_times(rk4_vd_type(), f_rate_equations(R, R_sum, *atom->get_L0(), *atom->get_Lsum()),
-						x0.at(i), t.begin(), t.end(), dt, push_back_VectorXd(results.at(i)));
+					if (dense)
+					{
+						d_dopri5_vd_type dopri5 = make_dense_output(atol, rtol, dt_max, dopri5_vd_type());
+						n = integrate_times(dopri5, f_rate_equations(R, R_sum, *atom->get_L0(), *atom->get_Lsum()),
+							x0.at(i), t.begin(), t.end(), dt, push_back_VectorXd(results.at(i)));
+					}
+					else if (controlled)
+					{
+						c_dopri5_vd_type dopri5 = make_controlled(atol, rtol, dt_max, dopri5_vd_type());
+						n = integrate_times(dopri5, f_rate_equations(R, R_sum, *atom->get_L0(), *atom->get_Lsum()),
+							x0.at(i), t.begin(), t.end(), dt, push_back_VectorXd(results.at(i)));
+					}
+					else
+					{
+						n = integrate_times(rk4_vd_type(), f_rate_equations(R, R_sum, *atom->get_L0(), *atom->get_Lsum()),
+							x0.at(i), t.begin(), t.end(), dt, push_back_VectorXd(results.at(i)));
+					}
 				}
+				progress.fetch_add(1, std::memory_order_relaxed);
 			}
-			progress.at(i) = 1;
-			printf("\r\033[92mSolving rate equations ... %3.2f %%\033[0m", 100 * std::reduce(progress.begin(), progress.end()) / x0.size());
-		}
-	);
+		);
+	});
+
+	while (progress.load() < x0.size()) {
+		printf("\r\033[92mSolving rate equations ... %3.2f %%", 100.0 * progress.load() / x0.size());
+		std::this_thread::sleep_for(std::chrono::milliseconds(100));
+	}
+
+	worker.join();
+
 	printf("\r\033[92mSolving rate equations ... 100.00 %%\033[0m");
 	printf("\n");
+
 	return results;
 }
 
 std::vector<std::vector<VectorXcd>> Interaction::schroedinger(
 	const std::vector<double>& t, const std::vector<VectorXd>& delta, const std::vector<Vector3d>& v, std::vector<VectorXcd>& x0)
 {
-	std::vector<std::vector<VectorXcd>> results = std::vector<std::vector<VectorXcd>>(x0.size());
+	std::vector<std::vector<VectorXcd>> results(x0.size());
+	for (auto& vec : results) vec.reserve(t.size());
 
 	VectorXd w0 = *atom->get_w0();
 
 	std::vector<size_t> n_vec(x0.size());
-	std::vector<float> progress(x0.size());
 	for (size_t i = 0; i < x0.size(); ++i)
 	{
 		n_vec.at(i) = i;
-		progress.at(i) = 0;
 	}
 
-	std::for_each(std::execution::par_unseq, n_vec.begin(), n_vec.end(),
-		[this, &t, &x0, &delta, &v, &w0, &results, &progress](size_t i)
-		{
-			VectorXd w = gen_w(delta.at(i), v.at(i));
-			MatrixXcd H = gen_hamiltonian(w0, w);
-			size_t n = 0;
+	std::atomic<size_t> progress{0};
+	std::thread worker([this, &t, &x0, &delta, &v, &w0, &results, &progress, &n_vec]
+	{
+		std::for_each(std::execution::par, n_vec.begin(), n_vec.end(),
+			[this, &t, &x0, &delta, &v, &w0, &results, &progress](size_t i)
+			{
+				thread_local VectorXd w;
+				thread_local MatrixXcd H;
 
-			if (dense)
-			{
-				if (time_dependent)
+				const Index w_size = lasers.size();
+				const Index H_size = atom->get_size();
+
+				if (w.size() != w_size)
+					w.resize(w_size);
+
+				if (H.rows() != H_size || H.cols() != H_size)
+					H.resize(H_size, H_size);
+
+				update_w(w, delta.at(i), v.at(i));
+				update_hamiltonian(H, w0, w);
+
+				size_t n = 0;
+
+				if (dense)
 				{
-					d_dopri5_vcd_type d_dopri5 = make_dense_output(atol, rtol, dt_max, dopri5_vcd_type());
-					n = integrate_times(d_dopri5, f_schroedinger_t(H, w0, w, *this),
-						x0.at(i), t.begin(), t.end(), dt, push_back_VectorXcd(results.at(i)));
+					if (time_dependent)
+					{
+						d_dopri5_vcd_type d_dopri5 = make_dense_output(atol, rtol, dt_max, dopri5_vcd_type());
+						n = integrate_times(d_dopri5, f_schroedinger_t(H, w0, w, *this),
+							x0.at(i), t.begin(), t.end(), dt, push_back_VectorXcd(results.at(i)));
+					}
+					else
+					{
+						d_dopri5_vcd_type d_dopri5 = make_dense_output(atol, rtol, dt_max, dopri5_vcd_type());
+						n = integrate_times(d_dopri5, f_schroedinger(H),
+							x0.at(i), t.begin(), t.end(), dt, push_back_VectorXcd(results.at(i)));
+					}
+				}
+				else if (controlled)
+				{
+					if (time_dependent)
+					{
+						c_dopri5_vcd_type c_dopri5 = make_controlled(atol, rtol, dt_max, dopri5_vcd_type());
+						n = integrate_times(c_dopri5, f_schroedinger_t(H, w0, w, *this),
+							x0.at(i), t.begin(), t.end(), dt, push_back_VectorXcd(results.at(i)));
+					}
+					else
+					{
+						c_dopri5_vcd_type c_dopri5 = make_controlled(atol, rtol, dt_max, dopri5_vcd_type());
+						n = integrate_times(c_dopri5, f_schroedinger(H),
+							x0.at(i), t.begin(), t.end(), dt, push_back_VectorXcd(results.at(i)));
+					}
 				}
 				else
 				{
-					d_dopri5_vcd_type d_dopri5 = make_dense_output(atol, rtol, dt_max, dopri5_vcd_type());
-					n = integrate_times(d_dopri5, f_schroedinger(H),
-						x0.at(i), t.begin(), t.end(), dt, push_back_VectorXcd(results.at(i)));
+					if (time_dependent)
+					{
+						n = integrate_times(rk4_vcd_type(), f_schroedinger_t(H, w0, w, *this),
+							x0.at(i), t.begin(), t.end(), dt, push_back_VectorXcd(results.at(i)));
+					}
+					else
+					{
+						n = integrate_times(rk4_vcd_type(), f_schroedinger(H),
+							x0.at(i), t.begin(), t.end(), dt, push_back_VectorXcd(results.at(i)));
+					}
 				}
+				progress.fetch_add(1, std::memory_order_relaxed);
 			}
-			else if (controlled)
-			{
-				if (time_dependent)
-				{
-					c_dopri5_vcd_type c_dopri5 = make_controlled(atol, rtol, dt_max, dopri5_vcd_type());
-					n = integrate_times(c_dopri5, f_schroedinger_t(H, w0, w, *this),
-						x0.at(i), t.begin(), t.end(), dt, push_back_VectorXcd(results.at(i)));
-				}
-				else
-				{
-					c_dopri5_vcd_type c_dopri5 = make_controlled(atol, rtol, dt_max, dopri5_vcd_type());
-					n = integrate_times(c_dopri5, f_schroedinger(H),
-						x0.at(i), t.begin(), t.end(), dt, push_back_VectorXcd(results.at(i)));
-				}
-			}
-			else
-			{
-				if (time_dependent)
-				{
-					n = integrate_times(rk4_vcd_type(), f_schroedinger_t(H, w0, w, *this),
-						x0.at(i), t.begin(), t.end(), dt, push_back_VectorXcd(results.at(i)));
-				}
-				else
-				{
-					n = integrate_times(rk4_vcd_type(), f_schroedinger(H),
-						x0.at(i), t.begin(), t.end(), dt, push_back_VectorXcd(results.at(i)));
-				}
-			}
-			progress.at(i) = 1;
-			printf("\r\033[92mSolving schroedinger equation ... %3.2f %%\033[0m", 100 * std::reduce(progress.begin(), progress.end()) / x0.size());
-		}
-	);
-	printf("\r\033[92mSolving schroedinger equation ... 100.00 %%\033[0m");
+		);
+	});
+
+	while (progress.load() < x0.size()) {
+		printf("\r\033[92mSolving Schroedinger equation ... %3.2f %%", 100.0 * progress.load() / x0.size());
+		std::this_thread::sleep_for(std::chrono::milliseconds(100));
+	}
+
+	worker.join();
+
+	printf("\r\033[92mSolving Schroedinger equation ... 100.00 %%\033[0m");
 	printf("\n");
+
 	return results;
 }
 
 std::vector<std::vector<MatrixXcd>> Interaction::master(
 	const std::vector<double>& t, const std::vector<VectorXd>& delta, const std::vector<Vector3d>& v, std::vector<MatrixXcd>& x0)
 {
-	std::vector<std::vector<MatrixXcd>> results = std::vector<std::vector<MatrixXcd>>(x0.size());
+	std::vector<std::vector<MatrixXcd>> results(x0.size());
+	for (auto& vec : results) vec.reserve(t.size());
 
 	VectorXd w0 = *atom->get_w0();
 	MatrixXd L0 = *atom->get_L0();
 	MatrixXd L1 = *atom->get_L1();
 
 	std::vector<size_t> n_vec(x0.size());
-	std::vector<float> progress(x0.size());
 	for (size_t i = 0; i < x0.size(); ++i)
 	{
 		n_vec.at(i) = i;
-		progress.at(i) = 0;
 	}
 
-	std::for_each(std::execution::par_unseq, n_vec.begin(), n_vec.end(),
-		[this, &t, &x0, &delta, &v, &w0, &L0, &L1, &results, &progress](size_t i)
-		{
-			VectorXd w = gen_w(delta.at(i), v.at(i));
-			MatrixXcd H = gen_hamiltonian(w0, w);
-			size_t n = 0;
+	std::atomic<size_t> progress{0};
+	std::thread worker([this, &t, &x0, &delta, &v, &w0, &L0, &L1, &results, &progress, &n_vec]
+	{
+		std::for_each(std::execution::par, n_vec.begin(), n_vec.end(),
+			[this, &t, &x0, &delta, &v, &w0, &L0, &L1, &results, &progress](size_t i)
+			{
+				thread_local VectorXd w;
+				thread_local MatrixXcd H;
 
-			Eigen::Map<Eigen::VectorXcd> x0_vec(x0.at(i).data(), x0.at(i).size());
+				const Index w_size = lasers.size();
+				const Index H_size = atom->get_size();
 
-			if (dense)
-			{
-				if (time_dependent)
+				if (w.size() != w_size)
+					w.resize(w_size);
+
+				if (H.rows() != H_size || H.cols() != H_size)
+					H.resize(H_size, H_size);
+
+				update_w(w, delta.at(i), v.at(i));
+				update_hamiltonian(H, w0, w);
+
+				size_t n = 0;
+				Eigen::Map<Eigen::VectorXcd> x0_vec(x0.at(i).data(), x0.at(i).size());
+
+				if (dense)
 				{
-					d_dopri5_vcd_type d_dopri5 = make_dense_output(atol, rtol, dt_max, dopri5_vcd_type());
-					n = integrate_times(d_dopri5, f_master_t(H, L0, L1, w0, w, *this),
-						x0_vec, t.begin(), t.end(), dt,
-						push_back_VectorXcd_as_MatrixXcd(results.at(i), H.rows(), H.cols()));
+					if (time_dependent)
+					{
+						d_dopri5_vcd_type d_dopri5 = make_dense_output(atol, rtol, dt_max, dopri5_vcd_type());
+						n = integrate_times(d_dopri5, f_master_t(H, L0, L1, w0, w, *this),
+							x0_vec, t.begin(), t.end(), dt,
+							push_back_VectorXcd_as_MatrixXcd(results.at(i), H.rows(), H.cols()));
+					}
+					else
+					{
+						d_dopri5_vcd_type d_dopri5 = make_dense_output(atol, rtol, dt_max, dopri5_vcd_type());
+						n = integrate_times(d_dopri5, f_master(H, L0, L1),
+							x0_vec, t.begin(), t.end(), dt,
+							push_back_VectorXcd_as_MatrixXcd(results.at(i), H.rows(), H.cols()));
+					}
+				}
+				else if (controlled)
+				{
+					if (time_dependent)
+					{
+						c_dopri5_vcd_type c_dopri5 = make_controlled(atol, rtol, dt_max, dopri5_vcd_type());
+						n = integrate_times(c_dopri5, f_master_t(H, L0, L1, w0, w, *this),
+							x0_vec, t.begin(), t.end(), dt,
+							push_back_VectorXcd_as_MatrixXcd(results.at(i), H.rows(), H.cols()));
+					}
+					else
+					{
+						c_dopri5_vcd_type c_dopri5 = make_controlled(atol, rtol, dt_max, dopri5_vcd_type());
+						n = integrate_times(c_dopri5, f_master(H, L0, L1),
+							x0_vec, t.begin(), t.end(), dt,
+							push_back_VectorXcd_as_MatrixXcd(results.at(i), H.rows(), H.cols()));
+					}
 				}
 				else
 				{
-					d_dopri5_vcd_type d_dopri5 = make_dense_output(atol, rtol, dt_max, dopri5_vcd_type());
-					n = integrate_times(d_dopri5, f_master(H, L0, L1),
-						x0_vec, t.begin(), t.end(), dt,
-						push_back_VectorXcd_as_MatrixXcd(results.at(i), H.rows(), H.cols()));
+					if (time_dependent)
+					{
+						n = integrate_times(rk4_vcd_type(), f_master_t(H, L0, L1, w0, w, *this),
+							x0_vec, t.begin(), t.end(), dt,
+							push_back_VectorXcd_as_MatrixXcd(results.at(i), H.rows(), H.cols()));
+					}
+					else
+					{
+						n = integrate_times(rk4_vcd_type(), f_master(H, L0, L1),
+							x0_vec, t.begin(), t.end(), dt,
+							push_back_VectorXcd_as_MatrixXcd(results.at(i), H.rows(), H.cols()));
+					}
 				}
+				progress.fetch_add(1, std::memory_order_relaxed);
 			}
-			else if (controlled)
-			{
-				if (time_dependent)
-				{
-					c_dopri5_vcd_type c_dopri5 = make_controlled(atol, rtol, dt_max, dopri5_vcd_type());
-					n = integrate_times(c_dopri5, f_master_t(H, L0, L1, w0, w, *this),
-						x0_vec, t.begin(), t.end(), dt,
-						push_back_VectorXcd_as_MatrixXcd(results.at(i), H.rows(), H.cols()));
-				}
-				else
-				{
-					c_dopri5_vcd_type c_dopri5 = make_controlled(atol, rtol, dt_max, dopri5_vcd_type());
-					n = integrate_times(c_dopri5, f_master(H, L0, L1),
-						x0_vec, t.begin(), t.end(), dt,
-						push_back_VectorXcd_as_MatrixXcd(results.at(i), H.rows(), H.cols()));
-				}
-			}
-			else
-			{
-				if (time_dependent)
-				{
-					n = integrate_times(rk4_vcd_type(), f_master_t(H, L0, L1, w0, w, *this),
-						x0_vec, t.begin(), t.end(), dt,
-						push_back_VectorXcd_as_MatrixXcd(results.at(i), H.rows(), H.cols()));
-				}
-				else
-				{
-					n = integrate_times(rk4_vcd_type(), f_master(H, L0, L1),
-						x0_vec, t.begin(), t.end(), dt,
-						push_back_VectorXcd_as_MatrixXcd(results.at(i), H.rows(), H.cols()));
-				}
-			}
-			progress.at(i) = 1;
-			printf("\r\033[92mSolving master equation ... %3.2f %%\033[0m", 100 * std::reduce(progress.begin(), progress.end()) / x0.size());
-		}
-	);
+		);
+	});
+
+	while (progress.load() < x0.size()) {
+		printf("\r\033[92mSolving master equation ... %3.2f %%", 100.0 * progress.load() / x0.size());
+		std::this_thread::sleep_for(std::chrono::milliseconds(100));
+	}
+
+	worker.join();
+
 	printf("\r\033[92mSolving master equation ... 100.00 %%\033[0m");
 	printf("\n");
+
 	return results;
 }
 
@@ -1230,7 +1436,8 @@ std::vector<std::vector<VectorXcd>> Interaction::mc_master(
 	const std::vector<double>& t, const std::vector<VectorXd>& delta, std::vector<Vector3d>& v, std::vector<VectorXcd>& x0, const bool dynamics)
 {
 	// if (controlled || dense) printf("\r\033[93mWarning: Interaction.mc_master does not support controlled or dense steppers.\033[0m");
-	std::vector<std::vector<VectorXcd>> results = std::vector<std::vector<VectorXcd>>(x0.size());
+	std::vector<std::vector<VectorXcd>> results(x0.size());
+	for (auto& vec : results) vec.reserve(t.size());
 
 	std::vector<size_t> c_i;
 	std::vector<size_t> c_j;
@@ -1249,105 +1456,130 @@ std::vector<std::vector<VectorXcd>> Interaction::mc_master(
 	}
 
 	std::vector<size_t> n_vec(x0.size());
-	std::vector<float> progress(x0.size());
 	for (size_t i = 0; i < x0.size(); ++i)
 	{
 		n_vec.at(i) = i;
-		progress.at(i) = 0;
 	}
 
-	std::for_each(std::execution::par_unseq, n_vec.begin(), n_vec.end(),
-		[this, &x0, &delta, &v, dynamics, &c_i, &c_j, &c_a, &t, &results, &progress](size_t n)
-		{
-			// d_dopri5_vcd_type dopri5 = make_dense_output(atol, rtol, dt_max, dopri5_vcd_type());
-			VectorXd w0 = *atom->get_w0();
-			VectorXd w = gen_w(delta.at(n), v.at(0), dynamics);
-			MatrixXcd H = MatrixXcd::Zero(atom->get_size(), atom->get_size());
-			update_hamiltonian_off(H);
-
-			thread_local std::random_device rd;
-			thread_local std::mt19937 gen(rd());
-			thread_local std::uniform_real_distribution<double> d(0, 1);
-
-			update_w(w, delta.at(n), v.at(n), dynamics);
-			if (!time_dependent) update_hamiltonian_leaky_diag(H, w0, w);
-
-			Vector3d v_temp = Vector3d::Zero();
-			v_temp += v.at(n);
-			size_t i = gen_index(x0.at(n).cwiseAbs2(), d, gen);
-			double r = d(gen);
-			double p = 0;
-			double p_n = 0;
-
-			size_t i_t = 1;
-			double _t = t.front();
-			double _t1 = 0;
-			double _dt = dt;
-			results.at(n).push_back(x0.at(n));
-			bool break_loop = false;
-			while (true)
+	std::atomic<size_t> progress{0};
+	std::thread worker([this, &x0, &delta, &v, dynamics, &c_i, &c_j, &c_a, &t, &results, &progress, &n_vec]
+	{
+		std::for_each(std::execution::par, n_vec.begin(), n_vec.end(),
+			[this, &x0, &delta, &v, dynamics, &c_i, &c_j, &c_a, &t, &results, &progress](size_t n)
 			{
-				_t1 = _t + dt;
-				_dt = dt;
-				while (t.at(i_t) < _t + _dt)
-				{
-					_dt = t.at(i_t) - _t;
-					if (time_dependent) rk4_vcd_type().do_step(
-						f_schroedinger_leaky_t(H, w0, w, std::ref(*this)), x0.at(n), _t, _dt);
-					else rk4_vcd_type().do_step(f_schroedinger(H), x0.at(n), _t, _dt);
+				thread_local std::random_device rd;
+				thread_local std::mt19937 gen(rd());
+				thread_local std::uniform_real_distribution<double> d(0, 1);
 
-					results.at(n).push_back(x0.at(n) / sqrt(x0.at(n).cwiseAbs2().sum()));
-					_t += _dt;
-					_dt = _t1 - _t;
-					if (++i_t == t.size())
-					{
-						break_loop = true;
-						break;
-					}
-				}
-				if (break_loop) break;
-				if (_dt > 0)
+				thread_local VectorXd w0;
+				thread_local VectorXd w;
+				thread_local MatrixXcd H;
+
+				const Index w_size = lasers.size();
+				const Index H_size = atom->get_size();
+
+				if (w0.size() != H_size)
+					w0.resize(H_size);
+
+				if (w.size() != w_size)
+					w.resize(w_size);
+
+				if (H.rows() != H_size || H.cols() != H_size)
+					H.resize(H_size, H_size);
+				
+				w0 = *atom->get_w0();
+				update_w(w, delta.at(n), v.at(n), dynamics);
+				H.setZero();
+				update_hamiltonian_off(H);
+				if (!time_dependent) update_hamiltonian_leaky_diag(H, w0, w);
+
+				Vector3d v_temp = Vector3d::Zero();
+				v_temp += v.at(n);
+				size_t i = gen_index(x0.at(n).cwiseAbs2(), d, gen);
+				double r = d(gen);
+				double p = 0;
+				double p_n = 0;
+
+				size_t i_t = 1;
+				double _t = t.front();
+				double _t1 = 0;
+				double _dt = dt;
+				results.at(n).push_back(x0.at(n));
+				bool break_loop = false;
+				while (true)
 				{
-					if (time_dependent) rk4_vcd_type().do_step(
-						f_schroedinger_leaky_t(H, w0, w, std::ref(*this)), x0.at(n), _t, _dt);
-					else rk4_vcd_type().do_step(f_schroedinger(H), x0.at(n), _t, _dt);
-					_t = _t1;
-				}
-				if (x0.at(n).cwiseAbs2().sum() < r)
-				{
-					p = 0;
-					p_n = 0;
-					for (size_t j = 0; j < c_i.size(); ++j)
+					_t1 = _t + dt;
+					_dt = dt;
+					while (t.at(i_t) < _t + _dt)
 					{
-						p += c_a.at(j) * std::pow(std::abs(x0.at(n)(c_i.at(j))), 2);
-					}
-					r = d(gen);
-					for (size_t j = 0; j < c_i.size(); ++j)
-					{
-						p_n += c_a.at(j) * std::pow(std::abs(x0.at(n)(c_i.at(j))), 2) / p;
-						if (p_n >= r)
+						_dt = t.at(i_t) - _t;
+						if (time_dependent) rk4_vcd_type().do_step(
+							f_schroedinger_leaky_t(H, w0, w, std::ref(*this)), x0.at(n), _t, _dt);
+						else rk4_vcd_type().do_step(f_schroedinger_leaky(H), x0.at(n), _t, _dt);
+
+						results.at(n).push_back(x0.at(n) / sqrt(x0.at(n).cwiseAbs2().sum()));
+						_t += _dt;
+						_dt = _t1 - _t;
+						if (++i_t == t.size())
 						{
-							if (dynamics)
-							{
-								v_temp += gen_velocity_change(gen, w0, w, i, c_i.at(j), c_j.at(j));
-								update_w(w, delta.at(n), v_temp, dynamics);
-								if (!time_dependent) update_hamiltonian_leaky_diag(H, w0, w);
-							}
-
-							i = c_j.at(j);
-							x0.at(n).fill(0);
-							x0.at(n)(c_j.at(j)) = 1.;
+							break_loop = true;
 							break;
 						}
 					}
-					r = d(gen);
+					if (break_loop) break;
+					if (_dt > 0)
+					{
+						if (time_dependent) rk4_vcd_type().do_step(
+							f_schroedinger_leaky_t(H, w0, w, std::ref(*this)), x0.at(n), _t, _dt);
+						else rk4_vcd_type().do_step(f_schroedinger_leaky(H), x0.at(n), _t, _dt);
+						_t = _t1;
+					}
+					if (x0.at(n).cwiseAbs2().sum() < r)
+					{
+						p = 0;
+						p_n = 0;
+						for (size_t j = 0; j < c_i.size(); ++j)
+						{
+							p += c_a.at(j) * std::pow(std::abs(x0.at(n)(c_i.at(j))), 2);
+						}
+						r = d(gen);
+						for (size_t j = 0; j < c_i.size(); ++j)
+						{
+							p_n += c_a.at(j) * std::pow(std::abs(x0.at(n)(c_i.at(j))), 2) / p;
+							if (p_n >= r)
+							{
+								if (dynamics)
+								{
+									v_temp += gen_velocity_change(gen, w0, w, i, c_i.at(j), c_j.at(j));
+									update_w(w, delta.at(n), v_temp, dynamics);
+									if (!time_dependent) update_hamiltonian_leaky_diag(H, w0, w);
+								}
+
+								i = c_j.at(j);
+								x0.at(n).fill(0);
+								x0.at(n)(c_j.at(j)) = 1.;
+								break;
+							}
+						}
+						r = d(gen);
+					}
 				}
+				if (dynamics) v.at(n) += v_temp;
+				progress.fetch_add(1, std::memory_order_relaxed);
 			}
-			if (dynamics) v.at(n) += v_temp;
-			progress.at(n) = 1;
-			printf("\r\033[92mSolving MC master equation ... %3.2f %%\033[0m", 100 * std::reduce(progress.begin(), progress.end()) / x0.size());
-		});
+		);
+	});
+
+	while (progress.load() < x0.size())
+	{
+		printf("\r\033[92mSolving MC master equation ... %3.2f %%", 100.0 * progress.load() / x0.size());
+		std::this_thread::sleep_for(std::chrono::milliseconds(100));
+	}
+
+	worker.join();
+
 	printf("\r\033[92mSolving MC master equation ... 100.00 %%\033[0m");
 	printf("\n");
+
 	return results;
 }

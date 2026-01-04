@@ -964,7 +964,7 @@ double* interaction_get_delta(void* interaction)
     Interaction* _interaction = static_cast<Interaction*>(interaction);
 
     VectorXd* delta = new VectorXd(_interaction->get_atom()->get_size());
-    *delta = _interaction->gen_delta(*_interaction->get_atom()->get_w0(), _interaction->gen_w());
+    *delta = _interaction->get_delta(*_interaction->get_atom()->get_w0(), _interaction->gen_w());
     return delta->data();
 }
 

@@ -6,10 +6,28 @@
 #include <boost/numeric/odeint/external/eigen/eigen.hpp>
 #include <unsupported/Eigen/MatrixFunctions>
 
+#include <Eigen/Core>
+
+#if defined(EIGEN_VECTORIZE_AVX512)
+#pragma message("Eigen: AVX-512 enabled")
+#elif defined(EIGEN_VECTORIZE_AVX2)//
+#pragma message("Eigen: AVX2 enabled")
+#elif defined(EIGEN_VECTORIZE_AVX)
+#pragma message("Eigen: AVX enabled")
+#elif defined(EIGEN_VECTORIZE_SSE4_2)
+#pragma message("Eigen: SSE4.2 enabled")
+#elif defined(EIGEN_VECTORIZE_SSE2)
+#pragma message("Eigen: SSE2 enabled")
+#else
+#pragma message("Eigen: NO SIMD")
+#endif
+
 #include "Physics.h"
 #include "Matter.h"
 #include "Light.h"
 #include "Utility.h"
+#include <atomic>
+#include <thread>
 #include <set>
 #include <queue>
 #include <random>
@@ -140,35 +158,60 @@ public:
 	VectorXd gen_w(const VectorXd& delta, const Vector3d& v, const bool dynamics = false);
 	void update_w(VectorXd& w, const VectorXd& delta, const Vector3d& v, const bool dynamics = false);
 	// VectorXd gen_delta(VectorXd& w0, VectorXd& w);
-	VectorXd gen_delta(const VectorXd& w0, const VectorXd& w);
+
+	VectorXd get_delta(const VectorXd& w0, const VectorXd& w);
+	void update_delta(VectorXd& delta, const VectorXd& w0, const VectorXd& w);
 
 	std::vector<MatrixXd> gen_R_k(VectorXd& w0, VectorXd& w);
 	Vector3d gen_k_up(std::mt19937& gen, VectorXd& w0, VectorXd& w, size_t i, size_t j);
 	Vector3d gen_velocity_change(std::mt19937& gen, VectorXd& w0, VectorXd& w, size_t i, size_t j, size_t f);
 
-	MatrixXd gen_rates(VectorXd& w0, VectorXd& w);
-	VectorXd gen_rates_sum(MatrixXd& R);
-	void update_rates(MatrixXd& R, VectorXd& w0, VectorXd& w);
-	void update_rates_sum(VectorXd& R_sum, MatrixXd& R);
+	MatrixXd gen_rates(const VectorXd& w0, const VectorXd& w);
+	VectorXd gen_rates_sum(const MatrixXd& R);
+	void update_rates(MatrixXd& R, const VectorXd& w0, const VectorXd& w);
+	void update_rates_sum(VectorXd& R_sum, const MatrixXd& R);
 
-	MatrixXcd gen_hamiltonian(VectorXd& w0, VectorXd& w);
+	MatrixXcd gen_hamiltonian(const VectorXd& w0, const VectorXd& w);
+
+	void update_hamiltonian(MatrixXcd& H, const VectorXd& w0, const VectorXd& w);
+	void update_hamiltonian_diag(MatrixXcd& H, const VectorXd& w0, const VectorXd& w);
 	void update_hamiltonian_off(MatrixXcd& H);
 
-	void update_hamiltonian(MatrixXcd& H, VectorXd& w0, VectorXd& w, double t);
-	void update_hamiltonian_off(MatrixXcd& H, VectorXd& w, double t);
+	void update_hamiltonian(MatrixXcd& H, const VectorXd& w0, const VectorXd& w, double t);
+	void update_hamiltonian_off(MatrixXcd& H, const VectorXd& w, double t);
 
-	MatrixXcd gen_hamiltonian_leaky(VectorXd& w0, VectorXd& w);
-	void update_hamiltonian_leaky(MatrixXcd& H, VectorXd& w0, VectorXd& w, double t);
+	MatrixXcd gen_hamiltonian_leaky(const VectorXd& w0, const VectorXd& w);
 
-	void update_hamiltonian_diag(MatrixXcd& H, VectorXd& w0, VectorXd& w);
-	void update_hamiltonian_leaky_diag(MatrixXcd& H, VectorXd& w0, VectorXd& w);
+	void update_hamiltonian_leaky(MatrixXcd& H, const VectorXd& w0, const VectorXd& w, double t);
+	void update_hamiltonian_leaky_diag(MatrixXcd& H, const VectorXd& w0, const VectorXd& w);
 
 	std::vector<std::vector<VectorXd>> rates(
-		const std::vector<double>& t, const std::vector<VectorXd>& delta, const std::vector<Vector3d>& v, std::vector<VectorXd>& x0, const bool analytic);
+		const std::vector<double>& t,
+		const std::vector<VectorXd>& delta,
+		const std::vector<Vector3d>& v,
+		std::vector<VectorXd>& x0,
+		const bool analytic
+	);
+
 	std::vector<std::vector<VectorXcd>> schroedinger(
-		const std::vector<double>& t, const std::vector<VectorXd>& delta, const std::vector<Vector3d>& v, std::vector<VectorXcd>& x0);
+		const std::vector<double>& t,
+		const std::vector<VectorXd>& delta,
+		const std::vector<Vector3d>& v,
+		std::vector<VectorXcd>& x0
+	);
+
 	std::vector<std::vector<MatrixXcd>> master(
-		const std::vector<double>& t, const std::vector<VectorXd>& delta, const std::vector<Vector3d>& v, std::vector<MatrixXcd>& x0);
+		const std::vector<double>& t,
+		const std::vector<VectorXd>& delta,
+		const std::vector<Vector3d>& v,
+		std::vector<MatrixXcd>& x0
+	);
+
 	std::vector<std::vector<VectorXcd>> mc_master(
-		const std::vector<double>& t, const std::vector<VectorXd>& delta, std::vector<Vector3d>& v, std::vector<VectorXcd>& x0, const bool dynamics = false);
+		const std::vector<double>& t,
+		const std::vector<VectorXd>& delta,
+		std::vector<Vector3d>& v,
+		std::vector<VectorXcd>& x0,
+		const bool dynamics = false
+	);
 };
