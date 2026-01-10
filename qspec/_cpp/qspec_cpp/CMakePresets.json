@@ -111,27 +111,27 @@
       "name": "windows-msvc-arm64-release",
       "configurePreset": "windows-msvc-arm64",
       "configuration": "Release",
-      "verbose": false
+      "verbose": true
     },
     {
       "name": "linux-gcc-x64",
       "configurePreset": "linux-gcc-x64",
-      "verbose": false
+      "verbose": true
     },
     {
       "name": "linux-gcc-arm64",
       "configurePreset": "linux-gcc-arm64",
-      "verbose": false
+      "verbose": true
     },
     {
       "name": "macos-clang-x64",
       "configurePreset": "macos-clang-x64",
-      "verbose": false
+      "verbose": true
     },
     {
       "name": "macos-clang-arm64",
       "configurePreset": "macos-clang-arm64",
-      "verbose": false
+      "verbose": true
     }
   ]
 }
