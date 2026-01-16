@@ -1,4 +1,4 @@
-@startuml
+@startuml simulate
 'https://plantuml.com/class-diagram
 !theme reddress-lightblue
 skinparam groupInheritance 2
@@ -37,16 +37,17 @@ package Matter <<Frame>> {
 
     class State {
         +<color:MediumPurple>float</color> freq_j
-        +<color:MediumPurple>float</color> s, l, j, i, f, m
+        +<color:MediumPurple>float</color> parity
+        +<color:MediumPurple>float</color> j, i, f, m
         +<color:MediumPurple>list[float]</color> hyper_const
-        +<color:MediumPurple>float</color> g
+        +<color:MediumPurple>float</color> gj, gi
         +<color:MediumPurple>str</color> label
-        +<color:MediumPurple>None</color> update(<color:MediumPurple>Environment</color> environment)
     }
 
     class DecayMap {
-        +<color:MediumPurple>list[tuple[str]]</color> labels
-        +<color:MediumPurple>list[float]</color> a
+        +<color:MediumPurple>list[tuple[str, str]]</color> labels
+        +<color:MediumPurple>list[float | dict]</color> a
+        +<color:MediumPurple>int</color> k_max
         +<color:MediumPurple>float</color> get(<color:MediumPurple>str</color> label_0, label_1)
     }
 
@@ -54,12 +55,14 @@ package Matter <<Frame>> {
         +<color:MediumPurple>list[State]</color> states
         +<color:MediumPurple>DecayMap</color> decay_map
         +<color:MediumPurple>float</color> mass
+        +<color:MediumPurple>None</color> update(<color:MediumPurple>Environment</color> env)
         +<color:MediumPurple>float</color> get_state_indexes(<color:MediumPurple>list[str]</color> labels, <color:MediumPurple>list[float]</color> f)
-        +<color:MediumPurple>ndarray</color> scattering_rate(<color:MediumPurple>ndarray</color> rho, theta, phi, i, j)
+        +<color:MediumPurple>set[str]</color> get_multipole_types(<color:MediumPurple>str</color> label_0, <color:MediumPurple>str</color> label_1)
+        +<color:MediumPurple>ndarray</color> get_y0_thermal(<color:MediumPurple>float</color> temperature)
+        +<color:MediumPurple>ndarray</color> scattering_rate(<color:MediumPurple>ndarray</color> rho)
         +<color:MediumPurple>None</color> plot()
     }
 
-    Environment ..> State
     State ..> Atom
     DecayMap ..> Atom
 }
@@ -80,5 +83,6 @@ class Interaction {
 
 Atom .> Interaction
 Laser ..> Interaction
+Interaction <. Environment
 
 @enduml

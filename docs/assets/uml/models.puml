@@ -1,4 +1,4 @@
-@startuml
+@startuml models
 'https://plantuml.com/class-diagram
 !theme reddress-lightblue
 skinparam groupInheritance 2
@@ -21,7 +21,7 @@ abstract class Model {
     +<color:MediumPurple>list[list[float]]</color> intervals()
 }
 
-class "Empty,\nNPeak,\nOffset,\n Amplifier,\nCustom,\nYPars" as c1
+class "Empty\nNPeak\nOffset\n Amplifier\nCustom\nYPars" as c1
 abstract class Listed {
     +<color:MediumPurple>list[Model]</color> models
 }
@@ -31,17 +31,17 @@ abstract class Splitter {
     +<color:MediumPurple>None</color> racah()
 }
 
-class "Hyperfine,\nHyperfineQI,\n HyperfineMixed" as Hyperfine
+class "Hyperfine\nHyperfineQI\nHyperfineMixed\nHyperfineZeeman" as Hyperfine
 
 abstract class Convolved {
     +<color:MediumPurple>Model</color> model_1
 }
-class "GaussConvolved,\nLorentzConvolved,\n GaussChi2Convolved" as c3
+class "GaussConvolved\nLorentzConvolved\nGaussChi2Convolved" as c3
 
 abstract class Spectrum {
     +<color:MediumPurple>float</color> fwhm()
 }
-class "Lorentz,\nLorentzQI,\nGauss,\nVoigt,\n VoigtDerivative,\nVoigtAsy,\nVoigtCEC,\nGaussChi2" as c2
+class "Lorentz\nLorentzQI\nGauss\nVoigt\n VoigtDerivative\nVoigtAsy\nVoigtCEC\nGaussChi2" as c2
 
 Model <|-- Listed
 Model <|-- c1

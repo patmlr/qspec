@@ -254,9 +254,7 @@ def example(n: int | set[int] | None = None) -> None:
         df_s = 19.8e3  # frequency splitting between the two s-states.
         df_p = 11.8e3  # frequency splitting between two p-states.
 
-        states = sim.gen_hyperfine_ls_state(
-            freq_j=0, s=1, l=0, j=1, i=1.5, f=1.5, hyper_const=[df_s / 2.5], label="s3"
-        )
+        states = sim.gen_hyperfine_ls_state(freq_j=0, s=1, l=0, j=1, i=1.5, f=1.5, hyper_const=[df_s / 2.5], label="s3")
         states += sim.gen_hyperfine_ls_state(0, 1, 0, 1, 1.5, 2.5, [df_s / 2.5], label="s5")
         states += sim.gen_hyperfine_ls_state(f, 1, 1, 2, 1.5, 2.5, [df_p / 3.5], label="p")
 
@@ -689,7 +687,7 @@ def example(n: int | set[int] | None = None) -> None:
         z = r * np.cos(theta)
 
         fig_ax = plt.subplots(subplot_kw={"projection": "3d"})
-        ax: Axes3D = fig_ax[1] # type: ignore
+        ax: Axes3D = fig_ax[1]  # type: ignore
         cm = plt.get_cmap("plasma")
 
         ax.plot_surface(x, y, z, facecolors=cm(r), rcount=64, ccount=128, linewidth=0, antialiased=False)

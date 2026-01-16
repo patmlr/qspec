@@ -47,7 +47,7 @@ tracker = 'https://github.com/patmlr/qspec/issues'
 packages = ['qspec']
 
 [tool.setuptools.package-data]
-'*' = ['*.dll']
+'*' = ['*.dll', '*.dylib', '*.so']
 
 [tool.ruff]
 extend-exclude = [

@@ -1,5 +1,5 @@
 <h1>
-<img src="https://raw.githubusercontent.com/patmlr/qspec/refs/heads/dev-jekyll/docs/assets/img/logo.svg" width="300">
+<img src="https://raw.githubusercontent.com/patmlr/qspec/main/docs/assets/img/logo.svg" width="300">
 </h1><hr>
 
 [![Static Badge](https://img.shields.io/badge/OS-Windows%20|%20Linux-gold)](https://www.microsoft.com)
