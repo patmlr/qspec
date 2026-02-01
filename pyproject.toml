@@ -44,11 +44,11 @@ tracker = 'https://github.com/patmlr/qspec/issues'
 include = ["qspec/**"]
 
 # Hatchling wheel build config
-[tool.hatch.build.wheel]
+[tool.hatch.build.targets.wheel]
 include = ["qspec/**"]
 universal = false
 
-[tool.hatch.build.sdist]
+[tool.hatch.build.targets.sdist]
 include = [
     "qspec/**",
     "qspec/_cpp/qspec_cpp/**/*"
