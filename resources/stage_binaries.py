@@ -2,6 +2,7 @@
 import platform
 import shutil
 import struct
+import sys
 from pathlib import Path
 
 # Detect OS
@@ -10,31 +11,35 @@ machine = platform.machine().lower()
 arch = struct.calcsize("P") * 8
 
 if os_name == "Darwin":
-    if machine == "arm64":
+    if machine == "arm64" and arch == 64:
         target_folder = "macos-arm64"
-    elif machine == "x86_64":
+    elif machine == "x86_64" and arch == 64:
         target_folder = "macos-x64"
     else:
-        raise RuntimeError(f"Unsupported macOS architecture: {machine} ({arch}-bit)")
+        print(f"Unsupported macOS architecture: {machine} ({arch}-bit)")
+        sys.exit(0)
 
 elif os_name == "Windows":
-    if machine == "amd64":
+    if machine == "amd64" and arch == 64:
         target_folder = "windows-x64/Release"
-    elif machine == "arm64":
+    elif machine == "arm64" and arch == 64:
         target_folder = "windows-arm64/Release"
     else:
-        raise RuntimeError(f"Unsupported Windows architecture: {machine} ({arch}-bit)")
+        print(f"Unsupported Windows architecture: {machine} ({arch}-bit)")
+        sys.exit(0)
 
 elif os_name == "Linux":
-    if machine == "aarch64":
+    if machine == "aarch64" and arch == 64:
         target_folder = "linux-aarch64"
-    elif machine == "x86_64":
+    elif machine == "x86_64" and arch == 64:
         target_folder = "linux-x64"
     else:
-        raise RuntimeError(f"Unsupported Linux architecture: {machine} ({arch}-bit)")
+        print(f"Unsupported Linux architecture: {machine} ({arch}-bit)")
+        sys.exit(0)
 
 else:
-    raise RuntimeError(f"Unsupported OS: {os_name}")
+    print(f"Unsupported OS: {os_name}")
+    sys.exit(0)
 
 src = Path("qspec/_cpp/qspec_cpp/build") / target_folder
 dst = Path("qspec/_cpp/bin")
