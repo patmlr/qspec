@@ -16,8 +16,7 @@ if os_name == "Darwin":
     elif machine == "x86_64" and arch == 64:
         target_folder = "macos-x64"
     else:
-        print(f"Unsupported macOS architecture: {machine} ({arch}-bit)")
-        sys.exit(0)
+        raise RuntimeError(f"Unsupported macOS architecture: {machine} ({arch}-bit)")
 
 elif os_name == "Windows":
     if machine == "amd64" and arch == 64:
@@ -25,8 +24,7 @@ elif os_name == "Windows":
     elif machine == "arm64" and arch == 64:
         target_folder = "windows-arm64/Release"
     else:
-        print(f"Unsupported Windows architecture: {machine} ({arch}-bit)")
-        sys.exit(0)
+        raise RuntimeError(f"Unsupported Windows architecture: {machine} ({arch}-bit)")
 
 elif os_name == "Linux":
     if machine == "aarch64" and arch == 64:
@@ -34,18 +32,17 @@ elif os_name == "Linux":
     elif machine == "x86_64" and arch == 64:
         target_folder = "linux-x64"
     else:
-        print(f"Unsupported Linux architecture: {machine} ({arch}-bit)")
-        sys.exit(0)
+        raise RuntimeError(f"Unsupported Linux architecture: {machine} ({arch}-bit)")
 
 else:
-    print(f"Unsupported OS: {os_name}")
-    sys.exit(0)
+    raise RuntimeError(f"Unsupported OS: {os_name}")
 
 src = Path("qspec/_cpp/qspec_cpp/build") / target_folder
 dst = Path("qspec/_cpp/bin")
 
 if not src.exists():
-    raise FileNotFoundError(f"No prebuilt binaries found for {target_folder}")
+    print(f"No prebuilt binaries found for {target_folder}")
+    sys.exit(0)
 
 # Clear previous staged binaries
 if dst.exists():
