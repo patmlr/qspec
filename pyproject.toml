@@ -46,12 +46,12 @@ include = ["qspec/**"]
 # Hatchling wheel build config
 [tool.hatch.build.targets.wheel]
 include = ["qspec/**"]
-universal = false
+exclude = ["qspec/_cpp/qspec_cpp/*"]
+pure_python = false
 
 [tool.hatch.build.targets.sdist]
 include = [
     "qspec/**",
-    "qspec/_cpp/qspec_cpp/**/*"
 ]
 exclude = ["qspec/_cpp/qspec_cpp/build/*"]
 

@@ -9,8 +9,8 @@ os_name = platform.system()
 arch = platform.machine().lower()
 
 PLATFORM_MAP = {
-    ("Windows", "amd64"): ("windows-x64", "win_amd64"),
-    ("Windows", "arm64"): ("windows-arm64", "win_arm64"),
+    ("Windows", "amd64"): ("windows-x64/Release", "win_amd64"),
+    ("Windows", "arm64"): ("windows-arm64/Release", "win_arm64"),
     ("Linux", "x86_64"): ("linux-x64", "manylinux_2_28_x86_64"),
     ("Linux", "aarch64"): ("linux-arm64", "manylinux_2_28_aarch64"),
     ("Darwin", "x86_64"): ("macosx-x64", "macosx_12_0_x86_64"),
@@ -39,9 +39,9 @@ else:
     for f in src.iterdir():
         try:
             shutil.copy2(f, dst)
-            print(f"Copied {f.name}")
+            print(f"Copied {f.name} from {src} to {dst}")
         except Exception as e:
-            print(f"Warning: Failed to copy {f.name}: {e}")
+            print(f"Warning: Failed to copy {f.name} from {src} to {dst}: {e}")
 
 print(f"Staging complete for {lib_folder}")
 print(f"::set-output name=plat_name::{PLAT_NAME}")

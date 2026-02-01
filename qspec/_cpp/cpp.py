@@ -69,13 +69,13 @@ def _get_platform() -> str:
 
 
 def _load_dll() -> ctypes.CDLL:
-    dll_path = os.path.abspath(os.path.dirname(__file__))
+    file_path = os.path.abspath(os.path.dirname(__file__))
 
     arch = _get_architecture()
     plat = _get_platform()
     config = "Debug" if False else "Release"
 
-    dll_path = os.path.join(dll_path, "qspec_cpp", "build")
+    dll_path = os.path.join(file_path, "qspec_cpp", "build")
 
     if plat == "windows":
         dll_path = os.path.join(dll_path, f"windows-{arch}", config)
@@ -95,8 +95,11 @@ def _load_dll() -> ctypes.CDLL:
 
     dll_name = f"{prefix}qspec_cpp{suffix}"
 
-    print(f"Loading from: {dll_path}")
-    return ctypes.CDLL(os.path.join(dll_path, dll_name))
+    try:
+        return ctypes.CDLL(os.path.join(dll_path, dll_name))
+    except FileNotFoundError:
+        dll_path = os.path.join(file_path, "bin")
+        return ctypes.CDLL(os.path.join(dll_path, dll_name))
 
 
 def set_argtypes(func: CFuncPtr, argtypes: tuple[Any, ...]) -> None:

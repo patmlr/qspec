@@ -1,2 +1,0 @@
-recursive-include qspec/_cpp/qspec_cpp/ *
-recursive-exclude qspec/_cpp/qspec_cpp/build *

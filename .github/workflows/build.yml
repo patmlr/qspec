@@ -30,7 +30,7 @@ jobs:
         run: python resources/stage_binaries.py
 
       - name: Determine wheel platform name
-        run: echo "PLAT_NAME=${{ steps.stage.outputs.plat_name }}" >> $GITHUB_ENV
+        run: echo "PLAT_NAME=${{ steps.stage.outputs.plat_name }}" >> $GITHUB_OUTPUT
 
       - name: Build platform wheel
         run: hatch build -t wheel
