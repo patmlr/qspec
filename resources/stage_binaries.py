@@ -1,56 +1,48 @@
 #!/usr/bin/env python3
 import platform
 import shutil
-import struct
 import sys
 from pathlib import Path
 
-# Detect OS
+# Detect platform
 os_name = platform.system()
-machine = platform.machine().lower()
-arch = struct.calcsize("P") * 8
+arch = platform.machine().lower()
 
-if os_name == "Darwin":
-    if machine == "arm64" and arch == 64:
-        target_folder = "macos-arm64"
-    elif machine == "x86_64" and arch == 64:
-        target_folder = "macos-x64"
-    else:
-        raise RuntimeError(f"Unsupported macOS architecture: {machine} ({arch}-bit)")
+PLATFORM_MAP = {
+    ("Windows", "amd64"): ("windows-x64", "win_amd64"),
+    ("Windows", "arm64"): ("windows-arm64", "win_arm64"),
+    ("Linux", "x86_64"): ("linux-x64", "manylinux_2_28_x86_64"),
+    ("Linux", "aarch64"): ("linux-arm64", "manylinux_2_28_aarch64"),
+    ("Darwin", "x86_64"): ("macosx-x64", "macosx_12_0_x86_64"),
+    ("Darwin", "arm64"): ("macosx-arm64", "macosx_12_0_arm64"),
+}
 
-elif os_name == "Windows":
-    if machine == "amd64" and arch == 64:
-        target_folder = "windows-x64/Release"
-    elif machine == "arm64" and arch == 64:
-        target_folder = "windows-arm64/Release"
-    else:
-        raise RuntimeError(f"Unsupported Windows architecture: {machine} ({arch}-bit)")
-
-elif os_name == "Linux":
-    if machine == "aarch64" and arch == 64:
-        target_folder = "linux-aarch64"
-    elif machine == "x86_64" and arch == 64:
-        target_folder = "linux-x64"
-    else:
-        raise RuntimeError(f"Unsupported Linux architecture: {machine} ({arch}-bit)")
-
-else:
-    raise RuntimeError(f"Unsupported OS: {os_name}")
-
-src = Path("qspec/_cpp/qspec_cpp/build") / target_folder
-dst = Path("qspec/_cpp/bin")
-
-if not src.exists():
-    print(f"No prebuilt binaries found for {target_folder}")
+key = (os_name, arch)
+if key not in PLATFORM_MAP:
+    print(f"Warning: Unsupported platform {os_name} {arch}, skipping binary staging")
     sys.exit(0)
 
-# Clear previous staged binaries
+lib_folder, PLAT_NAME = PLATFORM_MAP[key]
+
+src = Path("qspec/_cpp/qspec_cpp/build") / lib_folder
+dst = Path("qspec/_cpp/bin")
+
+# Clear old staged binaries
 if dst.exists():
     shutil.rmtree(dst)
 dst.mkdir(parents=True, exist_ok=True)
 
-# Copy only target binaries
-for f in src.iterdir():
-    shutil.copy2(f, dst)
+# Copy binaries if present
+if not src.exists() or not any(src.iterdir()):
+    print(f"Warning: No binaries found for {lib_folder}. Continuing without them.")
+else:
+    for f in src.iterdir():
+        try:
+            shutil.copy2(f, dst)
+            print(f"Copied {f.name}")
+        except Exception as e:
+            print(f"Warning: Failed to copy {f.name}: {e}")
 
-print(f"Staged {list(dst.iterdir())} for {target_folder}")
+print(f"Staging complete for {lib_folder}")
+print(f"::set-output name=plat_name::{PLAT_NAME}")
+sys.exit(0)

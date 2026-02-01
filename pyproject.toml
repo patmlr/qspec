@@ -44,7 +44,9 @@ source = 'https://github.com/patmlr/qspec'
 tracker = 'https://github.com/patmlr/qspec/issues'
 
 [tool.setuptools]
-packages = ['qspec']
+
+[tool.setuptools.packages.find]
+where = ["qspec"]
 
 [tool.setuptools.package-data]
 qspec = [

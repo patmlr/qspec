@@ -63,7 +63,7 @@
       "name": "macos-clang-x64",
       "displayName": "macOS (AppleClang x64)",
       "generator": "Ninja",
-      "binaryDir": "${sourceDir}/build/macos-x64",
+      "binaryDir": "${sourceDir}/build/macosx-x64",
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Release",
         "CMAKE_C_COMPILER": "/usr/bin/clang",
@@ -80,7 +80,7 @@
       "name": "macos-clang-arm64",
       "displayName": "macOS (AppleClang ARM64)",
       "generator": "Ninja",
-      "binaryDir": "${sourceDir}/build/macos-arm64",
+      "binaryDir": "${sourceDir}/build/macosx-arm64",
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Release",
         "CMAKE_C_COMPILER": "/usr/bin/clang",
