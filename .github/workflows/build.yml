@@ -29,7 +29,7 @@ jobs:
 
       - name: Stage platform binaries
         id: stage
-        run: python tools/stage_binaries.py
+        run: python resources/stage_binaries.py
 
       - name: Determine wheel platform name
         run: echo "PLAT_NAME=${{ steps.stage.outputs.plat_name }}" >> $GITHUB_ENV
