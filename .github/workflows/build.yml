@@ -1,0 +1,39 @@
+name: Build Wheels
+
+on:
+  push:
+    branches: [test-actions]
+  pull_request:
+
+jobs:
+  build-wheels:
+    strategy:
+      matrix:
+        platform: [windows, linux, macos]
+    runs-on: ${{ matrix.platform == 'windows' && 'windows-2022' || matrix.platform == 'linux' && 'ubuntu-latest' || matrix.platform == 'macos' && 'macos-13' }}
+    env:
+      PYTHON_VERSION: 3.12
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install build dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install build setuptools wheel
+
+      - name: Stage platform binaries (auto-detect)
+        run: python resources/stage_binaries.py
+
+      - name: Build wheel and sdist
+        run: python -m build --wheel --sdist --outdir dist
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ matrix.platform }}-wheels
+          path: dist/*

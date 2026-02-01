@@ -5,7 +5,7 @@ qspec._cpp
 Module for simulations of laser-atom interaction.
 """
 
-from qspec._cpp._cpp import (
+from qspec._cpp.cpp import (
     POINTER,
     C,
     c_bool,
