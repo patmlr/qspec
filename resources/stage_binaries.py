@@ -44,5 +44,5 @@ else:
             print(f"Warning: Failed to copy {f.name} from {src} to {dst}: {e}")
 
 print(f"Staging complete for {lib_folder}")
-print(f"::set-output name=plat_name::{PLAT_NAME}")
+print(f"Determined platform tag {PLAT_NAME}")
 sys.exit(0)
