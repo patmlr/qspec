@@ -33,7 +33,7 @@ jobs:
         run: echo "PLAT_NAME=${{ steps.stage.outputs.plat_name }}" >> $GITHUB_ENV
 
       - name: Build platform wheel
-        run: python -m build --wheel --outdir dist --plat-name $PLAT_NAME
+        run: hatch build --wheel --outdir dist
 
       - name: Upload platform wheels
         uses: actions/upload-artifact@v6
@@ -59,7 +59,7 @@ jobs:
         - name: Build fallback wheel
           run: |
             rm -rf qspec/_cpp/bin
-            python -m build --outdir dist
+            hatch build --outdir dist
 
         - name: Upload fallback wheel
           uses: actions/upload-artifact@v6
