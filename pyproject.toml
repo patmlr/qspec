@@ -1,59 +1,56 @@
 [build-system]
-requires = ["hatchling"]
-build-backend = "hatchling.build"
+requires = ["setuptools>=81.0.0", "wheel"]
+build-backend = "setuptools.build_meta"
 
 [project]
-name = 'qspec'
-version = '0.5.0'
-description = 'Physics toolbox for laser spectroscopy'
-readme = 'README.md'
-requires-python = '>=3.12'
-license = 'MIT'
-license-files = ['LICENSE']
-# license = {file = 'LICENSE'}
+name = "qspec"
+version = "0.5.0"
+description = "Physics toolbox for laser spectroscopy"
+readme = "README.md"
+requires-python = ">=3.12"
+license = "MIT"
+license-files = ["LICENSE"]
+# license = {file = "LICENSE"}
 
-keywords = ['physics', 'simulation', 'data analysis', 'atomic structure', 'laser spectroscopy', 'laser cooling', 'coherent interaction', 'quantum computing']
+keywords = ["physics", "simulation", "data analysis", "atomic structure", "laser spectroscopy", "laser cooling", "coherent interaction", "quantum computing"]
 authors = [
-    {name = 'Patrick Müller', email = 'pamueller.ikp@gmail.com'},
+    {name = "Patrick Müller", email = "pamueller.ikp@gmail.com"},
 ]
 classifiers = [
-    'Development Status :: 4 - Beta',
-    'Intended Audience :: Science/Research',
-    # 'License :: OSI Approved :: MIT License',
-    'Operating System :: Microsoft :: Windows',
-    'Programming Language :: C++',
-    'Programming Language :: Python :: 3',
-    'Programming Language :: Python :: 3 :: Only',
-    'Topic :: Scientific/Engineering :: Physics',
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Science/Research",
+    # "License :: OSI Approved :: MIT License",
+    "Operating System :: Microsoft :: Windows",
+    "Programming Language :: C++",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+    "Topic :: Scientific/Engineering :: Physics",
 ]
 dependencies = [
-    'matplotlib',
-    'numpy >= 2.0.2',
-    'scipy >= 1.13.1',
-    'sympy'
+    "matplotlib",
+    "numpy >= 2.0.2",
+    "scipy >= 1.13.1",
+    "sympy"
 ]
 
 [project.urls]
-homepage = 'https://patmlr.github.io/qspec/'
-documentation = 'https://patmlr.github.io/qspec/doc/doc.html'
-download = 'https://pypi.org/project/qspec/#files'
-source = 'https://github.com/patmlr/qspec'
-tracker = 'https://github.com/patmlr/qspec/issues'
+homepage = "https://patmlr.github.io/qspec/"
+documentation = "https://patmlr.github.io/qspec/doc/doc.html"
+download = "https://pypi.org/project/qspec/#files"
+source = "https://github.com/patmlr/qspec"
+tracker = "https://github.com/patmlr/qspec/issues"
 
-[tool.hatch.metadata.files]
-include = ["qspec/**"]
+[tool.setuptools]
+include-package-data = false
+zip-safe = false
 
-# Hatchling wheel build config
-[tool.hatch.build.targets.wheel]
-include = ["qspec/**"]
-exclude = ["qspec/_cpp/qspec_cpp/**"]
-pure_python = false
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["qspec", "qspec.*"]
+exclude = ["qspec._cpp.qspec_cpp.src._lib*"]
 
-[tool.hatch.build.targets.sdist]
-include = [
-    "qspec/**",
-]
-exclude = ["qspec/_cpp/qspec_cpp/build/**"]
+[tool.setuptools.package-data]
+"qspec" = ["**/*.dll", "**/*.so", "**/*.dylib"]
 
 [tool.ruff]
 extend-exclude = [

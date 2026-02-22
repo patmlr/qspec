@@ -7,6 +7,7 @@ __pycache__
 
 /build/
 /dist/
+/wheelhouse/
 /qspec.egg-info/
 
 /docs/_site/
