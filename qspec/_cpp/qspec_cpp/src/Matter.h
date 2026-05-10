@@ -6,11 +6,19 @@
 #include <vector>
 #include <string>
 #include <random>
-#include <execution>
 #include <Eigen/Dense>
 
 #define FMT_HEADER_ONLY
 #include <fmt/core.h>
+
+#ifdef __APPLE__
+#define QSPEC_EXEC_PAR
+#define QSPEC_EXEC_PAR_UNSEQ
+#else
+#include <execution>
+#define QSPEC_EXEC_PAR std::execution::par,
+#define QSPEC_EXEC_PAR_UNSEQ std::execution::par_unseq,
+#endif
 
 using namespace Eigen;
 

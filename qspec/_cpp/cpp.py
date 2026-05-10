@@ -62,7 +62,6 @@ def _get_platform() -> str:
     if system.lower() == "linux":
         return "linux"
     if system.lower() == "darwin":
-        raise OSError(f"Unsupported platform: {system}")
         return "macos"
 
     raise OSError(f"Unsupported platform: {system}")
@@ -89,6 +88,11 @@ def _load_dll() -> ctypes.CDLL:
         dll_path = os.path.join(dll_path, f"linux-{arch}")
         prefix = "lib"
         suffix = ".so"
+
+    elif plat == "macos":
+            dll_path = os.path.join(dll_path, f"macosx-{arch}")
+            prefix = "lib"
+            suffix = ".dylib"
 
     else:
         raise OSError(f"Unsupported platform: {plat}")

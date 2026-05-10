@@ -23,7 +23,7 @@ set(QSPEC_INCLUDES
     src/
     src/_lib/boost_1_90_0
     src/_lib/eigen-5.0.0
-    src/_lib/fmt-master/include
+    src/_lib/fmt-main/include
 )
 
 # Export macro
@@ -41,34 +41,39 @@ target_compile_definitions(qspec_cpp PRIVATE
 
 if(MSVC)
     target_compile_options(qspec_cpp PRIVATE
-        # MSVC: UTF-8 source encoding
         /utf-8
 
-        # MSVC
-        $<$<AND:$<CXX_COMPILER_ID:MSVC>,$<CONFIG:Release>,$<STREQUAL:${CMAKE_VS_PLATFORM_NAME},x64>>:/arch:AVX2>
-
-        # MSVC ARM64 (no SIMD flag for now)
-        $<$<AND:$<CXX_COMPILER_ID:MSVC>,$<CONFIG:Release>,$<STREQUAL:${CMAKE_VS_PLATFORM_NAME},ARM64>>:/arch:ARM64>
+        # AVX2 only for x64 release builds
+        $<$<AND:$<CONFIG:Release>,$<STREQUAL:${CMAKE_VS_PLATFORM_NAME},x64>>:/arch:AVX2>
     )
 
+    # ARM64: NEON is implicit
+    if(CMAKE_VS_PLATFORM_NAME STREQUAL "ARM64")
+        target_compile_definitions(qspec_cpp PRIVATE
+            $<$<CONFIG:Release>:EIGEN_VECTORIZE_NEON>
+        )
+    endif()
+
 else()
-    if(CMAKE_SYSTEM_PROCESSOR STREQUAL "x86_64")
-        # x86 SIMD flags
+    if(CMAKE_SYSTEM_PROCESSOR MATCHES "^(x86_64|AMD64)$")
         target_compile_options(qspec_cpp PRIVATE
             $<$<CONFIG:Release>:-msse4.2>
         )
-    elseif(CMAKE_SYSTEM_PROCESSOR STREQUAL "aarch64")
-        # ARM64 NEON SIMD flags
-        target_compile_options(qspec_cpp PRIVATE
-            $<$<CONFIG:Release>:-mfpu=neon>
+
+    elseif(CMAKE_SYSTEM_PROCESSOR MATCHES "^(aarch64|arm64)$")
+        # ARM64 NEON is implicit
+        target_compile_definitions(qspec_cpp PRIVATE
+            $<$<CONFIG:Release>:EIGEN_VECTORIZE_NEON>
         )
     endif()
 endif()
 
 # GCC/G++: Force static runtime on GCC/G++ (no GCC/G++ SO dependencies)
-if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU" OR CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
     target_compile_options(qspec_cpp PRIVATE -fPIC)
     target_link_options(qspec_cpp PRIVATE -static-libstdc++ -static-libgcc)
+elseif(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+    target_compile_options(qspec_cpp PRIVATE -fPIC)
 endif()
 
 # Output DLL name

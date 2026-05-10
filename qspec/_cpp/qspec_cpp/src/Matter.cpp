@@ -735,7 +735,7 @@ bool Atom::is_electric(size_t k, size_t i, size_t j)
 	bool parity_equal = get_parity_equal(i, j);
 
 	bool electric = true;
-	if ((parity_equal && k % 2 != 0) || (not parity_equal && k % 2 == 0)) electric = false;
+	if ((parity_equal && k % 2 != 0) || (!parity_equal && k % 2 == 0)) electric = false;
 	return electric;
 }
 
@@ -772,14 +772,14 @@ void Atom::gen_multipole()
 			{
 				size_t i_decay = decays->get_index(states[i]->get_label(), states[j]->get_label());
 				if (i_decay == decays->get_size()) continue;
-				if (not leading_order_e_set) leading_order_e.at(i_decay) = k + 1;
-				if (not leading_order_m_set) leading_order_m.at(i_decay) = k + 1;
+				if (!leading_order_e_set) leading_order_e.at(i_decay) = k + 1;
+				if (!leading_order_m_set) leading_order_m.at(i_decay) = k + 1;
 
 				bool parity_equal = get_parity_equal(i, j);
 				double a = 0.;
 
 				bool electric = true;
-				if ((parity_equal && k % 2 != 0) || (not parity_equal && k % 2 == 0)) electric = false;
+				if ((parity_equal && k % 2 != 0) || (!parity_equal && k % 2 == 0)) electric = false;
 
 				if (electric)
 				{
@@ -868,7 +868,7 @@ void Atom::gen_multipole()
 						leading_order_e.at(i_decay) = k;
 						leading_order_e_set = true;
 					}
-					if (not electric && decays->get_am(i_decay).size() == 1)
+					if (!electric && decays->get_am(i_decay).size() == 1)
 					{
 						leading_order_m.at(i_decay) = k;
 						leading_order_m_set = true;
@@ -1026,7 +1026,7 @@ void Atom::scattering_rate(double* results, std::vector<size_t>& k, std::vector<
 	std::iota(indexes.begin(), indexes.end(), 0);
 
 	// printf("qk: %.3f + %.3fi, %.3f + %.3fi, %.3f + %.3fi\n", qk.at(0).at(0)(0, 1).real(), qk.at(0).at(0)(0, 1).imag(), qk.at(0).at(0)(1, 1).real(), qk.at(0).at(0)(1, 1).imag(), qk.at(0).at(0)(2, 1).real(), qk.at(0).at(0)(2, 1).imag());
-	std::for_each(std::execution::par_unseq, indexes.begin(), indexes.end(),
+	std::for_each(QSPEC_EXEC_PAR indexes.begin(), indexes.end(),
 		[this, results, rho, qk, k, i, f](size_t index)
 		{
 			size_t index_qk = index / rho.size();

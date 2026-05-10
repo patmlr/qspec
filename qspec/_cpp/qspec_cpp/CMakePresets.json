@@ -1,137 +1,131 @@
 {
-  "version": 5,
-
-  "configurePresets": [
-    {
-      "name": "windows-msvc-x64",
-      "displayName": "Windows (MSVC x64)",
-      "generator": "Visual Studio 18 2026",
-      "architecture": "x64",
-      "binaryDir": "${sourceDir}/build/windows-x64",
-      "cacheVariables": {
-        "CMAKE_GENERATOR_PLATFORM": "x64",
-        "CMAKE_CONFIGURATION_TYPES": "Debug;Release;RelWithDebInfo;MinSizeRel"
-      }
-    },
-    {
-      "name": "windows-msvc-arm64",
-      "displayName": "Windows (MSVC ARM64)",
-      "generator": "Visual Studio 18 2026",
-      "architecture": "ARM64",
-      "binaryDir": "${sourceDir}/build/windows-arm64",
-      "cacheVariables": {
-        "CMAKE_GENERATOR_PLATFORM": "ARM64",
-        "CMAKE_CONFIGURATION_TYPES": "Debug;Release;RelWithDebInfo;MinSizeRel"
-      }
-    },
-
-    {
-      "name": "linux-gcc-x64",
-      "displayName": "Linux (GCC x64)",
-      "generator": "Ninja",
-      "binaryDir": "${sourceDir}/build/linux-x64",
-      "cacheVariables": {
-        "CMAKE_BUILD_TYPE": "Release",
-        "CMAKE_C_COMPILER": "/usr/bin/gcc",
-        "CMAKE_CXX_COMPILER": "/usr/bin/g++"
-      },
-      "condition": {
-        "type": "equals",
-        "lhs": "${hostSystemName}",
-        "rhs": "Linux"
-      }
-    },
-
-    {
-      "name": "linux-gcc-arm64",
-      "displayName": "Linux (GCC ARM64)",
-      "generator": "Ninja",
-      "binaryDir": "${sourceDir}/build/linux-arm64",
-      "cacheVariables": {
-        "CMAKE_BUILD_TYPE": "Release",
-        "CMAKE_C_COMPILER": "/usr/bin/gcc",
-        "CMAKE_CXX_COMPILER": "/usr/bin/g++"
-      },
-      "condition": {
-        "type": "equals",
-        "lhs": "${hostSystemName}",
-        "rhs": "Linux"
-      }
-    },
-
-    {
-      "name": "macos-clang-x64",
-      "displayName": "macOS (AppleClang x64)",
-      "generator": "Ninja",
-      "binaryDir": "${sourceDir}/build/macosx-x64",
-      "cacheVariables": {
-        "CMAKE_BUILD_TYPE": "Release",
-        "CMAKE_C_COMPILER": "/usr/bin/clang",
-        "CMAKE_CXX_COMPILER": "/usr/bin/clang++"
-      },
-      "condition": {
-        "type": "equals",
-        "lhs": "${hostSystemName}",
-        "rhs": "Darwin"
-      }
-    },
-
-    {
-      "name": "macos-clang-arm64",
-      "displayName": "macOS (AppleClang ARM64)",
-      "generator": "Ninja",
-      "binaryDir": "${sourceDir}/build/macosx-arm64",
-      "cacheVariables": {
-        "CMAKE_BUILD_TYPE": "Release",
-        "CMAKE_C_COMPILER": "/usr/bin/clang",
-        "CMAKE_CXX_COMPILER": "/usr/bin/clang++"
-      },
-      "condition": {
-        "type": "equals",
-        "lhs": "${hostSystemName}",
-        "rhs": "Darwin"
-      }
-    }
-  ],
-
-  "buildPresets": [
-    {
-      "name": "windows-msvc-x64-debug",
-      "configurePreset": "windows-msvc-x64",
-      "configuration": "Debug",
-      "verbose": true
-    },
-    {
-      "name": "windows-msvc-x64-release",
-      "configurePreset": "windows-msvc-x64",
-      "configuration": "Release",
-      "verbose": true
-    },
-    {
-      "name": "windows-msvc-arm64-release",
-      "configurePreset": "windows-msvc-arm64",
-      "configuration": "Release",
-      "verbose": true
-    },
-    {
-      "name": "linux-gcc-x64",
-      "configurePreset": "linux-gcc-x64",
-      "verbose": true
-    },
-    {
-      "name": "linux-gcc-arm64",
-      "configurePreset": "linux-gcc-arm64",
-      "verbose": true
-    },
-    {
-      "name": "macos-clang-x64",
-      "configurePreset": "macos-clang-x64",
-      "verbose": true
-    },
-    {
-      "name": "macos-clang-arm64",
-      "configurePreset": "macos-clang-arm64",
-      "verbose": true
-    }
-  ]
+    "version": 5,
+    "configurePresets": [
+        {
+            "name": "windows-msvc-x64",
+            "displayName": "Windows (MSVC x64)",
+            "generator": "Visual Studio 18 2026",
+            "architecture": "x64",
+            "binaryDir": "${sourceDir}/build/windows-x64",
+            "cacheVariables": {
+                "CMAKE_GENERATOR_PLATFORM": "x64",
+                "CMAKE_CONFIGURATION_TYPES": "Debug;Release;RelWithDebInfo;MinSizeRel"
+            }
+        },
+        {
+            "name": "windows-msvc-arm64",
+            "displayName": "Windows (MSVC ARM64)",
+            "generator": "Visual Studio 18 2026",
+            "architecture": "ARM64",
+            "binaryDir": "${sourceDir}/build/windows-arm64",
+            "cacheVariables": {
+                "CMAKE_GENERATOR_PLATFORM": "ARM64",
+                "CMAKE_CONFIGURATION_TYPES": "Debug;Release;RelWithDebInfo;MinSizeRel"
+            }
+        },
+        {
+            "name": "linux-gcc-x64",
+            "displayName": "Linux (GCC x64)",
+            "generator": "Ninja",
+            "binaryDir": "${sourceDir}/build/linux-x64",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Release",
+                "CMAKE_C_COMPILER": "/usr/bin/gcc",
+                "CMAKE_CXX_COMPILER": "/usr/bin/g++"
+            },
+            "condition": {
+                "type": "equals",
+                "lhs": "${hostSystemName}",
+                "rhs": "Linux"
+            }
+        },
+        {
+            "name": "linux-gcc-arm64",
+            "displayName": "Linux (GCC ARM64)",
+            "generator": "Ninja",
+            "binaryDir": "${sourceDir}/build/linux-arm64",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Release",
+                "CMAKE_C_COMPILER": "/usr/bin/gcc",
+                "CMAKE_CXX_COMPILER": "/usr/bin/g++"
+            },
+            "condition": {
+                "type": "equals",
+                "lhs": "${hostSystemName}",
+                "rhs": "Linux"
+            }
+        },
+        {
+            "name": "macos-clang-x64",
+            "displayName": "macOS (AppleClang x64)",
+            "generator": "Ninja",
+            "binaryDir": "${sourceDir}/build/macosx-x64",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Release",
+                "CMAKE_C_COMPILER": "/usr/bin/clang",
+                "CMAKE_CXX_COMPILER": "/usr/bin/clang++"
+            },
+            "condition": {
+                "type": "equals",
+                "lhs": "${hostSystemName}",
+                "rhs": "Darwin"
+            }
+        },
+        {
+            "name": "macos-clang-arm64",
+            "displayName": "macOS (AppleClang ARM64)",
+            "generator": "Ninja",
+            "binaryDir": "${sourceDir}/build/macosx-arm64",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Release",
+                "CMAKE_C_COMPILER": "/usr/bin/clang",
+                "CMAKE_CXX_COMPILER": "/usr/bin/clang++"
+            },
+            "condition": {
+                "type": "equals",
+                "lhs": "${hostSystemName}",
+                "rhs": "Darwin"
+            }
+        }
+    ],
+    "buildPresets": [
+        {
+            "name": "windows-msvc-x64-debug",
+            "configurePreset": "windows-msvc-x64",
+            "configuration": "Debug",
+            "verbose": true
+        },
+        {
+            "name": "windows-msvc-x64-release",
+            "configurePreset": "windows-msvc-x64",
+            "configuration": "Release",
+            "verbose": true
+        },
+        {
+            "name": "windows-msvc-arm64-release",
+            "configurePreset": "windows-msvc-arm64",
+            "configuration": "Release",
+            "verbose": true
+        },
+        {
+            "name": "linux-gcc-x64",
+            "configurePreset": "linux-gcc-x64",
+            "verbose": true
+        },
+        {
+            "name": "linux-gcc-arm64",
+            "configurePreset": "linux-gcc-arm64",
+            "verbose": true
+        },
+        {
+            "name": "macos-clang-x64",
+            "configurePreset": "macos-clang-x64",
+            "verbose": true
+        },
+        {
+            "name": "macos-clang-arm64",
+            "configurePreset": "macos-clang-arm64",
+            "verbose": true
+        }
+    ]
 }
