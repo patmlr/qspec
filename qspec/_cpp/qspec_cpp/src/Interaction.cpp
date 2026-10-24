@@ -1564,7 +1564,7 @@ std::vector<std::vector<VectorXcd>> Interaction::mc_master(
 						r = d(gen);
 					}
 				}
-				if (dynamics) v.at(n) += v_temp;
+				if (dynamics) v.at(n) = v_temp;
 				progress.fetch_add(1, std::memory_order_relaxed);
 			}
 		);
