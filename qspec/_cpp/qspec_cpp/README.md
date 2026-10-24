@@ -3,9 +3,22 @@ qspec_cpp
 
 This is the C++ shared library project for the [*qspec*](https://patmlr.github.io/qspec/) Python package. *qspec_cpp* uses CMake to create a .dll (Windows), .so (Linux) or .dylib (MacOS) file. See below for the compilation requirements.
 
+## Python wheels
+
+The Python wheels are built by GitHub Actions (`.github/workflows/wheels.yml`) using [cibuildwheel](https://cibuildwheel.pypa.io/) and [scikit-build-core](https://scikit-build-core.readthedocs.io/), for Windows, Linux and macOS on x64 and arm64.
+The library does not use the Python C API, so each wheel is tagged `py3-none-<platform>` and works with all Python 3 versions.
+Each wheel only contains the binary for its platform, installed into `qspec/_cpp/bin/`.
+
+On x86-64, CMake builds the library twice: `qspec_cpp` for all CPUs (x86-64-v2, SSE4.2) and `qspec_cpp_avx2` (x86-64-v3: AVX2, FMA, BMI), which is 1.5-2x faster for the master equation.
+When importing *qspec*, `qspec/_cpp/cpp.py` loads the baseline build, which checks the CPU (`cpu_supports_avx2()` in `src/Cpu.cpp`), and switches to the AVX2 build if it is supported.
+Set the environment variable `QSPEC_DISABLE_AVX2=1` to always use the baseline build.
+
+To build a wheel for the current machine locally, run `pip wheel . --no-deps -w dist` in the repository root.
+
 ## How to compile
 
 - Move the [Boost](https://www.boost.org/) (1.90.0), [Eigen](https://libeigen.gitlab.io/) (5.0.0) and [fmt](https://github.com/fmtlib/fmt) (12.1.0) libraries into `./src/_lib`.
+  If they are missing, CMake downloads them automatically (see `qspec_find_dependency` in `CMakeLists.txt`).
 
 
 ### Linux

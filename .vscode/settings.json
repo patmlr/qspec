@@ -14,4 +14,5 @@
     "cmake.useCMakePresets": "always",
     "cmake.configureOnOpen": false,
     "cmake.configureOnEdit": false,
+    "cmake.sourceDirectory": "${workspaceFolder}/qspec/_cpp/qspec_cpp",
 }

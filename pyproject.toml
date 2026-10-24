@@ -1,6 +1,6 @@
 [build-system]
-requires = ["setuptools>=81.0.0", "wheel"]
-build-backend = "setuptools.build_meta"
+requires = ["scikit-build-core>=0.11"]
+build-backend = "scikit_build_core.build"
 
 [project]
 name = "qspec"
@@ -21,6 +21,8 @@ classifiers = [
     "Intended Audience :: Science/Research",
     # "License :: OSI Approved :: MIT License",
     "Operating System :: Microsoft :: Windows",
+    "Operating System :: POSIX :: Linux",
+    "Operating System :: MacOS",
     "Programming Language :: C++",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3 :: Only",
@@ -40,17 +42,37 @@ download = "https://pypi.org/project/qspec/#files"
 source = "https://github.com/patmlr/qspec"
 tracker = "https://github.com/patmlr/qspec/issues"
 
-[tool.setuptools]
-include-package-data = false
-zip-safe = false
+[tool.scikit-build]
+minimum-version = "build-system.requires"
+cmake.source-dir = "qspec/_cpp/qspec_cpp"
+cmake.build-type = "Release"
+# The library is loaded via ctypes and does not use the Python C API,
+# so one wheel per platform (py3-none-<platform>) works for all Python 3 versions.
+wheel.py-api = "py3"
+wheel.packages = ["qspec"]
+# The C++ sources and locally built binaries are not needed in the wheel.
+# The library built by CMake is installed into qspec/_cpp/bin/ instead.
+wheel.exclude = ["qspec/_cpp/qspec_cpp/**"]
+sdist.exclude = [
+    "qspec/_cpp/qspec_cpp/build/",
+    ".github/",
+    ".vscode/",
+    "docs/",
+    "resources/",
+]
 
-[tool.setuptools.packages.find]
-where = ["."]
-include = ["qspec", "qspec.*"]
-exclude = ["qspec._cpp.qspec_cpp.src._lib*"]
+[tool.cibuildwheel]
+# The wheels are not Python-version-specific. cibuildwheel builds once on the oldest version
+# and only tests the same wheel on the newer versions.
+build = "cp312-* cp313-* cp314-*"
+skip = "*-musllinux_*"
+archs = ["native"]
+build-verbosity = 1
+test-sources = ["resources/qspec_test/smoke_test.py"]
+test-command = "python resources/qspec_test/smoke_test.py"
 
-[tool.setuptools.package-data]
-"qspec" = ["**/*.dll", "**/*.so", "**/*.dylib"]
+[tool.cibuildwheel.macos.environment]
+MACOSX_DEPLOYMENT_TARGET = "11.0"
 
 [tool.ruff]
 extend-exclude = [

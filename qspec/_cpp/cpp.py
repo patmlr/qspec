@@ -74,36 +74,41 @@ def _load_dll() -> ctypes.CDLL:
     plat = _get_platform()
     config = "Debug" if False else "Release"
 
-    dll_path = os.path.join(file_path, "qspec_cpp", "build")
-
     if plat == "windows":
-        dll_path = os.path.join(dll_path, f"windows-{arch}", config)
-        prefix = ""
-        suffix = ".dll"
+        build_dir = os.path.join(f"windows-{arch}", config)
+        prefix, suffix = "", ".dll"
 
     elif plat == "linux":
-        if arch == "arm64":
-            raise OSError(f"Python architecture {arch} not supported on Linux.")
-
-        dll_path = os.path.join(dll_path, f"linux-{arch}")
-        prefix = "lib"
-        suffix = ".so"
+        build_dir = f"linux-{arch}"
+        prefix, suffix = "lib", ".so"
 
     elif plat == "macos":
-            dll_path = os.path.join(dll_path, f"macosx-{arch}")
-            prefix = "lib"
-            suffix = ".dylib"
+        build_dir = f"macosx-{arch}"
+        prefix, suffix = "lib", ".dylib"
 
     else:
         raise OSError(f"Unsupported platform: {plat}")
 
     dll_name = f"{prefix}qspec_cpp{suffix}"
+    lib_dirs = [
+        os.path.join(file_path, "qspec_cpp", "build", build_dir),  # Local CMake build (CMakePresets.json).
+        os.path.join(file_path, "bin"),  # Installed from a wheel.
+    ]
+    lib_dir = next((d for d in lib_dirs if os.path.isfile(os.path.join(d, dll_name))), None)
+    if lib_dir is None:
+        raise OSError(f"Could not find {dll_name} for {plat}-{arch}. Searched: {lib_dirs}")
 
-    try:
-        return ctypes.CDLL(os.path.join(dll_path, dll_name))
-    except FileNotFoundError:
-        dll_path = os.path.join(file_path, "bin")
-        return ctypes.CDLL(os.path.join(dll_path, dll_name))
+    dll = ctypes.CDLL(os.path.join(lib_dir, dll_name))
+
+    # On x86-64, an AVX2 build of the library exists next to the baseline build. Load it instead if the CPU supports it,
+    # unless disabled with the environment variable QSPEC_DISABLE_AVX2=1.
+    avx2_path = os.path.join(lib_dir, f"{prefix}qspec_cpp_avx2{suffix}")
+    if os.path.isfile(avx2_path) and os.environ.get("QSPEC_DISABLE_AVX2", "") in {"", "0"}:
+        dll.cpu_supports_avx2.restype = ctypes.c_bool
+        if dll.cpu_supports_avx2():
+            return ctypes.CDLL(avx2_path)
+
+    return dll
 
 
 def set_argtypes(func: CFuncPtr, argtypes: tuple[Any, ...]) -> None:

@@ -1026,7 +1026,7 @@ void Atom::scattering_rate(double* results, std::vector<size_t>& k, std::vector<
 	std::iota(indexes.begin(), indexes.end(), 0);
 
 	// printf("qk: %.3f + %.3fi, %.3f + %.3fi, %.3f + %.3fi\n", qk.at(0).at(0)(0, 1).real(), qk.at(0).at(0)(0, 1).imag(), qk.at(0).at(0)(1, 1).real(), qk.at(0).at(0)(1, 1).imag(), qk.at(0).at(0)(2, 1).real(), qk.at(0).at(0)(2, 1).imag());
-	std::for_each(QSPEC_EXEC_PAR indexes.begin(), indexes.end(),
+	parallel_for_each(indexes.begin(), indexes.end(),
 		[this, results, rho, qk, k, i, f](size_t index)
 		{
 			size_t index_qk = index / rho.size();

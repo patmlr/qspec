@@ -5,6 +5,7 @@
 #include "Matter.h"
 #include "Interaction.h"
 #include "King.h"
+#include "Cpu.h"
 
 #include <complex>
 
@@ -218,6 +219,9 @@ extern "C" {
     QSPEC_API void multivariatenormal_rvs(void* mvn, double* ret);
     QSPEC_API void gen_collinear(double* x, double* mean, double* cov, size_t* n, size_t size, size_t dim,
         size_t* n_max, bool user_seed, size_t seed, bool report);
+
+    // CPU
+    QSPEC_API bool cpu_supports_avx2();
 
 #ifdef __cplusplus
 };

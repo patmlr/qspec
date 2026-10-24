@@ -1,0 +1,64 @@
+# Builds one py3-none-<platform> wheel per OS and architecture (see [tool.cibuildwheel] in pyproject.toml),
+# plus the sdist. Publishing a GitHub release uploads everything to PyPI.
+name: Build wheels
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+  release:
+    types: [published]
+
+jobs:
+  build_wheels:
+    name: Wheel ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - windows-latest    # Windows x64
+          - windows-11-arm    # Windows arm64
+          - ubuntu-latest     # Linux x86_64 (manylinux)
+          - ubuntu-24.04-arm  # Linux aarch64 (manylinux)
+          - macos-15-intel    # macOS x86_64
+          - macos-15          # macOS arm64
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: pypa/cibuildwheel@v4.3.4
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: wheels-${{ matrix.os }}
+          path: wheelhouse/*.whl
+
+  build_sdist:
+    name: Source distribution
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - run: pipx run build --sdist
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: sdist
+          path: dist/*.tar.gz
+
+  publish:
+    name: Publish to PyPI
+    needs: [build_wheels, build_sdist]
+    if: github.event_name == 'release' && github.event.action == 'published'
+    runs-on: ubuntu-latest
+    environment: pypi
+    permissions:
+      id-token: write  # PyPI trusted publishing, no API token needed.
+    steps:
+      - uses: actions/download-artifact@v8
+        with:
+          path: dist
+          merge-multiple: true
+
+      - uses: pypa/gh-action-pypi-publish@release/v1
