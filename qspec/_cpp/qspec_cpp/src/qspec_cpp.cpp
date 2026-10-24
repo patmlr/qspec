@@ -1192,3 +1192,9 @@ void gen_collinear(double* x, double* mean, double* cov, size_t* n, size_t size,
     *n = res.get_n_accepted();
     *n_max = res.get_n_samples();
 }
+
+// CPU
+bool cpu_supports_avx2()
+{
+    return supports_x86_64_v3();
+}

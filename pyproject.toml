@@ -1,16 +1,15 @@
 [build-system]
-requires = ["setuptools>=81.0.0", "wheel"]
-build-backend = "setuptools.build_meta"
+requires = ["scikit-build-core>=0.11", "setuptools-scm>=8"]
+build-backend = "scikit_build_core.build"
 
 [project]
 name = "qspec"
-version = "0.5.0"
+dynamic = ["version"]
 description = "Physics toolbox for laser spectroscopy"
 readme = "README.md"
 requires-python = ">=3.12"
 license = "MIT"
 license-files = ["LICENSE"]
-# license = {file = "LICENSE"}
 
 keywords = ["physics", "simulation", "data analysis", "atomic structure", "laser spectroscopy", "laser cooling", "coherent interaction", "quantum computing"]
 authors = [
@@ -19,8 +18,9 @@ authors = [
 classifiers = [
     "Development Status :: 4 - Beta",
     "Intended Audience :: Science/Research",
-    # "License :: OSI Approved :: MIT License",
     "Operating System :: Microsoft :: Windows",
+    "Operating System :: POSIX :: Linux",
+    "Operating System :: MacOS",
     "Programming Language :: C++",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3 :: Only",
@@ -40,17 +40,67 @@ download = "https://pypi.org/project/qspec/#files"
 source = "https://github.com/patmlr/qspec"
 tracker = "https://github.com/patmlr/qspec/issues"
 
-[tool.setuptools]
-include-package-data = false
-zip-safe = false
+[tool.scikit-build]
+minimum-version = "build-system.requires"
+metadata.version.provider = "scikit_build_core.metadata.setuptools_scm"
+cmake.source-dir = "qspec/_cpp/qspec_cpp"
+cmake.build-type = "Release"
+wheel.cmake = false
+wheel.packages = ["qspec"]
+wheel.exclude = [
+    "qspec/_cpp/qspec_cpp/**",
+    "!qspec/_cpp/qspec_cpp/build/windows-*/Release/qspec_cpp*.dll",
+    "!qspec/_cpp/qspec_cpp/build/linux-*/libqspec_cpp*.so",
+    "!qspec/_cpp/qspec_cpp/build/macosx-*/libqspec_cpp*.dylib",
+]
+sdist.exclude = [
+    ".github/",
+    ".vscode/",
+    "docs/",
+    "resources/",
+]
 
-[tool.setuptools.packages.find]
-where = ["."]
-include = ["qspec", "qspec.*"]
-exclude = ["qspec._cpp.qspec_cpp.src._lib*"]
+[[tool.scikit-build.overrides]]
+if.state = "sdist"
+inherit.sdist.exclude = "append"
+sdist.exclude = ["qspec/_cpp/qspec_cpp/build/"]
 
-[tool.setuptools.package-data]
-"qspec" = ["**/*.dll", "**/*.so", "**/*.dylib"]
+[[tool.scikit-build.overrides]]
+# Compile the library with CMake in cibuildwheel (PyPI wheels), when installing from the sdist,
+# on platforms without committed binaries (macOS, Linux aarch64),
+# or when the environment variable QSPEC_BUILD_CPP=1 is set.
+if.any.env.CIBUILDWHEEL = true
+if.any.env.QSPEC_BUILD_CPP = true
+if.any.from-sdist = true
+if.any.platform-system = "^darwin"
+if.any.platform-machine = "^aarch64$"
+wheel.cmake = true
+wheel.py-api = "py3"
+wheel.exclude = ["qspec/_cpp/qspec_cpp/**"]
+messages.after-failure = """
+{bold.red}Compiling the qspec C++ library failed.{normal}
+It requires CMake >= 3.22, a C++23 compiler (GCC >= 13, Clang >= 17 or MSVC 2026) and internet access
+to download Boost, Eigen and fmt. See qspec/_cpp/qspec_cpp/README.md.
+"""
+
+[tool.cibuildwheel]
+build = "cp312-* cp313-* cp314-*"
+skip = "*-musllinux_*"
+archs = ["native"]
+build-verbosity = 1
+test-sources = ["resources/qspec_test/smoke_test.py"]
+test-command = "python resources/qspec_test/smoke_test.py"
+
+[tool.cibuildwheel.linux]
+environment-pass = ["SETUPTOOLS_SCM_PRETEND_VERSION"]
+
+[tool.cibuildwheel.macos.environment]
+MACOSX_DEPLOYMENT_TARGET = "11.0"
+
+[tool.setuptools_scm]
+# The version is derived from the latest git tag vX.Y.Z (e.g. 0.5.1.dev3+g1f15b85 three commits after v0.5.0).
+# Releases set it explicitly, see .github/workflows/wheels.yml. The fallback applies without git metadata.
+fallback_version = "0.0.0"
 
 [tool.ruff]
 extend-exclude = [

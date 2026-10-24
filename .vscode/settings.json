@@ -14,4 +14,18 @@
     "cmake.useCMakePresets": "always",
     "cmake.configureOnOpen": false,
     "cmake.configureOnEdit": false,
+    "cmake.sourceDirectory": "${workspaceFolder}/qspec/_cpp/qspec_cpp",
+
+    // IntelliSense uses the configuration of CMake Tools (after "CMake: Configure").
+    // The defaults below are the fallback. Without them, IntelliSense searches all of ${workspaceFolder}/**
+    // (including every subdirectory of Boost) for headers and reports false errors.
+    "C_Cpp.default.configurationProvider": "ms-vscode.cmake-tools",
+    "C_Cpp.default.cppStandard": "c++23",
+    "C_Cpp.default.includePath": [
+        "${workspaceFolder}/qspec/_cpp/qspec_cpp/src",
+        "${workspaceFolder}/qspec/_cpp/qspec_cpp/src/_lib/boost_1_90_0",
+        "${workspaceFolder}/qspec/_cpp/qspec_cpp/src/_lib/eigen-5.0.0",
+        "${workspaceFolder}/qspec/_cpp/qspec_cpp/src/_lib/fmt-main/include",
+    ],
+    "C_Cpp.default.defines": ["QSPEC_EXPORTS"],
 }

@@ -6,11 +6,12 @@
 #include <vector>
 #include <string>
 #include <random>
-#include <execution>
 #include <Eigen/Dense>
 
 #define FMT_HEADER_ONLY
 #include <fmt/core.h>
+
+#include "Parallel.h"
 
 using namespace Eigen;
 

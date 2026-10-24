@@ -1153,7 +1153,7 @@ std::vector<std::vector<VectorXd>> Interaction::rates(
 	std::atomic<size_t> progress{0};
 	std::thread worker([this, &t, &x0, &delta, &v, &analytic, &w0, &results, &progress, &n_vec]
 	{
-		std::for_each(std::execution::par, n_vec.begin(), n_vec.end(),
+		parallel_for_each(n_vec.begin(), n_vec.end(),
 			[this, &t, &x0, &delta, &v, &analytic, &w0, &results, &progress](size_t i)
 			{
 				thread_local VectorXd w;
@@ -1244,7 +1244,7 @@ std::vector<std::vector<VectorXcd>> Interaction::schroedinger(
 	std::atomic<size_t> progress{0};
 	std::thread worker([this, &t, &x0, &delta, &v, &w0, &results, &progress, &n_vec]
 	{
-		std::for_each(std::execution::par, n_vec.begin(), n_vec.end(),
+		parallel_for_each(n_vec.begin(), n_vec.end(),
 			[this, &t, &x0, &delta, &v, &w0, &results, &progress](size_t i)
 			{
 				thread_local VectorXd w;
@@ -1344,7 +1344,7 @@ std::vector<std::vector<MatrixXcd>> Interaction::master(
 	std::atomic<size_t> progress{0};
 	std::thread worker([this, &t, &x0, &delta, &v, &w0, &L0, &L1, &results, &progress, &n_vec]
 	{
-		std::for_each(std::execution::par, n_vec.begin(), n_vec.end(),
+		parallel_for_each(n_vec.begin(), n_vec.end(),
 			[this, &t, &x0, &delta, &v, &w0, &L0, &L1, &results, &progress](size_t i)
 			{
 				thread_local VectorXd w;
@@ -1464,7 +1464,7 @@ std::vector<std::vector<VectorXcd>> Interaction::mc_master(
 	std::atomic<size_t> progress{0};
 	std::thread worker([this, &x0, &delta, &v, dynamics, &c_i, &c_j, &c_a, &t, &results, &progress, &n_vec]
 	{
-		std::for_each(std::execution::par, n_vec.begin(), n_vec.end(),
+		parallel_for_each(n_vec.begin(), n_vec.end(),
 			[this, &x0, &delta, &v, dynamics, &c_i, &c_j, &c_a, &t, &results, &progress](size_t n)
 			{
 				thread_local std::random_device rd;
@@ -1564,7 +1564,7 @@ std::vector<std::vector<VectorXcd>> Interaction::mc_master(
 						r = d(gen);
 					}
 				}
-				if (dynamics) v.at(n) += v_temp;
+				if (dynamics) v.at(n) = v_temp;
 				progress.fetch_add(1, std::memory_order_relaxed);
 			}
 		);

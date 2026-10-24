@@ -267,7 +267,7 @@ Vector3d* Laser::get_k()
 
 void Laser::set_k(Vector3d _k)
 {
-	k = _k / _k.norm() * freq / sc::c;
+	k = _k / _k.norm();
 }
 
 Vector3d Laser::get_k_si()

@@ -1,0 +1,145 @@
+# Builds one py3-none-<platform> wheel per OS and architecture (see [tool.cibuildwheel] in pyproject.toml),
+# plus the sdist. Pushes and pull requests only build and test.
+#
+# To release, run this workflow manually on main (Actions > Build wheels > Run workflow) and choose the
+# semantic version bump. The new version is computed from the latest vX.Y.Z tag, everything is built with it
+# and uploaded to PyPI, and finally the tag and a GitHub release with generated notes are created.
+name: Build wheels
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      release:
+        description: Version bump (none only builds)
+        type: choice
+        options: [none, patch, minor, major]
+        default: none
+
+concurrency:
+  group: ${{ github.workflow }}-${{ (inputs.release && inputs.release != 'none') && 'release' || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  version:
+    name: Determine version
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.bump.outputs.version }}
+    steps:
+      - uses: actions/checkout@v6
+        if: inputs.release && inputs.release != 'none'
+        with:
+          fetch-depth: 0  # All tags.
+
+      - id: bump
+        if: inputs.release && inputs.release != 'none'
+        env:
+          BUMP: ${{ inputs.release }}
+        run: |
+          if [ "$GITHUB_REF" != "refs/heads/main" ]; then
+            echo "::error::Releases can only be made from main."
+            exit 1
+          fi
+          latest=$(git tag --list 'v[0-9]*.[0-9]*.[0-9]*' --sort=-v:refname | head -n 1)
+          if [ -z "$latest" ]; then
+            echo "::error::No vX.Y.Z tag found. Tag the last release first, e.g. git tag v0.5.0 <commit> && git push origin v0.5.0"
+            exit 1
+          fi
+          IFS=. read -r major minor patch <<< "${latest#v}"
+          case "$BUMP" in
+            major) version="$((major + 1)).0.0" ;;
+            minor) version="$major.$((minor + 1)).0" ;;
+            patch) version="$major.$minor.$((patch + 1))" ;;
+          esac
+          echo "Releasing $latest -> v$version"
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+
+  build_wheels:
+    name: Wheel ${{ matrix.os }}
+    needs: version
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - windows-latest    # Windows x64
+          - windows-11-arm    # Windows arm64
+          - ubuntu-latest     # Linux x86_64 (manylinux)
+          - ubuntu-24.04-arm  # Linux aarch64 (manylinux)
+          - macos-15-intel    # macOS x86_64
+          - macos-15          # macOS arm64
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Set release version
+        if: needs.version.outputs.version
+        shell: bash
+        run: echo "SETUPTOOLS_SCM_PRETEND_VERSION=${{ needs.version.outputs.version }}" >> "$GITHUB_ENV"
+
+      - uses: pypa/cibuildwheel@v4.3.4
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: wheels-${{ matrix.os }}
+          path: wheelhouse/*.whl
+
+  build_sdist:
+    name: Source distribution
+    needs: version
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Set release version
+        if: needs.version.outputs.version
+        run: echo "SETUPTOOLS_SCM_PRETEND_VERSION=${{ needs.version.outputs.version }}" >> "$GITHUB_ENV"
+
+      - run: pipx run build --sdist
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: sdist
+          path: dist/*.tar.gz
+
+  publish:
+    name: Publish to PyPI
+    needs: [version, build_wheels, build_sdist]
+    if: needs.version.outputs.version
+    runs-on: ubuntu-latest
+    environment:
+      name: pypi
+      url: https://pypi.org/project/qspec/${{ needs.version.outputs.version }}/
+    permissions:
+      id-token: write  # PyPI trusted publishing, no API token needed.
+    steps:
+      - uses: actions/download-artifact@v8
+        with:
+          path: dist
+          merge-multiple: true
+
+      - uses: pypa/gh-action-pypi-publish@release/v1
+
+  github_release:
+    name: Tag and GitHub release
+    needs: [version, publish]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write  # Create the tag and the release.
+    steps:
+      - uses: actions/download-artifact@v8
+        with:
+          path: dist
+          merge-multiple: true
+
+      - env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: v${{ needs.version.outputs.version }}
+        run: |
+          gh release create "$TAG" dist/* \
+            --repo "$GITHUB_REPOSITORY" \
+            --target "$GITHUB_SHA" \
+            --title "$TAG" \
+            --generate-notes

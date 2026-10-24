@@ -10,7 +10,7 @@
 
 #if defined(EIGEN_VECTORIZE_AVX512)
 #pragma message("Eigen: AVX-512 enabled")
-#elif defined(EIGEN_VECTORIZE_AVX2)//
+#elif defined(EIGEN_VECTORIZE_AVX2)
 #pragma message("Eigen: AVX2 enabled")
 #elif defined(EIGEN_VECTORIZE_AVX)
 #pragma message("Eigen: AVX enabled")
@@ -18,6 +18,8 @@
 #pragma message("Eigen: SSE4.2 enabled")
 #elif defined(EIGEN_VECTORIZE_SSE2)
 #pragma message("Eigen: SSE2 enabled")
+#elif defined(EIGEN_VECTORIZE_NEON)
+#pragma message("Eigen: NEON enabled")
 #else
 #pragma message("Eigen: NO SIMD")
 #endif
@@ -31,7 +33,6 @@
 #include <set>
 #include <queue>
 #include <random>
-#include <execution>
 #include <iostream>
 
 #define FMT_HEADER_ONLY
