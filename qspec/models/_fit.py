@@ -75,14 +75,43 @@ def _sqrt_zero_free(x: array_like) -> ndarray[floating]:
 
 
 def sigma_poisson(x: array_like, y: array_like, y_model: array_like, *params: Any) -> ndarray[floating]:
+    r"""
+    Poisson uncertainties $\sqrt{y_\mathrm{model}}$ estimated from the model values.
+    Model values smaller than or equal to $1$ get an uncertainty of $1$.
+    Can be passed as `sigma_y` to [`qspec.models.fit`].
+
+    :param x: The x data (unused).
+    :param y: The y data (unused).
+    :param y_model: The model values at the x data.
+    :param params: The model parameters (unused).
+    :returns: (sigma_y) The Poisson uncertainties.
+    """
     return _sqrt_zero_free(y_model)
 
 
 def residuals(model: _base.Model, x: ndarray, y: ndarray) -> ndarray:
+    """
+    The residuals $y - f(x)$ of a model with its current parameter values `model.vals`.
+
+    :param model: The `Model`.
+    :param x: The x data.
+    :param y: The y data.
+    :returns: (res) The residuals.
+    """
     return y - model(x, *model.vals)
 
 
 def reduced_chi2(model: _base.Model, x: ndarray, y: ndarray, sigma_y: ndarray) -> float:
+    r"""
+    The reduced $\chi^2$ of a model with its current parameter values `model.vals`.
+    The number of degrees of freedom is the number of data points minus the number of free parameters.
+
+    :param model: The `Model`.
+    :param x: The x data.
+    :param y: The y data.
+    :param sigma_y: The uncertainties of the y data.
+    :returns: (red_chi2) The reduced $\chi^2$.
+    """
     fixed, _bounds = model.fit_prepare()
     n_free = sum(int(not f) for f in fixed)
     return np.sum(residuals(model, x, y) ** 2 / sigma_y**2) / (y.size - n_free)

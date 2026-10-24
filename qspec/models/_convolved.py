@@ -24,8 +24,8 @@ class Convolved(Model):
         """
         A generic numerical convolution model.
 
-        :param model_0: The first model to convolve.
-        :param model_0: The second model to convolve.
+        :param model: The first model to convolve.
+        :param model_1: The second model to convolve.
         """
         super().__init__(model=model)
         self.type = "Convolved"

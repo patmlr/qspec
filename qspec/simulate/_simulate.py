@@ -617,7 +617,9 @@ class Geometry:
     def plot(self, show: bool = True) -> tuple[Figure, Axes3D]:
         """
         Shows a 3d plot of the angular range covered by the geometry object.
-        :returns: The axes object.
+
+        :param show: Whether to show the plot.
+        :returns: (fig, ax) The figure and the axes object.
         """
 
         fig = plt.figure(num=1, figsize=(8, 8), clear=True)
@@ -776,6 +778,12 @@ class ScatteringRate:
         self.polarization.def_q_axis(self.e_r_b)
 
     def set_laser(self, laser: Laser | None = None) -> None:
+        """
+        Set the laser and update the saturation parameter and the polarization.
+
+        :param laser: The incident laser beam. If `None`, a laser with the transition frequency, an intensity of $1$
+         and the default polarization is used.
+        """
         if laser is None:
             laser = Laser(self.freq_0, intensity=1.0, polarization=Polarization())
         self.laser = laser

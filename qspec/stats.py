@@ -323,6 +323,14 @@ def lognormal(
 
 
 def mode_lognormal(x: array_like, bins: array_like = 100) -> float:
+    """
+    Estimate the mode of a sample by fitting a lognormal distribution to its histogram.
+    The histogram and the fitted distribution are plotted.
+
+    :param x: The sample data.
+    :param bins: The number of bins or the bin edges of the histogram, see `numpy.histogram`.
+    :returns: (mode) The mode of the lognormal distribution.
+    """
     y, edges = np.histogram(x, bins=bins)
     delta = np.mean(edges[1:] - edges[:-1])
     x = edges[:-1] + 0.5 * delta

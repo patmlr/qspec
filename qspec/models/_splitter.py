@@ -230,6 +230,11 @@ class Splitter(Model):
             self.vals[i] = intensity
 
     def racah_fixed(self, fix: fix_type) -> None:
+        """
+        Set the fix state of all intensity parameters.
+
+        :param fix: The new fix state of the intensity parameters.
+        """
         for i in self.racah_indices:
             self.fixes[i] = fix
 
@@ -764,6 +769,9 @@ class HyperfineZeeman(Splitter):
         :param q: The polarization vector $\vec{q}$.
         :param rho_ml: The lower state population. Must be an Iterable of arrays.
          If `None`, the default list is given by `rho_ml = [np.ones(2 * f + 1) for f in f_l]`.
+        :param rho_as_par: Whether to parameterize the transition intensities by the lower state populations
+         `rho(F, m)` and the polarization components `q(-1)`, `q(0)` and `q(1)` (`True`)
+         instead of one intensity parameter per transition (`False`).
         :param scale_par_with_shift: Choose a parameter that is scaled with the Zeeman shift
          such as the Lorentz width `"Gamma"`.
         :param linear: Whether the Zeeman shift is linear (`True`) or nonlinear (`False`). If nonlinear,

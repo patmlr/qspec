@@ -57,8 +57,7 @@ def generate_collinear_points_cpp(
     :param mean: The data vectors $\vec{\mu}_i$. Must have shape `(k, n)`, where `k` is the number of data points
      and `n` is the number of dimensions of each point.
     :param cov: The covariance matrices $\mathbf{\Sigma}_i$ of the data vectors. Must have shape `(k, n, n)`.
-     Use <a href="{{ '/doc/functions/analyze/covariance_matrix.html' | relative_url }}">
-    `covariance_matrix`</a> to construct covariance matrices.
+     Use [`covariance_matrix`] to construct covariance matrices.
     :param n_samples: The number of samples generated for each data point.
      If `None` and `method == 'cpp"`, samples are generated until `n_accepted` samples get accepted.
     :param n_accepted: The number of samples to be accepted for each data point.

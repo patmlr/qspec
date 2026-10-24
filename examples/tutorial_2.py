@@ -6,6 +6,7 @@ Tutorial 2 from the website: Calculation of hyperfine structure and Zeeman shift
 """
 
 import matplotlib.pyplot as plt
+# docs: hfs-0
 import numpy as np
 
 import qspec as qs
@@ -16,13 +17,14 @@ g_i = -1.09316 / I  # The nuclear g-factor [1]
 g_j = qs.lande_j(s=0.5, l=2, j=2.5)
 # The nuclear g-factor, calculated from the nuclear magnetic moment
 
-A, B = 2.1743, 49.11  # (MHz), The hyperfine-structure constants [2]
+A, B, C = 2.1743, 49.11, 0.  # (MHz), The hyperfine-structure constants [2]
 b_field = np.linspace(0., 4e-3, 4000)  # (T), The magnetic flux density
 
 e_eig, m_list, fm_list, mi_mj_list \
-    = qs.hyper_zeeman_num(I, J, [A, B], g_i, g_j, b_field)
+    = qs.hyper_zeeman_num(I, J, [A, B, C], g_i, g_j, b_field)
 # The eigenvalues of the HFS + Zeeman-effect Hamiltonian
-# and the lists of m_F, F and (m_I, m_J) quantum numbers.
+# and the lists of m_F, F and (m_I, m_J) quantum numbers
+# docs: end
 
 
 """ Plot """

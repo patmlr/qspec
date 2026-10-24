@@ -5,6 +5,7 @@ examples.tutorial_1
 Tutorial 1 from the website: Getting started.
 """
 
+# docs: start-0
 import qspec as qs
 # This imports the analyze, algebra,
 # physics, stats, and tools modules
@@ -34,3 +35,4 @@ print(f"f_laser: {f_laser} MHz")
 df_atom = qs.doppler_el_d1(f_laser, qs.pi, U, q, m)  # (MHz / V)
 # >>> +12.84 MHz / V
 print(f"df_atom: {df_atom} MHz")
+# docs: end

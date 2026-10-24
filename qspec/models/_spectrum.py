@@ -42,7 +42,7 @@ def fwhm_voigt(gamma: array_like, sigma: array_like) -> ndarray:
     $$
 
     :param gamma: The FWHM of the Lorentzian $\Gamma$ (arb. unit).
-    :param sigma: The standard deviation of the Gaussian $\sigma$ ([`gamma`]).
+    :param sigma: The standard deviation of the Gaussian $\sigma$ (unit of `gamma`).
     :returns: The FWHM $\delta\nu$ of a Voigt profile.
     """
     gamma, sigma = np.asarray(gamma, dtype=float), np.asarray(sigma, dtype=float)
@@ -64,7 +64,7 @@ def fwhm_voigt_d(gamma: array_like, gamma_d: array_like, sigma: array_like, sigm
 
     :param gamma: The FWHM of the Lorentzian $\Gamma$ (arb. unit).
     :param gamma_d: The uncertainty of `gamma` $\Delta\Gamma$.
-    :param sigma: The standard deviation of the Gaussian $\sigma$ ([`gamma`]).
+    :param sigma: The standard deviation of the Gaussian $\sigma$ (unit of `gamma`).
     :param sigma_d: The uncertainty of `sigma` $\Delta\sigma$.
     :returns: The uncertainty of the FWHM of a Voigt profile $\Delta\delta\nu$.
     """

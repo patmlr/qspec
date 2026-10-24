@@ -500,7 +500,7 @@ def doppler(f: array_like, v: array_like, alpha: array_like, return_frame: str =
     :param alpha: The angle $\alpha$ between the velocity- and the light-vector in the laboratory frame (rad).
     :param return_frame: The coordinate system for which the frequency is returned. Can be either `"atom"` or `"lab"`.
     :returns: (f_doppler) the Doppler-shifted frequency $f^\prime$ in either the rest frame of the atom
-     or the laboratory frame ([`f`]).
+     or the laboratory frame (unit of `f`).
     :raises ValueError: `return_frame` must be either `"atom"` or `"lab"`.
     """
     f, alpha = np.asarray(f, dtype=float), np.asarray(alpha, dtype=float)
@@ -527,7 +527,7 @@ def doppler_d1(f: array_like, v: array_like, alpha: array_like, return_frame: st
     :param alpha: The angle $\alpha$ between the velocity- and the light-vector in the laboratory frame (rad).
     :param return_frame: The coordinate system for which the frequency is returned. Can be either `"atom"` or `"lab"`.
     :returns: (df_dv) the first derivative $\partial f^\prime / \partial v$ of the Doppler-shifted frequency
-     $f^\prime$ with respect to `v` in either the rest frame of the atom or the laboratory frame ([`f`] s/m).
+     $f^\prime$ with respect to `v` in either the rest frame of the atom or the laboratory frame (`f` s/m).
     :raises ValueError: `return_frame` must be either `"atom"` or `"lab"`.
     """
     f = np.asarray(f, dtype=float)
@@ -567,7 +567,7 @@ def doppler_e_d1(
     :param relativistic: The calculation is performed either relativistically (`True`) or classically (`False`).
      The default is `True`.
     :returns: (df_dE) The first derivative $\partial f^\prime / \partial E$ of the Doppler-shifted frequency
-     $f^\prime$ with respect to `e` in either the rest frame of the atom or the laboratory frame ([`f`] / eV).
+     $f^\prime$ with respect to `e` in either the rest frame of the atom or the laboratory frame (`f` / eV).
     :raises ValueError: `return_frame` must be either `"atom"` or `"lab"`.
     """
     v = v_e(e, m, v0=v0, relativistic=relativistic)
@@ -599,7 +599,7 @@ def doppler_el_d1(
     :param relativistic: The calculation is performed either relativistically (`True`) or classically (`False`).
      The default is `True`.
     :returns: (df_dU) The first derivative $\partial f^\prime / \partial U$ of the Doppler-shifted frequency
-     $f^\prime$ with respect to `u` in either the rest frame of the atom or the laboratory frame ([`f`] / V).
+     $f^\prime$ with respect to `u` in either the rest frame of the atom or the laboratory frame (`f` / V).
     :raises ValueError: `return_frame` must be either `"atom"` or `"lab"`.
     """
     v = v_el(u, q, m, v0=v0, relativistic=relativistic)
@@ -618,7 +618,7 @@ def inverse_doppler(
     Specify `mode` to choose the desired behavior.
 
     :param f_atom: The frequency of light $f_\mathrm{atom}$ in the atom's rest frame (arb. units).
-    :param f_lab: The frequency of light $f_\mathrm{lab}$ in the laboratory frame ([`f_atom`]).
+    :param f_lab: The frequency of light $f_\mathrm{lab}$ in the laboratory frame (unit of `f_atom`).
     :param alpha: The angle $\alpha$ between the velocity- and the light-vector in the laboratory frame (rad).
     :param mode: The mode how to handle `nan` values and ambiguous velocities. Available options are:
     <ul>
@@ -704,7 +704,7 @@ def inverse_doppler_d1(
     Specify `mode` to choose the desired behavior.
 
     :param f_atom: The frequency of light $f_\mathrm{atom}$ in the atom's rest frame (arb. units).
-    :param f_lab: The frequency of light $f_\mathrm{lab}$ in the laboratory frame ([`f_atom`]).
+    :param f_lab: The frequency of light $f_\mathrm{lab}$ in the laboratory frame (unit of `f_atom`).
     :param alpha: The angle $\alpha$ between the velocity- and the light-vector in the laboratory frame (rad).
     :param mode: The mode how to handle `nan` values and ambiguous velocities. Available options are:
     <ul>
@@ -1033,7 +1033,7 @@ def hyperfine(i: scalar, j: scalar, f: scalar, hyper_const: array_like = 0.0) ->
      $B = eQ_I (\partial^2 V_J / \partial z^2)$ and $C = \Omega_I T_J^{(3)}$
      of the magnetic dipole, electric quadrupole and magnetic octupole order, respectively.
      If a scalar is given, only the $A$ constant is used (MHz if `as_freq` else eV).
-    :returns: (dnu_hfs) The hyperfine structure shift $\Delta_\mathrm{hfs}$ ([`a_hyper`]).
+    :returns: (dnu_hfs) The hyperfine structure shift $\Delta_\mathrm{hfs}$ (unit of `a_hyper`).
     """
     a_hyper, b_hyper, c_hyper = cast_hyper_const(hyper_const)
 
@@ -1839,17 +1839,17 @@ def delta_r2(
     \end{aligned}$$
 
     :param r: The Barrett radius $R$ of the first isotope (arb. units).
-    :param r_d: The uncertainty of the Barrett radius $\Delta R$ of the first isotope ([`r`]).
-    :param r_ref: The Barrett radius $R_\mathrm{ref}$ of the second isotope ([`r`]).
-    :param r_ref_d: The uncertainty of the Barrett radius $\Delta R_\mathrm{ref}$ of the second isotope ([`r`]).
+    :param r_d: The uncertainty of the Barrett radius $\Delta R$ of the first isotope (unit of `r`).
+    :param r_ref: The Barrett radius $R_\mathrm{ref}$ of the second isotope (unit of `r`).
+    :param r_ref_d: The uncertainty of the Barrett radius $\Delta R_\mathrm{ref}$ of the second isotope (unit of `r`).
     :param dr: The difference between the Barrett radii $\delta R = R - R_\mathrm{ref}$
-     of the first and second isotope ([`r`]).
+     of the first and second isotope (unit of `r`).
     :param dr_d: The uncertainty of the difference between the Barrett radii $\Delta\delta R$
-     of the first and second isotope ([`r`]).
+     of the first and second isotope (unit of `r`).
     :param v2: The shape factor $V_2$ of the first isotope.
     :param v2_ref: The shape factor $V_{2,\mathrm{ref}}$ of the second isotope.
     :returns: (dr2, dr2_d) The difference of the mean-square nuclear charge radius between two isotopes
-     $\delta\!\langle r^2\rangle$ and its uncertainty $\Delta\delta\!\langle r^2\rangle$ ([`r ** 2`]).
+     $\delta\!\langle r^2\rangle$ and its uncertainty $\Delta\delta\!\langle r^2\rangle$ (unit of `r ** 2`).
     """
     r, r_d = np.asarray(r, dtype=float), np.asarray(r_d, dtype=float)
     r_ref, r_ref_d = np.asarray(r_ref, dtype=float), np.asarray(r_ref_d, dtype=float)
@@ -1911,17 +1911,17 @@ def delta_r4(
     for the mean-square nuclear charge radius.
 
     :param r: The Barrett radius $R$ of the first isotope (arb. units).
-    :param r_d: The uncertainty of the Barrett radius $\Delta R$ of the first isotope ([`r`]).
-    :param r_ref: The Barrett radius $R_\mathrm{ref}$ of the second isotope ([`r`]).
-    :param r_ref_d: The uncertainty of the Barrett radius $\Delta R_\mathrm{ref}$ of the second isotope ([`r`]).
+    :param r_d: The uncertainty of the Barrett radius $\Delta R$ of the first isotope (unit of `r`).
+    :param r_ref: The Barrett radius $R_\mathrm{ref}$ of the second isotope (unit of `r`).
+    :param r_ref_d: The uncertainty of the Barrett radius $\Delta R_\mathrm{ref}$ of the second isotope (unit of `r`).
     :param dr: The difference between the Barrett radii $\delta R = R - R_\mathrm{ref}$
-     of the first and second isotope ([`r`]).
+     of the first and second isotope (unit of `r`).
     :param dr_d: The uncertainty of the difference between the Barrett radii $\Delta\delta R$
-     of the first and second isotope ([`r`]).
+     of the first and second isotope (unit of `r`).
     :param v4: The shape factor $V_4$ of the first isotope.
     :param v4_ref: The shape factor $V_{4,\mathrm{ref}}$ of the second isotope.
     :returns: (dr4, dr4_d) The difference of the mean-quartic nuclear charge radius between two isotopes
-     $\delta\!\langle r^4\rangle$ and its uncertainty $\Delta\delta\!\langle r^4\rangle$ ([`r ** 4`]).
+     $\delta\!\langle r^4\rangle$ and its uncertainty $\Delta\delta\!\langle r^4\rangle$ (unit of `r ** 4`).
     """
     r, r_d = np.asarray(r, dtype=float), np.asarray(r_d, dtype=float)
     r_ref, r_ref_d = np.asarray(r_ref, dtype=float), np.asarray(r_ref_d, dtype=float)
@@ -1989,17 +1989,17 @@ def delta_r6(
     for the mean-quartic nuclear charge radius.
 
     :param r: The Barrett radius $R$ of the first isotope (arb. units).
-    :param r_d: The uncertainty of the Barrett radius $\Delta R$ of the first isotope ([`r`]).
-    :param r_ref: The Barrett radius $R_\mathrm{ref}$ of the second isotope ([`r`]).
-    :param r_ref_d: The uncertainty of the Barrett radius $\Delta R_\mathrm{ref}$ of the second isotope ([`r`]).
+    :param r_d: The uncertainty of the Barrett radius $\Delta R$ of the first isotope (unit of `r`).
+    :param r_ref: The Barrett radius $R_\mathrm{ref}$ of the second isotope (unit of `r`).
+    :param r_ref_d: The uncertainty of the Barrett radius $\Delta R_\mathrm{ref}$ of the second isotope (unit of `r`).
     :param dr: The difference between the Barrett radii $\delta R = R - R_\mathrm{ref}$
-     of the first and second isotope ([`r`]).
+     of the first and second isotope (unit of `r`).
     :param dr_d: The uncertainty of the difference between the Barrett radii $\Delta\delta R$
-     of the first and second isotope ([`r`]).
+     of the first and second isotope (unit of `r`).
     :param v6: The shape factor $V_6$ of the first isotope.
     :param v6_ref: The shape factor $V_{6,\mathrm{ref}}$ of the second isotope.
     :returns: (dr6, dr6_d) The difference of the mean-sextic nuclear charge radius between two isotopes
-     $\delta\!\langle r^6\rangle$ and its uncertainty $\Delta\delta\!\langle r^6\rangle$ ([`r**6`]).
+     $\delta\!\langle r^6\rangle$ and its uncertainty $\Delta\delta\!\langle r^6\rangle$ (unit of `r**6`).
     """
     r, r_d = np.asarray(r, dtype=float), np.asarray(r_d, dtype=float)
     r_ref, r_ref_d = np.asarray(r_ref, dtype=float), np.asarray(r_ref_d, dtype=float)
@@ -2066,23 +2066,23 @@ def lambda_r(
     `delta_r2`, `delta_r4` and `delta_r6`.
 
     :param r: The Barrett radius $R$ of the first isotope (arb. units).
-    :param r_d: The uncertainty of the Barrett radius $\Delta R$ of the first isotope ([`r`]).
-    :param r_ref: The Barrett radius $R_\mathrm{ref}$ of the second isotope ([`r`]).
-    :param r_ref_d: The uncertainty of the Barrett radius $\Delta R_\mathrm{ref}$ of the second isotope ([`r`]).
+    :param r_d: The uncertainty of the Barrett radius $\Delta R$ of the first isotope (unit of `r`).
+    :param r_ref: The Barrett radius $R_\mathrm{ref}$ of the second isotope (unit of `r`).
+    :param r_ref_d: The uncertainty of the Barrett radius $\Delta R_\mathrm{ref}$ of the second isotope (unit of `r`).
     :param dr: The difference between the Barrett radii $\delta R = R - R_\mathrm{ref}$
-     of the first and second isotope ([`r`]).
+     of the first and second isotope (unit of `r`).
     :param dr_d: The uncertainty of the difference between the Barrett radii $\Delta\delta R$
-     of the first and second isotope ([`r`]).
+     of the first and second isotope (unit of `r`).
     :param v2: The shape factor $V_2$ of the first isotope.
     :param v2_ref: The shape factor $V_{2,\mathrm{ref}}$ of the second isotope.
     :param v4: The shape factor $V_4$ of the first isotope.
     :param v4_ref: The shape factor $V_{4,\mathrm{ref}}$ of the second isotope.
     :param v6: The shape factor $V_6$ of the first isotope.
     :param v6_ref: The shape factor $V_{6,\mathrm{ref}}$ of the second isotope.
-    :param c2c1: Seltzer's coefficient for the quartic moment $C_2 / C_1$ ([`1 / r**2`]).
-    :param c3c1: Seltzer's coefficient for the sextic moment $C_3 / C_1$ ([`1 / r**4`]).
+    :param c2c1: Seltzer's coefficient for the quartic moment $C_2 / C_1$ (unit of `1 / r**2`).
+    :param c3c1: Seltzer's coefficient for the sextic moment $C_3 / C_1$ (unit of `1 / r**4`).
     :returns: (Lambda, Lambda_d) The difference of the nuclear charge radius series between two isotopes $\Lambda$
-     and its uncertainty $\Delta\Lambda$ ([`r**2`]).
+     and its uncertainty $\Delta\Lambda$ (unit of `r**2`).
     """
     r2 = delta_r2(r, r_d, r_ref, r_ref_d, dr, dr_d, v2, v2_ref)
     r4 = delta_r4(r, r_d, r_ref, r_ref_d, dr, dr_d, v4, v4_ref)
@@ -2124,10 +2124,10 @@ def lambda_rn(
     $\delta\!\langle r^6\rangle$.
     :param r6_d: The uncertainty of the difference of the mean-sextic nuclear charge radius
     $\Delta\delta\!\langle r^6\rangle$.
-    :param c2c1: Seltzer's coefficient for the quartic moment $C_2 / C_1$ ([`1 / r**2`]).
-    :param c3c1: Seltzer's coefficient for the sextic moment $C_3 / C_1$ ([`1 / r**4`]).
+    :param c2c1: Seltzer's coefficient for the quartic moment $C_2 / C_1$ (unit of `1 / r**2`).
+    :param c3c1: Seltzer's coefficient for the sextic moment $C_3 / C_1$ (unit of `1 / r**4`).
     :returns: (Lambda, Lambda_d) The difference of the nuclear charge radius series between two isotopes $\Lambda$
-     and its uncertainty $\Delta\Lambda$ ([`r**2`]).
+     and its uncertainty $\Delta\Lambda$ (unit of `r**2`).
     """
     r2, r2_d = np.asarray(r2, dtype=float), np.asarray(r2_d, dtype=float)
     r4, r4_d = np.asarray(r4, dtype=float), np.asarray(r4_d, dtype=float)
@@ -2222,7 +2222,7 @@ def boost(x: array_like, v: array_like, axis: int = -1) -> ndarray:
     :param v: The velocity 3-vector $\vec{v}$. Must have size 3 in the specified `axis` (m/s).
     :param axis: The axis along which the vector components are aligned.
     :returns: (x_boosted) The 4-vector $x^{\prime\mu}$ in the coordinate system moving with velocity `v`
-    relative to the current rest frame ([`x`]).
+    relative to the current rest frame (unit of `x`).
     :raises ValueError: `x` and `v` must have 4 and 3 components along the specified `axis`, respectively.
      The shapes of `x` and `v` must be compatible.
     """
@@ -2283,7 +2283,7 @@ def doppler_3d(k: array_like, v: array_like, return_frame: str = "atom", axis: i
     :param return_frame: The coordinate system in which the frequency is returned. Can be either `"atom"` or `"lab"`.
     :param axis: The axis along which the vector components are aligned.
     :returns: (k_boosted) the Doppler-shifted 3-vector $\vec{k}^{\prime}$ in either the rest frame of the atom
-     or the laboratory frame ([`k`]).
+     or the laboratory frame (unit of `k`).
     :raises ValueError: `rest_frame` must be either `"atom"` or `"lab"`. The shapes of `k` and `v` must be compatible.
     """
     k, v = np.asarray(k), np.asarray(v)
@@ -2457,7 +2457,7 @@ def t_xi(xi: array_like, f: array_like, u: array_like, q: array_like, m: array_l
 
     where $\gamma$ is the relativistic time-dilation factor.
 
-    :param xi: The asymmetry parameter $\xi$ ([`f`]).
+    :param xi: The asymmetry parameter $\xi$ (unit of `f`).
     :param f: The rest-frame transition frequency (arb. units).
     :param u: The acceleration voltage (V).
     :param q: The electric charge of the ions (e).
@@ -2490,7 +2490,7 @@ def xi_t(t: array_like, f: array_like, u: array_like, q: array_like, m: array_li
     :param u: The acceleration voltage (V).
     :param q: The electric charge of the ions (e).
     :param m: The mass of the ions (u).
-    :returns: (xi) The asymmetry parameter $\xi$ ([`f`]).
+    :returns: (xi) The asymmetry parameter $\xi$ (unit of `f`).
     """
     t = np.asarray(t, dtype=float)
     return t / t_xi(1.0, f, u, q, m)
@@ -2662,8 +2662,7 @@ def normal_chi2_convolved_vx_pdf(
     \end{aligned}$$
 
     where $\gamma$ is the time-dilation factor and $\rho$ is the probability density function
-    <a href="{{ '/doc/functions/physics/normal_chi2_convolved_ex_pdf.html' | relative_url }}">
-    `normal_chi2_convolved_ex_pdf`</a>.
+    [`normal_chi2_convolved_ex_pdf`].
 
     :param vx: The velocity quantiles $v_x$ (m/s).
     :param m: The mass $m$ of the particle (u).
@@ -2714,18 +2713,17 @@ def normal_chi2_convolved_f_pdf(
     \end{aligned}$$
 
     where $\rho^\prime$ is the probability density function
-    <a href="{{ '/doc/functions/physics/normal_chi2_convolved_vx_pdf.html' | relative_url }}">
-    `normal_chi2_convolved_vx_pdf`</a>.
+    [`normal_chi2_convolved_vx_pdf`].
 
     :param f: The frequency quantiles $f$ (arb. units).
-    :param f_lab: The laser frequency $f_\text{lab}$ in the laboratory frame ([`f`]).
+    :param f_lab: The laser frequency $f_\text{lab}$ in the laboratory frame (unit of `f`).
     :param alpha: The angle $\alpha$ between the laser and the velocity of the atom (rad).
     :param m: The mass $m$ of the atom (u).
     :param t: The temperature $T$ of the environment (K).
     :param scale_e: The standard deviation $\sigma_{E_x}$ of the normal distribution (eV).
     :param e0: The mean energy $E_0$ of the normal distribution (eV).
     :param relativistic: Kinetic energies are calculated either relativistically (`True`) or classically (`False`).
-    :returns: (rho_f) The probability density in thermal equilibrium at the frequency `f` ([`1/f`]).
+    :returns: (rho_f) The probability density in thermal equilibrium at the frequency `f` (unit of `1/f`).
     """
     f, f_lab = np.asarray(f, dtype=float), np.asarray(f_lab, dtype=float)
     m, t, scale_e, e0 = (
@@ -2769,11 +2767,11 @@ def normal_chi2_convolved_f_xi_pdf(
     and $\varpi \approx 2.6220575543$ is the lemniscate constant.
 
     :param f: The frequency quantiles $f$ (arb. units).
-    :param f0: A frequency offset $f_0$ ([`f`]).
-    :param xi: The asymmetry parameter $\xi$ ([`f`]).
-    :param sigma_f: The standard deviation $\sigma_\mathrm{f}$ of the normal distribution ([`f`]).
+    :param f0: A frequency offset $f_0$ (unit of `f`).
+    :param xi: The asymmetry parameter $\xi$ (unit of `f`).
+    :param sigma_f: The standard deviation $\sigma_\mathrm{f}$ of the normal distribution (unit of `f`).
     :param col: The laser can be aligned collinearly (`True`) or anticollinearly (`False`) to the velocity of the atom.
-    :returns: (rho_f) The probability density in thermal equilibrium at the frequency `f` (1/[`f`]).
+    :returns: (rho_f) The probability density in thermal equilibrium at the frequency `f` (unit of `1/f`).
     """
     f, f0, xi, sigma_f = asarray(f, f0, xi, sigma_f, dtype=float)
 
@@ -2791,16 +2789,15 @@ def normal_chi2_convolved_f_xi_pdf(
 def source_energy_pdf(f: array_like, f0: scalar, sigma: scalar, xi: scalar, collinear: bool = True) -> ndarray:
     r"""
     This is the same function as
-    <a href="{{ '/doc/functions/physics/normal_chi2_convolved_f_xi_pdf.html' | relative_url }}">
-    `normal_chi2_convolved_f_xi_pdf`</a> with less array processing and reordered parameters, used in `qspec.models`.
+    [`normal_chi2_convolved_f_xi_pdf`] with less array processing and reordered parameters, used in `qspec.models`.
 
     :param f: The frequency quantiles $f$ (arb. units).
-    :param f0: A frequency offset $f_0$ ([`f`]).
-    :param sigma: The standard deviation of the underlying normal distribution in frequency units ([`f`]).
-    :param xi: The asymmetry parameter $\xi$ ([`f`]).
+    :param f0: A frequency offset $f_0$ (unit of `f`).
+    :param sigma: The standard deviation of the underlying normal distribution in frequency units (unit of `f`).
+    :param xi: The asymmetry parameter $\xi$ (unit of `f`).
     :param collinear: The laser can be aligned collinearly (`True`)
      or anticollinearly (`False`) to the velocity of the atom.
-    :returns: (rho_f) The probability density in thermal equilibrium at the frequency `f` (1/[`f`]).
+    :returns: (rho_f) The probability density in thermal equilibrium at the frequency `f` (unit of `1/f`).
     """
     pm = 1.0 if collinear else -1.0
     f = np.asarray(f, dtype=float)

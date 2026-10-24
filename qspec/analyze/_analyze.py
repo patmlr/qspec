@@ -182,8 +182,7 @@ def straight(x: array_like, a: array_like, b: array_like) -> ndarray:
 
 def straight_std(x: array_like, sigma_a: array_like, sigma_b: array_like, corr_ab: array_like) -> ndarray:
     r"""
-    The standard deviation of a <a href="{{ '/doc/functions/analyze/straight.html' | relative_url }}">
-    `straight`</a>
+    The standard deviation of a [`straight`]
 
     $$\sigma_f(x) = \sqrt{\sigma_a^2 + (x\sigma_b)^2 + 2x\sigma_a\sigma_b\rho_{ab}}.$$
 
@@ -200,8 +199,7 @@ def straight_x_std(
     x: array_like, b: array_like, sigma_x: array_like, sigma_a: array_like, sigma_b: array_like, corr_ab: array_like
 ) -> ndarray:
     r"""
-    The standard deviation of a <a href="{{ '/doc/functions/analyze/straight.html' | relative_url }}">
-    `straight`</a>
+    The standard deviation of a [`straight`]
 
     $$\sigma_f(x) = \sqrt{\sigma_a^2 + (x\sigma_b)^2 + 2x\sigma_a\sigma_b\rho_{ab}
     + (b\sigma_x)^2 + (\sigma_b\sigma_x)^2}.$$
@@ -246,8 +244,7 @@ def draw_straight_unc_area(
 ) -> None:
     r"""
     Draws the $1\sigma_f$ standard deviation area of a
-    <a href="{{ '/doc/functions/analyze/straight.html' | relative_url }}">
-    `straight`</a> $f$ enclosed by
+    [`straight`] $f$ enclosed by
 
     $$[f(x) - \sigma_f(x), f(x) + \sigma_f(x)].$$
 
@@ -626,8 +623,7 @@ def linear_nd_fit(
     :param x: The data vectors $\vec{\mu}_i$. Must have shape `(k, n)`, where `k` is the number of data points
      and `n` is the number of dimensions of each point.
     :param cov: The covariance matrices $\mathbf{\Sigma}_i$ of the data vectors. Must have shape `(k, n, n)`.
-     Use <a href="{{ '/doc/functions/analyze/covariance_matrix.html' | relative_url }}">
-    `covariance_matrix`</a> to construct covariance matrices.
+     Use [`covariance_matrix`] to construct covariance matrices.
     :param p0: The start parameters for the linear fit. Must have shape `(2 * n, )`.
      The first `n` elements specify the origin vector of the straight,
      the second `n` elements specify the direction of the straight.
@@ -768,8 +764,7 @@ def linear_fit(
     \rho_{xy}\sigma_x\sigma_y & \sigma_y^2
     \end{pmatrix}.$$
 
-    This is a wrapper for the more general <a href="{{ '/doc/functions/analyze/linear_nd_fit.html' | relative_url }}">
-    `linear_nd_fit`</a> function.
+    This is a wrapper for the more general [`linear_nd_fit`] function.
     The algorithm is described in <a href="https://doi.org/10.1016/j.cpc.2025.109550">
     qspec's publication</a>.
 
@@ -825,12 +820,10 @@ def _test_order_linear_nd_monte_carlo(
     :param x: The data vectors $\vec{\mu}_i$. Must have shape `(k, n)`, where `k` is the number of data points
      and `n` is the number of dimensions of each point.
     :param cov: The covariance matrices $\mathbf{\Sigma}_i$ of the data vectors. Must have shape `(k, n, n)`.
-     Use <a href="{{ '/doc/functions/analyze/covariance_matrix.html' | relative_url }}">
-    `covariance_matrix`</a> to construct covariance matrices.
+     Use [`covariance_matrix`] to construct covariance matrices.
     :param n_samples: Maximum number of generated samples.
      If `None` and `method == "cpp"`, samples are generated until `n_accepted` samples get accepted,
-     see <a href="{{ '/doc/functions/analyze/generate_collinear_points_cpp.html' | relative_url }}">
-     `generate_collinear_points_cpp`</a>.
+     see [`generate_collinear_points_cpp`].
     :param n_accepted: The number of samples to be accepted for each data point. Only available if `method == "cpp"`.
     :param method: The method to generate the collinear points. Can be one of `{"py", "cpp"}`.
      The `"py"` version is faster but only allows to specify `n_samples`.
@@ -874,8 +867,7 @@ def generate_collinear_points_py(
     :param mean: The data vectors $\vec{\mu}_i$. Must have shape `(k, n)`, where `k` is the number of data points
      and `n` is the number of dimensions of each point.
     :param cov: The covariance matrices $\mathbf{\Sigma}_i$ of the data vectors. Must have shape `(k, n, n)`.
-     Use <a href="{{ '/doc/functions/analyze/covariance_matrix.html' | relative_url }}">
-    `covariance_matrix`</a> to construct covariance matrices.
+     Use [`covariance_matrix`] to construct covariance matrices.
     :param n_samples: The number of samples generated for each data point.
     :param report: Whether to report the number of samples.
     :param kwargs: Additional keyword arguments.
@@ -937,8 +929,7 @@ def generate_collinear_points(
     :param x: The data vectors $\vec{\mu}_i$. Must have shape `(k, n)`, where `k` is the number of data points
      and `n` is the number of dimensions of each point.
     :param cov: The covariance matrices $\mathbf{\Sigma}_i$ of the data vectors. Must have shape `(k, n, n)`.
-     Use <a href="{{ '/doc/functions/analyze/covariance_matrix.html' | relative_url }}">
-    `covariance_matrix`</a> to construct covariance matrices.
+     Use [`covariance_matrix`] to construct covariance matrices.
     :param n_samples: The number of samples generated for each data point.
      If `None` and `method == "cpp"`, samples are generated until `n_accepted` samples get accepted.
     :param n_accepted: The number of samples to be accepted for each data point. Only available if `method == "cpp"`.
@@ -984,8 +975,7 @@ def linear_nd_monte_carlo(
     :param x: The data vectors $\vec{\mu}_i$. Must have shape `(k, n)`, where `k` is the number of data points
      and `n` is the number of dimensions of each point.
     :param cov: The covariance matrices $\mathbf{\Sigma}_i$ of the data vectors. Must have shape `(k, n, n)`.
-     Use <a href="{{ '/doc/functions/analyze/covariance_matrix.html' | relative_url }}">
-    `covariance_matrix`</a> to construct covariance matrices.
+     Use [`covariance_matrix`] to construct covariance matrices.
      If `None`, samples are generated until `n_accepted` samples get accepted.
     :param axis: The index of the vector component of the n-dimensional vectors that are fixed for fitting.
      This is required since a straight in `n` dimensions is fully described by `2 * (n - 1)` parameters.
@@ -1098,8 +1088,7 @@ def linear_monte_carlo(
     assuming $2$-dimensional multivariate normal distributions $\mathcal{N}(\vec{\mu}_i, \mathbf{\Sigma}_i)$.
 
     TThis is a wrapper for the more general
-    <a href="{{ '/doc/functions/analyze/linear_nd_monte_carlo.html' | relative_url }}">
-    `linear_nd_monte_carlo`</a> function. The algorithm is described in the supplementary material of
+    [`linear_nd_monte_carlo`] function. The algorithm is described in the supplementary material of
     [<a href="https://doi.org/10.1103/PhysRevLett.115.053003">Gebert et al., Phys. Rev. Lett. 115, 053003 (2015)</a>].
 
     :param x: The $x$ data.
@@ -1172,12 +1161,9 @@ def linear_alpha_fit(
 ) -> tuple[ndarray, ndarray, float]:
     r"""
     Wrapper for the $2$-dimensional linear regression algorithms
-    <a href="{{ '/doc/functions/analyze/york_fit.html' | relative_url }}">
-    `york_fit`</a>,
-     <a href="{{ '/doc/functions/analyze/linear_fit.html' | relative_url }}">
-    `linear_fit`</a> and
-    <a href="{{ '/doc/functions/analyze/linear_monte_carlo.html' | relative_url }}">
-    `linear_monte_carlo`</a> that optimizes an additional $x$-axis shift $\alpha$
+    [`york_fit`],
+     [`linear_fit`] and
+    [`linear_monte_carlo`] that optimizes an additional $x$-axis shift $\alpha$
      for the minimum correlation coefficient between $y$-intercept and slope.
 
     :param x: The $x$ data.
@@ -1558,19 +1544,14 @@ class King:
     ) -> None:
         r"""
         A class for $n$-dimensional King plots, encapsulating the linear regression algorithms of the
-        <a href="{{ '/doc/modules/analyze.html' | relative_url }}">
-        `qspec.analyze`</a> module. Call <a href="{{ '/doc/functions/analyze/King/fit.html' | relative_url }}">
-        `King.fit`</a> or <a href="{{ '/doc/functions/analyze/King/fit_nd.html' | relative_url }}">
-        `King.fit_nd`</a> for $2$- or $n$-dimensional fitting.
+        [`qspec.analyze`] module. Call [`King.fit`] or [`King.fit_nd`] for $2$- or $n$-dimensional fitting.
 
         :param a: An iterable of the mass numbers $A$ of the considered isotopes with shape `(k, )`,
          where `k` is the number of isotopes.
         :param m: The masses and their uncertainties of the isotopes `a` (u). `m` must have shape `(k, 2)`.
         :param x_abs: The absolute values of the data vectors and their standard deviations
          corresponding to the mass numbers `a`. If given, the `x` and `y` parameters can be omitted in
-         <a href="{{ '/doc/functions/analyze/King/fit.html' | relative_url }}">
-        `King.fit`</a> and <a href="{{ '/doc/functions/analyze/King/fit_nd.html' | relative_url }}">
-        `King.fit_nd`</a>, and are determined automatically as the shift between the mass numbers `a`
+         [`King.fit`] and [`King.fit_nd`], and are determined automatically as the shift between the mass numbers `a`
          and `a_ref`. Must have shape `(k, n, 2)` where `n` is the number of dimensions of the King plot.
         :param subtract_electrons: The number of electron masses that should be subtracted from the specified isotope
          masses. `subtract_electrons` can be a `float` if the ionization energy shall be considered.
@@ -1703,8 +1684,7 @@ class King:
          May not give the desired result if `alpha` was initialized too far from its optimal value.
         :param show: Whether to plot the fit result.
         :param kwargs: Additional keyword arguments are passed to
-         <a href="{{ '/doc/functions/analyze/King/plot.html' | relative_url }}">
-         `King.plot`</a>.
+         [`King.plot`].
         :returns: (popt, pcov) The best y-intercept and slope and their covariance matrix.
          The final `alpha` can be accessed through `King.alpha`.
         """
@@ -1793,8 +1773,7 @@ class King:
         :param func: The fitting routine. Must be one of `{"linear_nd_fit" (default), "linear_nd_monte_carlo"}`.
         :param show: Whether to plot the fit result.
         :param kwargs: Additional keyword arguments are passed to `func` and
-         <a href="{{ '/doc/functions/analyze/King/plot.html' | relative_url }}">
-         `King.plot`</a>.
+         [`King.plot`].
         :returns: (popt, pcov) The optimized parameters and their covariances.
          The resulting shapes are `(2 * n, )` and `(2 * n, 2 * n)`.
         """
@@ -1893,8 +1872,7 @@ class King:
          set `axis=0` to use the isotope shifts of the D1-line to calculate those of the D2-line.
         :param show: Whether to draw the calculated values in the King plot.
         :param kwargs: Additional keyword arguments are passed to
-         <a href="{{ '/doc/functions/analyze/King/plot.html' | relative_url }}">
-         `King.plot`</a>.
+         [`King.plot`].
         :returns: (y, cov, cov_stat) The unmodified $y$ values calculated with the fit results and the given `x` values.
          `y` has shape `(k, n)` and includes the given `x` values, where `k` is the number of data points/isotopes
          and `n` is the dimension of te King plot.

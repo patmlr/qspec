@@ -2004,11 +2004,9 @@ class Interaction(CppClass):
         $\hat{k}_m$ is the direction of laser `m`,
         $\Delta_m$ is the detuning of lasers `m`,
         $\gamma(\vec{v})$ is the time-dilation factor
-        <a href="{{ '/doc/functions/physics/gamma_3d.html' | relative_url }}">
-        `qspec.physics.gamma_3d`</a>,
+        [`qspec.physics.gamma_3d`],
         and $\Omega_m$ is the complex Rabi-frequency matrix of laser `m`, see
-        <a href="{{ '/doc/functions/simulate/Interaction/rabi.html' | relative_url }}">
-        `qspec.simulate.Interaction.rabi`</a>.</br></br>
+        [`qspec.simulate.Interaction.rabi`].</br></br>
 
         If the Hamiltonian is time-dependent, because two or more lasers drive the same transition
         or form loops within the atom, the off-diagonal Hamiltonian becomes
@@ -2099,11 +2097,9 @@ class Interaction(CppClass):
         $\hat{k}_m$ is the direction of laser `m`,
         $\Delta_m$ is the detuning of lasers `m`,
         $\gamma(\vec{v})$ is the time-dilation factor, see
-        <a href="{{ '/doc/functions/physics/gamma_3d.html' | relative_url }}">
-        `qspec.physics.gamma_3d`</a>
+        [`qspec.physics.gamma_3d`]
         and $\Omega_{ij}^m$ is the Rabi frequency induced by laser `m`, see
-        <a href="{{ '/doc/functions/simulate/Interaction/rabi.html' | relative_url }}">
-        `qspec.simulate.Interaction.rabi`</a>. Solutions for `n` samples can be calculated in parallel for `nt` times.
+        [`qspec.simulate.Interaction.rabi`]. Solutions for `n` samples can be calculated in parallel for `nt` times.
 
         :param t: The times $t$ when to compute the solution. Any array is cast to the shape `(nt, )`,
          where `nt` is the size of the array `t` (&mu;s).
@@ -2173,8 +2169,7 @@ class Interaction(CppClass):
         \end{aligned}$$
 
         where the Hamiltonian $H$ (2&pi;&thinsp;MHz) is time-independent whenever possible, see
-        <a href="{{ '/doc/functions/simulate/Interaction/hamiltonian.html' | relative_url }}">
-        `qspec.simulate.Interaction.hamiltonian`</a>.
+        [`qspec.simulate.Interaction.hamiltonian`].
         Solutions for `n` samples can be calculated in parallel for `nt` times.
 
         :param t: The times $t$ when to compute the solution. Any array is cast to the shape `(nt, )`,
@@ -2251,8 +2246,7 @@ class Interaction(CppClass):
         \end{aligned}$$
 
         where the Hamiltonian $H$ (2&pi;&thinsp;MHz) is time-independent whenever possible, see
-        <a href="{{ '/doc/functions/simulate/Interaction/hamiltonian.html' | relative_url }}">
-        `qspec.simulate.Interaction.hamiltonian`</a>.
+        [`qspec.simulate.Interaction.hamiltonian`].
         Solutions for `n` samples can be calculated in parallel for `nt` times.
 
         :param t: The times $t$ when to compute the solution. Any array is cast to the shape `(nt, )`,
@@ -2334,8 +2328,7 @@ class Interaction(CppClass):
         \end{aligned}$$
 
         where the Hamiltonian $H$ (2&pi;&thinsp;MHz) is time-independent whenever possible, see
-        <a href="{{ '/doc/functions/simulate/Interaction/hamiltonian.html' | relative_url }}">
-        `qspec.simulate.Interaction.hamiltonian`</a>, $H_\text{leaky}$ is an imaginary diagonal operator,
+        [`qspec.simulate.Interaction.hamiltonian`], $H_\text{leaky}$ is an imaginary diagonal operator,
         and $\rho$ is the density matrix in the limit of an infinite number of samples.
         Solutions for `n` samples can be calculated in parallel for `nt` times.
         The complexity of the Monte-Carlo approach only scales linearly with `Atom.size`,

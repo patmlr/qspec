@@ -478,8 +478,7 @@ def a_dipole_cart(
     \frac{i}{\sqrt{2}}\left[(A_{Fm}^{F^\prime m^\prime})_{-1} + (A_{Fm}^{F^\prime m^\prime})_1\right]\\
     (A_{Fm}^{F^\prime m^\prime})_0
     \end{pmatrix},$$
-    with $(A_{Fm}^{F^\prime m^\prime})_q$ as in <a href="{{ '/doc/functions/algebra/a_dipole.html' | relative_url }}">
-    `a_dipole`</a>.
+    with $(A_{Fm}^{F^\prime m^\prime})_q$ as in [`a_dipole`].
     See [<a href="https://doi.org/10.1103/PhysRevA.87.032504">R. C. Brown et al., Phys. Rev. A 87, 032504 (2013)</a>].
 
     :param i: The nuclear spin quantum number $I$.
