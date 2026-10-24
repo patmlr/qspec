@@ -43,12 +43,12 @@ __pycache__
 !/qspec/_cpp/qspec_cpp/build/linux-arm64/libqspec_cpp*.so
 !/qspec/_cpp/qspec_cpp/build/linux-arm64/__init__.py
 
-/qspec/_cpp/qspec_cpp/build/mac-x64/*
-!/qspec/_cpp/qspec_cpp/build/mac-x64/
-!/qspec/_cpp/qspec_cpp/build/mac-x64/libqspec_cpp*.dylib
-!/qspec/_cpp/qspec_cpp/build/mac-x64/__init__.py
+/qspec/_cpp/qspec_cpp/build/macosx-x64/*
+!/qspec/_cpp/qspec_cpp/build/macosx-x64/
+!/qspec/_cpp/qspec_cpp/build/macosx-x64/libqspec_cpp*.dylib
+!/qspec/_cpp/qspec_cpp/build/macosx-x64/__init__.py
 
-/qspec/_cpp/qspec_cpp/build/mac-arm64/*
-!/qspec/_cpp/qspec_cpp/build/mac-arm64/
-!/qspec/_cpp/qspec_cpp/build/mac-arm64/libqspec_cpp*.dylib
-!/qspec/_cpp/qspec_cpp/build/mac-arm64/__init__.py
+/qspec/_cpp/qspec_cpp/build/macosx-arm64/*
+!/qspec/_cpp/qspec_cpp/build/macosx-arm64/
+!/qspec/_cpp/qspec_cpp/build/macosx-arm64/libqspec_cpp*.dylib
+!/qspec/_cpp/qspec_cpp/build/macosx-arm64/__init__.py

@@ -22,13 +22,15 @@ set(QSPEC_SOURCES
 # Header-only dependencies. Uses the copies in src/_lib/ if present (local development),
 # otherwise downloads pinned releases (CI and pip builds from the sdist).
 include(FetchContent)
+# Show the download progress, otherwise large downloads (Boost) look like the build is stuck.
+set(FETCHCONTENT_QUIET OFF)
 
-function(qspec_find_dependency name local_dir url sha256)
+function(qspec_find_dependency name local_dir url sha256 size)
     if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${local_dir}")
         set(${name}_DIR "${CMAKE_CURRENT_SOURCE_DIR}/${local_dir}" PARENT_SCOPE)
         return()
     endif()
-    message(STATUS "${local_dir} not found, downloading ${name}")
+    message(STATUS "qspec: ${local_dir} not found, downloading ${name} (${size}) ...")
     FetchContent_Declare(${name}
         URL "${url}"
         URL_HASH SHA256=${sha256}
@@ -41,13 +43,13 @@ endfunction()
 
 qspec_find_dependency(boost src/_lib/boost_1_90_0
     https://github.com/boostorg/boost/releases/download/boost-1.90.0/boost-1.90.0-b2-nodocs.tar.xz
-    9e6bee9ab529fb2b0733049692d57d10a72202af085e553539a05b4204211a6f)
+    9e6bee9ab529fb2b0733049692d57d10a72202af085e553539a05b4204211a6f "~50 MB")
 qspec_find_dependency(eigen src/_lib/eigen-5.0.0
     https://gitlab.com/libeigen/eigen/-/archive/5.0.0/eigen-5.0.0.tar.gz
-    315c881e19e17542a7d428c5aa37d113c89b9500d350c433797b730cd449c056)
+    315c881e19e17542a7d428c5aa37d113c89b9500d350c433797b730cd449c056 "~3 MB")
 qspec_find_dependency(fmt src/_lib/fmt-main
     https://github.com/fmtlib/fmt/releases/download/12.1.0/fmt-12.1.0.zip
-    695fd197fa5aff8fc67b5f2bbc110490a875cdf7a41686ac8512fb480fa8ada7)
+    695fd197fa5aff8fc67b5f2bbc110490a875cdf7a41686ac8512fb480fa8ada7 "~1.5 MB")
 
 # Include directories (header-only)
 set(QSPEC_INCLUDES
@@ -137,6 +139,11 @@ else()
         )
     endif()
 endif()
+
+list(LENGTH QSPEC_SOURCES QSPEC_N_SOURCES)
+list(LENGTH QSPEC_TARGETS QSPEC_N_TARGETS)
+message(STATUS "qspec: Compiling ${QSPEC_N_SOURCES} source files for ${QSPEC_N_TARGETS} target(s) (${QSPEC_TARGETS}). "
+    "This can take several minutes.")
 
 # Install location inside the Python wheel (used by scikit-build-core, see pyproject.toml).
 # qspec/_cpp/cpp.py loads the library from qspec/_cpp/bin/.

@@ -10,7 +10,6 @@ readme = "README.md"
 requires-python = ">=3.12"
 license = "MIT"
 license-files = ["LICENSE"]
-# license = {file = "LICENSE"}
 
 keywords = ["physics", "simulation", "data analysis", "atomic structure", "laser spectroscopy", "laser cooling", "coherent interaction", "quantum computing"]
 authors = [
@@ -19,7 +18,6 @@ authors = [
 classifiers = [
     "Development Status :: 4 - Beta",
     "Intended Audience :: Science/Research",
-    # "License :: OSI Approved :: MIT License",
     "Operating System :: Microsoft :: Windows",
     "Operating System :: POSIX :: Linux",
     "Operating System :: MacOS",
@@ -46,24 +44,45 @@ tracker = "https://github.com/patmlr/qspec/issues"
 minimum-version = "build-system.requires"
 cmake.source-dir = "qspec/_cpp/qspec_cpp"
 cmake.build-type = "Release"
-# The library is loaded via ctypes and does not use the Python C API,
-# so one wheel per platform (py3-none-<platform>) works for all Python 3 versions.
-wheel.py-api = "py3"
+wheel.cmake = false
 wheel.packages = ["qspec"]
-# The C++ sources and locally built binaries are not needed in the wheel.
-# The library built by CMake is installed into qspec/_cpp/bin/ instead.
-wheel.exclude = ["qspec/_cpp/qspec_cpp/**"]
+wheel.exclude = [
+    "qspec/_cpp/qspec_cpp/**",
+    "!qspec/_cpp/qspec_cpp/build/windows-*/Release/qspec_cpp*.dll",
+    "!qspec/_cpp/qspec_cpp/build/linux-*/libqspec_cpp*.so",
+    "!qspec/_cpp/qspec_cpp/build/macosx-*/libqspec_cpp*.dylib",
+]
 sdist.exclude = [
-    "qspec/_cpp/qspec_cpp/build/",
     ".github/",
     ".vscode/",
     "docs/",
     "resources/",
 ]
 
+[[tool.scikit-build.overrides]]
+if.state = "sdist"
+inherit.sdist.exclude = "append"
+sdist.exclude = ["qspec/_cpp/qspec_cpp/build/"]
+
+[[tool.scikit-build.overrides]]
+# Compile the library with CMake in cibuildwheel (PyPI wheels), when installing from the sdist,
+# on platforms without committed binaries (macOS, Linux aarch64),
+# or when the environment variable QSPEC_BUILD_CPP=1 is set.
+if.any.env.CIBUILDWHEEL = true
+if.any.env.QSPEC_BUILD_CPP = true
+if.any.from-sdist = true
+if.any.platform-system = "^darwin"
+if.any.platform-machine = "^aarch64$"
+wheel.cmake = true
+wheel.py-api = "py3"
+wheel.exclude = ["qspec/_cpp/qspec_cpp/**"]
+messages.after-failure = """
+{bold.red}Compiling the qspec C++ library failed.{normal}
+It requires CMake >= 3.22, a C++23 compiler (GCC >= 13, Clang >= 17 or MSVC 2026) and internet access
+to download Boost, Eigen and fmt. See qspec/_cpp/qspec_cpp/README.md.
+"""
+
 [tool.cibuildwheel]
-# The wheels are not Python-version-specific. cibuildwheel builds once on the oldest version
-# and only tests the same wheel on the newer versions.
 build = "cp312-* cp313-* cp314-*"
 skip = "*-musllinux_*"
 archs = ["native"]

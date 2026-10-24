@@ -13,7 +13,12 @@ On x86-64, CMake builds the library twice: `qspec_cpp` for all CPUs (x86-64-v2, 
 When importing *qspec*, `qspec/_cpp/cpp.py` loads the baseline build, which checks the CPU (`cpu_supports_avx2()` in `src/Cpu.cpp`), and switches to the AVX2 build if it is supported.
 Set the environment variable `QSPEC_DISABLE_AVX2=1` to always use the baseline build.
 
-To build a wheel for the current machine locally, run `pip wheel . --no-deps -w dist` in the repository root.
+A local `pip install .` from the repository does not compile anything on Windows (x64, arm64) and Linux x64. It packages the committed binaries from `./build/` instead.
+CMake only runs in cibuildwheel, when installing from the sdist, on macOS and Linux aarch64 (no committed binaries), or when the environment variable `QSPEC_BUILD_CPP=1` is set.
+Compiling takes several minutes and downloads Boost (~50 MB), Eigen and fmt if they are not in `./src/_lib`.
+pip hides the build output, so use `pip install -v .` to follow the download and compilation progress.
+
+To build a wheel with a freshly compiled library for the current machine locally, run `QSPEC_BUILD_CPP=1 pip wheel . --no-deps -w dist` in the repository root.
 
 ## How to compile
 
