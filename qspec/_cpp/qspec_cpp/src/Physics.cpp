@@ -1,16 +1,10 @@
 /*
-* PyCLS.Physics.cpp
-* 
-* Factorial, GCcoeff, ThreeJSymbol, SixJSymbol and NineJSymbol taken and modified from
-* https://nukephysik101.wordpress.com/2019/01/30/3j-6j-9j-symbol-fro-c/
-* by Tsz Leung Tang (Also known as Ryan Tang)
-* Orcid: 0000-0001-5527-076X
+* qspec.Physics.cpp
 */
 
 #include "Physics.h"
 
 using namespace std::complex_literals;
-using namespace WignerSymbols;
 
 
 double wigner_d_qm(size_t j, int q, int m, double theta)
@@ -93,11 +87,9 @@ double a_dipole(double i, double j_l, double f_l, double m_l, double j_u, double
     double sqrt_f = sqrt(2 * f_l + 1);
     double sqrt_j = sqrt(2 * j_u + 1);
     double exp = f_l + i + 1 + j_u;
-    // double w6j = wigner_6j(j_u, j_l, 1, f_l, f_u, i);
-    // double cg = clebsch_gordan(f_l, m_l, 1, q, f_u, m_u);
-    double w6j = wigner6j(j_u, j_l, 1, f_l, f_u, i);
-    double cg = clebschGordan(f_l, 1, f_u, m_l, q, m_u);
-    return pow(-1, exp) * sqrt_f * sqrt_j * w6j * cg;  // wigner6j(j_u, j_l, 1, f_l, f_u, i) * clebschGordan(f_u, f_l, 1, m_u, m_l, q)
+    double w6j = wigner_6j(j_u, j_l, 1, f_l, f_u, i);
+    double cg = clebsch_gordan(f_l, 1, f_u, m_l, q, m_u);
+    return pow(-1, exp) * sqrt_f * sqrt_j * w6j * cg;
 }
 
 double d_emk(size_t k, bool parity_equal, double a, double freq_0, double freq_1)
@@ -115,15 +107,10 @@ double a_multipole(double k, double i, double j_l, double f_l, double m_l, doubl
     double exp = f_l + i + k + j_u;
     // printf("W6j: {%3.3f, %3.3f, %3.3f, %3.3f, %3.3f, %3.3f}\n", j_u, j_l, k, f_l, f_u, i);
     // printf("CGC: {%3.3f, %3.3f, %3.3f, %3.3f, %3.3f, %3.3f}\n", f_l, k, f_u, m_l, q, m_u);
-    // double w6j_n = wigner_6j(j_u, j_l, k, f_l, f_u, i);
-    // double cg_n = clebsch_gordan(f_l, k, f_u, m_l, q, m_u);
-    double w6j = wigner6j(j_u, j_l, k, f_l, f_u, i);
-    double cg = clebschGordan(f_l, k, f_u, m_l, q, m_u);
-    // if (w6j_n != w6j) printf("w6j: %s\n", fmt::format("{:.3e}", w6j_n - w6j).c_str());
-    // if (cg_n != cg) printf("cg: %s\n", fmt::format("{:.3e}", cg_n - cg).c_str());
+    double w6j = wigner_6j(j_u, j_l, k, f_l, f_u, i);
+    double cg = clebsch_gordan(f_l, k, f_u, m_l, q, m_u);
     // printf("%s\n", fmt::format("  w6j,   cg: {:.3e}, {:.3e}", w6j, cg).c_str());
-    // if (k == 1.) printf("%s\n", fmt::format("w6j_n, cg_n: {:.3e}, {:.3e}", w6j_n, cg_n).c_str());
-    return pow(-1, exp) * sqrt_f * sqrt_j * w6j * cg;  // wigner6j(j_u, j_l, 1, f_l, f_u, i) * clebschGordan(f_u, f_l, 1, m_u, m_l, q)
+    return pow(-1, exp) * sqrt_f * sqrt_j * w6j * cg;
 }
 
 double lande_n(double gyro)

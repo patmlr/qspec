@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Utility.h"
-#include "wignerSymbols-cpp.h"
+#include "Algebra.h"
 
 #include <stdlib.h>
 #include <complex>

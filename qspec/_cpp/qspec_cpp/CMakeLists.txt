@@ -15,7 +15,7 @@ set(QSPEC_SOURCES
     src/Light.cpp
     src/Matter.cpp
     src/Interaction.cpp
-    src/wignerSymbols-cpp.cpp
+    src/Algebra.cpp
     src/King.cpp
 )
 
