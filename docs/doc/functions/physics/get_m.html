@@ -8,22 +8,25 @@ title: qspec.get_m
 <span class="sig-name">get_m</span>
 <span class="sig-paren">&nbsp;(&nbsp;</span>
 <em class="sig-param"><span class="n">f</span></em>
-<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/physics.py#L827-L834' }}"><span class="sig-source">[source]</span></a>
+<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/physics.py#L966-L977' }}"><span class="sig-source">[source]</span></a>
 </dt>
 <dd class="field-body">
-<p>All quantum numbers fulfilling $-F \leq m \leq F$, where $m\in\mathbb{Z}$.</p>
+<p>All magnetic quantum numbers of the total angular momentum quantum number $F$</p>
+<div class="math-block">$$
+m \in \{-F, -F + 1, \dots, F\}.
+$$</div>
 <dl class="field-list">
 <dt class="field-head">Parameters<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>f<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">scalar</a></em></span></dt>
+<dt>f<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#scalar' | relative_url }}">scalar</a></em></span></dt>
 <dd class="field-desc"><p>The total angular momentum quantum number $F$.</p></dd>
 </dl>
 </dd>
 <dt class="field-head">Returns<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>m_list<span class="classifier"><em>list[<a href="{{ '/doc/modules/qtypes.html' | relative_url }}">quant</a>]</em></span></dt>
+<dt>m_list<span class="classifier"><em>list[<a href="{{ '/doc/functions/qtypes/quant/quant.html' | relative_url }}">quant</a>]</em></span></dt>
 <dd class="field-desc"><p>All possible magnetic quantum numbers $m$ of the specified quantum number $F$.</p></dd>
 </dl>
 </dd>

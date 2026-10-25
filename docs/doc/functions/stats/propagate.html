@@ -17,39 +17,45 @@ title: qspec.propagate
 ,&nbsp;
 <em class="sig-param"><span class="n">unc_places</span><span class="o">=</span><span class="default_value">None</span></em>
 ,&nbsp;
-<em class="sig-param"><span class="n">sample_size</span><span class="o">=</span><span class="default_value num">1000000</span></em>
+<em class="sig-param"><span class="n">sample_size</span><span class="o">=</span><span class="default_value"><span class="num">1000000</span></span></em>
 ,&nbsp;
-<em class="sig-param"><span class="n">rtol</span><span class="o">=</span><span class="default_value num">0.001</span></em>
+<em class="sig-param"><span class="n">rtol</span><span class="o">=</span><span class="default_value"><span class="num">0.001</span></span></em>
 ,&nbsp;
 <em class="sig-param"><span class="n">atol</span><span class="o">=</span><span class="default_value">None</span></em>
 ,&nbsp;
-<em class="sig-param"><span class="n">force_sym</span><span class="o">=</span><span class="default_value bool">False</span></em>
+<em class="sig-param"><span class="n">force_sym</span><span class="o">=</span><span class="default_value"><span class="bool">False</span></span></em>
 ,&nbsp;
-<em class="sig-param"><span class="n">full_output</span><span class="o">=</span><span class="default_value bool">False</span></em>
+<em class="sig-param"><span class="n">full_output</span><span class="o">=</span><span class="default_value"><span class="bool">False</span></span></em>
 ,&nbsp;
-<em class="sig-param"><span class="n">show</span><span class="o">=</span><span class="default_value bool">False</span></em>
-<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/stats.py#L356-L468' }}"><span class="sig-source">[source]</span></a>
+<em class="sig-param"><span class="n">show</span><span class="o">=</span><span class="default_value"><span class="bool">False</span></span></em>
+<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/stats.py#L391-L449' }}"><span class="sig-source">[source]</span></a>
 </dt>
 <dd class="field-body">
-
+<p>Propagate the uncertainties of the input values <code>x</code> through the function <code>f</code> using Monte-Carlo sampling.</p>
+<p>If the resulting uncertainties are asymmetric, the value and the two uncertainties of the returned <code>Observable</code>
+are the median and the left- (~0.1587) and right-sided (~0.8413) 1-sigma percentiles
+relative to the median, respectively, and the parameters of a skew normal distribution
+are fitted to the sample and stored in the observable. If the uncertainties are symmetric,
+the observable is assumed to be normally distributed and its value and uncertainty are
+the mean and the standard deviation of the sample.</p>
 <dl class="field-list">
 <dt class="field-head">Parameters<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
 <dt>f<span class="classifier"><em>Callable</em></span></dt>
 <dd class="field-desc"><p>The function to compute. <code>f</code> needs to be vectorized.</p></dd>
-<dt>x<span class="classifier"><em>Iterable[<a href="{{ '/doc/modules/qtypes.html' | relative_url }}">scalar</a>]</em></span></dt>
-<dd class="field-desc"><p>The input values. If <code>x_d</code> is None, the sample data will be generated with the <code>Observable.rvs</code> function
+<dt>x<span class="classifier"><em>Iterable[<a href="{{ '/doc/modules/qtypes.html#scalar' | relative_url }}">scalar</a>]</em></span></dt>
+<dd class="field-desc"><p>The input values. If <code>x_d</code> is <code>None</code>, the sample data is generated with <a href="{{ '/doc/functions/stats/Observable/rvs.html' | relative_url }}"><code>Observable.rvs</code></a>,
 which considers asymmetric uncertainties. If an element is not an <code>Observable</code>, its uncertainty is assumed to be 0.</p></dd>
-<dt>x_d<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">array_like</a> | None</em></span></dt>
+<dt>x_d<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a> | None</em></span></dt>
 <dd class="field-desc"><p>The uncertainties of the input values.</p></dd>
-<dt>cov<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">scalar_nd</a> | None</em></span></dt>
-<dd class="field-desc"><p>The covariance matrix of the x values. If not None, <code>x</code> are assumed to be distributed according to
-a multivariate normal distribution with covariance <code>cov</code>.</p></dd>
-<dt>unc_places<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">int_like</a> | None</em></span></dt>
+<dt>cov<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#scalar_nd' | relative_url }}">scalar_nd</a> | None</em></span></dt>
+<dd class="field-desc"><p>The covariance matrix of the input values. If not <code>None</code>, <code>x</code> is assumed to be distributed according
+to a multivariate normal distribution with covariance <code>cov</code>.</p></dd>
+<dt>unc_places<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#int_like' | relative_url }}">int_like</a> | None</em></span></dt>
 <dd class="field-desc"><p>The number of significant decimal places the result will be rounded to.
-If None, the result is not rounded.</p></dd>
-<dt>sample_size<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">int_like</a></em></span></dt>
+If <code>None</code>, the result is not rounded.</p></dd>
+<dt>sample_size<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#int_like' | relative_url }}">int_like</a></em></span></dt>
 <dd class="field-desc"><p>The number of random variates used for the calculation. The default is 1,000,000.</p></dd>
 <dt>rtol<span class="classifier"><em>float</em></span></dt>
 <dd class="field-desc"><p>The relative tolerance, with respect to the median of the resulting sample,
@@ -62,22 +68,23 @@ before asymmetric uncertainties are used. Overrides <code>rtol</code>.</p></dd>
 <dt>full_output<span class="classifier"><em>bool</em></span></dt>
 <dd class="field-desc"><p>Whether to return the randomly generated data samples.</p></dd>
 <dt>show<span class="classifier"><em>bool</em></span></dt>
-<dd class="field-desc"><p>Whether to show a histogram and estimated PDFs of the computed sample data.</p></dd>
+<dd class="field-desc"><p>Whether to show a histogram and estimated pdfs of the computed sample data.</p></dd>
 </dl>
 </dd>
 <dt class="field-head">Returns<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>out<span class="classifier"><em><a href="{{ '/doc/functions/stats/Observable/Observable.html' | relative_url }}">Observable</a> | tuple[<a href="{{ '/doc/functions/stats/Observable/Observable.html' | relative_url }}">Observable</a>, <a href="{{ '/doc/modules/qtypes.html' | relative_url }}">ndarray</a>, <a href="{{ '/doc/modules/qtypes.html' | relative_url }}">ndarray</a>]</em></span></dt>
-<dd class="field-desc"><p>An <code>Observable</code> whose uncertainties result from the propagation of the uncertainties
-of the input values <code>x</code> by function <code>f</code>.
-If the uncertainties are asymmetric, the parameters of a skew normal distribution
-are estimated using least-square fitting and are stored to the observable. The value and the two uncertainties are
-the median and the left- (~0.1587) and right-sided (~0.8413) 1-sigma percentiles
-relative to the median, respectively. If the uncertainties are symmetric the observable
-is assumed to be normally distributed. The value and the single uncertainty is then calculated using
-the mean and the standard deviation of the sampled data. If <code>full_output</code> is True, a list of the input samples
-as well as the output sample are returned along with the observable.</p></dd>
+<dt>(ob, x_samples, y_samples)<span class="classifier"><em><a href="{{ '/doc/functions/stats/Observable/Observable.html' | relative_url }}">Observable</a> | tuple[<a href="{{ '/doc/functions/stats/Observable/Observable.html' | relative_url }}">Observable</a>, <a href="{{ '/doc/modules/qtypes.html#ndarray' | relative_url }}">ndarray</a>, <a href="{{ '/doc/modules/qtypes.html#ndarray' | relative_url }}">ndarray</a>]</em></span></dt>
+<dd class="field-desc"><p>An <code>Observable</code> whose uncertainties result from the propagation
+of the uncertainties of the input values <code>x</code> by the function <code>f</code>.
+If <code>full_output</code> is <code>True</code>, the input samples and the output sample are returned as well.</p></dd>
+</dl>
+</dd>
+<dt class="field-head">Raises<span class="colon">:</span></dt>
+<dd class="field-par">
+<dl>
+<dt>ValueError</dt>
+<dd class="field-desc"><p>If <code>x</code> and <code>x_d</code> have different sizes.</p></dd>
 </dl>
 </dd>
 </dl>

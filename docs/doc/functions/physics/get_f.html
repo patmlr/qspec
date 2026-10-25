@@ -10,24 +10,27 @@ title: qspec.get_f
 <em class="sig-param"><span class="n">i</span></em>
 ,&nbsp;
 <em class="sig-param"><span class="n">j</span></em>
-<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/physics.py#L816-L824' }}"><span class="sig-source">[source]</span></a>
+<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/physics.py#L951-L963' }}"><span class="sig-source">[source]</span></a>
 </dt>
 <dd class="field-body">
-<p>All quantum numbers fulfilling $|I - J| \leq F \leq I + J$, where $F\in\mathbb{N}_0$.</p>
+<p>All total angular momentum quantum numbers of the coupled angular momenta $\vec{F} = \vec{I} + \vec{J}$</p>
+<div class="math-block">$$
+F \in \{|I - J|, |I - J| + 1, \dots, I + J\}.
+$$</div>
 <dl class="field-list">
 <dt class="field-head">Parameters<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>i<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">scalar</a></em></span></dt>
+<dt>i<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#scalar' | relative_url }}">scalar</a></em></span></dt>
 <dd class="field-desc"><p>The nuclear spin quantum number $I$.</p></dd>
-<dt>j<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">scalar</a></em></span></dt>
+<dt>j<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#scalar' | relative_url }}">scalar</a></em></span></dt>
 <dd class="field-desc"><p>The electronic total angular momentum quantum number $J$.</p></dd>
 </dl>
 </dd>
 <dt class="field-head">Returns<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>F_list<span class="classifier"><em>list[<a href="{{ '/doc/modules/qtypes.html' | relative_url }}">quant</a>]</em></span></dt>
+<dt>F_list<span class="classifier"><em>list[<a href="{{ '/doc/functions/qtypes/quant/quant.html' | relative_url }}">quant</a>]</em></span></dt>
 <dd class="field-desc"><p>All possible $F$ quantum numbers.</p></dd>
 </dl>
 </dd>

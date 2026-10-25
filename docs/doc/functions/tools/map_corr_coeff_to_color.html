@@ -9,19 +9,19 @@ title: qspec.map_corr_coeff_to_color
 <span class="sig-paren">&nbsp;(&nbsp;</span>
 <em class="sig-param"><span class="n">val</span></em>
 ,&nbsp;
-<em class="sig-param"><span class="n">clip</span><span class="o">=</span><span class="default_value bool">True</span></em>
-<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/tools.py#L188-L206' }}"><span class="sig-source">[source]</span></a>
+<em class="sig-param"><span class="n">clip</span><span class="o">=</span><span class="default_value"><span class="bool">True</span></span></em>
+<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/tools.py#L203-L222' }}"><span class="sig-source">[source]</span></a>
 </dt>
 <dd class="field-body">
-<p>Maps a value between -1 and 1 to a red-to-green colormap.</p>
+<p>Map a value between -1 and 1 to a red-to-green colormap.</p>
 <dl class="field-list">
 <dt class="field-head">Parameters<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>val<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">scalar</a></em></span></dt>
+<dt>val<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#scalar' | relative_url }}">scalar</a></em></span></dt>
 <dd class="field-desc"><p>A value between -1 and 1.</p></dd>
 <dt>clip<span class="classifier"><em>bool</em></span></dt>
-<dd class="field-desc"><p>Whether to clip vals outside -1 and 1. If False, raise ValueError.</p></dd>
+<dd class="field-desc"><p>Whether to clip values outside of [-1, 1]. <code>nan</code> values are mapped to 0.</p></dd>
 </dl>
 </dd>
 <dt class="field-head">Returns<span class="colon">:</span></dt>
@@ -29,6 +29,13 @@ title: qspec.map_corr_coeff_to_color
 <dl>
 <dt>(r, g, b)<span class="classifier"><em>tuple[int, int, int]</em></span></dt>
 <dd class="field-desc"><p>A tuple of RGB values in the range 0-255.</p></dd>
+</dl>
+</dd>
+<dt class="field-head">Raises<span class="colon">:</span></dt>
+<dd class="field-par">
+<dl>
+<dt>ValueError</dt>
+<dd class="field-desc"><p>If <code>clip</code> is <code>False</code> and <code>val</code> is <code>nan</code> or outside of [-1, 1].</p></dd>
 </dl>
 </dd>
 </dl>

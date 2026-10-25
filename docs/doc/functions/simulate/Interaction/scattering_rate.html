@@ -9,7 +9,7 @@ title: qspec.simulate.Interaction.scattering_rate
 <span class="sig-paren">&nbsp;(&nbsp;</span>
 <em class="sig-param"><span class="n">rho</span></em>
 ,&nbsp;
-<em class="sig-param"><span class="n">as_density_matrix</span><span class="o">=</span><span class="default_value bool">True</span></em>
+<em class="sig-param"><span class="n">as_density_matrix</span><span class="o">=</span><span class="default_value"><span class="bool">True</span></span></em>
 ,&nbsp;
 <em class="sig-param"><span class="n">k</span><span class="o">=</span><span class="default_value">None</span></em>
 ,&nbsp;
@@ -25,83 +25,39 @@ title: qspec.simulate.Interaction.scattering_rate
 ,&nbsp;
 <em class="sig-param"><span class="n">f</span><span class="o">=</span><span class="default_value">None</span></em>
 ,&nbsp;
-<em class="sig-param"><span class="n">axis</span><span class="o">=</span><span class="default_value num">1</span></em>
-<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/simulate/_simulate_cpp.py#L2405-L2502' }}"><span class="sig-source">[source]</span></a>
+<em class="sig-param"><span class="n">axis</span><span class="o">=</span><span class="default_value"><span class="num">1</span></span></em>
+<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/simulate/_simulate_cpp.py#L2415-L2468' }}"><span class="sig-source">[source]</span></a>
 </dt>
 <dd class="field-body">
-<p>The photon scattering rate</p>
-<div class="math-block">$$\begin{aligned}
-\Gamma_\mathrm{sc}\left(\rho, \hat{k}(\theta, \phi), \vec{\varepsilon}\right) &amp;= \sum\limits_{f\in\mathcal{F}}
-\,\sum\limits_{i\in\mathcal{I}}\sum\limits_{Xk_{fi}}\sum\limits_{j\in\mathcal{I}}\sum\limits_{Xk_{fj}}
-\rho_{ji}\sqrt{A_{if}^{Xk_{fi}}A_{jf}^{Xk_{fj}}}\\[1ex]
-&amp;\quad\times\left\lbrace\sum\limits_\lambda (-1)^{k_{fi} + \lambda}\,a_{fi,k_{fi}}^\lambda
-\left[(-\mathrm{i})^{k_{fi} - X_{fi}}\,\vec{\varepsilon}
-\cdot\vec{Y}_{k_{fi}\lambda}^{(X_{fi})}(\hat{k}(\theta, \phi))\right]\right\rbrace\\[1ex]
-&amp;\quad\times\left\lbrace\sum\limits_\lambda (-1)^{k_{fj} + \lambda}\,a_{jf,k_{fj}}^\lambda
-\left[(-\mathrm{i})^{k_{fj} - X_{fj}}\,\vec{\varepsilon}
-\cdot\vec{Y}_{k_{fj}\lambda}^{(X_{fj})}(\hat{k}(\theta, \phi))\right]^\ast\right\rbrace\\[3ex]
-a_{fi,k_{fi}}^\lambda &amp;= (-1)^{F_f + I + k_{fi} + J_i}\sqrt{(2F_f + 1)(2J_i + 1)}
-\langle F_fm_fk_{fi}\lambda|F_im_i\rangle\begin{Bmatrix}J_i &amp; J_f &amp; k_{fi} \\F_f &amp; F_i &amp; I\end{Bmatrix}\\[3ex]
-X_{\!fi} &amp;= \begin{cases}+1, &amp; \text{if electric } (\mathrm{E}k_{fi}) \\
-\ \,0, &amp; \text{if magnetic } (\mathrm{M}k_{fi})\end{cases},
-\end{aligned}$$</div>
-<p>where $A_{if}^{Xk_{fi}}$ is the Einstein coefficient for the electric (magnetic)
-decay $|i\rangle\rightarrow|f\rangle$ and the rank-$k_{fi}$ multipole order,
-$\vec{Y}_{k_{fi}\lambda}^{(X_{fi})}(\hat{k})$ is the vector spherical harmonic
-(see p. 215, Eq. (35) in [<a href=https://doi.org/10.1142/0270>D. A. Varshalovich et al. (1988)</a>]),
-$\rho$ is the density matrix, $\hat{k}$ is the direction of emission and $\vec{\varepsilon}$
-is the complex polarization vector of the emitted photons.
-The calculation includes interference terms between all multipole ranks <code>1 &lt;= k &lt;= Atom.decay_map.k_max</code>
-if emission directions are chosen through the (<code>theta</code>, <code>phi</code>) or <code>k_vec</code> parameters.
-Parity mixing is currently not considered, such that all rank-$k$ electric (magnetic) transition are pure.
-The emitted polarization can be chosen through the <code>x_vec</code> parameter. If <code>x_vec</code> is <code>None</code>, the above equation
-will be summed over two orthogonal polarization vectors.
-The emitted multipole orders can be limited through the <code>k</code> parameter.
-The transitions contributing to the scattering rate can be limited through the index lists <code>i</code> and <code>f</code>
-of the initial and final states, before and after spontaneous decay, respectively.</br></br></p>
-<p>If no emission direction is chosen (<code>theta = phi = k_vec = None</code>), the above equation simplifies
-to the scattering rate into the complete $4\pi$ solid angle (without polarization selection)</p>
-<div class="math-block">$$\begin{aligned}
-\Gamma_\mathrm{sc}(\rho) &amp;= \sum\limits_{f\in\mathcal{F}}
-\sum\limits_{i\in\mathcal{I}}\sum\limits_{(Xk)_{fi}}
-\rho_{ii}A_{if}^{Xk_{fi}}\left(a_{fi,k_{fi}}^{m_i - m_f}\right)^2.
-\end{aligned}$$</div>
-<p>For more details about multipole transitions algebra, see
-[<a href=https://doi.org/10.1142/0270>D. A. Varshalovich et al. (1988)</a>,
-<a href=https://doi.org/10.48550/arXiv.2510.07451>W. C. Campbell, arXiv:2510.07451 (2025)</a>].</p>
+<p>The photon scattering rate of the atom of the interaction, see <a href="{{ '/doc/functions/simulate/Atom/scattering_rate.html' | relative_url }}"><code>Atom.scattering_rate</code></a>.</p>
 <dl class="field-list">
 <dt class="field-head">Parameters<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>rho<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">array_like</a></em></span></dt>
+<dt>rho<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a></em></span></dt>
 <dd class="field-desc"><p>The density matrix $\rho$ of the <code>Atom</code>. Must have the same size as the <code>Atom</code>
 along the specified <code>axis</code>, and <code>axis + 1</code> if <code>as_density_matrix == True</code>.</p></dd>
 <dt>as_density_matrix<span class="classifier"><em>bool</em></span></dt>
-<dd class="field-desc"><p>Whether 'rho' is a state vector or a density matrix.</p></dd>
-<dt>k<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">array_like</a> | None</em></span></dt>
+<dd class="field-desc"><p>Whether <code>rho</code> is a state vector or a density matrix.</p></dd>
+<dt>k<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a> | None</em></span></dt>
 <dd class="field-desc"><p>The rank(s) $k$ of the emitted multipole radiation. If <code>None</code>,
 all orders <code>1 &lt;= k &lt;= Atom.decay_map.k_max</code> are considered.</p></dd>
-<dt>theta<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">array_like</a> | None</em></span></dt>
+<dt>theta<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a> | None</em></span></dt>
 <dd class="field-desc"><p>The elevation angle of detection relative to the $z$-axis.</p></dd>
-<dt>phi<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">array_like</a> | None</em></span></dt>
+<dt>phi<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a> | None</em></span></dt>
 <dd class="field-desc"><p>The azimuthal angle of detection in the $xy$-plane.</p></dd>
-<dt>k_vec<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">array_like</a> | None</em></span></dt>
+<dt>k_vec<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a> | None</em></span></dt>
 <dd class="field-desc"><p>An iterable of directional vectors $\hat{k}$ emitted by the atom.
-<code>k_vec</code> must have shape <code>(3, )</code> or <code>(m, 3)</code> .</p></dd>
-<dt>x_vec<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">array_like</a> | None</em></span></dt>
+<code>k_vec</code> must have shape <code>(3, )</code> or <code>(m, 3)</code>.</p></dd>
+<dt>x_vec<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a> | None</em></span></dt>
 <dd class="field-desc"><p>An iterable of complex polarization vectors $\vec{\varepsilon}$ emitted by the atom.
-<code>x_vec</code> must have shape <code>(3, )</code> or <code>(m, 3)</code> or be a <code>str</code> indicating a special polarization:
-<ul>
-<li>$e_\theta$: <code>{'z', 'theta', 't'}</code></li>
-<li>$e_\phi$: <code>{'x', 'y', 'xy', 'phi', 'p'}</code></li>
-<li>$\sigma^-$: <code>{'-', 's-', 'sigma-', 'l'}</code></li>
-<li>$\sigma^+$: <code>{'+', 's+', 'sigma+', 'r'}</code></li>
-</ul>
-In these cases, the polarizations are created automatically based on the emission directions.</p></dd>
-<dt>i<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">array_like</a> | None</em></span></dt>
+<code>x_vec</code> must have shape <code>(3, )</code> or <code>(m, 3)</code> or be a <code>str</code> indicating a special polarization,
+which is created automatically based on the emission directions:</p>
+<ul><li>$\hat{e}_\theta$: <code>{"z", "theta", "t"}</code></li><li>$\hat{e}_\phi$: <code>{"x", "y", "xy", "phi", "p"}</code></li><li>$\sigma^-$: <code>{"-", "s-", "sigma-", "l"}</code></li><li>$\sigma^+$: <code>{"+", "s+", "sigma+", "r"}</code></li></ul></dd>
+<dt>i<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a> | None</em></span></dt>
 <dd class="field-desc"><p>The initially excited state indexes to consider for spontaneous decay.
 If <code>None</code>, all states are considered.</p></dd>
-<dt>f<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">array_like</a> | None</em></span></dt>
+<dt>f<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a> | None</em></span></dt>
 <dd class="field-desc"><p>The final decayed state indexes to consider for spontaneous decay.
 If <code>None</code>, all states are considered.</p></dd>
 <dt>axis<span class="classifier"><em>int</em></span></dt>
@@ -112,8 +68,16 @@ expecting <code>rho</code> as an array with shape <code>(n, Atom.size, Atom.size
 <dt class="field-head">Returns<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>Gamma_sc<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">ndarray</a></em></span></dt>
+<dt>Gamma_sc<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#ndarray' | relative_url }}">ndarray</a></em></span></dt>
 <dd class="field-desc"><p>The scattering rate $\Gamma_\mathrm{sc}$ as an array with shape <code>(m, n, ...)</code>.</p></dd>
+</dl>
+</dd>
+<dt class="field-head">Raises<span class="colon">:</span></dt>
+<dd class="field-par">
+<dl>
+<dt>ValueError</dt>
+<dd class="field-desc"><p>If the emission directions or polarizations are specified inconsistently
+or if <code>k</code> is out of range.</p></dd>
 </dl>
 </dd>
 </dl>

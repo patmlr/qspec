@@ -13,25 +13,29 @@ title: qspec.p_el
 ,&nbsp;
 <em class="sig-param"><span class="n">m</span></em>
 ,&nbsp;
-<em class="sig-param"><span class="n">p0</span><span class="o">=</span><span class="default_value num">0</span></em>
+<em class="sig-param"><span class="n">p0</span><span class="o">=</span><span class="default_value"><span class="num">0</span></span></em>
 ,&nbsp;
-<em class="sig-param"><span class="n">relativistic</span><span class="o">=</span><span class="default_value bool">True</span></em>
-<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/physics.py#L477-L490' }}"><span class="sig-source">[source]</span></a>
+<em class="sig-param"><span class="n">relativistic</span><span class="o">=</span><span class="default_value"><span class="bool">True</span></span></em>
+<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/physics.py#L574-L592' }}"><span class="sig-source">[source]</span></a>
 </dt>
 <dd class="field-body">
-<p>The momentum $p = \frac{1}{c}\sqrt{(qU)^2 + (p_0 c)^2 + 2qU\sqrt{(p_0 c)^2 + (mc^2)^2}}$.</p>
+<p>The momentum</p>
+<div class="math-block">$$
+p = \begin{cases}\frac{1}{c}\sqrt{(qU)^2 + (p_0 c)^2 + 2qU\sqrt{(p_0 c)^2 + (mc^2)^2}}, &amp; \text{relativistic}\\
+\sqrt{p_0^2 + 2mqU}, &amp; \text{classical}\end{cases}.
+$$</div>
 <dl class="field-list">
 <dt class="field-head">Parameters<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>u<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">array_like</a></em></span></dt>
+<dt>u<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a></em></span></dt>
 <dd class="field-desc"><p>The electric potential difference $U$ added to the kinetic energy of a body with momentum <code>p0</code> (V).</p></dd>
-<dt>q<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">array_like</a></em></span></dt>
+<dt>q<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a></em></span></dt>
 <dd class="field-desc"><p>The electric charge $q$ of the body (e).</p></dd>
-<dt>m<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">array_like</a></em></span></dt>
+<dt>m<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a></em></span></dt>
 <dd class="field-desc"><p>The mass $m$ of the body (u).</p></dd>
-<dt>p0<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">array_like</a></em></span></dt>
-<dd class="field-desc"><p>The initial momentum of the body (u m/s).</p></dd>
+<dt>p0<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a></em></span></dt>
+<dd class="field-desc"><p>The initial momentum $p_0$ of the body (u m/s).</p></dd>
 <dt>relativistic<span class="classifier"><em>bool</em></span></dt>
 <dd class="field-desc"><p>The calculation is performed either relativistically (<code>True</code>) or classically (<code>False</code>).
 The default is <code>True</code>.</p></dd>
@@ -40,9 +44,9 @@ The default is <code>True</code>.</p></dd>
 <dt class="field-head">Returns<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>p<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">ndarray</a></em></span></dt>
+<dt>p<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#ndarray' | relative_url }}">ndarray</a></em></span></dt>
 <dd class="field-desc"><p>The momentum $p$ of a body with electric charge <code>q</code>, mass <code>m</code> and starting momentum <code>p0</code>
-after the addition of the energy <code>e</code> (u m/s).</p></dd>
+after electrostatic acceleration with the voltage <code>u</code> (u m/s).</p></dd>
 </dl>
 </dd>
 </dl>

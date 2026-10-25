@@ -4,7 +4,7 @@ description: A physics toolbox for laser spectroscopy.
 show_downloads: true
 accent_color: "#ff7f0e"
 copyright: 2026 Patrick M&#252;ller. All rights reserved.
-remote_theme: patmlr/qdocs@v0.1.0
+remote_theme: patmlr/qdocs@v0.3.0
 plugins:
   - jekyll-remote-theme
   - jekyll-seo-tag

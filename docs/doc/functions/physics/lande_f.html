@@ -16,7 +16,7 @@ title: qspec.lande_f
 <em class="sig-param"><span class="n">gi</span></em>
 ,&nbsp;
 <em class="sig-param"><span class="n">gj</span></em>
-<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/physics.py#L961-L986' }}"><span class="sig-source">[source]</span></a>
+<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/physics.py#L1109-L1136' }}"><span class="sig-source">[source]</span></a>
 </dt>
 <dd class="field-body">
 <p>The total atomic g-factor in the IJ-coupling scheme</p>
@@ -31,23 +31,23 @@ and $g_\mathrm{p}$, the g-factor of the proton, must be positive.</p>
 <dt class="field-head">Parameters<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>i<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">scalar</a></em></span></dt>
+<dt>i<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#scalar' | relative_url }}">scalar</a></em></span></dt>
 <dd class="field-desc"><p>The nuclear spin quantum number $I$.</p></dd>
-<dt>j<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">scalar</a></em></span></dt>
+<dt>j<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#scalar' | relative_url }}">scalar</a></em></span></dt>
 <dd class="field-desc"><p>The electronic total angular momentum quantum number $J$.</p></dd>
-<dt>f<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">scalar</a></em></span></dt>
+<dt>f<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#scalar' | relative_url }}">scalar</a></em></span></dt>
 <dd class="field-desc"><p>The total angular momentum quantum number $F$.</p></dd>
-<dt>gi<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">array_like</a></em></span></dt>
+<dt>gi<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a></em></span></dt>
 <dd class="field-desc"><p>The nuclear g-factor $g_I$.</p></dd>
-<dt>gj<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">array_like</a></em></span></dt>
+<dt>gj<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a></em></span></dt>
 <dd class="field-desc"><p>The electronic g-factor $g_J$.</p></dd>
 </dl>
 </dd>
 <dt class="field-head">Returns<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>g_F<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">ndarray</a></em></span></dt>
-<dd class="field-desc"><p>The total atomic g-factor $g_F$.</p></dd>
+<dt>g_F<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#ndarray' | relative_url }}">ndarray</a></em></span></dt>
+<dd class="field-desc"><p>The total atomic g-factor $g_F$. For $F = 0$, $g_F = 0$ is returned.</p></dd>
 </dl>
 </dd>
 </dl>

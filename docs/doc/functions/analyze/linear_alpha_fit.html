@@ -17,42 +17,43 @@ title: qspec.analyze.linear_alpha_fit
 ,&nbsp;
 <em class="sig-param"><span class="n">corr</span><span class="o">=</span><span class="default_value">None</span></em>
 ,&nbsp;
-<em class="sig-param"><span class="n">func</span><span class="o">=</span><span class="default_value">york_fit</span></em>
+<em class="sig-param"><span class="n">func</span><span class="o">=</span><span class="default_value"><span class="func">york_fit</span></span></em>
 ,&nbsp;
-<em class="sig-param"><span class="n">alpha</span><span class="o">=</span><span class="default_value num">0</span></em>
+<em class="sig-param"><span class="n">alpha</span><span class="o">=</span><span class="default_value"><span class="num">0</span></span></em>
 ,&nbsp;
-<em class="sig-param"><span class="n">find_alpha</span><span class="o">=</span><span class="default_value bool">True</span></em>
+<em class="sig-param"><span class="n">find_alpha</span><span class="o">=</span><span class="default_value"><span class="bool">True</span></span></em>
 ,&nbsp;
-<em class="sig-param"><span class="n">report</span><span class="o">=</span><span class="default_value bool">False</span></em>
+<em class="sig-param"><span class="n">report</span><span class="o">=</span><span class="default_value"><span class="bool">False</span></span></em>
 ,&nbsp;
-<em class="sig-param"><span class="n">show</span><span class="o">=</span><span class="default_value bool">False</span></em>
+<em class="sig-param"><span class="n">show</span><span class="o">=</span><span class="default_value"><span class="bool">False</span></span></em>
 ,&nbsp;
 <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em>
-<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/analyze/_analyze.py#L1149-L1209' }}"><span class="sig-source">[source]</span></a>
+<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/analyze/_analyze.py#L1217-L1281' }}"><span class="sig-source">[source]</span></a>
 </dt>
 <dd class="field-body">
-<p>Wrapper for the $2$-dimensional linear regression algorithms
-<a href="{{ '/doc/functions/analyze/york_fit.html' | relative_url }}"><code>york_fit</code></a>,
-<a href="{{ '/doc/functions/analyze/linear_fit.html' | relative_url }}"><code>linear_fit</code></a> and
-<a href="{{ '/doc/functions/analyze/linear_monte_carlo.html' | relative_url }}"><code>linear_monte_carlo</code></a> that optimizes an additional $x$-axis shift $\alpha$
-for the minimum correlation coefficient between $y$-intercept and slope.</p>
+<p>Wrapper for the $2$-dimensional linear regression algorithms <a href="{{ '/doc/functions/analyze/york_fit.html' | relative_url }}"><code>york_fit</code></a>, <a href="{{ '/doc/functions/analyze/linear_fit.html' | relative_url }}"><code>linear_fit</code></a>
+and <a href="{{ '/doc/functions/analyze/linear_monte_carlo.html' | relative_url }}"><code>linear_monte_carlo</code></a> that optimizes an additional $x$-axis shift $\alpha$
+for the minimum correlation coefficient between the $y$-intercept and the slope of the straight line</p>
+<div class="math-block">$$
+f(x) = a + b(x - \alpha).
+$$</div>
 <dl class="field-list">
 <dt class="field-head">Parameters<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>x<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">array_like</a></em></span></dt>
+<dt>x<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a></em></span></dt>
 <dd class="field-desc"><p>The $x$ data.</p></dd>
-<dt>y<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">array_like</a></em></span></dt>
+<dt>y<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a></em></span></dt>
 <dd class="field-desc"><p>The $y$ data.</p></dd>
-<dt>sigma_x<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">array_like</a> | None</em></span></dt>
+<dt>sigma_x<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a> | None</em></span></dt>
 <dd class="field-desc"><p>The standard deviation $\sigma_x$ of the <code>x</code> data.</p></dd>
-<dt>sigma_y<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">array_like</a> | None</em></span></dt>
+<dt>sigma_y<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a> | None</em></span></dt>
 <dd class="field-desc"><p>The standard deviation $\sigma_y$ of the <code>y</code> data.</p></dd>
-<dt>corr<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">array_like</a> | None</em></span></dt>
+<dt>corr<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a> | None</em></span></dt>
 <dd class="field-desc"><p>The correlation coefficients $\rho_{xy}$ between the <code>x</code> and <code>y</code> data.</p></dd>
 <dt>func<span class="classifier"><em>Callable | str</em></span></dt>
 <dd class="field-desc"><p>The fitting routine. Supports any of <code>{"york_fit", "linear_fit", "linear_monte_carlo"}</code>.</p></dd>
-<dt>alpha<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">scalar</a></em></span></dt>
+<dt>alpha<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#scalar' | relative_url }}">scalar</a></em></span></dt>
 <dd class="field-desc"><p>An $x$-axis offset $\alpha$ to reduce the correlation coefficient
 between the $y$-intercept and the slope.</p></dd>
 <dt>find_alpha<span class="classifier"><em>bool</em></span></dt>
@@ -69,8 +70,15 @@ May not give the desired result if <code>alpha</code> was initialized too far fr
 <dt class="field-head">Returns<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>(popt, pcov, alpha)<span class="classifier"><em>tuple[<a href="{{ '/doc/modules/qtypes.html' | relative_url }}">ndarray</a>, <a href="{{ '/doc/modules/qtypes.html' | relative_url }}">ndarray</a>, float]</em></span></dt>
-<dd class="field-desc"><p>. The best y-intercept and slope, their covariance matrix and the final <code>alpha</code>.</p></dd>
+<dt>(popt, pcov, alpha)<span class="classifier"><em>tuple[<a href="{{ '/doc/modules/qtypes.html#ndarray' | relative_url }}">ndarray</a>, <a href="{{ '/doc/modules/qtypes.html#ndarray' | relative_url }}">ndarray</a>, float]</em></span></dt>
+<dd class="field-desc"><p>The best y-intercept and slope, their covariance matrix and the final <code>alpha</code>.</p></dd>
+</dl>
+</dd>
+<dt class="field-head">Raises<span class="colon">:</span></dt>
+<dd class="field-par">
+<dl>
+<dt>ValueError</dt>
+<dd class="field-desc"><p>If <code>func</code> is not supported.</p></dd>
 </dl>
 </dd>
 </dl>

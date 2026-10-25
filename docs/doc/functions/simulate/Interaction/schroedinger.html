@@ -11,12 +11,12 @@ title: qspec.simulate.Interaction.schroedinger
 ,&nbsp;
 <em class="sig-param"><span class="n">delta</span><span class="o">=</span><span class="default_value">None</span></em>
 ,&nbsp;
-<em class="sig-param"><span class="n">m</span><span class="o">=</span><span class="default_value num">0</span></em>
+<em class="sig-param"><span class="n">m</span><span class="o">=</span><span class="default_value"><span class="num">0</span></span></em>
 ,&nbsp;
 <em class="sig-param"><span class="n">v</span><span class="o">=</span><span class="default_value">None</span></em>
 ,&nbsp;
 <em class="sig-param"><span class="n">y0</span><span class="o">=</span><span class="default_value">None</span></em>
-<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/simulate/_simulate_cpp.py#L2156-L2223' }}"><span class="sig-source">[source]</span></a>
+<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/simulate/_simulate_cpp.py#L2163-L2230' }}"><span class="sig-source">[source]</span></a>
 </dt>
 <dd class="field-body">
 <p>Solver for the Schr&ouml;dinger equation</p>
@@ -30,18 +30,18 @@ Solutions for <code>n</code> samples can be calculated in parallel for <code>nt<
 <dt class="field-head">Parameters<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>t<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">array_like</a></em></span></dt>
+<dt>t<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a></em></span></dt>
 <dd class="field-desc"><p>The times $t$ when to compute the solution. Any array is cast to the shape <code>(nt, )</code>,
 where <code>nt</code> is the size of the array <code>t</code> (&mu;s).</p></dd>
-<dt>delta<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">array_like</a> | None</em></span></dt>
+<dt>delta<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a> | None</em></span></dt>
 <dd class="field-desc"><p>An array of laser frequency shifts $\vec{\Delta}$. <code>delta</code> must be a scalar, a 1d- or 2d-array
 with shapes <code>(n, )</code> or <code>(n, nl)</code>, respectively, where <code>nl</code> is the number of lasers of the <code>Interaction</code> (MHz).</p></dd>
 <dt>m<span class="classifier"><em>int | None</em></span></dt>
-<dd class="field-desc"><p>The index of the shifted laser. If <code>delta</code> is a 2d-array, <code>m</code> ist omitted.</p></dd>
-<dt>v<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">array_like</a> | None</em></span></dt>
+<dd class="field-desc"><p>The index of the shifted laser. If <code>delta</code> is a 2d-array, <code>m</code> is ignored.</p></dd>
+<dt>v<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a> | None</em></span></dt>
 <dd class="field-desc"><p>Atom velocities $\vec{v}$. Must be a scalar or have shape <code>(n, )</code> or <code>(n, 3)</code>. In the first two cases,
 the velocity vector(s) are assumed to be aligned with the $x$-axis (m/s).</p></dd>
-<dt>y0<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">array_like</a> | None</em></span></dt>
+<dt>y0<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a> | None</em></span></dt>
 <dd class="field-desc"><p>The initial state of the <code>Atom</code>.
 This must be <code>None</code> or have shape <code>(Atom.size, )</code> or <code>(n, Atom.size)</code>.
 If <code>None</code>, all states with the same label as the first <code>State</code> in <code>atom.states</code> are populated equally.</p></dd>
@@ -50,7 +50,7 @@ If <code>None</code>, all states with the same label as the first <code>State</c
 <dt class="field-head">Returns<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>psi_t<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">ndarray</a></em></span></dt>
+<dt>psi_t<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#ndarray' | relative_url }}">ndarray</a></em></span></dt>
 <dd class="field-desc"><p>The integrated Schr&ouml;dinger equation as a complex-valued array
 of shape <code>(n, Atom.size, nt)</code>.</p></dd>
 </dl>

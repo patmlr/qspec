@@ -11,6 +11,8 @@
 
     "terminal.integrated.defaultProfile.windows": "Windows PowerShell",
 
+    "files.eol": "\n",
+
     "cmake.useCMakePresets": "always",
     "cmake.configureOnOpen": false,
     "cmake.configureOnEdit": false,

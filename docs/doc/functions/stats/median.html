@@ -10,26 +10,26 @@ title: qspec.median
 <em class="sig-param"><span class="n">a</span></em>
 ,&nbsp;
 <em class="sig-param"><span class="n">axis</span><span class="o">=</span><span class="default_value">None</span></em>
-<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/stats.py#L276-L287' }}"><span class="sig-source">[source]</span></a>
+<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/stats.py#L308-L321' }}"><span class="sig-source">[source]</span></a>
 </dt>
 <dd class="field-body">
-
+<p>The median and the 1-sigma percentiles of a sample, ignoring <code>nan</code> values.</p>
 <dl class="field-list">
 <dt class="field-head">Parameters<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>a<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">array_like</a></em></span></dt>
+<dt>a<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a></em></span></dt>
 <dd class="field-desc"><p>The sample data.</p></dd>
-<dt>axis<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">int_like</a> | None</em></span></dt>
+<dt>axis<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#int_like' | relative_url }}">int_like</a> | None</em></span></dt>
 <dd class="field-desc"><p>The axis along which the three percentiles are computed.</p></dd>
 </dl>
 </dd>
 <dt class="field-head">Returns<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>out<span class="classifier"><em>tuple[<a href="{{ '/doc/modules/qtypes.html' | relative_url }}">ndarray</a>, <a href="{{ '/doc/modules/qtypes.html' | relative_url }}">ndarray</a>, <a href="{{ '/doc/modules/qtypes.html' | relative_url }}">ndarray</a>]</em></span></dt>
-<dd class="field-desc"><p>The median (0.5-percentile) as well as the left- (~0.1587) and right-sided (~0.8413) 1-sigma percentile
-of a given sample <code>a</code> along the specified <code>axis</code>.</p></dd>
+<dt>(med, per_0, per_1)<span class="classifier"><em>tuple[<a href="{{ '/doc/modules/qtypes.html#ndarray' | relative_url }}">ndarray</a>, <a href="{{ '/doc/modules/qtypes.html#ndarray' | relative_url }}">ndarray</a>, <a href="{{ '/doc/modules/qtypes.html#ndarray' | relative_url }}">ndarray</a>]</em></span></dt>
+<dd class="field-desc"><p>The median (0.5-percentile) as well as the left- (~0.1587)
+and right-sided (~0.8413) 1-sigma percentile of a given sample <code>a</code> along the specified <code>axis</code>.</p></dd>
 </dl>
 </dd>
 </dl>

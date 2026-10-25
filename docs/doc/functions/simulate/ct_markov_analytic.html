@@ -13,39 +13,50 @@ title: qspec.simulate.ct_markov_analytic
 ,&nbsp;
 <em class="sig-param"><span class="n">rates</span></em>
 ,&nbsp;
-<em class="sig-param"><span class="n">r</span><span class="o">=</span><span class="default_value num">1.0</span></em>
-<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/simulate/_simulate.py#L34-L115' }}"><span class="sig-source">[source]</span></a>
+<em class="sig-param"><span class="n">r</span><span class="o">=</span><span class="default_value"><span class="num">1.0</span></span></em>
+<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/simulate/_simulate.py#L34-L120' }}"><span class="sig-source">[source]</span></a>
 </dt>
 <dd class="field-body">
-<p>Computes the analytic solution of the evolution of a linear continuous-time markov chain.</p>
-<p>CAUTION! Computation of analytic solution problematic
-(Multiplication of very small numbers with very large numbers).</p>
+<p>The analytic solution of the evolution of a linear continuous-time Markov chain
+$0\rightarrow 1\rightarrow 2\rightarrow\dots$ with the rates $\lambda_i$, starting in the state 0.
+For a constant rate $\lambda$, this is the Poisson distribution</p>
+<div class="math-block">$$
+P(n, t) = \frac{(r\lambda t)^n}{n!}e^{-\lambda t}.
+$$</div>
+<p>For individual rates, the analytic solution can be numerically unstable,
+since very small numbers are multiplied with very large numbers. See <a href="{{ '/doc/functions/simulate/ct_markov_dgl.html' | relative_url }}"><code>ct_markov_dgl</code></a> for a numerical solution.</p>
 <dl class="field-list">
 <dt class="field-head">Parameters<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>t<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">array_like</a></em></span></dt>
-<dd class="field-desc"><p>The time at which the probability is returned (us).</p></dd>
-<dt>n<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">array_like</a></em></span></dt>
-<dd class="field-desc"><p>The number of the state for which the probability is returned. The first state corresponds to 'n' = 0.</p></dd>
-<dt>rates<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">array_like</a></em></span></dt>
-<dd class="field-desc"><p>The rate(s) at which the markov chain is transferring population from state i to state i + 1.
-If 'rates' is a scalar, this rate is assumed for all 0 &#8804; i &#8804; 'n'. If 'rates' is an Iterable,
-it must have length max('n') + 1 and individual rates 'rates[i]' are assumed for the states
-0 &#8804; i &#8804; 'n'.</p></dd>
-<dt>r<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">array_like</a></em></span></dt>
-<dd class="field-desc"><p>The ratio of the population which is transferred from state i to state i + 1. Then 1 - r is the ratio
-of the population that is lost during the transition from state i to state i + 1.</p></dd>
+<dt>t<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a></em></span></dt>
+<dd class="field-desc"><p>The time $t$ at which the probability is returned (&mu;s).</p></dd>
+<dt>n<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a></em></span></dt>
+<dd class="field-desc"><p>The number $n$ of the state for which the probability is returned.
+The first state corresponds to <code>n = 0</code>.</p></dd>
+<dt>rates<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a></em></span></dt>
+<dd class="field-desc"><p>The rate(s) $\lambda_i$ at which the Markov chain transfers population
+from the state $i$ to the state $i + 1$ (MHz). If <code>rates</code> is a scalar, this rate is assumed for all
+$0 \leq i \leq n$. If <code>rates</code> is an iterable, it must have length <code>max(n) + 1</code>
+and individual rates <code>rates[i]</code> are assumed for the states $0 \leq i \leq n$.</p></dd>
+<dt>r<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a></em></span></dt>
+<dd class="field-desc"><p>The ratio $r$ of the population which is transferred from the state $i$ to the state $i + 1$.
+Then $1 - r$ is the ratio of the population that is lost during the transition.</p></dd>
 </dl>
 </dd>
 <dt class="field-head">Returns<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>out<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">ndarray</a></em></span></dt>
-<dd class="field-desc"><p>The probability for the markov chain to be in state 'n' after the time 't' for P(t=0, n=0) = 1.
-The normalization condition is sum_n(P(n, t0)) = 1 for every single point in time t0.
-If 't' and 'n' are Iterables, a 2-d array is returned
-with shape (t.size, n.size), containing all probabilities P(t, n).</p></dd>
+<dt>p<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#ndarray' | relative_url }}">ndarray</a></em></span></dt>
+<dd class="field-desc"><p>The probability $P(n, t)$ for the Markov chain to be in the state <code>n</code> after the time <code>t</code>,
+with $P(0, 0) = 1$. If <code>t</code> and <code>n</code> are iterables, a 2d-array with shape <code>(t.size, n.size)</code> is returned.</p></dd>
+</dl>
+</dd>
+<dt class="field-head">Raises<span class="colon">:</span></dt>
+<dd class="field-par">
+<dl>
+<dt>ValueError</dt>
+<dd class="field-desc"><p>If <code>r</code> is not a scalar between 0 and 1.</p></dd>
 </dl>
 </dd>
 </dl>

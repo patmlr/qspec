@@ -10,25 +10,27 @@ title: qspec.f_recoil
 <em class="sig-param"><span class="n">f</span></em>
 ,&nbsp;
 <em class="sig-param"><span class="n">m</span></em>
-<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/physics.py#L784-L794' }}"><span class="sig-source">[source]</span></a>
+<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/physics.py#L911-L924' }}"><span class="sig-source">[source]</span></a>
 </dt>
 <dd class="field-body">
-<p>The change of a transition frequency of an atom at rest $\delta f = hf^2 / (2mc^2)$
-due to the absorption of a photon with frequency $f$.</p>
+<p>The change of a transition frequency of an atom at rest due to the absorption of a photon with frequency $f$</p>
+<div class="math-block">$$
+\delta f = \frac{hf^2}{2mc^2}.
+$$</div>
 <dl class="field-list">
 <dt class="field-head">Parameters<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>f<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">array_like</a></em></span></dt>
-<dd class="field-desc"><p>The frequency of light in the atoms rest frame (MHz).</p></dd>
-<dt>m<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">array_like</a></em></span></dt>
+<dt>f<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a></em></span></dt>
+<dd class="field-desc"><p>The frequency of light $f$ in the atom's rest frame (MHz).</p></dd>
+<dt>m<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a></em></span></dt>
 <dd class="field-desc"><p>The mass $m$ of the atom (u).</p></dd>
 </dl>
 </dd>
 <dt class="field-head">Returns<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>df_rec<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">ndarray</a></em></span></dt>
+<dt>df_rec<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#ndarray' | relative_url }}">ndarray</a></em></span></dt>
 <dd class="field-desc"><p>The change of the transition frequency $\delta f$ (MHz).</p></dd>
 </dl>
 </dd>

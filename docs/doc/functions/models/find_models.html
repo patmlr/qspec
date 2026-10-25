@@ -12,10 +12,11 @@ title: qspec.models.find_models
 <em class="sig-param"><span class="n">sub_model</span></em>
 ,&nbsp;
 <em class="sig-param"><span class="n">model_list</span><span class="o">=</span><span class="default_value">None</span></em>
-<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/models/_helper.py#L134-L162' }}"><span class="sig-source">[source]</span></a>
+<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/models/_helper.py#L142-L167' }}"><span class="sig-source">[source]</span></a>
 </dt>
 <dd class="field-body">
-
+<p>Find the first submodel of a given type in every branch of a model.
+The branches are the submodels of <a href="{{ '/doc/functions/models/Listed/Listed.html' | relative_url }}"><code>Listed</code></a> models.</p>
 <dl class="field-list">
 <dt class="field-head">Parameters<span class="colon">:</span></dt>
 <dd class="field-par">
@@ -23,17 +24,17 @@ title: qspec.models.find_models
 <dt>model<span class="classifier"><em>_base.Model | None</em></span></dt>
 <dd class="field-desc"><p>The model to search in.</p></dd>
 <dt>sub_model<span class="classifier"><em>type[T]</em></span></dt>
-<dd class="field-desc"><p>The submodel to find.</p></dd>
+<dd class="field-desc"><p>The type of the submodels to find.</p></dd>
 <dt>model_list<span class="classifier"><em>Iterable[T] | None</em></span></dt>
-<dd class="field-desc"><p>A list of models to append the found submodel to.</p></dd>
+<dd class="field-desc"><p>A list of models to append the found submodels to.</p></dd>
 </dl>
 </dd>
 <dt class="field-head">Returns<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>out<span class="classifier"><em>list[T]</em></span></dt>
-<dd class="field-desc"><p>This function returns a list of the first models of type or with the same type as <code>sub_model</code>
-for every branch in model.</p></dd>
+<dt>subs<span class="classifier"><em>list[T]</em></span></dt>
+<dd class="field-desc"><p>The first submodels of type <code>sub_model</code> of every branch in <code>model</code>,
+appended to <code>model_list</code>. Branches without a submodel of type <code>sub_model</code> are skipped.</p></dd>
 </dl>
 </dd>
 </dl>

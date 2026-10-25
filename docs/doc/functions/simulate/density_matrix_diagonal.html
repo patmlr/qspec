@@ -9,8 +9,8 @@ title: qspec.simulate.density_matrix_diagonal
 <span class="sig-paren">&nbsp;(&nbsp;</span>
 <em class="sig-param"><span class="n">rho</span></em>
 ,&nbsp;
-<em class="sig-param"><span class="n">axis</span><span class="o">=</span><span class="default_value num">1</span></em>
-<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/simulate/_simulate_cpp.py#L2505-L2529' }}"><span class="sig-source">[source]</span></a>
+<em class="sig-param"><span class="n">axis</span><span class="o">=</span><span class="default_value"><span class="num">1</span></span></em>
+<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/simulate/_simulate_cpp.py#L2471-L2497' }}"><span class="sig-source">[source]</span></a>
 </dt>
 <dd class="field-body">
 <p>The diagonal of the density matrix $\operatorname{diag}(\rho)$.</p>
@@ -18,7 +18,7 @@ title: qspec.simulate.density_matrix_diagonal
 <dt class="field-head">Parameters<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>rho<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">array_like</a></em></span></dt>
+<dt>rho<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a></em></span></dt>
 <dd class="field-desc"><p>The density matrix $\rho$. Must have the same size in <code>axis</code> and <code>axis + 1</code>.</p></dd>
 <dt>axis<span class="classifier"><em>int</em></span></dt>
 <dd class="field-desc"><p>The axis along which the population is aligned in <code>rho</code>. The default is <code>axis = 1</code>,
@@ -28,8 +28,16 @@ expecting <code>rho</code> as an array with shape <code>(n, Atom.size, Atom.size
 <dt class="field-head">Returns<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>out<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">ndarray</a>[floating]</em></span></dt>
-<dd class="field-desc"><p>the diagonal of the density matrix as an array with shape <code>(n, Atom.size, ...)</code>.</p></dd>
+<dt>rho_diag<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#ndarray' | relative_url }}">ndarray</a>[floating]</em></span></dt>
+<dd class="field-desc"><p>The diagonal of the density matrix as an array with shape <code>(n, Atom.size, ...)</code>.</p></dd>
+</dl>
+</dd>
+<dt class="field-head">Raises<span class="colon">:</span></dt>
+<dd class="field-par">
+<dl>
+<dt>ValueError</dt>
+<dd class="field-desc"><p>If <code>rho</code> has less than <code>axis + 2</code> dimensions
+or different sizes in the axes <code>axis</code> and <code>axis + 1</code>.</p></dd>
 </dl>
 </dd>
 </dl>

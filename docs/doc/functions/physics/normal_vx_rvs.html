@@ -11,8 +11,8 @@ title: qspec.normal_vx_rvs
 ,&nbsp;
 <em class="sig-param"><span class="n">t</span></em>
 ,&nbsp;
-<em class="sig-param"><span class="n">size</span><span class="o">=</span><span class="default_value num">1</span></em>
-<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/physics.py#L2520-L2539' }}"><span class="sig-source">[source]</span></a>
+<em class="sig-param"><span class="n">size</span><span class="o">=</span><span class="default_value"><span class="num">1</span></span></em>
+<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/physics.py#L2682-L2701' }}"><span class="sig-source">[source]</span></a>
 </dt>
 <dd class="field-body">
 <p>Random sample velocity components $v_x$ from the Gaussian probability density function</p>
@@ -24,9 +24,9 @@ $$</div>
 <dt class="field-head">Parameters<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>m<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">array_like</a></em></span></dt>
+<dt>m<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a></em></span></dt>
 <dd class="field-desc"><p>The mass $m$ of the particle (u).</p></dd>
-<dt>t<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">array_like</a></em></span></dt>
+<dt>t<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a></em></span></dt>
 <dd class="field-desc"><p>The temperature $T$ of the environment (K).</p></dd>
 <dt>size<span class="classifier"><em>int | tuple[int, ...]</em></span></dt>
 <dd class="field-desc"><p>Either the size (<code>int</code>) or shape (<code>tuple</code>) of the returned velocity array.
@@ -36,7 +36,7 @@ If <code>m</code> or <code>t</code> is an iterable/array, their common shape mus
 <dt class="field-head">Returns<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>vx<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">ndarray</a></em></span></dt>
+<dt>vx<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#ndarray' | relative_url }}">ndarray</a></em></span></dt>
 <dd class="field-desc"><p>Random velocities $v_x$ (m/s).</p></dd>
 </dl>
 </dd>

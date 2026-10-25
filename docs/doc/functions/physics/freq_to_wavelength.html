@@ -8,23 +8,26 @@ title: qspec.freq_to_wavelength
 <span class="sig-name">freq_to_wavelength</span>
 <span class="sig-paren">&nbsp;(&nbsp;</span>
 <em class="sig-param"><span class="n">f</span></em>
-<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/physics.py#L201-L208' }}"><span class="sig-source">[source]</span></a>
+<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/physics.py#L218-L229' }}"><span class="sig-source">[source]</span></a>
 </dt>
 <dd class="field-body">
-<p>Convert MHz into &mu;m using $\lambda = c / f$.</p>
+<p>Convert a frequency in MHz into a wavelength in &mu;m</p>
+<div class="math-block">$$
+\lambda = \frac{c}{f}.
+$$</div>
 <dl class="field-list">
 <dt class="field-head">Parameters<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>f<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">array_like</a></em></span></dt>
+<dt>f<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a></em></span></dt>
 <dd class="field-desc"><p>The frequency $f$ of a transition (MHz).</p></dd>
 </dl>
 </dd>
 <dt class="field-head">Returns<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>lambda<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">ndarray</a></em></span></dt>
-<dd class="field-desc"><p>The wavelength corresponding to the frequency <code>f</code> (&mu;m).</p></dd>
+<dt>lambda<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#ndarray' | relative_url }}">ndarray</a></em></span></dt>
+<dd class="field-desc"><p>The wavelength $\lambda$ corresponding to the frequency <code>f</code> (&mu;m).</p></dd>
 </dl>
 </dd>
 </dl>

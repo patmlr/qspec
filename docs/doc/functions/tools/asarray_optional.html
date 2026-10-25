@@ -10,25 +10,25 @@ title: qspec.asarray_optional
 <em class="sig-param"><span class="n">a</span></em>
 ,&nbsp;
 <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em>
-<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/tools.py#L450-L456' }}"><span class="sig-source">[source]</span></a>
+<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/tools.py#L492-L500' }}"><span class="sig-source">[source]</span></a>
 </dt>
 <dd class="field-body">
-
+<p>Cast <code>a</code> to a numpy array unless it is <code>None</code>.</p>
 <dl class="field-list">
 <dt class="field-head">Parameters<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
 <dt>a<span class="classifier"><em>Any | None</em></span></dt>
-<dd class="field-desc"><p>Input data, see numpy docs.</p></dd>
+<dd class="field-desc"><p>Input data, see <code>numpy.asarray</code>.</p></dd>
 <dt>kwargs</dt>
-<dd class="field-desc"><p>The keyword arguments are passed to <code>numpy.asarray</code>.</p></dd>
+<dd class="field-desc"><p>Additional keyword arguments are passed to <code>numpy.asarray</code>.</p></dd>
 </dl>
 </dd>
 <dt class="field-head">Returns<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>out<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">ndarray</a> | None</em></span></dt>
-<dd class="field-desc"><p>None if <code>a</code> is None else <code>numpy.asarray(a, **kwargs)</code>.</p></dd>
+<dt>arr<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#ndarray' | relative_url }}">ndarray</a> | None</em></span></dt>
+<dd class="field-desc"><p><code>None</code> if <code>a</code> is <code>None</code>, else <code>numpy.asarray(a, **kwargs)</code>.</p></dd>
 </dl>
 </dd>
 </dl>

@@ -15,10 +15,10 @@ title: qspec.normal_chi2_convolved_vx_pdf
 ,&nbsp;
 <em class="sig-param"><span class="n">scale_e</span></em>
 ,&nbsp;
-<em class="sig-param"><span class="n">e0</span><span class="o">=</span><span class="default_value num">0</span></em>
+<em class="sig-param"><span class="n">e0</span><span class="o">=</span><span class="default_value"><span class="num">0</span></span></em>
 ,&nbsp;
-<em class="sig-param"><span class="n">relativistic</span><span class="o">=</span><span class="default_value bool">True</span></em>
-<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/physics.py#L2653-L2691' }}"><span class="sig-source">[source]</span></a>
+<em class="sig-param"><span class="n">relativistic</span><span class="o">=</span><span class="default_value"><span class="bool">True</span></span></em>
+<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/physics.py#L2815-L2850' }}"><span class="sig-source">[source]</span></a>
 </dt>
 <dd class="field-body">
 <p>The probability density at the velocity $v_x$ of particles with kinetic energy $E_x$, distributed according
@@ -26,21 +26,21 @@ to a convolution of a normal and a $\chi^2_1$ distribution</p>
 <div class="math-block">$$\begin{aligned}
 \rho^\prime(v_x) = m|v_x|\gamma^3(v_x)\rho(E_x(v_x)), \qquad\int\limits_0^\infty \rho^\prime(v_x)\mathrm{d}v_x = 1,
 \end{aligned}$$</div>
-<p>where $\gamma$ is the time-dilation factor and $\rho$ is the probability density function
-<a href="{{ '/doc/functions/physics/normal_chi2_convolved_ex_pdf.html' | relative_url }}"><code>normal_chi2_convolved_ex_pdf</code></a>.</p>
+<p>where $\gamma$ is the time-dilation factor ($\gamma = 1$ if <code>relativistic</code> is <code>False</code>)
+and $\rho$ is the probability density function <a href="{{ '/doc/functions/physics/normal_chi2_convolved_ex_pdf.html' | relative_url }}"><code>normal_chi2_convolved_ex_pdf</code></a>.</p>
 <dl class="field-list">
 <dt class="field-head">Parameters<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>vx<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">array_like</a></em></span></dt>
+<dt>vx<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a></em></span></dt>
 <dd class="field-desc"><p>The velocity quantiles $v_x$ (m/s).</p></dd>
-<dt>m<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">array_like</a></em></span></dt>
+<dt>m<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a></em></span></dt>
 <dd class="field-desc"><p>The mass $m$ of the particle (u).</p></dd>
-<dt>t<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">array_like</a></em></span></dt>
+<dt>t<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a></em></span></dt>
 <dd class="field-desc"><p>The temperature $T$ of the environment (K).</p></dd>
-<dt>scale_e<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">array_like</a></em></span></dt>
-<dd class="field-desc"><p>The standard deviation $\sigma_{E_x}$ of the normal distribution (eV).</p></dd>
-<dt>e0<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">array_like</a></em></span></dt>
+<dt>scale_e<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a></em></span></dt>
+<dd class="field-desc"><p>The standard deviation $\sigma_\mathrm{e}$ of the normal distribution (eV).</p></dd>
+<dt>e0<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a></em></span></dt>
 <dd class="field-desc"><p>The mean energy $E_0$ of the normal distribution (eV).</p></dd>
 <dt>relativistic<span class="classifier"><em>bool</em></span></dt>
 <dd class="field-desc"><p>Kinetic energies are calculated either relativistically (<code>True</code>) or classically (<code>False</code>).</p></dd>
@@ -49,7 +49,7 @@ to a convolution of a normal and a $\chi^2_1$ distribution</p>
 <dt class="field-head">Returns<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>rho_vx<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">ndarray</a></em></span></dt>
+<dt>rho_vx<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#ndarray' | relative_url }}">ndarray</a></em></span></dt>
 <dd class="field-desc"><p>The probability density in thermal equilibrium at the velocity <code>vx</code> (s/m).</p></dd>
 </dl>
 </dd>

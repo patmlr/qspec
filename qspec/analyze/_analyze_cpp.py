@@ -1,6 +1,6 @@
 """
-qspec._analyze_cpp
-==================
+qspec.analyze._analyze_cpp
+==========================
 
 Classes and methods for the `analyze` module using the Python/C++ interface.
 """
@@ -58,13 +58,14 @@ def generate_collinear_points_cpp(
      and `n` is the number of dimensions of each point.
     :param cov: The covariance matrices $\mathbf{\Sigma}_i$ of the data vectors. Must have shape `(k, n, n)`.
      Use [`covariance_matrix`] to construct covariance matrices.
-    :param n_samples: The number of samples generated for each data point.
-     If `None` and `method == 'cpp"`, samples are generated until `n_accepted` samples get accepted.
+    :param n_samples: The maximum number of samples generated for each data point. If `None`, it is 100,000.
     :param n_accepted: The number of samples to be accepted for each data point.
-    :param seed: A seed for the random number generator.
+     If `None`, it is the maximum of 100,000 and `n_samples`.
+    :param seed: A seed for the random number generator. If `None`, a random seed is used.
     :param report: Whether to report the number of samples.
-    :param kwargs: Additional keyword arguments.
-    :returns: (p, n_accepted, n_samples) The generated data vectors $\vec{p}_i$ with shape `(n_accepted, k ,n)`
+    :param kwargs: Additional keyword arguments are accepted for compatibility with
+     [`generate_collinear_points_py`] and ignored.
+    :returns: (p, n_accepted, n_samples) The generated data vectors $\vec{p}_i$ with shape `(n_accepted, k, n)`
      and the number of accepted and generated samples.
     """
     mean, cov = np.ascontiguousarray(mean, dtype=float), np.ascontiguousarray(cov, dtype=float)

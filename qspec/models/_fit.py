@@ -2,7 +2,7 @@
 qspec.models._fit
 =================
 
-Module to fit the models to data.
+Module to fit lineshape models to data.
 """
 
 import numpy as np
@@ -27,6 +27,7 @@ __all__ = ["ROUTINES", "fit", "reduced_chi2", "residuals", "sigma_poisson"]
 
 
 ROUTINES = {"curve_fit", "odr_fit"}
+"""The names of the fit routines supported by [`fit`]."""
 SIGMA_FTYPE_SIGNATURE_ERROR = (
     "`sigma_y` is a `Callable` but does not have the signature `sigma_y(x, y, y_fit, *params)`."
 )
@@ -76,8 +77,12 @@ def _sqrt_zero_free(x: array_like) -> ndarray[floating]:
 
 def sigma_poisson(x: array_like, y: array_like, y_model: array_like, *params: Any) -> ndarray[floating]:
     r"""
-    Poisson uncertainties $\sqrt{y_\mathrm{model}}$ estimated from the model values.
-    Model values smaller than or equal to $1$ get an uncertainty of $1$.
+    Poisson uncertainties estimated from the model values
+
+    $$
+    \sigma_y = \begin{cases}\sqrt{y_\mathrm{model}}, & y_\mathrm{model} > 1\\ 1, & \text{else}\end{cases}.
+    $$
+
     Can be passed as `sigma_y` to [`qspec.models.fit`].
 
     :param x: The x data (unused).
@@ -91,9 +96,13 @@ def sigma_poisson(x: array_like, y: array_like, y_model: array_like, *params: An
 
 def residuals(model: _base.Model, x: ndarray, y: ndarray) -> ndarray:
     """
-    The residuals $y - f(x)$ of a model with its current parameter values `model.vals`.
+    The residuals of a model with its current parameter values `model.vals`
 
-    :param model: The `Model`.
+    $$
+    r = y - f(x).
+    $$
+
+    :param model: The `Model` $f$.
     :param x: The x data.
     :param y: The y data.
     :returns: (res) The residuals.
@@ -103,10 +112,15 @@ def residuals(model: _base.Model, x: ndarray, y: ndarray) -> ndarray:
 
 def reduced_chi2(model: _base.Model, x: ndarray, y: ndarray, sigma_y: ndarray) -> float:
     r"""
-    The reduced $\chi^2$ of a model with its current parameter values `model.vals`.
-    The number of degrees of freedom is the number of data points minus the number of free parameters.
+    The reduced $\chi^2$ of a model with its current parameter values `model.vals`
 
-    :param model: The `Model`.
+    $$
+    \chi^2_\mathrm{red} = \frac{1}{N - n}\sum\limits_{i=1}^N \left(\frac{y_i - f(x_i)}{\sigma_{y,i}}\right)^2,
+    $$
+
+    where $N$ is the number of data points and $n$ the number of free parameters.
+
+    :param model: The `Model` $f$.
     :param x: The x data.
     :param y: The y data.
     :param sigma_y: The uncertainties of the y data.
@@ -130,33 +144,36 @@ def fit(
     **kwargs,
 ) -> tuple[ndarray, ndarray, dict]:
     """
-    Fit a `Model` from `qspec.models` to data. This fit routine encapsulates the `qspec.curve_fit`
-    and the `qspec.odr_fit` routines to facilitate the use of all modular fit model features,
-    such as *Priors* and `Linked` fitting.
+    Fit a `Model` from [`qspec.models`] to data. This fit routine encapsulates [`qspec.analyze.curve_fit`]
+    and [`qspec.analyze.odr_fit`] to facilitate the use of all modular fit model features,
+    such as priors, see [`Model.set_fix`], and [`Linked`] fitting.
 
     :param model: The `Model` to fit.
     :param x: The input data. Can be any object accepted by the model.
-     If model is a Linked model, `x` should be a list of objects compatible with the linked models.
-    :param y: The y data. This has to be a 1-d array or a list of 1-d arrays if model is a Linked model.
-    :param sigma_x: The uncertainties of the x-values. This is only compatible with Monte-Carlo sampling and the
-     odr_fit routine. If `sigma_x` is not `None`, no routine is specified and `mc_sigma == 0`,
-     the routine is automatically set to odr_fit.
-    :param sigma_y: The uncertainties of the y-values.
-     This has to be a 1-d array or a list of 1-d arrays if model is a Linked model and have the same shape as `y`.
-     If routine is `curve_fit`, sigma may be a function `g` such that `g(x, y, model(x, *params), *params) -> sigma`.
-     `g` should accept the same `x` as the `model` while `y` and `model(x, *params)` should be 1-d arrays.
+     If `model` is a `Linked` model, `x` should be a list of objects compatible with the linked models.
+    :param y: The y data. This has to be a 1d-array or a list of 1d-arrays if `model` is a `Linked` model.
+    :param sigma_x: The uncertainties of the x values. This is only compatible with Monte-Carlo sampling and the
+     `odr_fit` routine. If `sigma_x` is not `None`, no routine is specified and `mc_sigma == 0`,
+     the routine is automatically set to `odr_fit`.
+    :param sigma_y: The uncertainties of the y values.
+     This has to be a 1d-array or a list of 1d-arrays if `model` is a `Linked` model and have the same shape as `y`.
+     If the routine is `curve_fit`, `sigma_y` may be a function `g` such that
+     `g(x, y, model(x, *params), *params) -> sigma`, e.g., [`sigma_poisson`].
+     `g` should accept the same `x` as the `model` while `y` and `model(x, *params)` should be 1d-arrays.
     :param report: Whether to print the fit results.
-    :param routine: The routine to use for fitting. Currently supported are {'curve_fit', 'odr_fit'}.
+    :param routine: The routine to use for fitting. Can be either `"curve_fit"` or `"odr_fit"`, see `ROUTINES`.
      If `None`, `curve_fit` is used. See `sigma_x` for one exception.
-    :param guess_offset: Guess initial parameters for Offset models.
+    :param guess_offset: Guess initial parameters for `Offset` models, see [`Offset.guess_offset`].
      Currently, this is not working if `x` is not a 1d-array.
     :param mc_sigma: The number of samples to generate. If 0, no Monte-Carlo sampling will be done.
      This is not available with linked fitting.
-    :param kwargs: Additional kwargs to pass to the fit `routine`.
-    :returns: (popt, pcov, info) The optimized parameters their covariance matrix
-     and a dictionary containing info about the fit.
-    :raises (ValueError, TypeError): If the specified routine is not supported (`ValueError`) or
-     the specified `model` is not a `qspec.models.Model` (`TypeError`).
+    :param kwargs: Additional keyword arguments are passed to the fit `routine`.
+    :returns: (popt, pcov, info) The optimized parameters, their covariance matrix
+     and a dictionary with information about the fit. Its keys are `"warn"` (whether a warning occurred),
+     `"err"` (whether the fit failed) and `"chi2"` (the reduced $\\chi^2$, see [`reduced_chi2`]).
+    :raises ValueError: If the specified routine is not supported, if `x` or `y` is not iterable
+     for a `Linked` model, or if `sigma_y` is callable and `mc_sigma > 0`.
+    :raises TypeError: If `model` is not a [`Model`] or if `model` is a `Linked` model and `mc_sigma > 0`.
     """
     if routine is None:
         _routine: Callable = odr_fit if sigma_x is not None and mc_sigma == 0 else curve_fit
@@ -190,7 +207,7 @@ def fit(
         if not isinstance(y, Iterable):
             raise ValueError("If `model` is a `Linked` model, `y` must be an `Iterable.`")
 
-        models_offset = _helper.find_models(model, _base.Offset)
+        models_offset = [_helper.find_model(_model, _base.Offset) for _model in model.models]
         for _offset, _x, _y in zip(models_offset, x, y, strict=True):
             if _offset is not None:
                 _offset.update_on_call = False
@@ -231,7 +248,7 @@ def fit(
         y = np.concatenate([y, vals], axis=0)
         if is_sigma_ftype(sigma_y):
             sigma_y = _wrap_sigma_y(sigma_y, uncs)
-        elif callable(sigma_y):  # Currently unreachable as all callables are accepted as `sigma_ftype`.
+        elif callable(sigma_y):
             raise ValueError(SIGMA_FTYPE_SIGNATURE_ERROR)
         elif sigma_y is not None:
             sigma_y = np.concatenate([sigma_y, uncs], axis=0)
@@ -294,7 +311,7 @@ def fit(
             chi2 = 0.0
         elif is_sigma_ftype(sigma_y):
             chi2 = reduced_chi2(model, x, y, sigma_y(x, y, model(x, *popt), *popt))
-        elif callable(sigma_y):  # Currently unreachable as all callables are accepted as `sigma_ftype`.
+        elif callable(sigma_y):
             raise ValueError(SIGMA_FTYPE_SIGNATURE_ERROR)
         else:
             chi2 = reduced_chi2(model, x, y, sigma_y)
@@ -325,15 +342,15 @@ def fit(
             print_colored("OKGREEN", "Fit successful.\n")
 
     if discard_y_pars:
-        model = model.model  # Discard the YPars model.
+        model = model.model
 
     if isinstance(model, _base.Linked):
         for model_offset in models_offset:
             if model_offset is not None:
-                model_offset.update_on_call = True  # Reset the offset model to be updated on call.
+                model_offset.update_on_call = True
     else:
         if models_offset[0] is not None:
-            models_offset[0].update_on_call = True  # Reset the offset model to be updated on call.
+            models_offset[0].update_on_call = True
 
     info = dict(warn=warn, err=err, chi2=chi2)
     return popt, pcov, info

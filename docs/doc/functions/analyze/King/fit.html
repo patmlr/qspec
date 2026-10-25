@@ -15,49 +15,49 @@ title: qspec.analyze.King.fit
 ,&nbsp;
 <em class="sig-param"><span class="n">y</span><span class="o">=</span><span class="default_value">None</span></em>
 ,&nbsp;
-<em class="sig-param"><span class="n">xy</span><span class="o">=</span><span class="default_value num">(0, 1)</span></em>
+<em class="sig-param"><span class="n">xy</span><span class="o">=</span><span class="default_value">(<span class="num">0</span>, <span class="num">1</span>)</span></em>
 ,&nbsp;
-<em class="sig-param"><span class="n">func</span><span class="o">=</span><span class="default_value">york_fit</span></em>
+<em class="sig-param"><span class="n">func</span><span class="o">=</span><span class="default_value"><span class="func">york_fit</span></span></em>
 ,&nbsp;
-<em class="sig-param"><span class="n">alpha</span><span class="o">=</span><span class="default_value num">0</span></em>
+<em class="sig-param"><span class="n">alpha</span><span class="o">=</span><span class="default_value"><span class="num">0</span></span></em>
 ,&nbsp;
-<em class="sig-param"><span class="n">find_alpha</span><span class="o">=</span><span class="default_value bool">False</span></em>
+<em class="sig-param"><span class="n">find_alpha</span><span class="o">=</span><span class="default_value"><span class="bool">False</span></span></em>
 ,&nbsp;
-<em class="sig-param"><span class="n">show</span><span class="o">=</span><span class="default_value bool">True</span></em>
+<em class="sig-param"><span class="n">show</span><span class="o">=</span><span class="default_value"><span class="bool">True</span></span></em>
 ,&nbsp;
 <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em>
-<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/analyze/_analyze.py#L1648-L1747' }}"><span class="sig-source">[source]</span></a>
+<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/analyze/_analyze.py#L1757-L1857' }}"><span class="sig-source">[source]</span></a>
 </dt>
 <dd class="field-body">
-<p>Perform $2$-dimensional linear regression to create a King plot.
+<p>Perform $2$-dimensional linear regression to create a King plot, see <a href="{{ '/doc/functions/analyze/linear_alpha_fit.html' | relative_url }}"><code>linear_alpha_fit</code></a>.
+The data are modified with the mass factors $\mu$, see <a href="{{ '/doc/functions/physics/mass_factor.html' | relative_url }}"><code>qspec.physics.mass_factor</code></a>.
 Choose between <code>{"york_fit" (default), "linear_fit", "linear_monte_carlo"}</code> for the fit routine.
 Use a parameter <code>alpha</code> to optimize the correlation coefficient between the $y$-intercept and the slope.</p>
 <dl class="field-list">
 <dt class="field-head">Parameters<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>a<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">array_like</a></em></span></dt>
-<dd class="field-desc"><p>An Iterable of the mass numbers $A$ of the used isotopes.</p></dd>
-<dt>a_ref<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">array_like</a></em></span></dt>
-<dd class="field-desc"><p>An Iterable of the mass numbers $A_\mathrm{ref}$ of the used reference isotopes.</p></dd>
-<dt>x<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">array_like</a> | None</em></span></dt>
+<dt>a<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a></em></span></dt>
+<dd class="field-desc"><p>An iterable of the mass numbers $A$ of the used isotopes.</p></dd>
+<dt>a_ref<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a></em></span></dt>
+<dd class="field-desc"><p>An iterable of the mass numbers $A_\mathrm{ref}$ of the used reference isotopes.</p></dd>
+<dt>x<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a> | None</em></span></dt>
 <dd class="field-desc"><p>The $x$ data and their standard deviations as shape <code>(len(a), 2)</code> arrays.
-If plotted with <code>mode == "radii"</code>,
-the differences of mean-square nuclear charge radii $\delta\langle r^2\rangle^{A,A_\mathrm{ref}}$
-or $\Lambda^{A,A_\mathrm{ref}}$ are expected, else isotope shifts $\delta\nu_x^{A,A_\mathrm{ref}}$
-are expected. Expected units: (fm$^2$) or (MHz).
-If <code>x</code> is <code>None</code>, <code>y</code> is tried to be inherited from <code>King.x_abs</code>.</p></dd>
-<dt>y<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">array_like</a> | None</em></span></dt>
-<dd class="field-desc"><p>The isotope shifts  $\delta\nu_y^{A,A_\mathrm{ref}}$ and their standard deviations
-as shape <code>(len(a), 2)</code> arrays. Expected units: (MHz).
-If <code>None</code>, <code>y</code> is tried to be inherited from <code>King.x_abs</code>.</p></dd>
+Either the differences of mean-square nuclear charge radii $\delta\langle r^2\rangle^{A,A_\mathrm{ref}}$
+or $\Lambda^{A,A_\mathrm{ref}}$ (fm$^2$), plotted with <code>mode="radii"</code>,
+or isotope shifts $\delta\nu_x^{A,A_\mathrm{ref}}$ (MHz), plotted with <code>mode="shifts"</code>, see <a href="{{ '/doc/functions/analyze/King/plot.html' | relative_url }}"><code>King.plot</code></a>.
+If <code>None</code>, <code>x</code> is inherited from <code>King.x_abs</code>.</p></dd>
+<dt>y<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a> | None</em></span></dt>
+<dd class="field-desc"><p>The isotope shifts $\delta\nu_y^{A,A_\mathrm{ref}}$ and their standard deviations
+as shape <code>(len(a), 2)</code> arrays (MHz).
+If <code>None</code>, <code>y</code> is inherited from <code>King.x_abs</code>.</p></dd>
 <dt>xy<span class="classifier"><em>tuple[int, int]</em></span></dt>
 <dd class="field-desc"><p>A 2-tuple of indices <code>(ix, iy)</code>, used to select the two plot axes from <code>King.x_abs</code>.
 Only used if <code>x</code> or <code>y</code> is not specified. The default value is <code>(0, 1)</code>,
 fitting the second against the first axis.</p></dd>
 <dt>func<span class="classifier"><em>str | Callable</em></span></dt>
 <dd class="field-desc"><p>The fitting routine. Must be one of <code>{"york_fit" (default), "linear_fit", "linear_monte_carlo"}</code>.</p></dd>
-<dt>alpha<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">scalar</a></em></span></dt>
+<dt>alpha<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#scalar' | relative_url }}">scalar</a></em></span></dt>
 <dd class="field-desc"><p>An $x$-axis offset $\alpha$ to reduce the correlation coefficient
 between the $y$-intercept and the slope. Expected unit: (u fm$^2$) or (u MHz).</p></dd>
 <dt>find_alpha<span class="classifier"><em>bool</em></span></dt>
@@ -66,16 +66,23 @@ May not give the desired result if <code>alpha</code> was initialized too far fr
 <dt>show<span class="classifier"><em>bool</em></span></dt>
 <dd class="field-desc"><p>Whether to plot the fit result.</p></dd>
 <dt>kwargs</dt>
-<dd class="field-desc"><p>Additional keyword arguments are passed to
-<a href="{{ '/doc/functions/analyze/King/plot.html' | relative_url }}"><code>King.plot</code></a>.</p></dd>
+<dd class="field-desc"><p>Additional keyword arguments are passed to <a href="{{ '/doc/functions/analyze/King/plot.html' | relative_url }}"><code>King.plot</code></a>.</p></dd>
 </dl>
 </dd>
 <dt class="field-head">Returns<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>(popt, pcov)<span class="classifier"><em>tuple[<a href="{{ '/doc/modules/qtypes.html' | relative_url }}">ndarray</a>, <a href="{{ '/doc/modules/qtypes.html' | relative_url }}">ndarray</a>]</em></span></dt>
+<dt>(popt, pcov)<span class="classifier"><em>tuple[<a href="{{ '/doc/modules/qtypes.html#ndarray' | relative_url }}">ndarray</a>, <a href="{{ '/doc/modules/qtypes.html#ndarray' | relative_url }}">ndarray</a>]</em></span></dt>
 <dd class="field-desc"><p>The best y-intercept and slope and their covariance matrix.
 The final <code>alpha</code> can be accessed through <code>King.alpha</code>.</p></dd>
+</dl>
+</dd>
+<dt class="field-head">Raises<span class="colon">:</span></dt>
+<dd class="field-par">
+<dl>
+<dt>ValueError</dt>
+<dd class="field-desc"><p>If less than 3 data points are given, if neither <code>x</code> (<code>y</code>) nor <code>King.x_abs</code> are given,
+or if <code>func</code> is not supported.</p></dd>
 </dl>
 </dd>
 </dl>

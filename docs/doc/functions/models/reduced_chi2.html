@@ -14,22 +14,25 @@ title: qspec.models.reduced_chi2
 <em class="sig-param"><span class="n">y</span></em>
 ,&nbsp;
 <em class="sig-param"><span class="n">sigma_y</span></em>
-<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/models/_fit.py#L104-L117' }}"><span class="sig-source">[source]</span></a>
+<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/models/_fit.py#L113-L131' }}"><span class="sig-source">[source]</span></a>
 </dt>
 <dd class="field-body">
-<p>The reduced $\chi^2$ of a model with its current parameter values <code>model.vals</code>.
-The number of degrees of freedom is the number of data points minus the number of free parameters.</p>
+<p>The reduced $\chi^2$ of a model with its current parameter values <code>model.vals</code></p>
+<div class="math-block">$$
+\chi^2_\mathrm{red} = \frac{1}{N - n}\sum\limits_{i=1}^N \left(\frac{y_i - f(x_i)}{\sigma_{y,i}}\right)^2,
+$$</div>
+<p>where $N$ is the number of data points and $n$ the number of free parameters.</p>
 <dl class="field-list">
 <dt class="field-head">Parameters<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
 <dt>model<span class="classifier"><em>_base.Model</em></span></dt>
-<dd class="field-desc"><p>The <code>Model</code>.</p></dd>
-<dt>x<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">ndarray</a></em></span></dt>
+<dd class="field-desc"><p>The <code>Model</code> $f$.</p></dd>
+<dt>x<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#ndarray' | relative_url }}">ndarray</a></em></span></dt>
 <dd class="field-desc"><p>The x data.</p></dd>
-<dt>y<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">ndarray</a></em></span></dt>
+<dt>y<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#ndarray' | relative_url }}">ndarray</a></em></span></dt>
 <dd class="field-desc"><p>The y data.</p></dd>
-<dt>sigma_y<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">ndarray</a></em></span></dt>
+<dt>sigma_y<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#ndarray' | relative_url }}">ndarray</a></em></span></dt>
 <dd class="field-desc"><p>The uncertainties of the y data.</p></dd>
 </dl>
 </dd>

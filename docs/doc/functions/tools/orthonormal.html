@@ -9,16 +9,16 @@ title: qspec.orthonormal
 <span class="sig-paren">&nbsp;(&nbsp;</span>
 <em class="sig-param"><span class="n">r</span></em>
 ,&nbsp;
-<em class="sig-param"><span class="n">axis</span><span class="o">=</span><span class="default_value num">-1</span></em>
-<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/tools.py#L1010-L1030' }}"><span class="sig-source">[source]</span></a>
+<em class="sig-param"><span class="n">axis</span><span class="o">=</span><span class="default_value"><span class="num">-1</span></span></em>
+<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/tools.py#L1122-L1145' }}"><span class="sig-source">[source]</span></a>
 </dt>
 <dd class="field-body">
-
+<p>An orthonormal system with the first vector pointing in the direction of <code>r</code>.</p>
 <dl class="field-list">
 <dt class="field-head">Parameters<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>r<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">array_like</a></em></span></dt>
+<dt>r<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a></em></span></dt>
 <dd class="field-desc"><p>The first vector of the orthonormal system. Does not have to be normalized.</p></dd>
 <dt>axis<span class="classifier"><em>int</em></span></dt>
 <dd class="field-desc"><p>The axis along which the vector components are aligned.</p></dd>
@@ -27,8 +27,15 @@ title: qspec.orthonormal
 <dt class="field-head">Returns<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>out<span class="classifier"><em>tuple[<a href="{{ '/doc/modules/qtypes.html' | relative_url }}">ndarray</a>, <a href="{{ '/doc/modules/qtypes.html' | relative_url }}">ndarray</a>, <a href="{{ '/doc/modules/qtypes.html' | relative_url }}">ndarray</a>]</em></span></dt>
-<dd class="field-desc"><p>Three orthonormal vectors, given the first vector 'r'.</p></dd>
+<dt>(r1, r2, r3)<span class="classifier"><em>tuple[<a href="{{ '/doc/modules/qtypes.html#ndarray' | relative_url }}">ndarray</a>, <a href="{{ '/doc/modules/qtypes.html#ndarray' | relative_url }}">ndarray</a>, <a href="{{ '/doc/modules/qtypes.html#ndarray' | relative_url }}">ndarray</a>]</em></span></dt>
+<dd class="field-desc"><p>Three orthonormal vectors.</p></dd>
+</dl>
+</dd>
+<dt class="field-head">Raises<span class="colon">:</span></dt>
+<dd class="field-par">
+<dl>
+<dt>ValueError</dt>
+<dd class="field-desc"><p>If <code>r</code> does not have 3 components along the specified <code>axis</code>.</p></dd>
 </dl>
 </dd>
 </dl>

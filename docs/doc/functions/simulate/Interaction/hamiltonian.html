@@ -11,29 +11,29 @@ title: qspec.simulate.Interaction.hamiltonian
 ,&nbsp;
 <em class="sig-param"><span class="n">delta</span><span class="o">=</span><span class="default_value">None</span></em>
 ,&nbsp;
-<em class="sig-param"><span class="n">m</span><span class="o">=</span><span class="default_value num">0</span></em>
+<em class="sig-param"><span class="n">m</span><span class="o">=</span><span class="default_value"><span class="num">0</span></span></em>
 ,&nbsp;
 <em class="sig-param"><span class="n">v</span><span class="o">=</span><span class="default_value">None</span></em>
-<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/simulate/_simulate_cpp.py#L1987-L2064' }}"><span class="sig-source">[source]</span></a>
+<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/simulate/_simulate_cpp.py#L1994-L2071' }}"><span class="sig-source">[source]</span></a>
 </dt>
 <dd class="field-body">
 <p>The interaction Hamiltonian of the coherent light-matter interaction in frequency units</p>
-<div class="math-block">$$\begin{align}
+<div class="math-block">$$\begin{aligned}
 H &amp;= H_\text{diagonal} + H_\text{off-diagonal}\\[1ex]
   &amp;= \operatorname{diag}(A\vec{\omega}_0 + B\vec{\omega}^\prime) + \frac{1}{2}\sum\limits_m\Omega_m,\\[2ex]
 \omega^\prime_m &amp;= 2\pi(\nu_m + \Delta_m) \gamma(\vec{v})(1 - \hat{k}_m\cdot\frac{\vec{v}}{c})
-\end{align}$$</div>
+\end{aligned}$$</div>
 <p>where $A$ (<code>Interaction.atommap</code>) is a matrix with shape <code>(atom.size, atom.size)</code>,
 mapping the atomic frequencies $\vec{\omega}_0$ onto the diagonal of the Hamiltonian,
 $B$ (<code>Interaction.deltamap</code>) is a matrix with shape <code>(atom.size, #lasers)</code>,
 mapping the laser frequencies in the rest-frame of the atom $\vec{\omega}^\prime$
 onto the diagonal of the Hamiltonian, $\vec{v}$ is the velocity vector of the atom,
 $\hat{k}_m$ is the direction of laser <code>m</code>,
-$\Delta_m$ is the detuning of lasers <code>m</code>,
+$\Delta_m$ is the detuning of laser <code>m</code>,
 $\gamma(\vec{v})$ is the time-dilation factor
 <a href="{{ '/doc/functions/physics/gamma_3d.html' | relative_url }}"><code>qspec.physics.gamma_3d</code></a>,
 and $\Omega_m$ is the complex Rabi-frequency matrix of laser <code>m</code>, see
-<a href="{{ '/doc/functions/simulate/Interaction/rabi.html' | relative_url }}"><code>qspec.simulate.Interaction.rabi</code></a>.</br></br></p>
+<a href="{{ '/doc/functions/simulate/Interaction/rabi.html' | relative_url }}"><code>qspec.simulate.Interaction.rabi</code></a>.</p>
 <p>If the Hamiltonian is time-dependent, because two or more lasers drive the same transition
 or form loops within the atom, the off-diagonal Hamiltonian becomes</p>
 <div class="math-block">$$
@@ -48,15 +48,15 @@ depending on the energetic order of the two involved states and if the transitio
 <dt class="field-head">Parameters<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>t<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">array_like</a></em></span></dt>
+<dt>t<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a></em></span></dt>
 <dd class="field-desc"><p>The times $t$ when to compute the solution. Any array is cast to the shape <code>(nt, )</code>,
 where <code>nt</code> is the size of the array <code>t</code> (&mu;s).</p></dd>
-<dt>delta<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">array_like</a> | None</em></span></dt>
+<dt>delta<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a> | None</em></span></dt>
 <dd class="field-desc"><p>An array of laser frequency shifts $\vec{\Delta}$. <code>delta</code> must be a scalar, a 1d- or 2d-array
 with shapes <code>(n, )</code> or <code>(n, nl)</code>, respectively, where <code>nl</code> is the number of lasers of the <code>Interaction</code> (MHz).</p></dd>
-<dt>m<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">int_like</a> | None</em></span></dt>
-<dd class="field-desc"><p>The index of the shifted laser. If <code>delta</code> is a 2d-array, <code>m</code> ist omitted.</p></dd>
-<dt>v<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">array_like</a> | None</em></span></dt>
+<dt>m<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#int_like' | relative_url }}">int_like</a> | None</em></span></dt>
+<dd class="field-desc"><p>The index of the shifted laser. If <code>delta</code> is a 2d-array, <code>m</code> is ignored.</p></dd>
+<dt>v<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a> | None</em></span></dt>
 <dd class="field-desc"><p>Atom velocities $\vec{v}$. Must be a scalar or have shape <code>(n, )</code> or <code>(n, 3)</code>. In the first two cases,
 the velocity vector(s) are assumed to be aligned with the $x$-axis (m/s).</p></dd>
 </dl>
@@ -64,7 +64,7 @@ the velocity vector(s) are assumed to be aligned with the $x$-axis (m/s).</p></d
 <dt class="field-head">Returns<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>H<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">ndarray</a></em></span></dt>
+<dt>H<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#ndarray' | relative_url }}">ndarray</a></em></span></dt>
 <dd class="field-desc"><p>The (time-dependent) Hamiltonian(s) for <code>n</code> samples and <code>nt</code> times in the shape
 <code>(n, atom.size, atom.size, nt)</code> ($2\pi\,\mathrm{MHz}$).</p></dd>
 </dl>

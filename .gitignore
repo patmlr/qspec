@@ -1,14 +1,16 @@
 .idea
-.ruff_cache
 .vscode/*
 !.vscode/settings.json
 !.vscode/launch.json
 __pycache__
+.mypy_cache
+.ruff_cache
+.venv
 
-/build/
-/dist/
-/wheelhouse/
-/qspec.egg-info/
+/build
+/dist
+/wheelhouse
+/qspec.egg-info
 
 /docs/_site/
 /docs/.jekyll-metadata

@@ -15,23 +15,23 @@ title: qspec.models.fwhm_voigt
 <dd class="field-body">
 <p>The full width at half maximum (FWHM) of a Voigt profile</p>
 <div class="math-block">$$
-\delta\nu = 0.5346\Gamma + \sqrt{0.2166\Gamma^2 + 8\log(2)\sigma^2}
+\delta\nu = 0.5346\Gamma + \sqrt{0.2166\Gamma^2 + 8\ln(2)\sigma^2}.
 $$</div>
 <dl class="field-list">
 <dt class="field-head">Parameters<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>gamma<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">array_like</a></em></span></dt>
-<dd class="field-desc"><p>The FWHM of the Lorentzian $\Gamma$ (arb. unit).</p></dd>
-<dt>sigma<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">array_like</a></em></span></dt>
-<dd class="field-desc"><p>The standard deviation of the Gaussian $\sigma$ (unit of <code>gamma</code>).</p></dd>
+<dt>gamma<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a></em></span></dt>
+<dd class="field-desc"><p>The FWHM $\Gamma$ of the Lorentzian (arb. units).</p></dd>
+<dt>sigma<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a></em></span></dt>
+<dd class="field-desc"><p>The standard deviation $\sigma$ of the Gaussian (unit of <code>gamma</code>).</p></dd>
 </dl>
 </dd>
 <dt class="field-head">Returns<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>out<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">ndarray</a></em></span></dt>
-<dd class="field-desc"><p>The FWHM $\delta\nu$ of a Voigt profile.</p></dd>
+<dt>fwhm<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#ndarray' | relative_url }}">ndarray</a></em></span></dt>
+<dd class="field-desc"><p>The FWHM $\delta\nu$ of the Voigt profile (unit of <code>gamma</code>).</p></dd>
 </dl>
 </dd>
 </dl>

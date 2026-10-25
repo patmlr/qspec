@@ -15,8 +15,8 @@ title: qspec.normal_chi2_convolved_f_xi_pdf
 ,&nbsp;
 <em class="sig-param"><span class="n">sigma_f</span></em>
 ,&nbsp;
-<em class="sig-param"><span class="n">col</span><span class="o">=</span><span class="default_value bool">True</span></em>
-<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/physics.py#L2744-L2786' }}"><span class="sig-source">[source]</span></a>
+<em class="sig-param"><span class="n">col</span><span class="o">=</span><span class="default_value"><span class="bool">True</span></span></em>
+<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/physics.py#L2903-L2946' }}"><span class="sig-source">[source]</span></a>
 </dt>
 <dd class="field-body">
 <p>The probability density at the frequency $f$ in the rest frame of an atom with kinetic energy $E_x$,
@@ -24,30 +24,31 @@ determined through the parameter $\xi$,
 and distributed according to a convolution of a normal and a $\chi^2_1$ distribution</p>
 <div class="math-block">$$\begin{aligned}
 \rho(f) &amp;= \frac{1}{2\pi\sigma_\mathrm{f}\sqrt{\xi}}\int\limits_0^\infty \frac{1}{\sqrt{\eta}}
-\exp\left[-\frac{1}{2}\left(\frac{f - f_0 - \eta}{\sigma_\mathrm{f}}\right)^2
-- \frac{\eta}{2\xi}\right]\mathrm{d}\eta\\[1ex]
+\exp\left[-\frac{1}{2}\left(\frac{\Delta f - \eta}{\sigma_\mathrm{f}}\right)^2
+- \frac{\eta}{2\xi}\right]\mathrm{d}\eta,\quad \Delta f = \mp(f - f_0)\\[1ex]
 &amp;= N\times\begin{cases}
 \sqrt{-\frac{\mu}{2\pi}}\exp[-(x + \mu)] K_{1/4}(x), &amp; \text{if } \mu &lt; 0 \\[1.5ex]
 \sqrt{\frac{\varpi}{\sqrt{\pi}}\sigma}, &amp; \text{if } \mu = 0 \\[1.5ex]
 \sqrt{\pi\mu}\exp[-(x + \mu)] \frac{1}{2}\left[ I_{1/4}(x) + I_{-1/4}(x) \right], &amp; \text{if } \mu &gt; 0
 \end{cases}\\[2ex]
-x &amp;= \left(\!\frac{\mu}{2\sigma}\!\right)^{\!2},\quad\mu = \frac{f - f_0}{2\xi} - \sigma^2,
+x &amp;= \left(\!\frac{\mu}{2\sigma}\!\right)^{\!2},\quad\mu = \frac{\Delta f}{2\xi} - \sigma^2,
 \quad\sigma = \frac{\sigma_\mathrm{f}}{2\xi}\\[2ex]
 N &amp;= \frac{1}{\sqrt{2\pi}\sigma_\mathrm{f}}\exp\left(-\frac{\sigma^2}{2}\right),
 \end{aligned}$$</div>
-<p>where $I_\alpha$, and $K_\alpha$ are the modified Bessel functions of first and second kind,
+<p>where the upper (lower) sign of $\Delta f$ applies to collinear (anticollinear) alignment,
+$I_\alpha$ and $K_\alpha$ are the modified Bessel functions of first and second kind,
 and $\varpi \approx 2.6220575543$ is the lemniscate constant.</p>
 <dl class="field-list">
 <dt class="field-head">Parameters<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>f<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">array_like</a></em></span></dt>
+<dt>f<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a></em></span></dt>
 <dd class="field-desc"><p>The frequency quantiles $f$ (arb. units).</p></dd>
-<dt>f0<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">array_like</a></em></span></dt>
+<dt>f0<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a></em></span></dt>
 <dd class="field-desc"><p>A frequency offset $f_0$ (unit of <code>f</code>).</p></dd>
-<dt>xi<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">array_like</a></em></span></dt>
+<dt>xi<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a></em></span></dt>
 <dd class="field-desc"><p>The asymmetry parameter $\xi$ (unit of <code>f</code>).</p></dd>
-<dt>sigma_f<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">array_like</a></em></span></dt>
+<dt>sigma_f<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a></em></span></dt>
 <dd class="field-desc"><p>The standard deviation $\sigma_\mathrm{f}$ of the normal distribution (unit of <code>f</code>).</p></dd>
 <dt>col<span class="classifier"><em>bool</em></span></dt>
 <dd class="field-desc"><p>The laser can be aligned collinearly (<code>True</code>) or anticollinearly (<code>False</code>) to the velocity of the atom.</p></dd>
@@ -56,7 +57,7 @@ and $\varpi \approx 2.6220575543$ is the lemniscate constant.</p>
 <dt class="field-head">Returns<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>rho_f<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">ndarray</a></em></span></dt>
+<dt>rho_f<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#ndarray' | relative_url }}">ndarray</a></em></span></dt>
 <dd class="field-desc"><p>The probability density in thermal equilibrium at the frequency <code>f</code> (unit of <code>1/f</code>).</p></dd>
 </dl>
 </dd>

@@ -12,27 +12,28 @@ title: qspec.models.hf_trans
 <em class="sig-param"><span class="n">j_l</span></em>
 ,&nbsp;
 <em class="sig-param"><span class="n">j_u</span></em>
-<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/models/_splitter.py#L113-L127' }}"><span class="sig-source">[source]</span></a>
+<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/models/_splitter.py#L120-L135' }}"><span class="sig-source">[source]</span></a>
 </dt>
 <dd class="field-body">
-<p>Calculate all allowed hyperfine transitions and their hyperfine coefficients.</p>
+<p>All allowed electric dipole transitions $F_l\rightarrow F_u$ between two hyperfine-structure multiplets
+and their hyperfine coefficients, see <a href="{{ '/doc/functions/models/hf_coeff.html' | relative_url }}"><code>hf_coeff</code></a>.</p>
 <dl class="field-list">
 <dt class="field-head">Parameters<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>i<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">scalar</a></em></span></dt>
-<dd class="field-desc"><p>The nuclear spin $I$.</p></dd>
-<dt>j_l<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">scalar</a></em></span></dt>
-<dd class="field-desc"><p>The total lower state electron angular momentum $J$.</p></dd>
-<dt>j_u<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">scalar</a></em></span></dt>
-<dd class="field-desc"><p>The total upper state electron angular momentum $J^\prime$.</p></dd>
+<dt>i<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#scalar' | relative_url }}">scalar</a></em></span></dt>
+<dd class="field-desc"><p>The nuclear spin quantum number $I$.</p></dd>
+<dt>j_l<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#scalar' | relative_url }}">scalar</a></em></span></dt>
+<dd class="field-desc"><p>The electronic total angular momentum quantum number $J_l$ of the lower state.</p></dd>
+<dt>j_u<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#scalar' | relative_url }}">scalar</a></em></span></dt>
+<dd class="field-desc"><p>The electronic total angular momentum quantum number $J_u$ of the upper state.</p></dd>
 </dl>
 </dd>
 <dt class="field-head">Returns<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
 <dt>transitions<span class="classifier"><em>list[list[tuple]]</em></span></dt>
-<dd class="field-desc"></dd>
+<dd class="field-desc"><p>A list of transitions <code>[(f_l, f_u), coeffs_l, coeffs_u]</code>.</p></dd>
 </dl>
 </dd>
 </dl>

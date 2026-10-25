@@ -14,35 +14,48 @@ title: qspec.average
 <em class="sig-param"><span class="n">cov</span><span class="o">=</span><span class="default_value">None</span></em>
 ,&nbsp;
 <em class="sig-param"><span class="n">axis</span><span class="o">=</span><span class="default_value">None</span></em>
-<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/stats.py#L196-L273' }}"><span class="sig-source">[source]</span></a>
+<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/stats.py#L217-L305' }}"><span class="sig-source">[source]</span></a>
 </dt>
 <dd class="field-body">
-
+<p>The (weighted) average of a sample and its standard error</p>
+<div class="math-block">$$\begin{aligned}
+\bar{a} &amp;= \frac{\sum_i w_ia_i}{\sum_i w_i},\quad w_i = \frac{1}{\Sigma_{ii}}\\[1ex]
+\sigma_{\bar{a}}^2 &amp;= \frac{\sum_{ij} w_iw_j\Sigma_{ij}}{\left(\sum_i w_i\right)^2},
+\end{aligned}$$</div>
+<p>with the covariance matrix $\Sigma$ given by <code>cov</code> or by $\Sigma_{ij} = \delta_{ij}\sigma_i^2$ if <code>std</code> is given.
+If neither is given, the arithmetic mean and the standard error of the mean are returned.</p>
 <dl class="field-list">
 <dt class="field-head">Parameters<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>a<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">array_like</a></em></span></dt>
+<dt>a<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a></em></span></dt>
 <dd class="field-desc"><p>The sample data.</p></dd>
-<dt>std<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">array_like</a> | None</em></span></dt>
+<dt>std<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a> | None</em></span></dt>
 <dd class="field-desc"><p>An array of standard deviations associated with the values in <code>a</code>.
 If specified, the weighted average of the uncorrelated sample data and its standard error is returned.</p></dd>
-<dt>cov<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">scalar_nd</a> | None</em></span></dt>
+<dt>cov<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#scalar_nd' | relative_url }}">scalar_nd</a> | None</em></span></dt>
 <dd class="field-desc"><p>The covariance matrix associated with the values in <code>a</code>.
 If specified, it overrides <code>std</code> and the weighted average of the correlated sample data
-and its standard error is returned. If no axis is specified, <code>cov</code> must have shape (a.size, a.size)
+and its standard error is returned. If no axis is specified, <code>cov</code> must have shape <code>(a.size, a.size)</code>
 with elements associated with the values in the flattened <code>a</code>,
-otherwise cov must have either shape (a.shape[axis], a.shape[axis])
-or (..., a.shape[axis - 1], a.shape[axis], a.shape[axis], a.shape[axis + 1], ...).</p></dd>
-<dt>axis<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">int_like</a> | None</em></span></dt>
-<dd class="field-desc"><p>The axis along which the average is computed.</p></dd>
+otherwise <code>cov</code> must have either shape <code>(a.shape[axis], a.shape[axis])</code>
+or <code>(..., a.shape[axis - 1], a.shape[axis], a.shape[axis], a.shape[axis + 1], ...)</code>.</p></dd>
+<dt>axis<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#int_like' | relative_url }}">int_like</a> | None</em></span></dt>
+<dd class="field-desc"><p>The axis along which the average is computed. If <code>None</code>, <code>a</code> is flattened.</p></dd>
 </dl>
 </dd>
 <dt class="field-head">Returns<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>out<span class="classifier"><em>tuple[<a href="{{ '/doc/modules/qtypes.html' | relative_url }}">ndarray</a>, <a href="{{ '/doc/modules/qtypes.html' | relative_url }}">ndarray</a>]</em></span></dt>
+<dt>(av, av_d)<span class="classifier"><em>tuple[<a href="{{ '/doc/modules/qtypes.html#ndarray' | relative_url }}">ndarray</a>, <a href="{{ '/doc/modules/qtypes.html#ndarray' | relative_url }}">ndarray</a>]</em></span></dt>
 <dd class="field-desc"><p>The average and its standard error for a given sample <code>a</code> along the specified <code>axis</code>.</p></dd>
+</dl>
+</dd>
+<dt class="field-head">Raises<span class="colon">:</span></dt>
+<dd class="field-par">
+<dl>
+<dt>ValueError</dt>
+<dd class="field-desc"><p>If the shapes of <code>a</code> and <code>cov</code> do not match.</p></dd>
 </dl>
 </dd>
 </dl>

@@ -11,16 +11,16 @@ title: qspec.a_einstein_m1
 ,&nbsp;
 <em class="sig-param"><span class="n">mu</span><span class="o">=</span><span class="default_value">None</span></em>
 ,&nbsp;
-<em class="sig-param"><span class="n">j_l</span><span class="o">=</span><span class="default_value num">0</span></em>
+<em class="sig-param"><span class="n">j_l</span><span class="o">=</span><span class="default_value"><span class="num">0</span></span></em>
 ,&nbsp;
-<em class="sig-param"><span class="n">j_u</span><span class="o">=</span><span class="default_value num">0</span></em>
+<em class="sig-param"><span class="n">j_u</span><span class="o">=</span><span class="default_value"><span class="num">0</span></span></em>
 ,&nbsp;
-<em class="sig-param"><span class="n">ls</span><span class="o">=</span><span class="default_value num">(0, 0)</span></em>
+<em class="sig-param"><span class="n">ls</span><span class="o">=</span><span class="default_value">(<span class="num">0</span>, <span class="num">0</span>)</span></em>
 ,&nbsp;
 <em class="sig-param"><span class="n">jj_l</span><span class="o">=</span><span class="default_value">None</span></em>
 ,&nbsp;
 <em class="sig-param"><span class="n">jj_u</span><span class="o">=</span><span class="default_value">None</span></em>
-<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/physics.py#L1607-L1667' }}"><span class="sig-source">[source]</span></a>
+<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/physics.py#L1772-L1833' }}"><span class="sig-source">[source]</span></a>
 </dt>
 <dd class="field-body">
 <p>The Einstein coefficient of an M1 transition</p>
@@ -31,32 +31,32 @@ $$</div>
 <p>where $\mu_0$ is the vacuum permeability, $\vec{\mu}$ is the electronic magnetic moment operator
 in units of the Bohr magneton, $h$ is the Planck constant, and $c$ is the speed of light.
 If <code>mu</code> is <code>None</code>, this calculation neglects spin-orbit couplings, as $\Delta S = \Delta L = 0$ holds strictly
-in the estimation of <code>mu</code>. Consequently, M1 transition rates of transition such as
+in the estimation of <code>mu</code>. Consequently, M1 transition rates of transitions such as
 $^3\mathrm{S}_1\rightarrow\, ^1\mathrm{S}_0$ cannot be calculated with this function without specifying <code>mu</code>.</p>
 <dl class="field-list">
 <dt class="field-head">Parameters<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>f<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">array_like</a></em></span></dt>
+<dt>f<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a></em></span></dt>
 <dd class="field-desc"><p>The frequency $f$ of a transition (MHz).</p></dd>
-<dt>mu<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">array_like</a> | None</em></span></dt>
+<dt>mu<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a> | None</em></span></dt>
 <dd class="field-desc"><p>The magnetic dipole moment $\mu$ of a transition ($\mu_\mathrm{B}$).
 If <code>None</code>, the parameters <code>j_l</code>, <code>j_u</code>, <code>ls</code>, <code>jj_l</code>, <code>jj_u</code> are used to determine <code>mu</code>.
-Otherwise, they are omitted.</p></dd>
-<dt>j_l<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">scalar</a></em></span></dt>
+Otherwise, they are ignored.</p></dd>
+<dt>j_l<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#scalar' | relative_url }}">scalar</a></em></span></dt>
 <dd class="field-desc"><p>The electronic total angular momentum quantum number $J_\mathrm{l}$ of the lower state.</p></dd>
-<dt>j_u<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">scalar</a></em></span></dt>
+<dt>j_u<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#scalar' | relative_url }}">scalar</a></em></span></dt>
 <dd class="field-desc"><p>The electronic total angular momentum quantum number $J_\mathrm{u}$ of the upper state.</p></dd>
-<dt>ls<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">scalar_nd</a></em></span></dt>
-<dd class="field-desc"><p>A list <code>[(l_c, s_c), (l_o, l_c)]</code> or a single pair <code>(L, S)</code>
+<dt>ls<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#scalar_nd' | relative_url }}">scalar_nd</a></em></span></dt>
+<dd class="field-desc"><p>A list <code>[(l_c, s_c), (l_o, s_o)]</code> or a single pair <code>(L, S)</code>
 of electronic angular momentum and spin quantum numbers $(l, s)$ valid for both the lower and upper state.
 If this is a list of ls-pairs, the first pair specifies $l$ and $s$ of the core electron(s)
 and the second pair those of the outer electron(s). In this case, also a tuple of $(j_\mathrm{c}, j_\mathrm{o})$
-quantum numbers needs to specified for the parameters <code>jj_l</code> and <code>jj_u</code>.</p></dd>
-<dt>jj_l<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">scalar_1d</a> | None</em></span></dt>
+quantum numbers needs to be specified for the parameters <code>jj_l</code> and <code>jj_u</code>.</p></dd>
+<dt>jj_l<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#scalar_1d' | relative_url }}">scalar_1d</a> | None</em></span></dt>
 <dd class="field-desc"><p>A tuple of electronic total angular momentum quantum numbers $(j_\mathrm{c}, j_\mathrm{o})$
 of the lower state. Only needs to be specified if <code>ls</code> is a list of ls-pairs.</p></dd>
-<dt>jj_u<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">scalar_1d</a> | None</em></span></dt>
+<dt>jj_u<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#scalar_1d' | relative_url }}">scalar_1d</a> | None</em></span></dt>
 <dd class="field-desc"><p>A tuple of electronic total angular momentum quantum numbers $(j_\mathrm{c}, j_\mathrm{o})$
 of the upper state. Only needs to be specified if <code>ls</code> is a list of ls-pairs.</p></dd>
 </dl>
@@ -64,8 +64,15 @@ of the upper state. Only needs to be specified if <code>ls</code> is a list of l
 <dt class="field-head">Returns<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>A_ul<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">ndarray</a></em></span></dt>
+<dt>A_ul<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#ndarray' | relative_url }}">ndarray</a></em></span></dt>
 <dd class="field-desc"><p>The Einstein coefficient $A_\mathrm{ul}$ of an M1 transition (MHz).</p></dd>
+</dl>
+</dd>
+<dt class="field-head">Raises<span class="colon">:</span></dt>
+<dd class="field-par">
+<dl>
+<dt>ValueError</dt>
+<dd class="field-desc"><p>If <code>mu</code> is <code>None</code> and <code>ls</code>, <code>jj_l</code> and <code>jj_u</code> have incompatible formats.</p></dd>
 </dl>
 </dd>
 </dl>

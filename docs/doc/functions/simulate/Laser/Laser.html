@@ -7,36 +7,49 @@ title: qspec.simulate.Laser
 <span class="sig-prename">qspec.simulate.</span>
 <span class="sig-classname">Laser</span>
 <span class="sig-paren">&nbsp;(&nbsp;</span>
-<em class="sig-param"><span class="n">freq</span><span class="o">=</span><span class="default_value num">0.0</span></em>
+<em class="sig-param"><span class="n">freq</span><span class="o">=</span><span class="default_value"><span class="num">0.0</span></span></em>
 ,&nbsp;
-<em class="sig-param"><span class="n">intensity</span><span class="o">=</span><span class="default_value num">1.0</span></em>
+<em class="sig-param"><span class="n">intensity</span><span class="o">=</span><span class="default_value"><span class="num">1.0</span></span></em>
 ,&nbsp;
 <em class="sig-param"><span class="n">polarization</span><span class="o">=</span><span class="default_value">None</span></em>
 ,&nbsp;
 <em class="sig-param"><span class="n">k</span><span class="o">=</span><span class="default_value">None</span></em>
 ,&nbsp;
 <em class="sig-param"><span class="n">instance</span><span class="o">=</span><span class="default_value">None</span></em>
-<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/simulate/_simulate_cpp.py#L204-L324' }}"><span class="sig-source">[source]</span></a>
+<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/simulate/_simulate_cpp.py#L203-L325' }}"><span class="sig-source">[source]</span></a>
 </dt>
 <dd class="field-body">
-<p>Class representing a laser that has a frequency $\nu$, an intensity $I = \frac{1}{2}\varepsilon_0c\vec{E}^2$,
+<p>A laser that has a frequency $\nu$, an intensity $I = \frac{1}{2}\varepsilon_0c\vec{E}^2$,
 a polarization $\vec{\varepsilon} = \vec{E} / |E|$ and a direction $\vec{k}$.</p>
 <dl class="field-list">
 <dt class="field-head">Parameters<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>freq<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">scalar</a></em></span></dt>
+<dt>freq<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#scalar' | relative_url }}">scalar</a></em></span></dt>
 <dd class="field-desc"><p>The frequency $\nu$ of the laser (MHz).</p></dd>
-<dt>intensity<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">scalar</a></em></span></dt>
+<dt>intensity<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#scalar' | relative_url }}">scalar</a></em></span></dt>
 <dd class="field-desc"><p>The intensity $I$ of the laser
 $(\mu\mathrm{W} / \mathrm{mm}^2 = \mathrm{W} / \mathrm{m}^2)$.</p></dd>
-<dt>polarization<span class="classifier"><em><a href="{{ '/doc/functions/simulate/Polarization/Polarization.html' | relative_url }}">Polarization</a> | <a href="{{ '/doc/modules/qtypes.html' | relative_url }}">array_like</a> | None</em></span></dt>
+<dt>polarization<span class="classifier"><em><a href="{{ '/doc/functions/simulate/Polarization/Polarization.html' | relative_url }}">Polarization</a> | <a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a> | None</em></span></dt>
 <dd class="field-desc"><p>The polarization of the laser $\vec{\varepsilon}$ as a complex vector
-in cartesian coordinates or as a <code>Polarization</code> object.</p></dd>
-<dt>k<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">array_like</a> | None</em></span></dt>
+in Cartesian coordinates or as a <code>Polarization</code> object.</p></dd>
+<dt>k<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a> | None</em></span></dt>
 <dd class="field-desc"><p>The direction of the laser $\vec{k}$. The user input is normalized to a vector with length 1.</p></dd>
 <dt>instance<span class="classifier"><em><a href="{{ '/doc/functions/simulate/Laser/Laser.html' | relative_url }}">Laser</a> | C.LaserHandler.value | None</em></span></dt>
-<dd class="field-desc"><p>An existing <code>Laser</code> instance. If this is specified, the other parameters are omitted.</p></dd>
+<dd class="field-desc"><p>An existing <code>Laser</code> instance. If this is specified, the other parameters are ignored.</p></dd>
+</dl>
+</dd>
+<dt class="field-head">Attributes<span class="colon">:</span></dt>
+<dd class="field-par">
+<dl>
+<dt>freq<span class="classifier"><em>float</em></span></dt>
+<dd class="field-desc"><p>The frequency of the laser $\nu$.</p></dd>
+<dt>intensity<span class="classifier"><em>float</em></span></dt>
+<dd class="field-desc"><p>The intensity of the laser $I = \frac{1}{2}\varepsilon_0c\vec{E}^2$.</p></dd>
+<dt>k<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#ndarray' | relative_url }}">ndarray</a></em></span></dt>
+<dd class="field-desc"><p>The normalized direction of the laser $\vec{k}$. The default direction is $(1, 0, 0)$.</p></dd>
+<dt>polarization<span class="classifier"><em><a href="{{ '/doc/functions/simulate/Polarization/Polarization.html' | relative_url }}">Polarization</a></em></span></dt>
+<dd class="field-desc"><p>The polarization of the laser $\varepsilon$ as a <code>Polarization</code> object.</p></dd>
 </dl>
 </dd>
 </dl>

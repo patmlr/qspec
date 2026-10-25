@@ -15,23 +15,23 @@ title: qspec.source_energy_pdf
 ,&nbsp;
 <em class="sig-param"><span class="n">xi</span></em>
 ,&nbsp;
-<em class="sig-param"><span class="n">collinear</span><span class="o">=</span><span class="default_value bool">True</span></em>
-<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/physics.py#L2789-L2834' }}"><span class="sig-source">[source]</span></a>
+<em class="sig-param"><span class="n">collinear</span><span class="o">=</span><span class="default_value"><span class="bool">True</span></span></em>
+<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/physics.py#L2949-L2994' }}"><span class="sig-source">[source]</span></a>
 </dt>
 <dd class="field-body">
-<p>This is the same function as
-<a href="{{ '/doc/functions/physics/normal_chi2_convolved_f_xi_pdf.html' | relative_url }}"><code>normal_chi2_convolved_f_xi_pdf</code></a> with less array processing and reordered parameters, used in <code>qspec.models</code>.</p>
+<p>The probability density <a href="{{ '/doc/functions/physics/normal_chi2_convolved_f_xi_pdf.html' | relative_url }}"><code>normal_chi2_convolved_f_xi_pdf</code></a> with less array processing and reordered parameters,
+used in <a href="{{ '/doc/modules/models.html' | relative_url }}"><code>qspec.models</code></a>.</p>
 <dl class="field-list">
 <dt class="field-head">Parameters<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>f<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">array_like</a></em></span></dt>
+<dt>f<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a></em></span></dt>
 <dd class="field-desc"><p>The frequency quantiles $f$ (arb. units).</p></dd>
-<dt>f0<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">scalar</a></em></span></dt>
+<dt>f0<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#scalar' | relative_url }}">scalar</a></em></span></dt>
 <dd class="field-desc"><p>A frequency offset $f_0$ (unit of <code>f</code>).</p></dd>
-<dt>sigma<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">scalar</a></em></span></dt>
-<dd class="field-desc"><p>The standard deviation of the underlying normal distribution in frequency units (unit of <code>f</code>).</p></dd>
-<dt>xi<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">scalar</a></em></span></dt>
+<dt>sigma<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#scalar' | relative_url }}">scalar</a></em></span></dt>
+<dd class="field-desc"><p>The standard deviation $\sigma_\mathrm{f}$ of the underlying normal distribution (unit of <code>f</code>).</p></dd>
+<dt>xi<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#scalar' | relative_url }}">scalar</a></em></span></dt>
 <dd class="field-desc"><p>The asymmetry parameter $\xi$ (unit of <code>f</code>).</p></dd>
 <dt>collinear<span class="classifier"><em>bool</em></span></dt>
 <dd class="field-desc"><p>The laser can be aligned collinearly (<code>True</code>)
@@ -41,7 +41,7 @@ or anticollinearly (<code>False</code>) to the velocity of the atom.</p></dd>
 <dt class="field-head">Returns<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>rho_f<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">ndarray</a></em></span></dt>
+<dt>rho_f<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#ndarray' | relative_url }}">ndarray</a></em></span></dt>
 <dd class="field-desc"><p>The probability density in thermal equilibrium at the frequency <code>f</code> (unit of <code>1/f</code>).</p></dd>
 </dl>
 </dd>

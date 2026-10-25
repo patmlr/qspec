@@ -9,7 +9,7 @@ title: qspec.simulate.ScatteringRate.plot_angular_distribution
 <span class="sig-paren">&nbsp;(&nbsp;</span>
 <em class="sig-param"><span class="n">x</span><span class="o">=</span><span class="default_value">None</span></em>
 ,&nbsp;
-<em class="sig-param"><span class="n">n</span><span class="o">=</span><span class="default_value num">5</span></em>
+<em class="sig-param"><span class="n">n</span><span class="o">=</span><span class="default_value"><span class="num">5</span></span></em>
 ,&nbsp;
 <em class="sig-param"><span class="n">theta</span><span class="o">=</span><span class="default_value">None</span></em>
 ,&nbsp;
@@ -17,40 +17,40 @@ title: qspec.simulate.ScatteringRate.plot_angular_distribution
 ,&nbsp;
 <em class="sig-param"><span class="n">mode</span><span class="o">=</span><span class="default_value">None</span></em>
 ,&nbsp;
-<em class="sig-param"><span class="n">show</span><span class="o">=</span><span class="default_value bool">True</span></em>
+<em class="sig-param"><span class="n">show</span><span class="o">=</span><span class="default_value"><span class="bool">True</span></span></em>
 ,&nbsp;
 <em class="sig-param"><span class="n">save</span><span class="o">=</span><span class="default_value">None</span></em>
-<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/simulate/_simulate.py#L1052-L1159' }}"><span class="sig-source">[source]</span></a>
+<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/simulate/_simulate.py#L1080-L1189' }}"><span class="sig-source">[source]</span></a>
 </dt>
 <dd class="field-body">
-
+<p>Plot the angular distribution of the fluorescence light for a given laser frequency, see
+<a href="{{ '/doc/functions/simulate/ScatteringRate/generate_y.html' | relative_url }}"><code>ScatteringRate.generate_y</code></a>.</p>
 <dl class="field-list">
 <dt class="field-head">Parameters<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>x<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">scalar</a> | None</em></span></dt>
-<dd class="field-desc"><p>The frequency of light in an atoms rest frame (MHz).
-If None, the position of the first maximum is taken (self.x0[0][0]).</p></dd>
+<dt>x<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#scalar' | relative_url }}">scalar</a> | None</em></span></dt>
+<dd class="field-desc"><p>The frequency of light in the atom's rest frame (MHz).
+If <code>None</code>, the position of the first resonance is taken.</p></dd>
 <dt>n<span class="classifier"><em>int</em></span></dt>
-<dd class="field-desc"><p>2 ** n + 1 samples for 'theta' and 2 ** (n + 1) + 1 samples for 'phi' are drawn,
-giving a total of 2 ** (2n + 1) + 3 * 2 ** n + 1 points to draw.</p></dd>
-<dt>theta<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">array_like</a> | None</em></span></dt>
-<dd class="field-desc"><p>A custom array for theta. Overwrites 'n'.</p></dd>
-<dt>phi<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">array_like</a> | None</em></span></dt>
-<dd class="field-desc"><p>A custom array for phi. Overwrites 'n'.</p></dd>
+<dd class="field-desc"><p><code>2**n + 1</code> samples for <code>theta</code> and <code>2**(n + 1) + 1</code> samples for <code>phi</code> are drawn.</p></dd>
+<dt>theta<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a> | None</em></span></dt>
+<dd class="field-desc"><p>A custom array for $\theta$. Overwrites <code>n</code>.</p></dd>
+<dt>phi<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a> | None</em></span></dt>
+<dd class="field-desc"><p>A custom array for $\phi$. Overwrites <code>n</code>.</p></dd>
 <dt>mode<span class="classifier"><em>str | None</em></span></dt>
-<dd class="field-desc"><p>Either '3d' for a surface plot or anything else for a color-mesh plot.</p></dd>
+<dd class="field-desc"><p>Either <code>"3d"</code> for a surface plot or anything else for a color-mesh plot.</p></dd>
 <dt>show<span class="classifier"><em>bool</em></span></dt>
 <dd class="field-desc"><p>Whether to show the plot.</p></dd>
 <dt>save<span class="classifier"><em>str | None</em></span></dt>
-<dd class="field-desc"><p>The path where to save the plot. If None, the plot will not be saved.</p></dd>
+<dd class="field-desc"><p>The path where to save the plot. If <code>None</code>, the plot will not be saved.</p></dd>
 </dl>
 </dd>
 <dt class="field-head">Returns<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>out<span class="classifier"><em>tuple[<a href="{{ '/doc/modules/qtypes.html' | relative_url }}">ndarray</a>, <a href="{{ '/doc/modules/qtypes.html' | relative_url }}">ndarray</a>, <a href="{{ '/doc/modules/qtypes.html' | relative_url }}">ndarray</a>]</em></span></dt>
-<dd class="field-desc"><p>theta, phi and z. Optionally, a plot is drawn and saved.</p></dd>
+<dt>(theta, phi, y)<span class="classifier"><em>tuple[<a href="{{ '/doc/modules/qtypes.html#ndarray' | relative_url }}">ndarray</a>, <a href="{{ '/doc/modules/qtypes.html#ndarray' | relative_url }}">ndarray</a>, <a href="{{ '/doc/modules/qtypes.html#ndarray' | relative_url }}">ndarray</a>]</em></span></dt>
+<dd class="field-desc"><p>The angles and the fluorescence intensities.</p></dd>
 </dl>
 </dd>
 </dl>

@@ -15,23 +15,23 @@ title: qspec.propagate_fit
 ,&nbsp;
 <em class="sig-param"><span class="n">pcov</span></em>
 ,&nbsp;
-<em class="sig-param"><span class="n">sample_size</span><span class="o">=</span><span class="default_value num">1000000</span></em>
-<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/stats.py#L471-L487' }}"><span class="sig-source">[source]</span></a>
+<em class="sig-param"><span class="n">sample_size</span><span class="o">=</span><span class="default_value"><span class="num">1000000</span></span></em>
+<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/stats.py#L539-L558' }}"><span class="sig-source">[source]</span></a>
 </dt>
 <dd class="field-body">
-
+<p>Propagate the uncertainties of fitted parameters through the function <code>f</code> using Monte-Carlo sampling.</p>
 <dl class="field-list">
 <dt class="field-head">Parameters<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
 <dt>f<span class="classifier"><em>Callable</em></span></dt>
-<dd class="field-desc"><p>The function to compute. $f$ needs to be vectorized.</p></dd>
-<dt>x<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">array_like</a></em></span></dt>
+<dd class="field-desc"><p>The function <code>f(x, *popt)</code> to compute. <code>f</code> needs to be vectorized.</p></dd>
+<dt>x<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a></em></span></dt>
 <dd class="field-desc"><p>The input values.</p></dd>
-<dt>popt<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">array_like</a></em></span></dt>
-<dd class="field-desc"><p>An array of the fitted parameters (compare curve_fit).</p></dd>
-<dt>pcov<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">array_like</a></em></span></dt>
-<dd class="field-desc"><p>A 2d-array of the estimated covariances (compare curve_fit).</p></dd>
+<dt>popt<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a></em></span></dt>
+<dd class="field-desc"><p>An array of the fitted parameters, e.g., from <code>scipy.optimize.curve_fit</code>.</p></dd>
+<dt>pcov<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a></em></span></dt>
+<dd class="field-desc"><p>A 2d-array of the estimated covariances of <code>popt</code>.</p></dd>
 <dt>sample_size<span class="classifier"><em>int</em></span></dt>
 <dd class="field-desc"><p>The number of random variates used for the calculation. The default is 1,000,000.</p></dd>
 </dl>
@@ -39,8 +39,9 @@ title: qspec.propagate_fit
 <dt class="field-head">Returns<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>out<span class="classifier"><em>tuple[<a href="{{ '/doc/modules/qtypes.html' | relative_url }}">ndarray</a>, <a href="{{ '/doc/modules/qtypes.html' | relative_url }}">ndarray</a>, <a href="{{ '/doc/modules/qtypes.html' | relative_url }}">ndarray</a>]</em></span></dt>
-<dd class="field-desc"><p>The median and the $1\sigma$ percentiles of the sampled function $f$.</p></dd>
+<dt>(med, per_0, per_1)<span class="classifier"><em>tuple[<a href="{{ '/doc/modules/qtypes.html#ndarray' | relative_url }}">ndarray</a>, <a href="{{ '/doc/modules/qtypes.html#ndarray' | relative_url }}">ndarray</a>, <a href="{{ '/doc/modules/qtypes.html#ndarray' | relative_url }}">ndarray</a>]</em></span></dt>
+<dd class="field-desc"><p>The median and the left- and right-sided 1-sigma percentiles
+of the sampled function values at <code>x</code>.</p></dd>
 </dl>
 </dd>
 </dl>

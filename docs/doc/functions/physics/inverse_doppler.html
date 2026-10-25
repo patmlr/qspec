@@ -13,15 +13,17 @@ title: qspec.inverse_doppler
 ,&nbsp;
 <em class="sig-param"><span class="n">alpha</span></em>
 ,&nbsp;
-<em class="sig-param"><span class="n">mode</span><span class="o">=</span><span class="default_value string">&#x27;raise-raise&#x27;</span></em>
+<em class="sig-param"><span class="n">mode</span><span class="o">=</span><span class="default_value"><span class="string">&#x27;raise-raise&#x27;</span></span></em>
 ,&nbsp;
-<em class="sig-param"><span class="n">return_mask</span><span class="o">=</span><span class="default_value bool">False</span></em>
-<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/physics.py#L609-L689' }}"><span class="sig-source">[source]</span></a>
+<em class="sig-param"><span class="n">return_mask</span><span class="o">=</span><span class="default_value"><span class="bool">False</span></span></em>
+<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/physics.py#L724-L806' }}"><span class="sig-source">[source]</span></a>
 </dt>
 <dd class="field-body">
-<p>The velocity</p>
-<div class="math-block">$$\begin{aligned}v &amp;= \frac{c}{s}\left[\cos(\alpha) \pm (f_\mathrm{atom}/f_\mathrm{lab})\sqrt{s - 1}\right]\\[2ex]
-  s &amp;= (f_\mathrm{atom}/f_\mathrm{lab})^2 + \cos(\alpha)^2\end{aligned}.$$</div>
+<p>The velocity required to Doppler-shift the frequency $f_\mathrm{lab}$ to $f_\mathrm{atom}$</p>
+<div class="math-block">$$\begin{aligned}
+v &amp;= \frac{c}{s}\left[\cos(\alpha) \pm \frac{f_\mathrm{atom}}{f_\mathrm{lab}}\sqrt{s - 1}\right]\\[2ex]
+s &amp;= \left(\frac{f_\mathrm{atom}}{f_\mathrm{lab}}\right)^2 + \cos(\alpha)^2.
+\end{aligned}$$</div>
 <p>For angles $-\pi/2 &lt; \alpha &lt; \pi/2$, there can be two solutions.
 Depending on the combination of <code>f_atom</code>, <code>f_lab</code> and <code>alpha</code>, the situation may be physically impossible.
 Specify <code>mode</code> to choose the desired behavior.</p>
@@ -29,22 +31,15 @@ Specify <code>mode</code> to choose the desired behavior.</p>
 <dt class="field-head">Parameters<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>f_atom<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">array_like</a></em></span></dt>
+<dt>f_atom<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a></em></span></dt>
 <dd class="field-desc"><p>The frequency of light $f_\mathrm{atom}$ in the atom's rest frame (arb. units).</p></dd>
-<dt>f_lab<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">array_like</a></em></span></dt>
+<dt>f_lab<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a></em></span></dt>
 <dd class="field-desc"><p>The frequency of light $f_\mathrm{lab}$ in the laboratory frame (unit of <code>f_atom</code>).</p></dd>
-<dt>alpha<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">array_like</a></em></span></dt>
+<dt>alpha<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a></em></span></dt>
 <dd class="field-desc"><p>The angle $\alpha$ between the velocity- and the light-vector in the laboratory frame (rad).</p></dd>
 <dt>mode<span class="classifier"><em>str</em></span></dt>
-<dd class="field-desc"><p>The mode how to handle <code>nan</code> values and ambiguous velocities. Available options are:
-<ul>
-<li> <code>"raise-raise"</code>: Raise an error if there are <code>nan</code> values or if the velocity is ambiguous.</li>
-<li> <code>"raise-small"</code>: Raise an error if there are <code>nan</code> values and return the smaller velocity.</li>
-<li> <code>"raise-large"</code>: Raise an error if there are <code>nan</code> values and return the larger velocity.</li>
-<li> <code>"isnan-raise"</code>: Ignore <code>nan</code> values and raise an error if the velocity is ambiguous.</li>
-<li> <code>"isnan-small"</code>: Ignore <code>nan</code> values and return the smaller velocity.</li>
-<li> <code>"isnan-large"</code>: Ignore <code>nan</code> values and return the larger velocity.</li>
-</ul></p></dd>
+<dd class="field-desc"><p>How to handle <code>nan</code> values and ambiguous velocities. Available options are:</p>
+<ul><li><code>"raise-raise"</code>: Raise an error if there are <code>nan</code> values or if the velocity is ambiguous.</li><li><code>"raise-small"</code>: Raise an error if there are <code>nan</code> values and return the smaller velocity.</li><li><code>"raise-large"</code>: Raise an error if there are <code>nan</code> values and return the larger velocity.</li><li><code>"isnan-raise"</code>: Ignore <code>nan</code> values and raise an error if the velocity is ambiguous.</li><li><code>"isnan-small"</code>: Ignore <code>nan</code> values and return the smaller velocity.</li><li><code>"isnan-large"</code>: Ignore <code>nan</code> values and return the larger velocity.</li></ul></dd>
 <dt>return_mask<span class="classifier"><em>bool</em></span></dt>
 <dd class="field-desc"><p>Whether the mask where the velocity is ambiguous is returned as a second argument.</p></dd>
 </dl>
@@ -52,17 +47,17 @@ Specify <code>mode</code> to choose the desired behavior.</p>
 <dt class="field-head">Returns<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>v<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">ndarray</a> | tuple[<a href="{{ '/doc/modules/qtypes.html' | relative_url }}">ndarray</a>, <a href="{{ '/doc/modules/qtypes.html' | relative_url }}">ndarray</a>]</em></span></dt>
-<dd class="field-desc"><p>The velocity $v$ required to shift <code>f_lab</code> to <code>f_atom</code>.
-Optionally returns the mask where the velocity is ambiguous (m/s).</p></dd>
+<dt>(v, mask)<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#ndarray' | relative_url }}">ndarray</a> | tuple[<a href="{{ '/doc/modules/qtypes.html#ndarray' | relative_url }}">ndarray</a>, <a href="{{ '/doc/modules/qtypes.html#ndarray' | relative_url }}">ndarray</a>]</em></span></dt>
+<dd class="field-desc"><p>The velocity $v$ required to shift <code>f_lab</code> to <code>f_atom</code> (m/s)
+and, if <code>return_mask</code> is <code>True</code>, the mask where the velocity is ambiguous.</p></dd>
 </dl>
 </dd>
 <dt class="field-head">Raises<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
 <dt>ValueError</dt>
-<dd class="field-desc"><p><code>mode</code> must be <code>"raise-raise"</code>, <code>"raise-small"</code>, <code>"raise-large"</code>, <code>"isnan-raise"</code>,
-<code>"isnan-small"</code>, or <code>"isnan-large"</code>. For additionally raised errors, see the description of the <code>mode</code> parameter.</p></dd>
+<dd class="field-desc"><p>If <code>mode</code> is not one of the options above,
+or if <code>nan</code> values or ambiguous velocities occur and <code>mode</code> requires to raise an error.</p></dd>
 </dl>
 </dd>
 </dl>

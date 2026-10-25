@@ -17,33 +17,33 @@ title: qspec.analyze.draw_sigma2d
 ,&nbsp;
 <em class="sig-param"><span class="n">corr</span></em>
 ,&nbsp;
-<em class="sig-param"><span class="n">n</span><span class="o">=</span><span class="default_value num">1</span></em>
+<em class="sig-param"><span class="n">n</span><span class="o">=</span><span class="default_value"><span class="num">1</span></span></em>
 ,&nbsp;
 <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em>
-<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/analyze/_analyze.py#L287-L313' }}"><span class="sig-source">[source]</span></a>
+<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/analyze/_analyze.py#L347-L373' }}"><span class="sig-source">[source]</span></a>
 </dt>
 <dd class="field-body">
-<p>Draws the $n\sigma$ bounds of the given data points $(x, y)$ with standard deviations $(\sigma_x, \sigma_y)$
-and correlation $\rho_{xy}$.</p>
+<p>Draw the $n\sigma$ bounds of the given data points $(x, y)$ with standard deviations $(\sigma_x, \sigma_y)$
+and correlation $\rho_{xy}$, see <a href="{{ '/doc/functions/analyze/ellipse2d.html' | relative_url }}"><code>ellipse2d</code></a>.</p>
 <dl class="field-list">
 <dt class="field-head">Parameters<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>x<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">array_like</a></em></span></dt>
+<dt>x<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a></em></span></dt>
 <dd class="field-desc"><p>The $x$ data.</p></dd>
-<dt>y<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">array_like</a></em></span></dt>
+<dt>y<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a></em></span></dt>
 <dd class="field-desc"><p>The $y$ data.</p></dd>
-<dt>sigma_x<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">array_like</a></em></span></dt>
+<dt>sigma_x<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a></em></span></dt>
 <dd class="field-desc"><p>The standard deviation $\sigma_x$ of the <code>x</code> data.</p></dd>
-<dt>sigma_y<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">array_like</a></em></span></dt>
+<dt>sigma_y<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a></em></span></dt>
 <dd class="field-desc"><p>The standard deviation $\sigma_y$ of the <code>y</code> data.</p></dd>
-<dt>corr<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">array_like</a></em></span></dt>
+<dt>corr<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a></em></span></dt>
 <dd class="field-desc"><p>The correlation coefficients $\rho_{xy}$ between the <code>x</code> and <code>y</code> data.</p></dd>
 <dt>n<span class="classifier"><em>int</em></span></dt>
 <dd class="field-desc"><p>The maximum sigma region $n$ to draw.</p></dd>
 <dt>kwargs</dt>
-<dd class="field-desc"><p>Additional keyword arguments are passed to <code>plt.plot()</code>.
-Use key <code>fmt</code> to specify the third argument of <code>plt.plot()</code>.</p></dd>
+<dd class="field-desc"><p>Additional keyword arguments are passed to <code>matplotlib.pyplot.plot</code>.
+Use the key <code>fmt</code> to specify the format string (third argument) of <code>matplotlib.pyplot.plot</code>.</p></dd>
 </dl>
 </dd>
 </dl>

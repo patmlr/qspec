@@ -9,29 +9,44 @@ title: qspec.Observable
 <span class="sig-paren">&nbsp;(&nbsp;</span>
 <em class="sig-param"><span class="n">x</span></em>
 ,&nbsp;
-<em class="sig-param"><span class="n">std</span><span class="o">=</span><span class="default_value num">0.0</span></em>
+<em class="sig-param"><span class="n">std</span><span class="o">=</span><span class="default_value"><span class="num">0.0</span></span></em>
 ,&nbsp;
-<em class="sig-param"><span class="n">std_2</span><span class="o">=</span><span class="default_value num">0.0</span></em>
+<em class="sig-param"><span class="n">std_2</span><span class="o">=</span><span class="default_value"><span class="num">0.0</span></span></em>
 ,&nbsp;
 <em class="sig-param"><span class="n">label</span><span class="o">=</span><span class="default_value">None</span></em>
-<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/stats.py#L48-L175' }}"><span class="sig-source">[source]</span></a>
+<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/stats.py#L48-L192' }}"><span class="sig-source">[source]</span></a>
 </dt>
 <dd class="field-body">
-
+<p>A float with a <code>label</code> and either a symmetric or a left- and right-sided uncertainty.
+The operators <code>+</code>, <code>*</code> and <code>**</code> propagate the uncertainties with <a href="{{ '/doc/functions/stats/propagate.html' | relative_url }}"><code>propagate</code></a>.</p>
 <dl class="field-list">
 <dt class="field-head">Parameters<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
 <dt>x<span class="classifier"><em>SupportsFloat | SupportsIndex | str | bytes | bytearray</em></span></dt>
 <dd class="field-desc"><p>The value of the observable.</p></dd>
-<dt>std<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">scalar</a></em></span></dt>
-<dd class="field-desc"><p>The left-sided 1-sigma percentile relative to <code>x</code> if <code>std_2</code> is specified,
-else the standard deviation of the observable.</p></dd>
-<dt>std_2<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">scalar</a></em></span></dt>
-<dd class="field-desc"><p>The right-sided 1-sigma percentile relative to <code>x</code> if <code>std</code> is specified,
-else the standard deviation of the observable.</p></dd>
+<dt>std<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#scalar' | relative_url }}">scalar</a></em></span></dt>
+<dd class="field-desc"><p>The standard deviation of the observable if <code>std_2</code> is 0,
+else the left-sided 1-sigma percentile relative to <code>x</code>.</p></dd>
+<dt>std_2<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#scalar' | relative_url }}">scalar</a></em></span></dt>
+<dd class="field-desc"><p>The right-sided 1-sigma percentile relative to <code>x</code>. If 0, the uncertainty is symmetric.</p></dd>
 <dt>label<span class="classifier"><em>str | None</em></span></dt>
 <dd class="field-desc"><p>The label of the observable.</p></dd>
+</dl>
+</dd>
+<dt class="field-head">Attributes<span class="colon">:</span></dt>
+<dd class="field-par">
+<dl>
+<dt>est<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#ndarray' | relative_url }}">ndarray</a> | None</em></span></dt>
+<dd class="field-desc"><p>The parameters of a skew normal distribution estimated from the asymmetric uncertainties.</p></dd>
+<dt>label<span class="classifier"><em>str | None</em></span></dt>
+<dd class="field-desc"><p>The label of the observable.</p></dd>
+<dt>popt<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#ndarray' | relative_url }}">ndarray</a> | None</em></span></dt>
+<dd class="field-desc"><p>The parameters of a skew normal distribution fitted to the observable, see <a href="{{ '/doc/functions/stats/Observable/set_popt.html' | relative_url }}"><code>Observable.set_popt</code></a>.</p></dd>
+<dt>std<span class="classifier"><em>float</em></span></dt>
+<dd class="field-desc"><p>The standard deviation, or the left-sided 1-sigma percentile relative to the value if <code>std_2</code> is not 0.</p></dd>
+<dt>std_2<span class="classifier"><em>float</em></span></dt>
+<dd class="field-desc"><p>The right-sided 1-sigma percentile relative to the value. If 0, the uncertainty is symmetric.</p></dd>
 </dl>
 </dd>
 </dl>

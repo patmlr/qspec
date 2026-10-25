@@ -8,16 +8,16 @@ title: qspec.simulate.Atom.update
 <span class="sig-name">update</span>
 <span class="sig-paren">&nbsp;(&nbsp;</span>
 <em class="sig-param"><span class="n">env</span><span class="o">=</span><span class="default_value">None</span></em>
-<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/simulate/_simulate_cpp.py#L822-L830' }}"><span class="sig-source">[source]</span></a>
+<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/simulate/_simulate_cpp.py#L806-L815' }}"><span class="sig-source">[source]</span></a>
 </dt>
 <dd class="field-body">
-<p>Update the atom.</p>
+<p>Update the atom, e.g., after changing its states, its decay map or its environment.</p>
 <dl class="field-list">
 <dt class="field-head">Parameters<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
 <dt>env<span class="classifier"><em><a href="{{ '/doc/functions/simulate/Environment/Environment.html' | relative_url }}">Environment</a> | None</em></span></dt>
-<dd class="field-desc"><p>The electromagnetic <code>Environment</code> of the atom.</p></dd>
+<dd class="field-desc"><p>The electromagnetic <code>Environment</code> of the atom. If <code>None</code>, the current environment is kept.</p></dd>
 </dl>
 </dd>
 </dl>

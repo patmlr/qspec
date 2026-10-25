@@ -10,26 +10,28 @@ title: qspec.v_recoil
 <em class="sig-param"><span class="n">f</span></em>
 ,&nbsp;
 <em class="sig-param"><span class="n">m</span></em>
-<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/physics.py#L771-L781' }}"><span class="sig-source">[source]</span></a>
+<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/physics.py#L895-L908' }}"><span class="sig-source">[source]</span></a>
 </dt>
 <dd class="field-body">
-<p>The change of velocity of an atom at rest $\delta v = hf / (mc)$
-due to the absorption of a photon with frequency $f$.</p>
+<p>The change of velocity of an atom at rest due to the absorption of a photon with frequency $f$</p>
+<div class="math-block">$$
+\delta v = \frac{hf}{mc}.
+$$</div>
 <dl class="field-list">
 <dt class="field-head">Parameters<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>f<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">array_like</a></em></span></dt>
+<dt>f<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a></em></span></dt>
 <dd class="field-desc"><p>The frequency of light $f$ in the atom's rest frame (MHz).</p></dd>
-<dt>m<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">array_like</a></em></span></dt>
+<dt>m<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a></em></span></dt>
 <dd class="field-desc"><p>The mass $m$ of the atom (u).</p></dd>
 </dl>
 </dd>
 <dt class="field-head">Returns<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>dv_rec<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">ndarray</a></em></span></dt>
-<dd class="field-desc"><p>The change of velocity  $\delta v$ (m/s).</p></dd>
+<dt>dv_rec<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#ndarray' | relative_url }}">ndarray</a></em></span></dt>
+<dd class="field-desc"><p>The change of velocity $\delta v$ (m/s).</p></dd>
 </dl>
 </dd>
 </dl>

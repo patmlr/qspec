@@ -13,25 +13,29 @@ title: qspec.v_el_d1
 ,&nbsp;
 <em class="sig-param"><span class="n">m</span></em>
 ,&nbsp;
-<em class="sig-param"><span class="n">v0</span><span class="o">=</span><span class="default_value num">0</span></em>
+<em class="sig-param"><span class="n">v0</span><span class="o">=</span><span class="default_value"><span class="num">0</span></span></em>
 ,&nbsp;
-<em class="sig-param"><span class="n">relativistic</span><span class="o">=</span><span class="default_value bool">True</span></em>
-<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/physics.py#L420-L436' }}"><span class="sig-source">[source]</span></a>
+<em class="sig-param"><span class="n">relativistic</span><span class="o">=</span><span class="default_value"><span class="bool">True</span></span></em>
+<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/physics.py#L503-L524' }}"><span class="sig-source">[source]</span></a>
 </dt>
 <dd class="field-body">
-<p>The first derivative $\frac{\partial v}{\partial E} = \frac{q}{amv(E)}$ with
-$a = \begin{cases}(\gamma(v_0) + qU / (mc^2))^3, &amp; \mathrm{True}\\1, &amp; \mathrm{False}\end{cases}$</p>
+<p>The first derivative</p>
+<div class="math-block">$$
+\frac{\partial v}{\partial U} = \frac{q}{amv(U)},\quad
+a = \begin{cases}\left[\gamma(v_0) + \frac{qU}{mc^2}\right]^3, &amp; \text{relativistic}\\
+1, &amp; \text{classical}\end{cases}.
+$$</div>
 <dl class="field-list">
 <dt class="field-head">Parameters<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>u<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">array_like</a></em></span></dt>
+<dt>u<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a></em></span></dt>
 <dd class="field-desc"><p>The electric potential difference $U$ added to the kinetic energy of a body with velocity <code>v0</code> (V).</p></dd>
-<dt>q<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">array_like</a></em></span></dt>
+<dt>q<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a></em></span></dt>
 <dd class="field-desc"><p>The electric charge $q$ of the body (e).</p></dd>
-<dt>m<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">array_like</a></em></span></dt>
+<dt>m<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a></em></span></dt>
 <dd class="field-desc"><p>The mass $m$ of the body (u).</p></dd>
-<dt>v0<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">array_like</a></em></span></dt>
+<dt>v0<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a></em></span></dt>
 <dd class="field-desc"><p>The initial velocity $v_0$ of the body (m/s).</p></dd>
 <dt>relativistic<span class="classifier"><em>bool</em></span></dt>
 <dd class="field-desc"><p>The calculation is performed either relativistically (<code>True</code>) or classically (<code>False</code>).
@@ -41,7 +45,7 @@ The default is <code>True</code>.</p></dd>
 <dt class="field-head">Returns<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>dv_dU<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">ndarray</a></em></span></dt>
+<dt>dv_dU<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#ndarray' | relative_url }}">ndarray</a></em></span></dt>
 <dd class="field-desc"><p>The first derivative $\partial v / \partial U$ of the velocity $v$ of the body
 with starting velocity <code>v0</code>, electric charge <code>q</code> and mass <code>m</code> after electrostatic acceleration
 with the voltage <code>u</code> (m/(s V)).</p></dd>

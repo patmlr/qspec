@@ -10,26 +10,28 @@ title: qspec.analyze.poly
 <em class="sig-param"><span class="n">x</span></em>
 ,&nbsp;
 <em class="sig-param"><span class="o">*</span><span class="n">args</span></em>
-<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/analyze/_analyze.py#L139-L152' }}"><span class="sig-source">[source]</span></a>
+<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/analyze/_analyze.py#L182-L197' }}"><span class="sig-source">[source]</span></a>
 </dt>
 <dd class="field-body">
 <p>A polynomial</p>
-<div class="math-block">$$f(x) = \sum\limits_{k=0}^n \frac{a_k}{k!}x^k$$</div>
-<p>of order <code>n = len(args)</code> with coefficients <code>args</code>.</p>
+<div class="math-block">$$
+f(x) = \sum\limits_{k=0}^n \frac{a_k}{k!}x^k
+$$</div>
+<p>of order <code>n = len(args) - 1</code> with coefficients <code>args</code>.</p>
 <dl class="field-list">
 <dt class="field-head">Parameters<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>x<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">array_like</a></em></span></dt>
+<dt>x<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a></em></span></dt>
 <dd class="field-desc"><p>The $x$ values.</p></dd>
-<dt>args<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">scalar</a></em></span></dt>
+<dt>args<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#scalar' | relative_url }}">scalar</a></em></span></dt>
 <dd class="field-desc"><p>The coefficients of the polynomial $a_k$.</p></dd>
 </dl>
 </dd>
 <dt class="field-head">Returns<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>y<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">ndarray</a></em></span></dt>
+<dt>y<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#ndarray' | relative_url }}">ndarray</a></em></span></dt>
 <dd class="field-desc"><p>The function value $f(x)$.</p></dd>
 </dl>
 </dd>

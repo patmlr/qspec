@@ -11,13 +11,13 @@ title: qspec.simulate.Atom
 ,&nbsp;
 <em class="sig-param"><span class="n">decay_map</span><span class="o">=</span><span class="default_value">None</span></em>
 ,&nbsp;
-<em class="sig-param"><span class="n">mass</span><span class="o">=</span><span class="default_value num">0</span></em>
+<em class="sig-param"><span class="n">mass</span><span class="o">=</span><span class="default_value"><span class="num">0</span></span></em>
 ,&nbsp;
 <em class="sig-param"><span class="n">instance</span><span class="o">=</span><span class="default_value">None</span></em>
-<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/simulate/_simulate_cpp.py#L778-L1403' }}"><span class="sig-source">[source]</span></a>
+<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/simulate/_simulate_cpp.py#L762-L1410' }}"><span class="sig-source">[source]</span></a>
 </dt>
 <dd class="field-body">
-<p>Class representing an Atom and its inner structure.</p>
+<p>An atom and its inner structure.</p>
 <dl class="field-list">
 <dt class="field-head">Parameters<span class="colon">:</span></dt>
 <dd class="field-par">
@@ -25,11 +25,38 @@ title: qspec.simulate.Atom
 <dt>states<span class="classifier"><em>Iterable[<a href="{{ '/doc/functions/simulate/State/State.html' | relative_url }}">State</a>] | None</em></span></dt>
 <dd class="field-desc"><p>The states $|\mathrm{[label]}\pi JIFm\rangle$ of the atom.</p></dd>
 <dt>decay_map<span class="classifier"><em><a href="{{ '/doc/functions/simulate/DecayMap/DecayMap.html' | relative_url }}">DecayMap</a> | None</em></span></dt>
-<dd class="field-desc"><p>The <code>DecayMap</code> connecting the atomic states.</p></dd>
-<dt>mass<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">scalar</a></em></span></dt>
+<dd class="field-desc"><p>The <code>DecayMap</code> connecting the atomic states. If <code>None</code>, an empty <code>DecayMap</code> is used.</p></dd>
+<dt>mass<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#scalar' | relative_url }}">scalar</a></em></span></dt>
 <dd class="field-desc"><p>The mass $m$ of the atom (u).</p></dd>
 <dt>instance<span class="classifier"><em><a href="{{ '/doc/functions/simulate/Atom/Atom.html' | relative_url }}">Atom</a> | C.AtomHandler.value | None</em></span></dt>
-<dd class="field-desc"><p>An existing <code>Atom</code> instance. If this is specified, the other parameters are omitted.</p></dd>
+<dd class="field-desc"><p>An existing <code>Atom</code> instance. If this is specified, the other parameters are ignored.</p></dd>
+</dl>
+</dd>
+<dt class="field-head">Attributes<span class="colon">:</span></dt>
+<dd class="field-par">
+<dl>
+<dt>d_em<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#ndarray' | relative_url }}">ndarray</a></em></span></dt>
+<dd class="field-desc"><p>Multipole transition strengths ordered by the rank $k$, starting at <code>k = 1</code> (dipole).</p></dd>
+<dt>decay_map<span class="classifier"><em><a href="{{ '/doc/functions/simulate/DecayMap/DecayMap.html' | relative_url }}">DecayMap</a></em></span></dt>
+<dd class="field-desc"><p>The <code>DecayMap</code> connecting the atomic states.</p></dd>
+<dt>ek<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#ndarray' | relative_url }}">ndarray</a></em></span></dt>
+<dd class="field-desc"><p>A map of the electric multipole orders of the transitions between the states.</p></dd>
+<dt>emk<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#ndarray' | relative_url }}">ndarray</a></em></span></dt>
+<dd class="field-desc"><p>A map of the multipole orders of the transitions between the states.</p></dd>
+<dt>gs<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#ndarray' | relative_url }}">ndarray</a></em></span></dt>
+<dd class="field-desc"><p>The indexes of the states with the same label as the first state <code>Atom.states[0]</code>.</p></dd>
+<dt>l0<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#ndarray' | relative_url }}">ndarray</a></em></span></dt>
+<dd class="field-desc"><p>The matrix of the partial spontaneous decay rates $\Gamma_{ij}$ between the states.</p></dd>
+<dt>l1<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#ndarray' | relative_url }}">ndarray</a></em></span></dt>
+<dd class="field-desc"><p>The matrix of the decay rates of the coherences, derived from <code>Atom.l0</code>.</p></dd>
+<dt>mass<span class="classifier"><em>float</em></span></dt>
+<dd class="field-desc"><p>The mass $m$ of the atom (u).</p></dd>
+<dt>mk<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#ndarray' | relative_url }}">ndarray</a></em></span></dt>
+<dd class="field-desc"><p>A map of the magnetic multipole orders of the transitions between the states.</p></dd>
+<dt>size<span class="classifier"><em>int</em></span></dt>
+<dd class="field-desc"><p>The number of states of the atom.</p></dd>
+<dt>states<span class="classifier"><em>list[<a href="{{ '/doc/functions/simulate/State/State.html' | relative_url }}">State</a>]</em></span></dt>
+<dd class="field-desc"><p>A list of the atom states $|\mathrm{[label]}\pi JIFm\rangle$.</p></dd>
 </dl>
 </dd>
 </dl>

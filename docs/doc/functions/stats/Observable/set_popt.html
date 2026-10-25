@@ -8,16 +8,16 @@ title: qspec.Observable.set_popt
 <span class="sig-name">set_popt</span>
 <span class="sig-paren">&nbsp;(&nbsp;</span>
 <em class="sig-param"><span class="n">popt</span><span class="o">=</span><span class="default_value">None</span></em>
-<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/stats.py#L120-L129' }}"><span class="sig-source">[source]</span></a>
+<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/stats.py#L131-L140' }}"><span class="sig-source">[source]</span></a>
 </dt>
 <dd class="field-body">
-<p>Set the <code>popt</code> attribute.</p>
+<p>Set the parameters <code>Observable.popt</code> of a skew normal distribution, e.g., fitted to a sample of the observable.</p>
 <dl class="field-list">
 <dt class="field-head">Parameters<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>popt<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">array_like</a> | None</em></span></dt>
-<dd class="field-desc"><p>The new value of <code>popt</code>.</p></dd>
+<dt>popt<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a> | None</em></span></dt>
+<dd class="field-desc"><p>The parameters <code>(a, loc, scale)</code> of <code>scipy.stats.skewnorm</code> or <code>None</code>.</p></dd>
 </dl>
 </dd>
 </dl>

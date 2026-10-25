@@ -7,28 +7,21 @@ title: qspec.Observable.hist
 <span class="sig-prename">qspec.</span><span class="sig-classname">Observable</span><span class="sig-prename">.</span>
 <span class="sig-name">hist</span>
 <span class="sig-paren">&nbsp;(&nbsp;</span>
-<em class="sig-param"><span class="n">size</span><span class="o">=</span><span class="default_value num">1000000</span></em>
+<em class="sig-param"><span class="n">size</span><span class="o">=</span><span class="default_value"><span class="num">1000000</span></span></em>
 ,&nbsp;
-<em class="sig-param"><span class="n">n_bins</span><span class="o">=</span><span class="default_value num">200</span></em>
-<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/stats.py#L164-L175' }}"><span class="sig-source">[source]</span></a>
+<em class="sig-param"><span class="n">n_bins</span><span class="o">=</span><span class="default_value"><span class="num">200</span></span></em>
+<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/stats.py#L180-L192' }}"><span class="sig-source">[source]</span></a>
 </dt>
 <dd class="field-body">
-
+<p>Plot a histogram of random variates of the observable together with its pdf.</p>
 <dl class="field-list">
 <dt class="field-head">Parameters<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>size<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">int_like</a></em></span></dt>
-<dd class="field-desc"><p>The defining number of random variates (default is 1,000,000).</p></dd>
-<dt>n_bins<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">int_like</a></em></span></dt>
+<dt>size<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#int_like' | relative_url }}">int_like</a></em></span></dt>
+<dd class="field-desc"><p>The number of random variates. The default is 1,000,000.</p></dd>
+<dt>n_bins<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#int_like' | relative_url }}">int_like</a></em></span></dt>
 <dd class="field-desc"><p>The number of bins.</p></dd>
-</dl>
-</dd>
-<dt class="field-head">Returns<span class="colon">:</span></dt>
-<dd class="field-par">
-<dl>
-<dt>out<span class="classifier"><em>None</em></span></dt>
-<dd class="field-desc"><p>Plots a histogram of the observable.</p></dd>
 </dl>
 </dd>
 </dl>

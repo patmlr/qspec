@@ -13,15 +13,15 @@ title: qspec.simulate.Interaction
 ,&nbsp;
 <em class="sig-param"><span class="n">environment</span><span class="o">=</span><span class="default_value">None</span></em>
 ,&nbsp;
-<em class="sig-param"><span class="n">delta_max</span><span class="o">=</span><span class="default_value num">1000.0</span></em>
+<em class="sig-param"><span class="n">delta_max</span><span class="o">=</span><span class="default_value"><span class="num">1000.0</span></span></em>
 ,&nbsp;
-<em class="sig-param"><span class="n">controlled</span><span class="o">=</span><span class="default_value bool">True</span></em>
+<em class="sig-param"><span class="n">controlled</span><span class="o">=</span><span class="default_value"><span class="bool">True</span></span></em>
 ,&nbsp;
 <em class="sig-param"><span class="n">instance</span><span class="o">=</span><span class="default_value">None</span></em>
-<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/simulate/_simulate_cpp.py#L1643-L2502' }}"><span class="sig-source">[source]</span></a>
+<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/simulate/_simulate_cpp.py#L1650-L2468' }}"><span class="sig-source">[source]</span></a>
 </dt>
 <dd class="field-body">
-<p>Class representing an Interaction between an <code>Atom</code> and a list of <code>lasers</code> in an <code>Environment</code>.
+<p>An interaction between an <code>Atom</code> and a list of <code>lasers</code> in an <code>Environment</code>.
 All frequencies are in $\mathrm{MHz}$, all times are in $\mu\mathrm{s}$.</p>
 <dl class="field-list">
 <dt class="field-head">Parameters<span class="colon">:</span></dt>
@@ -33,7 +33,7 @@ All frequencies are in $\mathrm{MHz}$, all times are in $\mu\mathrm{s}$.</p>
 <dd class="field-desc"><p>The lasers interacting with the <code>Atom</code>.</p></dd>
 <dt>environment<span class="classifier"><em><a href="{{ '/doc/functions/simulate/Environment/Environment.html' | relative_url }}">Environment</a> | None</em></span></dt>
 <dd class="field-desc"><p>The electromagnetic <code>Environment</code> of the interaction.</p></dd>
-<dt>delta_max<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">scalar</a></em></span></dt>
+<dt>delta_max<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#scalar' | relative_url }}">scalar</a></em></span></dt>
 <dd class="field-desc"><p>The maximum difference between a laser and a transition frequency
 for that transition to be considered laser-driven. The default value is <code>1000.0</code> (MHz).</p></dd>
 <dt>controlled<span class="classifier"><em>bool</em></span></dt>
@@ -42,7 +42,56 @@ Setting this to True is particularly useful for dynamics where a changing resolu
 However, this comes at the cost of computing time.
 The default step size for the uncontrolled stepper is <code>dt = 1e-3</code> (1 ns).</p></dd>
 <dt>instance<span class="classifier"><em><a href="{{ '/doc/functions/simulate/Interaction/Interaction.html' | relative_url }}">Interaction</a> | C.InteractionHandler.value | None</em></span></dt>
-<dd class="field-desc"><p>An existing <code>Interaction</code> instance. If this is specified, the other parameters are omitted.</p></dd>
+<dd class="field-desc"><p>An existing <code>Interaction</code> instance. If this is specified, the other parameters are ignored.</p></dd>
+</dl>
+</dd>
+<dt class="field-head">Attributes<span class="colon">:</span></dt>
+<dd class="field-par">
+<dl>
+<dt>atol<span class="classifier"><em>float</em></span></dt>
+<dd class="field-desc"><p>The absolute error tolerance of controlled solver.</p></dd>
+<dt>atom<span class="classifier"><em><a href="{{ '/doc/functions/simulate/Atom/Atom.html' | relative_url }}">Atom</a></em></span></dt>
+<dd class="field-desc"><p>The <code>Atom</code> of the interaction.</p></dd>
+<dt>atommap<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#ndarray' | relative_url }}">ndarray</a></em></span></dt>
+<dd class="field-desc"><p>A projection matrix $A$ mapping the state frequencies onto the diagonal of the Hamiltonian.
+It holds $H_{ii} \leftarrow \sum\limits_j A_{ij} (\omega_0)_j$.</p></dd>
+<dt>controlled<span class="classifier"><em>bool</em></span></dt>
+<dd class="field-desc"><p>Whether the ODE solver uses an error controlled stepper or a fixed step size.
+Setting this to True is particularly useful for dynamics where a changing resolution is required.
+However, this comes at the cost of computing time.
+The default step size for the uncontrolled stepper is <code>dt = 1e-3</code> (1 ns).</p></dd>
+<dt>delta_max<span class="classifier"><em>float</em></span></dt>
+<dd class="field-desc"><p>The maximum difference between a laser and a transition frequency
+for that transition to be considered laser-driven. The default value is <code>1000.0</code> (MHz).</p></dd>
+<dt>deltamap<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#ndarray' | relative_url }}">ndarray</a></em></span></dt>
+<dd class="field-desc"><p>A projection matrix $B$ mapping the laser frequencies onto the diagonal of the Hamiltonian.
+It holds $H_{ii} \leftarrow \sum\limits_m B_{im}\omega_m$.</p></dd>
+<dt>dense<span class="classifier"><em>bool</em></span></dt>
+<dd class="field-desc"><p>Whether the ODE solver uses an error controlled dense output stepper or a fixed step size.
+If True, this overrides the controlled flag.
+Setting this to True is particularly useful for dynamics where a changing resolution is required.
+However, this comes at the cost of computing time.
+The default step size for the uncontrolled stepper is <code>dt = 1e-3</code> (1 ns).</p></dd>
+<dt>dt<span class="classifier"><em>float</em></span></dt>
+<dd class="field-desc"><p>The (initial) step size of (controlled) solvers.</p></dd>
+<dt>dt_max<span class="classifier"><em>float</em></span></dt>
+<dd class="field-desc"><p>The maximum step size of controlled solvers.</p></dd>
+<dt>environment<span class="classifier"><em><a href="{{ '/doc/functions/simulate/Environment/Environment.html' | relative_url }}">Environment</a></em></span></dt>
+<dd class="field-desc"><p>The <code>Environment</code> of the interaction.</p></dd>
+<dt>history<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#ndarray' | relative_url }}">ndarray</a></em></span></dt>
+<dd class="field-desc"><p>The history of states visited during the generation of the diagonal maps.</p></dd>
+<dt>history_size<span class="classifier"><em>int</em></span></dt>
+<dd class="field-desc"><p>The length of the history of states visited during the generation of the diagonal maps.</p></dd>
+<dt>lasers<span class="classifier"><em>list[<a href="{{ '/doc/functions/simulate/Laser/Laser.html' | relative_url }}">Laser</a>]</em></span></dt>
+<dd class="field-desc"><p>The lasers of the interaction.</p></dd>
+<dt>loop<span class="classifier"><em>bool</em></span></dt>
+<dd class="field-desc"><p>Whether there are loops formed by the lasers in the atom.</p></dd>
+<dt>rtol<span class="classifier"><em>float</em></span></dt>
+<dd class="field-desc"><p>The relative error tolerance of controlled solver.</p></dd>
+<dt>summap<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#ndarray' | relative_url }}">ndarray</a></em></span></dt>
+<dd class="field-desc"><p>An array with shape <code>(atom.size, atom.size)</code>, indicating the laser-connected states.</p></dd>
+<dt>time_dependent<span class="classifier"><em>bool</em></span></dt>
+<dd class="field-desc"><p>Whether the system Hamiltonian is allowed to be time-dependent.</p></dd>
 </dl>
 </dd>
 </dl>

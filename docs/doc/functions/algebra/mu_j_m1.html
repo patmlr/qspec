@@ -15,34 +15,36 @@ title: qspec.mu_j_m1
 ,&nbsp;
 <em class="sig-param"><span class="n">j_u</span></em>
 ,&nbsp;
-<em class="sig-param"><span class="n">as_sympy</span><span class="o">=</span><span class="default_value bool">False</span></em>
-<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/algebra.py#L637-L671' }}"><span class="sig-source">[source]</span></a>
+<em class="sig-param"><span class="n">as_sympy</span><span class="o">=</span><span class="default_value"><span class="bool">False</span></span></em>
+<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/algebra.py#L716-L752' }}"><span class="sig-source">[source]</span></a>
 </dt>
 <dd class="field-body">
 <p>The reduced magnetic dipole transition matrix element</p>
-<div class="math-block">$$\mu_{J_l}^{J_u}\coloneqq\langle LS,J_l||\vec{\mu}||LS,J_u\rangle$$</div>
+<div class="math-block">$$
+\mu_{J_l}^{J_u}\coloneqq\langle LS,J_l||\vec{\mu}||LS,J_u\rangle
+$$</div>
 <p>in units of the Bohr magneton $\mu_\mathrm{B}$.</p>
 <dl class="field-list">
 <dt class="field-head">Parameters<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>s<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">sympy_scalar</a></em></span></dt>
+<dt>s<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#sympy_scalar' | relative_url }}">sympy_scalar</a></em></span></dt>
 <dd class="field-desc"><p>The electronic spin quantum number $S$ of the lower and upper state.</p></dd>
-<dt>l<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">sympy_scalar</a></em></span></dt>
+<dt>l<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#sympy_scalar' | relative_url }}">sympy_scalar</a></em></span></dt>
 <dd class="field-desc"><p>The electronic orbital angular momentum quantum number $L$ of the lower and upper state.</p></dd>
-<dt>j_l<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">sympy_scalar</a></em></span></dt>
+<dt>j_l<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#sympy_scalar' | relative_url }}">sympy_scalar</a></em></span></dt>
 <dd class="field-desc"><p>The electronic total angular momentum quantum number $J_l$ of the lower state.</p></dd>
-<dt>j_u<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">sympy_scalar</a></em></span></dt>
+<dt>j_u<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#sympy_scalar' | relative_url }}">sympy_scalar</a></em></span></dt>
 <dd class="field-desc"><p>The electronic total angular momentum quantum number $J_u$ of the upper state.</p></dd>
 <dt>as_sympy<span class="classifier"><em>bool</em></span></dt>
-<dd class="field-desc"><p>Return the result as a symbol (<code>True</code>) or as a <code>float</code> (<code>False</code>).</p></dd>
+<dd class="field-desc"><p>Whether to return the result as a sympy expression (<code>True</code>) or as a <code>float</code> (<code>False</code>).</p></dd>
 </dl>
 </dd>
 <dt class="field-head">Returns<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>out<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">sympy_expr</a> | float</em></span></dt>
-<dd class="field-desc"><p>The magnetic dipole transition matrix element $\mu_{J_l}^{J_u}$ ($\mu_\mathrm{B}$).</p></dd>
+<dt>mu<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#sympy_expr' | relative_url }}">sympy_expr</a> | float</em></span></dt>
+<dd class="field-desc"><p>The reduced magnetic dipole transition matrix element $\mu_{J_l}^{J_u}$ ($\mu_\mathrm{B}$).</p></dd>
 </dl>
 </dd>
 </dl>

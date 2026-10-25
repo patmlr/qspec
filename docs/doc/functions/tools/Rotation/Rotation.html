@@ -7,21 +7,41 @@ title: qspec.Rotation
 <span class="sig-prename">qspec.</span>
 <span class="sig-classname">Rotation</span>
 <span class="sig-paren">&nbsp;(&nbsp;</span>
-<em class="sig-param"><span class="n">alpha</span><span class="o">=</span><span class="default_value num">0.0</span></em>
+<em class="sig-param"><span class="n">alpha</span><span class="o">=</span><span class="default_value"><span class="num">0.0</span></span></em>
 ,&nbsp;
 <em class="sig-param"><span class="n">dr</span><span class="o">=</span><span class="default_value">None</span></em>
-<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/tools.py#L1047-L1068' }}"><span class="sig-source">[source]</span></a>
+<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/tools.py#L1170-L1199' }}"><span class="sig-source">[source]</span></a>
 </dt>
 <dd class="field-body">
-
+<p>A rotation in 3d-space, defined by an angle and a rotation axis, see <a href="{{ '/doc/functions/tools/rotation_matrix.html' | relative_url }}"><code>rotation_matrix</code></a>.</p>
 <dl class="field-list">
 <dt class="field-head">Parameters<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>alpha<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">scalar</a></em></span></dt>
+<dt>alpha<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#scalar' | relative_url }}">scalar</a></em></span></dt>
 <dd class="field-desc"><p>The angle of the rotation (rad).</p></dd>
-<dt>dr<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">scalar_nd</a> | None</em></span></dt>
-<dd class="field-desc"><p>The rotational axis of the rotation.</p></dd>
+<dt>dr<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#scalar_nd' | relative_url }}">scalar_nd</a> | None</em></span></dt>
+<dd class="field-desc"><p>The rotation axis. If <code>None</code>, the $z$-axis is used.</p></dd>
+</dl>
+</dd>
+<dt class="field-head">Attributes<span class="colon">:</span></dt>
+<dd class="field-par">
+<dl>
+<dt>R<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#ndarray' | relative_url }}">ndarray</a></em></span></dt>
+<dd class="field-desc"><p>The rotation matrix.</p></dd>
+<dt>alpha<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#scalar' | relative_url }}">scalar</a></em></span></dt>
+<dd class="field-desc"><p>The angle of the rotation (rad).</p></dd>
+<dt>alpha_deg<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#scalar' | relative_url }}">scalar</a></em></span></dt>
+<dd class="field-desc"><p>The angle of the rotation (deg).</p></dd>
+<dt>dr<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#ndarray' | relative_url }}">ndarray</a></em></span></dt>
+<dd class="field-desc"><p>The normalized rotation axis.</p></dd>
+</dl>
+</dd>
+<dt class="field-head">Raises<span class="colon">:</span></dt>
+<dd class="field-par">
+<dl>
+<dt>ValueError</dt>
+<dd class="field-desc"><p>If <code>dr</code> is not a 3d-vector.</p></dd>
 </dl>
 </dd>
 </dl>

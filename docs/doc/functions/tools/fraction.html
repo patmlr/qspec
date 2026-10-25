@@ -8,23 +8,30 @@ title: qspec.fraction
 <span class="sig-name">fraction</span>
 <span class="sig-paren">&nbsp;(&nbsp;</span>
 <em class="sig-param"><span class="n">r</span></em>
-<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/tools.py#L244-L259' }}"><span class="sig-source">[source]</span></a>
+<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/tools.py#L259-L277' }}"><span class="sig-source">[source]</span></a>
 </dt>
 <dd class="field-body">
-
+<p>The numerator and denominator of a fraction.</p>
 <dl class="field-list">
 <dt class="field-head">Parameters<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
 <dt>r<span class="classifier"><em>Rational | str</em></span></dt>
-<dd class="field-desc"><p>A sympy.Rational or a str with the signature "num/denom".</p></dd>
+<dd class="field-desc"><p>A <code>sympy.Rational</code> or a <code>str</code> with the format <code>"num/denom"</code>.</p></dd>
 </dl>
 </dd>
 <dt class="field-head">Returns<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>out<span class="classifier"><em>tuple[int, int]</em></span></dt>
-<dd class="field-desc"><p>the numerator and denominator of <code>r</code>.</p></dd>
+<dt>(num, denom)<span class="classifier"><em>tuple[int, int]</em></span></dt>
+<dd class="field-desc"><p>The numerator and denominator of <code>r</code>.</p></dd>
+</dl>
+</dd>
+<dt class="field-head">Raises<span class="colon">:</span></dt>
+<dd class="field-par">
+<dl>
+<dt>TypeError</dt>
+<dd class="field-desc"><p>If <code>r</code> is neither a <code>sympy.Rational</code> nor a <code>str</code>.</p></dd>
 </dl>
 </dd>
 </dl>

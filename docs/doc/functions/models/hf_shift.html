@@ -14,29 +14,33 @@ title: qspec.models.hf_shift
 <em class="sig-param"><span class="n">coeff_l</span></em>
 ,&nbsp;
 <em class="sig-param"><span class="n">coeff_u</span></em>
-<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/models/_splitter.py#L130-L145' }}"><span class="sig-source">[source]</span></a>
+<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/models/_splitter.py#L138-L161' }}"><span class="sig-source">[source]</span></a>
 </dt>
 <dd class="field-body">
-
+<p>The hyperfine structure shift of an optical transition</p>
+<div class="math-block">$$
+\Delta_\mathrm{hfs} = \sum\limits_k K_k^u c_k^u - \sum\limits_k K_k^l c_k^l,
+$$</div>
+<p>with the hyperfine structure constants $K_k \in \{A, B, C\}$ and the coefficients $c_k$, see <a href="{{ '/doc/functions/models/hf_coeff.html' | relative_url }}"><code>hf_coeff</code></a>.</p>
 <dl class="field-list">
 <dt class="field-head">Parameters<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>hyper_l<span class="classifier"><em>Iterable[<a href="{{ '/doc/modules/qtypes.html' | relative_url }}">scalar</a>]</em></span></dt>
-<dd class="field-desc"><p>The hyperfine structure constants of the lower state (Al, Bl, Cl, ...).</p></dd>
-<dt>hyper_u<span class="classifier"><em>Iterable[<a href="{{ '/doc/modules/qtypes.html' | relative_url }}">scalar</a>]</em></span></dt>
-<dd class="field-desc"><p>The hyperfine structure constants of the upper state (Au, Bu, Cu, ...).</p></dd>
-<dt>coeff_l<span class="classifier"><em>Iterable[<a href="{{ '/doc/modules/qtypes.html' | relative_url }}">scalar</a>]</em></span></dt>
-<dd class="field-desc"><p>The coefficients of the lower state to be multiplied by the constants (coAl, coBl, coCl, ...).</p></dd>
-<dt>coeff_u<span class="classifier"><em>Iterable[<a href="{{ '/doc/modules/qtypes.html' | relative_url }}">scalar</a>]</em></span></dt>
-<dd class="field-desc"><p>The coefficients of the lower state to be multiplied by the constants (coAu, coBu, coCu, ...).</p></dd>
+<dt>hyper_l<span class="classifier"><em>Iterable[<a href="{{ '/doc/modules/qtypes.html#scalar' | relative_url }}">scalar</a>]</em></span></dt>
+<dd class="field-desc"><p>The hyperfine structure constants $K_k^l$ of the lower state <code>(Al, Bl, Cl, ...)</code>.</p></dd>
+<dt>hyper_u<span class="classifier"><em>Iterable[<a href="{{ '/doc/modules/qtypes.html#scalar' | relative_url }}">scalar</a>]</em></span></dt>
+<dd class="field-desc"><p>The hyperfine structure constants $K_k^u$ of the upper state <code>(Au, Bu, Cu, ...)</code>.</p></dd>
+<dt>coeff_l<span class="classifier"><em>Iterable[<a href="{{ '/doc/modules/qtypes.html#scalar' | relative_url }}">scalar</a>]</em></span></dt>
+<dd class="field-desc"><p>The coefficients $c_k^l$ of the lower state.</p></dd>
+<dt>coeff_u<span class="classifier"><em>Iterable[<a href="{{ '/doc/modules/qtypes.html#scalar' | relative_url }}">scalar</a>]</em></span></dt>
+<dd class="field-desc"><p>The coefficients $c_k^u$ of the upper state.</p></dd>
 </dl>
 </dd>
 <dt class="field-head">Returns<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>out<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">ndarray</a>[floating]</em></span></dt>
-<dd class="field-desc"><p>The hyperfine structure shift of an optical transition.</p></dd>
+<dt>dnu_hfs<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#ndarray' | relative_url }}">ndarray</a>[floating]</em></span></dt>
+<dd class="field-desc"><p>The hyperfine structure shift $\Delta_\mathrm{hfs}$ (unit of <code>hyper_l</code>).</p></dd>
 </dl>
 </dd>
 </dl>

@@ -12,28 +12,28 @@ title: qspec.estimate_skewnorm
 <em class="sig-param"><span class="n">per_0</span></em>
 ,&nbsp;
 <em class="sig-param"><span class="n">per_1</span></em>
-<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/stats.py#L290-L315' }}"><span class="sig-source">[source]</span></a>
+<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/stats.py#L324-L351' }}"><span class="sig-source">[source]</span></a>
 </dt>
 <dd class="field-body">
-
+<p>Estimate the parameters of a skew normal distribution from its median and 1-sigma percentiles.</p>
 <dl class="field-list">
 <dt class="field-head">Parameters<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>med<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">scalar</a></em></span></dt>
+<dt>med<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#scalar' | relative_url }}">scalar</a></em></span></dt>
 <dd class="field-desc"><p>The median (0.5-percentile) of a random variable.</p></dd>
-<dt>per_0<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">scalar</a></em></span></dt>
+<dt>per_0<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#scalar' | relative_url }}">scalar</a></em></span></dt>
 <dd class="field-desc"><p>The left-sided 1-sigma percentile (~0.1587-percentile) relative to <code>med</code>.</p></dd>
-<dt>per_1<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">scalar</a></em></span></dt>
+<dt>per_1<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#scalar' | relative_url }}">scalar</a></em></span></dt>
 <dd class="field-desc"><p>The right-sided 1-sigma percentile (~0.8413-percentile) relative to <code>med</code>.</p></dd>
 </dl>
 </dd>
 <dt class="field-head">Returns<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>out<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">ndarray</a> | None</em></span></dt>
-<dd class="field-desc"><p>A size-3-array of the estimated parameters (alpha, mean, std.)
-of a skew normal distribution that matches the given percentiles.</p></dd>
+<dt>popt<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#ndarray' | relative_url }}">ndarray</a> | None</em></span></dt>
+<dd class="field-desc"><p>The estimated parameters <code>(a, loc, scale)</code> of <code>scipy.stats.skewnorm</code>
+that match the given percentiles, or <code>None</code> if <code>per_0</code> or <code>per_1</code> is 0.</p></dd>
 </dl>
 </dd>
 <dt class="field-head">Raises<span class="colon">:</span></dt>

@@ -7,15 +7,15 @@ title: qspec.simulate.gen_hyperfine_state
 <span class="sig-prename">qspec.simulate.</span>
 <span class="sig-name">gen_hyperfine_state</span>
 <span class="sig-paren">&nbsp;(&nbsp;</span>
-<em class="sig-param"><span class="n">freq_j</span><span class="o">=</span><span class="default_value num">0.0</span></em>
+<em class="sig-param"><span class="n">freq_j</span><span class="o">=</span><span class="default_value"><span class="num">0.0</span></span></em>
 ,&nbsp;
 <em class="sig-param"><span class="n">parity</span><span class="o">=</span><span class="default_value">None</span></em>
 ,&nbsp;
-<em class="sig-param"><span class="n">j</span><span class="o">=</span><span class="default_value num">0</span></em>
+<em class="sig-param"><span class="n">j</span><span class="o">=</span><span class="default_value"><span class="num">0</span></span></em>
 ,&nbsp;
-<em class="sig-param"><span class="n">i</span><span class="o">=</span><span class="default_value num">0</span></em>
+<em class="sig-param"><span class="n">i</span><span class="o">=</span><span class="default_value"><span class="num">0</span></span></em>
 ,&nbsp;
-<em class="sig-param"><span class="n">f</span><span class="o">=</span><span class="default_value num">0</span></em>
+<em class="sig-param"><span class="n">f</span><span class="o">=</span><span class="default_value"><span class="num">0</span></span></em>
 ,&nbsp;
 <em class="sig-param"><span class="n">ls</span><span class="o">=</span><span class="default_value">None</span></em>
 ,&nbsp;
@@ -25,47 +25,47 @@ title: qspec.simulate.gen_hyperfine_state
 ,&nbsp;
 <em class="sig-param"><span class="n">gj</span><span class="o">=</span><span class="default_value">None</span></em>
 ,&nbsp;
-<em class="sig-param"><span class="n">gi</span><span class="o">=</span><span class="default_value num">0</span></em>
+<em class="sig-param"><span class="n">gi</span><span class="o">=</span><span class="default_value"><span class="num">0</span></span></em>
 ,&nbsp;
 <em class="sig-param"><span class="n">label</span><span class="o">=</span><span class="default_value">None</span></em>
-<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/simulate/_simulate_cpp.py#L2757-L2810' }}"><span class="sig-source">[source]</span></a>
+<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/simulate/_simulate_cpp.py#L2726-L2780' }}"><span class="sig-source">[source]</span></a>
 </dt>
 <dd class="field-body">
-<p>Creates all magnetic substates of a hyperfine-structure state $|\mathrm{[label]}\pi JIF\rangle$
+<p>Create all magnetic substates of a hyperfine-structure state $|\mathrm{[label]}\pi JIF\rangle$
 using a common <code>label</code>.</p>
 <dl class="field-list">
 <dt class="field-head">Parameters<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>freq_j<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">scalar</a></em></span></dt>
+<dt>freq_j<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#scalar' | relative_url }}">scalar</a></em></span></dt>
 <dd class="field-desc"><p>The energetic position of the state without the hyperfine structure or the magnetic field (MHz).</p></dd>
 <dt>parity<span class="classifier"><em>bool | str | None</em></span></dt>
 <dd class="field-desc"><p>The parity $\pi$ of the state is used to check the selection rules.
 If None, it is inferred from <code>ls</code> if possible.
 It can be either <code>"even"</code> (<code>"e"</code>, <code>False</code>) or <code>"odd"</code> (<code>"o"</code>, <code>True</code>).</p></dd>
-<dt>j<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">scalar</a></em></span></dt>
+<dt>j<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#scalar' | relative_url }}">scalar</a></em></span></dt>
 <dd class="field-desc"><p>The electronic total angular momentum quantum number $J$.</p></dd>
-<dt>i<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">scalar</a></em></span></dt>
+<dt>i<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#scalar' | relative_url }}">scalar</a></em></span></dt>
 <dd class="field-desc"><p>The nuclear spin quantum number $I$.</p></dd>
-<dt>f<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">scalar</a></em></span></dt>
+<dt>f<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#scalar' | relative_url }}">scalar</a></em></span></dt>
 <dd class="field-desc"><p>The total angular momentum quantum number $F$.</p></dd>
-<dt>ls<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">scalar_nd</a> | None</em></span></dt>
+<dt>ls<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#scalar_nd' | relative_url }}">scalar_nd</a> | None</em></span></dt>
 <dd class="field-desc"><p>A list or a single pair of electronic angular momentum and spin quantum numbers $(l_i, s_i)$
 used to check the selection rules and to calculate the electronic g-factor in the LS-coupling scheme.
 If this is a list of LS-pairs, the parameter <code>jj</code> requires a list of $j_i$ quantum numbers.</p></dd>
-<dt>jj<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">scalar_1d</a> | None</em></span></dt>
+<dt>jj<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#scalar_1d' | relative_url }}">scalar_1d</a> | None</em></span></dt>
 <dd class="field-desc"><p>A list of two electronic total angular momentum quantum numbers $(j_0, j_1)$
 used to calculate the electronic g-factor in the jj-coupling scheme.
 Either a list of two $(l_i, s_i)$ pairs needs to be specified for the parameter <code>ls</code>
 or a list of g-factors $g_{j_i}$ for the parameter <code>gj</code>.</p></dd>
-<dt>hyper_const<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">array_like</a> | None</em></span></dt>
+<dt>hyper_const<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a> | None</em></span></dt>
 <dd class="field-desc"><p>A list of the hyperfine-structure constants.
-Currently, constants up to the electric quadrupole order are supported ($A$, $B$). If 'hyper_const' is a scalar,
+Currently, constants up to the electric quadrupole order are supported ($A$, $B$). If <code>hyper_const</code> is a scalar,
 it is assumed to be the constant $A$ and the other orders are 0 (MHz).</p></dd>
-<dt>gj<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">scalar</a> | None</em></span></dt>
+<dt>gj<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#scalar' | relative_url }}">scalar</a> | None</em></span></dt>
 <dd class="field-desc"><p>A list of two $g_{j_i}$ or a single electronic g-factor $g_J$. If <code>gj</code> is a list, <code>jj</code> is required
 and <code>ls</code> is overwritten. If <code>gj</code> is a scalar, both <code>ls</code> and <code>jj</code> are overwritten.</p></dd>
-<dt>gi<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">scalar</a></em></span></dt>
+<dt>gi<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#scalar' | relative_url }}">scalar</a></em></span></dt>
 <dd class="field-desc"><p>The nuclear g-factor $g_I$.</p></dd>
 <dt>label<span class="classifier"><em>str | None</em></span></dt>
 <dd class="field-desc"><p>The label of the states. The labels are used to link states via a <code>DecayMap</code>.</p></dd>
@@ -76,6 +76,13 @@ and <code>ls</code> is overwritten. If <code>gj</code> is a scalar, both <code>l
 <dl>
 <dt>states<span class="classifier"><em>list[<a href="{{ '/doc/functions/simulate/State/State.html' | relative_url }}">State</a>]</em></span></dt>
 <dd class="field-desc"><p>A list of the created states $|\mathrm{[label]}\pi JIFm\rangle$.</p></dd>
+</dl>
+</dd>
+<dt class="field-head">Raises<span class="colon">:</span></dt>
+<dd class="field-par">
+<dl>
+<dt>ValueError</dt>
+<dd class="field-desc"><p>If <code>parity</code> is <code>None</code> and cannot be inferred from <code>ls</code>.</p></dd>
 </dl>
 </dd>
 </dl>

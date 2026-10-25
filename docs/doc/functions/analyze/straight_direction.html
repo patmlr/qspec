@@ -11,19 +11,21 @@ title: qspec.analyze.straight_direction
 ,&nbsp;
 <em class="sig-param"><span class="n">p_1</span></em>
 ,&nbsp;
-<em class="sig-param"><span class="n">axis</span><span class="o">=</span><span class="default_value num">-1</span></em>
-<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/analyze/_analyze.py#L226-L239' }}"><span class="sig-source">[source]</span></a>
+<em class="sig-param"><span class="n">axis</span><span class="o">=</span><span class="default_value"><span class="num">-1</span></span></em>
+<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/analyze/_analyze.py#L279-L294' }}"><span class="sig-source">[source]</span></a>
 </dt>
 <dd class="field-body">
-<p>The normalized directional vector of a straight through two points</p>
-<div class="math-block">$$\vec{r} = \frac{\vec{p}_1 - \vec{p}_0}{|\vec{p}_1 - \vec{p}_0|}.$$</div>
+<p>The normalized directional vector of a straight line through two points</p>
+<div class="math-block">$$
+\vec{r} = \frac{\vec{p}_1 - \vec{p}_0}{|\vec{p}_1 - \vec{p}_0|}.
+$$</div>
 <dl class="field-list">
 <dt class="field-head">Parameters<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>p_0<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">array_like</a></em></span></dt>
+<dt>p_0<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a></em></span></dt>
 <dd class="field-desc"><p>The first point(s) $\vec{p}_0$.</p></dd>
-<dt>p_1<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">array_like</a></em></span></dt>
+<dt>p_1<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a></em></span></dt>
 <dd class="field-desc"><p>The second point(s) $\vec{p}_1$.</p></dd>
 <dt>axis<span class="classifier"><em>int</em></span></dt>
 <dd class="field-desc"><p>The axis along which the vector components are aligned.</p></dd>
@@ -32,7 +34,7 @@ title: qspec.analyze.straight_direction
 <dt class="field-head">Returns<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>r<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">ndarray</a></em></span></dt>
+<dt>r<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#ndarray' | relative_url }}">ndarray</a></em></span></dt>
 <dd class="field-desc"><p>The direction $\vec{r}$ of a straight line.</p></dd>
 </dl>
 </dd>

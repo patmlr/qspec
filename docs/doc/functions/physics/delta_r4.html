@@ -19,13 +19,13 @@ title: qspec.delta_r4
 ,&nbsp;
 <em class="sig-param"><span class="n">dr_d</span><span class="o">=</span><span class="default_value">None</span></em>
 ,&nbsp;
-<em class="sig-param"><span class="n">v4</span><span class="o">=</span><span class="default_value num">1.0</span></em>
+<em class="sig-param"><span class="n">v4</span><span class="o">=</span><span class="default_value"><span class="num">1.0</span></span></em>
 ,&nbsp;
-<em class="sig-param"><span class="n">v4_ref</span><span class="o">=</span><span class="default_value num">1.0</span></em>
-<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/physics.py#L1876-L1946' }}"><span class="sig-source">[source]</span></a>
+<em class="sig-param"><span class="n">v4_ref</span><span class="o">=</span><span class="default_value"><span class="num">1.0</span></span></em>
+<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/physics.py#L2040-L2110' }}"><span class="sig-source">[source]</span></a>
 </dt>
 <dd class="field-body">
-<p>The difference of the mean square nuclear charge radius between two isotopes and its uncertainty
+<p>The difference of the mean-quartic nuclear charge radius between two isotopes and its uncertainty
 calculated from the Barrett radii and elastic electron scattering form factors</p>
 <div class="math-block">$$\begin{aligned}
 \delta\!\langle r^4\rangle &amp;= \left(\frac{R}{V_4}\right)^4
@@ -50,32 +50,32 @@ for the mean-square nuclear charge radius.</p>
 <dt class="field-head">Parameters<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>r<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">array_like</a></em></span></dt>
+<dt>r<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a></em></span></dt>
 <dd class="field-desc"><p>The Barrett radius $R$ of the first isotope (arb. units).</p></dd>
-<dt>r_d<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">array_like</a></em></span></dt>
+<dt>r_d<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a></em></span></dt>
 <dd class="field-desc"><p>The uncertainty of the Barrett radius $\Delta R$ of the first isotope (unit of <code>r</code>).</p></dd>
-<dt>r_ref<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">array_like</a></em></span></dt>
+<dt>r_ref<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a></em></span></dt>
 <dd class="field-desc"><p>The Barrett radius $R_\mathrm{ref}$ of the second isotope (unit of <code>r</code>).</p></dd>
-<dt>r_ref_d<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">array_like</a></em></span></dt>
+<dt>r_ref_d<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a></em></span></dt>
 <dd class="field-desc"><p>The uncertainty of the Barrett radius $\Delta R_\mathrm{ref}$ of the second isotope (unit of <code>r</code>).</p></dd>
-<dt>dr<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">array_like</a> | None</em></span></dt>
+<dt>dr<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a> | None</em></span></dt>
 <dd class="field-desc"><p>The difference between the Barrett radii $\delta R = R - R_\mathrm{ref}$
 of the first and second isotope (unit of <code>r</code>).</p></dd>
-<dt>dr_d<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">array_like</a> | None</em></span></dt>
+<dt>dr_d<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a> | None</em></span></dt>
 <dd class="field-desc"><p>The uncertainty of the difference between the Barrett radii $\Delta\delta R$
 of the first and second isotope (unit of <code>r</code>).</p></dd>
-<dt>v4<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">array_like</a></em></span></dt>
+<dt>v4<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a></em></span></dt>
 <dd class="field-desc"><p>The shape factor $V_4$ of the first isotope.</p></dd>
-<dt>v4_ref<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">array_like</a></em></span></dt>
+<dt>v4_ref<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a></em></span></dt>
 <dd class="field-desc"><p>The shape factor $V_{4,\mathrm{ref}}$ of the second isotope.</p></dd>
 </dl>
 </dd>
 <dt class="field-head">Returns<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>(dr4, dr4_d)<span class="classifier"><em>tuple[<a href="{{ '/doc/modules/qtypes.html' | relative_url }}">ndarray</a>, <a href="{{ '/doc/modules/qtypes.html' | relative_url }}">ndarray</a>]</em></span></dt>
+<dt>(dr4, dr4_d)<span class="classifier"><em>tuple[<a href="{{ '/doc/modules/qtypes.html#ndarray' | relative_url }}">ndarray</a>, <a href="{{ '/doc/modules/qtypes.html#ndarray' | relative_url }}">ndarray</a>]</em></span></dt>
 <dd class="field-desc"><p>The difference of the mean-quartic nuclear charge radius between two isotopes
-$\delta\!\langle r^4\rangle$ and its uncertainty $\Delta\delta\!\langle r^4\rangle$ (unit of <code>r ** 4</code>).</p></dd>
+$\delta\!\langle r^4\rangle$ and its uncertainty $\Delta\delta\!\langle r^4\rangle$ (unit of <code>r**4</code>).</p></dd>
 </dl>
 </dd>
 </dl>

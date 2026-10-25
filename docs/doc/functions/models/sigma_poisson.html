@@ -14,21 +14,23 @@ title: qspec.models.sigma_poisson
 <em class="sig-param"><span class="n">y_model</span></em>
 ,&nbsp;
 <em class="sig-param"><span class="o">*</span><span class="n">params</span></em>
-<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/models/_fit.py#L77-L89' }}"><span class="sig-source">[source]</span></a>
+<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/models/_fit.py#L78-L94' }}"><span class="sig-source">[source]</span></a>
 </dt>
 <dd class="field-body">
-<p>Poisson uncertainties $\sqrt{y_\mathrm{model}}$ estimated from the model values.
-Model values smaller than or equal to $1$ get an uncertainty of $1$.
-Can be passed as <code>sigma_y</code> to <a href="{{ '/doc/functions/models/fit.html' | relative_url }}"><code>qspec.models.fit</code></a>.</p>
+<p>Poisson uncertainties estimated from the model values</p>
+<div class="math-block">$$
+\sigma_y = \begin{cases}\sqrt{y_\mathrm{model}}, &amp; y_\mathrm{model} &gt; 1\\ 1, &amp; \text{else}\end{cases}.
+$$</div>
+<p>Can be passed as <code>sigma_y</code> to <a href="{{ '/doc/functions/models/fit.html' | relative_url }}"><code>qspec.models.fit</code></a>.</p>
 <dl class="field-list">
 <dt class="field-head">Parameters<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>x<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">array_like</a></em></span></dt>
+<dt>x<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a></em></span></dt>
 <dd class="field-desc"><p>The x data (unused).</p></dd>
-<dt>y<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">array_like</a></em></span></dt>
+<dt>y<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a></em></span></dt>
 <dd class="field-desc"><p>The y data (unused).</p></dd>
-<dt>y_model<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">array_like</a></em></span></dt>
+<dt>y_model<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a></em></span></dt>
 <dd class="field-desc"><p>The model values at the x data.</p></dd>
 <dt>params<span class="classifier"><em>Any</em></span></dt>
 <dd class="field-desc"><p>The model parameters (unused).</p></dd>
@@ -37,7 +39,7 @@ Can be passed as <code>sigma_y</code> to <a href="{{ '/doc/functions/models/fit.
 <dt class="field-head">Returns<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>sigma_y<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">ndarray</a>[floating]</em></span></dt>
+<dt>sigma_y<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#ndarray' | relative_url }}">ndarray</a>[floating]</em></span></dt>
 <dd class="field-desc"><p>The Poisson uncertainties.</p></dd>
 </dl>
 </dd>

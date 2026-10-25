@@ -15,50 +15,53 @@ title: qspec.hyper_zeeman_linear
 ,&nbsp;
 <em class="sig-param"><span class="n">m</span></em>
 ,&nbsp;
-<em class="sig-param"><span class="n">hyper_const</span><span class="o">=</span><span class="default_value num">0.0</span></em>
+<em class="sig-param"><span class="n">hyper_const</span><span class="o">=</span><span class="default_value"><span class="num">0.0</span></span></em>
 ,&nbsp;
-<em class="sig-param"><span class="n">g_f</span><span class="o">=</span><span class="default_value num">0.0</span></em>
+<em class="sig-param"><span class="n">g_f</span><span class="o">=</span><span class="default_value"><span class="num">0.0</span></span></em>
 ,&nbsp;
-<em class="sig-param"><span class="n">b_field</span><span class="o">=</span><span class="default_value num">0.0</span></em>
+<em class="sig-param"><span class="n">b_field</span><span class="o">=</span><span class="default_value"><span class="num">0.0</span></span></em>
 ,&nbsp;
-<em class="sig-param"><span class="n">as_freq</span><span class="o">=</span><span class="default_value bool">True</span></em>
-<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/physics.py#L1089-L1119' }}"><span class="sig-source">[source]</span></a>
+<em class="sig-param"><span class="n">as_freq</span><span class="o">=</span><span class="default_value"><span class="bool">True</span></span></em>
+<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/physics.py#L1241-L1275' }}"><span class="sig-source">[source]</span></a>
 </dt>
 <dd class="field-body">
 <p>The total energy shift of an atomic state $|Fm\rangle$ due to the hyperfine structure splitting
 and the linear Zeeman effect</p>
-<div class="math-block">$$\Delta = \Delta_\mathrm{hfs} + \Delta_\mathrm{Zeeman}.$$</div>
+<div class="math-block">$$
+\Delta = \Delta_\mathrm{hfs} + \Delta_\mathrm{Zeeman},
+$$</div>
+<p>see <a href="{{ '/doc/functions/physics/hyperfine.html' | relative_url }}"><code>hyperfine</code></a> and <a href="{{ '/doc/functions/physics/zeeman_linear.html' | relative_url }}"><code>zeeman_linear</code></a>.</p>
 <dl class="field-list">
 <dt class="field-head">Parameters<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>i<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">scalar</a></em></span></dt>
+<dt>i<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#scalar' | relative_url }}">scalar</a></em></span></dt>
 <dd class="field-desc"><p>The nuclear spin quantum number $I$.</p></dd>
-<dt>j<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">scalar</a></em></span></dt>
+<dt>j<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#scalar' | relative_url }}">scalar</a></em></span></dt>
 <dd class="field-desc"><p>The electronic total angular momentum quantum number $J$.</p></dd>
-<dt>f<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">scalar</a></em></span></dt>
+<dt>f<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#scalar' | relative_url }}">scalar</a></em></span></dt>
 <dd class="field-desc"><p>The total angular momentum quantum number $F$.</p></dd>
-<dt>m<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">scalar</a></em></span></dt>
+<dt>m<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#scalar' | relative_url }}">scalar</a></em></span></dt>
 <dd class="field-desc"><p>The magnetic quantum number $m_F$.</p></dd>
-<dt>hyper_const<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">array_like</a></em></span></dt>
+<dt>hyper_const<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a></em></span></dt>
 <dd class="field-desc"><p>The hyperfine structure constants $A = \mu_I \mathcal{B}_J / (IJ)$,
 $B = eQ_I (\partial^2 V_J / \partial z^2)$ and $C = \Omega_I T_J^{(3)}$
 of the magnetic dipole, electric quadrupole and magnetic octupole order, respectively.
 If a scalar is given, only the $A$ constant is used (MHz if <code>as_freq</code> else eV).</p></dd>
-<dt>g_f<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">array_like</a></em></span></dt>
+<dt>g_f<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a></em></span></dt>
 <dd class="field-desc"><p>The atomic g-factor $g_F$.</p></dd>
-<dt>b_field<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">array_like</a></em></span></dt>
+<dt>b_field<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a></em></span></dt>
 <dd class="field-desc"><p>The B-field $\mathcal{B}$ (T).</p></dd>
 <dt>as_freq<span class="classifier"><em>bool</em></span></dt>
 <dd class="field-desc"><p>The shift can be returned in energy (<code>False</code>, eV) or frequency units (<code>True</code>, MHz).
-The default is <code>True</code></p></dd>
+The default is <code>True</code>.</p></dd>
 </dl>
 </dd>
 <dt class="field-head">Returns<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>dnu_hfs_zeeman<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">ndarray</a></em></span></dt>
-<dd class="field-desc"><p>The hyperfine structure + linear Zeeman shift $\Delta$ (MHz if <code>as_freq</code> else eV)</p></dd>
+<dt>dnu_hfs_zeeman<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#ndarray' | relative_url }}">ndarray</a></em></span></dt>
+<dd class="field-desc"><p>The hyperfine structure + linear Zeeman shift $\Delta$ (MHz if <code>as_freq</code> else eV).</p></dd>
 </dl>
 </dd>
 </dl>

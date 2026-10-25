@@ -13,22 +13,24 @@ title: qspec.doppler_d1
 ,&nbsp;
 <em class="sig-param"><span class="n">alpha</span></em>
 ,&nbsp;
-<em class="sig-param"><span class="n">return_frame</span><span class="o">=</span><span class="default_value string">&#x27;atom&#x27;</span></em>
-<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/physics.py#L519-L544' }}"><span class="sig-source">[source]</span></a>
+<em class="sig-param"><span class="n">return_frame</span><span class="o">=</span><span class="default_value"><span class="string">&#x27;atom&#x27;</span></span></em>
+<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/physics.py#L625-L651' }}"><span class="sig-source">[source]</span></a>
 </dt>
 <dd class="field-body">
-<p>The first derivative $\frac{\partial f^\prime}{\partial v} = a\frac{f^\prime}{c}\gamma^3(v)(\frac{v}{c}
- - \cos(\alpha))$ with $a = \begin{cases}f / f^\prime, &amp; \mathrm{atom}\\
- -f^\prime / f, &amp; \mathrm{lab}\end{cases}$</p>
+<p>The first derivative of the Doppler-shifted frequency <a href="{{ '/doc/functions/physics/doppler.html' | relative_url }}"><code>doppler</code></a></p>
+<div class="math-block">$$
+\frac{\partial f^\prime}{\partial v} = a\frac{f^\prime}{c}\gamma^3(v)\left[\frac{v}{c} - \cos(\alpha)\right],\quad
+a = \begin{cases}f / f^\prime, &amp; \text{atom}\\ -f^\prime / f, &amp; \text{lab}\end{cases}.
+$$</div>
 <dl class="field-list">
 <dt class="field-head">Parameters<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>f<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">array_like</a></em></span></dt>
+<dt>f<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a></em></span></dt>
 <dd class="field-desc"><p>The frequency $f$ of light (arb. units).</p></dd>
-<dt>v<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">array_like</a></em></span></dt>
+<dt>v<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a></em></span></dt>
 <dd class="field-desc"><p>The velocity $v$ of a body (m/s).</p></dd>
-<dt>alpha<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">array_like</a></em></span></dt>
+<dt>alpha<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a></em></span></dt>
 <dd class="field-desc"><p>The angle $\alpha$ between the velocity- and the light-vector in the laboratory frame (rad).</p></dd>
 <dt>return_frame<span class="classifier"><em>str</em></span></dt>
 <dd class="field-desc"><p>The coordinate system for which the frequency is returned. Can be either <code>"atom"</code> or <code>"lab"</code>.</p></dd>
@@ -37,8 +39,8 @@ title: qspec.doppler_d1
 <dt class="field-head">Returns<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>df_dv<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">ndarray</a></em></span></dt>
-<dd class="field-desc"><p>the first derivative $\partial f^\prime / \partial v$ of the Doppler-shifted frequency
+<dt>df_dv<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#ndarray' | relative_url }}">ndarray</a></em></span></dt>
+<dd class="field-desc"><p>The first derivative $\partial f^\prime / \partial v$ of the Doppler-shifted frequency
 $f^\prime$ with respect to <code>v</code> in either the rest frame of the atom or the laboratory frame (<code>f</code> s/m).</p></dd>
 </dl>
 </dd>

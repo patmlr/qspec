@@ -7,28 +7,35 @@ title: qspec.models.gen_splitter_model
 <span class="sig-prename">qspec.models.</span>
 <span class="sig-name">gen_splitter_model</span>
 <span class="sig-paren">&nbsp;(&nbsp;</span>
-<em class="sig-param"><span class="n">qi</span><span class="o">=</span><span class="default_value bool">False</span></em>
+<em class="sig-param"><span class="n">qi</span><span class="o">=</span><span class="default_value"><span class="bool">False</span></span></em>
 ,&nbsp;
-<em class="sig-param"><span class="n">hf_mixing</span><span class="o">=</span><span class="default_value bool">False</span></em>
-<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/models/_splitter.py#L48-L62' }}"><span class="sig-source">[source]</span></a>
+<em class="sig-param"><span class="n">hf_mixing</span><span class="o">=</span><span class="default_value"><span class="bool">False</span></span></em>
+<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/models/_splitter.py#L48-L65' }}"><span class="sig-source">[source]</span></a>
 </dt>
 <dd class="field-body">
-
+<p>Choose the <code>Splitter</code> type: <a href="{{ '/doc/functions/models/HyperfineQI/HyperfineQI.html' | relative_url }}"><code>HyperfineQI</code></a>, <a href="{{ '/doc/functions/models/HyperfineMixed/HyperfineMixed.html' | relative_url }}"><code>HyperfineMixed</code></a> or <a href="{{ '/doc/functions/models/Hyperfine/Hyperfine.html' | relative_url }}"><code>Hyperfine</code></a>.</p>
 <dl class="field-list">
 <dt class="field-head">Parameters<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
 <dt>qi<span class="classifier"><em>bool</em></span></dt>
-<dd class="field-desc"><p>Whether to consider QI effects.</p></dd>
+<dd class="field-desc"><p>Whether to consider quantum interference (QI) effects.</p></dd>
 <dt>hf_mixing<span class="classifier"><em>bool</em></span></dt>
-<dd class="field-desc"><p>Whether to consider HF mixing.</p></dd>
+<dd class="field-desc"><p>Whether to consider hyperfine-induced mixing.</p></dd>
 </dl>
 </dd>
 <dt class="field-head">Returns<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>out<span class="classifier"><em>type[&quot;<a href="{{ '/doc/functions/models/Splitter/Splitter.html' | relative_url }}">Splitter</a>&quot;]</em></span></dt>
-<dd class="field-desc"><p>The appropriate 'Splitter' model.</p></dd>
+<dt>splitter<span class="classifier"><em>type[&quot;<a href="{{ '/doc/functions/models/Splitter/Splitter.html' | relative_url }}">Splitter</a>&quot;]</em></span></dt>
+<dd class="field-desc"><p>The appropriate <code>Splitter</code> type.</p></dd>
+</dl>
+</dd>
+<dt class="field-head">Raises<span class="colon">:</span></dt>
+<dd class="field-par">
+<dl>
+<dt>ValueError</dt>
+<dd class="field-desc"><p>If both <code>qi</code> and <code>hf_mixing</code> are <code>True</code>.</p></dd>
 </dl>
 </dd>
 </dl>

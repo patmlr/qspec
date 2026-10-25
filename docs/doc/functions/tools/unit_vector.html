@@ -11,23 +11,23 @@ title: qspec.unit_vector
 ,&nbsp;
 <em class="sig-param"><span class="n">dim</span></em>
 ,&nbsp;
-<em class="sig-param"><span class="n">axis</span><span class="o">=</span><span class="default_value num">-1</span></em>
+<em class="sig-param"><span class="n">axis</span><span class="o">=</span><span class="default_value"><span class="num">-1</span></span></em>
 ,&nbsp;
-<em class="sig-param"><span class="n">dtype</span><span class="o">=</span><span class="default_value">float</span></em>
-<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/tools.py#L905-L914' }}"><span class="sig-source">[source]</span></a>
+<em class="sig-param"><span class="n">dtype</span><span class="o">=</span><span class="default_value"><span class="class">float</span></span></em>
+<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/tools.py#L999-L1010' }}"><span class="sig-source">[source]</span></a>
 </dt>
 <dd class="field-body">
-
+<p>Unit vectors with a 1 at the specified indexes.</p>
 <dl class="field-list">
 <dt class="field-head">Parameters<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>indexes<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">array_like</a></em></span></dt>
-<dd class="field-desc"><p>The indexes of the vectors that are filled with a 1.</p></dd>
-<dt>dim<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">int_like</a></em></span></dt>
+<dt>indexes<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a></em></span></dt>
+<dd class="field-desc"><p>The indexes of the vector components that are 1.</p></dd>
+<dt>dim<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#int_like' | relative_url }}">int_like</a></em></span></dt>
 <dd class="field-desc"><p>The dimension of the unit vectors.</p></dd>
-<dt>axis<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">int_like</a></em></span></dt>
-<dd class="field-desc"><p>The axis with the dimension 'dim'.</p></dd>
+<dt>axis<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#int_like' | relative_url }}">int_like</a></em></span></dt>
+<dd class="field-desc"><p>The axis with the dimension <code>dim</code>.</p></dd>
 <dt>dtype<span class="classifier"><em>type</em></span></dt>
 <dd class="field-desc"><p>The data type of the unit vectors.</p></dd>
 </dl>
@@ -35,8 +35,8 @@ title: qspec.unit_vector
 <dt class="field-head">Returns<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>out<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">ndarray</a></em></span></dt>
-<dd class="field-desc"><p>Unit vectors in the specified 'indexes' with dimension 'dim' along the specified 'axis'.</p></dd>
+<dt>e<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#ndarray' | relative_url }}">ndarray</a></em></span></dt>
+<dd class="field-desc"><p>Unit vectors with 1 at the specified <code>indexes</code> and dimension <code>dim</code> along the specified <code>axis</code>.</p></dd>
 </dl>
 </dd>
 </dl>

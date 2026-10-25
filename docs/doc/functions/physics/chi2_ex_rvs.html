@@ -9,8 +9,8 @@ title: qspec.chi2_ex_rvs
 <span class="sig-paren">&nbsp;(&nbsp;</span>
 <em class="sig-param"><span class="n">t</span></em>
 ,&nbsp;
-<em class="sig-param"><span class="n">size</span><span class="o">=</span><span class="default_value num">1</span></em>
-<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/physics.py#L2562-L2579' }}"><span class="sig-source">[source]</span></a>
+<em class="sig-param"><span class="n">size</span><span class="o">=</span><span class="default_value"><span class="num">1</span></span></em>
+<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/physics.py#L2724-L2741' }}"><span class="sig-source">[source]</span></a>
 </dt>
 <dd class="field-body">
 <p>Random sample energy components $E_x$ from the $\chi^2_1$ probability density function</p>
@@ -22,18 +22,18 @@ $$</div>
 <dt class="field-head">Parameters<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>t<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">array_like</a></em></span></dt>
+<dt>t<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a></em></span></dt>
 <dd class="field-desc"><p>The temperature $T$ of the environment (K).</p></dd>
 <dt>size<span class="classifier"><em>int | tuple[int, ...]</em></span></dt>
-<dd class="field-desc"><p>Either the size (<code>int</code>) or shape (<code>tuple</code>) of the returned velocity array.
-If <code>m</code> or <code>t</code> is an iterable/array, their common shape must be appended to the desired shape of the random samples.</p></dd>
+<dd class="field-desc"><p>Either the size (<code>int</code>) or shape (<code>tuple</code>) of the returned energy array.
+If <code>t</code> is an iterable/array, its shape must be appended to the desired shape of the random samples.</p></dd>
 </dl>
 </dd>
 <dt class="field-head">Returns<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>vx<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">ndarray</a></em></span></dt>
-<dd class="field-desc"><p>Random energies $E_x$ (m/s).</p></dd>
+<dt>ex<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#ndarray' | relative_url }}">ndarray</a></em></span></dt>
+<dd class="field-desc"><p>Random energies $E_x$ (eV).</p></dd>
 </dl>
 </dd>
 </dl>

@@ -13,22 +13,22 @@ title: qspec.analyze.linear_nd_monte_carlo
 ,&nbsp;
 <em class="sig-param"><span class="n">axis</span><span class="o">=</span><span class="default_value">None</span></em>
 ,&nbsp;
-<em class="sig-param"><span class="n">optimize_cov</span><span class="o">=</span><span class="default_value bool">False</span></em>
+<em class="sig-param"><span class="n">optimize_cov</span><span class="o">=</span><span class="default_value"><span class="bool">False</span></span></em>
 ,&nbsp;
 <em class="sig-param"><span class="n">n_samples</span><span class="o">=</span><span class="default_value">None</span></em>
 ,&nbsp;
 <em class="sig-param"><span class="n">n_accepted</span><span class="o">=</span><span class="default_value">None</span></em>
 ,&nbsp;
-<em class="sig-param"><span class="n">optimize_sampling</span><span class="o">=</span><span class="default_value bool">True</span></em>
+<em class="sig-param"><span class="n">optimize_sampling</span><span class="o">=</span><span class="default_value"><span class="bool">True</span></span></em>
 ,&nbsp;
-<em class="sig-param"><span class="n">return_samples</span><span class="o">=</span><span class="default_value bool">False</span></em>
+<em class="sig-param"><span class="n">return_samples</span><span class="o">=</span><span class="default_value"><span class="bool">False</span></span></em>
 ,&nbsp;
-<em class="sig-param"><span class="n">method</span><span class="o">=</span><span class="default_value string">&#x27;py&#x27;</span></em>
+<em class="sig-param"><span class="n">method</span><span class="o">=</span><span class="default_value"><span class="string">&#x27;py&#x27;</span></span></em>
 ,&nbsp;
-<em class="sig-param"><span class="n">report</span><span class="o">=</span><span class="default_value bool">False</span></em>
+<em class="sig-param"><span class="n">report</span><span class="o">=</span><span class="default_value"><span class="bool">False</span></span></em>
 ,&nbsp;
 <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em>
-<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/analyze/_analyze.py#L954-L1067' }}"><span class="sig-source">[source]</span></a>
+<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/analyze/_analyze.py#L1018-L1132' }}"><span class="sig-source">[source]</span></a>
 </dt>
 <dd class="field-body">
 <p>Maximum likelihood Monte-Carlo sampling of a straight line through points $\vec{\mu}_i\in\mathbb{R}^n$
@@ -40,28 +40,30 @@ assuming $n$-dimensional multivariate normal distributions $\mathcal{N}(\vec{\mu
 <dt class="field-head">Parameters<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>x<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">array_like</a></em></span></dt>
+<dt>x<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a></em></span></dt>
 <dd class="field-desc"><p>The data vectors $\vec{\mu}_i$. Must have shape <code>(k, n)</code>, where <code>k</code> is the number of data points
 and <code>n</code> is the number of dimensions of each point.</p></dd>
-<dt>cov<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">array_like</a> | None</em></span></dt>
+<dt>cov<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a> | None</em></span></dt>
 <dd class="field-desc"><p>The covariance matrices $\mathbf{\Sigma}_i$ of the data vectors. Must have shape <code>(k, n, n)</code>.
 Use <a href="{{ '/doc/functions/analyze/covariance_matrix.html' | relative_url }}"><code>covariance_matrix</code></a> to construct covariance matrices.
-If <code>None</code>, samples are generated until <code>n_accepted</code> samples get accepted.</p></dd>
-<dt>axis<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">int_like</a> | None</em></span></dt>
+If <code>None</code>, all covariance matrices are identity matrices.</p></dd>
+<dt>axis<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#int_like' | relative_url }}">int_like</a> | None</em></span></dt>
 <dd class="field-desc"><p>The index of the vector component of the n-dimensional vectors that are fixed for fitting.
-This is required since a straight in <code>n</code> dimensions is fully described by <code>2 * (n - 1)</code> parameters.
-If <code>None</code>, the best axis is determined from the data, and the direction vector of the straight is normalized.</p></dd>
+This is required since a straight line in <code>n</code> dimensions is fully described by <code>2 * (n - 1)</code> parameters.
+If <code>None</code>, the best axis is determined from the data,
+and the direction vector of the straight line is normalized.</p></dd>
 <dt>optimize_cov<span class="classifier"><em>bool</em></span></dt>
-<dd class="field-desc"><p>If <code>True</code>, the origin vector of the straight is optimized to yield the smallest covariances.</p></dd>
-<dt>n_samples<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">int_like</a> | None</em></span></dt>
+<dd class="field-desc"><p>If <code>True</code>, the origin vector of the straight line is optimized
+to yield the smallest covariances.</p></dd>
+<dt>n_samples<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#int_like' | relative_url }}">int_like</a> | None</em></span></dt>
 <dd class="field-desc"><p>The number of samples generated for each data point.
 If <code>None</code> and <code>method == "cpp"</code>, samples are generated until <code>n_accepted</code> samples get accepted.</p></dd>
-<dt>n_accepted<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">int_like</a> | None</em></span></dt>
+<dt>n_accepted<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#int_like' | relative_url }}">int_like</a> | None</em></span></dt>
 <dd class="field-desc"><p>The number of samples to be accepted for each data point. Only available if <code>method == "cpp"</code>.</p></dd>
 <dt>optimize_sampling<span class="classifier"><em>bool</em></span></dt>
 <dd class="field-desc"><p>Whether to optimize the data sampling for acceptance efficiency.</p></dd>
 <dt>return_samples<span class="classifier"><em>bool</em></span></dt>
-<dd class="field-desc"><p>Whether to also return the generated points $\vec{p}_i$ with shape <code>(n_samples, k ,n)</code>.</p></dd>
+<dd class="field-desc"><p>Whether to also return the generated points $\vec{p}_i$ with shape <code>(n_accepted, k, n)</code>.</p></dd>
 <dt>method<span class="classifier"><em>str</em></span></dt>
 <dd class="field-desc"><p>The method to generate the collinear points. Can be one of <code>{"py", "cpp"}</code>.
 The <code>"py"</code> version is faster but only allows to specify <code>n_samples</code>.
@@ -77,8 +79,15 @@ The <code>"cpp"</code> version is slower but allows to specify both <code>n_acce
 <dl>
 <dt>(popt, pcov, p)<span class="classifier"><em>Any</em></span></dt>
 <dd class="field-desc"><p>The optimized parameters and their covariances.
-If <code>return_samples == True</code>, also the generated points $\vec{p}_i$ are returned.
-The resulting shapes are <code>(2 * n, )</code>, <code>(2 * n, 2 * n)</code> and <code>(n_samples, k, n)</code>.</p></dd>
+If <code>return_samples</code> is <code>True</code>, also the generated points $\vec{p}_i$ are returned.
+The resulting shapes are <code>(2 * n, )</code>, <code>(2 * n, 2 * n)</code> and <code>(n_accepted, k, n)</code>.</p></dd>
+</dl>
+</dd>
+<dt class="field-head">Raises<span class="colon">:</span></dt>
+<dd class="field-par">
+<dl>
+<dt>ValueError</dt>
+<dd class="field-desc"><p>If <code>method</code> is not supported.</p></dd>
 </dl>
 </dd>
 </dl>

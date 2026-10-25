@@ -11,19 +11,22 @@ title: qspec.e_kin
 ,&nbsp;
 <em class="sig-param"><span class="n">m</span></em>
 ,&nbsp;
-<em class="sig-param"><span class="n">relativistic</span><span class="o">=</span><span class="default_value bool">True</span></em>
-<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/physics.py#L321-L336' }}"><span class="sig-source">[source]</span></a>
+<em class="sig-param"><span class="n">relativistic</span><span class="o">=</span><span class="default_value"><span class="bool">True</span></span></em>
+<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/physics.py#L379-L398' }}"><span class="sig-source">[source]</span></a>
 </dt>
 <dd class="field-body">
-<p>The kinetic energy $E_\mathrm{kin} = \begin{cases}(\gamma(v) - 1) mc^2, &amp; \mathrm{True}\\
-\frac{1}{2}mv^2 &amp; \mathrm{False}\end{cases}$.</p>
+<p>The kinetic energy</p>
+<div class="math-block">$$
+E_\mathrm{kin} = \begin{cases}(\gamma(v) - 1)mc^2, &amp; \text{relativistic}\\
+\frac{1}{2}mv^2, &amp; \text{classical}\end{cases}.
+$$</div>
 <dl class="field-list">
 <dt class="field-head">Parameters<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>v<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">array_like</a></em></span></dt>
+<dt>v<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a></em></span></dt>
 <dd class="field-desc"><p>The velocity $v$ of a body (m/s).</p></dd>
-<dt>m<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">array_like</a></em></span></dt>
+<dt>m<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a></em></span></dt>
 <dd class="field-desc"><p>The mass $m$ of the body (u).</p></dd>
 <dt>relativistic<span class="classifier"><em>bool</em></span></dt>
 <dd class="field-desc"><p>The calculation is performed either relativistically (<code>True</code>) or classically (<code>False</code>).
@@ -33,7 +36,7 @@ The default is <code>True</code>.</p></dd>
 <dt class="field-head">Returns<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>E_kin<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">ndarray</a></em></span></dt>
+<dt>E_kin<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#ndarray' | relative_url }}">ndarray</a></em></span></dt>
 <dd class="field-desc"><p>The kinetic energy $E_\mathrm{kin}$ of a body with velocity <code>v</code> and mass <code>m</code> (eV).</p></dd>
 </dl>
 </dd>

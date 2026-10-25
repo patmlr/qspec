@@ -12,18 +12,17 @@ title: qspec.models.Offset.evaluate
 <em class="sig-param"><span class="o">*</span><span class="n">args</span></em>
 ,&nbsp;
 <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em>
-<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/models/_base.py#L598-L602' }}"><span class="sig-source">[source]</span></a>
+<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/models/_base.py#L630-L634' }}"><span class="sig-source">[source]</span></a>
 </dt>
 <dd class="field-body">
-<p>The main function of the model. This is executed when the model is called.
-Reimplement this function in subclasses.</p>
+<p>The function values of the model for the given parameters.</p>
 <dl class="field-list">
 <dt class="field-head">Parameters<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>x<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">ndarray</a></em></span></dt>
+<dt>x<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#ndarray' | relative_url }}">ndarray</a></em></span></dt>
 <dd class="field-desc"><p>The input values $x$.</p></dd>
-<dt>args<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">scalar</a></em></span></dt>
+<dt>args<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#scalar' | relative_url }}">scalar</a></em></span></dt>
 <dd class="field-desc"><p>The function parameters. Must have length <code>Model.size</code>.</p></dd>
 <dt>kwargs<span class="classifier"><em>Any</em></span></dt>
 <dd class="field-desc"><p>Additional keyword arguments.</p></dd>
@@ -32,7 +31,7 @@ Reimplement this function in subclasses.</p>
 <dt class="field-head">Returns<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>out<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">ndarray</a></em></span></dt>
+<dt>y<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#ndarray' | relative_url }}">ndarray</a></em></span></dt>
 <dd class="field-desc"><p>The function values $y$ at the input values <code>x</code>.</p></dd>
 </dl>
 </dd>

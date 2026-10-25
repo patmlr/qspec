@@ -14,20 +14,20 @@ title: qspec.models.LorentzQI.evaluate_qi
 <em class="sig-param"><span class="o">*</span><span class="n">args</span></em>
 ,&nbsp;
 <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em>
-<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/models/_spectrum.py#L180-L189' }}"><span class="sig-source">[source]</span></a>
+<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/models/_spectrum.py#L179-L190' }}"><span class="sig-source">[source]</span></a>
 </dt>
 <dd class="field-body">
-
+<p>The dispersive interference term $f_\mathrm{qi}$ of two Lorentzians at 0 and <code>x_qi</code>.</p>
 <dl class="field-list">
 <dt class="field-head">Parameters<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>x<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">ndarray</a></em></span></dt>
+<dt>x<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#ndarray' | relative_url }}">ndarray</a></em></span></dt>
 <dd class="field-desc"><p>The input values.</p></dd>
-<dt>x_qi<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">ndarray</a></em></span></dt>
+<dt>x_qi<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#ndarray' | relative_url }}">ndarray</a></em></span></dt>
 <dd class="field-desc"><p>The x value of the interfering Lorentzian.</p></dd>
-<dt>args<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">scalar</a></em></span></dt>
-<dd class="field-desc"><p>The function parameters. Must have length self.size.</p></dd>
+<dt>args<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#scalar' | relative_url }}">scalar</a></em></span></dt>
+<dd class="field-desc"><p>The function parameters. Must have length <code>Model.size</code>.</p></dd>
 <dt>kwargs<span class="classifier"><em>Any</em></span></dt>
 <dd class="field-desc"><p>Additional keyword arguments.</p></dd>
 </dl>
@@ -35,8 +35,8 @@ title: qspec.models.LorentzQI.evaluate_qi
 <dt class="field-head">Returns<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>out<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">ndarray</a></em></span></dt>
-<dd class="field-desc"><p>The function results of the dispersive Lorentzian at the input values 'x'.</p></dd>
+<dt>y<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#ndarray' | relative_url }}">ndarray</a></em></span></dt>
+<dd class="field-desc"><p>The values of the dispersive term at the input values <code>x</code>.</p></dd>
 </dl>
 </dd>
 </dl>

@@ -18,31 +18,68 @@ title: qspec.models.HyperfineQI
 <em class="sig-param"><span class="n">label</span><span class="o">=</span><span class="default_value">None</span></em>
 ,&nbsp;
 <em class="sig-param"><span class="n">qi_path</span><span class="o">=</span><span class="default_value">None</span></em>
-<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/models/_splitter.py#L365-L517' }}"><span class="sig-source">[source]</span></a>
+<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/models/_splitter.py#L385-L535' }}"><span class="sig-source">[source]</span></a>
 </dt>
 <dd class="field-body">
-<p>A perturbative quantum interference (QI) hyperfine-structure model
+<p>A perturbative quantum interference (QI) hyperfine-structure model</p>
+<div class="math-block">$$
+f(x) = \frac{1}{\max A_F^{F^\prime}}\sum\limits_{F, F^\prime}\left[\left(A_F^{F^\prime}
++ B_F^{F^\prime}G\right)L(x - \Delta_{FF^\prime}) + G\sum\limits_{F^{\prime\prime} &gt; F^\prime}
+C_F^{F^\prime F^{\prime\prime}}L_\mathrm{qi}(x - \Delta_{FF^\prime}, \Delta_{FF^{\prime\prime}}
+- \Delta_{FF^\prime})\right],
+$$</div>
+<p>with the coefficients $A_F^{F^\prime}$, $B_F^{F^\prime}$ and $C_F^{F^\prime F^{\prime\prime}}$
+<a href="{{ '/doc/functions/algebra/abc.html' | relative_url }}"><code>qspec.algebra.abc</code></a>, the Lorentzian $L$ and its dispersive term $L_\mathrm{qi}$ <a href="{{ '/doc/functions/models/LorentzQI/LorentzQI.html' | relative_url }}"><code>LorentzQI</code></a>,
+the hyperfine structure shifts $\Delta_{FF^\prime}$ <a href="{{ '/doc/functions/models/hf_shift.html' | relative_url }}"><code>hf_shift</code></a> and the geometry parameter $G$ (<code>geo</code>),
 based on [<a href="https://doi.org/10.1103/PhysRevA.87.032504">
-R. C. Brown <i>et al.</i>, Phys. Rev. A <b>87</b>, 032504 (2013)</a>].</p>
+R. C. Brown <i>et al.</i>, Phys. Rev. A <b>87</b>, 032504 (2013)</a>].
+The other parameters are those of <a href="{{ '/doc/functions/models/Hyperfine/Hyperfine.html' | relative_url }}"><code>Hyperfine</code></a>, without the intensities.</p>
 <dl class="field-list">
 <dt class="field-head">Parameters<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
 <dt>_<span class="classifier"><em><a href="{{ '/doc/functions/models/Model/Model.html' | relative_url }}">Model</a></em></span></dt>
-<dd class="field-desc"><p>Empty <code>model</code> parameter. This hyperfine-structure model always uses <code>Lorentz</code> lineshapes.
-To use other lineshapes, combine it with the <code>Convolve</code> model.</p></dd>
-<dt>i<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">scalar</a></em></span></dt>
-<dd class="field-desc"><p>The nuclear spin $I$.</p></dd>
-<dt>j_l<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">scalar</a></em></span></dt>
-<dd class="field-desc"><p>The total lower state electron angular momentum $J$.</p></dd>
-<dt>j_u<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">scalar</a></em></span></dt>
-<dd class="field-desc"><p>The total upper state electron angular momentum $J^\prime$.</p></dd>
+<dd class="field-desc"><p>Empty <code>model</code> parameter. This hyperfine-structure model always uses <code>LorentzQI</code> lineshapes.
+To use other lineshapes, combine it with a <a href="{{ '/doc/functions/models/Convolved/Convolved.html' | relative_url }}"><code>Convolved</code></a> model.</p></dd>
+<dt>i<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#scalar' | relative_url }}">scalar</a></em></span></dt>
+<dd class="field-desc"><p>The nuclear spin quantum number $I$.</p></dd>
+<dt>j_l<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#scalar' | relative_url }}">scalar</a></em></span></dt>
+<dd class="field-desc"><p>The electronic total angular momentum quantum number $J_l$ of the lower state.</p></dd>
+<dt>j_u<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#scalar' | relative_url }}">scalar</a></em></span></dt>
+<dd class="field-desc"><p>The electronic total angular momentum quantum number $J_u$ of the upper state.</p></dd>
 <dt>label<span class="classifier"><em>str | None</em></span></dt>
 <dd class="field-desc"><p>A label for the <code>Splitter</code> (isotope / isomer / transition).</p></dd>
 <dt>qi_path<span class="classifier"><em>str | None</em></span></dt>
 <dd class="field-desc"><p>Specify a directory to save and load the calculated geometric parts of the
 dipole matrix elements for faster repeated calculations.
 These depend only on the quantum numbers <code>i</code>, <code>j_l</code> and <code>j_u</code>.</p></dd>
+</dl>
+</dd>
+<dt class="field-head">Attributes<span class="colon">:</span></dt>
+<dd class="field-par">
+<dl>
+<dt>description<span class="classifier"><em>str</em></span></dt>
+<dd class="field-desc"><p>A description of the model hierarchy, e.g., <code>"Offset.Summed[0].Hyperfine.Voigt"</code>.</p></dd>
+<dt>dx<span class="classifier"><em>float</em></span></dt>
+<dd class="field-desc"><p>A hint for an x-axis step size for a smooth display of the model.</p></dd>
+<dt>error<span class="classifier"><em>str</em></span></dt>
+<dd class="field-desc"><p>An error message if there is an issue with the model parameters (not implemented).</p></dd>
+<dt>fixes<span class="classifier"><em>list[<a href="{{ '/doc/modules/qtypes.html#fix_type' | relative_url }}">fix_type</a>]</em></span></dt>
+<dd class="field-desc"><p>The fix states of the parameters, see <a href="{{ '/doc/functions/models/Model/set_fix.html' | relative_url }}"><code>Model.set_fix</code></a>.</p></dd>
+<dt>links<span class="classifier"><em>list[bool]</em></span></dt>
+<dd class="field-desc"><p>Whether the parameters are linked to the parameters with the same name in a <a href="{{ '/doc/functions/models/Linked/Linked.html' | relative_url }}"><code>Linked</code></a> model.</p></dd>
+<dt>model<span class="classifier"><em><a href="{{ '/doc/functions/models/Model/Model.html' | relative_url }}">Model</a> | None</em></span></dt>
+<dd class="field-desc"><p>The submodel.</p></dd>
+<dt>names<span class="classifier"><em>list[str]</em></span></dt>
+<dd class="field-desc"><p>The names of the parameters.</p></dd>
+<dt>p<span class="classifier"><em>dict[str, int]</em></span></dt>
+<dd class="field-desc"><p>A map of the parameter names to their indexes.</p></dd>
+<dt>size<span class="classifier"><em>int</em></span></dt>
+<dd class="field-desc"><p>The number of parameters required by the model.</p></dd>
+<dt>type<span class="classifier"><em>str</em></span></dt>
+<dd class="field-desc"><p>The name of the model type.</p></dd>
+<dt>vals<span class="classifier"><em>list[float]</em></span></dt>
+<dd class="field-desc"><p>The current values of the parameters.</p></dd>
 </dl>
 </dd>
 </dl>

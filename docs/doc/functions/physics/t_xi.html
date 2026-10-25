@@ -16,10 +16,10 @@ title: qspec.t_xi
 <em class="sig-param"><span class="n">q</span></em>
 ,&nbsp;
 <em class="sig-param"><span class="n">m</span></em>
-<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/physics.py#L2450-L2475' }}"><span class="sig-source">[source]</span></a>
+<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/physics.py#L2612-L2637' }}"><span class="sig-source">[source]</span></a>
 </dt>
 <dd class="field-body">
-<p>The temperature of an ensemble of ions with asymmetry parameter <code>xi</code></p>
+<p>The temperature of an ensemble of accelerated ions with asymmetry parameter $\xi$</p>
 <div class="math-block">$$
 T = \xi\frac{\sqrt{8qUmc^2}}{\gamma k_\mathrm{B}f},
 $$</div>
@@ -28,22 +28,22 @@ $$</div>
 <dt class="field-head">Parameters<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>xi<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">array_like</a></em></span></dt>
+<dt>xi<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a></em></span></dt>
 <dd class="field-desc"><p>The asymmetry parameter $\xi$ (unit of <code>f</code>).</p></dd>
-<dt>f<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">array_like</a></em></span></dt>
-<dd class="field-desc"><p>The rest-frame transition frequency (arb. units).</p></dd>
-<dt>u<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">array_like</a></em></span></dt>
-<dd class="field-desc"><p>The acceleration voltage (V).</p></dd>
-<dt>q<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">array_like</a></em></span></dt>
-<dd class="field-desc"><p>The electric charge of the ions (e).</p></dd>
-<dt>m<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">array_like</a></em></span></dt>
-<dd class="field-desc"><p>The mass of the ions (u).</p></dd>
+<dt>f<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a></em></span></dt>
+<dd class="field-desc"><p>The rest-frame transition frequency $f$ (arb. units).</p></dd>
+<dt>u<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a></em></span></dt>
+<dd class="field-desc"><p>The acceleration voltage $U$ (V).</p></dd>
+<dt>q<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a></em></span></dt>
+<dd class="field-desc"><p>The electric charge $q$ of the ions (e).</p></dd>
+<dt>m<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a></em></span></dt>
+<dd class="field-desc"><p>The mass $m$ of the ions (u).</p></dd>
 </dl>
 </dd>
 <dt class="field-head">Returns<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>T<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">ndarray</a></em></span></dt>
+<dt>T<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#ndarray' | relative_url }}">ndarray</a></em></span></dt>
 <dd class="field-desc"><p>The temperature $T$ (K).</p></dd>
 </dl>
 </dd>

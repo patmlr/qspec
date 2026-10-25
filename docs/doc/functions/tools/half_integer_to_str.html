@@ -9,17 +9,17 @@ title: qspec.half_integer_to_str
 <span class="sig-paren">&nbsp;(&nbsp;</span>
 <em class="sig-param"><span class="n">val</span></em>
 ,&nbsp;
-<em class="sig-param"><span class="n">symbol</span><span class="o">=</span><span class="default_value string">&#x27;/&#x27;</span></em>
-<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/tools.py#L283-L292' }}"><span class="sig-source">[source]</span></a>
+<em class="sig-param"><span class="n">symbol</span><span class="o">=</span><span class="default_value"><span class="string">&#x27;/&#x27;</span></span></em>
+<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/tools.py#L305-L317' }}"><span class="sig-source">[source]</span></a>
 </dt>
 <dd class="field-body">
-
+<p>Convert a half-integer into a rational <code>str</code> representation, e.g., <code>"3/2"</code>.</p>
 <dl class="field-list">
 <dt class="field-head">Parameters<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>val<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">scalar</a></em></span></dt>
-<dd class="field-desc"><p>A scalar value.</p></dd>
+<dt>val<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#scalar' | relative_url }}">scalar</a></em></span></dt>
+<dd class="field-desc"><p>A half-integer value.</p></dd>
 <dt>symbol<span class="classifier"><em>str</em></span></dt>
 <dd class="field-desc"><p>The symbol to use for the fraction.</p></dd>
 </dl>
@@ -27,8 +27,15 @@ title: qspec.half_integer_to_str
 <dt class="field-head">Returns<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>out<span class="classifier"><em>str</em></span></dt>
-<dd class="field-desc"><p>A rational str-representation of a half-integer.</p></dd>
+<dt>s<span class="classifier"><em>str</em></span></dt>
+<dd class="field-desc"><p>A rational <code>str</code> representation of the half-integer.</p></dd>
+</dl>
+</dd>
+<dt class="field-head">Raises<span class="colon">:</span></dt>
+<dd class="field-par">
+<dl>
+<dt>ValueError</dt>
+<dd class="field-desc"><p>If <code>val</code> is not a multiple of 1/2.</p></dd>
 </dl>
 </dd>
 </dl>

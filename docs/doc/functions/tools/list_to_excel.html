@@ -11,37 +11,44 @@ title: qspec.list_to_excel
 ,&nbsp;
 <em class="sig-param"><span class="n">save</span><span class="o">=</span><span class="default_value">None</span></em>
 ,&nbsp;
-<em class="sig-param"><span class="n">delimiter</span><span class="o">=</span><span class="default_value string">&#x27;	&#x27;</span></em>
+<em class="sig-param"><span class="n">delimiter</span><span class="o">=</span><span class="default_value"><span class="string">&#x27;\t&#x27;</span></span></em>
 ,&nbsp;
-<em class="sig-param"><span class="n">header</span><span class="o">=</span><span class="default_value string">&#x27;&#x27;</span></em>
+<em class="sig-param"><span class="n">header</span><span class="o">=</span><span class="default_value"><span class="string">&#x27;&#x27;</span></span></em>
 ,&nbsp;
-<em class="sig-param"><span class="n">align</span><span class="o">=</span><span class="default_value string">&#x27;top&#x27;</span></em>
-<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/tools.py#L633-L685' }}"><span class="sig-source">[source]</span></a>
+<em class="sig-param"><span class="n">align</span><span class="o">=</span><span class="default_value"><span class="string">&#x27;top&#x27;</span></span></em>
+<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/tools.py#L695-L749' }}"><span class="sig-source">[source]</span></a>
 </dt>
 <dd class="field-body">
-
+<p>Print or save iterables as columns in an Excel-compatible format.</p>
 <dl class="field-list">
 <dt class="field-head">Parameters<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>args<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">scalar_nd</a></em></span></dt>
-<dd class="field-desc"><p>1- or 2-dimensional iterables to print or save in an excel-compatible format.</p></dd>
+<dt>args<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#scalar_nd' | relative_url }}">scalar_nd</a></em></span></dt>
+<dd class="field-desc"><p>1- or 2-dimensional iterables to print or save in an Excel-compatible format.</p></dd>
 <dt>save<span class="classifier"><em>str | None</em></span></dt>
-<dd class="field-desc"><p>The filepath, either absolute or relative to the working directory. If None, the output is printed.</p></dd>
+<dd class="field-desc"><p>The filepath, either absolute or relative to the working directory. If <code>None</code>, the output is printed.</p></dd>
 <dt>delimiter<span class="classifier"><em>str</em></span></dt>
 <dd class="field-desc"><p>The delimiter between two columns.</p></dd>
 <dt>header<span class="classifier"><em>str</em></span></dt>
-<dd class="field-desc"><p>Add a header above the content to the output.</p></dd>
+<dd class="field-desc"><p>A header above the content of the output.</p></dd>
 <dt>align<span class="classifier"><em>str</em></span></dt>
 <dd class="field-desc"><p>How to align the columns that are smaller than the largest column.
-Supported alignments are {"top", "bottom", else == "top"}.</p></dd>
+Can be either <code>"top"</code> or <code>"bottom"</code>. Any other value is treated as <code>"top"</code>.</p></dd>
 </dl>
 </dd>
 <dt class="field-head">Returns<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>out<span class="classifier"><em>str</em></span></dt>
-<dd class="field-desc"><p>Prints or saves the 'args' in an excel-compatible way.</p></dd>
+<dt>s<span class="classifier"><em>str</em></span></dt>
+<dd class="field-desc"><p>The formatted <code>str</code>.</p></dd>
+</dl>
+</dd>
+<dt class="field-head">Raises<span class="colon">:</span></dt>
+<dd class="field-par">
+<dl>
+<dt>ValueError</dt>
+<dd class="field-desc"><p>If any argument is not 1- or 2-dimensional.</p></dd>
 </dl>
 </dd>
 </dl>

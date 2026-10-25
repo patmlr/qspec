@@ -10,25 +10,25 @@ title: qspec.models.get_all_f
 <em class="sig-param"><span class="n">i</span></em>
 ,&nbsp;
 <em class="sig-param"><span class="n">j</span></em>
-<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/models/_splitter.py#L65-L72' }}"><span class="sig-source">[source]</span></a>
+<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/models/_splitter.py#L68-L77' }}"><span class="sig-source">[source]</span></a>
 </dt>
 <dd class="field-body">
-
+<p>All total angular momentum quantum numbers $F$ of one or several fine-structure states.</p>
 <dl class="field-list">
 <dt class="field-head">Parameters<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>i<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">scalar</a></em></span></dt>
-<dd class="field-desc"><p>The nuclear spin $I$.</p></dd>
-<dt>j<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">scalar</a></em></span></dt>
-<dd class="field-desc"><p>The total electron angular momentum $J$.</p></dd>
+<dt>i<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#scalar' | relative_url }}">scalar</a></em></span></dt>
+<dd class="field-desc"><p>The nuclear spin(s) $I$.</p></dd>
+<dt>j<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#scalar' | relative_url }}">scalar</a></em></span></dt>
+<dd class="field-desc"><p>The electronic total angular momentum quantum number(s) $J$.</p></dd>
 </dl>
 </dd>
 <dt class="field-head">Returns<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>out<span class="classifier"><em>list[<a href="{{ '/doc/modules/qtypes.html' | relative_url }}">quant</a>]</em></span></dt>
-<dd class="field-desc"><p>All possible F quantum numbers of an electronic finestructure state.</p></dd>
+<dt>F_list<span class="classifier"><em>list[<a href="{{ '/doc/functions/qtypes/quant/quant.html' | relative_url }}">quant</a>]</em></span></dt>
+<dd class="field-desc"><p>The sorted list of all possible $F$ quantum numbers of all combinations of <code>i</code> and <code>j</code>.</p></dd>
 </dl>
 </dd>
 </dl>

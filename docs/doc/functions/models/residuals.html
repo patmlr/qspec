@@ -12,26 +12,29 @@ title: qspec.models.residuals
 <em class="sig-param"><span class="n">x</span></em>
 ,&nbsp;
 <em class="sig-param"><span class="n">y</span></em>
-<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/models/_fit.py#L92-L101' }}"><span class="sig-source">[source]</span></a>
+<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/models/_fit.py#L97-L110' }}"><span class="sig-source">[source]</span></a>
 </dt>
 <dd class="field-body">
-<p>The residuals $y - f(x)$ of a model with its current parameter values <code>model.vals</code>.</p>
+<p>The residuals of a model with its current parameter values <code>model.vals</code></p>
+<div class="math-block">$$
+r = y - f(x).
+$$</div>
 <dl class="field-list">
 <dt class="field-head">Parameters<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
 <dt>model<span class="classifier"><em>_base.Model</em></span></dt>
-<dd class="field-desc"><p>The <code>Model</code>.</p></dd>
-<dt>x<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">ndarray</a></em></span></dt>
+<dd class="field-desc"><p>The <code>Model</code> $f$.</p></dd>
+<dt>x<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#ndarray' | relative_url }}">ndarray</a></em></span></dt>
 <dd class="field-desc"><p>The x data.</p></dd>
-<dt>y<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">ndarray</a></em></span></dt>
+<dt>y<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#ndarray' | relative_url }}">ndarray</a></em></span></dt>
 <dd class="field-desc"><p>The y data.</p></dd>
 </dl>
 </dd>
 <dt class="field-head">Returns<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>res<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">ndarray</a></em></span></dt>
+<dt>res<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#ndarray' | relative_url }}">ndarray</a></em></span></dt>
 <dd class="field-desc"><p>The residuals.</p></dd>
 </dl>
 </dd>

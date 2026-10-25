@@ -13,21 +13,22 @@ title: qspec.simulate.ScatteringRate.generate_y
 ,&nbsp;
 <em class="sig-param"><span class="n">phi</span></em>
 ,&nbsp;
-<em class="sig-param"><span class="n">decimals</span><span class="o">=</span><span class="default_value num">8</span></em>
-<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/simulate/_simulate.py#L955-L994' }}"><span class="sig-source">[source]</span></a>
+<em class="sig-param"><span class="n">decimals</span><span class="o">=</span><span class="default_value"><span class="num">8</span></span></em>
+<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/simulate/_simulate.py#L987-L1022' }}"><span class="sig-source">[source]</span></a>
 </dt>
 <dd class="field-body">
-
+<p>The fluorescence spectrum for the direction of emission $\hat{e}_r(\theta, \phi)$ in the coordinate system
+of the detection geometry, see <a href="{{ '/doc/functions/simulate/Geometry/Geometry.html' | relative_url }}"><code>Geometry</code></a>.</p>
 <dl class="field-list">
 <dt class="field-head">Parameters<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>x<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">array_like</a></em></span></dt>
-<dd class="field-desc"><p>The frequency of light in an atoms rest frame (MHz).</p></dd>
-<dt>theta<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">array_like</a></em></span></dt>
-<dd class="field-desc"><p>The angle between the emission direction of the fluorescence light and the x-axis + 90 deg.</p></dd>
-<dt>phi<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">array_like</a></em></span></dt>
-<dd class="field-desc"><p>The mixing angle between the y- and z-axis (sin(phi), cos(phi)).</p></dd>
+<dt>x<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a></em></span></dt>
+<dd class="field-desc"><p>The frequency of light in the atom's rest frame (MHz).</p></dd>
+<dt>theta<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a></em></span></dt>
+<dd class="field-desc"><p>The angle $\theta$ of the emission direction (rad).</p></dd>
+<dt>phi<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a></em></span></dt>
+<dd class="field-desc"><p>The angle $\phi$ of the emission direction (rad).</p></dd>
 <dt>decimals<span class="classifier"><em>int</em></span></dt>
 <dd class="field-desc"><p>The precision of the vector calculus in considered decimal places.</p></dd>
 </dl>
@@ -35,9 +36,9 @@ title: qspec.simulate.ScatteringRate.generate_y
 <dt class="field-head">Returns<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>out<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">ndarray</a></em></span></dt>
-<dd class="field-desc"><p>The fluorescence spectrum for incident light with frequency 'x'
-for the direction of emission defined by 'theta' and 'phi'.</p></dd>
+<dt>y<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#ndarray' | relative_url }}">ndarray</a></em></span></dt>
+<dd class="field-desc"><p>The fluorescence spectrum for incident light with the frequencies <code>x</code>
+for the directions of emission defined by <code>theta</code> and <code>phi</code> with shape <code>(x.size, theta.size, phi.size)</code>.</p></dd>
 </dl>
 </dd>
 </dl>

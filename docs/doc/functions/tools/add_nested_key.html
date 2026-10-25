@@ -12,10 +12,10 @@ title: qspec.add_nested_key
 <em class="sig-param"><span class="n">key_list</span></em>
 ,&nbsp;
 <em class="sig-param"><span class="n">val</span></em>
-<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/tools.py#L688-L706' }}"><span class="sig-source">[source]</span></a>
+<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/tools.py#L752-L773' }}"><span class="sig-source">[source]</span></a>
 </dt>
 <dd class="field-body">
-
+<p>Assign a value to a nested key of a dictionary, creating the intermediate dictionaries if necessary.</p>
 <dl class="field-list">
 <dt class="field-head">Parameters<span class="colon">:</span></dt>
 <dd class="field-par">
@@ -23,16 +23,23 @@ title: qspec.add_nested_key
 <dt>a<span class="classifier"><em>dict</em></span></dt>
 <dd class="field-desc"><p>The target dictionary.</p></dd>
 <dt>key_list<span class="classifier"><em>list</em></span></dt>
-<dd class="field-desc"><p>A list of nested keys of a.</p></dd>
-<dt>val<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">array_like</a></em></span></dt>
-<dd class="field-desc"><p>The value that is assigned to the last key in key_list.</p></dd>
+<dd class="field-desc"><p>A list of nested keys of <code>a</code>.</p></dd>
+<dt>val<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a></em></span></dt>
+<dd class="field-desc"><p>The value that is assigned to the last key in <code>key_list</code>.</p></dd>
 </dl>
 </dd>
 <dt class="field-head">Returns<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>out<span class="classifier"><em>dict</em></span></dt>
-<dd class="field-desc"><p>The dictionary a with val assigned to the last key in key_list.</p></dd>
+<dt>a<span class="classifier"><em>dict</em></span></dt>
+<dd class="field-desc"><p>The dictionary <code>a</code> with <code>val</code> assigned to the last key in <code>key_list</code>.</p></dd>
+</dl>
+</dd>
+<dt class="field-head">Raises<span class="colon">:</span></dt>
+<dd class="field-par">
+<dl>
+<dt>TypeError</dt>
+<dd class="field-desc"><p>If an intermediate value is not a dictionary.</p></dd>
 </dl>
 </dd>
 </dl>

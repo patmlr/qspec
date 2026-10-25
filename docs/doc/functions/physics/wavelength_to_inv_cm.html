@@ -8,22 +8,25 @@ title: qspec.wavelength_to_inv_cm
 <span class="sig-name">wavelength_to_inv_cm</span>
 <span class="sig-paren">&nbsp;(&nbsp;</span>
 <em class="sig-param"><span class="n">lam</span></em>
-<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/physics.py#L244-L251' }}"><span class="sig-source">[source]</span></a>
+<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/physics.py#L274-L285' }}"><span class="sig-source">[source]</span></a>
 </dt>
 <dd class="field-body">
-<p>Convert &mu;m into cm<sup>-1</sup> using $\lambda = 10^4 / \lambda$.</p>
+<p>Convert a wavelength in &mu;m into a wavenumber in cm<sup>-1</sup></p>
+<div class="math-block">$$
+k = \frac{10^4}{\lambda}.
+$$</div>
 <dl class="field-list">
 <dt class="field-head">Parameters<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>lam<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">array_like</a></em></span></dt>
+<dt>lam<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a></em></span></dt>
 <dd class="field-desc"><p>The wavelength $\lambda$ of a transition (&mu;m).</p></dd>
 </dl>
 </dd>
 <dt class="field-head">Returns<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>k<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">ndarray</a></em></span></dt>
+<dt>k<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#ndarray' | relative_url }}">ndarray</a></em></span></dt>
 <dd class="field-desc"><p>The wavenumber $k$ corresponding to the wavelength <code>lam</code> (cm<sup>-1</sup>).</p></dd>
 </dl>
 </dd>

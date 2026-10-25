@@ -14,29 +14,31 @@ title: qspec.analyze.straight_std
 <em class="sig-param"><span class="n">sigma_b</span></em>
 ,&nbsp;
 <em class="sig-param"><span class="n">corr_ab</span></em>
-<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/analyze/_analyze.py#L183-L195' }}"><span class="sig-source">[source]</span></a>
+<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/analyze/_analyze.py#L232-L246' }}"><span class="sig-source">[source]</span></a>
 </dt>
 <dd class="field-body">
-<p>The standard deviation of a <a href="{{ '/doc/functions/analyze/straight.html' | relative_url }}"><code>straight</code></a></p>
-<div class="math-block">$$\sigma_f(x) = \sqrt{\sigma_a^2 + (x\sigma_b)^2 + 2x\sigma_a\sigma_b\rho_{ab}}.$$</div>
+<p>The standard deviation of a straight line <a href="{{ '/doc/functions/analyze/straight.html' | relative_url }}"><code>straight</code></a></p>
+<div class="math-block">$$
+\sigma_f(x) = \sqrt{\sigma_a^2 + (x\sigma_b)^2 + 2x\sigma_a\sigma_b\rho_{ab}}.
+$$</div>
 <dl class="field-list">
 <dt class="field-head">Parameters<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>x<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">array_like</a></em></span></dt>
+<dt>x<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a></em></span></dt>
 <dd class="field-desc"><p>The $x$ values.</p></dd>
-<dt>sigma_a<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">array_like</a></em></span></dt>
+<dt>sigma_a<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a></em></span></dt>
 <dd class="field-desc"><p>The standard deviation $\sigma_a$ of the y-intercept.</p></dd>
-<dt>sigma_b<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">array_like</a></em></span></dt>
+<dt>sigma_b<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a></em></span></dt>
 <dd class="field-desc"><p>The standard deviation $\sigma_b$ of the slope.</p></dd>
-<dt>corr_ab<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">array_like</a></em></span></dt>
+<dt>corr_ab<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a></em></span></dt>
 <dd class="field-desc"><p>The correlation coefficient $\rho_{ab}$ between the slope and the y-intercept.</p></dd>
 </dl>
 </dd>
 <dt class="field-head">Returns<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>sigma_f<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">ndarray</a></em></span></dt>
+<dt>sigma_f<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#ndarray' | relative_url }}">ndarray</a></em></span></dt>
 <dd class="field-desc"><p>The standard deviation $\sigma_f$ of a straight line.</p></dd>
 </dl>
 </dd>

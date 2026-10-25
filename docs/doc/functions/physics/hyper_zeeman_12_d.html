@@ -11,52 +11,54 @@ title: qspec.hyper_zeeman_12_d
 ,&nbsp;
 <em class="sig-param"><span class="n">m</span></em>
 ,&nbsp;
-<em class="sig-param"><span class="n">a_hyper</span><span class="o">=</span><span class="default_value num">0.0</span></em>
+<em class="sig-param"><span class="n">a_hyper</span><span class="o">=</span><span class="default_value"><span class="num">0.0</span></span></em>
 ,&nbsp;
-<em class="sig-param"><span class="n">gi</span><span class="o">=</span><span class="default_value num">0.0</span></em>
+<em class="sig-param"><span class="n">gi</span><span class="o">=</span><span class="default_value"><span class="num">0.0</span></span></em>
 ,&nbsp;
-<em class="sig-param"><span class="n">gj</span><span class="o">=</span><span class="default_value num">0.0</span></em>
+<em class="sig-param"><span class="n">gj</span><span class="o">=</span><span class="default_value"><span class="num">0.0</span></span></em>
 ,&nbsp;
-<em class="sig-param"><span class="n">b_field</span><span class="o">=</span><span class="default_value num">0.0</span></em>
+<em class="sig-param"><span class="n">b_field</span><span class="o">=</span><span class="default_value"><span class="num">0.0</span></span></em>
 ,&nbsp;
-<em class="sig-param"><span class="n">g_n_as_gyro</span><span class="o">=</span><span class="default_value bool">False</span></em>
+<em class="sig-param"><span class="n">g_n_as_gyro</span><span class="o">=</span><span class="default_value"><span class="bool">False</span></span></em>
 ,&nbsp;
-<em class="sig-param"><span class="n">as_freq</span><span class="o">=</span><span class="default_value bool">True</span></em>
-<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/physics.py#L1535-L1587' }}"><span class="sig-source">[source]</span></a>
+<em class="sig-param"><span class="n">as_freq</span><span class="o">=</span><span class="default_value"><span class="bool">True</span></span></em>
+<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/physics.py#L1694-L1748' }}"><span class="sig-source">[source]</span></a>
 </dt>
 <dd class="field-body">
-<p>The first derivative of the two eigenvalues of the hyperfine structure + Zeeman effect Hamiltonian,
-with respect to the <code>b-field</code>, for a nuclear spin of $I=1/2$ and the magnetic quantum number <code>m</code>,
-calculated analytically using the Breit-Rabi equation.</p>
+<p>The first derivatives $\partial E_\pm / \partial\mathcal{B}$ of the two eigenvalues
+of the hyperfine structure + Zeeman effect Hamiltonian for a nuclear spin of $I=1/2$
+and the magnetic quantum number $m$, calculated analytically using the Breit-Rabi equation,
+see <a href="{{ '/doc/functions/physics/hyper_zeeman_12.html' | relative_url }}"><code>hyper_zeeman_12</code></a>.</p>
 <dl class="field-list">
 <dt class="field-head">Parameters<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>j<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">scalar</a></em></span></dt>
+<dt>j<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#scalar' | relative_url }}">scalar</a></em></span></dt>
 <dd class="field-desc"><p>The electronic total angular momentum quantum number $J$.</p></dd>
-<dt>m<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">scalar</a></em></span></dt>
+<dt>m<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#scalar' | relative_url }}">scalar</a></em></span></dt>
 <dd class="field-desc"><p>The magnetic quantum number $m_F$.</p></dd>
-<dt>a_hyper<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">array_like</a></em></span></dt>
+<dt>a_hyper<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a></em></span></dt>
 <dd class="field-desc"><p>The magnetic dipole hyperfine constant $A = \mu_I \mathcal{B}_J / (IJ)$ (MHz if <code>as_freq</code> else eV).</p></dd>
-<dt>gi<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">array_like</a></em></span></dt>
-<dd class="field-desc"><p>The nuclear g-factor $g_I$ or the gyromagnetic ratio $\gamma_I$ if <code>g_n_as_gyro == True</code>.</p></dd>
-<dt>gj<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">array_like</a></em></span></dt>
+<dt>gi<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a></em></span></dt>
+<dd class="field-desc"><p>The nuclear g-factor $g_I$ or the gyromagnetic ratio $\gamma_I$ (MHz/T) if <code>g_n_as_gyro</code> is <code>True</code>.</p></dd>
+<dt>gj<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a></em></span></dt>
 <dd class="field-desc"><p>The electronic g-factor $g_J$.</p></dd>
-<dt>b_field<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">array_like</a></em></span></dt>
+<dt>b_field<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a></em></span></dt>
 <dd class="field-desc"><p>The B-field $\mathcal{B}$ (T).</p></dd>
 <dt>g_n_as_gyro<span class="classifier"><em>bool</em></span></dt>
-<dd class="field-desc"><p>Whether <code>gi</code> is the nuclear g-factor or the gyromagnetic ratio $\gamma_I$ (MHz).</p></dd>
+<dd class="field-desc"><p>Whether <code>gi</code> is the nuclear g-factor (<code>False</code>) or the gyromagnetic ratio $\gamma_I$ (<code>True</code>).
+The default is <code>False</code>.</p></dd>
 <dt>as_freq<span class="classifier"><em>bool</em></span></dt>
-<dd class="field-desc"><p>The shift can be returned in energy (<code>False</code>, eV) or frequency units (<code>True</code>, MHz).
-The default is <code>True</code></p></dd>
+<dd class="field-desc"><p>The derivatives can be returned in energy (<code>False</code>, eV/T) or frequency units (<code>True</code>, MHz/T).
+The default is <code>True</code>.</p></dd>
 </dl>
 </dd>
 <dt class="field-head">Returns<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>(x0, x1)<span class="classifier"><em>tuple[<a href="{{ '/doc/modules/qtypes.html' | relative_url }}">ndarray</a>, <a href="{{ '/doc/modules/qtypes.html' | relative_url }}">ndarray</a>]</em></span></dt>
+<dt>(x0, x1)<span class="classifier"><em>tuple[<a href="{{ '/doc/modules/qtypes.html#ndarray' | relative_url }}">ndarray</a>, <a href="{{ '/doc/modules/qtypes.html#ndarray' | relative_url }}">ndarray</a>]</em></span></dt>
 <dd class="field-desc"><p>The first derivatives of the two solutions of the Breit-Rabi equation,
-where <code>x0</code> and <code>x1</code> correspond to $F = J \mp 1/2$, respectively.</p></dd>
+where <code>x0</code> and <code>x1</code> correspond to $F = J \mp 1/2$, respectively (MHz/T if <code>as_freq</code> else eV/T).</p></dd>
 </dl>
 </dd>
 </dl>

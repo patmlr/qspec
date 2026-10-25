@@ -11,13 +11,14 @@ title: qspec.combine_dicts
 ,&nbsp;
 <em class="sig-param"><span class="n">key_lists</span></em>
 ,&nbsp;
-<em class="sig-param"><span class="n">operator</span><span class="o">=</span><span class="default_value string">&#x27;+&#x27;</span></em>
+<em class="sig-param"><span class="n">operator</span><span class="o">=</span><span class="default_value"><span class="string">&#x27;+&#x27;</span></span></em>
 ,&nbsp;
-<em class="sig-param"><span class="n">short_keys</span><span class="o">=</span><span class="default_value bool">True</span></em>
-<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/tools.py#L759-L788' }}"><span class="sig-source">[source]</span></a>
+<em class="sig-param"><span class="n">short_keys</span><span class="o">=</span><span class="default_value"><span class="bool">True</span></span></em>
+<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/tools.py#L832-L865' }}"><span class="sig-source">[source]</span></a>
 </dt>
 <dd class="field-body">
-
+<p>Combine the values of several dictionaries with the given operator, e.g., for <code>operator == "+"</code>, the dictionary
+<code>{key_lists[0][i] + key_lists[1][i] + ...: dicts[0][key_lists[0][i]] + dicts[1][key_lists[1][i]] + ...}</code>.</p>
 <dl class="field-list">
 <dt class="field-head">Parameters<span class="colon">:</span></dt>
 <dd class="field-par">
@@ -25,21 +26,28 @@ title: qspec.combine_dicts
 <dt>dicts<span class="classifier"><em>list</em></span></dt>
 <dd class="field-desc"><p>A list of dictionaries to be combined.</p></dd>
 <dt>key_lists<span class="classifier"><em>Iterable</em></span></dt>
-<dd class="field-desc"><p>A list of Iterables of the same lengths which include keys from 'a'.
-Must have the same length as 'dicts'.</p></dd>
+<dd class="field-desc"><p>A list of iterables of the same length which include keys from the corresponding <code>dicts</code>.
+Must have the same length as <code>dicts</code>.</p></dd>
 <dt>operator<span class="classifier"><em>str</em></span></dt>
-<dd class="field-desc"><p>The operator which is used to combine the key_lists.</p></dd>
+<dd class="field-desc"><p>The operator which is used to combine the values.
+Can be one of <code>"+"</code>, <code>"-"</code>, <code>"*"</code>, <code>"/"</code>, <code>"%"</code> or <code>"gauss"</code> (the square root of the sum of squares).</p></dd>
 <dt>short_keys<span class="classifier"><em>bool</em></span></dt>
-<dd class="field-desc"><p>Whether to just use the keys of the first key_list
+<dd class="field-desc"><p>Whether to use the keys of the first key list
 or representations of the entire operations as the new keys.</p></dd>
 </dl>
 </dd>
 <dt class="field-head">Returns<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>out<span class="classifier"><em>dict</em></span></dt>
-<dd class="field-desc"><p>A dictionary of the shape {key_lists[0] + key_lists[1] + ... :
-dicts[0][key_lists[0]] + dicts[1][key_lists[1]] + ... } if operator == '+'.</p></dd>
+<dt>a_comb<span class="classifier"><em>dict</em></span></dt>
+<dd class="field-desc"><p>The dictionary with the combined values.</p></dd>
+</dl>
+</dd>
+<dt class="field-head">Raises<span class="colon">:</span></dt>
+<dd class="field-par">
+<dl>
+<dt>ValueError</dt>
+<dd class="field-desc"><p>If <code>operator</code> is not supported.</p></dd>
 </dl>
 </dd>
 </dl>

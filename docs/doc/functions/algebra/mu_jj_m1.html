@@ -27,47 +27,48 @@ title: qspec.mu_jj_m1
 ,&nbsp;
 <em class="sig-param"><span class="n">j_u</span></em>
 ,&nbsp;
-<em class="sig-param"><span class="n">as_sympy</span><span class="o">=</span><span class="default_value bool">False</span></em>
-<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/algebra.py#L674-L733' }}"><span class="sig-source">[source]</span></a>
+<em class="sig-param"><span class="n">as_sympy</span><span class="o">=</span><span class="default_value"><span class="bool">False</span></span></em>
+<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/algebra.py#L755-L815' }}"><span class="sig-source">[source]</span></a>
 </dt>
 <dd class="field-body">
 <p>The reduced magnetic dipole transition matrix element</p>
-<div class="math-block">$$\mu_{J_l}^{J_u}\coloneqq\langle j_{l,c}j_{l,o},J_l||
-\vec{\mu}||j_{u,c}j_{u,o},J_u\rangle$$</div>
+<div class="math-block">$$
+\mu_{J_l}^{J_u}\coloneqq\langle j_{l,c}j_{l,o},J_l||\vec{\mu}||j_{u,c}j_{u,o},J_u\rangle
+$$</div>
 <p>in units of the Bohr magneton $\mu_\mathrm{B}$.</p>
 <dl class="field-list">
 <dt class="field-head">Parameters<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>sc<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">sympy_scalar</a></em></span></dt>
+<dt>sc<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#sympy_scalar' | relative_url }}">sympy_scalar</a></em></span></dt>
 <dd class="field-desc"><p>The spin quantum number $s_c$ of the core electron(s) of the lower and upper state.</p></dd>
-<dt>lc<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">sympy_scalar</a></em></span></dt>
+<dt>lc<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#sympy_scalar' | relative_url }}">sympy_scalar</a></em></span></dt>
 <dd class="field-desc"><p>The orbital angular momentum quantum number $l_c$ of the core electron(s) of the lower and upper state.</p></dd>
-<dt>jc_l<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">sympy_scalar</a></em></span></dt>
+<dt>jc_l<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#sympy_scalar' | relative_url }}">sympy_scalar</a></em></span></dt>
 <dd class="field-desc"><p>The total angular momentum quantum number $j_{l,c}$ of the core electron(s) of the lower state.</p></dd>
-<dt>jo_l<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">sympy_scalar</a></em></span></dt>
+<dt>jo_l<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#sympy_scalar' | relative_url }}">sympy_scalar</a></em></span></dt>
 <dd class="field-desc"><p>The total angular momentum quantum number $j_{l,o}$ of the outer electron(s) of the lower state.</p></dd>
-<dt>j_l<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">sympy_scalar</a></em></span></dt>
+<dt>j_l<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#sympy_scalar' | relative_url }}">sympy_scalar</a></em></span></dt>
 <dd class="field-desc"><p>The total angular momentum quantum number $J_l$ of the lower state.</p></dd>
-<dt>so<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">sympy_scalar</a></em></span></dt>
+<dt>so<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#sympy_scalar' | relative_url }}">sympy_scalar</a></em></span></dt>
 <dd class="field-desc"><p>The spin quantum number $s_o$ of the outer electron(s) of the lower and upper state.</p></dd>
-<dt>lo<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">sympy_scalar</a></em></span></dt>
+<dt>lo<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#sympy_scalar' | relative_url }}">sympy_scalar</a></em></span></dt>
 <dd class="field-desc"><p>The orbital angular momentum quantum number $l_o$ of the outer electron(s) of the lower and upper state.</p></dd>
-<dt>jc_u<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">sympy_scalar</a></em></span></dt>
+<dt>jc_u<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#sympy_scalar' | relative_url }}">sympy_scalar</a></em></span></dt>
 <dd class="field-desc"><p>The total angular momentum quantum number $j_{u,c}$ of the core electron(s) of the upper state.</p></dd>
-<dt>jo_u<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">sympy_scalar</a></em></span></dt>
+<dt>jo_u<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#sympy_scalar' | relative_url }}">sympy_scalar</a></em></span></dt>
 <dd class="field-desc"><p>The total angular momentum quantum number $j_{u,o}$ of the outer electron(s) of the upper state.</p></dd>
-<dt>j_u<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">sympy_scalar</a></em></span></dt>
+<dt>j_u<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#sympy_scalar' | relative_url }}">sympy_scalar</a></em></span></dt>
 <dd class="field-desc"><p>The total angular momentum quantum number $J_u$ of the upper state.</p></dd>
 <dt>as_sympy<span class="classifier"><em>bool</em></span></dt>
-<dd class="field-desc"><p>Return the result as a symbol (<code>True</code>) or as a <code>float</code> (<code>False</code>).</p></dd>
+<dd class="field-desc"><p>Whether to return the result as a sympy expression (<code>True</code>) or as a <code>float</code> (<code>False</code>).</p></dd>
 </dl>
 </dd>
 <dt class="field-head">Returns<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>out<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">sympy_expr</a> | float</em></span></dt>
-<dd class="field-desc"><p>The magnetic dipole transition matrix element $\mu_{J_l}^{J_u}$ ($\mu_\mathrm{B}$).</p></dd>
+<dt>mu<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#sympy_expr' | relative_url }}">sympy_expr</a> | float</em></span></dt>
+<dd class="field-desc"><p>The reduced magnetic dipole transition matrix element $\mu_{J_l}^{J_u}$ ($\mu_\mathrm{B}$).</p></dd>
 </dl>
 </dd>
 </dl>

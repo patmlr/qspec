@@ -11,22 +11,35 @@ title: qspec.models.Model.set_fix
 ,&nbsp;
 <em class="sig-param"><span class="n">fix</span></em>
 ,&nbsp;
-<em class="sig-param"><span class="n">force</span><span class="o">=</span><span class="default_value bool">False</span></em>
-<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/models/_base.py#L291-L362' }}"><span class="sig-source">[source]</span></a>
+<em class="sig-param"><span class="n">force</span><span class="o">=</span><span class="default_value"><span class="bool">False</span></span></em>
+<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/models/_base.py#L303-L385' }}"><span class="sig-source">[source]</span></a>
 </dt>
 <dd class="field-body">
-<p>Set a specific parameter fix state.</p>
+<p>Set a specific parameter fix state. The fix state can be</p>
+<ul><li>a <code>bool</code>, whether the parameter is fixed (<code>True</code>) or varied (<code>False</code>) in a fit.</li><li>a positive <code>float</code> $\sigma$, to vary the parameter with a Gaussian prior with the standard deviation
+$\sigma$ around its current value. <code>0</code> or negative values fix the parameter, <code>inf</code> varies it freely.</li><li>a <code>str</code> <code>"val(unc)"</code>, e.g., <code>"1.5(0.2)"</code>, to vary the parameter with a Gaussian prior
+with mean <code>val</code> and standard deviation <code>unc</code>.</li><li>any other <code>str</code>, an expression of the other parameter names, e.g., <code>"2 * Al"</code>,
+that defines the value of the parameter. The parameter is not varied in a fit.</li><li>a list <code>[lower, upper]</code>, to vary the parameter within the bounds. An empty list is equivalent to <code>[0, 1]</code>,
+a list with a single value to <code>[0, upper]</code>.</li></ul>
+<p>Invalid expressions and expressions that form loops are rejected with a printed message.</p>
 <dl class="field-list">
 <dt class="field-head">Parameters<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>i<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">int_like</a> | str</em></span></dt>
+<dt>i<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#int_like' | relative_url }}">int_like</a> | str</em></span></dt>
 <dd class="field-desc"><p>The index (<code>int</code>) or the name (<code>str</code>) of the parameter.</p></dd>
-<dt>fix<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">fix_type</a></em></span></dt>
-<dd class="field-desc"><p>The new parameter value.</p></dd>
+<dt>fix<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#fix_type' | relative_url }}">fix_type</a></em></span></dt>
+<dd class="field-desc"><p>The new fix state of the parameter.</p></dd>
 <dt>force<span class="classifier"><em>bool</em></span></dt>
 <dd class="field-desc"><p>Force the parameter to take exactly the new fix state.
 If <code>False</code>, the parameter is converted to the correct format.</p></dd>
+</dl>
+</dd>
+<dt class="field-head">Raises<span class="colon">:</span></dt>
+<dd class="field-par">
+<dl>
+<dt>ValueError</dt>
+<dd class="field-desc"><p>If <code>fix</code> has the wrong format.</p></dd>
 </dl>
 </dd>
 </dl>

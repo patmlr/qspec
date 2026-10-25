@@ -17,39 +17,41 @@ title: qspec.reduced_f_root
 ,&nbsp;
 <em class="sig-param"><span class="n">f_u</span></em>
 ,&nbsp;
-<em class="sig-param"><span class="n">as_sympy</span><span class="o">=</span><span class="default_value bool">False</span></em>
-<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/algebra.py#L514-L541' }}"><span class="sig-source">[source]</span></a>
+<em class="sig-param"><span class="n">as_sympy</span><span class="o">=</span><span class="default_value"><span class="bool">False</span></span></em>
+<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/algebra.py#L588-L616' }}"><span class="sig-source">[source]</span></a>
 </dt>
 <dd class="field-body">
 <p>The geometric coefficient</p>
-<div class="math-block">$$\sqrt{f_F^{F^\prime}} = (-1)^{F + I + 1 + J_u}\sqrt{2F_l + 1}\sqrt{2F_u + 1}\begin{Bmatrix}
+<div class="math-block">$$
+\sqrt{f_F^{F^\prime}} = (-1)^{F_l + I + 1 + J_u}\sqrt{2F_l + 1}\sqrt{2F_u + 1}\begin{Bmatrix}
 J_u &amp; J_l &amp; 1 \\
 F_l &amp; F_u &amp; I
-\end{Bmatrix},$$</div>
+\end{Bmatrix},
+$$</div>
 <p>as described in
 [<a href="https://doi.org/10.1103/PhysRevA.87.032504">R. C. Brown et al., Phys. Rev. A 87, 032504 (2013)</a>].</p>
 <dl class="field-list">
 <dt class="field-head">Parameters<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>i<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">sympy_scalar</a></em></span></dt>
+<dt>i<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#sympy_scalar' | relative_url }}">sympy_scalar</a></em></span></dt>
 <dd class="field-desc"><p>The nuclear spin quantum number $I$.</p></dd>
-<dt>j_l<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">sympy_scalar</a></em></span></dt>
+<dt>j_l<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#sympy_scalar' | relative_url }}">sympy_scalar</a></em></span></dt>
 <dd class="field-desc"><p>The electronic total angular momentum quantum number $J_l$ of the lower state.</p></dd>
-<dt>f_l<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">sympy_scalar</a></em></span></dt>
+<dt>f_l<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#sympy_scalar' | relative_url }}">sympy_scalar</a></em></span></dt>
 <dd class="field-desc"><p>The total angular momentum quantum number $F_l$ of the lower state.</p></dd>
-<dt>j_u<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">sympy_scalar</a></em></span></dt>
+<dt>j_u<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#sympy_scalar' | relative_url }}">sympy_scalar</a></em></span></dt>
 <dd class="field-desc"><p>The electronic total angular momentum quantum number $J_u$ of the upper state.</p></dd>
-<dt>f_u<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">sympy_scalar</a></em></span></dt>
+<dt>f_u<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#sympy_scalar' | relative_url }}">sympy_scalar</a></em></span></dt>
 <dd class="field-desc"><p>The total angular momentum quantum number $F_u$ of the upper state.</p></dd>
 <dt>as_sympy<span class="classifier"><em>bool</em></span></dt>
-<dd class="field-desc"><p>Return the result as a symbol (<code>True</code>) or as a <code>float</code> (<code>False</code>).</p></dd>
+<dd class="field-desc"><p>Whether to return the result as a sympy expression (<code>True</code>) or as a <code>float</code> (<code>False</code>).</p></dd>
 </dl>
 </dd>
 <dt class="field-head">Returns<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>out<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">sympy_expr</a> | float</em></span></dt>
+<dt>f_root<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#sympy_expr' | relative_url }}">sympy_expr</a> | float</em></span></dt>
 <dd class="field-desc"><p>The geometric coefficient $\sqrt{f_F^{F^\prime}}$.</p></dd>
 </dl>
 </dd>

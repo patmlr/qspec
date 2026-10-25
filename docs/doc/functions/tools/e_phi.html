@@ -11,19 +11,22 @@ title: qspec.e_phi
 ,&nbsp;
 <em class="sig-param"><span class="n">phi</span></em>
 ,&nbsp;
-<em class="sig-param"><span class="n">axis</span><span class="o">=</span><span class="default_value num">-1</span></em>
-<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/tools.py#L972-L985' }}"><span class="sig-source">[source]</span></a>
+<em class="sig-param"><span class="n">axis</span><span class="o">=</span><span class="default_value"><span class="num">-1</span></span></em>
+<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/tools.py#L1078-L1094' }}"><span class="sig-source">[source]</span></a>
 </dt>
 <dd class="field-body">
-
+<p>The azimuthal unit vector of the orthonormal system defined by <a href="{{ '/doc/functions/tools/e_r.html' | relative_url }}"><code>e_r</code></a></p>
+<div class="math-block">$$
+\hat{e}_\phi = \begin{pmatrix}0\\ \cos(\phi)\\ -\sin(\phi)\end{pmatrix}.
+$$</div>
 <dl class="field-list">
 <dt class="field-head">Parameters<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>theta<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">array_like</a></em></span></dt>
-<dd class="field-desc"><p>The angle theta.</p></dd>
-<dt>phi<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">array_like</a></em></span></dt>
-<dd class="field-desc"><p>The angle phi.</p></dd>
+<dt>theta<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a></em></span></dt>
+<dd class="field-desc"><p>The angle $\theta$ (rad).</p></dd>
+<dt>phi<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a></em></span></dt>
+<dd class="field-desc"><p>The angle $\phi$ (rad).</p></dd>
 <dt>axis<span class="classifier"><em>int</em></span></dt>
 <dd class="field-desc"><p>The axis along which the vector components are aligned.</p></dd>
 </dl>
@@ -31,11 +34,8 @@ title: qspec.e_phi
 <dt class="field-head">Returns<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>out<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">ndarray</a></em></span></dt>
-<dd class="field-desc"><p>The unit vector 'e_phi'. Part of an orthonormal system defined by:
-e_x = e_r(pi/2, .)
-e_y = e_r(0, pi/2)
-e_z = e_r(0, 0)</p></dd>
+<dt>e_phi<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#ndarray' | relative_url }}">ndarray</a></em></span></dt>
+<dd class="field-desc"><p>The unit vector $\hat{e}_\phi$.</p></dd>
 </dl>
 </dd>
 </dl>

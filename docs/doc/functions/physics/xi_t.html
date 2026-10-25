@@ -1,0 +1,52 @@
+---
+layout: api
+title: qspec.xi_t
+---
+<dl class="py function">
+<dt class="func-sig">
+<span class="sig-prename">qspec.</span>
+<span class="sig-name">xi_t</span>
+<span class="sig-paren">&nbsp;(&nbsp;</span>
+<em class="sig-param"><span class="n">t</span></em>
+,&nbsp;
+<em class="sig-param"><span class="n">f</span></em>
+,&nbsp;
+<em class="sig-param"><span class="n">u</span></em>
+,&nbsp;
+<em class="sig-param"><span class="n">q</span></em>
+,&nbsp;
+<em class="sig-param"><span class="n">m</span></em>
+<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/physics.py#L2640-L2658' }}"><span class="sig-source">[source]</span></a>
+</dt>
+<dd class="field-body">
+<p>The asymmetry parameter of an ensemble of accelerated ions with temperature $T$</p>
+<div class="math-block">$$
+\xi = T\frac{\gamma k_\mathrm{B}f}{\sqrt{8qUmc^2}},
+$$</div>
+<p>where $\gamma$ is the relativistic time-dilation factor.</p>
+<dl class="field-list">
+<dt class="field-head">Parameters<span class="colon">:</span></dt>
+<dd class="field-par">
+<dl>
+<dt>t<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a></em></span></dt>
+<dd class="field-desc"><p>The temperature $T$ of the ions (K).</p></dd>
+<dt>f<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a></em></span></dt>
+<dd class="field-desc"><p>The rest-frame transition frequency $f$ (arb. units).</p></dd>
+<dt>u<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a></em></span></dt>
+<dd class="field-desc"><p>The acceleration voltage $U$ (V).</p></dd>
+<dt>q<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a></em></span></dt>
+<dd class="field-desc"><p>The electric charge $q$ of the ions (e).</p></dd>
+<dt>m<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a></em></span></dt>
+<dd class="field-desc"><p>The mass $m$ of the ions (u).</p></dd>
+</dl>
+</dd>
+<dt class="field-head">Returns<span class="colon">:</span></dt>
+<dd class="field-par">
+<dl>
+<dt>xi<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#ndarray' | relative_url }}">ndarray</a></em></span></dt>
+<dd class="field-desc"><p>The asymmetry parameter $\xi$ (unit of <code>f</code>).</p></dd>
+</dl>
+</dd>
+</dl>
+</dd>
+</dl>

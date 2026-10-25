@@ -19,10 +19,10 @@ title: qspec.lambda_rn
 ,&nbsp;
 <em class="sig-param"><span class="n">r6_d</span></em>
 ,&nbsp;
-<em class="sig-param"><span class="n">c2c1</span><span class="o">=</span><span class="default_value num">1.0</span></em>
+<em class="sig-param"><span class="n">c2c1</span><span class="o">=</span><span class="default_value"><span class="num">1.0</span></span></em>
 ,&nbsp;
-<em class="sig-param"><span class="n">c3c1</span><span class="o">=</span><span class="default_value num">1.0</span></em>
-<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/physics.py#L2093-L2140' }}"><span class="sig-source">[source]</span></a>
+<em class="sig-param"><span class="n">c3c1</span><span class="o">=</span><span class="default_value"><span class="num">1.0</span></span></em>
+<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/physics.py#L2257-L2304' }}"><span class="sig-source">[source]</span></a>
 </dt>
 <dd class="field-body">
 <p>The differential nuclear charge radius series up to $\mathcal{O}(r^6)$ between two isotopes and its uncertainty
@@ -38,36 +38,36 @@ calculated from the moments of the nuclear charge radii and the Seltzer coeffici
 <dt class="field-head">Parameters<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>r2<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">array_like</a></em></span></dt>
+<dt>r2<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a></em></span></dt>
 <dd class="field-desc"><p>The difference of the mean-square nuclear charge radius between two isotopes
-$\delta\!\langle r^2\rangle$.</p></dd>
-<dt>r2_d<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">array_like</a></em></span></dt>
+$\delta\!\langle r^2\rangle$ (arb. units).</p></dd>
+<dt>r2_d<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a></em></span></dt>
 <dd class="field-desc"><p>The uncertainty of the difference of the mean-square nuclear charge radius
-$\Delta\delta\!\langle r^2\rangle$.</p></dd>
-<dt>r4<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">array_like</a></em></span></dt>
+$\Delta\delta\!\langle r^2\rangle$ (unit of <code>r2</code>).</p></dd>
+<dt>r4<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a></em></span></dt>
 <dd class="field-desc"><p>The difference of the mean-quartic nuclear charge radius between two isotopes
-$\delta\!\langle r^4\rangle$.</p></dd>
-<dt>r4_d<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">array_like</a></em></span></dt>
+$\delta\!\langle r^4\rangle$ (unit of <code>r2**2</code>).</p></dd>
+<dt>r4_d<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a></em></span></dt>
 <dd class="field-desc"><p>The uncertainty of the difference of the mean-quartic nuclear charge radius
-$\Delta\delta\!\langle r^4\rangle$.</p></dd>
-<dt>r6<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">array_like</a></em></span></dt>
+$\Delta\delta\!\langle r^4\rangle$ (unit of <code>r4</code>).</p></dd>
+<dt>r6<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a></em></span></dt>
 <dd class="field-desc"><p>The difference of the mean-sextic nuclear charge radius between two isotopes
-$\delta\!\langle r^6\rangle$.</p></dd>
-<dt>r6_d<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">array_like</a></em></span></dt>
+$\delta\!\langle r^6\rangle$ (unit of <code>r2**3</code>).</p></dd>
+<dt>r6_d<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a></em></span></dt>
 <dd class="field-desc"><p>The uncertainty of the difference of the mean-sextic nuclear charge radius
-$\Delta\delta\!\langle r^6\rangle$.</p></dd>
-<dt>c2c1<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">array_like</a></em></span></dt>
-<dd class="field-desc"><p>Seltzer's coefficient for the quartic moment $C_2 / C_1$ (unit of <code>1 / r**2</code>).</p></dd>
-<dt>c3c1<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">array_like</a></em></span></dt>
-<dd class="field-desc"><p>Seltzer's coefficient for the sextic moment $C_3 / C_1$ (unit of <code>1 / r**4</code>).</p></dd>
+$\Delta\delta\!\langle r^6\rangle$ (unit of <code>r6</code>).</p></dd>
+<dt>c2c1<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a></em></span></dt>
+<dd class="field-desc"><p>Seltzer's coefficient for the quartic moment $C_2 / C_1$ (unit of <code>1 / r2</code>).</p></dd>
+<dt>c3c1<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a></em></span></dt>
+<dd class="field-desc"><p>Seltzer's coefficient for the sextic moment $C_3 / C_1$ (unit of <code>1 / r2**2</code>).</p></dd>
 </dl>
 </dd>
 <dt class="field-head">Returns<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>(Lambda, Lambda_d)<span class="classifier"><em>tuple[<a href="{{ '/doc/modules/qtypes.html' | relative_url }}">ndarray</a>, <a href="{{ '/doc/modules/qtypes.html' | relative_url }}">ndarray</a>]</em></span></dt>
+<dt>(Lambda, Lambda_d)<span class="classifier"><em>tuple[<a href="{{ '/doc/modules/qtypes.html#ndarray' | relative_url }}">ndarray</a>, <a href="{{ '/doc/modules/qtypes.html#ndarray' | relative_url }}">ndarray</a>]</em></span></dt>
 <dd class="field-desc"><p>The difference of the nuclear charge radius series between two isotopes $\Lambda$
-and its uncertainty $\Delta\Lambda$ (unit of <code>r**2</code>).</p></dd>
+and its uncertainty $\Delta\Lambda$ (unit of <code>r2</code>).</p></dd>
 </dl>
 </dd>
 </dl>

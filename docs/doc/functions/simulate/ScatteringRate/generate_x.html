@@ -7,29 +7,29 @@ title: qspec.simulate.ScatteringRate.generate_x
 <span class="sig-prename">qspec.simulate.</span><span class="sig-classname">ScatteringRate</span><span class="sig-prename">.</span>
 <span class="sig-name">generate_x</span>
 <span class="sig-paren">&nbsp;(&nbsp;</span>
-<em class="sig-param"><span class="n">width</span><span class="o">=</span><span class="default_value num">20.0</span></em>
+<em class="sig-param"><span class="n">width</span><span class="o">=</span><span class="default_value"><span class="num">20.0</span></span></em>
 ,&nbsp;
 <em class="sig-param"><span class="n">step</span><span class="o">=</span><span class="default_value">None</span></em>
-<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/simulate/_simulate.py#L908-L923' }}"><span class="sig-source">[source]</span></a>
+<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/simulate/_simulate.py#L935-L952' }}"><span class="sig-source">[source]</span></a>
 </dt>
 <dd class="field-body">
-
+<p>Generate frequencies which cover the entire spectrum.</p>
 <dl class="field-list">
 <dt class="field-head">Parameters<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>width<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">scalar</a></em></span></dt>
-<dd class="field-desc"><p>The covered width around resonances in natural linewidths.</p></dd>
-<dt>step<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">scalar</a> | None</em></span></dt>
-<dd class="field-desc"><p>The step size between generated x values.
+<dt>width<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#scalar' | relative_url }}">scalar</a></em></span></dt>
+<dd class="field-desc"><p>The covered width around the resonances in natural linewidths.</p></dd>
+<dt>step<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#scalar' | relative_url }}">scalar</a> | None</em></span></dt>
+<dd class="field-desc"><p>The step size between generated x values (MHz). If <code>None</code>, a 30th of the natural linewidth.
 Note that between resonances, there might be a larger step.</p></dd>
 </dl>
 </dd>
 <dt class="field-head">Returns<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>out<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">array_like</a></em></span></dt>
-<dd class="field-desc"><p>An array of frequencies which covers the entire spectrum.</p></dd>
+<dt>x<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a></em></span></dt>
+<dd class="field-desc"><p>An array of frequencies which covers the entire spectrum (MHz).</p></dd>
 </dl>
 </dd>
 </dl>

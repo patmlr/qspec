@@ -12,31 +12,31 @@ title: qspec.scattering_rate
 <em class="sig-param"><span class="n">a</span></em>
 ,&nbsp;
 <em class="sig-param"><span class="n">s</span></em>
-<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/physics.py#L1738-L1755' }}"><span class="sig-source">[source]</span></a>
+<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/physics.py#L1902-L1919' }}"><span class="sig-source">[source]</span></a>
 </dt>
 <dd class="field-body">
 <p>The equilibrium scattering rate of a closed two-level transition</p>
 <div class="math-block">$$\begin{aligned}
 \Gamma_\mathrm{sc} &amp;= \frac{s}{2}\frac{A_{ki}^3}{(4\pi\Delta f)^2 + (1 + s)A_{ki}^2}\\[2ex]
-\lim\limits_{s\rightarrow\inf}\Gamma_\mathrm{sc}\big|_{\Delta f = 0} &amp;= A_{ki} / 2.
+\lim\limits_{s\rightarrow\infty}\Gamma_\mathrm{sc}\big|_{\Delta f = 0} &amp;= A_{ki} / 2.
 \end{aligned}$$</div>
 <dl class="field-list">
 <dt class="field-head">Parameters<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>df<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">array_like</a></em></span></dt>
+<dt>df<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a></em></span></dt>
 <dd class="field-desc"><p>The frequency detuning $\Delta f$ of the absorbed light.
-This must be differences of real frequencies, such that $\Delta\omega = 2\pi\Delta f$ (MHz).</p></dd>
-<dt>a<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">array_like</a></em></span></dt>
+This must be a difference of real frequencies, such that $\Delta\omega = 2\pi\Delta f$ (MHz).</p></dd>
+<dt>a<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a></em></span></dt>
 <dd class="field-desc"><p>The Einstein $A_{ki}$ coefficient (MHz).</p></dd>
-<dt>s<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">array_like</a></em></span></dt>
+<dt>s<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a></em></span></dt>
 <dd class="field-desc"><p>The saturation parameter $s$.</p></dd>
 </dl>
 </dd>
 <dt class="field-head">Returns<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>Gamma<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">ndarray</a></em></span></dt>
+<dt>Gamma<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#ndarray' | relative_url }}">ndarray</a></em></span></dt>
 <dd class="field-desc"><p>The equilibrium scattering rate $\Gamma_\mathrm{sc}$
 of a closed two-level transition (MHz).</p></dd>
 </dl>

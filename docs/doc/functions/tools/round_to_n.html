@@ -10,26 +10,33 @@ title: qspec.round_to_n
 <em class="sig-param"><span class="n">x</span></em>
 ,&nbsp;
 <em class="sig-param"><span class="n">n</span></em>
-<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/tools.py#L408-L431' }}"><span class="sig-source">[source]</span></a>
+<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/tools.py#L445-L471' }}"><span class="sig-source">[source]</span></a>
 </dt>
 <dd class="field-body">
-
+<p>Round a value to <code>n</code> significant decimal places.</p>
 <dl class="field-list">
 <dt class="field-head">Parameters<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>x<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">scalar</a></em></span></dt>
+<dt>x<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#scalar' | relative_url }}">scalar</a></em></span></dt>
 <dd class="field-desc"><p>The input data.</p></dd>
-<dt>n<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">int_like</a></em></span></dt>
+<dt>n<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#int_like' | relative_url }}">int_like</a></em></span></dt>
 <dd class="field-desc"><p>The number of significant decimal places to round to.</p></dd>
 </dl>
 </dd>
 <dt class="field-head">Returns<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>out<span class="classifier"><em>tuple[<a href="{{ '/doc/modules/qtypes.html' | relative_url }}">scalar</a>, int]</em></span></dt>
-<dd class="field-desc"><p>x rounded to 'n' significant decimal places and
+<dt>(x_round, decimals)<span class="classifier"><em>tuple[<a href="{{ '/doc/modules/qtypes.html#scalar' | relative_url }}">scalar</a>, int]</em></span></dt>
+<dd class="field-desc"><p><code>x</code> rounded to <code>n</code> significant decimal places and
 the corresponding number of decimal places after the decimal point.</p></dd>
+</dl>
+</dd>
+<dt class="field-head">Raises<span class="colon">:</span></dt>
+<dd class="field-par">
+<dl>
+<dt>TypeError</dt>
+<dd class="field-desc"><p>If <code>x</code> is not a scalar.</p></dd>
 </dl>
 </dd>
 </dl>

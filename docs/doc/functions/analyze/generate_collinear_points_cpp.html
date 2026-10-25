@@ -20,7 +20,7 @@ title: qspec.analyze.generate_collinear_points_cpp
 <em class="sig-param"><span class="n">report</span><span class="o">=</span><span class="default_value">None</span></em>
 ,&nbsp;
 <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em>
-<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/analyze/_analyze_cpp.py#L43-L101' }}"><span class="sig-source">[source]</span></a>
+<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/analyze/_analyze_cpp.py#L43-L102' }}"><span class="sig-source">[source]</span></a>
 </dt>
 <dd class="field-body">
 <p>Randomly generate points $\vec{p}_i$ according to the given data vectors $\vec{\mu}_i\in\mathbb{R}^n$
@@ -30,30 +30,31 @@ under the condition that they are aligned on a straight line. This function uses
 <dt class="field-head">Parameters<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>mean<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">ndarray</a></em></span></dt>
+<dt>mean<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#ndarray' | relative_url }}">ndarray</a></em></span></dt>
 <dd class="field-desc"><p>The data vectors $\vec{\mu}_i$. Must have shape <code>(k, n)</code>, where <code>k</code> is the number of data points
 and <code>n</code> is the number of dimensions of each point.</p></dd>
-<dt>cov<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">ndarray</a></em></span></dt>
+<dt>cov<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#ndarray' | relative_url }}">ndarray</a></em></span></dt>
 <dd class="field-desc"><p>The covariance matrices $\mathbf{\Sigma}_i$ of the data vectors. Must have shape <code>(k, n, n)</code>.
 Use <a href="{{ '/doc/functions/analyze/covariance_matrix.html' | relative_url }}"><code>covariance_matrix</code></a> to construct covariance matrices.</p></dd>
-<dt>n_samples<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">int_like</a> | None</em></span></dt>
-<dd class="field-desc"><p>The number of samples generated for each data point.
-If <code>None</code> and <code>method == 'cpp"</code>, samples are generated until <code>n_accepted</code> samples get accepted.</p></dd>
-<dt>n_accepted<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">int_like</a> | None</em></span></dt>
-<dd class="field-desc"><p>The number of samples to be accepted for each data point.</p></dd>
+<dt>n_samples<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#int_like' | relative_url }}">int_like</a> | None</em></span></dt>
+<dd class="field-desc"><p>The maximum number of samples generated for each data point. If <code>None</code>, it is 100,000.</p></dd>
+<dt>n_accepted<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#int_like' | relative_url }}">int_like</a> | None</em></span></dt>
+<dd class="field-desc"><p>The number of samples to be accepted for each data point.
+If <code>None</code>, it is the maximum of 100,000 and <code>n_samples</code>.</p></dd>
 <dt>seed<span class="classifier"><em>int | None</em></span></dt>
-<dd class="field-desc"><p>A seed for the random number generator.</p></dd>
+<dd class="field-desc"><p>A seed for the random number generator. If <code>None</code>, a random seed is used.</p></dd>
 <dt>report<span class="classifier"><em>bool | None</em></span></dt>
 <dd class="field-desc"><p>Whether to report the number of samples.</p></dd>
 <dt>kwargs</dt>
-<dd class="field-desc"><p>Additional keyword arguments.</p></dd>
+<dd class="field-desc"><p>Additional keyword arguments are accepted for compatibility with
+<a href="{{ '/doc/functions/analyze/generate_collinear_points_py.html' | relative_url }}"><code>generate_collinear_points_py</code></a> and ignored.</p></dd>
 </dl>
 </dd>
 <dt class="field-head">Returns<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>(p, n_accepted, n_samples)<span class="classifier"><em>tuple[<a href="{{ '/doc/modules/qtypes.html' | relative_url }}">ndarray</a>, int, int]</em></span></dt>
-<dd class="field-desc"><p>The generated data vectors $\vec{p}_i$ with shape <code>(n_accepted, k ,n)</code>
+<dt>(p, n_accepted, n_samples)<span class="classifier"><em>tuple[<a href="{{ '/doc/modules/qtypes.html#ndarray' | relative_url }}">ndarray</a>, int, int]</em></span></dt>
+<dd class="field-desc"><p>The generated data vectors $\vec{p}_i$ with shape <code>(n_accepted, k, n)</code>
 and the number of accepted and generated samples.</p></dd>
 </dl>
 </dd>

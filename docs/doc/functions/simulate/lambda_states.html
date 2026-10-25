@@ -21,49 +21,51 @@ title: qspec.simulate.lambda_states
 ,&nbsp;
 <em class="sig-param"><span class="n">s_2</span></em>
 ,&nbsp;
-<em class="sig-param"><span class="n">lw_1</span><span class="o">=</span><span class="default_value num">0.0</span></em>
+<em class="sig-param"><span class="n">lw_1</span><span class="o">=</span><span class="default_value"><span class="num">0.0</span></span></em>
 ,&nbsp;
-<em class="sig-param"><span class="n">lw_2</span><span class="o">=</span><span class="default_value num">0.0</span></em>
+<em class="sig-param"><span class="n">lw_2</span><span class="o">=</span><span class="default_value"><span class="num">0.0</span></span></em>
 ,&nbsp;
 <em class="sig-param"><span class="n">p0</span><span class="o">=</span><span class="default_value">None</span></em>
 ,&nbsp;
-<em class="sig-param"><span class="n">time_resolved</span><span class="o">=</span><span class="default_value bool">False</span></em>
+<em class="sig-param"><span class="n">time_resolved</span><span class="o">=</span><span class="default_value"><span class="bool">False</span></span></em>
 ,&nbsp;
-<em class="sig-param"><span class="n">show</span><span class="o">=</span><span class="default_value bool">False</span></em>
-<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/simulate/_simulate.py#L218-L327' }}"><span class="sig-source">[source]</span></a>
+<em class="sig-param"><span class="n">show</span><span class="o">=</span><span class="default_value"><span class="bool">False</span></span></em>
+<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/simulate/_simulate.py#L227-L333' }}"><span class="sig-source">[source]</span></a>
 </dt>
 <dd class="field-body">
-<p>Computes the evolution of Lambda-systems such as the alkali metals or the singly-charged alkaline-earth metals.
-The state vector is defined as (g, m, e), where g is the first end of the Lambda,
-m the second end and e the intermediate state.</p>
+<p>The evolution of the density matrix of a $\Lambda$-system, such as the alkali metals
+or the singly-charged alkaline-earth metals, driven by two lasers.
+The states are $|g\rangle$ and $|m\rangle$, the two ends of the $\Lambda$, and the intermediate state $|e\rangle$.</p>
 <dl class="field-list">
 <dt class="field-head">Parameters<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>t<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">array_like</a></em></span></dt>
-<dd class="field-desc"><p>The time after which the probability is returned.
-If all times from 0 to 't' are required, use 'time_resolved'=True (us).</p></dd>
-<dt>delta_1<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">scalar</a></em></span></dt>
-<dd class="field-desc"><p>The detuning of the first laser relative to the g->e transition.</p></dd>
-<dt>delta_2<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">scalar</a></em></span></dt>
-<dd class="field-desc"><p>The detuning of the second laser relative to the m->e transition.</p></dd>
-<dt>a_ge<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">scalar</a></em></span></dt>
-<dd class="field-desc"><p>The Einstein coefficient of the e->g transition.</p></dd>
-<dt>a_me<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">scalar</a></em></span></dt>
-<dd class="field-desc"><p>The Einstein coefficient of the e->m transition.</p></dd>
-<dt>s_1<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">scalar</a></em></span></dt>
-<dd class="field-desc"><p>The saturation parameter of the g->e transition.</p></dd>
-<dt>s_2<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">scalar</a></em></span></dt>
-<dd class="field-desc"><p>The saturation parameter of the m->e transition.</p></dd>
-<dt>lw_1<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">scalar</a></em></span></dt>
-<dd class="field-desc"><p>The frequency width of the first laser.</p></dd>
-<dt>lw_2<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">scalar</a></em></span></dt>
-<dd class="field-desc"><p>The frequency width of the second laser.</p></dd>
-<dt>p0<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">array_like</a> | None</em></span></dt>
-<dd class="field-desc"><p>The initial density matrix. Must have shape (6, ), containing the elements [gg, mm, ee, gm, eg, em].
-If None, initially all population is in the g state.</p></dd>
+<dt>t<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a></em></span></dt>
+<dd class="field-desc"><p>The time $t$ after which the density matrix is returned (&mu;s).
+If all times from 0 to <code>t</code> are required, use <code>time_resolved=True</code>.</p></dd>
+<dt>delta_1<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#scalar' | relative_url }}">scalar</a></em></span></dt>
+<dd class="field-desc"><p>The detuning of the first laser relative to the $g\rightarrow e$ transition (MHz).</p></dd>
+<dt>delta_2<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#scalar' | relative_url }}">scalar</a></em></span></dt>
+<dd class="field-desc"><p>The detuning of the second laser relative to the $m\rightarrow e$ transition (MHz).</p></dd>
+<dt>a_ge<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#scalar' | relative_url }}">scalar</a></em></span></dt>
+<dd class="field-desc"><p>The Einstein coefficient of the $e\rightarrow g$ transition (MHz).</p></dd>
+<dt>a_me<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#scalar' | relative_url }}">scalar</a></em></span></dt>
+<dd class="field-desc"><p>The Einstein coefficient of the $e\rightarrow m$ transition (MHz).</p></dd>
+<dt>s_1<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#scalar' | relative_url }}">scalar</a></em></span></dt>
+<dd class="field-desc"><p>The saturation parameter of the $g\rightarrow e$ transition.</p></dd>
+<dt>s_2<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#scalar' | relative_url }}">scalar</a></em></span></dt>
+<dd class="field-desc"><p>The saturation parameter of the $m\rightarrow e$ transition.</p></dd>
+<dt>lw_1<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#scalar' | relative_url }}">scalar</a></em></span></dt>
+<dd class="field-desc"><p>The frequency width of the first laser (MHz).</p></dd>
+<dt>lw_2<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#scalar' | relative_url }}">scalar</a></em></span></dt>
+<dd class="field-desc"><p>The frequency width of the second laser (MHz).</p></dd>
+<dt>p0<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a> | None</em></span></dt>
+<dd class="field-desc"><p>The initial density matrix elements <code>[gg, mm, ee, gm, eg, em]</code>. Must have shape <code>(6, )</code>.
+If <code>None</code>, initially all population is in the state $|g\rangle$.</p></dd>
 <dt>time_resolved<span class="classifier"><em>bool</em></span></dt>
-<dd class="field-desc"><p>Whether to return the complete history of the result.</p></dd>
+<dd class="field-desc"><p>Whether to return the complete history of the result.
+If <code>True</code>, a 2-tuple <code>(t, rho)</code> is returned, where <code>rho</code> has shape <code>(t.size, 6)</code>
+and <code>t</code> is an array of equally spaced times, such that numerical integrations can be performed easily.</p></dd>
 <dt>show<span class="classifier"><em>bool</em></span></dt>
 <dd class="field-desc"><p>Whether to plot the result.</p></dd>
 </dl>
@@ -71,10 +73,15 @@ If None, initially all population is in the g state.</p></dd>
 <dt class="field-head">Returns<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>out<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">ndarray</a> | tuple[<a href="{{ '/doc/modules/qtypes.html' | relative_url }}">ndarray</a>, <a href="{{ '/doc/modules/qtypes.html' | relative_url }}">ndarray</a>]</em></span></dt>
-<dd class="field-desc"><p>The density matrix elements after the time 't'. If time_resolved is True,
-a 2-tuple similar to (time, density matrix) is returned, were the density matrix has shape (time.size, 6).
-time will be an array of equally spaced times, such that numerical integrations can be performed easily.</p></dd>
+<dt>rho<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#ndarray' | relative_url }}">ndarray</a> | tuple[<a href="{{ '/doc/modules/qtypes.html#ndarray' | relative_url }}">ndarray</a>, <a href="{{ '/doc/modules/qtypes.html#ndarray' | relative_url }}">ndarray</a>]</em></span></dt>
+<dd class="field-desc"><p>The density matrix elements <code>[gg, mm, ee, gm, eg, em]</code> after the time <code>t</code>.</p></dd>
+</dl>
+</dd>
+<dt class="field-head">Raises<span class="colon">:</span></dt>
+<dd class="field-par">
+<dl>
+<dt>ValueError</dt>
+<dd class="field-desc"><p>If <code>t</code> is not a scalar or if <code>p0</code> has the wrong size.</p></dd>
 </dl>
 </dd>
 </dl>

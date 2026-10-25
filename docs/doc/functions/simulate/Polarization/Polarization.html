@@ -9,34 +9,45 @@ title: qspec.simulate.Polarization
 <span class="sig-paren">&nbsp;(&nbsp;</span>
 <em class="sig-param"><span class="n">vec</span><span class="o">=</span><span class="default_value">None</span></em>
 ,&nbsp;
-<em class="sig-param"><span class="n">q_axis</span><span class="o">=</span><span class="default_value num">2</span></em>
+<em class="sig-param"><span class="n">q_axis</span><span class="o">=</span><span class="default_value"><span class="num">2</span></span></em>
 ,&nbsp;
-<em class="sig-param"><span class="n">vec_as_q</span><span class="o">=</span><span class="default_value bool">True</span></em>
+<em class="sig-param"><span class="n">vec_as_q</span><span class="o">=</span><span class="default_value"><span class="bool">True</span></span></em>
 ,&nbsp;
 <em class="sig-param"><span class="n">instance</span><span class="o">=</span><span class="default_value">None</span></em>
-<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/simulate/_simulate_cpp.py#L116-L186' }}"><span class="sig-source">[source]</span></a>
+<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/simulate/_simulate_cpp.py#L115-L185' }}"><span class="sig-source">[source]</span></a>
 </dt>
 <dd class="field-body">
-<p>Class representing a polarization state of light. The property <code>Polarization.x</code> holds the polarization
-vector in cartesian coordinates. The property <code>Polarization.q</code> holds the polarization vector
+<p>A polarization state of light. The property <code>Polarization.x</code> holds the polarization
+vector in Cartesian coordinates. The property <code>Polarization.q</code> holds the polarization vector
 in the helicity basis $(\vec{\sigma}^-, \vec{\pi}, \vec{\sigma}^+)$ for the given quantization axis <code>q_axis</code>.</p>
 <dl class="field-list">
 <dt class="field-head">Parameters<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>vec<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">array_like</a> | None</em></span></dt>
+<dt>vec<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a> | None</em></span></dt>
 <dd class="field-desc"><p>The complex-valued polarization vector $\vec{\varepsilon}$ of an electromagnetic wave / photon.
 The user input is normalized to a vector with length 1.
 The default value corresponds to linear polarization in $z$-direction,
 such that <code>Polarization.x = [0, 0, 1]</code> and <code>Polarization.q = [0, 1, 0]</code>.</p></dd>
-<dt>q_axis<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">array_like</a></em></span></dt>
+<dt>q_axis<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a></em></span></dt>
 <dd class="field-desc"><p>The quantization axis used to transform <code>Polarization.x</code> and <code>Polarization.q</code> into each other.
 Must be an integer in <code>{0, 1, 2}</code> or a 3d-vector. The default is <code>q_axis = 2</code> (z-axis).</p></dd>
 <dt>vec_as_q<span class="classifier"><em>bool</em></span></dt>
-<dd class="field-desc"><p>Whether <code>vec</code> is given in the helicity basis (<code>True</code>) or in cartesian coordinates (<code>False</code>).
+<dd class="field-desc"><p>Whether <code>vec</code> is given in the helicity basis (<code>True</code>) or in Cartesian coordinates (<code>False</code>).
 The default is <code>True</code>.</p></dd>
 <dt>instance<span class="classifier"><em><a href="{{ '/doc/functions/simulate/Polarization/Polarization.html' | relative_url }}">Polarization</a> | C.PolarizationHandler.value | None</em></span></dt>
-<dd class="field-desc"><p>An existing <code>Polarization</code> instance. If this is specified, the other parameters are omitted.</p></dd>
+<dd class="field-desc"><p>An existing <code>Polarization</code> instance. If this is specified, the other parameters are ignored.</p></dd>
+</dl>
+</dd>
+<dt class="field-head">Attributes<span class="colon">:</span></dt>
+<dd class="field-par">
+<dl>
+<dt>q<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#ndarray' | relative_url }}">ndarray</a>[complexfloating]</em></span></dt>
+<dd class="field-desc"><p>The complex polarization in the helicity basis $(\vec{\sigma}^-, \vec{\pi}, \vec{\sigma}^+)$.</p></dd>
+<dt>q_axis<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#ndarray' | relative_url }}">ndarray</a></em></span></dt>
+<dd class="field-desc"><p>The quantization axis.</p></dd>
+<dt>x<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#ndarray' | relative_url }}">ndarray</a>[complexfloating]</em></span></dt>
+<dd class="field-desc"><p>The complex polarization in Cartesian coordinates $(\vec{x}, \vec{y}, \vec{z})$.</p></dd>
 </dl>
 </dd>
 </dl>

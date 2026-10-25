@@ -13,12 +13,12 @@ title: qspec.analyze.King
 ,&nbsp;
 <em class="sig-param"><span class="n">x_abs</span><span class="o">=</span><span class="default_value">None</span></em>
 ,&nbsp;
-<em class="sig-param"><span class="n">subtract_electrons</span><span class="o">=</span><span class="default_value num">0.0</span></em>
+<em class="sig-param"><span class="n">subtract_electrons</span><span class="o">=</span><span class="default_value"><span class="num">0.0</span></span></em>
 ,&nbsp;
-<em class="sig-param"><span class="n">n_samples</span><span class="o">=</span><span class="default_value num">100000</span></em>
+<em class="sig-param"><span class="n">n_samples</span><span class="o">=</span><span class="default_value"><span class="num">100000</span></span></em>
 ,&nbsp;
 <em class="sig-param"><span class="n">element_label</span><span class="o">=</span><span class="default_value">None</span></em>
-<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/analyze/_analyze.py#L1528-L2368' }}"><span class="sig-source">[source]</span></a>
+<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/analyze/_analyze.py#L1593-L2373' }}"><span class="sig-source">[source]</span></a>
 </dt>
 <dd class="field-body">
 <p>A class for $n$-dimensional King plots, encapsulating the linear regression algorithms of the
@@ -27,23 +27,81 @@ title: qspec.analyze.King
 <dt class="field-head">Parameters<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>a<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">array_like</a></em></span></dt>
+<dt>a<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a></em></span></dt>
 <dd class="field-desc"><p>An iterable of the mass numbers $A$ of the considered isotopes with shape <code>(k, )</code>,
 where <code>k</code> is the number of isotopes.</p></dd>
-<dt>m<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">array_like</a></em></span></dt>
+<dt>m<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a></em></span></dt>
 <dd class="field-desc"><p>The masses and their uncertainties of the isotopes <code>a</code> (u). <code>m</code> must have shape <code>(k, 2)</code>.</p></dd>
-<dt>x_abs<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">array_like</a> | None</em></span></dt>
+<dt>x_abs<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a> | None</em></span></dt>
 <dd class="field-desc"><p>The absolute values of the data vectors and their standard deviations
 corresponding to the mass numbers <code>a</code>. If given, the <code>x</code> and <code>y</code> parameters can be omitted in
 <a href="{{ '/doc/functions/analyze/King/fit.html' | relative_url }}"><code>King.fit</code></a> and <a href="{{ '/doc/functions/analyze/King/fit_nd.html' | relative_url }}"><code>King.fit_nd</code></a>, and are determined automatically as the shift between the mass numbers <code>a</code>
 and <code>a_ref</code>. Must have shape <code>(k, n, 2)</code> where <code>n</code> is the number of dimensions of the King plot.</p></dd>
-<dt>subtract_electrons<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">scalar</a></em></span></dt>
+<dt>subtract_electrons<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#scalar' | relative_url }}">scalar</a></em></span></dt>
 <dd class="field-desc"><p>The number of electron masses that should be subtracted from the specified isotope
 masses. <code>subtract_electrons</code> can be a <code>float</code> if the ionization energy shall be considered.</p></dd>
 <dt>n_samples<span class="classifier"><em>int</em></span></dt>
-<dd class="field-desc"><p>The number of generated samples for the monte-carlo routines.</p></dd>
+<dd class="field-desc"><p>The number of generated samples for the Monte-Carlo routines.</p></dd>
 <dt>element_label<span class="classifier"><em>str | None</em></span></dt>
 <dd class="field-desc"><p>The label of the element to enhance the printed and plotted information.</p></dd>
+</dl>
+</dd>
+<dt class="field-head">Attributes<span class="colon">:</span></dt>
+<dd class="field-par">
+<dl>
+<dt>FIT_NOT_DONE_ERROR<span class="attr-value"><span class="default_value"><span class="string">&quot;No fit was performed yet. Use one of the fitting options {&#x27;King.fit&#x27;, &#x27;King.fit_nd&#x27;}.&quot;</span></span></span></dt>
+<dd class="field-desc"><p>The error message if a method requires a fit that was not performed yet.</p></dd>
+<dt>NOT_ENOUGH_DATA_POINTS_ERROR<span class="attr-value"><span class="default_value"><span class="string">&#x27;Cannot perform a linear fit with less than 3 data points. Only {} isotopes and {} reference isotopes were specified.&#x27;</span></span></span></dt>
+<dd class="field-desc"><p>The error message if less than 3 data points are given.</p></dd>
+<dt>NO_X_ABS_ERROR<span class="attr-value"><span class="default_value"><span class="string">&#x27;To fit, either specify `{}` or `King.x_abs`. Both are `None`.&#x27;</span></span></span></dt>
+<dd class="field-desc"><p>The error message if neither the data nor <code>King.x_abs</code> are given.</p></dd>
+<dt>a<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#ndarray' | relative_url }}">ndarray</a>[integer]</em></span></dt>
+<dd class="field-desc"><p>The mass numbers of the considered isotopes.</p></dd>
+<dt>a_fit<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#ndarray' | relative_url }}">ndarray</a>[integer] | None</em></span></dt>
+<dd class="field-desc"><p>The mass numbers of the isotopes of the last fit.</p></dd>
+<dt>a_ref<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#ndarray' | relative_url }}">ndarray</a>[integer] | None</em></span></dt>
+<dd class="field-desc"><p>The mass numbers of the reference isotopes of the last fit.</p></dd>
+<dt>alpha<span class="classifier"><em>float | None</em></span></dt>
+<dd class="field-desc"><p>The $x$-axis offset $\alpha$ of the last fit.</p></dd>
+<dt>axis<span class="classifier"><em>int</em></span></dt>
+<dd class="field-desc"><p>The vector component used for the parameterization in the last $n$-dimensional fit.</p></dd>
+<dt>corr<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#ndarray' | relative_url }}">ndarray</a>[floating] | None</em></span></dt>
+<dd class="field-desc"><p>The correlation coefficients of the modified $x$ and $y$ data of the last 2-dimensional fit.</p></dd>
+<dt>cov<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#ndarray' | relative_url }}">ndarray</a>[floating] | None</em></span></dt>
+<dd class="field-desc"><p>The covariance matrices of the modified data vectors of the last $n$-dimensional fit.</p></dd>
+<dt>element_label<span class="classifier"><em>str</em></span></dt>
+<dd class="field-desc"><p>The label of the element.</p></dd>
+<dt>m<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#ndarray' | relative_url }}">ndarray</a>[floating]</em></span></dt>
+<dd class="field-desc"><p>The masses and their uncertainties of the isotopes (u).</p></dd>
+<dt>m_mod<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#ndarray' | relative_url }}">ndarray</a>[floating]</em></span></dt>
+<dd class="field-desc"><p>The mass factors and their uncertainties of all isotope pairs, see <a href="{{ '/doc/functions/physics/mass_factor.html' | relative_url }}"><code>qspec.physics.mass_factor</code></a>.</p></dd>
+<dt>m_sub<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#ndarray' | relative_url }}">ndarray</a>[floating]</em></span></dt>
+<dd class="field-desc"><p>The masses and their uncertainties of the isotopes after subtracting <code>King.subtract_electrons</code> electrons (u).</p></dd>
+<dt>n<span class="classifier"><em>int</em></span></dt>
+<dd class="field-desc"><p>The number of dimensions of the King plot.</p></dd>
+<dt>n_samples<span class="classifier"><em>int</em></span></dt>
+<dd class="field-desc"><p>The number of generated samples for the Monte-Carlo routines.</p></dd>
+<dt>nd<span class="classifier"><em>bool</em></span></dt>
+<dd class="field-desc"><p>Whether the last fit was performed with <a href="{{ '/doc/functions/analyze/King/fit_nd.html' | relative_url }}"><code>King.fit_nd</code></a>.</p></dd>
+<dt>pcov<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#ndarray' | relative_url }}">ndarray</a>[floating] | None</em></span></dt>
+<dd class="field-desc"><p>The covariance matrix of the optimized parameters of the last fit.</p></dd>
+<dt>popt<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#ndarray' | relative_url }}">ndarray</a>[floating] | None</em></span></dt>
+<dd class="field-desc"><p>The optimized parameters of the last fit.</p></dd>
+<dt>subtract_electrons<span class="classifier"><em>float</em></span></dt>
+<dd class="field-desc"><p>The number of electron masses subtracted from the isotope masses.</p></dd>
+<dt>x<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#ndarray' | relative_url }}">ndarray</a>[floating] | None</em></span></dt>
+<dd class="field-desc"><p>The data vectors and their standard deviations of the last fit.</p></dd>
+<dt>x_abs<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#ndarray' | relative_url }}">ndarray</a>[floating] | None</em></span></dt>
+<dd class="field-desc"><p>The absolute values of the data vectors and their standard deviations.</p></dd>
+<dt>x_mod<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#ndarray' | relative_url }}">ndarray</a>[floating] | None</em></span></dt>
+<dd class="field-desc"><p>The modified data vectors and their standard deviations of the last fit.</p></dd>
+</dl>
+</dd>
+<dt class="field-head">Raises<span class="colon">:</span></dt>
+<dd class="field-par">
+<dl>
+<dt>ValueError</dt>
+<dd class="field-desc"><p>If the mass numbers <code>a</code> are not unique.</p></dd>
 </dl>
 </dd>
 </dl>

@@ -11,10 +11,10 @@ title: qspec.print_colored
 ,&nbsp;
 <em class="sig-param"><span class="o">*</span><span class="n">values</span></em>
 ,&nbsp;
-<em class="sig-param"><span class="n">returned</span><span class="o">=</span><span class="default_value bool">False</span></em>
+<em class="sig-param"><span class="n">returned</span><span class="o">=</span><span class="default_value"><span class="bool">False</span></span></em>
 ,&nbsp;
 <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em>
-<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/tools.py#L134-L149' }}"><span class="sig-source">[source]</span></a>
+<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/tools.py#L152-L167' }}"><span class="sig-source">[source]</span></a>
 </dt>
 <dd class="field-body">
 <p>Print with the specified color.</p>
@@ -23,20 +23,20 @@ title: qspec.print_colored
 <dd class="field-par">
 <dl>
 <dt>specifier<span class="classifier"><em>str</em></span></dt>
-<dd class="field-desc"><p>str of the color name defined in the COLORS class or an RGB-value (0-255, 0-255, 0-255).</p></dd>
+<dd class="field-desc"><p>The name of a color defined in <a href="{{ '/doc/functions/tools/COLORS/COLORS.html' | relative_url }}"><code>COLORS</code></a> or an RGB value <code>(0-255, 0-255, 0-255)</code>.</p></dd>
 <dt>values<span class="classifier"><em>object</em></span></dt>
 <dd class="field-desc"><p>The values to print.</p></dd>
 <dt>returned<span class="classifier"><em>bool</em></span></dt>
-<dd class="field-desc"><p>Return the str instead of printing it.</p></dd>
+<dd class="field-desc"><p>Whether to return the colored <code>str</code> instead of printing it.</p></dd>
 <dt>kwargs</dt>
-<dd class="field-desc"><p>See print().</p></dd>
+<dd class="field-desc"><p>Additional keyword arguments are passed to <code>print</code>.</p></dd>
 </dl>
 </dd>
 <dt class="field-head">Returns<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>out<span class="classifier"><em>str | None</em></span></dt>
-<dd class="field-desc"><p>The colored <code>values</code> if <code>returned == True</code> else <code>None</code>.</p></dd>
+<dt>s<span class="classifier"><em>str | None</em></span></dt>
+<dd class="field-desc"><p>The colored <code>values</code> if <code>returned</code> is <code>True</code>, else <code>None</code>.</p></dd>
 </dl>
 </dd>
 </dl>

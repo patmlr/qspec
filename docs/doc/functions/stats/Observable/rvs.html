@@ -7,26 +7,26 @@ title: qspec.Observable.rvs
 <span class="sig-prename">qspec.</span><span class="sig-classname">Observable</span><span class="sig-prename">.</span>
 <span class="sig-name">rvs</span>
 <span class="sig-paren">&nbsp;(&nbsp;</span>
-<em class="sig-param"><span class="n">size</span><span class="o">=</span><span class="default_value num">1</span></em>
-<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/stats.py#L131-L147' }}"><span class="sig-source">[source]</span></a>
+<em class="sig-param"><span class="n">size</span><span class="o">=</span><span class="default_value"><span class="num">1</span></span></em>
+<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/stats.py#L142-L160' }}"><span class="sig-source">[source]</span></a>
 </dt>
 <dd class="field-body">
-
+<p>Random variates of the observable. If asymmetric uncertainties are specified,
+a skew normal distribution is assumed. However, the ratio between the left- and right-sided uncertainty
+must not exceed 1.5.</p>
 <dl class="field-list">
 <dt class="field-head">Parameters<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
 <dt>size<span class="classifier"><em>int</em></span></dt>
-<dd class="field-desc"><p>The defining number of random variates (default is 1).</p></dd>
+<dd class="field-desc"><p>The number of random variates. The default is 1.</p></dd>
 </dl>
 </dd>
 <dt class="field-head">Returns<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>out<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">ndarray</a></em></span></dt>
-<dd class="field-desc"><p>Random variates of the observable of given <code>size</code>. If asymmetric uncertainties are specified,
-a skew normal distribution is assumed. However, the ratio between the left- and right-sided uncertainty
-must not exceed 1.5.</p></dd>
+<dt>x<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#ndarray' | relative_url }}">ndarray</a></em></span></dt>
+<dd class="field-desc"><p>Random variates of the observable with the given <code>size</code>.</p></dd>
 </dl>
 </dd>
 </dl>

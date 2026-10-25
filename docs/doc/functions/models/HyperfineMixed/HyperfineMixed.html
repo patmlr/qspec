@@ -18,33 +18,63 @@ title: qspec.models.HyperfineMixed
 <em class="sig-param"><span class="n">label</span><span class="o">=</span><span class="default_value">None</span></em>
 ,&nbsp;
 <em class="sig-param"><span class="n">config</span><span class="o">=</span><span class="default_value">None</span></em>
-<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/models/_splitter.py#L520-L737' }}"><span class="sig-source">[source]</span></a>
+<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/models/_splitter.py#L538-L744' }}"><span class="sig-source">[source]</span></a>
 </dt>
 <dd class="field-body">
-<p>Hyperfine-mixing model based on [<a href="https://doi.org/10.1103/PhysRevA.55.2728">
-W. R. Johnson <i>et al.</i>, Phys. Rev. A <b>55</b>, 2728 (1997)</a>].</p>
+<p>A hyperfine structure model including the hyperfine-induced mixing of fine-structure states
+with the same $F$, based on [<a href="https://doi.org/10.1103/PhysRevA.55.2728">
+W. R. Johnson <i>et al.</i>, Phys. Rev. A <b>55</b>, 2728 (1997)</a>].
+For the mixed lower or upper states, the peak positions are the eigenvalues of Eq. (2.5) of the reference,
+parameterized by the fine-structure energies <code>FS_l{i}(J)</code> and <code>FS_u{i}(J)</code>. For states without mixing,
+the hyperfine structure constants <code>A_l{i}(J)</code>, <code>B_l{i}(J)</code>, ... are used as in <a href="{{ '/doc/functions/models/Hyperfine/Hyperfine.html' | relative_url }}"><code>Hyperfine</code></a>.
+The intensities are named <code>int{i}(...)</code>.</p>
 <dl class="field-list">
 <dt class="field-head">Parameters<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
 <dt>model<span class="classifier"><em><a href="{{ '/doc/functions/models/Model/Model.html' | relative_url }}">Model</a></em></span></dt>
 <dd class="field-desc"><p>A submodel whose parameters are adopted by this model.</p></dd>
-<dt>i<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">scalar</a></em></span></dt>
-<dd class="field-desc"><p>The nuclear spin $I$.</p></dd>
-<dt>j_l<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">scalar</a></em></span></dt>
-<dd class="field-desc"><p>The total lower state electron angular momentum $J$.</p></dd>
-<dt>j_u<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">scalar</a></em></span></dt>
-<dd class="field-desc"><p>The total upper state electron angular momentum $J^\prime$.</p></dd>
+<dt>i<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#scalar' | relative_url }}">scalar</a></em></span></dt>
+<dd class="field-desc"><p>The nuclear spin quantum number $I$.</p></dd>
+<dt>j_l<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#scalar' | relative_url }}">scalar</a></em></span></dt>
+<dd class="field-desc"><p>The electronic total angular momentum quantum number $J_l$ of the lower state.</p></dd>
+<dt>j_u<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#scalar' | relative_url }}">scalar</a></em></span></dt>
+<dd class="field-desc"><p>The electronic total angular momentum quantum number $J_u$ of the upper state.</p></dd>
 <dt>label<span class="classifier"><em>str | None</em></span></dt>
 <dd class="field-desc"><p>A label for the <code>Splitter</code> (isotope / isomer / transition).</p></dd>
 <dt>config<span class="classifier"><em>dict | None</em></span></dt>
 <dd class="field-desc"><p>The configuration of the hyperfine-induced mixing. This is a dictionary such as
-<code>{'enabled_l'=False, 'enabled_u'=False, 'Jl'=[0.5, ], 'Ju'=[0.5, ],
-  'Tl'=[[1.]], 'Tu'=[[1.]], 'fl'=[0., ], 'fu'=[0., ], 'mu'=0.}</code>,
-where 'enabled_l'/'enabled_u' decide if the corresponding lower/upper J mix, 'Jl'/'Ju' are lists of lower/upper
-state J, including <code>j_l</code> and <code>j_u</code>, 'Tl'/'Tu' are matrix representations of
-the electronic magnetic dipole operator, see [1], 'fl'/'fu' are lists of initial fine-structure energies
-(can be omitted) and 'mu' is the magnetic dipole moment of the nucleus.</p></dd>
+<code>{"enabled_l": False, "enabled_u": False, "Jl": [0.5], "Ju": [0.5], "Tl": [[1.0]], "Tu": [[1.0]],
+"fl": [0.0], "fu": [0.0], "mu": 0.0}</code>, where</p>
+<ul><li><code>"enabled_l"</code>/<code>"enabled_u"</code> decide if the corresponding lower/upper states mix,</li><li><code>"Jl"</code>/<code>"Ju"</code> are lists of the lower/upper state $J$, including <code>j_l</code> and <code>j_u</code>,</li><li><code>"Tl"</code>/<code>"Tu"</code> are the matrix representations of the electronic magnetic dipole operator, see the reference,</li><li><code>"fl"</code>/<code>"fu"</code> are lists of the initial fine-structure energies (can be omitted) and</li><li><code>"mu"</code> is the magnetic dipole moment of the nucleus ($\mu_\mathrm{N}$).</li></ul>
+<p>If <code>None</code>, the mixing is disabled.</p></dd>
+</dl>
+</dd>
+<dt class="field-head">Attributes<span class="colon">:</span></dt>
+<dd class="field-par">
+<dl>
+<dt>description<span class="classifier"><em>str</em></span></dt>
+<dd class="field-desc"><p>A description of the model hierarchy, e.g., <code>"Offset.Summed[0].Hyperfine.Voigt"</code>.</p></dd>
+<dt>dx<span class="classifier"><em>float</em></span></dt>
+<dd class="field-desc"><p>A hint for an x-axis step size for a smooth display of the model.</p></dd>
+<dt>error<span class="classifier"><em>str</em></span></dt>
+<dd class="field-desc"><p>An error message if there is an issue with the model parameters (not implemented).</p></dd>
+<dt>fixes<span class="classifier"><em>list[<a href="{{ '/doc/modules/qtypes.html#fix_type' | relative_url }}">fix_type</a>]</em></span></dt>
+<dd class="field-desc"><p>The fix states of the parameters, see <a href="{{ '/doc/functions/models/Model/set_fix.html' | relative_url }}"><code>Model.set_fix</code></a>.</p></dd>
+<dt>links<span class="classifier"><em>list[bool]</em></span></dt>
+<dd class="field-desc"><p>Whether the parameters are linked to the parameters with the same name in a <a href="{{ '/doc/functions/models/Linked/Linked.html' | relative_url }}"><code>Linked</code></a> model.</p></dd>
+<dt>model<span class="classifier"><em><a href="{{ '/doc/functions/models/Model/Model.html' | relative_url }}">Model</a> | None</em></span></dt>
+<dd class="field-desc"><p>The submodel.</p></dd>
+<dt>names<span class="classifier"><em>list[str]</em></span></dt>
+<dd class="field-desc"><p>The names of the parameters.</p></dd>
+<dt>p<span class="classifier"><em>dict[str, int]</em></span></dt>
+<dd class="field-desc"><p>A map of the parameter names to their indexes.</p></dd>
+<dt>size<span class="classifier"><em>int</em></span></dt>
+<dd class="field-desc"><p>The number of parameters required by the model.</p></dd>
+<dt>type<span class="classifier"><em>str</em></span></dt>
+<dd class="field-desc"><p>The name of the model type.</p></dd>
+<dt>vals<span class="classifier"><em>list[float]</em></span></dt>
+<dd class="field-desc"><p>The current values of the parameters.</p></dd>
 </dl>
 </dd>
 </dl>

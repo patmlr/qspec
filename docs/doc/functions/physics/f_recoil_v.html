@@ -14,30 +14,33 @@ title: qspec.f_recoil_v
 <em class="sig-param"><span class="n">f_lab</span></em>
 ,&nbsp;
 <em class="sig-param"><span class="n">m</span></em>
-<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/physics.py#L797-L810' }}"><span class="sig-source">[source]</span></a>
+<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/physics.py#L927-L945' }}"><span class="sig-source">[source]</span></a>
 </dt>
 <dd class="field-body">
-<p>The change of a transition frequency of an atom moving with velocity $v$ (in the direction of its velocity vector)
-due to the absorption of a laser photon with frequency $f$.
-Implemented as <code>df = f_recoil(doppler(f_lab, v, alpha, return_frame='atom'), m)</code></p>
+<p>The change of a transition frequency of an atom moving with velocity $v$
+due to the absorption of a laser photon with frequency $f_\mathrm{lab}$ in the laboratory frame</p>
+<div class="math-block">$$
+\delta f = \frac{hf^{\prime 2}}{2mc^2},
+$$</div>
+<p>where $f^\prime$ is the Doppler-shifted frequency in the rest frame of the atom, see <a href="{{ '/doc/functions/physics/doppler.html' | relative_url }}"><code>doppler</code></a>.</p>
 <dl class="field-list">
 <dt class="field-head">Parameters<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>v<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">array_like</a></em></span></dt>
+<dt>v<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a></em></span></dt>
 <dd class="field-desc"><p>The velocity $v$ of the atom (m/s).</p></dd>
-<dt>alpha<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">array_like</a></em></span></dt>
+<dt>alpha<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a></em></span></dt>
 <dd class="field-desc"><p>The angle $\alpha$ between a velocity- and a wave-vector in the laboratory frame (rad).</p></dd>
-<dt>f_lab<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">array_like</a></em></span></dt>
-<dd class="field-desc"><p>The frequency of light $f$ in the laboratory frame (MHz).</p></dd>
-<dt>m<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">array_like</a></em></span></dt>
+<dt>f_lab<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a></em></span></dt>
+<dd class="field-desc"><p>The frequency of light $f_\mathrm{lab}$ in the laboratory frame (MHz).</p></dd>
+<dt>m<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a></em></span></dt>
 <dd class="field-desc"><p>The mass $m$ of the atom (u).</p></dd>
 </dl>
 </dd>
 <dt class="field-head">Returns<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>df_rec<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">ndarray</a></em></span></dt>
+<dt>df_rec<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#ndarray' | relative_url }}">ndarray</a></em></span></dt>
 <dd class="field-desc"><p>The change of the transition frequency $\delta f$ (MHz).</p></dd>
 </dl>
 </dd>

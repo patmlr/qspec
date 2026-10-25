@@ -13,21 +13,25 @@ title: qspec.doppler
 ,&nbsp;
 <em class="sig-param"><span class="n">alpha</span></em>
 ,&nbsp;
-<em class="sig-param"><span class="n">return_frame</span><span class="o">=</span><span class="default_value string">&#x27;atom&#x27;</span></em>
-<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/physics.py#L493-L516' }}"><span class="sig-source">[source]</span></a>
+<em class="sig-param"><span class="n">return_frame</span><span class="o">=</span><span class="default_value"><span class="string">&#x27;atom&#x27;</span></span></em>
+<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/physics.py#L595-L622' }}"><span class="sig-source">[source]</span></a>
 </dt>
 <dd class="field-body">
-<p>The Doppler-shifted frequency $f^\prime = \begin{cases}f\gamma(v)(1 - \frac{v}{c}\cos(\alpha)), &amp; \mathrm{atom}\\
-f[\gamma(v)(1 - \frac{v}{c}\cos(\alpha))]^{-1}, &amp; \mathrm{lab}\end{cases}$</p>
+<p>The Doppler-shifted frequency</p>
+<div class="math-block">$$
+f^\prime = \begin{cases}f\gamma(v)\left[1 - \frac{v}{c}\cos(\alpha)\right], &amp; \text{atom}\\
+\frac{f}{\gamma(v)\left[1 - \frac{v}{c}\cos(\alpha)\right]}, &amp; \text{lab}\end{cases},
+$$</div>
+<p>where $\alpha = 0$ corresponds to collinear alignment of the velocity and the light.</p>
 <dl class="field-list">
 <dt class="field-head">Parameters<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>f<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">array_like</a></em></span></dt>
+<dt>f<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a></em></span></dt>
 <dd class="field-desc"><p>The frequency $f$ of light (arb. units).</p></dd>
-<dt>v<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">array_like</a></em></span></dt>
+<dt>v<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a></em></span></dt>
 <dd class="field-desc"><p>The velocity $v$ of a body (m/s).</p></dd>
-<dt>alpha<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">array_like</a></em></span></dt>
+<dt>alpha<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a></em></span></dt>
 <dd class="field-desc"><p>The angle $\alpha$ between the velocity- and the light-vector in the laboratory frame (rad).</p></dd>
 <dt>return_frame<span class="classifier"><em>str</em></span></dt>
 <dd class="field-desc"><p>The coordinate system for which the frequency is returned. Can be either <code>"atom"</code> or <code>"lab"</code>.</p></dd>
@@ -36,8 +40,8 @@ f[\gamma(v)(1 - \frac{v}{c}\cos(\alpha))]^{-1}, &amp; \mathrm{lab}\end{cases}$</
 <dt class="field-head">Returns<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>f_doppler<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">ndarray</a></em></span></dt>
-<dd class="field-desc"><p>the Doppler-shifted frequency $f^\prime$ in either the rest frame of the atom
+<dt>f_doppler<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#ndarray' | relative_url }}">ndarray</a></em></span></dt>
+<dd class="field-desc"><p>The Doppler-shifted frequency $f^\prime$ in either the rest frame of the atom
 or the laboratory frame (unit of <code>f</code>).</p></dd>
 </dl>
 </dd>

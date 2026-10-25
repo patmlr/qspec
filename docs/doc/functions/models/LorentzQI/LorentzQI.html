@@ -7,21 +7,50 @@ title: qspec.models.LorentzQI
 <span class="sig-prename">qspec.models.</span>
 <span class="sig-classname">LorentzQI</span>
 <span class="sig-paren">&nbsp;(&nbsp;</span>
-<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/models/_spectrum.py#L156-L211' }}"><span class="sig-source">[source]</span></a>
+<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/models/_spectrum.py#L153-L203' }}"><span class="sig-source">[source]</span></a>
 </dt>
 <dd class="field-body">
-<p>A Lorentzian peak function of the form</p>
+<p>A Lorentzian peak function, normalized to its maximum</p>
 <div class="math-block">$$
-f(x, \Gamma) = \frac{\Gamma^2}{(2x)^2 + \Gamma^2}.
+f(x, \Gamma) = \frac{\Gamma^2}{(2x)^2 + \Gamma^2},
 $$</div>
-<p>A dispersive term for consideration of quantum interference (QI) effects is available through <code>evaluate_qi</code></p>
+<p>with the parameter <code>Gamma</code> (the FWHM $\Gamma$).
+A dispersive term for the consideration of quantum interference (QI) effects is available through
+<a href="{{ '/doc/functions/models/LorentzQI/evaluate_qi.html' | relative_url }}"><code>LorentzQI.evaluate_qi</code></a></p>
 <div class="math-block">$$
-f(x, x_\mathrm{qi}, \Gamma) = \mathrm{Re}\left[\frac{\Gamma^2}
-{(2x + i\Gamma)(2(x - x_\mathrm{qi}) - i\Gamma)}\right].
+f_\mathrm{qi}(x, x_\mathrm{qi}, \Gamma) = \mathrm{Re}\left[\frac{2\Gamma^2}
+{(2x + \mathrm{i}\Gamma)(2(x - x_\mathrm{qi}) - \mathrm{i}\Gamma)}\right].
 $$</div>
 <p>This model needs to be implemented in another model that combines <code>evaluate</code> with <code>evaluate_qi</code>,
-see <code>HyperfineQI</code>.</p>
+see <a href="{{ '/doc/functions/models/HyperfineQI/HyperfineQI.html' | relative_url }}"><code>HyperfineQI</code></a>.</p>
 <dl class="field-list">
+<dt class="field-head">Attributes<span class="colon">:</span></dt>
+<dd class="field-par">
+<dl>
+<dt>description<span class="classifier"><em>str</em></span></dt>
+<dd class="field-desc"><p>A description of the model hierarchy, e.g., <code>"Offset.Summed[0].Hyperfine.Voigt"</code>.</p></dd>
+<dt>dx<span class="classifier"><em>float</em></span></dt>
+<dd class="field-desc"><p>A hint for an x-axis step size for a smooth display of the model.</p></dd>
+<dt>error<span class="classifier"><em>str</em></span></dt>
+<dd class="field-desc"><p>An error message if there is an issue with the model parameters (not implemented).</p></dd>
+<dt>fixes<span class="classifier"><em>list[<a href="{{ '/doc/modules/qtypes.html#fix_type' | relative_url }}">fix_type</a>]</em></span></dt>
+<dd class="field-desc"><p>The fix states of the parameters, see <a href="{{ '/doc/functions/models/Model/set_fix.html' | relative_url }}"><code>Model.set_fix</code></a>.</p></dd>
+<dt>links<span class="classifier"><em>list[bool]</em></span></dt>
+<dd class="field-desc"><p>Whether the parameters are linked to the parameters with the same name in a <a href="{{ '/doc/functions/models/Linked/Linked.html' | relative_url }}"><code>Linked</code></a> model.</p></dd>
+<dt>model<span class="classifier"><em><a href="{{ '/doc/functions/models/Model/Model.html' | relative_url }}">Model</a> | None</em></span></dt>
+<dd class="field-desc"><p>The submodel.</p></dd>
+<dt>names<span class="classifier"><em>list[str]</em></span></dt>
+<dd class="field-desc"><p>The names of the parameters.</p></dd>
+<dt>p<span class="classifier"><em>dict[str, int]</em></span></dt>
+<dd class="field-desc"><p>A map of the parameter names to their indexes.</p></dd>
+<dt>size<span class="classifier"><em>int</em></span></dt>
+<dd class="field-desc"><p>The number of parameters required by the model.</p></dd>
+<dt>type<span class="classifier"><em>str</em></span></dt>
+<dd class="field-desc"><p>The name of the model type.</p></dd>
+<dt>vals<span class="classifier"><em>list[float]</em></span></dt>
+<dd class="field-desc"><p>The current values of the parameters.</p></dd>
+</dl>
+</dd>
 </dl>
 </dd>
 </dl>

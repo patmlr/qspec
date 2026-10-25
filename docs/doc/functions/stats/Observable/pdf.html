@@ -7,16 +7,17 @@ title: qspec.Observable.pdf
 <span class="sig-prename">qspec.</span><span class="sig-classname">Observable</span><span class="sig-prename">.</span>
 <span class="sig-name">pdf</span>
 <span class="sig-paren">&nbsp;(&nbsp;</span>
-<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/stats.py#L149-L162' }}"><span class="sig-source">[source]</span></a>
+<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/stats.py#L162-L178' }}"><span class="sig-source">[source]</span></a>
 </dt>
 <dd class="field-body">
-
+<p>The probability density function (pdf) of the observable. If asymmetric uncertainties are specified,
+a skew normal distribution is assumed.</p>
 <dl class="field-list">
 <dt class="field-head">Returns<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>out<span class="classifier"><em>Callable</em></span></dt>
-<dd class="field-desc"><p>The probability distribution function (pdf) of the observable.</p></dd>
+<dt>pdf<span class="classifier"><em>Callable</em></span></dt>
+<dd class="field-desc"><p>The pdf as a function of the quantiles <code>x</code>.</p></dd>
 </dl>
 </dd>
 </dl>

@@ -7,9 +7,9 @@ title: qspec.analyze.King.plot
 <span class="sig-prename">qspec.analyze.</span><span class="sig-classname">King</span><span class="sig-prename">.</span>
 <span class="sig-name">plot</span>
 <span class="sig-paren">&nbsp;(&nbsp;</span>
-<em class="sig-param"><span class="n">mode</span><span class="o">=</span><span class="default_value string">&#x27;&#x27;</span></em>
+<em class="sig-param"><span class="n">mode</span><span class="o">=</span><span class="default_value"><span class="string">&#x27;&#x27;</span></span></em>
 ,&nbsp;
-<em class="sig-param"><span class="n">sigma2d</span><span class="o">=</span><span class="default_value num">1</span></em>
+<em class="sig-param"><span class="n">sigma2d</span><span class="o">=</span><span class="default_value"><span class="num">1</span></span></em>
 ,&nbsp;
 <em class="sig-param"><span class="n">scale</span><span class="o">=</span><span class="default_value">None</span></em>
 ,&nbsp;
@@ -19,42 +19,49 @@ title: qspec.analyze.King.plot
 ,&nbsp;
 <em class="sig-param"><span class="n">font_dict</span><span class="o">=</span><span class="default_value">None</span></em>
 ,&nbsp;
-<em class="sig-param"><span class="n">show</span><span class="o">=</span><span class="default_value bool">True</span></em>
+<em class="sig-param"><span class="n">show</span><span class="o">=</span><span class="default_value"><span class="bool">True</span></span></em>
 ,&nbsp;
 <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em>
-<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/analyze/_analyze.py#L2201-L2368' }}"><span class="sig-source">[source]</span></a>
+<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/analyze/_analyze.py#L2209-L2373' }}"><span class="sig-source">[source]</span></a>
 </dt>
 <dd class="field-body">
-<p>Show the King plot using <a href="https://matplotlib.org/">
-<code>matplotlib</code></a>. The King plot is based on the modified axes <code>King.x_mod_nd</code> and <code>King.y_mod_nd</code>
-as well as the fit results <code>King.results_nd</code>.</p>
+<p>Show the King plot using <a href="https://matplotlib.org/"><code>matplotlib</code></a>.
+The King plot is based on the modified data <code>King.x_mod</code> and the fit results <code>King.popt</code> and <code>King.pcov</code>.</p>
 <dl class="field-list">
 <dt class="field-head">Parameters<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
 <dt>mode<span class="classifier"><em>str</em></span></dt>
-<dd class="field-desc"><p>The mode of the King plot. If <code>mode == "radii"</code>,
-the differences of mean-square nuclear charge radii $\delta\langle r^2\rangle^{A,A_\mathrm{ref}}$
-or $\Lambda^{A,A_\mathrm{ref}}$ are expected for the $x$-axis,
-else isotope shifts $\delta\nu_x^{A,A_\mathrm{ref}}$ are expected.</p></dd>
+<dd class="field-desc"><p>The mode of the King plot, which determines the label of the $x$-axis.
+If <code>mode == "radii"</code>, the differences of mean-square nuclear charge radii
+$\delta\langle r^2\rangle^{A,A_\mathrm{ref}}$ or $\Lambda^{A,A_\mathrm{ref}}$ are expected for the $x$-axis,
+if <code>mode == "shifts"</code>, isotope shifts $\delta\nu_x^{A,A_\mathrm{ref}}$ are expected.</p></dd>
 <dt>sigma2d<span class="classifier"><em>int</em></span></dt>
 <dd class="field-desc"><p>Whether to draw actual 2-dimensional uncertainty bounds or classical errorbars.
 An integer number corresponds to the number of drawn sigma regions.</p></dd>
 <dt>scale<span class="classifier"><em>tuple | None</em></span></dt>
 <dd class="field-desc"><p>Factors to scale the $x$ and the $y$-axis.</p></dd>
-<dt>add_xy<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">array_like</a> | None</em></span></dt>
-<dd class="field-desc"><p>Additional $x$ and $y$ data to plot. Must have shape <code>(n - 1, k, 5)</code>,
-where n is the dimension of the data vectors, k is the number of additional data points and the five entries
+<dt>add_xy<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a> | None</em></span></dt>
+<dd class="field-desc"><p>Additional $x$ and $y$ data to plot. Must have shape <code>(n - 1, k, 5)</code>
+(<code>(k, 5)</code> for 2-dimensional fits), where <code>n</code> is the dimension of the data vectors,
+<code>k</code> is the number of additional data points and the five entries
 in the last axis correspond to arrays of the form <code>[x, x_d, y, y_d, corr_xy]</code>.</p></dd>
-<dt>add_a<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">array_like</a> | None</em></span></dt>
+<dt>add_a<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a> | None</em></span></dt>
 <dd class="field-desc"><p>Additional mass numbers for the additional data. Must have shape <code>(k, 2)</code>,
 where each row is a tuple <code>(A, A_ref)</code>.</p></dd>
 <dt>font_dict<span class="classifier"><em>dict | None</em></span></dt>
 <dd class="field-desc"><p>The font_dict passed to <code>matplotlib.rc("font", font_dict)</code>.</p></dd>
 <dt>show<span class="classifier"><em>bool</em></span></dt>
-<dd class="field-desc"><p>Whether to call <code>plt.show()</code>.</p></dd>
+<dd class="field-desc"><p>Whether to call <code>matplotlib.pyplot.show</code>.</p></dd>
 <dt>kwargs<span class="classifier"><em>Any</em></span></dt>
-<dd class="field-desc"><p>Additional keyword arguments.</p></dd>
+<dd class="field-desc"><p>Additional keyword arguments are accepted for compatibility with the fit methods and ignored.</p></dd>
+</dl>
+</dd>
+<dt class="field-head">Raises<span class="colon">:</span></dt>
+<dd class="field-par">
+<dl>
+<dt>ValueError</dt>
+<dd class="field-desc"><p>If no fit was performed yet.</p></dd>
 </dl>
 </dd>
 </dl>

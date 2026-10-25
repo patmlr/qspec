@@ -17,8 +17,8 @@ title: qspec.gaussian_beam_3d
 ,&nbsp;
 <em class="sig-param"><span class="n">r0</span><span class="o">=</span><span class="default_value">None</span></em>
 ,&nbsp;
-<em class="sig-param"><span class="n">axis</span><span class="o">=</span><span class="default_value num">-1</span></em>
-<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/physics.py#L2308-L2355' }}"><span class="sig-source">[source]</span></a>
+<em class="sig-param"><span class="n">axis</span><span class="o">=</span><span class="default_value"><span class="num">-1</span></span></em>
+<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/physics.py#L2471-L2516' }}"><span class="sig-source">[source]</span></a>
 </dt>
 <dd class="field-body">
 <p>The Gaussian beam intensity at the position $\vec{r} - \vec{r}_0$</p>
@@ -34,15 +34,15 @@ are unit vectors orthogonal to $\hat{k}$.</p>
 <dt class="field-head">Parameters<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>r<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">array_like</a></em></span></dt>
+<dt>r<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a></em></span></dt>
 <dd class="field-desc"><p>The position 3-vector $\vec{r}$ where to calculate the beam intensity (m).</p></dd>
-<dt>k<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">array_like</a></em></span></dt>
+<dt>k<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a></em></span></dt>
 <dd class="field-desc"><p>The 3-vector $\vec{k}$ of light, where $|\vec{k}| = \omega / c$ (rad / m).</p></dd>
-<dt>w0<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">array_like</a></em></span></dt>
+<dt>w0<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a></em></span></dt>
 <dd class="field-desc"><p>The beam waist $w_0$ (m).</p></dd>
-<dt>p0<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">array_like</a></em></span></dt>
-<dd class="field-desc"><p>The total power $P_0$ propagated by the gaussian beam (W).</p></dd>
-<dt>r0<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">array_like</a> | None</em></span></dt>
+<dt>p0<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a></em></span></dt>
+<dd class="field-desc"><p>The total power $P_0$ propagated by the Gaussian beam (W).</p></dd>
+<dt>r0<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a> | None</em></span></dt>
 <dd class="field-desc"><p>The position 3-vector $\vec{r}_0$ of the beam waist. If <code>r0</code> is <code>None</code>, it is <code>[0., 0., 0.]</code> (m).</p></dd>
 <dt>axis<span class="classifier"><em>int</em></span></dt>
 <dd class="field-desc"><p>The axis along which the vector components are aligned.</p></dd>
@@ -51,7 +51,7 @@ are unit vectors orthogonal to $\hat{k}$.</p>
 <dt class="field-head">Returns<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>I_r<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">ndarray</a></em></span></dt>
+<dt>I_r<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#ndarray' | relative_url }}">ndarray</a></em></span></dt>
 <dd class="field-desc"><p>The intensity $I(\vec{r})$ (W/m<sup>2</sup> = &mu;W/mm<sup>2</sup>).</p></dd>
 </dl>
 </dd>
@@ -59,8 +59,7 @@ are unit vectors orthogonal to $\hat{k}$.</p>
 <dd class="field-par">
 <dl>
 <dt>ValueError</dt>
-<dd class="field-desc"><p><code>r</code>, <code>k</code> and <code>r0</code> must have 3 components along the specified <code>axis</code>.
-The shapes of <code>r</code>, <code>k</code>, <code>w0</code>, <code>r0</code> and <code>p0</code> must be compatible.</p></dd>
+<dd class="field-desc"><p><code>r</code> and <code>k</code> must have 3 components along the specified <code>axis</code>.</p></dd>
 </dl>
 </dd>
 </dl>

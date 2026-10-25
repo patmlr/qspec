@@ -10,25 +10,32 @@ title: qspec.rotation_to_vector
 <em class="sig-param"><span class="n">x</span></em>
 ,&nbsp;
 <em class="sig-param"><span class="n">y</span></em>
-<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/tools.py#L1071-L1093' }}"><span class="sig-source">[source]</span></a>
+<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/tools.py#L1202-L1227' }}"><span class="sig-source">[source]</span></a>
 </dt>
 <dd class="field-body">
-
+<p>The rotation which rotates the direction of the vector <code>x</code> onto that of the vector <code>y</code>.</p>
 <dl class="field-list">
 <dt class="field-head">Parameters<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>x<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">scalar_nd</a></em></span></dt>
+<dt>x<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#scalar_nd' | relative_url }}">scalar_nd</a></em></span></dt>
 <dd class="field-desc"><p>The first vector.</p></dd>
-<dt>y<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">scalar_nd</a></em></span></dt>
+<dt>y<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#scalar_nd' | relative_url }}">scalar_nd</a></em></span></dt>
 <dd class="field-desc"><p>The second vector.</p></dd>
 </dl>
 </dd>
 <dt class="field-head">Returns<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>out<span class="classifier"><em><a href="{{ '/doc/functions/tools/Rotation/Rotation.html' | relative_url }}">Rotation</a></em></span></dt>
-<dd class="field-desc"><p>A Rotation object which rotates the first vector onto the second.</p></dd>
+<dt>rotation<span class="classifier"><em><a href="{{ '/doc/functions/tools/Rotation/Rotation.html' | relative_url }}">Rotation</a></em></span></dt>
+<dd class="field-desc"><p>A <code>Rotation</code> which rotates the first vector onto the second.</p></dd>
+</dl>
+</dd>
+<dt class="field-head">Raises<span class="colon">:</span></dt>
+<dd class="field-par">
+<dl>
+<dt>ValueError</dt>
+<dd class="field-desc"><p>If <code>x</code> or <code>y</code> is not a 3d-vector.</p></dd>
 </dl>
 </dd>
 </dl>

@@ -29,48 +29,58 @@ title: qspec.c_dipole
 ,&nbsp;
 <em class="sig-param"><span class="n">scatter_pol</span></em>
 ,&nbsp;
-<em class="sig-param"><span class="n">as_sympy</span><span class="o">=</span><span class="default_value bool">False</span></em>
-<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/algebra.py#L351-L419' }}"><span class="sig-source">[source]</span></a>
+<em class="sig-param"><span class="n">as_sympy</span><span class="o">=</span><span class="default_value"><span class="bool">False</span></span></em>
+<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/algebra.py#L400-L480' }}"><span class="sig-source">[source]</span></a>
 </dt>
 <dd class="field-body">
-<p>The transition dipole element $C_{i\rightarrow f}^{F^\prime}$, as described in
+<p>The transition dipole element for the scattering $|i\rangle\rightarrow|F^\prime m^\prime\rangle\rightarrow|f\rangle$
+of linearly polarized light into the polarization $\epsilon$</p>
+<div class="math-block">$$\begin{aligned}
+C_{i\rightarrow f, x}^{F^\prime} &amp;= -\frac{1}{\sqrt{2}}\sum\limits_{m^\prime}
+\left[(A_f)_1 - (A_f)_{-1}\right]a_\mathrm{L}\\[1ex]
+C_{i\rightarrow f, y}^{F^\prime} &amp;= \frac{\mathrm{i}}{\sqrt{2}}\sum\limits_{m^\prime}
+\left[(A_f)_1 + (A_f)_{-1}\right]a_\mathrm{L}\\[1ex]
+a_\mathrm{L} &amp;= \cos(\theta_\mathrm{L})(A_i)_0
+- \frac{\mathrm{i}}{\sqrt{2}}\sin(\theta_\mathrm{L})\left[(A_i)_1 + (A_i)_{-1}\right],
+\end{aligned}$$</div>
+<p>with the spherical transition dipole elements $(A_i)_q = (A_{F_im_i}^{F^\prime m^\prime})_q$
+and $(A_f)_q = (A_{F_fm_f}^{F^\prime m^\prime})_q$ <a href="{{ '/doc/functions/algebra/a_dipole.html' | relative_url }}"><code>a_dipole</code></a>, as described in
 [<a href="https://doi.org/10.1103/PhysRevA.87.032504">R. C. Brown et al., Phys. Rev. A 87, 032504 (2013)</a>].</p>
 <dl class="field-list">
 <dt class="field-head">Parameters<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>i<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">sympy_scalar</a></em></span></dt>
+<dt>i<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#sympy_scalar' | relative_url }}">sympy_scalar</a></em></span></dt>
 <dd class="field-desc"><p>The nuclear spin quantum number $I$.</p></dd>
-<dt>j_i<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">sympy_scalar</a></em></span></dt>
+<dt>j_i<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#sympy_scalar' | relative_url }}">sympy_scalar</a></em></span></dt>
 <dd class="field-desc"><p>The electronic total angular momentum quantum number $J_i$ of the initial lower state.</p></dd>
-<dt>f_i<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">sympy_scalar</a></em></span></dt>
+<dt>f_i<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#sympy_scalar' | relative_url }}">sympy_scalar</a></em></span></dt>
 <dd class="field-desc"><p>The total angular momentum quantum number $F_i$ of the initial lower state.</p></dd>
-<dt>m_i<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">sympy_scalar</a></em></span></dt>
-<dd class="field-desc"><p>The magnetic quantum number $m_i$ of the total angular moment of the initial lower state.</p></dd>
-<dt>j_u<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">sympy_scalar</a></em></span></dt>
+<dt>m_i<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#sympy_scalar' | relative_url }}">sympy_scalar</a></em></span></dt>
+<dd class="field-desc"><p>The magnetic quantum number $m_i$ of the total angular momentum of the initial lower state.</p></dd>
+<dt>j_u<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#sympy_scalar' | relative_url }}">sympy_scalar</a></em></span></dt>
 <dd class="field-desc"><p>The electronic total angular momentum quantum number $J_u$ of the intermediate upper state.</p></dd>
-<dt>f_u<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">sympy_scalar</a></em></span></dt>
+<dt>f_u<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#sympy_scalar' | relative_url }}">sympy_scalar</a></em></span></dt>
 <dd class="field-desc"><p>The total angular momentum quantum number $F_u$ of the intermediate upper state.</p></dd>
-<dt>j_f<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">sympy_scalar</a></em></span></dt>
+<dt>j_f<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#sympy_scalar' | relative_url }}">sympy_scalar</a></em></span></dt>
 <dd class="field-desc"><p>The electronic total angular momentum quantum number $J_f$ of the final lower state.</p></dd>
-<dt>f_f<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">sympy_scalar</a></em></span></dt>
+<dt>f_f<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#sympy_scalar' | relative_url }}">sympy_scalar</a></em></span></dt>
 <dd class="field-desc"><p>The total angular momentum quantum number $F_f$ of the final lower state.</p></dd>
-<dt>m_f<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">sympy_scalar</a></em></span></dt>
-<dd class="field-desc"><p>The magnetic quantum number $m_f$ of the total angular moment of the final lower state.</p></dd>
-<dt>theta_l<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">sympy_scalar</a></em></span></dt>
+<dt>m_f<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#sympy_scalar' | relative_url }}">sympy_scalar</a></em></span></dt>
+<dd class="field-desc"><p>The magnetic quantum number $m_f$ of the total angular momentum of the final lower state.</p></dd>
+<dt>theta_l<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#sympy_scalar' | relative_url }}">sympy_scalar</a></em></span></dt>
 <dd class="field-desc"><p>The angle $\theta_\mathrm{L}$ between the electric field of the linearly polarized incoming photon
 and the direction of detection.</p></dd>
 <dt>scatter_pol<span class="classifier"><em>str</em></span></dt>
-<dd class="field-desc"><p>The label for the two orthogonal polarizations of the scattered light.
-Can be either <code>"x"</code> or anything else.</p></dd>
+<dd class="field-desc"><p>The polarization $\epsilon$ of the scattered light. Can be either <code>"x"</code> or <code>"y"</code>.</p></dd>
 <dt>as_sympy<span class="classifier"><em>bool</em></span></dt>
-<dd class="field-desc"><p>Return the result as a symbol (<code>True</code>) or as a <code>float</code> (<code>False</code>).</p></dd>
+<dd class="field-desc"><p>Whether to return the result as a sympy expression (<code>True</code>) or as a <code>float</code> (<code>False</code>).</p></dd>
 </dl>
 </dd>
 <dt class="field-head">Returns<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>c_dipole<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">sympy_expr</a> | float</em></span></dt>
+<dt>c_dipole<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#sympy_expr' | relative_url }}">sympy_expr</a> | float</em></span></dt>
 <dd class="field-desc"><p>The transition dipole element $C_{i\rightarrow f}^{F^\prime}$.</p></dd>
 </dl>
 </dd>

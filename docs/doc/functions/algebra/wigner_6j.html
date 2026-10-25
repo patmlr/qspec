@@ -19,40 +19,42 @@ title: qspec.wigner_6j
 ,&nbsp;
 <em class="sig-param"><span class="n">j6</span></em>
 ,&nbsp;
-<em class="sig-param"><span class="n">as_sympy</span><span class="o">=</span><span class="default_value bool">False</span></em>
-<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/algebra.py#L102-L130' }}"><span class="sig-source">[source]</span></a>
+<em class="sig-param"><span class="n">as_sympy</span><span class="o">=</span><span class="default_value"><span class="bool">False</span></span></em>
+<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/algebra.py#L114-L144' }}"><span class="sig-source">[source]</span></a>
 </dt>
 <dd class="field-body">
-<p>Calculate the Wigner-6j symbol</p>
-<div class="math-block">$$W_{J_4J_5J_6}^{J_1J_2J_3}\coloneqq
+<p>The Wigner-6j symbol</p>
+<div class="math-block">$$
+W_{J_4J_5J_6}^{J_1J_2J_3}\coloneqq
 \begin{Bmatrix}
 J_1 &amp; J_2 &amp; J_3 \\
 J_4 &amp; J_5 &amp; J_6
-\end{Bmatrix}.$$</div>
+\end{Bmatrix}.
+$$</div>
 <dl class="field-list">
 <dt class="field-head">Parameters<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>j1<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">sympy_scalar</a></em></span></dt>
-<dd class="field-desc"><p>$J_1$</p></dd>
-<dt>j2<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">sympy_scalar</a></em></span></dt>
-<dd class="field-desc"><p>$J_2$</p></dd>
-<dt>j3<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">sympy_scalar</a></em></span></dt>
-<dd class="field-desc"><p>$J_3$</p></dd>
-<dt>j4<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">sympy_scalar</a></em></span></dt>
-<dd class="field-desc"><p>$J_4$</p></dd>
-<dt>j5<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">sympy_scalar</a></em></span></dt>
-<dd class="field-desc"><p>$J_5$</p></dd>
-<dt>j6<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">sympy_scalar</a></em></span></dt>
-<dd class="field-desc"><p>$J_6$</p></dd>
+<dt>j1<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#sympy_scalar' | relative_url }}">sympy_scalar</a></em></span></dt>
+<dd class="field-desc"><p>The angular momentum quantum number $J_1$.</p></dd>
+<dt>j2<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#sympy_scalar' | relative_url }}">sympy_scalar</a></em></span></dt>
+<dd class="field-desc"><p>The angular momentum quantum number $J_2$.</p></dd>
+<dt>j3<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#sympy_scalar' | relative_url }}">sympy_scalar</a></em></span></dt>
+<dd class="field-desc"><p>The angular momentum quantum number $J_3$.</p></dd>
+<dt>j4<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#sympy_scalar' | relative_url }}">sympy_scalar</a></em></span></dt>
+<dd class="field-desc"><p>The angular momentum quantum number $J_4$.</p></dd>
+<dt>j5<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#sympy_scalar' | relative_url }}">sympy_scalar</a></em></span></dt>
+<dd class="field-desc"><p>The angular momentum quantum number $J_5$.</p></dd>
+<dt>j6<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#sympy_scalar' | relative_url }}">sympy_scalar</a></em></span></dt>
+<dd class="field-desc"><p>The angular momentum quantum number $J_6$.</p></dd>
 <dt>as_sympy<span class="classifier"><em>bool</em></span></dt>
-<dd class="field-desc"><p>Return the result as a symbol (<code>True</code>) or as a <code>float</code> (<code>False</code>).</p></dd>
+<dd class="field-desc"><p>Whether to return the result as a sympy expression (<code>True</code>) or as a <code>float</code> (<code>False</code>).</p></dd>
 </dl>
 </dd>
 <dt class="field-head">Returns<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>w6<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">sympy_expr</a> | float</em></span></dt>
+<dt>w6<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#sympy_expr' | relative_url }}">sympy_expr</a> | float</em></span></dt>
 <dd class="field-desc"><p>The Wigner-6j symbol $W_{J_4J_5J_6}^{J_1J_2J_3}$.</p></dd>
 </dl>
 </dd>

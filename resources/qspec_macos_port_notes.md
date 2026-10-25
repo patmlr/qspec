@@ -152,17 +152,17 @@ cmake --build --preset macos-clang-arm64
 
 ```python
 import sys, numpy as np
+
 sys.path.insert(0, "qspec")
 import qspec.simulate as sim
 
-s = sim.gen_electronic_ls_state(0., s=0.5, l=0, j=0.5, label="s")
+s = sim.gen_electronic_ls_state(0.0, s=0.5, l=0, j=0.5, label="s")
 p = sim.gen_electronic_ls_state(7.55222766e8, 0.5, 1, 0.5, label="p")
-ca = sim.Atom(s + p, sim.DecayMap([("s","p")], [140.]))
-las = sim.Laser(7.55222766e8, intensity=500.,
-                polarization=sim.Polarization([0,1,0]))
+ca = sim.Atom(s + p, sim.DecayMap([("s", "p")], [140.0]))
+las = sim.Laser(7.55222766e8, intensity=500.0, polarization=sim.Polarization([0, 1, 0]))
 inter = sim.Interaction(ca, [las])
 n_t = inter.rates(np.linspace(0, 0.1, 51), delta=np.linspace(-50, 50, 11))
-print(n_t.shape)   # (11, 4, 51)
+print(n_t.shape)  # (11, 4, 51)
 ```
 
 Returns the expected `(n_delta, atom.size, nt)` shape.

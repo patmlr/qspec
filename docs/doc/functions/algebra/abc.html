@@ -19,8 +19,8 @@ title: qspec.abc
 ,&nbsp;
 <em class="sig-param"><span class="n">f2_u</span></em>
 ,&nbsp;
-<em class="sig-param"><span class="n">as_sympy</span><span class="o">=</span><span class="default_value bool">False</span></em>
-<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/algebra.py#L226-L254' }}"><span class="sig-source">[source]</span></a>
+<em class="sig-param"><span class="n">as_sympy</span><span class="o">=</span><span class="default_value"><span class="bool">False</span></span></em>
+<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/algebra.py#L260-L288' }}"><span class="sig-source">[source]</span></a>
 </dt>
 <dd class="field-body">
 <p>The coefficients $A_F^{F^\prime}$, $B_F^{F^\prime}$ and $C_F^{F^{\prime}F^{\prime\prime}}$,
@@ -31,26 +31,26 @@ the perturbative differential scattering rate, respectively, as described in
 <dt class="field-head">Parameters<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>i<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">sympy_scalar</a></em></span></dt>
+<dt>i<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#sympy_scalar' | relative_url }}">sympy_scalar</a></em></span></dt>
 <dd class="field-desc"><p>The nuclear spin quantum number $I$.</p></dd>
-<dt>j_l<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">sympy_scalar</a></em></span></dt>
+<dt>j_l<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#sympy_scalar' | relative_url }}">sympy_scalar</a></em></span></dt>
 <dd class="field-desc"><p>The electronic total angular momentum quantum number $J_l$ of the lower state.</p></dd>
-<dt>f_l<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">sympy_scalar</a></em></span></dt>
+<dt>f_l<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#sympy_scalar' | relative_url }}">sympy_scalar</a></em></span></dt>
 <dd class="field-desc"><p>The total angular momentum quantum number $F_l$ of the lower state.</p></dd>
-<dt>j_u<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">sympy_scalar</a></em></span></dt>
+<dt>j_u<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#sympy_scalar' | relative_url }}">sympy_scalar</a></em></span></dt>
 <dd class="field-desc"><p>The electronic total angular momentum quantum number $J_u$ of the upper state.</p></dd>
-<dt>f1_u<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">sympy_scalar</a></em></span></dt>
-<dd class="field-desc"><p>The first total angular momentum quantum number $F_u$ of the upper state.</p></dd>
-<dt>f2_u<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">sympy_scalar</a></em></span></dt>
-<dd class="field-desc"><p>The second total angular momentum quantum number $F_u$ of the upper state.</p></dd>
+<dt>f1_u<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#sympy_scalar' | relative_url }}">sympy_scalar</a></em></span></dt>
+<dd class="field-desc"><p>The first total angular momentum quantum number $F^\prime$ of the upper state.</p></dd>
+<dt>f2_u<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#sympy_scalar' | relative_url }}">sympy_scalar</a></em></span></dt>
+<dd class="field-desc"><p>The second total angular momentum quantum number $F^{\prime\prime}$ of the upper state.</p></dd>
 <dt>as_sympy<span class="classifier"><em>bool</em></span></dt>
-<dd class="field-desc"><p>Return the result as a symbol (<code>True</code>) or as a <code>float</code> (<code>False</code>).</p></dd>
+<dd class="field-desc"><p>Whether to return the result as a sympy expression (<code>True</code>) or as a <code>float</code> (<code>False</code>).</p></dd>
 </dl>
 </dd>
 <dt class="field-head">Returns<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>(A, B, C)<span class="classifier"><em>tuple[<a href="{{ '/doc/modules/qtypes.html' | relative_url }}">sympy_expr</a> | float, <a href="{{ '/doc/modules/qtypes.html' | relative_url }}">sympy_expr</a> | float, <a href="{{ '/doc/modules/qtypes.html' | relative_url }}">sympy_expr</a> | float]</em></span></dt>
+<dt>(A, B, C)<span class="classifier"><em>tuple[<a href="{{ '/doc/modules/qtypes.html#sympy_expr' | relative_url }}">sympy_expr</a> | float, <a href="{{ '/doc/modules/qtypes.html#sympy_expr' | relative_url }}">sympy_expr</a> | float, <a href="{{ '/doc/modules/qtypes.html#sympy_expr' | relative_url }}">sympy_expr</a> | float]</em></span></dt>
 <dd class="field-desc"><p>The $A_F^{F^\prime}$, $B_F^{F^\prime}$ and $C_F^{F^{\prime}F^{\prime\prime}}$ coefficients.</p></dd>
 </dl>
 </dd>

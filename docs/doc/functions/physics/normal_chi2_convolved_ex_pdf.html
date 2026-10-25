@@ -13,8 +13,8 @@ title: qspec.normal_chi2_convolved_ex_pdf
 ,&nbsp;
 <em class="sig-param"><span class="n">scale_e</span></em>
 ,&nbsp;
-<em class="sig-param"><span class="n">e0</span><span class="o">=</span><span class="default_value num">0</span></em>
-<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/physics.py#L2582-L2650' }}"><span class="sig-source">[source]</span></a>
+<em class="sig-param"><span class="n">e0</span><span class="o">=</span><span class="default_value"><span class="num">0</span></span></em>
+<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/physics.py#L2744-L2812' }}"><span class="sig-source">[source]</span></a>
 </dt>
 <dd class="field-body">
 <p>The probability density at the energy $E_x$, distributed according
@@ -32,26 +32,26 @@ x &amp;= \left(\!\frac{\mu}{2\sigma}\!\right)^{\!2},\quad\mu = \frac{E_x - E_0}{
 \quad\sigma = \frac{\sigma_\mathrm{e}}{k_\mathrm{B}T}\\[2ex]
 N &amp;= \frac{1}{\sqrt{2\pi}\sigma_\mathrm{e}}\exp\left(-\frac{\sigma^2}{2}\right),
 \end{aligned}$$</div>
-<p>where $I_\alpha$, and $K_\alpha$ are the modified Bessel functions of first and second kind,
+<p>where $I_\alpha$ and $K_\alpha$ are the modified Bessel functions of first and second kind,
 and $\varpi \approx 2.6220575543$ is the lemniscate constant.</p>
 <dl class="field-list">
 <dt class="field-head">Parameters<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>ex<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">array_like</a></em></span></dt>
+<dt>ex<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a></em></span></dt>
 <dd class="field-desc"><p>The energy quantiles $E_x$ (eV).</p></dd>
-<dt>t<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">array_like</a></em></span></dt>
+<dt>t<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a></em></span></dt>
 <dd class="field-desc"><p>The temperature $T$ of the environment (K).</p></dd>
-<dt>scale_e<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">array_like</a></em></span></dt>
+<dt>scale_e<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a></em></span></dt>
 <dd class="field-desc"><p>The standard deviation $\sigma_\mathrm{e}$ of the normal distribution (eV).</p></dd>
-<dt>e0<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">array_like</a></em></span></dt>
+<dt>e0<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a></em></span></dt>
 <dd class="field-desc"><p>The mean energy $E_0$ of the normal distribution (eV).</p></dd>
 </dl>
 </dd>
 <dt class="field-head">Returns<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>rho_ex<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">ndarray</a></em></span></dt>
+<dt>rho_ex<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#ndarray' | relative_url }}">ndarray</a></em></span></dt>
 <dd class="field-desc"><p>The probability density in thermal equilibrium at the energy <code>ex</code> (1/eV).</p></dd>
 </dl>
 </dd>

@@ -12,27 +12,30 @@ title: qspec.models.hf_coeff
 <em class="sig-param"><span class="n">j</span></em>
 ,&nbsp;
 <em class="sig-param"><span class="n">f</span></em>
-<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/models/_splitter.py#L75-L110' }}"><span class="sig-source">[source]</span></a>
+<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/models/_splitter.py#L80-L117' }}"><span class="sig-source">[source]</span></a>
 </dt>
 <dd class="field-body">
-
+<p>The coefficients of the hyperfine structure constants $A$, $B$ and $C$ of the magnetic dipole,
+electric quadrupole and magnetic octupole order, such that the hyperfine structure shift of the state
+is $\Delta_\mathrm{hfs} = c_AA + c_BB + c_CC$, see <a href="{{ '/doc/functions/physics/hyperfine.html' | relative_url }}"><code>qspec.physics.hyperfine</code></a>.
+Only the orders allowed by $I$ and $J$ are returned.</p>
 <dl class="field-list">
 <dt class="field-head">Parameters<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>i<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">scalar</a></em></span></dt>
-<dd class="field-desc"><p>The nuclear spin $I$.</p></dd>
-<dt>j<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">scalar</a></em></span></dt>
-<dd class="field-desc"><p>The total electron angular momentum $J$.</p></dd>
-<dt>f<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">scalar</a></em></span></dt>
-<dd class="field-desc"><p>The total angular momentum $F$.</p></dd>
+<dt>i<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#scalar' | relative_url }}">scalar</a></em></span></dt>
+<dd class="field-desc"><p>The nuclear spin quantum number $I$.</p></dd>
+<dt>j<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#scalar' | relative_url }}">scalar</a></em></span></dt>
+<dd class="field-desc"><p>The electronic total angular momentum quantum number $J$.</p></dd>
+<dt>f<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#scalar' | relative_url }}">scalar</a></em></span></dt>
+<dd class="field-desc"><p>The total angular momentum quantum number $F$.</p></dd>
 </dl>
 </dd>
 <dt class="field-head">Returns<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>out<span class="classifier"><em>tuple[float, ...]</em></span></dt>
-<dd class="field-desc"><p>The tuple of hyperfine coefficients for A and B-factors of a given quantum state.</p></dd>
+<dt>coeffs<span class="classifier"><em>tuple[float, ...]</em></span></dt>
+<dd class="field-desc"><p>The tuple of hyperfine coefficients $(c_A, c_B, c_C)$ of the quantum state.</p></dd>
 </dl>
 </dd>
 </dl>

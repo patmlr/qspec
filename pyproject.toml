@@ -27,11 +27,14 @@ classifiers = [
     "Topic :: Scientific/Engineering :: Physics",
 ]
 dependencies = [
-    "matplotlib",
+    "matplotlib >= 3.9",
     "numpy >= 2.0.2",
     "scipy >= 1.13.1",
     "sympy"
 ]
+
+[project.optional-dependencies]
+odr = ["odrpack >= 0.7"]
 
 [project.urls]
 homepage = "https://patmlr.github.io/qspec/"
@@ -98,15 +101,23 @@ environment-pass = ["SETUPTOOLS_SCM_PRETEND_VERSION"]
 MACOSX_DEPLOYMENT_TARGET = "11.0"
 
 [tool.setuptools_scm]
-# The version is derived from the latest git tag vX.Y.Z (e.g. 0.5.1.dev3+g1f15b85 three commits after v0.5.0).
-# Releases set it explicitly, see .github/workflows/wheels.yml. The fallback applies without git metadata.
 fallback_version = "0.0.0"
+
+[tool.mypy]
+python_version = "3.12"
+# follow_imports = "skip"
+ignore_missing_imports = false
+files = "qspec"
+exclude = [
+    "qspec/_cpp/qspec_cpp",
+]
 
 [tool.ruff]
 extend-exclude = [
     "__pycache__",
     "docs/*",
     "__init__.py",
+    "tutorial*.py"
 ]
 line-length = 120
 target-version = "py312"

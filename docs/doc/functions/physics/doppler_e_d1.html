@@ -15,30 +15,32 @@ title: qspec.doppler_e_d1
 ,&nbsp;
 <em class="sig-param"><span class="n">m</span></em>
 ,&nbsp;
-<em class="sig-param"><span class="n">v0</span><span class="o">=</span><span class="default_value num">0</span></em>
+<em class="sig-param"><span class="n">v0</span><span class="o">=</span><span class="default_value"><span class="num">0</span></span></em>
 ,&nbsp;
-<em class="sig-param"><span class="n">return_frame</span><span class="o">=</span><span class="default_value string">&#x27;atom&#x27;</span></em>
+<em class="sig-param"><span class="n">return_frame</span><span class="o">=</span><span class="default_value"><span class="string">&#x27;atom&#x27;</span></span></em>
 ,&nbsp;
-<em class="sig-param"><span class="n">relativistic</span><span class="o">=</span><span class="default_value bool">True</span></em>
-<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/physics.py#L547-L574' }}"><span class="sig-source">[source]</span></a>
+<em class="sig-param"><span class="n">relativistic</span><span class="o">=</span><span class="default_value"><span class="bool">True</span></span></em>
+<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/physics.py#L654-L685' }}"><span class="sig-source">[source]</span></a>
 </dt>
 <dd class="field-body">
-<p>The first derivative $\frac{\partial f^\prime}{\partial E} =
- \frac{\partial f^\prime}{\partial v}\frac{\partial v}{\partial E}$.
-Implemented as <code>doppler_d1(f, v, alpha, return_frame) * v_e_d1(e, m, v0, relativistic)</code>.</p>
+<p>The first derivative of the Doppler-shifted frequency <a href="{{ '/doc/functions/physics/doppler.html' | relative_url }}"><code>doppler</code></a> with respect to the added energy</p>
+<div class="math-block">$$
+\frac{\partial f^\prime}{\partial E} = \frac{\partial f^\prime}{\partial v}\frac{\partial v}{\partial E},
+$$</div>
+<p>with <a href="{{ '/doc/functions/physics/doppler_d1.html' | relative_url }}"><code>doppler_d1</code></a> and <a href="{{ '/doc/functions/physics/v_e_d1.html' | relative_url }}"><code>v_e_d1</code></a>.</p>
 <dl class="field-list">
 <dt class="field-head">Parameters<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>f<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">array_like</a></em></span></dt>
+<dt>f<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a></em></span></dt>
 <dd class="field-desc"><p>The frequency $f$ of light (arb. units).</p></dd>
-<dt>alpha<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">array_like</a></em></span></dt>
+<dt>alpha<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a></em></span></dt>
 <dd class="field-desc"><p>The angle $\alpha$ between the velocity- and the light-vector in the laboratory frame (rad).</p></dd>
-<dt>e<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">array_like</a></em></span></dt>
+<dt>e<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a></em></span></dt>
 <dd class="field-desc"><p>The energy $E$ added to the kinetic energy of a body with velocity <code>v0</code> (eV).</p></dd>
-<dt>m<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">array_like</a></em></span></dt>
+<dt>m<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a></em></span></dt>
 <dd class="field-desc"><p>The mass $m$ of the body (u).</p></dd>
-<dt>v0<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">array_like</a></em></span></dt>
+<dt>v0<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a></em></span></dt>
 <dd class="field-desc"><p>The initial velocity $v_0$ of the body (m/s).</p></dd>
 <dt>return_frame<span class="classifier"><em>str</em></span></dt>
 <dd class="field-desc"><p>The coordinate system for which the frequency is returned. Can be either <code>"atom"</code> or <code>"lab"</code>.</p></dd>
@@ -50,7 +52,7 @@ The default is <code>True</code>.</p></dd>
 <dt class="field-head">Returns<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>df_dE<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">ndarray</a></em></span></dt>
+<dt>df_dE<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#ndarray' | relative_url }}">ndarray</a></em></span></dt>
 <dd class="field-desc"><p>The first derivative $\partial f^\prime / \partial E$ of the Doppler-shifted frequency
 $f^\prime$ with respect to <code>e</code> in either the rest frame of the atom or the laboratory frame (<code>f</code> / eV).</p></dd>
 </dl>

@@ -11,9 +11,9 @@ title: qspec.models.gen_model
 ,&nbsp;
 <em class="sig-param"><span class="n">shape</span><span class="o">=</span><span class="default_value">None</span></em>
 ,&nbsp;
-<em class="sig-param"><span class="n">qi</span><span class="o">=</span><span class="default_value bool">False</span></em>
+<em class="sig-param"><span class="n">qi</span><span class="o">=</span><span class="default_value"><span class="bool">False</span></span></em>
 ,&nbsp;
-<em class="sig-param"><span class="n">hf_mixing</span><span class="o">=</span><span class="default_value bool">False</span></em>
+<em class="sig-param"><span class="n">hf_mixing</span><span class="o">=</span><span class="default_value"><span class="bool">False</span></span></em>
 ,&nbsp;
 <em class="sig-param"><span class="n">hf_config</span><span class="o">=</span><span class="default_value">None</span></em>
 ,&nbsp;
@@ -24,44 +24,57 @@ title: qspec.models.gen_model
 <em class="sig-param"><span class="n">x_cuts</span><span class="o">=</span><span class="default_value">None</span></em>
 ,&nbsp;
 <em class="sig-param"><span class="n">convolve</span><span class="o">=</span><span class="default_value">None</span></em>
-<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/models/_helper.py#L16-L111' }}"><span class="sig-source">[source]</span></a>
+<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/models/_helper.py#L16-L117' }}"><span class="sig-source">[source]</span></a>
 </dt>
 <dd class="field-body">
-<p>Create a lineshape model to fit arbitrary atomic fluorescence spectra.</p>
+<p>Create a lineshape model to fit arbitrary atomic fluorescence spectra.
+The model is composed of the <code>Spectrum</code>, a <code>Splitter</code> for each set of quantum numbers in <code>ijj</code>,
+optionally an <a href="{{ '/doc/functions/models/NPeak/NPeak.html' | relative_url }}"><code>NPeak</code></a> and a <a href="{{ '/doc/functions/models/Convolved/Convolved.html' | relative_url }}"><code>Convolved</code></a> model, and an <a href="{{ '/doc/functions/models/Offset/Offset.html' | relative_url }}"><code>Offset</code></a> model.</p>
 <dl class="field-list">
 <dt class="field-head">Parameters<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>ijj<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">scalar_nd</a></em></span></dt>
-<dd class="field-desc"><p>The three or an Iterable of three quantum numbers $I$, $J_l$ and $J_u$.
+<dt>ijj<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#scalar_nd' | relative_url }}">scalar_nd</a></em></span></dt>
+<dd class="field-desc"><p>The three or an iterable of three quantum numbers $I$, $J_l$ and $J_u$.
 Must be a list with the format <code>[I, J_l, J_u]</code> or <code>[[I0, J0_l, J0_u], [I1, J1_l, J1_u], ...]</code>.</p></dd>
 <dt>shape<span class="classifier"><em>str | type | _spectrum.Spectrum | None</em></span></dt>
-<dd class="field-desc"><p>A str representation of or a <code>Spectrum</code> type.</p></dd>
+<dd class="field-desc"><p>A <code>str</code> representation of a <code>Spectrum</code> type, see <code>SPECTRA</code>, or a <code>Spectrum</code> type.
+If <code>None</code>, the <a href="{{ '/doc/functions/models/Empty/Empty.html' | relative_url }}"><code>Empty</code></a> model is used.</p></dd>
 <dt>qi<span class="classifier"><em>bool</em></span></dt>
-<dd class="field-desc"><p>Whether to use a quantum interference model.</p></dd>
+<dd class="field-desc"><p>Whether to use a quantum interference model, see <a href="{{ '/doc/functions/models/HyperfineQI/HyperfineQI.html' | relative_url }}"><code>HyperfineQI</code></a>.</p></dd>
 <dt>hf_mixing<span class="classifier"><em>bool</em></span></dt>
-<dd class="field-desc"><p>Whether to use a hyperfine-induced mixing model. Not implemented for <code>qi=True</code>.</p></dd>
+<dd class="field-desc"><p>Whether to use a hyperfine-induced mixing model, see <a href="{{ '/doc/functions/models/HyperfineMixed/HyperfineMixed.html' | relative_url }}"><code>HyperfineMixed</code></a>.
+Not implemented for <code>qi=True</code>.</p></dd>
 <dt>hf_config<span class="classifier"><em>dict | None</em></span></dt>
 <dd class="field-desc"><p>A <code>dict</code> containing the configuration for the hf mixing. Only used if <code>hf_mixing=True</code>.</p></dd>
 <dt>n_peaks<span class="classifier"><em>int | None</em></span></dt>
-<dd class="field-desc"><p>The number of "peaks per resonance" or "lineshape duplicates".</p></dd>
-<dt>offsets<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">array_like</a> | None</em></span></dt>
+<dd class="field-desc"><p>The number of "peaks per resonance" or "lineshape duplicates", see <a href="{{ '/doc/functions/models/NPeak/NPeak.html' | relative_url }}"><code>NPeak</code></a>.</p></dd>
+<dt>offsets<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a> | None</em></span></dt>
 <dd class="field-desc"><p>The orders of the offset polynomials of the separate x-axis intervals.
 Must be a list or a single value. In the former case <code>len(offsets) == len(x_cuts) + 1</code> must hold.
 If <code>offsets</code> is <code>None</code>, a single constant offset is assumed.</p></dd>
-<dt>x_cuts<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">array_like</a> | None</em></span></dt>
+<dt>x_cuts<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a> | None</em></span></dt>
 <dd class="field-desc"><p>The x values where to cut the x-axis. Must be a list or a single value.
 In the former case <code>len(offsets) == len(x_cuts) + 1</code> must hold.
 If <code>x_cuts</code> is <code>None</code>, the x-axis will not be cut.</p></dd>
 <dt>convolve<span class="classifier"><em>str | type | _convolved.Convolved | None</em></span></dt>
-<dd class="field-desc"><p>A str representation of or a <code>Convolved</code> type.</p></dd>
+<dd class="field-desc"><p>A <code>str</code> representation of a <code>Convolved</code> type, see <code>CONVOLVE</code>, or a <code>Convolved</code> type.</p></dd>
 </dl>
 </dd>
 <dt class="field-head">Returns<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>out<span class="classifier"><em>_base.Model</em></span></dt>
+<dt>model<span class="classifier"><em>_base.Model</em></span></dt>
 <dd class="field-desc"><p>The constructed lineshape model.</p></dd>
+</dl>
+</dd>
+<dt class="field-head">Raises<span class="colon">:</span></dt>
+<dd class="field-par">
+<dl>
+<dt>NotImplementedError</dt>
+<dd class="field-desc"><p>If both <code>qi</code> and <code>hf_mixing</code> are <code>True</code>.</p></dd>
+<dt>ValueError</dt>
+<dd class="field-desc"><p>If <code>ijj</code>, <code>shape</code> or <code>convolve</code> have an invalid format or value.</p></dd>
 </dl>
 </dd>
 </dl>

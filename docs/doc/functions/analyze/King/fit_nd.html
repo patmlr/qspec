@@ -13,53 +13,61 @@ title: qspec.analyze.King.fit_nd
 ,&nbsp;
 <em class="sig-param"><span class="n">x</span><span class="o">=</span><span class="default_value">None</span></em>
 ,&nbsp;
-<em class="sig-param"><span class="n">axis</span><span class="o">=</span><span class="default_value num">0</span></em>
+<em class="sig-param"><span class="n">axis</span><span class="o">=</span><span class="default_value"><span class="num">0</span></span></em>
 ,&nbsp;
-<em class="sig-param"><span class="n">optimize_cov</span><span class="o">=</span><span class="default_value bool">False</span></em>
+<em class="sig-param"><span class="n">optimize_cov</span><span class="o">=</span><span class="default_value"><span class="bool">False</span></span></em>
 ,&nbsp;
-<em class="sig-param"><span class="n">func</span><span class="o">=</span><span class="default_value">linear_nd_fit</span></em>
+<em class="sig-param"><span class="n">func</span><span class="o">=</span><span class="default_value"><span class="func">linear_nd_fit</span></span></em>
 ,&nbsp;
-<em class="sig-param"><span class="n">show</span><span class="o">=</span><span class="default_value bool">True</span></em>
+<em class="sig-param"><span class="n">show</span><span class="o">=</span><span class="default_value"><span class="bool">True</span></span></em>
 ,&nbsp;
 <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em>
-<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/analyze/_analyze.py#L1749-L1826' }}"><span class="sig-source">[source]</span></a>
+<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/analyze/_analyze.py#L1859-L1938' }}"><span class="sig-source">[source]</span></a>
 </dt>
 <dd class="field-body">
 <p>Perform $n$-dimensional linear regression to create a King plot.
+The data are modified with the mass factors $\mu$, see <a href="{{ '/doc/functions/physics/mass_factor.html' | relative_url }}"><code>qspec.physics.mass_factor</code></a>.
 Choose between <code>{"linear_nd_fit" (default), "linear_nd_monte_carlo"}</code> for the fit routine.</p>
 <dl class="field-list">
 <dt class="field-head">Parameters<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>a<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">scalar_nd</a></em></span></dt>
-<dd class="field-desc"><p>An Iterable of the mass numbers $A$ of the used isotopes.</p></dd>
-<dt>a_ref<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">scalar_nd</a></em></span></dt>
-<dd class="field-desc"><p>An Iterable of the mass numbers $A_\mathrm{ref}$ of the used reference isotopes.</p></dd>
-<dt>x<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">scalar_nd</a> | None</em></span></dt>
-<dd class="field-desc"><p>The $x$ data as an iterable of vectors with standard deviations of shape <code>(k, n, 2)</code>, where k is the
-number of data points/isotopes and <code>n</code> is the dimension of each vector.</p></dd>
+<dt>a<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#scalar_nd' | relative_url }}">scalar_nd</a></em></span></dt>
+<dd class="field-desc"><p>An iterable of the mass numbers $A$ of the used isotopes.</p></dd>
+<dt>a_ref<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#scalar_nd' | relative_url }}">scalar_nd</a></em></span></dt>
+<dd class="field-desc"><p>An iterable of the mass numbers $A_\mathrm{ref}$ of the used reference isotopes.</p></dd>
+<dt>x<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#scalar_nd' | relative_url }}">scalar_nd</a> | None</em></span></dt>
+<dd class="field-desc"><p>The data as an iterable of vectors with standard deviations of shape <code>(k, n, 2)</code>, where <code>k</code> is the
+number of data points/isotopes and <code>n</code> is the dimension of each vector.
+If <code>None</code>, <code>x</code> is inherited from <code>King.x_abs</code>.</p></dd>
 <dt>axis<span class="classifier"><em>int</em></span></dt>
 <dd class="field-desc"><p>The vector component to use for the parameterization.
 For example, a King plot with the isotope shifts of two transitions <code>["D1", "D2"]</code>
 yields the slope $F_\mathrm{D2} / F_\mathrm{D1}$ if <code>axis == 0</code>.</p></dd>
 <dt>optimize_cov<span class="classifier"><em>bool</em></span></dt>
-<dd class="field-desc"><p>If <code>True</code>, the origin vector of the straight is optimized
+<dd class="field-desc"><p>If <code>True</code>, the origin vector of the straight line is optimized
 to yield the smallest covariances.</p></dd>
 <dt>func<span class="classifier"><em>Callable | str</em></span></dt>
 <dd class="field-desc"><p>The fitting routine. Must be one of <code>{"linear_nd_fit" (default), "linear_nd_monte_carlo"}</code>.</p></dd>
 <dt>show<span class="classifier"><em>bool</em></span></dt>
 <dd class="field-desc"><p>Whether to plot the fit result.</p></dd>
 <dt>kwargs</dt>
-<dd class="field-desc"><p>Additional keyword arguments are passed to <code>func</code> and
-<a href="{{ '/doc/functions/analyze/King/plot.html' | relative_url }}"><code>King.plot</code></a>.</p></dd>
+<dd class="field-desc"><p>Additional keyword arguments are passed to <code>func</code> and <a href="{{ '/doc/functions/analyze/King/plot.html' | relative_url }}"><code>King.plot</code></a>.</p></dd>
 </dl>
 </dd>
 <dt class="field-head">Returns<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>(popt, pcov)<span class="classifier"><em>tuple[<a href="{{ '/doc/modules/qtypes.html' | relative_url }}">ndarray</a>, <a href="{{ '/doc/modules/qtypes.html' | relative_url }}">ndarray</a>]</em></span></dt>
+<dt>(popt, pcov)<span class="classifier"><em>tuple[<a href="{{ '/doc/modules/qtypes.html#ndarray' | relative_url }}">ndarray</a>, <a href="{{ '/doc/modules/qtypes.html#ndarray' | relative_url }}">ndarray</a>]</em></span></dt>
 <dd class="field-desc"><p>The optimized parameters and their covariances.
 The resulting shapes are <code>(2 * n, )</code> and <code>(2 * n, 2 * n)</code>.</p></dd>
+</dl>
+</dd>
+<dt class="field-head">Raises<span class="colon">:</span></dt>
+<dd class="field-par">
+<dl>
+<dt>ValueError</dt>
+<dd class="field-desc"><p>If neither <code>x</code> nor <code>King.x_abs</code> are given or if <code>func</code> is not supported.</p></dd>
 </dl>
 </dd>
 </dl>

@@ -12,27 +12,27 @@ title: qspec.get_rgb_print_command
 <em class="sig-param"><span class="n">g</span></em>
 ,&nbsp;
 <em class="sig-param"><span class="n">b</span></em>
-<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/tools.py#L114-L121' }}"><span class="sig-source">[source]</span></a>
+<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/tools.py#L128-L137' }}"><span class="sig-source">[source]</span></a>
 </dt>
 <dd class="field-body">
-
+<p>The ANSI escape sequence to print text with an RGB color in the console.</p>
 <dl class="field-list">
 <dt class="field-head">Parameters<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>r<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">int_like</a></em></span></dt>
-<dd class="field-desc"><p>The fraction of red (0-255).</p></dd>
-<dt>g<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">int_like</a></em></span></dt>
-<dd class="field-desc"><p>The fraction of green (0-255).</p></dd>
-<dt>b<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">int_like</a></em></span></dt>
-<dd class="field-desc"><p>The fraction of blue (0-255).</p></dd>
+<dt>r<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#int_like' | relative_url }}">int_like</a></em></span></dt>
+<dd class="field-desc"><p>The red value (0-255).</p></dd>
+<dt>g<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#int_like' | relative_url }}">int_like</a></em></span></dt>
+<dd class="field-desc"><p>The green value (0-255).</p></dd>
+<dt>b<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#int_like' | relative_url }}">int_like</a></em></span></dt>
+<dd class="field-desc"><p>The blue value (0-255).</p></dd>
 </dl>
 </dd>
 <dt class="field-head">Returns<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>out<span class="classifier"><em>str</em></span></dt>
-<dd class="field-desc"><p>The command str to print rgb colors in the console.</p></dd>
+<dt>command<span class="classifier"><em>str</em></span></dt>
+<dd class="field-desc"><p>The escape sequence.</p></dd>
 </dl>
 </dd>
 </dl>

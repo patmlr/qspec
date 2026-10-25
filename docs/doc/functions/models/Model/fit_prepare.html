@@ -7,17 +7,25 @@ title: qspec.models.Model.fit_prepare
 <span class="sig-prename">qspec.models.</span><span class="sig-classname">Model</span><span class="sig-prename">.</span>
 <span class="sig-name">fit_prepare</span>
 <span class="sig-paren">&nbsp;(&nbsp;</span>
-<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/models/_base.py#L446-L479' }}"><span class="sig-source">[source]</span></a>
+<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/models/_base.py#L477-L514' }}"><span class="sig-source">[source]</span></a>
 </dt>
 <dd class="field-body">
-
+<p>Convert the fix states of the parameters into the <code>p0_fixed</code> and <code>bounds</code> parameters
+of <a href="{{ '/doc/functions/analyze/curve_fit.html' | relative_url }}"><code>qspec.analyze.curve_fit</code></a>.</p>
 <dl class="field-list">
 <dt class="field-head">Returns<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>(fixed, bounds)<span class="classifier"><em>tuple[list[<a href="{{ '/doc/modules/qtypes.html' | relative_url }}">fix_type</a>], tuple[float | list[float], float | list[float]]]</em></span></dt>
+<dt>(fixed, bounds)<span class="classifier"><em>tuple[list[<a href="{{ '/doc/modules/qtypes.html#fix_type' | relative_url }}">fix_type</a>], tuple[float | list[float], float | list[float]]]</em></span></dt>
 <dd class="field-desc"><p>A list of <code>bool</code> values specifying which parameters are not varied in a fit
-and a list of bounds for the fit parameters. See parameters <code>p0_fixed</code> and <code>bounds</code> of <code>qspec.curve_fit</code>.</p></dd>
+and the bounds of the fit parameters.</p></dd>
+</dl>
+</dd>
+<dt class="field-head">Raises<span class="colon">:</span></dt>
+<dd class="field-par">
+<dl>
+<dt>TypeError</dt>
+<dd class="field-desc"><p>If a fix state has an unsupported type.</p></dd>
 </dl>
 </dd>
 </dl>

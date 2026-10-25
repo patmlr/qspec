@@ -9,11 +9,11 @@ title: qspec.check_iterable
 <span class="sig-paren">&nbsp;(&nbsp;</span>
 <em class="sig-param"><span class="n">arg</span></em>
 ,&nbsp;
-<em class="sig-param"><span class="n">dtype</span><span class="o">=</span><span class="default_value">str</span></em>
-<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/tools.py#L480-L495' }}"><span class="sig-source">[source]</span></a>
+<em class="sig-param"><span class="n">dtype</span><span class="o">=</span><span class="default_value"><span class="class">str</span></span></em>
+<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/tools.py#L526-L543' }}"><span class="sig-source">[source]</span></a>
 </dt>
 <dd class="field-body">
-
+<p>Cast an argument or the elements of an argument of type <code>dtype</code> to a list.</p>
 <dl class="field-list">
 <dt class="field-head">Parameters<span class="colon">:</span></dt>
 <dd class="field-par">
@@ -21,15 +21,15 @@ title: qspec.check_iterable
 <dt>arg<span class="classifier"><em>object</em></span></dt>
 <dd class="field-desc"><p>The argument that is checked.</p></dd>
 <dt>dtype<span class="classifier"><em>type</em></span></dt>
-<dd class="field-desc"><p>The type that has to be matched by the elements of arg or arg itself.</p></dd>
+<dd class="field-desc"><p>The type that has to be matched by the elements of <code>arg</code> or <code>arg</code> itself.</p></dd>
 </dl>
 </dd>
 <dt class="field-head">Returns<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>out<span class="classifier"><em>list</em></span></dt>
-<dd class="field-desc"><p>'arg' as a list if it is a 'list', 'tuple' or 'set' of values of type 'dtype',
-a list of the single element 'arg' if it is of type 'dtype' and else an empty list.</p></dd>
+<dt>arg_list<span class="classifier"><em>list</em></span></dt>
+<dd class="field-desc"><p><code>arg</code> as a list if it is a <code>list</code>, <code>tuple</code> or <code>set</code> of values of type <code>dtype</code>,
+a list of the single element <code>arg</code> if it is of type <code>dtype</code> and else an empty list.</p></dd>
 </dl>
 </dd>
 </dl>

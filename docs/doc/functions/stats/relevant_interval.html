@@ -11,20 +11,20 @@ title: qspec.relevant_interval
 ,&nbsp;
 <em class="sig-param"><span class="o">*</span><span class="n">args</span></em>
 ,&nbsp;
-<em class="sig-param"><span class="n">show</span><span class="o">=</span><span class="default_value bool">False</span></em>
+<em class="sig-param"><span class="n">show</span><span class="o">=</span><span class="default_value"><span class="bool">False</span></span></em>
 ,&nbsp;
 <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em>
-<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/stats.py#L545-L589' }}"><span class="sig-source">[source]</span></a>
+<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/stats.py#L624-L670' }}"><span class="sig-source">[source]</span></a>
 </dt>
 <dd class="field-body">
-
+<p>Estimate the interval in which most of the probability of a probability density function (pdf) lies.</p>
 <dl class="field-list">
 <dt class="field-head">Parameters<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
 <dt>dist<span class="classifier"><em>Callable</em></span></dt>
-<dd class="field-desc"><p>The probability distribution function (pdf).</p></dd>
-<dt>args<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">scalar</a></em></span></dt>
+<dd class="field-desc"><p>The pdf.</p></dd>
+<dt>args<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#scalar' | relative_url }}">scalar</a></em></span></dt>
 <dd class="field-desc"><p>Additional arguments for the pdf.</p></dd>
 <dt>show<span class="classifier"><em>bool</em></span></dt>
 <dd class="field-desc"><p>Whether to show the pdf in the determined interval.</p></dd>
@@ -35,8 +35,8 @@ title: qspec.relevant_interval
 <dt class="field-head">Returns<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>out<span class="classifier"><em>tuple[float, float]</em></span></dt>
-<dd class="field-desc"><p>An estimation of the interval where most of the probability lies in.</p></dd>
+<dt>(x_min, x_max)<span class="classifier"><em>tuple[float, float]</em></span></dt>
+<dd class="field-desc"><p>The estimated interval.</p></dd>
 </dl>
 </dd>
 </dl>

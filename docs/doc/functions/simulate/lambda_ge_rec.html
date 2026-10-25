@@ -27,50 +27,56 @@ title: qspec.simulate.lambda_ge_rec
 ,&nbsp;
 <em class="sig-param"><span class="n">dt</span><span class="o">=</span><span class="default_value">None</span></em>
 ,&nbsp;
-<em class="sig-param"><span class="n">time_resolved</span><span class="o">=</span><span class="default_value bool">False</span></em>
+<em class="sig-param"><span class="n">time_resolved</span><span class="o">=</span><span class="default_value"><span class="bool">False</span></span></em>
 ,&nbsp;
-<em class="sig-param"><span class="n">show</span><span class="o">=</span><span class="default_value bool">False</span></em>
-<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/simulate/_simulate.py#L330-L506' }}"><span class="sig-source">[source]</span></a>
+<em class="sig-param"><span class="n">show</span><span class="o">=</span><span class="default_value"><span class="bool">False</span></span></em>
+<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/simulate/_simulate.py#L336-L512' }}"><span class="sig-source">[source]</span></a>
 </dt>
 <dd class="field-body">
-<p>Computes the evolution of Lambda-systems such as the alkali metals or the singly-charged alkaline-earth metals,
-taking into account photon recoils. The system is driven by a single laser.
-The state vector is defined as (g0, m0, e0, g1, m1, e1, ..., gn, mn, en), where g is the first end of the Lambda,
-m the second end and e the intermediate state.
+<p>The evolution of the density matrix of a $\Lambda$-system, such as the alkali metals
+or the singly-charged alkaline-earth metals, driven by a single laser, taking into account photon recoils.
+The states are $|g_k\rangle$ and $|m_k\rangle$, the two ends of the $\Lambda$, and the intermediate state
+$|e_k\rangle$, ordered as $(g_0, m_0, e_0, g_1, m_1, e_1, \dots, g_n, m_n, e_n)$,
+where $k$ is the number of photon recoils.
 The photon recoils are modeled using a discrete subspace and not the continuous momentum space.
-The number of photon recoils increases by one when the system is excited from the g state to the e state.
+The number of photon recoils increases by one when the system is excited from $|g\rangle$ to $|e\rangle$.
 Vice-versa, the number of photon recoils decreases by one when the system is deexcited
-from the e state to the g state via the process of stimulated emission. When the system decays into the g state
-via the dissipative mechanism described by the Einstein coefficient 'a_ge',
+from $|e\rangle$ to $|g\rangle$ via stimulated emission. When the system decays into $|g\rangle$
+via spontaneous emission, described by the Einstein coefficient <code>a_ge</code>,
 the number of photon recoils does not change.</p>
 <dl class="field-list">
 <dt class="field-head">Parameters<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>t<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">array_like</a></em></span></dt>
-<dd class="field-desc"><p>The time after which the probability is returned.
-If all times from 0 to 't' are required, use 'time_resolved'=True (us).</p></dd>
-<dt>n<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">int_like</a></em></span></dt>
-<dd class="field-desc"><p>The maximum number of photon recoils to consider.</p></dd>
-<dt>delta<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">scalar</a></em></span></dt>
-<dd class="field-desc"><p>The detuning of the laser relative to the g->e transition (MHz).</p></dd>
-<dt>a_ge<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">scalar</a></em></span></dt>
-<dd class="field-desc"><p>The Einstein coefficient of the e->g transition (MHz).</p></dd>
-<dt>a_me<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">scalar</a></em></span></dt>
-<dd class="field-desc"><p>The Einstein coefficient of the e->m transition (MHz).</p></dd>
-<dt>s<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">scalar</a></em></span></dt>
-<dd class="field-desc"><p>The saturation parameter of the g->e transition.</p></dd>
-<dt>f<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">scalar</a></em></span></dt>
-<dd class="field-desc"><p>The transition frequency of the g->e transition (MHz).</p></dd>
-<dt>m<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">scalar</a></em></span></dt>
-<dd class="field-desc"><p>The mass number of the atom (u).</p></dd>
-<dt>p0<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">array_like</a> | None</em></span></dt>
-<dd class="field-desc"><p>The initial density matrix. Must have shape (6, ), containing the elements [gg, mm, ee, gm, eg, em](0)
-or be the full density matrix with all the recoil information.</p></dd>
-<dt>dt<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">scalar</a> | None</em></span></dt>
-<dd class="field-desc"><p>The width of the time steps.</p></dd>
+<dt>t<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a></em></span></dt>
+<dd class="field-desc"><p>The time $t$ after which the density matrix is returned (&mu;s).
+If all times from 0 to <code>t</code> are required, use <code>time_resolved=True</code>.</p></dd>
+<dt>n<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#int_like' | relative_url }}">int_like</a></em></span></dt>
+<dd class="field-desc"><p>The maximum number $n$ of photon recoils to consider.</p></dd>
+<dt>delta<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#scalar' | relative_url }}">scalar</a></em></span></dt>
+<dd class="field-desc"><p>The detuning of the laser relative to the $g\rightarrow e$ transition (MHz).</p></dd>
+<dt>a_ge<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#scalar' | relative_url }}">scalar</a></em></span></dt>
+<dd class="field-desc"><p>The Einstein coefficient of the $e\rightarrow g$ transition (MHz).</p></dd>
+<dt>a_me<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#scalar' | relative_url }}">scalar</a></em></span></dt>
+<dd class="field-desc"><p>The Einstein coefficient of the $e\rightarrow m$ transition (MHz).</p></dd>
+<dt>s<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#scalar' | relative_url }}">scalar</a></em></span></dt>
+<dd class="field-desc"><p>The saturation parameter of the $g\rightarrow e$ transition.</p></dd>
+<dt>f<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#scalar' | relative_url }}">scalar</a></em></span></dt>
+<dd class="field-desc"><p>The transition frequency of the $g\rightarrow e$ transition (MHz).</p></dd>
+<dt>m<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#scalar' | relative_url }}">scalar</a></em></span></dt>
+<dd class="field-desc"><p>The mass of the atom (u).</p></dd>
+<dt>p0<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a> | None</em></span></dt>
+<dd class="field-desc"><p>The initial density matrix. Must either have shape <code>(6, )</code>,
+containing the elements <code>[gg, mm, ee, gm, eg, em]</code> without recoil,
+or be the full flattened density matrix with all the recoil information.
+If <code>None</code>, initially all population is in the state $|g_0\rangle$.</p></dd>
+<dt>dt<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#scalar' | relative_url }}">scalar</a> | None</em></span></dt>
+<dd class="field-desc"><p>The width of the time steps (&mu;s). If <code>None</code>, it is <code>0.1 / (a_ge + rabi)</code> with the Rabi frequency
+of the laser.</p></dd>
 <dt>time_resolved<span class="classifier"><em>bool</em></span></dt>
-<dd class="field-desc"><p>Whether to return the complete history of the result.</p></dd>
+<dd class="field-desc"><p>Whether to return the complete history of the result.
+If <code>True</code>, a 2-tuple <code>(t, rho)</code> is returned, where <code>rho</code> has shape <code>(t.size, 3 * (n + 1))</code>
+and <code>t</code> is an array of equally spaced times, such that numerical integrations can be performed easily.</p></dd>
 <dt>show<span class="classifier"><em>bool</em></span></dt>
 <dd class="field-desc"><p>Whether to plot the result.</p></dd>
 </dl>
@@ -78,10 +84,15 @@ or be the full density matrix with all the recoil information.</p></dd>
 <dt class="field-head">Returns<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>out<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">ndarray</a> | tuple[<a href="{{ '/doc/modules/qtypes.html' | relative_url }}">ndarray</a>, <a href="{{ '/doc/modules/qtypes.html' | relative_url }}">ndarray</a>]</em></span></dt>
-<dd class="field-desc"><p>The diagonal density matrix elements after the time 't'. If time_resolved is True,
-a 2-tuple similar to (time, density matrix) is returned, were the density matrix has shape (time.size, 3(n+1)).
-time will be an array of equally spaced times, such that numerical integrations can be performed easily.</p></dd>
+<dt>rho_diag<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#ndarray' | relative_url }}">ndarray</a> | tuple[<a href="{{ '/doc/modules/qtypes.html#ndarray' | relative_url }}">ndarray</a>, <a href="{{ '/doc/modules/qtypes.html#ndarray' | relative_url }}">ndarray</a>]</em></span></dt>
+<dd class="field-desc"><p>The diagonal density matrix elements after the time <code>t</code>.</p></dd>
+</dl>
+</dd>
+<dt class="field-head">Raises<span class="colon">:</span></dt>
+<dd class="field-par">
+<dl>
+<dt>ValueError</dt>
+<dd class="field-desc"><p>If <code>t</code> is not a scalar or if <code>p0</code> has the wrong size.</p></dd>
 </dl>
 </dd>
 </dl>

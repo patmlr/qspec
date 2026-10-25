@@ -11,28 +11,35 @@ title: qspec.transform
 ,&nbsp;
 <em class="sig-param"><span class="n">vec</span></em>
 ,&nbsp;
-<em class="sig-param"><span class="n">axis</span><span class="o">=</span><span class="default_value num">-1</span></em>
-<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/tools.py#L890-L902' }}"><span class="sig-source">[source]</span></a>
+<em class="sig-param"><span class="n">axis</span><span class="o">=</span><span class="default_value"><span class="num">-1</span></span></em>
+<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/tools.py#L982-L996' }}"><span class="sig-source">[source]</span></a>
 </dt>
 <dd class="field-body">
-
+<p>Transform vectors with a matrix, $\vec{v}^\prime = T\vec{v}$.</p>
 <dl class="field-list">
 <dt class="field-head">Parameters<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>t<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">array_like</a></em></span></dt>
-<dd class="field-desc"><p>The transformation matrix which must hold t.shape[axis+1] == vec.shape[axis].</p></dd>
-<dt>vec<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">array_like</a></em></span></dt>
-<dd class="field-desc"><p>The vector to be transformed.</p></dd>
+<dt>t<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a></em></span></dt>
+<dd class="field-desc"><p>The transformation matrix $T$. It must hold <code>t.shape[axis + 1] == vec.shape[axis]</code>.</p></dd>
+<dt>vec<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a></em></span></dt>
+<dd class="field-desc"><p>The vector $\vec{v}$ to be transformed.</p></dd>
 <dt>axis<span class="classifier"><em>int</em></span></dt>
-<dd class="field-desc"><p>The axis along which the vector components of 'vec' are aligned and that is summed over.</p></dd>
+<dd class="field-desc"><p>The axis along which the vector components of <code>vec</code> are aligned and that is summed over.</p></dd>
 </dl>
 </dd>
 <dt class="field-head">Returns<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>out<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">ndarray</a></em></span></dt>
-<dd class="field-desc"><p>The transformed vector vec_new = t * vec.</p></dd>
+<dt>vec_new<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#ndarray' | relative_url }}">ndarray</a></em></span></dt>
+<dd class="field-desc"><p>The transformed vector $\vec{v}^\prime$.</p></dd>
+</dl>
+</dd>
+<dt class="field-head">Raises<span class="colon">:</span></dt>
+<dd class="field-par">
+<dl>
+<dt>ValueError</dt>
+<dd class="field-desc"><p>If the shapes of <code>t</code> and <code>vec</code> are not compatible.</p></dd>
 </dl>
 </dd>
 </dl>

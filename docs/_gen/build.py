@@ -21,6 +21,8 @@ PROJECT = Project(
     namespaced={"models", "simulate", "analyze"},
     include={
         "qtypes": {
+            "HasGetItem",
+            "HasShape",
             "asarray",
             "asarray_none",
             "cast",
@@ -29,9 +31,9 @@ PROJECT = Project(
             "has_shape",
             "is_scalar",
             "is_sympy_expr",
+            "quant",
         }
     },
-    type_aliases="qtypes",
 )
 
 if __name__ == "__main__":

@@ -29,43 +29,52 @@ title: qspec.models.HyperfineZeeman
 ,&nbsp;
 <em class="sig-param"><span class="n">rho_ml</span><span class="o">=</span><span class="default_value">None</span></em>
 ,&nbsp;
-<em class="sig-param"><span class="n">rho_as_par</span><span class="o">=</span><span class="default_value bool">False</span></em>
+<em class="sig-param"><span class="n">rho_as_par</span><span class="o">=</span><span class="default_value"><span class="bool">False</span></span></em>
 ,&nbsp;
 <em class="sig-param"><span class="n">scale_par_with_shift</span><span class="o">=</span><span class="default_value">None</span></em>
 ,&nbsp;
-<em class="sig-param"><span class="n">linear</span><span class="o">=</span><span class="default_value bool">False</span></em>
+<em class="sig-param"><span class="n">linear</span><span class="o">=</span><span class="default_value"><span class="bool">False</span></span></em>
 ,&nbsp;
 <em class="sig-param"><span class="n">label</span><span class="o">=</span><span class="default_value">None</span></em>
-<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/models/_splitter.py#L740-L1036' }}"><span class="sig-source">[source]</span></a>
+<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/models/_splitter.py#L747-L1042' }}"><span class="sig-source">[source]</span></a>
 </dt>
 <dd class="field-body">
-
+<p>A hyperfine structure model in an external magnetic field, summing the submodel over all allowed transitions
+$|F_lm_l\rangle\rightarrow|F_um_u\rangle$. The Zeeman shifts are calculated with
+<a href="{{ '/doc/functions/physics/zeeman_linear.html' | relative_url }}"><code>qspec.physics.zeeman_linear</code></a> if <code>linear</code> is <code>True</code>, else with <a href="{{ '/doc/functions/physics/hyper_zeeman_num.html' | relative_url }}"><code>qspec.physics.hyper_zeeman_num</code></a>.
+The relative intensities are the Racah intensities <a href="{{ '/doc/functions/models/hf_int.html' | relative_url }}"><code>hf_int</code></a>, multiplied by the squared Clebsch-Gordan
+coefficients, the polarization components $q_{m_u - m_l}$ and the lower state populations $\rho(F_l, m_l)$.
+In addition to the parameters of <a href="{{ '/doc/functions/models/Hyperfine/Hyperfine.html' | relative_url }}"><code>Hyperfine</code></a>, the magnetic field is the parameter <code>B_field</code> (T).</p>
 <dl class="field-list">
 <dt class="field-head">Parameters<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
 <dt>model<span class="classifier"><em><a href="{{ '/doc/functions/models/Model/Model.html' | relative_url }}">Model</a></em></span></dt>
 <dd class="field-desc"><p>A submodel whose parameters are adopted by this model.</p></dd>
-<dt>i<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">scalar</a></em></span></dt>
-<dd class="field-desc"><p>The nuclear spin $I$.</p></dd>
-<dt>j_l<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">scalar</a></em></span></dt>
-<dd class="field-desc"><p>The total lower state electron angular momentum $J$.</p></dd>
-<dt>j_u<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">scalar</a></em></span></dt>
-<dd class="field-desc"><p>The total upper state electron angular momentum $J^\prime$.</p></dd>
-<dt>gi<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">scalar</a></em></span></dt>
-<dd class="field-desc"><p>The nuclear Lande g-factor.</p></dd>
-<dt>gj_l<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">scalar</a></em></span></dt>
-<dd class="field-desc"><p>The lower state Lande gj-factor.</p></dd>
-<dt>gj_u<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">scalar</a></em></span></dt>
-<dd class="field-desc"><p>The upper state Lande gj-factor.</p></dd>
-<dt>f_l<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">scalar</a> | None</em></span></dt>
-<dd class="field-desc"><p>The total lower state angular momenta $F$.</p></dd>
-<dt>f_u<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">scalar</a> | None</em></span></dt>
-<dd class="field-desc"><p>The total upper state angular momenta $F^\prime$.</p></dd>
-<dt>q<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">array_like</a> | None</em></span></dt>
-<dd class="field-desc"><p>The polarization vector $\vec{q}$.</p></dd>
-<dt>rho_ml<span class="classifier"><em>Iterable[<a href="{{ '/doc/modules/qtypes.html' | relative_url }}">array_like</a>] | None</em></span></dt>
-<dd class="field-desc"><p>The lower state population. Must be an Iterable of arrays.
+<dt>i<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#scalar' | relative_url }}">scalar</a></em></span></dt>
+<dd class="field-desc"><p>The nuclear spin quantum number $I$.</p></dd>
+<dt>j_l<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#scalar' | relative_url }}">scalar</a></em></span></dt>
+<dd class="field-desc"><p>The electronic total angular momentum quantum number $J_l$ of the lower state.</p></dd>
+<dt>j_u<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#scalar' | relative_url }}">scalar</a></em></span></dt>
+<dd class="field-desc"><p>The electronic total angular momentum quantum number $J_u$ of the upper state.</p></dd>
+<dt>gi<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#scalar' | relative_url }}">scalar</a></em></span></dt>
+<dd class="field-desc"><p>The nuclear g-factor $g_I$.</p></dd>
+<dt>gj_l<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#scalar' | relative_url }}">scalar</a></em></span></dt>
+<dd class="field-desc"><p>The electronic g-factor $g_J$ of the lower state.</p></dd>
+<dt>gj_u<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#scalar' | relative_url }}">scalar</a></em></span></dt>
+<dd class="field-desc"><p>The electronic g-factor $g_J$ of the upper state.</p></dd>
+<dt>f_l<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#scalar' | relative_url }}">scalar</a> | None</em></span></dt>
+<dd class="field-desc"><p>The total angular momentum quantum number(s) $F_l$ of the lower state to consider.
+If <code>None</code>, all are considered.</p></dd>
+<dt>f_u<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#scalar' | relative_url }}">scalar</a> | None</em></span></dt>
+<dd class="field-desc"><p>The total angular momentum quantum number(s) $F_u$ of the upper state to consider.
+If <code>None</code>, all are considered.</p></dd>
+<dt>q<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a> | None</em></span></dt>
+<dd class="field-desc"><p>The polarization vector $\vec{q} = (q_{-1}, q_0, q_1)$ in the helicity basis,
+or an integer in <code>{-1, 0, 1}</code> for pure $\sigma^-$, $\pi$ or $\sigma^+$ light.
+If <code>None</code>, all components are equal. The vector is normalized to a sum of 1.</p></dd>
+<dt>rho_ml<span class="classifier"><em>Iterable[<a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a>] | None</em></span></dt>
+<dd class="field-desc"><p>The lower state populations. Must be an iterable of arrays.
 If <code>None</code>, the default list is given by <code>rho_ml = [np.ones(2 * f + 1) for f in f_l]</code>.</p></dd>
 <dt>rho_as_par<span class="classifier"><em>bool</em></span></dt>
 <dd class="field-desc"><p>Whether to parameterize the transition intensities by the lower state populations
@@ -79,6 +88,40 @@ such as the Lorentz width <code>"Gamma"</code>.</p></dd>
 the Zeeman shift is calculated numerically, decreasing computing speed.</p></dd>
 <dt>label<span class="classifier"><em>str | None</em></span></dt>
 <dd class="field-desc"><p>A label for the <code>Splitter</code> (isotope / isomer / transition).</p></dd>
+</dl>
+</dd>
+<dt class="field-head">Attributes<span class="colon">:</span></dt>
+<dd class="field-par">
+<dl>
+<dt>description<span class="classifier"><em>str</em></span></dt>
+<dd class="field-desc"><p>A description of the model hierarchy, e.g., <code>"Offset.Summed[0].Hyperfine.Voigt"</code>.</p></dd>
+<dt>dx<span class="classifier"><em>float</em></span></dt>
+<dd class="field-desc"><p>A hint for an x-axis step size for a smooth display of the model.</p></dd>
+<dt>error<span class="classifier"><em>str</em></span></dt>
+<dd class="field-desc"><p>An error message if there is an issue with the model parameters (not implemented).</p></dd>
+<dt>fixes<span class="classifier"><em>list[<a href="{{ '/doc/modules/qtypes.html#fix_type' | relative_url }}">fix_type</a>]</em></span></dt>
+<dd class="field-desc"><p>The fix states of the parameters, see <a href="{{ '/doc/functions/models/Model/set_fix.html' | relative_url }}"><code>Model.set_fix</code></a>.</p></dd>
+<dt>links<span class="classifier"><em>list[bool]</em></span></dt>
+<dd class="field-desc"><p>Whether the parameters are linked to the parameters with the same name in a <a href="{{ '/doc/functions/models/Linked/Linked.html' | relative_url }}"><code>Linked</code></a> model.</p></dd>
+<dt>model<span class="classifier"><em><a href="{{ '/doc/functions/models/Model/Model.html' | relative_url }}">Model</a> | None</em></span></dt>
+<dd class="field-desc"><p>The submodel.</p></dd>
+<dt>names<span class="classifier"><em>list[str]</em></span></dt>
+<dd class="field-desc"><p>The names of the parameters.</p></dd>
+<dt>p<span class="classifier"><em>dict[str, int]</em></span></dt>
+<dd class="field-desc"><p>A map of the parameter names to their indexes.</p></dd>
+<dt>size<span class="classifier"><em>int</em></span></dt>
+<dd class="field-desc"><p>The number of parameters required by the model.</p></dd>
+<dt>type<span class="classifier"><em>str</em></span></dt>
+<dd class="field-desc"><p>The name of the model type.</p></dd>
+<dt>vals<span class="classifier"><em>list[float]</em></span></dt>
+<dd class="field-desc"><p>The current values of the parameters.</p></dd>
+</dl>
+</dd>
+<dt class="field-head">Raises<span class="colon">:</span></dt>
+<dd class="field-par">
+<dl>
+<dt>ValueError</dt>
+<dd class="field-desc"><p>If <code>q</code> is neither a 3d-vector nor in <code>{-1, 0, 1}</code>.</p></dd>
 </dl>
 </dd>
 </dl>

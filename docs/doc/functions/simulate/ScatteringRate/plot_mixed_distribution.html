@@ -7,38 +7,30 @@ title: qspec.simulate.ScatteringRate.plot_mixed_distribution
 <span class="sig-prename">qspec.simulate.</span><span class="sig-classname">ScatteringRate</span><span class="sig-prename">.</span>
 <span class="sig-name">plot_mixed_distribution</span>
 <span class="sig-paren">&nbsp;(&nbsp;</span>
-<em class="sig-param"><span class="n">n</span><span class="o">=</span><span class="default_value num">5</span></em>
+<em class="sig-param"><span class="n">n</span><span class="o">=</span><span class="default_value"><span class="num">5</span></span></em>
 ,&nbsp;
 <em class="sig-param"><span class="n">mode</span><span class="o">=</span><span class="default_value">None</span></em>
 ,&nbsp;
-<em class="sig-param"><span class="n">show</span><span class="o">=</span><span class="default_value bool">True</span></em>
+<em class="sig-param"><span class="n">show</span><span class="o">=</span><span class="default_value"><span class="bool">True</span></span></em>
 ,&nbsp;
 <em class="sig-param"><span class="n">save</span><span class="o">=</span><span class="default_value">None</span></em>
-<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/simulate/_simulate.py#L1161-L1259' }}"><span class="sig-source">[source]</span></a>
+<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/simulate/_simulate.py#L1191-L1289' }}"><span class="sig-source">[source]</span></a>
 </dt>
 <dd class="field-body">
-
+<p>Plot the fluorescence spectrum as a function of the frequency and the angle $\theta$ (at $\phi = 0$)
+and as a function of the frequency and the angle $\phi$ (at $\theta = 0$).</p>
 <dl class="field-list">
 <dt class="field-head">Parameters<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
 <dt>n<span class="classifier"><em>int</em></span></dt>
-<dd class="field-desc"><p>2 ** n + 1 samples for 'theta' and 2 ** (n + 1) + 1 samples for 'phi' are drawn,
-giving a total of (2 ** n + 1) * len(self.x) and (2 ** (n + 1) + 1) * len(self.x)
-points to draw for theta and phi, respectively.</p></dd>
+<dd class="field-desc"><p><code>2**n + 1</code> samples for <code>theta</code> and <code>2**(n + 1) + 1</code> samples for <code>phi</code> are drawn.</p></dd>
 <dt>mode<span class="classifier"><em>str | None</em></span></dt>
-<dd class="field-desc"><p>Either '3d' for a surface plot or anything else for a color-mesh plot.</p></dd>
+<dd class="field-desc"><p>Either <code>"3d"</code> for a surface plot or anything else for a color-mesh plot.</p></dd>
 <dt>show<span class="classifier"><em>bool</em></span></dt>
-<dd class="field-desc"><p>Whether to show the plot.</p></dd>
+<dd class="field-desc"><p>Whether to show the plots.</p></dd>
 <dt>save<span class="classifier"><em>str | None</em></span></dt>
-<dd class="field-desc"><p>The path where to save the plot. If None, the plot will not be saved.</p></dd>
-</dl>
-</dd>
-<dt class="field-head">Returns<span class="colon">:</span></dt>
-<dd class="field-par">
-<dl>
-<dt>out<span class="classifier"><em>None</em></span></dt>
-<dd class="field-desc"><p>Optionally, two plots are drawn for theta and phi as the y-axes and saved.</p></dd>
+<dd class="field-desc"><p>The path where to save the plots. If <code>None</code>, the plots will not be saved.</p></dd>
 </dl>
 </dd>
 </dl>

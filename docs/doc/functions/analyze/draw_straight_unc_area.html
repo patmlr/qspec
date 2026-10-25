@@ -20,30 +20,32 @@ title: qspec.analyze.draw_straight_unc_area
 <em class="sig-param"><span class="n">corr_ab</span></em>
 ,&nbsp;
 <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em>
-<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/analyze/_analyze.py#L242-L261' }}"><span class="sig-source">[source]</span></a>
+<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/analyze/_analyze.py#L297-L319' }}"><span class="sig-source">[source]</span></a>
 </dt>
 <dd class="field-body">
-<p>Draws the $1\sigma_f$ standard deviation area of a
-<a href="{{ '/doc/functions/analyze/straight.html' | relative_url }}"><code>straight</code></a> $f$ enclosed by</p>
-<div class="math-block">$$[f(x) - \sigma_f(x), f(x) + \sigma_f(x)].$$</div>
+<p>Draw the $1\sigma_f$ standard deviation area of a straight line $f$ <a href="{{ '/doc/functions/analyze/straight.html' | relative_url }}"><code>straight</code></a> enclosed by</p>
+<div class="math-block">$$
+[f(x) - \sigma_f(x), f(x) + \sigma_f(x)],
+$$</div>
+<p>see <a href="{{ '/doc/functions/analyze/straight_std.html' | relative_url }}"><code>straight_std</code></a>.</p>
 <dl class="field-list">
 <dt class="field-head">Parameters<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>x<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">array_like</a></em></span></dt>
+<dt>x<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a></em></span></dt>
 <dd class="field-desc"><p>The $x$ values.</p></dd>
-<dt>a<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">array_like</a></em></span></dt>
+<dt>a<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a></em></span></dt>
 <dd class="field-desc"><p>The y-intercept $a$.</p></dd>
-<dt>b<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">array_like</a></em></span></dt>
+<dt>b<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a></em></span></dt>
 <dd class="field-desc"><p>The slope $b$.</p></dd>
-<dt>sigma_a<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">array_like</a></em></span></dt>
+<dt>sigma_a<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a></em></span></dt>
 <dd class="field-desc"><p>The standard deviation $\sigma_a$ of the y-intercept <code>a</code>.</p></dd>
-<dt>sigma_b<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">array_like</a></em></span></dt>
+<dt>sigma_b<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a></em></span></dt>
 <dd class="field-desc"><p>The standard deviation $\sigma_b$ of the slope <code>b</code>.</p></dd>
-<dt>corr_ab<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">array_like</a></em></span></dt>
+<dt>corr_ab<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a></em></span></dt>
 <dd class="field-desc"><p>The correlation coefficient $\rho_{ab}$ between the y-intercept <code>a</code> and the slope <code>b</code>.</p></dd>
 <dt>kwargs</dt>
-<dd class="field-desc"><p>The keyword arguments for the <code>fill_between</code> function.</p></dd>
+<dd class="field-desc"><p>Additional keyword arguments are passed to <code>matplotlib.pyplot.fill_between</code>.</p></dd>
 </dl>
 </dd>
 </dl>

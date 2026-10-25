@@ -8,10 +8,11 @@ title: qspec.has_getitem
 <span class="sig-name">has_getitem</span>
 <span class="sig-paren">&nbsp;(&nbsp;</span>
 <em class="sig-param"><span class="n">a</span></em>
-<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/qtypes.py#L188-L197' }}"><span class="sig-source">[source]</span></a>
+<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/qtypes.py#L224-L234' }}"><span class="sig-source">[source]</span></a>
 </dt>
 <dd class="field-body">
-<p>Check if <code>a</code> implements <code>__getitem__</code> so that <code>a[i]</code> can be used and <code>TypeGuard</code> it.</p>
+<p>Check if <code>a</code> implements <code>__getitem__</code> so that <code>a[i]</code> can be used and <code>TypeGuard</code> it.
+Arrays with shape <code>()</code> do not support indexing.</p>
 <dl class="field-list">
 <dt class="field-head">Parameters<span class="colon">:</span></dt>
 <dd class="field-par">
@@ -23,8 +24,8 @@ title: qspec.has_getitem
 <dt class="field-head">Returns<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>has_getitem<span class="classifier"><em>TypeGuard[<a href="{{ '/doc/modules/qtypes.html' | relative_url }}">HasGetItem</a>]</em></span></dt>
-<dd class="field-desc"><p>if <code>a</code> implements <code>__getitem__</code>.</p></dd>
+<dt>has_getitem<span class="classifier"><em>TypeGuard[<a href="{{ '/doc/functions/qtypes/HasGetItem/HasGetItem.html' | relative_url }}">HasGetItem</a>]</em></span></dt>
+<dd class="field-desc"><p>Whether <code>a</code> implements <code>__getitem__</code>.</p></dd>
 </dl>
 </dd>
 </dl>

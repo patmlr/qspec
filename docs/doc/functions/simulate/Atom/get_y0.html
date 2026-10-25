@@ -8,22 +8,23 @@ title: qspec.simulate.Atom.get_y0
 <span class="sig-name">get_y0</span>
 <span class="sig-paren">&nbsp;(&nbsp;</span>
 <em class="sig-param"><span class="n">ground_state_labels</span><span class="o">=</span><span class="default_value">None</span></em>
-<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/simulate/_simulate_cpp.py#L965-L977' }}"><span class="sig-source">[source]</span></a>
+<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/simulate/_simulate_cpp.py#L960-L975' }}"><span class="sig-source">[source]</span></a>
 </dt>
 <dd class="field-body">
-
+<p>The initial population of the atom with all ground states populated equally.</p>
 <dl class="field-list">
 <dt class="field-head">Parameters<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
 <dt>ground_state_labels<span class="classifier"><em>Iterable[str] | str | None</em></span></dt>
-<dd class="field-desc"><p>An Iterable of labels belonging to ground states.</p></dd>
+<dd class="field-desc"><p>An iterable of labels belonging to ground states.
+If <code>None</code>, the label of the first state <code>Atom.states[0]</code> is used.</p></dd>
 </dl>
 </dd>
 <dt class="field-head">Returns<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>y0<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">ndarray</a></em></span></dt>
+<dt>y0<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#ndarray' | relative_url }}">ndarray</a></em></span></dt>
 <dd class="field-desc"><p>The initial population of the atom.</p></dd>
 </dl>
 </dd>

@@ -17,11 +17,12 @@ title: qspec.gaussian_doppler_3d
 ,&nbsp;
 <em class="sig-param"><span class="n">r0</span><span class="o">=</span><span class="default_value">None</span></em>
 ,&nbsp;
-<em class="sig-param"><span class="n">axis</span><span class="o">=</span><span class="default_value num">-1</span></em>
-<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/physics.py#L2358-L2411' }}"><span class="sig-source">[source]</span></a>
+<em class="sig-param"><span class="n">axis</span><span class="o">=</span><span class="default_value"><span class="num">-1</span></span></em>
+<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/physics.py#L2519-L2573' }}"><span class="sig-source">[source]</span></a>
 </dt>
 <dd class="field-body">
-<p>The length |$\vec{k}^\prime$| of the Doppler-shifted 3-vector <code>k</code> in the rest frame of the atom</p>
+<p>The length $|\vec{k}^\prime|$ of the Doppler-shifted wave vector <code>k</code> in the rest frame of the atom
+moving through a Gaussian beam</p>
 <div class="math-block">$$\begin{aligned}
 |\vec{k}^\prime| &amp;= |\vec{k}|\gamma\left[1 - \beta\cos(\alpha)\left(1 - \frac{w_0^2}{2z_+^2}
 - \frac{\rho^2z_-^2}{2z_+^4}\right) - \beta\sin(\alpha)\frac{\rho z}{z_+^2}\right]\\[2ex]
@@ -37,15 +38,15 @@ between $\vec{k}$ and $\vec{v}$.</p>
 <dt class="field-head">Parameters<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>r<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">array_like</a></em></span></dt>
-<dd class="field-desc"><p>The position 3-vector $\vec{r}$ where to calculate the beam intensity (m).</p></dd>
-<dt>k<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">array_like</a></em></span></dt>
+<dt>r<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a></em></span></dt>
+<dd class="field-desc"><p>The position 3-vector $\vec{r}$ of the atom (m).</p></dd>
+<dt>k<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a></em></span></dt>
 <dd class="field-desc"><p>The 3-vector $\vec{k}$ of light, where $|\vec{k}| = \omega / c$ (rad / m).</p></dd>
-<dt>w0<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">array_like</a></em></span></dt>
+<dt>w0<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a></em></span></dt>
 <dd class="field-desc"><p>The beam waist $w_0$ (m).</p></dd>
-<dt>v<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">array_like</a></em></span></dt>
+<dt>v<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a></em></span></dt>
 <dd class="field-desc"><p>The velocity 3-vector $\vec{v}$ (m/s).</p></dd>
-<dt>r0<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">array_like</a> | None</em></span></dt>
+<dt>r0<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a> | None</em></span></dt>
 <dd class="field-desc"><p>The position 3-vector $\vec{r}_0$ of the beam waist. If <code>r0</code> is <code>None</code>, it is <code>[0., 0., 0.]</code> (m).</p></dd>
 <dt>axis<span class="classifier"><em>int</em></span></dt>
 <dd class="field-desc"><p>The axis along which the vector components are aligned.</p></dd>
@@ -54,8 +55,8 @@ between $\vec{k}$ and $\vec{v}$.</p>
 <dt class="field-head">Returns<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>k_abs<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">ndarray</a></em></span></dt>
-<dd class="field-desc"><p>The length |$\vec{k}^\prime$| (rad / m).</p></dd>
+<dt>k_abs<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#ndarray' | relative_url }}">ndarray</a></em></span></dt>
+<dd class="field-desc"><p>The length $|\vec{k}^\prime|$ (rad / m).</p></dd>
 </dl>
 </dd>
 <dt class="field-head">Raises<span class="colon">:</span></dt>

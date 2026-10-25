@@ -15,36 +15,36 @@ title: qspec.simulate.gen_electronic_ls_state
 ,&nbsp;
 <em class="sig-param"><span class="n">j</span></em>
 ,&nbsp;
-<em class="sig-param"><span class="n">i</span><span class="o">=</span><span class="default_value num">0</span></em>
+<em class="sig-param"><span class="n">i</span><span class="o">=</span><span class="default_value"><span class="num">0</span></span></em>
 ,&nbsp;
 <em class="sig-param"><span class="n">hyper_const</span><span class="o">=</span><span class="default_value">None</span></em>
 ,&nbsp;
-<em class="sig-param"><span class="n">gi</span><span class="o">=</span><span class="default_value num">0</span></em>
+<em class="sig-param"><span class="n">gi</span><span class="o">=</span><span class="default_value"><span class="num">0</span></span></em>
 ,&nbsp;
 <em class="sig-param"><span class="n">label</span><span class="o">=</span><span class="default_value">None</span></em>
-<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/simulate/_simulate_cpp.py#L2590-L2623' }}"><span class="sig-source">[source]</span></a>
+<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/simulate/_simulate_cpp.py#L2558-L2591' }}"><span class="sig-source">[source]</span></a>
 </dt>
 <dd class="field-body">
-<p>Creates all substates of a fine-structure state $|\mathrm{[label]}\pi SLJI\rangle$ using a common label.</p>
+<p>Create all substates of a fine-structure state $|\mathrm{[label]}\pi SLJI\rangle$ using a common label.</p>
 <dl class="field-list">
 <dt class="field-head">Parameters<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>freq_j<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">scalar</a></em></span></dt>
+<dt>freq_j<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#scalar' | relative_url }}">scalar</a></em></span></dt>
 <dd class="field-desc"><p>The energetic position of the state without the hyperfine structure or the magnetic field (MHz).</p></dd>
-<dt>s<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">scalar</a></em></span></dt>
+<dt>s<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#scalar' | relative_url }}">scalar</a></em></span></dt>
 <dd class="field-desc"><p>The electron spin quantum number $S$.</p></dd>
-<dt>l<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">scalar</a></em></span></dt>
+<dt>l<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#scalar' | relative_url }}">scalar</a></em></span></dt>
 <dd class="field-desc"><p>The electronic angular momentum quantum number $L$.</p></dd>
-<dt>j<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">scalar</a></em></span></dt>
+<dt>j<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#scalar' | relative_url }}">scalar</a></em></span></dt>
 <dd class="field-desc"><p>The electronic total angular momentum quantum number $J$.</p></dd>
-<dt>i<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">scalar</a></em></span></dt>
+<dt>i<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#scalar' | relative_url }}">scalar</a></em></span></dt>
 <dd class="field-desc"><p>The nuclear spin quantum number $I$.</p></dd>
-<dt>hyper_const<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">array_like</a> | None</em></span></dt>
+<dt>hyper_const<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a> | None</em></span></dt>
 <dd class="field-desc"><p>A list of the hyperfine-structure constants.
 Currently, constants up to the electric quadrupole order are supported ($A$, $B$).
 If <code>hyper_const</code> is a scalar, it is assumed to be the constant $A$ and the other orders are 0 (MHz).</p></dd>
-<dt>gi<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">scalar</a></em></span></dt>
+<dt>gi<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#scalar' | relative_url }}">scalar</a></em></span></dt>
 <dd class="field-desc"><p>The nuclear g-factor $g_I$.</p></dd>
 <dt>label<span class="classifier"><em>str | None</em></span></dt>
 <dd class="field-desc"><p>The label of the state. The label is used to link states via a <code>DecayMap</code>.</p></dd>

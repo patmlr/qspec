@@ -11,24 +11,25 @@ title: qspec.doppler_3d
 ,&nbsp;
 <em class="sig-param"><span class="n">v</span></em>
 ,&nbsp;
-<em class="sig-param"><span class="n">return_frame</span><span class="o">=</span><span class="default_value string">&#x27;atom&#x27;</span></em>
+<em class="sig-param"><span class="n">return_frame</span><span class="o">=</span><span class="default_value"><span class="string">&#x27;atom&#x27;</span></span></em>
 ,&nbsp;
-<em class="sig-param"><span class="n">axis</span><span class="o">=</span><span class="default_value num">-1</span></em>
-<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/physics.py#L2271-L2305' }}"><span class="sig-source">[source]</span></a>
+<em class="sig-param"><span class="n">axis</span><span class="o">=</span><span class="default_value"><span class="num">-1</span></span></em>
+<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/physics.py#L2435-L2468' }}"><span class="sig-source">[source]</span></a>
 </dt>
 <dd class="field-body">
-<p>The 3D Doppler shift of the 3-vector $\vec{k}$</p>
+<p>The 3D Doppler shift of the wave vector $\vec{k}$</p>
 <div class="math-block">$$
-k^{\prime\mu} = \Lambda^\nu_\mu(\pm\vec{v})k^\mu,
+k^{\prime\mu} = \Lambda^\mu_{\ \nu}(\pm\vec{v})k^\nu,\quad k^\mu = (|\vec{k}|, \vec{k}),
 $$</div>
-<p>with the Lorentz-boost matrix $\Lambda_\nu^\mu$.</p>
+<p>with the Lorentz-boost matrix $\Lambda^\mu_{\ \nu}$, see <a href="{{ '/doc/functions/physics/boost.html' | relative_url }}"><code>boost</code></a>.
+The upper (lower) sign applies to <code>return_frame == "atom"</code> (<code>"lab"</code>).</p>
 <dl class="field-list">
 <dt class="field-head">Parameters<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>k<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">array_like</a></em></span></dt>
-<dd class="field-desc"><p>The 3-vector $\vec{k}$ of light. Must have size 3 in the specified <code>axis (arb. units)</code>.</p></dd>
-<dt>v<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">array_like</a></em></span></dt>
+<dt>k<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a></em></span></dt>
+<dd class="field-desc"><p>The wave vector $\vec{k}$ of light. Must have size 3 in the specified <code>axis</code> (arb. units).</p></dd>
+<dt>v<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a></em></span></dt>
 <dd class="field-desc"><p>The velocity 3-vector $\vec{v}$. Must have size 3 in the specified <code>axis</code> (m/s).</p></dd>
 <dt>return_frame<span class="classifier"><em>str</em></span></dt>
 <dd class="field-desc"><p>The coordinate system in which the frequency is returned. Can be either <code>"atom"</code> or <code>"lab"</code>.</p></dd>
@@ -39,8 +40,8 @@ $$</div>
 <dt class="field-head">Returns<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>k_boosted<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">ndarray</a></em></span></dt>
-<dd class="field-desc"><p>the Doppler-shifted 3-vector $\vec{k}^{\prime}$ in either the rest frame of the atom
+<dt>k_boosted<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#ndarray' | relative_url }}">ndarray</a></em></span></dt>
+<dd class="field-desc"><p>The Doppler-shifted wave vector $\vec{k}^{\prime}$ in either the rest frame of the atom
 or the laboratory frame (unit of <code>k</code>).</p></dd>
 </dl>
 </dd>
@@ -48,7 +49,8 @@ or the laboratory frame (unit of <code>k</code>).</p></dd>
 <dd class="field-par">
 <dl>
 <dt>ValueError</dt>
-<dd class="field-desc"><p><code>rest_frame</code> must be either <code>"atom"</code> or <code>"lab"</code>. The shapes of <code>k</code> and <code>v</code> must be compatible.</p></dd>
+<dd class="field-desc"><p><code>return_frame</code> must be either <code>"atom"</code> or <code>"lab"</code>.
+<code>k</code> and <code>v</code> must have 3 components along the specified <code>axis</code> and compatible shapes.</p></dd>
 </dl>
 </dd>
 </dl>

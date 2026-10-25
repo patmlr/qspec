@@ -10,25 +10,29 @@ title: qspec.rotation_matrix
 <em class="sig-param"><span class="n">alpha</span></em>
 ,&nbsp;
 <em class="sig-param"><span class="n">dr</span></em>
-<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/tools.py#L1033-L1044' }}"><span class="sig-source">[source]</span></a>
+<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/tools.py#L1148-L1167' }}"><span class="sig-source">[source]</span></a>
 </dt>
 <dd class="field-body">
-
+<p>The matrix of a rotation by the angle $\alpha$ about the axis $\hat{n}$ (Rodrigues' rotation formula)</p>
+<div class="math-block">$$
+R = \cos(\alpha)\mathbb{1} + \sin(\alpha)[\hat{n}]_\times + (1 - \cos(\alpha))\hat{n}\hat{n}^T,
+$$</div>
+<p>where $[\hat{n}]_\times$ is the cross-product matrix of $\hat{n}$.</p>
 <dl class="field-list">
 <dt class="field-head">Parameters<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>alpha<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">array_like</a></em></span></dt>
-<dd class="field-desc"><p>The angle to rotate.</p></dd>
-<dt>dr<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">scalar_nd</a></em></span></dt>
-<dd class="field-desc"><p>The vector to rotate about.</p></dd>
+<dt>alpha<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a></em></span></dt>
+<dd class="field-desc"><p>The angle $\alpha$ of the rotation (rad).</p></dd>
+<dt>dr<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#scalar_nd' | relative_url }}">scalar_nd</a></em></span></dt>
+<dd class="field-desc"><p>The vector to rotate about. Does not have to be normalized.</p></dd>
 </dl>
 </dd>
 <dt class="field-head">Returns<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>out<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">ndarray</a></em></span></dt>
-<dd class="field-desc"><p>The rotation matrix defined by the angle alpha and the vector dr.</p></dd>
+<dt>R<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#ndarray' | relative_url }}">ndarray</a></em></span></dt>
+<dd class="field-desc"><p>The rotation matrix $R$.</p></dd>
 </dl>
 </dd>
 </dl>

@@ -19,25 +19,25 @@ title: qspec.analyze.curve_fit
 ,&nbsp;
 <em class="sig-param"><span class="n">sigma</span><span class="o">=</span><span class="default_value">None</span></em>
 ,&nbsp;
-<em class="sig-param"><span class="n">absolute_sigma</span><span class="o">=</span><span class="default_value bool">False</span></em>
+<em class="sig-param"><span class="n">absolute_sigma</span><span class="o">=</span><span class="default_value"><span class="bool">False</span></span></em>
 ,&nbsp;
-<em class="sig-param"><span class="n">check_finite</span><span class="o">=</span><span class="default_value bool">True</span></em>
+<em class="sig-param"><span class="n">check_finite</span><span class="o">=</span><span class="default_value"><span class="bool">True</span></span></em>
 ,&nbsp;
-<em class="sig-param"><span class="n">bounds</span><span class="o">=</span><span class="default_value num">(-inf, inf)</span></em>
+<em class="sig-param"><span class="n">bounds</span><span class="o">=</span><span class="default_value">(<span class="num">-inf</span>, <span class="num">inf</span>)</span></em>
 ,&nbsp;
 <em class="sig-param"><span class="n">method</span><span class="o">=</span><span class="default_value">None</span></em>
 ,&nbsp;
 <em class="sig-param"><span class="n">jac</span><span class="o">=</span><span class="default_value">None</span></em>
 ,&nbsp;
-<em class="sig-param"><span class="n">full_output</span><span class="o">=</span><span class="default_value bool">False</span></em>
+<em class="sig-param"><span class="n">full_output</span><span class="o">=</span><span class="default_value"><span class="bool">False</span></span></em>
 ,&nbsp;
-<em class="sig-param"><span class="n">report</span><span class="o">=</span><span class="default_value bool">False</span></em>
+<em class="sig-param"><span class="n">report</span><span class="o">=</span><span class="default_value"><span class="bool">False</span></span></em>
 ,&nbsp;
 <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em>
-<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/analyze/_analyze.py#L1294-L1510' }}"><span class="sig-source">[source]</span></a>
+<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/analyze/_analyze.py#L1371-L1575' }}"><span class="sig-source">[source]</span></a>
 </dt>
 <dd class="field-body">
-<p>Use non-linear least squares to fit a function, $f$, to data. Assumes <code>ydata = f(xdata, *params) + eps</code>.
+<p>Use non-linear least squares to fit a function $f$ to data. Assumes <code>y = f(x, *params) + eps</code>.
 This is a reimplementation of
 <a href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.curve_fit.html">
 <code>scipy.optimize.curve_fit</code></a> with the additional features of fixing parameters with <code>p0_fixed</code>
@@ -48,35 +48,37 @@ and the option to use the parameter <code>sigma</code> dynamically as a function
 <dl>
 <dt>f<span class="classifier"><em>Callable</em></span></dt>
 <dd class="field-desc"><p>The model function $f$ to fit to the data.</p></dd>
-<dt>x<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">array_like</a> | object</em></span></dt>
+<dt>x<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a> | object</em></span></dt>
 <dd class="field-desc"><p>The $x$ data.</p></dd>
-<dt>y<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">array_like</a></em></span></dt>
+<dt>y<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a></em></span></dt>
 <dd class="field-desc"><p>The $y$ data.</p></dd>
-<dt>p0<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">array_like</a> | None</em></span></dt>
+<dt>p0<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a> | None</em></span></dt>
 <dd class="field-desc"><p>A numpy array or an Iterable of the initial guesses for the parameters.
 Must have at least the same length as the minimum number of parameters required by the function <code>f</code>.
 If <code>p0</code> is <code>None</code>, 1 is taken as an initial guess for all non-keyword parameters.</p></dd>
-<dt>p0_fixed<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">array_like</a> | None</em></span></dt>
+<dt>p0_fixed<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a> | None</em></span></dt>
 <dd class="field-desc"><p>A numpy array or an Iterable of <code>bool</code> values specifying whether to fix a parameter.
 Must have the same length as <code>p0</code>.</p></dd>
-<dt>sigma<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">array_like</a> | Callable | None</em></span></dt>
+<dt>sigma<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a> | Callable | None</em></span></dt>
 <dd class="field-desc"><p>The $1\sigma$ uncertainty of the <code>y</code> data.
 This can also be a function $g$ such that <code>g(x, y, f(x, *params), *params) -&gt; sigma</code>.</p></dd>
 <dt>absolute_sigma<span class="classifier"><em>bool</em></span></dt>
-<dd class="field-desc"><p>Assumes ydata = f(xdata, *params) + eps</p></dd>
+<dd class="field-desc"><p>Whether <code>sigma</code> is used in an absolute sense (<code>True</code>) and the covariance matrix
+reflects these absolute values, or only the relative magnitudes of <code>sigma</code> matter (<code>False</code>)
+and the covariance matrix is scaled by the reduced $\chi^2$.</p></dd>
 <dt>check_finite<span class="classifier"><em>bool</em></span></dt>
 <dd class="field-desc"><p>See
 <a href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.curve_fit.html">
 <code>scipy.optimize.curve_fit</code></a>.</p></dd>
-<dt>bounds<span class="classifier"><em>tuple[<a href="{{ '/doc/modules/qtypes.html' | relative_url }}">scalar</a>, <a href="{{ '/doc/modules/qtypes.html' | relative_url }}">scalar</a>]</em></span></dt>
+<dt>bounds<span class="classifier"><em>tuple[<a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a>, <a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a>] | Bounds</em></span></dt>
 <dd class="field-desc"><p>See
 <a href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.curve_fit.html">
 <code>scipy.optimize.curve_fit</code></a>.</p></dd>
-<dt>method<span class="classifier"><em>str | None</em></span></dt>
+<dt>method<span class="classifier"><em>Literal[&quot;trf&quot;, &quot;dogbox&quot;, &quot;lm&quot;] | None</em></span></dt>
 <dd class="field-desc"><p>See
 <a href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.curve_fit.html">
 <code>scipy.optimize.curve_fit</code></a>.</p></dd>
-<dt>jac<span class="classifier"><em>Callable | str | None</em></span></dt>
+<dt>jac<span class="classifier"><em>Callable | Literal[&quot;2-point&quot;, &quot;3-point&quot;, &quot;cs&quot;] | None</em></span></dt>
 <dd class="field-desc"><p>See
 <a href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.curve_fit.html">
 <code>scipy.optimize.curve_fit</code></a>. Must not be callable if <code>sigma</code> is callable.</p></dd>
@@ -97,17 +99,22 @@ This can also be a function $g$ such that <code>g(x, y, f(x, *params), *params) 
 <dl>
 <dt>(popt, pcov)<span class="classifier"><em>Any</em></span></dt>
 <dd class="field-desc"><p>The optimal parameters and their covariance matrix.
-Additional output if <code>full_output == True</code>.
+Additional output if <code>full_output</code> is <code>True</code>.
 See <a href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.curve_fit.html">
-<code>scipy.optimize.curve_fit</code></a>.</p></dd>
+<code>scipy.optimize.curve_fit</code></a>. An <code>OptimizeWarning</code> is issued
+if the covariance of the parameters cannot be estimated.</p></dd>
 </dl>
 </dd>
 <dt class="field-head">Raises<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>(ValueError, RuntimeError, OptimizeWarning)</dt>
-<dd class="field-desc"><p>If either <code>x</code> or <code>y</code> contain NaNs, or if incompatible options are used.
-If the least-squares minimization fails. If covariance of the parameters can not be estimated.</p></dd>
+<dt>ValueError</dt>
+<dd class="field-desc"><p>If either <code>x</code> or <code>y</code> contain NaNs, if <code>sigma</code> has an invalid shape
+or if incompatible options are used.</p></dd>
+<dt>RuntimeError</dt>
+<dd class="field-desc"><p>If the least-squares minimization fails.</p></dd>
+<dt>TypeError</dt>
+<dd class="field-desc"><p>If the number of parameters exceeds the number of data points for the method <code>"lm"</code>.</p></dd>
 </dl>
 </dd>
 </dl>

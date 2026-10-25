@@ -7,26 +7,45 @@ title: qspec.simulate.Geometry
 <span class="sig-prename">qspec.simulate.</span>
 <span class="sig-classname">Geometry</span>
 <span class="sig-paren">&nbsp;(&nbsp;</span>
-<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/simulate/_simulate.py#L509-L670' }}"><span class="sig-source">[source]</span></a>
+<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/simulate/_simulate.py#L515-L693' }}"><span class="sig-source">[source]</span></a>
 </dt>
 <dd class="field-body">
-<p>Class representing a fluorescence detection geometry. The solid angle over which fluorescence light is detected
-can be defined through intervals of the two angles $\theta$ and $\phi$.
-With these, every spacial direction can be addressed using an orthonormal system defined by</p>
+<p>A fluorescence detection geometry. The solid angle over which fluorescence light is detected
+can be defined through intervals of the two angles $\theta$ and $\phi$, see <a href="{{ '/doc/functions/simulate/Geometry/set_intervals.html' | relative_url }}"><code>Geometry.set_intervals</code></a>.
+With these, every spatial direction can be addressed using an orthonormal system defined by</p>
 <div class="math-block">$$
 \hat{e}_r = \begin{pmatrix}\sin(\theta)\\
-            \cos(\theta)\sin(\phi)\\
-            \cos(\theta)\cos(\phi)\end{pmatrix}.
+\cos(\theta)\sin(\phi)\\
+\cos(\theta)\cos(\phi)\end{pmatrix}.
 $$</div>
-<p>If the user specifies a rotation object with unitary matrix $R$,
-the new system is $\hat{e}_r^\prime = R \hat{e}_r$
-The entire two-dimensional interval is defined through the cartesian product
+<p>If a rotation with the matrix $R$ is specified, see <a href="{{ '/doc/functions/simulate/Geometry/set_rotation.html' | relative_url }}"><code>Geometry.set_rotation</code></a>,
+the new system is $\hat{e}_r^\prime = R \hat{e}_r$.
+The entire two-dimensional interval is defined through the Cartesian product
 $\bigcup_i \theta_i \times \bigcup_i \phi_i$.
-For every disjoint interval a weight can be defined through a 'weights' matrix.
-A probability distribution function (pdf) can be defined to have continuous angle weights.
-A rotation matrix can be defined to rotate the entire coordinate systems/detection geometry.
-A sample of angle pairs from the defined intervals can be generated using the 'integration_sample' method.</p>
+For every disjoint interval, a weight can be defined, see <a href="{{ '/doc/functions/simulate/Geometry/set_weights.html' | relative_url }}"><code>Geometry.set_weights</code></a>,
+and a probability density function can be defined for continuous angle weights, see <a href="{{ '/doc/functions/simulate/Geometry/set_pdf.html' | relative_url }}"><code>Geometry.set_pdf</code></a>.
+A sample of angle pairs from the defined intervals can be generated with <a href="{{ '/doc/functions/simulate/Geometry/integration_sample.html' | relative_url }}"><code>Geometry.integration_sample</code></a>.
+By default, the complete solid angle is covered.</p>
 <dl class="field-list">
+<dt class="field-head">Attributes<span class="colon">:</span></dt>
+<dd class="field-par">
+<dl>
+<dt>pdf<span class="classifier"><em>Callable | None</em></span></dt>
+<dd class="field-desc"><p>The probability density function <code>pdf(theta, phi)</code> of the continuous angle weights.</p></dd>
+<dt>phi_intervals<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#ndarray' | relative_url }}">ndarray</a></em></span></dt>
+<dd class="field-desc"><p>The intervals of the angle $\phi$ (rad).</p></dd>
+<dt>rotation<span class="classifier"><em>tools.Rotation</em></span></dt>
+<dd class="field-desc"><p>The rotation of the detection geometry.</p></dd>
+<dt>solid_angle<span class="classifier"><em>float</em></span></dt>
+<dd class="field-desc"><p>The solid angle covered by the intervals (sr).</p></dd>
+<dt>step<span class="classifier"><em>float</em></span></dt>
+<dd class="field-desc"><p>The default step size of the integration sample (rad).</p></dd>
+<dt>theta_intervals<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#ndarray' | relative_url }}">ndarray</a></em></span></dt>
+<dd class="field-desc"><p>The intervals of the angle $\theta$ (rad).</p></dd>
+<dt>weights<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#ndarray' | relative_url }}">ndarray</a> | None</em></span></dt>
+<dd class="field-desc"><p>The weights of the disjoint intervals.</p></dd>
+</dl>
+</dd>
 </dl>
 </dd>
 </dl>

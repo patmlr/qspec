@@ -22,6 +22,7 @@ Additional example scripts can be found in the example folder on [_GitHub_](http
 - [_NumPy_](http://www.numpy.org/)
 - [_SciPy_](http://www.scipy.org/)
 - [_SymPy_](http://www.sympy.org/)
+- [_odrpack_](https://pypi.org/project/odrpack/) (optional, for `qspec.analyze.odr_fit`, install with `pip install qspec[odr]`)
 
 ### Modules
 

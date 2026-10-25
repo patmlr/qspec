@@ -13,8 +13,8 @@ title: qspec.hyperfine
 ,&nbsp;
 <em class="sig-param"><span class="n">f</span></em>
 ,&nbsp;
-<em class="sig-param"><span class="n">hyper_const</span><span class="o">=</span><span class="default_value num">0.0</span></em>
-<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/physics.py#L1016-L1066' }}"><span class="sig-source">[source]</span></a>
+<em class="sig-param"><span class="n">hyper_const</span><span class="o">=</span><span class="default_value"><span class="num">0.0</span></span></em>
+<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/physics.py#L1167-L1218' }}"><span class="sig-source">[source]</span></a>
 </dt>
 <dd class="field-body">
 <p>The hyperfine structure (HFS) shift of an atomic state $|IJF\rangle$</p>
@@ -29,24 +29,31 @@ K &amp;= F(F + 1) - I(I + 1) - J(J + 1),
 <dt class="field-head">Parameters<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>i<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">scalar</a></em></span></dt>
+<dt>i<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#scalar' | relative_url }}">scalar</a></em></span></dt>
 <dd class="field-desc"><p>The nuclear spin quantum number $I$.</p></dd>
-<dt>j<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">scalar</a></em></span></dt>
+<dt>j<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#scalar' | relative_url }}">scalar</a></em></span></dt>
 <dd class="field-desc"><p>The electronic total angular momentum quantum number $J$.</p></dd>
-<dt>f<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">scalar</a></em></span></dt>
+<dt>f<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#scalar' | relative_url }}">scalar</a></em></span></dt>
 <dd class="field-desc"><p>The total angular momentum quantum number $F$.</p></dd>
-<dt>hyper_const<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">array_like</a></em></span></dt>
+<dt>hyper_const<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a></em></span></dt>
 <dd class="field-desc"><p>The hyperfine structure constants $A = \mu_I \mathcal{B}_J / (IJ)$,
 $B = eQ_I (\partial^2 V_J / \partial z^2)$ and $C = \Omega_I T_J^{(3)}$
 of the magnetic dipole, electric quadrupole and magnetic octupole order, respectively.
-If a scalar is given, only the $A$ constant is used (MHz if <code>as_freq</code> else eV).</p></dd>
+If a scalar is given, only the $A$ constant is used (arb. units).</p></dd>
 </dl>
 </dd>
 <dt class="field-head">Returns<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>dnu_hfs<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">ndarray</a></em></span></dt>
-<dd class="field-desc"><p>The hyperfine structure shift $\Delta_\mathrm{hfs}$ (unit of <code>a_hyper</code>).</p></dd>
+<dt>dnu_hfs<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#ndarray' | relative_url }}">ndarray</a></em></span></dt>
+<dd class="field-desc"><p>The hyperfine structure shift $\Delta_\mathrm{hfs}$ (unit of <code>hyper_const</code>).</p></dd>
+</dl>
+</dd>
+<dt class="field-head">Raises<span class="colon">:</span></dt>
+<dd class="field-par">
+<dl>
+<dt>ValueError</dt>
+<dd class="field-desc"><p>If any quantum number is negative or if $|I - J| \leq F \leq I + J$ is not fulfilled.</p></dd>
 </dl>
 </dd>
 </dl>

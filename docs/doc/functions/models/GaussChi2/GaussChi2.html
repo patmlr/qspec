@@ -7,13 +7,43 @@ title: qspec.models.GaussChi2
 <span class="sig-prename">qspec.models.</span>
 <span class="sig-classname">GaussChi2</span>
 <span class="sig-paren">&nbsp;(&nbsp;</span>
-<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/models/_spectrum.py#L410-L460' }}"><span class="sig-source">[source]</span></a>
+<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/models/_spectrum.py#L387-L433' }}"><span class="sig-source">[source]</span></a>
 </dt>
 <dd class="field-body">
-<p>An analytical convolution of a Gaussian with a Boltzmann distribution.
+<p>An analytical convolution of a Gaussian with a Boltzmann distribution, see
+<a href="{{ '/doc/functions/physics/source_energy_pdf.html' | relative_url }}"><code>qspec.physics.source_energy_pdf</code></a>, with the parameters <code>sigma</code> (the standard deviation $\sigma_\mathrm{f}$
+of the Gaussian) and <code>xi</code> (the asymmetry parameter $\xi$).
 This could be the velocity distribution of a thermalized ion ensemble produced
-on a linear or noisy voltage potential.</p>
+on a linear or noisy voltage potential. The function is normalized to its value at $x = 0$,
+which is at least approximately 80 % of its maximum.</p>
 <dl class="field-list">
+<dt class="field-head">Attributes<span class="colon">:</span></dt>
+<dd class="field-par">
+<dl>
+<dt>description<span class="classifier"><em>str</em></span></dt>
+<dd class="field-desc"><p>A description of the model hierarchy, e.g., <code>"Offset.Summed[0].Hyperfine.Voigt"</code>.</p></dd>
+<dt>dx<span class="classifier"><em>float</em></span></dt>
+<dd class="field-desc"><p>A hint for an x-axis step size for a smooth display of the model.</p></dd>
+<dt>error<span class="classifier"><em>str</em></span></dt>
+<dd class="field-desc"><p>An error message if there is an issue with the model parameters (not implemented).</p></dd>
+<dt>fixes<span class="classifier"><em>list[<a href="{{ '/doc/modules/qtypes.html#fix_type' | relative_url }}">fix_type</a>]</em></span></dt>
+<dd class="field-desc"><p>The fix states of the parameters, see <a href="{{ '/doc/functions/models/Model/set_fix.html' | relative_url }}"><code>Model.set_fix</code></a>.</p></dd>
+<dt>links<span class="classifier"><em>list[bool]</em></span></dt>
+<dd class="field-desc"><p>Whether the parameters are linked to the parameters with the same name in a <a href="{{ '/doc/functions/models/Linked/Linked.html' | relative_url }}"><code>Linked</code></a> model.</p></dd>
+<dt>model<span class="classifier"><em><a href="{{ '/doc/functions/models/Model/Model.html' | relative_url }}">Model</a> | None</em></span></dt>
+<dd class="field-desc"><p>The submodel.</p></dd>
+<dt>names<span class="classifier"><em>list[str]</em></span></dt>
+<dd class="field-desc"><p>The names of the parameters.</p></dd>
+<dt>p<span class="classifier"><em>dict[str, int]</em></span></dt>
+<dd class="field-desc"><p>A map of the parameter names to their indexes.</p></dd>
+<dt>size<span class="classifier"><em>int</em></span></dt>
+<dd class="field-desc"><p>The number of parameters required by the model.</p></dd>
+<dt>type<span class="classifier"><em>str</em></span></dt>
+<dd class="field-desc"><p>The name of the model type.</p></dd>
+<dt>vals<span class="classifier"><em>list[float]</em></span></dt>
+<dd class="field-desc"><p>The current values of the parameters.</p></dd>
+</dl>
+</dd>
 </dl>
 </dd>
 </dl>

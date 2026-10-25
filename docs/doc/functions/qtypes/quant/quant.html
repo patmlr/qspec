@@ -1,0 +1,45 @@
+---
+layout: api
+title: qspec.quant
+---
+<dl class="py function">
+<dt class="func-sig">
+<span class="sig-prename">qspec.</span>
+<span class="sig-classname">quant</span>
+<span class="sig-paren">&nbsp;(&nbsp;</span>
+<em class="sig-param"><span class="n">value</span></em>
+<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/qtypes.py#L76-L137' }}"><span class="sig-source">[source]</span></a>
+</dt>
+<dd class="field-body">
+<p>Convert a string or a number to a floating-point quantum number, if possible.
+Adding and subtracting quantum numbers returns a new quantum number.
+For all other algebraic operations or if different data types are involved, quantum numbers behave like floats.</p>
+<dl class="field-list">
+<dt class="field-head">Parameters<span class="colon">:</span></dt>
+<dd class="field-par">
+<dl>
+<dt>value<span class="classifier"><em>SupportsFloat | str</em></span></dt>
+<dd class="field-desc"><p>A (half-)integer number or a string such as <code>"3/2"</code>.</p></dd>
+</dl>
+</dd>
+<dt class="field-head">Attributes<span class="colon">:</span></dt>
+<dd class="field-par">
+<dl>
+<dt>p<span class="classifier"><em>int</em></span></dt>
+<dd class="field-desc"><p>The numerator of the quantum number, e.g. 3 for 3/2.</p></dd>
+<dt>q<span class="classifier"><em>int</em></span></dt>
+<dd class="field-desc"><p>The denominator of the quantum number, 1 for integers and 2 for half-integers.</p></dd>
+<dt>s<span class="classifier"><em>Rational</em></span></dt>
+<dd class="field-desc"><p>The quantum number as a sympy <code>Rational</code>.</p></dd>
+</dl>
+</dd>
+<dt class="field-head">Raises<span class="colon">:</span></dt>
+<dd class="field-par">
+<dl>
+<dt>ValueError</dt>
+<dd class="field-desc"><p>If <code>value</code> is not a (half-)integer number.</p></dd>
+</dl>
+</dd>
+</dl>
+</dd>
+</dl>

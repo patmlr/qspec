@@ -8,22 +8,25 @@ title: qspec.lande_n
 <span class="sig-name">lande_n</span>
 <span class="sig-paren">&nbsp;(&nbsp;</span>
 <em class="sig-param"><span class="n">gyro</span></em>
-<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/physics.py#L837-L845' }}"><span class="sig-source">[source]</span></a>
+<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/physics.py#L980-L992' }}"><span class="sig-source">[source]</span></a>
 </dt>
 <dd class="field-body">
-<p>The nuclear g-factor $g_I = \gamma_I h / \mu_N$ calculated from the gyromagnetic ratio <code>gyro</code>.</p>
+<p>The nuclear g-factor calculated from the gyromagnetic ratio</p>
+<div class="math-block">$$
+g_I = \frac{\gamma_I h}{\mu_\mathrm{N}}.
+$$</div>
 <dl class="field-list">
 <dt class="field-head">Parameters<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>gyro<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">array_like</a></em></span></dt>
-<dd class="field-desc"><p>The gyromagnetic ratio $\gamma_I$ (MHz).</p></dd>
+<dt>gyro<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a></em></span></dt>
+<dd class="field-desc"><p>The gyromagnetic ratio $\gamma_I$ (MHz/T).</p></dd>
 </dl>
 </dd>
 <dt class="field-head">Returns<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>g_I<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">ndarray</a></em></span></dt>
+<dt>g_I<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#ndarray' | relative_url }}">ndarray</a></em></span></dt>
 <dd class="field-desc"><p>The nuclear g-factor $g_I$.</p></dd>
 </dl>
 </dd>

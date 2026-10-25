@@ -11,23 +11,23 @@ title: qspec.boost
 ,&nbsp;
 <em class="sig-param"><span class="n">v</span></em>
 ,&nbsp;
-<em class="sig-param"><span class="n">axis</span><span class="o">=</span><span class="default_value num">-1</span></em>
-<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/physics.py#L2210-L2268' }}"><span class="sig-source">[source]</span></a>
+<em class="sig-param"><span class="n">axis</span><span class="o">=</span><span class="default_value"><span class="num">-1</span></span></em>
+<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/physics.py#L2374-L2432' }}"><span class="sig-source">[source]</span></a>
 </dt>
 <dd class="field-body">
 <p>The relativistic Lorentz-boosted 4-vector</p>
 <div class="math-block">$$
-x^{\prime\mu} = \Lambda^\nu_\mu(\vec{v})x^\mu,
+x^{\prime\mu} = \Lambda^\mu_{\ \nu}(\vec{v})x^\nu,
 $$</div>
-<p>with the Lorentz-boost matrix $\Lambda_\nu^\mu$.</p>
+<p>with the Lorentz-boost matrix $\Lambda^\mu_{\ \nu}$.</p>
 <dl class="field-list">
 <dt class="field-head">Parameters<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>x<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">array_like</a></em></span></dt>
+<dt>x<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a></em></span></dt>
 <dd class="field-desc"><p>The 4-vector $x^\mu$ in the stationary rest frame (arb. units).
 Must have size 4 in the specified <code>axis</code>.</p></dd>
-<dt>v<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">array_like</a></em></span></dt>
+<dt>v<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a></em></span></dt>
 <dd class="field-desc"><p>The velocity 3-vector $\vec{v}$. Must have size 3 in the specified <code>axis</code> (m/s).</p></dd>
 <dt>axis<span class="classifier"><em>int</em></span></dt>
 <dd class="field-desc"><p>The axis along which the vector components are aligned.</p></dd>
@@ -36,7 +36,7 @@ Must have size 4 in the specified <code>axis</code>.</p></dd>
 <dt class="field-head">Returns<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>x_boosted<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">ndarray</a></em></span></dt>
+<dt>x_boosted<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#ndarray' | relative_url }}">ndarray</a></em></span></dt>
 <dd class="field-desc"><p>The 4-vector $x^{\prime\mu}$ in the coordinate system moving with velocity <code>v</code>
 relative to the current rest frame (unit of <code>x</code>).</p></dd>
 </dl>

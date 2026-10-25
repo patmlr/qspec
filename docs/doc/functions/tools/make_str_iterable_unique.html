@@ -10,28 +10,28 @@ title: qspec.make_str_iterable_unique
 <em class="sig-param"><span class="n">a</span></em>
 ,&nbsp;
 <em class="sig-param"><span class="n">identifier</span><span class="o">=</span><span class="default_value">None</span></em>
-<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/tools.py#L498-L528' }}"><span class="sig-source">[source]</span></a>
+<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/tools.py#L546-L578' }}"><span class="sig-source">[source]</span></a>
 </dt>
 <dd class="field-body">
-
+<p>Make the values of a list of strings unique by appending identifiers to values that appear more than once.
+Equal values are grouped together, e.g., <code>["a", "b", "c", "b", "d"]</code> becomes
+<code>["a", "b_0", "b_1", "c", "d"]</code> or <code>["a", "b_" + identifier[0], "b_" + identifier[1], "c", "d"]</code>.</p>
 <dl class="field-list">
 <dt class="field-head">Parameters<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
 <dt>a<span class="classifier"><em>Iterable[str]</em></span></dt>
-<dd class="field-desc"><p>An Iterable of str values.</p></dd>
+<dd class="field-desc"><p>An iterable of <code>str</code> values.</p></dd>
 <dt>identifier<span class="classifier"><em>Iterable[str] | None</em></span></dt>
-<dd class="field-desc"><p>An Iterable of str values to append to the values of 'a' if they appear more than once.
-If None, '_i' is used as the identifier for the ith appearance of a value in 'a'.</p></dd>
+<dd class="field-desc"><p>An iterable of <code>str</code> values to append to the values of <code>a</code> if they appear more than once.
+If <code>None</code>, <code>"_i"</code> is appended to the <code>i</code>-th appearance of a value in <code>a</code>.</p></dd>
 </dl>
 </dd>
 <dt class="field-head">Returns<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>out<span class="classifier"><em>list[str]</em></span></dt>
-<dd class="field-desc"><p>'a', but the elements which appear more than once are numerated/attached with the identifiers and bunched.
-For example: ['a', 'b', 'c', 'b', 'd'] -> ['a', 'b_0', 'b_1', 'c', 'd'] or
-['a', 'b', 'c', 'b', 'd'] -> ['a', 'b' + identifier[0], 'b' + identifier[1], 'c', 'd'].</p></dd>
+<dt>a_unique<span class="classifier"><em>list[str]</em></span></dt>
+<dd class="field-desc"><p>The unique values.</p></dd>
 </dl>
 </dd>
 </dl>

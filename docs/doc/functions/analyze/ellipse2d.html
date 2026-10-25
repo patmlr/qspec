@@ -18,36 +18,38 @@ title: qspec.analyze.ellipse2d
 <em class="sig-param"><span class="n">phi</span></em>
 ,&nbsp;
 <em class="sig-param"><span class="n">corr</span></em>
-<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/analyze/_analyze.py#L264-L284' }}"><span class="sig-source">[source]</span></a>
+<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/analyze/_analyze.py#L322-L344' }}"><span class="sig-source">[source]</span></a>
 </dt>
 <dd class="field-body">
 <p>A point on an ellipse in 2d-space</p>
-<div class="math-block">$$\vec{p}(x, y) = \begin{pmatrix}
+<div class="math-block">$$
+\vec{p}(x, y) = \begin{pmatrix}
 x + \sigma_x\cos(\phi) \\
 y + \sigma_y\left[\rho_{xy}\cos(\phi) + \sqrt{1 - \rho_{xy}^2}\sin(\phi)\right]
-\end{pmatrix}.$$</div>
+\end{pmatrix}.
+$$</div>
 <dl class="field-list">
 <dt class="field-head">Parameters<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>x<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">array_like</a></em></span></dt>
+<dt>x<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a></em></span></dt>
 <dd class="field-desc"><p>The $x$-component of the position of the ellipse.</p></dd>
-<dt>y<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">array_like</a></em></span></dt>
+<dt>y<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a></em></span></dt>
 <dd class="field-desc"><p>The $y$-component of the position of the ellipse.</p></dd>
-<dt>scale_x<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">array_like</a></em></span></dt>
+<dt>scale_x<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a></em></span></dt>
 <dd class="field-desc"><p>The amplitude $\sigma_x$ of the $x$-component.</p></dd>
-<dt>scale_y<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">array_like</a></em></span></dt>
+<dt>scale_y<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a></em></span></dt>
 <dd class="field-desc"><p>The amplitude $\sigma_y$ of the $y$-component.</p></dd>
-<dt>phi<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">array_like</a></em></span></dt>
-<dd class="field-desc"><p>The angle $\phi$ between the vector to the point on the ellipse and the $x$-axis.</p></dd>
-<dt>corr<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">array_like</a></em></span></dt>
+<dt>phi<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a></em></span></dt>
+<dd class="field-desc"><p>The parameter angle $\phi$ of the ellipse (rad).</p></dd>
+<dt>corr<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a></em></span></dt>
 <dd class="field-desc"><p>The correlation coefficient $\rho_{xy}$ between the <code>x</code> and <code>y</code> data.</p></dd>
 </dl>
 </dd>
 <dt class="field-head">Returns<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>(p_x, p_y)<span class="classifier"><em>tuple[<a href="{{ '/doc/modules/qtypes.html' | relative_url }}">ndarray</a>, <a href="{{ '/doc/modules/qtypes.html' | relative_url }}">ndarray</a>]</em></span></dt>
+<dt>(p_x, p_y)<span class="classifier"><em>tuple[<a href="{{ '/doc/modules/qtypes.html#ndarray' | relative_url }}">ndarray</a>, <a href="{{ '/doc/modules/qtypes.html#ndarray' | relative_url }}">ndarray</a>]</em></span></dt>
 <dd class="field-desc"><p>A point $\vec{p}(x, y)$ on an ellipse.</p></dd>
 </dl>
 </dd>

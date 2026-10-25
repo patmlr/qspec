@@ -9,8 +9,8 @@ title: qspec.models.Model.set_pars
 <span class="sig-paren">&nbsp;(&nbsp;</span>
 <em class="sig-param"><span class="n">pars</span></em>
 ,&nbsp;
-<em class="sig-param"><span class="n">force</span><span class="o">=</span><span class="default_value bool">False</span></em>
-<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/models/_base.py#L223-L233' }}"><span class="sig-source">[source]</span></a>
+<em class="sig-param"><span class="n">force</span><span class="o">=</span><span class="default_value"><span class="bool">False</span></span></em>
+<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/models/_base.py#L240-L250' }}"><span class="sig-source">[source]</span></a>
 </dt>
 <dd class="field-body">
 <p>Set all <code>vals</code>, <code>fixes</code> and <code>links</code> with one nested list.</p>
@@ -18,10 +18,10 @@ title: qspec.models.Model.set_pars
 <dt class="field-head">Parameters<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>pars<span class="classifier"><em>Iterable[tuple[<a href="{{ '/doc/modules/qtypes.html' | relative_url }}">scalar</a>, <a href="{{ '/doc/modules/qtypes.html' | relative_url }}">fix_type</a>, bool]]</em></span></dt>
-<dd class="field-desc"><p>An <code>Iterable</code> of size-3 tuples. Equivalent to shape <code>(self.size, 3)</code>.</p></dd>
+<dt>pars<span class="classifier"><em>Iterable[tuple[<a href="{{ '/doc/modules/qtypes.html#scalar' | relative_url }}">scalar</a>, <a href="{{ '/doc/modules/qtypes.html#fix_type' | relative_url }}">fix_type</a>, bool]]</em></span></dt>
+<dd class="field-desc"><p>An iterable of size-3 tuples <code>(val, fix, link)</code>. Equivalent to shape <code>(Model.size, 3)</code>.</p></dd>
 <dt>force<span class="classifier"><em>bool</em></span></dt>
-<dd class="field-desc"><p>The <code>force</code> parameter of the <code>set_val</code>, <code>set_fix</code> and <code>set_link</code> functions.</p></dd>
+<dd class="field-desc"><p>The <code>force</code> parameter of <a href="{{ '/doc/functions/models/Model/set_val.html' | relative_url }}"><code>Model.set_val</code></a>, <a href="{{ '/doc/functions/models/Model/set_fix.html' | relative_url }}"><code>Model.set_fix</code></a> and <a href="{{ '/doc/functions/models/Model/set_link.html' | relative_url }}"><code>Model.set_link</code></a>.</p></dd>
 </dl>
 </dd>
 </dl>

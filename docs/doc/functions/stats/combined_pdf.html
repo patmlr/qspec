@@ -9,35 +9,40 @@ title: qspec.combined_pdf
 <span class="sig-paren">&nbsp;(&nbsp;</span>
 <em class="sig-param"><span class="n">z</span></em>
 ,&nbsp;
-<em class="sig-param"><span class="n">pdf_1</span><span class="o">=</span><span class="default_value">pdf</span></em>
+<em class="sig-param"><span class="n">pdf_1</span><span class="o">=</span><span class="default_value"><span class="func">pdf</span></span></em>
 ,&nbsp;
-<em class="sig-param"><span class="n">pdf_2</span><span class="o">=</span><span class="default_value">pdf</span></em>
+<em class="sig-param"><span class="n">pdf_2</span><span class="o">=</span><span class="default_value"><span class="func">pdf</span></span></em>
 ,&nbsp;
-<em class="sig-param"><span class="n">loc_1</span><span class="o">=</span><span class="default_value num">0.0</span></em>
+<em class="sig-param"><span class="n">loc_1</span><span class="o">=</span><span class="default_value"><span class="num">0.0</span></span></em>
 ,&nbsp;
-<em class="sig-param"><span class="n">scale_1</span><span class="o">=</span><span class="default_value num">1.0</span></em>
+<em class="sig-param"><span class="n">scale_1</span><span class="o">=</span><span class="default_value"><span class="num">1.0</span></span></em>
 ,&nbsp;
-<em class="sig-param"><span class="n">loc_2</span><span class="o">=</span><span class="default_value num">0.0</span></em>
+<em class="sig-param"><span class="n">loc_2</span><span class="o">=</span><span class="default_value"><span class="num">0.0</span></span></em>
 ,&nbsp;
-<em class="sig-param"><span class="n">scale_2</span><span class="o">=</span><span class="default_value num">1.0</span></em>
+<em class="sig-param"><span class="n">scale_2</span><span class="o">=</span><span class="default_value"><span class="num">1.0</span></span></em>
 ,&nbsp;
-<em class="sig-param"><span class="n">operator</span><span class="o">=</span><span class="default_value string">&#x27;+&#x27;</span></em>
+<em class="sig-param"><span class="n">operator</span><span class="o">=</span><span class="default_value"><span class="string">&#x27;+&#x27;</span></span></em>
 ,&nbsp;
-<em class="sig-param"><span class="n">n</span><span class="o">=</span><span class="default_value num">10</span></em>
-<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/stats.py#L490-L542' }}"><span class="sig-source">[source]</span></a>
+<em class="sig-param"><span class="n">n</span><span class="o">=</span><span class="default_value"><span class="num">10</span></span></em>
+<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/stats.py#L561-L621' }}"><span class="sig-source">[source]</span></a>
 </dt>
 <dd class="field-body">
-
+<p>The probability density function (pdf) of the sum or the product of two random variates $X$ and $Y$</p>
+<div class="math-block">$$
+\rho_Z(z) = \begin{cases}\int\rho_X(x)\,\rho_Y(z - x)\,\mathrm{d}x, &amp; Z = X + Y\\
+\int\rho_X(x)\,\rho_Y(z / x)\,\frac{1}{|x|}\,\mathrm{d}x, &amp; Z = XY\end{cases},
+$$</div>
+<p>calculated by numerical integration.</p>
 <dl class="field-list">
 <dt class="field-head">Parameters<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>z<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">array_like</a></em></span></dt>
-<dd class="field-desc"><p>The quantiles of the combined probability density function (pdf).</p></dd>
+<dt>z<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a></em></span></dt>
+<dd class="field-desc"><p>The quantiles $z$ of the combined pdf.</p></dd>
 <dt>pdf_1<span class="classifier"><em>Callable</em></span></dt>
-<dd class="field-desc"><p>The pdf of the first random variate.</p></dd>
+<dd class="field-desc"><p>The pdf $\rho_X$ of the first random variate.</p></dd>
 <dt>pdf_2<span class="classifier"><em>Callable</em></span></dt>
-<dd class="field-desc"><p>The pdf of the second random variate.</p></dd>
+<dd class="field-desc"><p>The pdf $\rho_Y$ of the second random variate.</p></dd>
 <dt>loc_1<span class="classifier"><em>float</em></span></dt>
 <dd class="field-desc"><p>The <code>loc</code> parameter of the first pdf.</p></dd>
 <dt>scale_1<span class="classifier"><em>float</em></span></dt>
@@ -47,18 +52,23 @@ title: qspec.combined_pdf
 <dt>scale_2<span class="classifier"><em>float</em></span></dt>
 <dd class="field-desc"><p>The <code>scale</code> parameter of the second pdf.</p></dd>
 <dt>operator<span class="classifier"><em>str</em></span></dt>
-<dd class="field-desc"><p>The operator that defines the new random variate given by Z = X <operator> Y.
-Currently supported operators are {"+", "*"}.</p></dd>
+<dd class="field-desc"><p>The operator that defines the new random variate $Z$. Can be either <code>"+"</code> or <code>"*"</code>.</p></dd>
 <dt>n<span class="classifier"><em>int</em></span></dt>
-<dd class="field-desc"><p>The precision of the numerical integration.
-The integration uses 2 ** n intervals to evaluate the integral.</p></dd>
+<dd class="field-desc"><p>The precision of the numerical integration, which uses <code>2**n</code> intervals.</p></dd>
 </dl>
 </dd>
 <dt class="field-head">Returns<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>out<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">ndarray</a></em></span></dt>
-<dd class="field-desc"><p>The value of the pdf at the given <code>z</code> quantiles.</p></dd>
+<dt>rho_z<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#ndarray' | relative_url }}">ndarray</a></em></span></dt>
+<dd class="field-desc"><p>The value of the pdf $\rho_Z$ at the given <code>z</code> quantiles.</p></dd>
+</dl>
+</dd>
+<dt class="field-head">Raises<span class="colon">:</span></dt>
+<dd class="field-par">
+<dl>
+<dt>ValueError</dt>
+<dd class="field-desc"><p>If <code>operator</code> is not supported.</p></dd>
 </dl>
 </dd>
 </dl>

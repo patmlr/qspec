@@ -1,0 +1,51 @@
+<dl class="field-list">
+<dt class="field-head">Type aliases<span class="colon">:</span></dt>
+<dd class="field-par">
+<dl>
+<dt id="int_like">int_like<span class="attr-value"><em>NDArray[integer] | integer | int</em></span></dt>
+<dd class="field-desc"><p>An integer or an array of integers.</p></dd>
+<dt id="float_like">float_like<span class="attr-value"><em>NDArray[floating] | floating | float</em></span></dt>
+<dd class="field-desc"><p>A float or an array of floats.</p></dd>
+<dt id="complex_like">complex_like<span class="attr-value"><em>NDArray[complexfloating] | complexfloating | complex</em></span></dt>
+<dd class="field-desc"><p>A complex number or an array of complex numbers.</p></dd>
+<dt id="scalar">scalar<span class="attr-value"><em>int | integer | float | floating | <a href="{{ '/doc/functions/qtypes/quant/quant.html' | relative_url }}">quant</a> | NDArray[integer | floating]</em></span></dt>
+<dd class="field-desc"><p>A real number, including quantum numbers and 0-dimensional arrays.</p></dd>
+<dt id="complexscalar">complexscalar<span class="attr-value"><em>number | <a href="{{ '/doc/modules/qtypes.html#scalar' | relative_url }}">scalar</a> | complex | NDArray[number | complexfloating]</em></span></dt>
+<dd class="field-desc"><p>A real or complex number, including 0-dimensional arrays.</p></dd>
+<dt id="ndarray">ndarray[T: generic]<span class="attr-value"><em>NDArray[T]</em></span></dt>
+<dd class="field-desc"><p>A numpy array with elements of type <code>T</code>.</p></dd>
+<dt id="array_like">array_like<span class="attr-value"><em>ArrayLike</em></span></dt>
+<dd class="field-desc"><p>Any object that can be converted to a numpy array, e.g. scalars, lists or arrays.</p></dd>
+<dt id="object_1d">object_1d<span class="attr-value"><em><a href="{{ '/doc/modules/qtypes.html#ndarray' | relative_url }}">ndarray</a> | Sequence[object]</em></span></dt>
+<dd class="field-desc"><p>A 1-dimensional array or sequence of objects.</p></dd>
+<dt id="object_nd">object_nd<span class="attr-value"><em>Sequence[<a href="{{ '/doc/modules/qtypes.html#object_nd' | relative_url }}">object_nd</a>] | <a href="{{ '/doc/modules/qtypes.html#object_1d' | relative_url }}">object_1d</a></em></span></dt>
+<dd class="field-desc"><p>An arbitrarily nested array or sequence of objects.</p></dd>
+<dt id="scalar_1d">scalar_1d<span class="attr-value"><em><a href="{{ '/doc/modules/qtypes.html#ndarray' | relative_url }}">ndarray</a>[integer | floating] | Sequence[<a href="{{ '/doc/modules/qtypes.html#scalar' | relative_url }}">scalar</a>]</em></span></dt>
+<dd class="field-desc"><p>A 1-dimensional array or sequence of real numbers.</p></dd>
+<dt id="scalar_nd">scalar_nd<span class="attr-value"><em>Sequence[<a href="{{ '/doc/modules/qtypes.html#scalar_nd' | relative_url }}">scalar_nd</a>] | <a href="{{ '/doc/modules/qtypes.html#scalar_1d' | relative_url }}">scalar_1d</a></em></span></dt>
+<dd class="field-desc"><p>An arbitrarily nested array or sequence of real numbers.</p></dd>
+<dt id="complexscalar_1d">complexscalar_1d<span class="attr-value"><em><a href="{{ '/doc/modules/qtypes.html#ndarray' | relative_url }}">ndarray</a>[integer | floating | complexfloating] | Sequence[<a href="{{ '/doc/modules/qtypes.html#complexscalar' | relative_url }}">complexscalar</a>]</em></span></dt>
+<dd class="field-desc"><p>A 1-dimensional array or sequence of real or complex numbers.</p></dd>
+<dt id="complexscalar_nd">complexscalar_nd<span class="attr-value"><em>Sequence[<a href="{{ '/doc/modules/qtypes.html#complexscalar_nd' | relative_url }}">complexscalar_nd</a>] | <a href="{{ '/doc/modules/qtypes.html#complexscalar_1d' | relative_url }}">complexscalar_1d</a></em></span></dt>
+<dd class="field-desc"><p>An arbitrarily nested array or sequence of real or complex numbers.</p></dd>
+<dt id="bool_1d">bool_1d<span class="attr-value"><em><a href="{{ '/doc/modules/qtypes.html#ndarray' | relative_url }}">ndarray</a>[bool_] | Sequence[bool_]</em></span></dt>
+<dd class="field-desc"><p>A 1-dimensional array or sequence of booleans.</p></dd>
+<dt id="bool_nd">bool_nd<span class="attr-value"><em>Sequence[<a href="{{ '/doc/modules/qtypes.html#bool_nd' | relative_url }}">bool_nd</a>] | <a href="{{ '/doc/modules/qtypes.html#bool_1d' | relative_url }}">bool_1d</a></em></span></dt>
+<dd class="field-desc"><p>An arbitrarily nested array or sequence of booleans.</p></dd>
+<dt id="str_1d">str_1d<span class="attr-value"><em><a href="{{ '/doc/modules/qtypes.html#ndarray' | relative_url }}">ndarray</a>[str_] | Sequence[str_]</em></span></dt>
+<dd class="field-desc"><p>A 1-dimensional array or sequence of strings.</p></dd>
+<dt id="str_nd">str_nd<span class="attr-value"><em>Sequence[<a href="{{ '/doc/modules/qtypes.html#str_nd' | relative_url }}">str_nd</a>] | <a href="{{ '/doc/modules/qtypes.html#str_1d' | relative_url }}">str_1d</a></em></span></dt>
+<dd class="field-desc"><p>An arbitrarily nested array or sequence of strings.</p></dd>
+<dt id="sympy_expr">sympy_expr<span class="attr-value"><em>Any</em></span></dt>
+<dd class="field-desc"><p>A sympy expression.</p></dd>
+<dt id="sympy_scalar">sympy_scalar<span class="attr-value"><em><a href="{{ '/doc/modules/qtypes.html#sympy_expr' | relative_url }}">sympy_expr</a> | <a href="{{ '/doc/modules/qtypes.html#scalar' | relative_url }}">scalar</a></em></span></dt>
+<dd class="field-desc"><p>A sympy expression or a real number.</p></dd>
+<dt id="sympy_complexscalar">sympy_complexscalar<span class="attr-value"><em><a href="{{ '/doc/modules/qtypes.html#sympy_expr' | relative_url }}">sympy_expr</a> | <a href="{{ '/doc/modules/qtypes.html#complexscalar' | relative_url }}">complexscalar</a></em></span></dt>
+<dd class="field-desc"><p>A sympy expression or a real or complex number.</p></dd>
+<dt id="fix_type">fix_type<span class="attr-value"><em>str | bool | <a href="{{ '/doc/modules/qtypes.html#scalar' | relative_url }}">scalar</a> | list</em></span></dt>
+<dd class="field-desc"><p>The fix state of a model parameter, see <a href="{{ '/doc/functions/models/Model/set_fix.html' | relative_url }}"><code>qspec.models.Model.set_fix</code></a>.</p></dd>
+<dt id="fix_type_1d">fix_type_1d<span class="attr-value"><em><a href="{{ '/doc/modules/qtypes.html#ndarray' | relative_url }}">ndarray</a> | tuple[<a href="{{ '/doc/modules/qtypes.html#fix_type' | relative_url }}">fix_type</a>, ...] | list[<a href="{{ '/doc/modules/qtypes.html#fix_type' | relative_url }}">fix_type</a>]</em></span></dt>
+<dd class="field-desc"><p>A list of fix states of model parameters.</p></dd>
+</dl>
+</dd>
+</dl>

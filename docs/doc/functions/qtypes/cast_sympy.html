@@ -9,24 +9,24 @@ title: qspec.cast_sympy
 <span class="sig-paren">&nbsp;(&nbsp;</span>
 <em class="sig-param"><span class="o">*</span><span class="n">args</span></em>
 ,&nbsp;
-<em class="sig-param"><span class="n">as_sympy</span><span class="o">=</span><span class="default_value bool">True</span></em>
+<em class="sig-param"><span class="n">as_sympy</span><span class="o">=</span><span class="default_value"><span class="bool">True</span></span></em>
 ,&nbsp;
-<em class="sig-param"><span class="n">dtype</span><span class="o">=</span><span class="default_value">float</span></em>
-<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/qtypes.py#L234-L244' }}"><span class="sig-source">[source]</span></a>
+<em class="sig-param"><span class="n">dtype</span><span class="o">=</span><span class="default_value"><span class="class">float</span></span></em>
+<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/qtypes.py#L271-L282' }}"><span class="sig-source">[source]</span></a>
 </dt>
 <dd class="field-body">
-<p>Cast the arguments <code>args</code> to a <a href="https://www.sympy.org/en/index.html">
-<code>sympy</code></a> type (symbol) or the specified <code>dtype</code>.</p>
+<p>Cast the arguments <code>args</code> to <a href="https://www.sympy.org/en/index.html"><code>sympy</code></a> expressions
+using <code>sympy.nsimplify</code> or to the specified <code>dtype</code>.</p>
 <dl class="field-list">
 <dt class="field-head">Parameters<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>args<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">sympy_scalar</a></em></span></dt>
+<dt>args<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#sympy_scalar' | relative_url }}">sympy_scalar</a></em></span></dt>
 <dd class="field-desc"><p>The arguments.</p></dd>
 <dt>as_sympy<span class="classifier"><em>bool</em></span></dt>
-<dd class="field-desc"><p>Return the result as a symbol (<code>True</code>) or as a <code>float</code> (<code>False</code>).</p></dd>
+<dd class="field-desc"><p>Whether to cast the arguments to sympy expressions (<code>True</code>) or to <code>dtype</code> (<code>False</code>).</p></dd>
 <dt>dtype<span class="classifier"><em>Callable[[Any], T]</em></span></dt>
-<dd class="field-desc"><p>The type to use if <code>as_sympy == False</code>.</p></dd>
+<dd class="field-desc"><p>The type to use if <code>as_sympy</code> is <code>False</code>.</p></dd>
 </dl>
 </dd>
 <dt class="field-head">Returns<span class="colon">:</span></dt>

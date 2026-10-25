@@ -8,28 +8,27 @@ title: qspec.simulate.Geometry.integration_sample
 <span class="sig-name">integration_sample</span>
 <span class="sig-paren">&nbsp;(&nbsp;</span>
 <em class="sig-param"><span class="n">step</span><span class="o">=</span><span class="default_value">None</span></em>
-<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/simulate/_simulate.py#L601-L615' }}"><span class="sig-source">[source]</span></a>
+<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/simulate/_simulate.py#L629-L644' }}"><span class="sig-source">[source]</span></a>
 </dt>
 <dd class="field-body">
-
+<p>Sample the defined intervals with equidistant values for numerical integration.
+All intervals are exactly covered by an odd number of values (for Simpson integration)
+at the expense of not matching the <code>step</code> size exactly.</p>
 <dl class="field-list">
 <dt class="field-head">Parameters<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>step<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">scalar</a> | None</em></span></dt>
-<dd class="field-desc"><p>None or a scalar which defines the approximate spacing
-between the equidistant values of the integration sample.
-If step == None, the currently defined step size is used. The standard value is pi/32.</p></dd>
+<dt>step<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#scalar' | relative_url }}">scalar</a> | None</em></span></dt>
+<dd class="field-desc"><p>The approximate spacing between the equidistant values of the integration sample (rad).
+If <code>None</code>, <code>Geometry.step</code> is used. The default value is $\pi/32$.</p></dd>
 </dl>
 </dd>
 <dt class="field-head">Returns<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>out<span class="classifier"><em>tuple[list[<a href="{{ '/doc/modules/qtypes.html' | relative_url }}">ndarray</a>], list[<a href="{{ '/doc/modules/qtypes.html' | relative_url }}">ndarray</a>]]</em></span></dt>
+<dt>(theta, phi)<span class="classifier"><em>tuple[list[<a href="{{ '/doc/modules/qtypes.html#ndarray' | relative_url }}">ndarray</a>], list[<a href="{{ '/doc/modules/qtypes.html#ndarray' | relative_url }}">ndarray</a>]]</em></span></dt>
 <dd class="field-desc"><p>Two lists of arrays with equidistant values
-in the defined intervals for 'theta' and 'phi', respectively.
-Note that all intervals are exactly covered by an odd number of values (for Simpson integration)
-under the expense of not matching the 'step' size exactly.</p></dd>
+in the defined intervals for $\theta$ and $\phi$, respectively.</p></dd>
 </dl>
 </dd>
 </dl>

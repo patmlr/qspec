@@ -17,41 +17,43 @@ title: qspec.analyze.york_fit
 ,&nbsp;
 <em class="sig-param"><span class="n">corr</span><span class="o">=</span><span class="default_value">None</span></em>
 ,&nbsp;
-<em class="sig-param"><span class="n">iter_max</span><span class="o">=</span><span class="default_value num">200</span></em>
+<em class="sig-param"><span class="n">iter_max</span><span class="o">=</span><span class="default_value"><span class="num">200</span></span></em>
 ,&nbsp;
-<em class="sig-param"><span class="n">report</span><span class="o">=</span><span class="default_value bool">False</span></em>
+<em class="sig-param"><span class="n">report</span><span class="o">=</span><span class="default_value"><span class="bool">False</span></span></em>
 ,&nbsp;
-<em class="sig-param"><span class="n">show</span><span class="o">=</span><span class="default_value bool">False</span></em>
+<em class="sig-param"><span class="n">show</span><span class="o">=</span><span class="default_value"><span class="bool">False</span></span></em>
 ,&nbsp;
 <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em>
-<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/analyze/_analyze.py#L331-L449' }}"><span class="sig-source">[source]</span></a>
+<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/analyze/_analyze.py#L393-L515' }}"><span class="sig-source">[source]</span></a>
 </dt>
 <dd class="field-body">
 <p>A linear regression algorithm to find the best straight line through points $\vec{\mu}_i\in\mathbb{R}^2$
 with covariances $\mathbf{\Sigma}_i\in\mathbb{R}^{2\times 2}$,
 assuming $2$-dimensional multivariate normal distributions $\mathcal{N}(\vec{\mu}_i, \mathbf{\Sigma}_i)$.
 The data points and covariances are given by</p>
-<div class="math-block">$$\vec{\mu} = \begin{pmatrix}x\\y\end{pmatrix},\quad
+<div class="math-block">$$
+\vec{\mu} = \begin{pmatrix}x\\y\end{pmatrix},\quad
 \mathbf{\Sigma} = \begin{pmatrix}
 \sigma_x^2 &amp; \rho_{xy}\sigma_x\sigma_y \\
 \rho_{xy}\sigma_x\sigma_y &amp; \sigma_y^2
-\end{pmatrix}.$$</div>
+\end{pmatrix}.
+$$</div>
 <p>The algorithm is described in
 [<a href="https://doi.org/10.1119/1.1632486">York et al., Am. J. Phys. 72, 367 (2004)</a>].</p>
 <dl class="field-list">
 <dt class="field-head">Parameters<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>x<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">array_like</a></em></span></dt>
+<dt>x<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a></em></span></dt>
 <dd class="field-desc"><p>The $x$ data.</p></dd>
-<dt>y<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">array_like</a></em></span></dt>
+<dt>y<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a></em></span></dt>
 <dd class="field-desc"><p>The $y$ data.</p></dd>
-<dt>sigma_x<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">array_like</a> | None</em></span></dt>
-<dd class="field-desc"><p>The standard deviation $\sigma_x$ of the <code>x</code> data.</p></dd>
-<dt>sigma_y<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">array_like</a> | None</em></span></dt>
-<dd class="field-desc"><p>The standard deviation $\sigma_y$ of the <code>y</code> data.</p></dd>
-<dt>corr<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">array_like</a> | None</em></span></dt>
-<dd class="field-desc"><p>The correlation coefficients $\rho_{xy}$ between the <code>x</code> and <code>y</code> data.</p></dd>
+<dt>sigma_x<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a> | None</em></span></dt>
+<dd class="field-desc"><p>The standard deviation $\sigma_x$ of the <code>x</code> data. If <code>None</code>, it is 1.</p></dd>
+<dt>sigma_y<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a> | None</em></span></dt>
+<dd class="field-desc"><p>The standard deviation $\sigma_y$ of the <code>y</code> data. If <code>None</code>, it is 1.</p></dd>
+<dt>corr<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a> | None</em></span></dt>
+<dd class="field-desc"><p>The correlation coefficients $\rho_{xy}$ between the <code>x</code> and <code>y</code> data. If <code>None</code>, it is 0.</p></dd>
 <dt>iter_max<span class="classifier"><em>int</em></span></dt>
 <dd class="field-desc"><p>The maximum number of iterations to find the best slope.</p></dd>
 <dt>report<span class="classifier"><em>bool</em></span></dt>
@@ -59,14 +61,22 @@ The data points and covariances are given by</p>
 <dt>show<span class="classifier"><em>bool</em></span></dt>
 <dd class="field-desc"><p>Whether to plot the fit result.</p></dd>
 <dt>kwargs</dt>
-<dd class="field-desc"><p>Additional keyword arguments.</p></dd>
+<dd class="field-desc"><p>Additional keyword arguments are accepted for compatibility with the other linear regression
+algorithms and ignored.</p></dd>
 </dl>
 </dd>
 <dt class="field-head">Returns<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>(popt, pcov)<span class="classifier"><em>tuple[<a href="{{ '/doc/modules/qtypes.html' | relative_url }}">ndarray</a>, <a href="{{ '/doc/modules/qtypes.html' | relative_url }}">ndarray</a>]</em></span></dt>
+<dt>(popt, pcov)<span class="classifier"><em>tuple[<a href="{{ '/doc/modules/qtypes.html#ndarray' | relative_url }}">ndarray</a>, <a href="{{ '/doc/modules/qtypes.html#ndarray' | relative_url }}">ndarray</a>]</em></span></dt>
 <dd class="field-desc"><p>The best y-intercept and slope and their covariance matrix.</p></dd>
+</dl>
+</dd>
+<dt class="field-head">Raises<span class="colon">:</span></dt>
+<dd class="field-par">
+<dl>
+<dt>ValueError</dt>
+<dd class="field-desc"><p>If the optimization fails.</p></dd>
 </dl>
 </dd>
 </dl>

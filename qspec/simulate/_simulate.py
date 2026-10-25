@@ -1,6 +1,6 @@
 """
-qspec._simulate
-===============
+qspec.simulate._simulate
+========================
 
 Module for simulations of laser-atom interaction.
 """
@@ -32,24 +32,30 @@ LINESTYLES = ["-", ":", "--", "-."]
 
 
 def ct_markov_analytic(t: array_like, n: array_like, rates: array_like, r: array_like = 1.0) -> ndarray:
-    """
-    Computes the analytic solution of the evolution of a linear continuous-time markov chain.
+    r"""
+    The analytic solution of the evolution of a linear continuous-time Markov chain
+    $0\rightarrow 1\rightarrow 2\rightarrow\dots$ with the rates $\lambda_i$, starting in the state 0.
+    For a constant rate $\lambda$, this is the Poisson distribution
 
-    CAUTION! Computation of analytic solution problematic
-    (Multiplication of very small numbers with very large numbers).
+    $$
+    P(n, t) = \frac{(r\lambda t)^n}{n!}e^{-\lambda t}.
+    $$
 
-    :param t: The time at which the probability is returned (us).
-    :param n: The number of the state for which the probability is returned. The first state corresponds to 'n' = 0.
-    :param rates: The rate(s) at which the markov chain is transferring population from state i to state i + 1.
-     If 'rates' is a scalar, this rate is assumed for all 0 &#8804; i &#8804; 'n'. If 'rates' is an Iterable,
-     it must have length max('n') + 1 and individual rates 'rates[i]' are assumed for the states
-     0 &#8804; i &#8804; 'n'.
-    :param r: The ratio of the population which is transferred from state i to state i + 1. Then 1 - r is the ratio
-     of the population that is lost during the transition from state i to state i + 1.
-    :returns: The probability for the markov chain to be in state 'n' after the time 't' for P(t=0, n=0) = 1.
-     The normalization condition is sum_n(P(n, t0)) = 1 for every single point in time t0.
-     If 't' and 'n' are Iterables, a 2-d array is returned
-     with shape (t.size, n.size), containing all probabilities P(t, n).
+    For individual rates, the analytic solution can be numerically unstable,
+    since very small numbers are multiplied with very large numbers. See [`ct_markov_dgl`] for a numerical solution.
+
+    :param t: The time $t$ at which the probability is returned (&mu;s).
+    :param n: The number $n$ of the state for which the probability is returned.
+     The first state corresponds to `n = 0`.
+    :param rates: The rate(s) $\lambda_i$ at which the Markov chain transfers population
+     from the state $i$ to the state $i + 1$ (MHz). If `rates` is a scalar, this rate is assumed for all
+     $0 \leq i \leq n$. If `rates` is an iterable, it must have length `max(n) + 1`
+     and individual rates `rates[i]` are assumed for the states $0 \leq i \leq n$.
+    :param r: The ratio $r$ of the population which is transferred from the state $i$ to the state $i + 1$.
+     Then $1 - r$ is the ratio of the population that is lost during the transition.
+    :returns: (p) The probability $P(n, t)$ for the Markov chain to be in the state `n` after the time `t`,
+     with $P(0, 0) = 1$. If `t` and `n` are iterables, a 2d-array with shape `(t.size, n.size)` is returned.
+    :raises ValueError: If `r` is not a scalar between 0 and 1.
     """
     t = np.asarray(t, dtype=float)
     t_scalar = False
@@ -63,7 +69,6 @@ def ct_markov_analytic(t: array_like, n: array_like, rates: array_like, r: array
     n_scalar = False
     if len(n.shape) == 0:
         n_scalar = True
-        # return np.array([ct_markov(t, n_i, rates[:(int(n_i)+1)], r=r) for n_i in n.flatten()]).T
     n = np.expand_dims(n.flatten(), axis=(0, 1))
 
     rates = np.asarray(rates, dtype=float)
@@ -124,25 +129,33 @@ def ct_markov_dgl(
     time_resolved: bool = False,
     show: bool = False,
 ) -> ndarray | tuple[ndarray, ndarray]:
-    """
-    Computes the evolution of a linear continuous-time markov chain numerically by solving the underlying ODE system.
+    r"""
+    The numerical solution of the evolution of a linear continuous-time Markov chain, see [`ct_markov_analytic`],
+    obtained by solving the underlying system of ordinary differential equations
 
-    :param t: The time after which the probability is returned.
-     If all times from 0 to 't' are required, use 'time_resolved'=True (us).
-    :param n: The maximum state number to compute. The first state corresponds to 'n' = 0.
-    :param rates: The rate(s) at which the markov chain is transferring population from state i to state i + 1.
-     If 'rates' is a scalar, this rate is assumed for all 0 &#8804; i &#8804; 'n'. If 'rates' is an Iterable,
-     individual rates 'rates[i]' are assumed for the states i and 'rates' must have size 'n' + 1.
-    :param r: The ratio of the population which is transferred from state i to state i + 1. Here 1 - r is the ratio
-     of the population that is lost during the transition from state i to state i + 1.
-    :param p0: The initial population distribution. Must be an Iterable of length max('n') + 1.
-     If None, 'p0' is set to [1, 0, 0, ..., 0].
+    $$
+    \frac{\mathrm{d}P_0}{\mathrm{d}t} = -\lambda_0P_0,\quad
+    \frac{\mathrm{d}P_i}{\mathrm{d}t} = r\lambda_{i - 1}P_{i - 1} - \lambda_iP_i.
+    $$
+
+    :param t: The time $t$ after which the probabilities are returned (&mu;s).
+     If all times from 0 to `t` are required, use `time_resolved=True`.
+    :param n: The maximum state number $n$ to compute. The first state corresponds to `n = 0`.
+    :param rates: The rate(s) $\lambda_i$ at which the Markov chain transfers population
+     from the state $i$ to the state $i + 1$ (MHz). If `rates` is a scalar, this rate is assumed for all
+     $0 \leq i \leq n$. If `rates` is an iterable, it must have size `n + 1`
+     and individual rates `rates[i]` are assumed for the states $i$.
+    :param r: The ratio $r$ of the population which is transferred from the state $i$ to the state $i + 1$.
+     Then $1 - r$ is the ratio of the population that is lost during the transition.
+    :param p0: The initial probabilities $P_i(0)$. Must be an iterable of size `n + 1`.
+     If `None`, `p0` is set to `[1, 0, 0, ..., 0]`.
     :param time_resolved: Whether to return the complete history of the result.
-     If True, a 2-tuple similar to (time, population) is returned, were population has shape (time.size, n + 1).
-     time will be an array of equally spaced times, such that numerical integrations can be performed easily.
+     If `True`, a 2-tuple `(t, p)` is returned, where `p` has shape `(t.size, n + 1)`
+     and `t` is an array of equally spaced times, such that numerical integrations can be performed easily.
     :param show: Whether to plot the result.
-    :returns: The probability distribution of the states 0 &#8804; i &#8804; 'n' after the time 't'
-     for P(t=0, n=i) = p0[i] The normalization condition is sum_n(P(n, t0)) = 1 for every single point in time t0.
+    :returns: (p) The probabilities $P_i(t)$ of the states $0 \leq i \leq n$ after the time `t`.
+    :raises ValueError: If `t` is not a scalar, if `rates` or `p0` have the wrong size,
+     or if `r` is not a scalar between 0 and 1.
     """
     t = np.asarray(t, dtype=float)
     if len(t.shape) > 0:
@@ -191,16 +204,12 @@ def ct_markov_dgl(
     t_array = np.linspace(0.0, t, tools.odd(t / dt))
     ode = si.ode(_f, jac=_df)
     ode.set_initial_value(p0, 0.0)
-    # noinspection PyTypeChecker
     y_array = np.array(
         [
             p0,
         ]
         + [ode.integrate(ti) for ti in t_array[1:]]
     )
-    # result = si.solve_ivp(_f, (0., t), p0, method='RK45', max_step=dt, t_eval=t_array, vectorized=True)
-    # # noinspection PyUnresolvedReferences
-    # t_array, y_array = result.t, result.y.T
 
     if show:
         for ni, yi in enumerate(y_array.T):
@@ -229,28 +238,29 @@ def lambda_states(
     time_resolved: bool = False,
     show: bool = False,
 ) -> ndarray | tuple[ndarray, ndarray]:
-    """
-    Computes the evolution of Lambda-systems such as the alkali metals or the singly-charged alkaline-earth metals.
-    The state vector is defined as (g, m, e), where g is the first end of the Lambda,
-    m the second end and e the intermediate state.
+    r"""
+    The evolution of the density matrix of a $\Lambda$-system, such as the alkali metals
+    or the singly-charged alkaline-earth metals, driven by two lasers.
+    The states are $|g\rangle$ and $|m\rangle$, the two ends of the $\Lambda$, and the intermediate state $|e\rangle$.
 
-    :param t: The time after which the probability is returned.
-     If all times from 0 to 't' are required, use 'time_resolved'=True (us).
-    :param delta_1: The detuning of the first laser relative to the g->e transition.
-    :param delta_2: The detuning of the second laser relative to the m->e transition.
-    :param a_ge: The Einstein coefficient of the e->g transition.
-    :param a_me: The Einstein coefficient of the e->m transition.
-    :param s_1: The saturation parameter of the g->e transition.
-    :param s_2: The saturation parameter of the m->e transition.
-    :param lw_1: The frequency width of the first laser.
-    :param lw_2: The frequency width of the second laser.
-    :param p0: The initial density matrix. Must have shape (6, ), containing the elements [gg, mm, ee, gm, eg, em].
-     If None, initially all population is in the g state.
+    :param t: The time $t$ after which the density matrix is returned (&mu;s).
+     If all times from 0 to `t` are required, use `time_resolved=True`.
+    :param delta_1: The detuning of the first laser relative to the $g\rightarrow e$ transition (MHz).
+    :param delta_2: The detuning of the second laser relative to the $m\rightarrow e$ transition (MHz).
+    :param a_ge: The Einstein coefficient of the $e\rightarrow g$ transition (MHz).
+    :param a_me: The Einstein coefficient of the $e\rightarrow m$ transition (MHz).
+    :param s_1: The saturation parameter of the $g\rightarrow e$ transition.
+    :param s_2: The saturation parameter of the $m\rightarrow e$ transition.
+    :param lw_1: The frequency width of the first laser (MHz).
+    :param lw_2: The frequency width of the second laser (MHz).
+    :param p0: The initial density matrix elements `[gg, mm, ee, gm, eg, em]`. Must have shape `(6, )`.
+     If `None`, initially all population is in the state $|g\rangle$.
     :param time_resolved: Whether to return the complete history of the result.
+     If `True`, a 2-tuple `(t, rho)` is returned, where `rho` has shape `(t.size, 6)`
+     and `t` is an array of equally spaced times, such that numerical integrations can be performed easily.
     :param show: Whether to plot the result.
-    :returns: The density matrix elements after the time 't'. If time_resolved is True,
-     a 2-tuple similar to (time, density matrix) is returned, were the density matrix has shape (time.size, 6).
-     time will be an array of equally spaced times, such that numerical integrations can be performed easily.
+    :returns: (rho) The density matrix elements `[gg, mm, ee, gm, eg, em]` after the time `t`.
+    :raises ValueError: If `t` is not a scalar or if `p0` has the wrong size.
     """
     t = np.asarray(t, dtype=float)
     if len(t.shape) > 0:
@@ -310,11 +320,7 @@ def lambda_states(
     t_array = np.linspace(0.0, t, tools.odd(t / dt))
     ode = si.complex_ode(_f)
     ode.set_initial_value(p0, 0.0).set_integrator("vode", method="bdf")
-    # noinspection PyTypeChecker
     y_array: ndarray[complexfloating] = np.array([p0] + [ode.integrate(ti) for ti in t_array[1:]], dtype=complex)
-    # result = si.solve_ivp(_f, (0., t), p0, method='RK45', max_step=dt, t_eval=t_array, vectorized=True)
-    # # noinspection PyUnresolvedReferences
-    # t_array, y_array = result.t, result.y.T
     if show:
         plt.plot(t_array, y_array[:, 0].real, label=r"$\rho_\mathrm{gg}$")
         plt.plot(t_array, y_array[:, 1].real, label=r"$\rho_\mathrm{mm}$")
@@ -341,35 +347,40 @@ def lambda_ge_rec(
     time_resolved: bool = False,
     show: bool = False,
 ) -> ndarray | tuple[ndarray, ndarray]:
-    """
-    Computes the evolution of Lambda-systems such as the alkali metals or the singly-charged alkaline-earth metals,
-    taking into account photon recoils. The system is driven by a single laser.
-    The state vector is defined as (g0, m0, e0, g1, m1, e1, ..., gn, mn, en), where g is the first end of the Lambda,
-    m the second end and e the intermediate state.
+    r"""
+    The evolution of the density matrix of a $\Lambda$-system, such as the alkali metals
+    or the singly-charged alkaline-earth metals, driven by a single laser, taking into account photon recoils.
+    The states are $|g_k\rangle$ and $|m_k\rangle$, the two ends of the $\Lambda$, and the intermediate state
+    $|e_k\rangle$, ordered as $(g_0, m_0, e_0, g_1, m_1, e_1, \dots, g_n, m_n, e_n)$,
+    where $k$ is the number of photon recoils.
     The photon recoils are modeled using a discrete subspace and not the continuous momentum space.
-    The number of photon recoils increases by one when the system is excited from the g state to the e state.
+    The number of photon recoils increases by one when the system is excited from $|g\rangle$ to $|e\rangle$.
     Vice-versa, the number of photon recoils decreases by one when the system is deexcited
-    from the e state to the g state via the process of stimulated emission. When the system decays into the g state
-    via the dissipative mechanism described by the Einstein coefficient 'a_ge',
+    from $|e\rangle$ to $|g\rangle$ via stimulated emission. When the system decays into $|g\rangle$
+    via spontaneous emission, described by the Einstein coefficient `a_ge`,
     the number of photon recoils does not change.
 
-    :param t: The time after which the probability is returned.
-     If all times from 0 to 't' are required, use 'time_resolved'=True (us).
-    :param n: The maximum number of photon recoils to consider.
-    :param delta: The detuning of the laser relative to the g->e transition (MHz).
-    :param a_ge: The Einstein coefficient of the e->g transition (MHz).
-    :param a_me: The Einstein coefficient of the e->m transition (MHz).
-    :param s: The saturation parameter of the g->e transition.
-    :param f: The transition frequency of the g->e transition (MHz).
-    :param m: The mass number of the atom (u).
-    :param p0: The initial density matrix. Must have shape (6, ), containing the elements [gg, mm, ee, gm, eg, em](0)
-     or be the full density matrix with all the recoil information.
-    :param dt: The width of the time steps.
+    :param t: The time $t$ after which the density matrix is returned (&mu;s).
+     If all times from 0 to `t` are required, use `time_resolved=True`.
+    :param n: The maximum number $n$ of photon recoils to consider.
+    :param delta: The detuning of the laser relative to the $g\rightarrow e$ transition (MHz).
+    :param a_ge: The Einstein coefficient of the $e\rightarrow g$ transition (MHz).
+    :param a_me: The Einstein coefficient of the $e\rightarrow m$ transition (MHz).
+    :param s: The saturation parameter of the $g\rightarrow e$ transition.
+    :param f: The transition frequency of the $g\rightarrow e$ transition (MHz).
+    :param m: The mass of the atom (u).
+    :param p0: The initial density matrix. Must either have shape `(6, )`,
+     containing the elements `[gg, mm, ee, gm, eg, em]` without recoil,
+     or be the full flattened density matrix with all the recoil information.
+     If `None`, initially all population is in the state $|g_0\rangle$.
+    :param dt: The width of the time steps (&mu;s). If `None`, it is `0.1 / (a_ge + rabi)` with the Rabi frequency
+     of the laser.
     :param time_resolved: Whether to return the complete history of the result.
+     If `True`, a 2-tuple `(t, rho)` is returned, where `rho` has shape `(t.size, 3 * (n + 1))`
+     and `t` is an array of equally spaced times, such that numerical integrations can be performed easily.
     :param show: Whether to plot the result.
-    :returns: The diagonal density matrix elements after the time 't'. If time_resolved is True,
-     a 2-tuple similar to (time, density matrix) is returned, were the density matrix has shape (time.size, 3(n+1)).
-     time will be an array of equally spaced times, such that numerical integrations can be performed easily.
+    :returns: (rho_diag) The diagonal density matrix elements after the time `t`.
+    :raises ValueError: If `t` is not a scalar or if `p0` has the wrong size.
     """
     t = np.asarray(t, dtype=float)
     if len(t.shape) > 0:
@@ -394,13 +405,12 @@ def lambda_ge_rec(
     rabi = a_ge * np.sqrt(s / 2.0)
     f_rec = 2 * np.pi * f_recoil(f, m)
 
-    def hamiltonian(_t: scalar, n1: int, n2: int) -> ndarray:  # without hbar
+    def hamiltonian(_t: scalar, n1: int, n2: int) -> ndarray:
         gg, mm, ee = 0.0 + 0.0j, 0.0 + 0.0j, 0.0 + 0.0j
         gm, eg, me = 0.0 + 0.0j, 0.0 + 0.0j, 0.0 + 0.0j
         mg, ge, em = 0.0 + 0.0j, 0.0 + 0.0j, 0.0 + 0.0j
         if n1 == n2:
             _e_kin = n1**2 * f_rec
-            # _delta includes one recoil, _delta := (w_eg - w_L +- k*v + k*v_recoil)
             gg = -(_delta + 2 * n1 * f_rec) + _e_kin
             mm, ee = _e_kin, _e_kin
         elif n1 == n2 - 1:
@@ -442,16 +452,12 @@ def lambda_ge_rec(
         ret += lindbladian_ge + lindbladian_me
         return np.concatenate(tuple(np.diagonal(ret, offset=_i) for _i in range(3 * (n + 1))), axis=0)
 
-    dt = float(0.1 / a_ge + rabi) if dt is None else float(dt)
+    dt = float(0.1 / (a_ge + rabi)) if dt is None else float(dt)
     t_array = np.linspace(0.0, t, tools.odd(t / dt))
     ode = si.complex_ode(_f)
     ode.set_initial_value(y0, 0.0).set_integrator("vode", method="bdf")
 
-    # noinspection PyTypeChecker
     y_array: ndarray[complexfloating] = np.array([y0] + [ode.integrate(ti) for ti in t_array[1:]], dtype=complex)
-    # result = si.solve_ivp(_f, (0., t), y0, method='RK45', max_step=dt, t_eval=t_array, vectorized=True)
-    # # noinspection PyUnresolvedReferences
-    # t_array, y_array = result.t, result.y.T
 
     if show:
         plt.plot(
@@ -494,7 +500,7 @@ def lambda_ge_rec(
             pm.set_label(r"$\rho_\mathrm{mm}^n$")
             pe.set_label(r"$\rho_\mathrm{ee}^n$")
         plt.xlabel("Time (us)")
-        plt.xlabel("Population")
+        plt.ylabel("Population")
         plt.legend(loc=7)
         plt.show()
 
@@ -507,26 +513,41 @@ def lambda_ge_rec(
 
 
 class Geometry:
+    theta_intervals: ndarray
+    """The intervals of the angle $\\theta$ (rad)."""
+    phi_intervals: ndarray
+    """The intervals of the angle $\\phi$ (rad)."""
+    solid_angle: float
+    """The solid angle covered by the intervals (sr)."""
+    step: float
+    """The default step size of the integration sample (rad)."""
+    pdf: Callable | None
+    """The probability density function `pdf(theta, phi)` of the continuous angle weights."""
+    weights: ndarray | None
+    """The weights of the disjoint intervals."""
+    rotation: tools.Rotation
+    """The rotation of the detection geometry."""
+
     def __init__(self) -> None:
         r"""
-        Class representing a fluorescence detection geometry. The solid angle over which fluorescence light is detected
-        can be defined through intervals of the two angles $\theta$ and $\phi$.
-        With these, every spacial direction can be addressed using an orthonormal system defined by
+        A fluorescence detection geometry. The solid angle over which fluorescence light is detected
+        can be defined through intervals of the two angles $\theta$ and $\phi$, see [`Geometry.set_intervals`].
+        With these, every spatial direction can be addressed using an orthonormal system defined by
 
         $$
         \hat{e}_r = \begin{pmatrix}\sin(\theta)\\
-                    \cos(\theta)\sin(\phi)\\
-                    \cos(\theta)\cos(\phi)\end{pmatrix}.
+        \cos(\theta)\sin(\phi)\\
+        \cos(\theta)\cos(\phi)\end{pmatrix}.
         $$
 
-        If the user specifies a rotation object with unitary matrix $R$,
-        the new system is $\hat{e}_r^\prime = R \hat{e}_r$
-        The entire two-dimensional interval is defined through the cartesian product
+        If a rotation with the matrix $R$ is specified, see [`Geometry.set_rotation`],
+        the new system is $\hat{e}_r^\prime = R \hat{e}_r$.
+        The entire two-dimensional interval is defined through the Cartesian product
         $\bigcup_i \theta_i \times \bigcup_i \phi_i$.
-        For every disjoint interval a weight can be defined through a 'weights' matrix.
-        A probability distribution function (pdf) can be defined to have continuous angle weights.
-        A rotation matrix can be defined to rotate the entire coordinate systems/detection geometry.
-        A sample of angle pairs from the defined intervals can be generated using the 'integration_sample' method.
+        For every disjoint interval, a weight can be defined, see [`Geometry.set_weights`],
+        and a probability density function can be defined for continuous angle weights, see [`Geometry.set_pdf`].
+        A sample of angle pairs from the defined intervals can be generated with [`Geometry.integration_sample`].
+        By default, the complete solid angle is covered.
         """
         self.theta_intervals = np.array([[-np.pi / 2.0, np.pi / 2.0]])
         self.phi_intervals = np.array([[0.0, 2.0 * np.pi]])
@@ -537,11 +558,13 @@ class Geometry:
         self.rotation = tools.Rotation()
 
     def set_intervals(self, theta: array_like, phi: array_like) -> None:
-        """
-        :param theta: An interval or a list of intervals for the angle 'theta'.
-        :param phi: An interval or a list of intervals for the angle 'phi'.
-        :returns: Merges overlapping intervals and calculates the solid angle
-         corresponding to the defined intervals.
+        r"""
+        Set the intervals of the angles $\theta$ and $\phi$. Overlapping intervals are merged
+        and the covered solid angle `Geometry.solid_angle` is calculated.
+
+        :param theta: An interval or a list of intervals for the angle $\theta$ (rad).
+        :param phi: An interval or a list of intervals for the angle $\phi$ (rad).
+        :raises ValueError: If `theta` or `phi` is neither an interval nor a list of intervals.
         """
         theta, phi = np.asarray(theta, dtype=float), np.asarray(phi, dtype=float)
         if len(theta.shape) == 1:
@@ -563,9 +586,11 @@ class Geometry:
 
     def set_weights(self, weights: array_like | None) -> None:
         """
-        :param weights: None or a matrix of weights for the defined disjoint intervals.
-         The shape of the weights must fulfill weights.shape == (len(self.theta_intervals), len(self.phi_intervals)).
-        :returns: Sets the 'weights' attribute of the geometry object.
+        Set the weights of the disjoint intervals.
+
+        :param weights: `None` or a matrix of weights for the defined disjoint intervals with shape
+         `(len(Geometry.theta_intervals), len(Geometry.phi_intervals))`.
+        :raises ValueError: If `weights` has the wrong shape.
         """
         if weights is not None:
             weights = np.asarray(weights)
@@ -576,8 +601,10 @@ class Geometry:
 
     def set_pdf(self, pdf: Callable | None) -> None:
         """
-        :param pdf: None or a callable which accepts two arguments (theta, phi).
-        :returns: Sets the 'pdf' attribute of the Geometry object.
+        Set the probability density function of continuous angle weights.
+
+        :param pdf: `None` or a callable `pdf(theta, phi)`.
+        :raises AttributeError: If `pdf` cannot be called with the two angles.
         """
         if pdf is not None:
             try:
@@ -588,9 +615,10 @@ class Geometry:
 
     def set_rotation(self, r: tools.Rotation | None = None) -> None:
         """
-        :param r: None or a 3x3 matrix defining a rotation.Therefore, dot(r, r.T) = I and Det(r) = 1 must be fulfilled.
-         If r == None, the Identity matrix is used.
-        :returns: Sets the 'R' attribute of the Geometry object.
+        Set the rotation of the entire detection geometry.
+
+        :param r: A [`qspec.tools.Rotation`]. If `None`, the identity is used.
+        :raises TypeError: If `r` is not a `Rotation`.
         """
         if r is None:
             r = tools.Rotation()
@@ -599,14 +627,15 @@ class Geometry:
         self.rotation = r
 
     def integration_sample(self, step: scalar | None = None) -> tuple[list[ndarray], list[ndarray]]:
-        """
-        :param step: None or a scalar which defines the approximate spacing
-         between the equidistant values of the integration sample.
-         If step == None, the currently defined step size is used. The standard value is pi/32.
-        :returns: Two lists of arrays with equidistant values
-         in the defined intervals for 'theta' and 'phi', respectively.
-         Note that all intervals are exactly covered by an odd number of values (for Simpson integration)
-         under the expense of not matching the 'step' size exactly.
+        r"""
+        Sample the defined intervals with equidistant values for numerical integration.
+        All intervals are exactly covered by an odd number of values (for Simpson integration)
+        at the expense of not matching the `step` size exactly.
+
+        :param step: The approximate spacing between the equidistant values of the integration sample (rad).
+         If `None`, `Geometry.step` is used. The default value is $\pi/32$.
+        :returns: (theta, phi) Two lists of arrays with equidistant values
+         in the defined intervals for $\theta$ and $\phi$, respectively.
         """
         if step is None:
             step = self.step
@@ -616,14 +645,13 @@ class Geometry:
 
     def plot(self, show: bool = True) -> tuple[Figure, Axes3D]:
         """
-        Shows a 3d plot of the angular range covered by the geometry object.
+        Plot the angular range covered by the geometry in 3D.
 
         :param show: Whether to show the plot.
         :returns: (fig, ax) The figure and the axes object.
         """
-
         fig = plt.figure(num=1, figsize=(8, 8), clear=True)
-        ax: Axes3D = fig.add_subplot(111, projection="3d")  # type: ignore
+        ax: Axes3D = fig.add_subplot(111, projection="3d")
         plt.xlabel(r"$x$ / arb. units")
         plt.ylabel(r"$y$ / arb. units")
         ax.set_zlabel(r"$z$ / arb. units")
@@ -635,7 +663,7 @@ class Geometry:
         ticks = [-1.0, -0.5, 0.0, 0.5, 1.0]
         ax.set_xticks(ticks)
         ax.set_yticks(ticks)
-        ax.set_zticks(ticks)  # type: ignore
+        ax.zaxis.set_ticks(ticks)
         ax.set_box_aspect([1.0, 1.0, 1.0])
 
         radius = 0.9
@@ -657,12 +685,7 @@ class Geometry:
                     alpha=0.5,
                 )
                 surf.set_clim(-radius, radius)
-        # cb = plt.colorbar(surf, ax=ax, shrink=0.5)
-        # cb.set_label('z / arb. units')
-        # cb.set_ticks([-1, 0, 1])
 
-        # plt.style.use('seaborn')
-        # plt.tight_layout()
         if show:
             plt.show()
             plt.style.use("default")
@@ -672,9 +695,10 @@ class Geometry:
 
 class ScatteringRate:
     """
-    Class representing the perturbative scattering rate of a closed electronic transition.
-    The spectrum is excited by a laser with the specified 'polarization'
-    and recorded with a FDR defined by 'geometry'. An external magnetic field can be defined through 'b'.
+    The perturbative scattering rate of a closed electronic transition.
+    The spectrum is excited by a laser with the specified polarization
+    and recorded with a fluorescence detection region (FDR) defined by a [`Geometry`].
+    An external magnetic field can be defined through `b`.
     """
 
     def __init__(
@@ -686,12 +710,14 @@ class ScatteringRate:
         b: array_like | None = None,
     ) -> None:
         """
-        :param atom: The investigated atom.
-        :param laser: The incident laser beam.
-        :param i_decay: The indexing of the transition in atom.decay_map.
-        :param geometry: The geometry of the FDR.
+        :param atom: The investigated atom. It must consist of a single closed transition
+         between two fine-structure states, see [`ScatteringRate.check_atom`].
+        :param laser: The incident laser beam. If `None`, see [`ScatteringRate.set_laser`].
+        :param i_decay: The index of the transition in `atom.decay_map`.
+        :param geometry: The geometry of the FDR. If `None`, the complete solid angle is covered.
         :param b: The external magnetic field. Can be a vector or a scalar.
-         In the latter case, the magnetic field is aligned with the z-axis.
+         In the latter case, the magnetic field is aligned with the $z$-axis.
+        :raises ValueError: If the atom does not fulfill the requirements.
         """
         self.environment = Environment()
         self.atom: Atom = atom
@@ -731,14 +757,14 @@ class ScatteringRate:
         self.set_geometry(geometry)
         self.set_velocity(self.v)
         self.generate_dipoles()
-        self.set_b(b)  # TODO: Implement Environments in C++.
+        self.set_b(b)
 
     def check_atom(self) -> None:
         """
         Check whether the structure of the atom fulfills all requirements to calculate the scattering rate.
 
-        :raises ValueError: The atom has to consist of a single closed transition between two fine-structure states.
-         Their common nucleus can have an arbitrary spin.
+        :raises ValueError: If the atom does not consist of a single closed transition between two fine-structure
+         states. Their common nucleus can have an arbitrary spin.
         """
         if len(self.state_l) == 0 or len(self.state_u) == 0:
             raise ValueError("The atom must have at least one lower and one upper state defined.")
@@ -756,8 +782,9 @@ class ScatteringRate:
 
     def set_geometry(self, geometry: Geometry | None = None) -> None:
         """
-        :param geometry: The geometry object. If None, the entire solid angle is covered by the detector.
-        :return: None. Sets the geometry object.
+        Set the detection geometry.
+
+        :param geometry: The `Geometry`. If `None`, the entire solid angle is covered by the detector.
         """
         if geometry is None:
             geometry = Geometry()
@@ -767,8 +794,9 @@ class ScatteringRate:
 
     def set_polarization(self, polarization: Polarization | None = None) -> None:
         """
-        :param polarization: The polarization object. If None, the light is linearly polarized along the z-axis.
-        :returns: Sets the polarization object and the local polarization vector 'e_l'.
+        Set the polarization of the incident light and update the local polarization vector `ScatteringRate.e_l`.
+
+        :param polarization: The `Polarization`. If `None`, the light is linearly polarized along the $z$-axis.
         """
         if polarization is None:
             polarization = Polarization([0, 0, 1])
@@ -794,8 +822,9 @@ class ScatteringRate:
 
     def set_velocity(self, v: array_like = 0.0) -> None:
         """
-        :param v: The velocity vector of the atom.
-        :returns: Sets the new velocity for all states and updates the resonance positions.
+        Set the velocity of the atom and update the resonance positions.
+
+        :param v: The velocity vector of the atom or its $z$-component (m/s).
         """
         if is_scalar(v):
             v = np.array([0.0, 0.0, v], dtype=float)
@@ -804,9 +833,7 @@ class ScatteringRate:
 
     def set_states(self) -> None:
         """
-        Define lower and upper states.
-
-        :returns:
+        Define the lower and upper states from the transition `i_decay` of the `DecayMap` of the atom.
         """
         state_l = [state for state in self.atom if state.label == self.atom.decay_map.labels[self.i_decay][0]]
         state_u = [state for state in self.atom if state.label == self.atom.decay_map.labels[self.i_decay][1]]
@@ -821,7 +848,7 @@ class ScatteringRate:
 
     def set_x0(self) -> None:
         """
-        :returns: Updates the resonance positions.
+        Update the resonance positions.
         """
         self.x0 = [
             [state_u.freq - state_l.freq - self.laser.freq for state_u in self.state_u] for state_l in self.state_l
@@ -830,8 +857,8 @@ class ScatteringRate:
 
     def generate_dipoles(self) -> None:
         """
-        :returns: Generates an array of frequencies which cover the entire spectrum
-         and saves it to the x attribute of the Spectrum object.
+        Calculate the transition dipole elements of all transitions between the lower and upper states,
+        see [`qspec.algebra.a_dipole`] and [`qspec.algebra.a_dipole_cart`].
         """
         i = self.state_l[0].i
         labels = self.atom.decay_map.labels[self.i_decay]
@@ -876,9 +903,9 @@ class ScatteringRate:
 
     def set_b(self, b: array_like | None) -> None:
         """
-        :param b: The magnetic field vector.
-        :returns: Sets the new magnetic field for all states
-         and updates the quantization axis and the resonance positions.
+        Set the magnetic field for all states and update the quantization axis and the resonance positions.
+
+        :param b: The magnetic field vector or its $z$-component. If `None`, there is no magnetic field.
         """
         if b is None:
             self.b = np.array([0.0, 0.0, 0.0])
@@ -907,10 +934,12 @@ class ScatteringRate:
 
     def generate_x(self, width: scalar = 20.0, step: scalar | None = None) -> array_like:
         """
-        :param width: The covered width around resonances in natural linewidths.
-        :param step: The step size between generated x values.
+        Generate frequencies which cover the entire spectrum.
+
+        :param width: The covered width around the resonances in natural linewidths.
+        :param step: The step size between generated x values (MHz). If `None`, a 30th of the natural linewidth.
          Note that between resonances, there might be a larger step.
-        :returns: An array of frequencies which covers the entire spectrum.
+        :returns: (x) An array of frequencies which covers the entire spectrum (MHz).
         """
         width = float(width)
         intervals = [[x0 - width * self.gamma / 2, x0 + width * self.gamma / 2] for x0 in self.x0_array]
@@ -923,10 +952,11 @@ class ScatteringRate:
         )
 
     def generate_y0(self, x: array_like) -> array_like:
-        """
-        :param x: The frequency of light in an atoms rest frame (MHz).
-        :returns: The spectrum for the case of unpolarized light
-         and the detection of the complete solid angle (4 pi).
+        r"""
+        The spectrum for unpolarized light and the detection of the complete solid angle $4\pi$.
+
+        :param x: The frequency of light in the atom's rest frame (MHz).
+        :returns: (y) The scattering rate at the frequencies `x`.
         """
         y0 = np.zeros_like(x, dtype=float)
         for x0_list, a_const_list in zip(self.x0, self.a_const):
@@ -937,9 +967,11 @@ class ScatteringRate:
         return y0 * (self.gamma / 2.0) ** 3 / len(self.x0) / 3 * 2 * np.pi * self.s
 
     def generate_y_4pi(self, x: array_like) -> ndarray:
-        """
-        :param x: The frequency of light in an atoms rest frame (MHz).
-        :returns: The spectrum for the detection of the complete solid angle (4 pi).
+        r"""
+        The spectrum for the polarization of the laser and the detection of the complete solid angle $4\pi$.
+
+        :param x: The frequency of light in the atom's rest frame (MHz).
+        :returns: (y) The scattering rate at the frequencies `x`.
         """
         y0 = np.zeros_like(x, dtype=float)
         for x0_list, a_const_list, ll in zip(self.x0, self.a_const, self.state_l):
@@ -953,13 +985,16 @@ class ScatteringRate:
         return y0 * (self.gamma / 2.0) ** 3 / len(self.x0) * 2 * np.pi * self.s
 
     def generate_y(self, x: array_like, theta: array_like, phi: array_like, decimals: int = 8) -> ndarray:
-        """
-        :param x: The frequency of light in an atoms rest frame (MHz).
-        :param theta: The angle between the emission direction of the fluorescence light and the x-axis + 90 deg.
-        :param phi: The mixing angle between the y- and z-axis (sin(phi), cos(phi)).
+        r"""
+        The fluorescence spectrum for the direction of emission $\hat{e}_r(\theta, \phi)$ in the coordinate system
+        of the detection geometry, see [`Geometry`].
+
+        :param x: The frequency of light in the atom's rest frame (MHz).
+        :param theta: The angle $\theta$ of the emission direction (rad).
+        :param phi: The angle $\phi$ of the emission direction (rad).
         :param decimals: The precision of the vector calculus in considered decimal places.
-        :returns: The fluorescence spectrum for incident light with frequency 'x'
-         for the direction of emission defined by 'theta' and 'phi'.
+        :returns: (y) The fluorescence spectrum for incident light with the frequencies `x`
+         for the directions of emission defined by `theta` and `phi` with shape `(x.size, theta.size, phi.size)`.
         """
         x, theta, phi = np.asarray(x).flatten(), np.asarray(theta).flatten(), np.asarray(phi).flatten()
         t, p = np.meshgrid(theta, phi, indexing="ij")
@@ -968,12 +1003,6 @@ class ScatteringRate:
         e_phi = np.around(tools.transform(np.expand_dims(self.R, axis=0), tools.e_phi(t, p)), decimals=decimals)
         e_theta /= np.expand_dims(tools.absolute(e_theta), axis=-1)
         e_phi /= np.expand_dims(tools.absolute(e_phi), axis=-1)
-        # Lorentz Boost TODO
-        # if self.v is not None:
-        #     e_theta = boost(np.concatenate([[1.], e_theta], axis=0), self.v)[1:]
-        #     e_phi = boost(np.concatenate([[1.], e_phi], axis=0), self.v)[1:]
-        #     e_theta /= tools.absolute(e_theta)
-        #     e_phi /= tools.absolute(e_phi)
 
         norm = 3.0 / (8.0 * np.pi) * (self.gamma / 2.0) ** 3 / len(self.x0) * 2 * np.pi * self.s
         denominator = 1.0 / (-np.expand_dims(x, axis=1) + self.x0_array + 0.5j * self.gamma)
@@ -990,15 +1019,15 @@ class ScatteringRate:
         t0 = time()
         ret = sr_generate_y(denominator, f_theta, f_phi, self.counts, shape).reshape((x.size, theta.size, phi.size))
         t0 = time() - t0
-        # print('Time: {}s'.format(t0))
         return ret * norm
 
     def integrate_y(self, x: array_like, step: scalar | None = None) -> ndarray:
         """
-        :param x: The frequency of light in an atoms rest frame (MHz).
-        :param step: The step size used for the integration over the angles theta and phi.
-        :returns: The fluorescence spectrum for incident light with frequencies 'x'
-         integrated over the directions of emission 'theta' and 'phi'.
+        The fluorescence spectrum integrated over the solid angle of the detection geometry.
+
+        :param x: The frequency of light in the atom's rest frame (MHz).
+        :param step: The step size used for the integration over the angles, see [`Geometry.integration_sample`].
+        :returns: (y) The fluorescence spectrum for incident light with the frequencies `x`.
         """
         x = np.asarray(x)
         theta, phi = self.geometry.integration_sample(step=step)
@@ -1021,14 +1050,13 @@ class ScatteringRate:
         return y_int
 
     def plot_spectrum(self, norm_to_4pi: bool = False, step: scalar | None = None) -> None:
-        """
+        r"""
+        Plot the spectrum for the given geometry and that for the detection with the complete solid angle $4\pi$.
 
-        :param norm_to_4pi: Whether to renormalize the spectrum defined by geometry to have the same maximum
-         as the spectrum for the detection with the complete solid angle 4 pi.
-         If True, the difference between the two spectra is plotted as well. Default is False.
+        :param norm_to_4pi: Whether to renormalize the spectrum of the geometry to have the same maximum
+         as the spectrum for the detection with the complete solid angle.
+         If `True`, the difference between the two spectra is plotted as well.
         :param step: The step size for the integration of the scattering rate.
-        :returns: Plots the spectrum for the given geometry
-         and that for the detection with the complete solid angle 4 pi.
         """
         plt.figure(figsize=(8, 4))
 
@@ -1059,17 +1087,19 @@ class ScatteringRate:
         show: bool = True,
         save: str | None = None,
     ) -> tuple[ndarray, ndarray, ndarray]:
-        """
-        :param x: The frequency of light in an atoms rest frame (MHz).
-         If None, the position of the first maximum is taken (self.x0[0][0]).
-        :param n: 2 ** n + 1 samples for 'theta' and 2 ** (n + 1) + 1 samples for 'phi' are drawn,
-         giving a total of 2 ** (2n + 1) + 3 * 2 ** n + 1 points to draw.
-        :param theta: A custom array for theta. Overwrites 'n'.
-        :param phi: A custom array for phi. Overwrites 'n'.
-        :param mode: Either '3d' for a surface plot or anything else for a color-mesh plot.
-        :param save: The path where to save the plot. If None, the plot will not be saved.
+        r"""
+        Plot the angular distribution of the fluorescence light for a given laser frequency, see
+        [`ScatteringRate.generate_y`].
+
+        :param x: The frequency of light in the atom's rest frame (MHz).
+         If `None`, the position of the first resonance is taken.
+        :param n: `2**n + 1` samples for `theta` and `2**(n + 1) + 1` samples for `phi` are drawn.
+        :param theta: A custom array for $\theta$. Overwrites `n`.
+        :param phi: A custom array for $\phi$. Overwrites `n`.
+        :param mode: Either `"3d"` for a surface plot or anything else for a color-mesh plot.
         :param show: Whether to show the plot.
-        :returns: theta, phi and z. Optionally, a plot is drawn and saved.
+        :param save: The path where to save the plot. If `None`, the plot will not be saved.
+        :returns: (theta, phi, y) The angles and the fluorescence intensities.
         """
         theta = np.linspace(-np.pi / 2.0, np.pi / 2.0, 2**n + 1) if theta is None else np.asarray(theta, dtype=float)
         phi = np.linspace(0.0, 2.0 * np.pi, 2 ** (n + 1) + 1) if phi is None else np.asarray(phi, dtype=float)
@@ -1081,7 +1111,7 @@ class ScatteringRate:
         if mode == "3d":
             r = np.array([[tools.transform(self.geometry.rotation.R, tools.e_r(t, p)) for p in phi] for t in theta])
             fig = plt.figure(num=1, figsize=(8, 8), clear=True)
-            ax3d: Axes3D = fig.add_subplot(111, projection="3d", label="Surface")  # type: ignore
+            ax3d: Axes3D = fig.add_subplot(111, projection="3d", label="Surface")
 
             rad = y[:, :]
             rad = np.expand_dims(rad, axis=-1)
@@ -1101,7 +1131,7 @@ class ScatteringRate:
             ticks = [-1.0, -0.5, 0.0, 0.5, 1.0]
             ax3d.set_xticks(ticks)
             ax3d.set_yticks(ticks)
-            ax3d.set_zticks(ticks)  # type: ignore
+            ax3d.zaxis.set_ticks(ticks)
             ax3d.set_box_aspect([1.0, 1.0, 1.0])
 
             x_color = tools.absolute(r, axis=-1)
@@ -1122,7 +1152,7 @@ class ScatteringRate:
 
             cb = plt.colorbar(cm, ax=ax3d, shrink=0.5)
             cb.set_label("Intensity (arb. units)")
-            cb.set_ticks(np.arange(0.0, 1.1, 0.2))  # type: ignore
+            cb.set_ticks(np.arange(0.0, 1.1, 0.2).tolist())
 
             plt.gca().axis("off")
             plt.style.use("seaborn")
@@ -1161,14 +1191,14 @@ class ScatteringRate:
     def plot_mixed_distribution(
         self, n: int = 5, mode: str | None = None, show: bool = True, save: str | None = None
     ) -> None:
-        """
-        :param n: 2 ** n + 1 samples for 'theta' and 2 ** (n + 1) + 1 samples for 'phi' are drawn,
-         giving a total of (2 ** n + 1) * len(self.x) and (2 ** (n + 1) + 1) * len(self.x)
-         points to draw for theta and phi, respectively.
-        :param mode: Either '3d' for a surface plot or anything else for a color-mesh plot.
-        :param save: The path where to save the plot. If None, the plot will not be saved.
-        :param show: Whether to show the plot.
-        :returns: Optionally, two plots are drawn for theta and phi as the y-axes and saved.
+        r"""
+        Plot the fluorescence spectrum as a function of the frequency and the angle $\theta$ (at $\phi = 0$)
+        and as a function of the frequency and the angle $\phi$ (at $\theta = 0$).
+
+        :param n: `2**n + 1` samples for `theta` and `2**(n + 1) + 1` samples for `phi` are drawn.
+        :param mode: Either `"3d"` for a surface plot or anything else for a color-mesh plot.
+        :param show: Whether to show the plots.
+        :param save: The path where to save the plots. If `None`, the plots will not be saved.
         """
         x = self.generate_x()
         theta = np.linspace(-np.pi / 2.0, np.pi / 2.0, 2**n + 1)
@@ -1187,7 +1217,7 @@ class ScatteringRate:
 
         if mode == "3d":
             fig = plt.figure(num=1, figsize=(16, 9), clear=True)
-            ax3d: Axes3D = fig.add_subplot(111, projection="3d", label="Surface")  # type: ignore
+            ax3d: Axes3D = fig.add_subplot(111, projection="3d", label="Surface")
             ax3d.set_zlabel(r"$I$ / arb. units")
 
             ax3d.plot_surface(
@@ -1208,7 +1238,7 @@ class ScatteringRate:
                 plt.show()
 
             fig = plt.figure(num=1, figsize=(16, 9), clear=True)
-            ax3d: Axes3D = fig.add_subplot(111, projection="3d", label="Surface")  # type: ignore
+            ax3d = fig.add_subplot(111, projection="3d", label="Surface")
 
             plt.xlabel(r"$\nu - \nu_0$ / MHz")
             plt.ylabel(r"$\phi$ / rad")
@@ -1260,32 +1290,25 @@ class ScatteringRate:
 
     def plot_setup(self) -> None:
         """
-        :returns: Creates a 3D-plot of the physical situation, including the axis
-         of the magnetic field (quantization axis), the real and imaginary axis of the polarization
-         and the are which is covered by the detector geometry.
+        Plot the physical situation in 3D, including the axis of the magnetic field (quantization axis),
+        the real and imaginary parts of the polarization, the velocity of the atom
+        and the area which is covered by the detector geometry.
         """
         _, ax = self.geometry.plot(show=False)
         x, y, z = np.zeros(1), np.zeros(1), np.zeros(1)
 
-        # Laser
-
-        # Polarization
-        # Real
         u, v, w = self.polarization.x.real[:, 0], self.polarization.x.real[:, 1], self.polarization.x.real[:, 2]
         ax.quiver(x, y, z, u, v, w, zorder=3, color="b", length=1, arrow_length_ratio=0.1, label="Real(Pol.)")
-        # Imag
         u, v, w = np.meshgrid(
             self.polarization.x.imag[:, 0], self.polarization.x.imag[:, 1], self.polarization.x.imag[:, 2]
         )
         ax.quiver(x, y, z, u, v, w, zorder=3, color="tab:orange", length=1, arrow_length_ratio=0.1, label="Imag(Pol.)")
 
-        # B-field / Quantization axis
         u, v, w = np.meshgrid(self.e_r_b[0], self.e_r_b[1], self.e_r_b[2])
         ax.quiver(
             x, y, z, u, v, w, zorder=2, color="g", length=1, arrow_length_ratio=0.1, label="B-field /\nQuant. axis"
         )
 
-        # Velocity
         if self.v is not None:
             u, v, w = np.meshgrid(self.v[0], self.v[1], self.v[2])
             ax.quiver(x, y, z, u, v, w, zorder=10, color="r", length=1, arrow_length_ratio=0.1, label="Velocity")

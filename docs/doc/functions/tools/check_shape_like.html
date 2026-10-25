@@ -9,33 +9,26 @@ title: qspec.check_shape_like
 <span class="sig-paren">&nbsp;(&nbsp;</span>
 <em class="sig-param"><span class="o">*</span><span class="n">args</span></em>
 ,&nbsp;
-<em class="sig-param"><span class="n">allow_scalar</span><span class="o">=</span><span class="default_value bool">True</span></em>
-<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/tools.py#L554-L574' }}"><span class="sig-source">[source]</span></a>
+<em class="sig-param"><span class="n">allow_scalar</span><span class="o">=</span><span class="default_value"><span class="bool">True</span></span></em>
+<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/tools.py#L605-L626' }}"><span class="sig-source">[source]</span></a>
 </dt>
 <dd class="field-body">
-
+<p>Check whether the shapes of all arguments can be broadcast together.</p>
 <dl class="field-list">
 <dt class="field-head">Parameters<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
-<dt>args<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html' | relative_url }}">ndarray</a></em></span></dt>
+<dt>args<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#ndarray' | relative_url }}">ndarray</a></em></span></dt>
 <dd class="field-desc"><p>The arguments which must have shapes that can be broadcast together.</p></dd>
 <dt>allow_scalar<span class="classifier"><em>bool</em></span></dt>
-<dd class="field-desc"><p>Whether scalar values (shape=()) are seen as compatible with arbitrary shapes.</p></dd>
-</dl>
-</dd>
-<dt class="field-head">Returns<span class="colon">:</span></dt>
-<dd class="field-par">
-<dl>
-<dt>out<span class="classifier"><em>None</em></span></dt>
-<dd class="field-desc"><p>None</p></dd>
+<dd class="field-desc"><p>Whether scalar values (<code>shape == ()</code>) are seen as compatible with arbitrary shapes.</p></dd>
 </dl>
 </dd>
 <dt class="field-head">Raises<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
 <dt>ValueError</dt>
-<dd class="field-desc"><p>All specified arguments must have shapes that can be broadcast together.</p></dd>
+<dd class="field-desc"><p>If the shapes of the arguments cannot be broadcast together.</p></dd>
 </dl>
 </dd>
 </dl>
