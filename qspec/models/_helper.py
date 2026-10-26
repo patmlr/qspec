@@ -2,7 +2,7 @@
 qspec.models._helper
 ====================
 
-Helper functions for the models.
+Helper functions to create and search lineshape models.
 """
 
 import numpy as np
@@ -26,22 +26,28 @@ def gen_model(
 ) -> _base.Model:
     """
     Create a lineshape model to fit arbitrary atomic fluorescence spectra.
+    The model is composed of the `Spectrum`, a `Splitter` for each set of quantum numbers in `ijj`,
+    optionally an [`NPeak`] and a [`Convolved`] model, and an [`Offset`] model.
 
-    :param ijj: The three or an Iterable of three quantum numbers $I$, $J_l$ and $J_u$.
+    :param ijj: The three or an iterable of three quantum numbers $I$, $J_l$ and $J_u$.
      Must be a list with the format `[I, J_l, J_u]` or `[[I0, J0_l, J0_u], [I1, J1_l, J1_u], ...]`.
-    :param shape: A str representation of or a `Spectrum` type.
-    :param qi: Whether to use a quantum interference model.
-    :param hf_mixing: Whether to use a hyperfine-induced mixing model. Not implemented for `qi=True`.
+    :param shape: A `str` representation of a `Spectrum` type, see `SPECTRA`, or a `Spectrum` type.
+     If `None`, the [`Empty`] model is used.
+    :param qi: Whether to use a quantum interference model, see [`HyperfineQI`].
+    :param hf_mixing: Whether to use a hyperfine-induced mixing model, see [`HyperfineMixed`].
+     Not implemented for `qi=True`.
     :param hf_config: A `dict` containing the configuration for the hf mixing. Only used if `hf_mixing=True`.
-    :param n_peaks: The number of "peaks per resonance" or "lineshape duplicates".
+    :param n_peaks: The number of "peaks per resonance" or "lineshape duplicates", see [`NPeak`].
     :param offsets: The orders of the offset polynomials of the separate x-axis intervals.
      Must be a list or a single value. In the former case `len(offsets) == len(x_cuts) + 1` must hold.
      If `offsets` is `None`, a single constant offset is assumed.
     :param x_cuts: The x values where to cut the x-axis. Must be a list or a single value.
      In the former case `len(offsets) == len(x_cuts) + 1` must hold.
      If `x_cuts` is `None`, the x-axis will not be cut.
-    :param convolve: A str representation of or a `Convolved` type.
-    :returns: The constructed lineshape model.
+    :param convolve: A `str` representation of a `Convolved` type, see `CONVOLVE`, or a `Convolved` type.
+    :returns: (model) The constructed lineshape model.
+    :raises NotImplementedError: If both `qi` and `hf_mixing` are `True`.
+    :raises ValueError: If `ijj`, `shape` or `convolve` have an invalid format or value.
     """
     if qi and hf_mixing:
         raise NotImplementedError("QI with HF-mixing is not implemented yet.")
@@ -74,7 +80,7 @@ def gen_model(
         raise ValueError("`shape` must be `None`, a `str` representation of, or a `Spectrum` type.")
 
     if convolve is None:
-        model_c: None | type[_convolved.Convolved] = None
+        model_c: type[_convolved.Convolved] | None = None
 
     else:
         if isinstance(convolve, type) and issubclass(convolve, _convolved.Convolved):
@@ -93,6 +99,7 @@ def gen_model(
             raise ValueError("convolve must be a str representation of or a Convolved type.")
 
     spl = _splitter.gen_splitter_model(qi=qi, hf_mixing=hf_mixing)
+    npeaks_model: _base.Model
     if hf_mixing:
         npeaks_model = _splitter.SplitterSummed(
             [spl(model(), i, j_l, j_u, f"HF{n}", config=hf_config) for n, (i, j_l, j_u) in enumerate(_ijj)]
@@ -113,10 +120,12 @@ def gen_model(
 
 def find_model[T: _base.Model](model: _base.Model | None, sub_model: type[T]) -> T | None:
     """
+    Find the first submodel of a given type. For [`Listed`] models, only the first branch is searched.
+
     :param model: The model to search in.
-    :param sub_model: The submodel to find.
-    :returns: The first submodel of type or with the same type as `sub_model`. If `model` already has the same type as
-     `sub_model`, `model` will be returned. Returns `None` if `model` has no submodel `sub_model`.
+    :param sub_model: The type of the submodel to find.
+    :returns: (sub) The first submodel of type `sub_model`. If `model` already has the type `sub_model`,
+     `model` is returned. Returns `None` if `model` has no submodel of type `sub_model`.
     """
     if model is None:
         return None
@@ -135,16 +144,16 @@ def find_models[T: _base.Model](
     model: _base.Model | None, sub_model: type[T], model_list: Iterable[T] | None = None
 ) -> list[T]:
     """
-    :param model: The model to search in.
-    :param sub_model: The submodel to find.
-    :param model_list: A list of models to append the found submodel to.
-    :returns: This function returns a list of the first models of type or with the same type as `sub_model`
-     for every branch in model.
-    """
+    Find the first submodel of a given type in every branch of a model.
+    The branches are the submodels of [`Listed`] models.
 
-    if model_list is None:
-        model_list = []
-    model_list = list(model_list)
+    :param model: The model to search in.
+    :param sub_model: The type of the submodels to find.
+    :param model_list: A list of models to append the found submodels to.
+    :returns: (subs) The first submodels of type `sub_model` of every branch in `model`,
+     appended to `model_list`. Branches without a submodel of type `sub_model` are skipped.
+    """
+    model_list = [] if model_list is None else list(model_list)
 
     if model is None:
         return model_list
@@ -152,11 +161,8 @@ def find_models[T: _base.Model](
     if isinstance(model, sub_model):
         return [*model_list, model]
 
-    _model = [model.model]
-    if _model is None and isinstance(model, _base.Listed):
-        _model = [m for m in model.models]
-
-    for m in _model:
-        find_models(m, sub_model, model_list=model_list)
+    sub_models = model.models if isinstance(model, _base.Listed) else [model.model]
+    for m in sub_models:
+        model_list = find_models(m, sub_model, model_list=model_list)
 
     return model_list

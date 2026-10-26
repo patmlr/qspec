@@ -84,18 +84,32 @@ __all__ = [
 
 
 ROMAN_NUMERALS = {"M": 1000, "D": 500, "C": 100, "L": 50, "X": 10, "V": 5, "I": 1}
+"""The values of the Roman numerals."""
 
 
 class COLORS:
+    """
+    ANSI escape sequences to print colored text in the console, see [`print_colored`].
+    """
+
     HEADER = "\033[95m"
+    """Pink."""
     OKBLUE = "\033[94m"
+    """Blue."""
     OKCYAN = "\033[96m"
+    """Cyan."""
     OKGREEN = "\033[92m"
+    """Green."""
     WARNING = "\033[93m"
+    """Yellow."""
     FAIL = "\033[91m"
+    """Red."""
     ENDC = "\033[0m"
+    """Resets the color and the style."""
     BOLD = "\033[1m"
+    """Bold text."""
     UNDERLINE = "\033[4m"
+    """Underlined text."""
 
     def __init__(self) -> None:
         pass
@@ -103,30 +117,34 @@ class COLORS:
     @classmethod
     def tab10(cls, i: int) -> str:
         """
-        Returns the pyplot tab10 color for the specified index.
+        The pyplot tab10 color with the specified index.
 
         :param i: The index of the pyplot color.
-        :returns: The `str` format of the specified color.
+        :returns: (color) The `str` format `"C{i}"` of the specified color.
         """
         return f"C{i}"
 
 
 def get_rgb_print_command(r: int_like, g: int_like, b: int_like) -> str:
     """
-    :param r: The fraction of red (0-255).
-    :param g: The fraction of green (0-255).
-    :param b: The fraction of blue (0-255).
-    :returns: The command str to print rgb colors in the console.
+    The ANSI escape sequence to print text with an RGB color in the console.
+
+    :param r: The red value (0-255).
+    :param g: The green value (0-255).
+    :param b: The blue value (0-255).
+    :returns: (command) The escape sequence.
     """
     return f"\033[38;2;{r};{g};{b}m"
 
 
 def rgb_to_hex_color(r: int_like, g: int_like, b: int_like) -> str:
     """
-    :param r: The fraction of red (0-255).
-    :param g: The fraction of green (0-255).
-    :param b: The fraction of blue (0-255).
-    :returns: A hexadecimal str representation of the `rgb` tuple.
+    Convert an RGB color into its hexadecimal representation.
+
+    :param r: The red value (0-255).
+    :param g: The green value (0-255).
+    :param b: The blue value (0-255).
+    :returns: (hex) A hexadecimal `str` representation `"#rrggbb"` of the color.
     """
     return f"#{r:02x}{g:02x}{b:02x}"
 
@@ -135,11 +153,11 @@ def print_colored(specifier: str, *values: object, returned: bool = False, **kwa
     """
     Print with the specified color.
 
-    :param specifier: str of the color name defined in the COLORS class or an RGB-value (0-255, 0-255, 0-255).
+    :param specifier: The name of a color defined in [`COLORS`] or an RGB value `(0-255, 0-255, 0-255)`.
     :param values: The values to print.
-    :param returned: Return the str instead of printing it.
-    :param kwargs: See print().
-    :returns: The colored `values` if `returned == True` else `None`.
+    :param returned: Whether to return the colored `str` instead of printing it.
+    :param kwargs: Additional keyword arguments are passed to `print`.
+    :returns: (s) The colored `values` if `returned` is `True`, else `None`.
     """
     _c = eval(f"COLORS.{specifier.upper()}") if isinstance(specifier, str) else get_rgb_print_command(*specifier)
     _values = (_c, *values, COLORS.ENDC)
@@ -151,11 +169,10 @@ def print_colored(specifier: str, *values: object, returned: bool = False, **kwa
 
 def printh(*values: object, **kwargs) -> None:
     """
-    Print with the HEADER color (pink).
+    Print with the `HEADER` color (pink).
 
     :param values: The values to print.
-    :param kwargs: See print().
-    :returns:
+    :param kwargs: Additional keyword arguments are passed to `print`.
     """
     _values = (COLORS.HEADER, *values, COLORS.ENDC)
     print("{}{}{}".format(*_values), **kwargs)
@@ -163,11 +180,10 @@ def printh(*values: object, **kwargs) -> None:
 
 def printw(*values: object, **kwargs) -> None:
     """
-    Print with the WARNING color (yellow).
+    Print with the `WARNING` color (yellow).
 
     :param values: The values to print.
-    :param kwargs: See print().
-    :returns:
+    :param kwargs: Additional keyword arguments are passed to `print`.
     """
     _values = (COLORS.WARNING, *values, COLORS.ENDC)
     print("{}{}{}".format(*_values), **kwargs)
@@ -175,11 +191,10 @@ def printw(*values: object, **kwargs) -> None:
 
 def printf(*values: object, **kwargs) -> None:
     """
-    Print with the FAIL color (red).
+    Print with the `FAIL` color (red).
 
     :param values: The values to print.
-    :param kwargs: See print().
-    :returns:
+    :param kwargs: Additional keyword arguments are passed to `print`.
     """
     _values = (COLORS.FAIL, *values, COLORS.ENDC)
     print("{}{}{}".format(*_values), **kwargs)
@@ -187,11 +202,12 @@ def printf(*values: object, **kwargs) -> None:
 
 def map_corr_coeff_to_color(val: scalar, clip: bool = True) -> tuple[int, int, int]:
     """
-    Maps a value between -1 and 1 to a red-to-green colormap.
+    Map a value between -1 and 1 to a red-to-green colormap.
 
     :param val: A value between -1 and 1.
-    :param clip: Whether to clip vals outside -1 and 1. If False, raise ValueError.
+    :param clip: Whether to clip values outside of [-1, 1]. `nan` values are mapped to 0.
     :returns: (r, g, b) A tuple of RGB values in the range 0-255.
+    :raises ValueError: If `clip` is `False` and `val` is `nan` or outside of [-1, 1].
     """
     if clip:
         if np.isnan(val):
@@ -208,12 +224,11 @@ def map_corr_coeff_to_color(val: scalar, clip: bool = True) -> tuple[int, int, i
 
 def print_cov(cov: array_like, normalize: bool = False, decimals: int = 2) -> None:
     """
-    Print a covariance "as is" or as color-coded Pearson correlation coefficients.
+    Print a covariance matrix "as is" or as color-coded Pearson correlation coefficients.
 
     :param cov: A covariance matrix.
-    :param normalize: Whether to normalize the covariance to be the Pearson correlation coefficient.
+    :param normalize: Whether to normalize the covariance matrix to the Pearson correlation coefficients.
     :param decimals: The number of decimal places to be printed.
-    :returns:
     """
     cov = np.array(cov, dtype=float)
     if normalize:
@@ -243,8 +258,11 @@ def print_cov(cov: array_like, normalize: bool = False, decimals: int = 2) -> No
 
 def fraction(r: Rational | str) -> tuple[int, int]:
     """
-    :param r: A sympy.Rational or a str with the signature "num/denom".
-    :returns: the numerator and denominator of `r`.
+    The numerator and denominator of a fraction.
+
+    :param r: A `sympy.Rational` or a `str` with the format `"num/denom"`.
+    :returns: (num, denom) The numerator and denominator of `r`.
+    :raises TypeError: If `r` is neither a `sympy.Rational` nor a `str`.
     """
     if not isinstance(r, Rational) and not isinstance(r, str):
         raise TypeError(f"Argument must be a sympy.Rational or str, but is {type(r)}: {r}.")
@@ -261,8 +279,9 @@ def fraction(r: Rational | str) -> tuple[int, int]:
 
 def check_half_integer(*args: scalar) -> None:
     """
+    Check whether the given arguments are multiples of 1/2.
+
     :param args: Scalar arguments.
-    :returns: Checks whether the given arguments are multiples of 1/2.
     :raises ValueError: If any argument is not a multiple of 1/2.
     """
     if sum([abs(float(arg) % 0.5) for arg in args]) > 0:
@@ -271,8 +290,11 @@ def check_half_integer(*args: scalar) -> None:
 
 def half_integer_to_fraction(val: scalar) -> tuple[int, int]:
     """
-    :param val: A scalar value.
-    :returns: The numerator and denominator of the half-integer.
+    The numerator and denominator of a half-integer.
+
+    :param val: A half-integer value.
+    :returns: (num, denom) The numerator and denominator of the half-integer.
+    :raises ValueError: If `val` is not a multiple of 1/2.
     """
     check_half_integer(val)
     if abs(float(val) % 1.0) > 0.0:
@@ -282,9 +304,12 @@ def half_integer_to_fraction(val: scalar) -> tuple[int, int]:
 
 def half_integer_to_str(val: scalar, symbol: str = "/") -> str:
     """
-    :param val: A scalar value.
+    Convert a half-integer into a rational `str` representation, e.g., `"3/2"`.
+
+    :param val: A half-integer value.
     :param symbol: The symbol to use for the fraction.
-    :returns: A rational str-representation of a half-integer.
+    :returns: (s) A rational `str` representation of the half-integer.
+    :raises ValueError: If `val` is not a multiple of 1/2.
     """
     num, denom = half_integer_to_fraction(val)
     if denom == 1:
@@ -294,9 +319,11 @@ def half_integer_to_str(val: scalar, symbol: str = "/") -> str:
 
 def get_val_with_unc(val_string: str) -> tuple[float, float]:
     """
+    Convert the `str` representation of a number with uncertainty into the value and its uncertainty.
+
     :param val_string: The `str` representation of a number with uncertainty of the format `"1.234(56)"`.
      Decimal separators can be used or spared arbitrarily.
-    :returns: The value and its uncertainty.
+    :returns: (val, unc) The value and its uncertainty.
     """
     err, decimals = 0.0, 0
     if val_string == "":
@@ -326,10 +353,10 @@ def get_val_with_unc(val_string: str) -> tuple[float, float]:
 
 def roman_to_int(roman: str) -> int:
     """
-    Convert from Roman numerals to an integer.
+    Convert Roman numerals into an integer.
 
-    :param roman: The `str` representation of a roman number.
-    :returns: The integer value of a `roman` number.
+    :param roman: The `str` representation of a Roman number.
+    :returns: (n) The integer value of the Roman number.
     """
     numbers = []
     for char in roman.upper():
@@ -349,24 +376,30 @@ def roman_to_int(roman: str) -> int:
 
 def odd(x: scalar) -> int:
     """
+    The odd integer `int(x)` or `int(x) + 1`.
+
     :param x: A scalar value.
-    :returns: The closest odd integer value.
+    :returns: (n) `int(x)` if it is odd, else `int(x) + 1`.
     """
     return int(x) if int(x) % 2 else int(x) + 1
 
 
 def even(x: scalar) -> int:
     """
+    The even integer `int(x)` or `int(x) + 1`.
+
     :param x: A scalar value.
-    :returns: The closest even integer value.
+    :returns: (n) `int(x)` if it is even, else `int(x) + 1`.
     """
     return int(x) if not int(x) % 2 else int(x) + 1
 
 
 def get_decimals(x: float) -> int:
     """
+    The number of displayed decimals of a float.
+
     :param x: A float value.
-    :return: The number of displayed decimals of the float value 'x'.
+    :returns: (n) The number of displayed decimals of `str(x)`.
     """
     s = str(x)
     dot = s.find(".")
@@ -375,8 +408,10 @@ def get_decimals(x: float) -> int:
 
 def floor_log2(x: array_like) -> ndarray:
     """
+    The integer part of the logarithm to the base 2, $\\lfloor\\log_2|x|\\rfloor$. Zeros are mapped to 0.
+
     :param x: Scalar values.
-    :returns: The closest integer values below the logarithm with basis 10 of the absolute value of 'x'.
+    :returns: (n) The closest integer values below the logarithm to the base 2 of the absolute value of `x`.
     """
     x = np.asarray(x)
     if len(x.shape) > 0:
@@ -391,8 +426,10 @@ def floor_log2(x: array_like) -> ndarray:
 
 def floor_log10(x: array_like) -> ndarray:
     """
+    The integer part of the logarithm to the base 10, $\\lfloor\\log_{10}|x|\\rfloor$. Zeros are mapped to 0.
+
     :param x: Scalar values.
-    :returns: The closest integer values below the logarithm with basis 10 of the absolute value of 'x'.
+    :returns: (n) The closest integer values below the logarithm to the base 10 of the absolute value of `x`.
     """
     x = np.asarray(x)
     if len(x.shape) > 0:
@@ -405,18 +442,22 @@ def floor_log10(x: array_like) -> ndarray:
     return np.floor(np.log10(np.abs(x))).astype(int)
 
 
-def round_to_n(x: scalar, n: int_like) -> tuple[scalar, int]:
+def round_to_n(x: scalar, n: int_like) -> tuple[float, int]:
     """
+    Round a value to `n` significant decimal places.
+
     :param x: The input data.
     :param n: The number of significant decimal places to round to.
-    :returns: x rounded to 'n' significant decimal places and
+    :returns: (x_round, decimals) `x` rounded to `n` significant decimal places and
      the corresponding number of decimal places after the decimal point.
+    :raises TypeError: If `x` is not a scalar.
     """
     if isinstance(x, np.ndarray):
         x = x.squeeze().tolist()
         if isinstance(x, list):
             raise TypeError("Only `scalar` types are supported.")
 
+    _f: type[float] | type[int]
     if isinstance(x, (float, floating)):
         _f = float
     elif isinstance(x, (int, integer)):
@@ -433,8 +474,10 @@ def round_to_n(x: scalar, n: int_like) -> tuple[scalar, int]:
 
 def factorial(n: array_like) -> ndarray:
     """
+    The factorial $n!$ of integers.
+
     :param n: The integer numbers. Float types are cast to int types.
-    :returns: n! (array compatible).
+    :returns: (n_factorial) The factorials of `n`. Values $n < 2$ yield 1.
     """
     n = np.asarray(n, dtype=int)
     mask = n > 1
@@ -449,18 +492,22 @@ def factorial(n: array_like) -> ndarray:
 
 def asarray_optional(a: Any | None, **kwargs) -> ndarray | None:
     """
-    :param a: Input data, see numpy docs.
-    :param kwargs: The keyword arguments are passed to `numpy.asarray`.
-    :returns: None if `a` is None else `numpy.asarray(a, **kwargs)`.
+    Cast `a` to a numpy array unless it is `None`.
+
+    :param a: Input data, see `numpy.asarray`.
+    :param kwargs: Additional keyword arguments are passed to `numpy.asarray`.
+    :returns: (arr) `None` if `a` is `None`, else `numpy.asarray(a, **kwargs)`.
     """
     return None if a is None else np.asarray(a, **kwargs)
 
 
 def in_nested(a: object, nested: object) -> bool:
     """
+    Check whether an element is part of a nested list.
+
     :param a: The element to look for.
     :param nested: The nested list.
-    :returns: Whether `a` is inside the `nested` list.
+    :returns: (is_in) Whether `a` is inside the `nested` list.
     """
     if not isinstance(nested, Iterable):
         return False
@@ -468,21 +515,17 @@ def in_nested(a: object, nested: object) -> bool:
     if a in nested:
         return True
 
-    ret = False
-    for el in nested:
-        ret += in_nested(a, el)
-        if ret:
-            return True
-
-    return bool(ret)
+    return any(in_nested(a, el) for el in nested)
 
 
 def check_iterable(arg: object, dtype: type = str) -> list:
     """
+    Cast an argument or the elements of an argument of type `dtype` to a list.
+
     :param arg: The argument that is checked.
-    :param dtype: The type that has to be matched by the elements of arg or arg itself.
-    :returns: 'arg' as a list if it is a 'list', 'tuple' or 'set' of values of type 'dtype',
-     a list of the single element 'arg' if it is of type 'dtype' and else an empty list.
+    :param dtype: The type that has to be matched by the elements of `arg` or `arg` itself.
+    :returns: (arg_list) `arg` as a list if it is a `list`, `tuple` or `set` of values of type `dtype`,
+     a list of the single element `arg` if it is of type `dtype` and else an empty list.
     """
     if isinstance(arg, (list, tuple, set)):
         if all(isinstance(s, dtype) for s in arg):
@@ -497,12 +540,14 @@ def check_iterable(arg: object, dtype: type = str) -> list:
 
 def make_str_iterable_unique(a: Iterable[str], identifier: Iterable[str] | None = None) -> list[str]:
     """
-    :param a: An Iterable of str values.
-    :param identifier: An Iterable of str values to append to the values of 'a' if they appear more than once.
-     If None, '_i' is used as the identifier for the ith appearance of a value in 'a'.
-    :returns: 'a', but the elements which appear more than once are numerated/attached with the identifiers and bunched.
-     For example: ['a', 'b', 'c', 'b', 'd'] -> ['a', 'b_0', 'b_1', 'c', 'd'] or
-     ['a', 'b', 'c', 'b', 'd'] -> ['a', 'b' + identifier[0], 'b' + identifier[1], 'c', 'd'].
+    Make the values of a list of strings unique by appending identifiers to values that appear more than once.
+    Equal values are grouped together, e.g., `["a", "b", "c", "b", "d"]` becomes
+    `["a", "b_0", "b_1", "c", "d"]` or `["a", "b_" + identifier[0], "b_" + identifier[1], "c", "d"]`.
+
+    :param a: An iterable of `str` values.
+    :param identifier: An iterable of `str` values to append to the values of `a` if they appear more than once.
+     If `None`, `"_i"` is appended to the `i`-th appearance of a value in `a`.
+    :returns: (a_unique) The unique values.
     """
     temp_1 = list(a)
     temp_2 = []
@@ -530,11 +575,12 @@ def make_str_iterable_unique(a: Iterable[str], identifier: Iterable[str] | None 
 
 def check_dimension(dim: int, axis: int, *args: array_like) -> None:
     """
-    :param dim: The number of components the axis 'axis' must have.
-    :param axis: The axis which must have 'dim' components.
-    :param args: The arguments which must have 'dim' components along axis 'axis'.
-    :returns: None
-    :raises ValueError: All specified arguments must have 'dim' components along axis 'axis'.
+    Check whether all arguments have `dim` components along the specified `axis`.
+
+    :param dim: The number of components the axis `axis` must have.
+    :param axis: The axis which must have `dim` components.
+    :param args: The arguments which must have `dim` components along axis `axis`.
+    :raises ValueError: If any argument does not have `dim` components along axis `axis`.
     """
     err_list = []
     for arg in args:
@@ -553,10 +599,11 @@ def check_dimension(dim: int, axis: int, *args: array_like) -> None:
 
 def check_shape_like(*args: ndarray, allow_scalar: bool = True) -> None:
     """
+    Check whether the shapes of all arguments can be broadcast together.
+
     :param args: The arguments which must have shapes that can be broadcast together.
-    :param allow_scalar: Whether scalar values (shape=()) are seen as compatible with arbitrary shapes.
-    :returns: None
-    :raises ValueError: All specified arguments must have shapes that can be broadcast together.
+    :param allow_scalar: Whether scalar values (`shape == ()`) are seen as compatible with arbitrary shapes.
+    :raises ValueError: If the shapes of the arguments cannot be broadcast together.
     """
     err_list = []
     shape = args[-1].shape
@@ -576,12 +623,15 @@ def check_shape_like(*args: ndarray, allow_scalar: bool = True) -> None:
 
 def check_shape(shape: tuple, *args: ndarray, allow_scalar: bool = True, return_mode: bool = False) -> bool | None:
     """
+    Check whether all arguments have the specified shape.
+
     :param shape: The shape which must be matched by the specified arguments.
     :param args: The arguments which must match the specified shape.
-    :param allow_scalar: Whether scalar values (shape=()) are seen as compatible with arbitrary shapes.
-    :param return_mode: Whether to raise a ValueError or return a boolean if any argument does not have shape 'shape'.
-    :returns: whether the arguments match the specified shape.
-    :raises ValueError: All specified arguments must match the specified shape.
+    :param allow_scalar: Whether scalar values (`shape == ()`) are seen as compatible with arbitrary shapes.
+    :param return_mode: Whether to return `False` instead of raising a `ValueError`
+     if any argument does not have shape `shape`.
+    :returns: (match) Whether the arguments match the specified shape.
+    :raises ValueError: If any argument does not match the specified shape and `return_mode` is `False`.
     """
     err_list = []
     allowed = [shape]
@@ -603,16 +653,21 @@ def check_shape(shape: tuple, *args: ndarray, allow_scalar: bool = True, return_
 
 def nan_helper(y: array_like) -> tuple[ndarray, Callable]:
     """
-    :param y: An array like value.
-    :returns: The mask where y is NaN and a function which returns the nonzero indices of an array.
+    A helper to handle `nan` values, e.g., to interpolate them with
+    `y[nans] = numpy.interp(x(nans), x(~nans), y[~nans])`.
+
+    :param y: An array-like value.
+    :returns: (nans, x) The mask where `y` is `nan` and a function which returns the nonzero indices of an array.
     """
     return np.isnan(y), lambda z: z.nonzero()[0]
 
 
 def dict_to_list(a: dict) -> tuple[list, list]:
     """
+    Split a dictionary into a list of its keys and a list of its values.
+
     :param a: A dictionary.
-    :returns: Two lists with the keys and values of 'a', respectively.
+    :returns: (keys, vals) Two lists with the keys and values of `a`, respectively.
      The lists are in the same order, however, they are not sorted.
     """
     kv = [[k, v] for k, v in a.items()]
@@ -621,9 +676,11 @@ def dict_to_list(a: dict) -> tuple[list, list]:
 
 def list_to_dict(values: array_like, keys: array_like | None = None) -> dict:
     """
+    Combine a list of values and a list of keys into a dictionary.
+
     :param values: The values of the dictionary.
     :param keys: The keys of the dictionary. If omitted, the keys will be the indices of the values.
-    :returns: A dictionary with the given 'values' and 'keys'.
+    :returns: (a) A dictionary with the given `values` and `keys`.
     """
     v_list = list(np.asarray(values).flatten())
     k_list = list(range(len(v_list))) if keys is None else list(np.asarray(keys).flatten())
@@ -634,14 +691,16 @@ def list_to_excel(
     *args: scalar_nd, save: str | None = None, delimiter: str = "\t", header: str = "", align: str = "top"
 ) -> str:
     """
+    Print or save iterables as columns in an Excel-compatible format.
 
-    :param args: 1- or 2-dimensional iterables to print or save in an excel-compatible format.
-    :param save: The filepath, either absolute or relative to the working directory. If None, the output is printed.
+    :param args: 1- or 2-dimensional iterables to print or save in an Excel-compatible format.
+    :param save: The filepath, either absolute or relative to the working directory. If `None`, the output is printed.
     :param delimiter: The delimiter between two columns.
-    :param header: Add a header above the content to the output.
+    :param header: A header above the content of the output.
     :param align: How to align the columns that are smaller than the largest column.
-     Supported alignments are {"top", "bottom", else == "top"}.
-    :returns: Prints or saves the 'args' in an excel-compatible way.
+     Can be either `"top"` or `"bottom"`. Any other value is treated as `"top"`.
+    :returns: (s) The formatted `str`.
+    :raises ValueError: If any argument is not 1- or 2-dimensional.
     """
     columns = []
     s = ""
@@ -687,10 +746,13 @@ def list_to_excel(
 
 def add_nested_key(a: dict, key_list: list, val: array_like) -> dict:
     """
+    Assign a value to a nested key of a dictionary, creating the intermediate dictionaries if necessary.
+
     :param a: The target dictionary.
-    :param key_list: A list of nested keys of a.
-    :param val: The value that is assigned to the last key in key_list.
-    :returns: The dictionary a with val assigned to the last key in key_list.
+    :param key_list: A list of nested keys of `a`.
+    :param val: The value that is assigned to the last key in `key_list`.
+    :returns: (a) The dictionary `a` with `val` assigned to the last key in `key_list`.
+    :raises TypeError: If an intermediate value is not a dictionary.
     """
     if not isinstance(a, dict):
         raise TypeError(f"Cannot assign another key ({key_list[0]}) since `a` is not a dictionary.")
@@ -708,10 +770,12 @@ def add_nested_key(a: dict, key_list: list, val: array_like) -> dict:
 
 def merge_dicts(a: dict, b: dict, path: list | None = None) -> dict:
     """
+    Recursively merge the dictionary `b` into the dictionary `a`. Values of `b` override those of `a`.
+
     :param a: The first `dict`.
     :param b: The second `dict`.
-    :param path: _.
-    :returns: `b` merged into `a`.
+    :param path: The keys of the current recursion level, used internally.
+    :returns: (a) `b` merged into `a`.
     """
     if path is None:
         path = []
@@ -728,13 +792,17 @@ def merge_dicts(a: dict, b: dict, path: list | None = None) -> dict:
 
 def convolve_dict(a: dict, *key_lists: Iterable, operator: str = "+", short_keys: bool = True) -> dict:
     """
+    Combine the values of a dictionary with the given operator, e.g., for `operator == "+"`, the dictionary
+    `{key_lists[0][i] + key_lists[1][i] + ...: a[key_lists[0][i]] + a[key_lists[1][i]] + ...}`.
+
     :param a: A dictionary to be convolved.
-    :param key_lists: An arbitrary number of Iterables of the same length which include keys from 'a'.
-    :param operator: The operator which is used to combine the key_lists.
-    :param short_keys: Whether to just use the keys of the first key_list
+    :param key_lists: An arbitrary number of iterables of the same length which include keys from `a`.
+    :param operator: The operator which is used to combine the values.
+     Can be one of `"+"`, `"-"`, `"*"`, `"/"`, `"%"` or `"gauss"` (the square root of the sum of squares).
+    :param short_keys: Whether to use the keys of the first key list
      or representations of the entire operations as the new keys.
-    :returns: A dictionary of the shape {key_lists[0] + key_lists[1] + ... :
-                                         a[key_lists[0]] + a[key_lists[1]] + ... } if operator == '+'.
+    :returns: (a_conv) The dictionary with the combined values.
+    :raises ValueError: If `operator` is not supported.
     """
     operators = ["+", "-", "*", "/", "%", "gauss"]
     if operator not in operators:
@@ -758,14 +826,18 @@ def convolve_dict(a: dict, *key_lists: Iterable, operator: str = "+", short_keys
 
 def combine_dicts(dicts: list, key_lists: Iterable, operator: str = "+", short_keys: bool = True) -> dict:
     """
+    Combine the values of several dictionaries with the given operator, e.g., for `operator == "+"`, the dictionary
+    `{key_lists[0][i] + key_lists[1][i] + ...: dicts[0][key_lists[0][i]] + dicts[1][key_lists[1][i]] + ...}`.
+
     :param dicts: A list of dictionaries to be combined.
-    :param key_lists: A list of Iterables of the same lengths which include keys from 'a'.
-     Must have the same length as 'dicts'.
-    :param operator: The operator which is used to combine the key_lists.
-    :param short_keys: Whether to just use the keys of the first key_list
+    :param key_lists: A list of iterables of the same length which include keys from the corresponding `dicts`.
+     Must have the same length as `dicts`.
+    :param operator: The operator which is used to combine the values.
+     Can be one of `"+"`, `"-"`, `"*"`, `"/"`, `"%"` or `"gauss"` (the square root of the sum of squares).
+    :param short_keys: Whether to use the keys of the first key list
      or representations of the entire operations as the new keys.
-    :returns: A dictionary of the shape {key_lists[0] + key_lists[1] + ... :
-                                         dicts[0][key_lists[0]] + dicts[1][key_lists[1]] + ... } if operator == '+'.
+    :returns: (a_comb) The dictionary with the combined values.
+    :raises ValueError: If `operator` is not supported.
     """
     operators = ["+", "-", "*", "/", "%", "gauss"]
     if operator not in operators:
@@ -790,9 +862,11 @@ def combine_dicts(dicts: list, key_lists: Iterable, operator: str = "+", short_k
 
 def merge_intervals(intervals: Iterable[Iterable[scalar]]) -> ndarray:
     """
+    Merge overlapping intervals.
+
     :param intervals: An iterable of intervals.
-     An interval i is itself an iterable of two scalar values. If `i[1] < i[0]`, the interval is reversed.
-    :returns: An iterable of non-overlapping intervals.
+     An interval `i` is itself an iterable of two scalar values. If `i[1] < i[0]`, the interval is reversed.
+    :returns: (merged) An array of sorted, non-overlapping intervals with shape `(n, 2)`.
     """
     inter = np.asarray(intervals)
     check_shape_like(inter, np.zeros((1, 2)))
@@ -814,17 +888,19 @@ def merge_intervals(intervals: Iterable[Iterable[scalar]]) -> ndarray:
         n += m + 1
 
     if inter.shape[0] == 1 or inter[-1, 0] > inter[-2, 1]:
-        new_inter.append(inter[-1, :])
+        new_inter.append(list(inter[-1, :]))
 
     return np.asarray(new_inter)
 
 
 def get_subarray(a: ndarray, i: int_like | slice, axis: int) -> ndarray:
     """
+    Select a subarray along an axis.
+
     :param a: The array.
-    :param i: The indexes to select along the 'axis'
-    :param axis: The axis along which the indexes 'i' are selected.
-    :returns: The subarray selected with the indexes 'i' along the 'axis'.
+    :param i: The indexes to select along the `axis`.
+    :param axis: The axis along which the indexes `i` are selected.
+    :returns: (sub) The subarray selected with the indexes `i` along the `axis`.
     """
 
     axis += a.ndim if axis < 0 else 0
@@ -837,9 +913,11 @@ def get_subarray(a: ndarray, i: int_like | slice, axis: int) -> ndarray:
 
 def absolute(x: array_like, axis: int = -1) -> ndarray:
     """
+    The length of real vectors $|\\vec{x}|$.
+
     :param x: A real vector or an array of real vectors.
     :param axis: The axis along which the vector components are aligned.
-    :returns: The length(s) of the vector(s) x.
+    :returns: (x_abs) The length(s) of the vector(s) `x`.
     """
     x = np.asarray(x)
     return np.sqrt(np.sum(x**2, axis=axis))
@@ -847,21 +925,29 @@ def absolute(x: array_like, axis: int = -1) -> ndarray:
 
 def absolute_complex(x: array_like, axis: int = -1) -> ndarray:
     """
+    The length of complex vectors $|\\vec{x}|$.
+
     :param x: A complex vector or an array of complex vectors.
     :param axis: The axis along which the vector components are aligned.
-    :returns: The length(s) of the vector(s) x.
+    :returns: (x_abs) The length(s) of the vector(s) `x`.
     """
     x = np.asarray(x)
     return np.sqrt(np.sum(np.abs(x) ** 2, axis=axis))
 
 
 def angle(x: array_like, y: array_like, axis: int = -1) -> ndarray:
-    """
-    :param x: The first vectors (arb. units).
-    :param y: The second vectors ([x]).
+    r"""
+    The angle between two vectors
+
+    $$
+    \alpha = \arccos\left(\frac{\vec{x}\cdot\vec{y}}{|\vec{x}||\vec{y}|}\right).
+    $$
+
+    :param x: The first vectors $\vec{x}$ (arb. units).
+    :param y: The second vectors $\vec{y}$ (arb. units).
     :param axis: The axis along which the vector components are aligned.
-    :returns: The angle between two vectors x and y (rad).
-    :raises ValueError: The shapes of x and y must be compatible.
+    :returns: (alpha) The angle $\alpha$ between the vectors `x` and `y` (rad).
+    :raises ValueError: If the shapes of `x` and `y` are not compatible.
     """
     x, y = asarray(x, y)
     check_shape_like(x, y)
@@ -870,15 +956,16 @@ def angle(x: array_like, y: array_like, axis: int = -1) -> ndarray:
 
 def angle_d(x: array_like, x_d: array_like, y: array_like, y_d: array_like, axis: int = -1) -> ndarray:
     """
+    The uncertainty of the angle between two vectors, see [`angle`].
+
     :param x: The first vectors (arb. units).
-    :param x_d: The uncertainties of the first vectors ([x]).
-    :param y: The second vectors ([x]).
-    :param y_d: The uncertainties of the second vectors ([x]).
+    :param x_d: The uncertainties of the first vectors (unit of `x`).
+    :param y: The second vectors (arb. units).
+    :param y_d: The uncertainties of the second vectors (unit of `y`).
     :param axis: The axis along which the vector components are aligned.
-    :returns: The angle between two vectors x and y (rad).
-    :raises ValueError: The shapes of x and y must be compatible.
+    :returns: (alpha_d) The uncertainty of the angle between the vectors `x` and `y` (rad).
     """
-    x, y = asarray(x, y)
+    x, x_d, y, y_d = asarray(x, x_d, y, y_d)
     z = np.sum(x * y, axis=axis)
     n = np.sum(x**2, axis=axis) * np.sum(y**2, axis=axis)
     arg = z / np.sqrt(n)
@@ -889,14 +976,16 @@ def angle_d(x: array_like, x_d: array_like, y: array_like, y_d: array_like, axis
 
 def transform(t: array_like, vec: array_like, axis: int = -1) -> ndarray:
     """
-    :param t: The transformation matrix which must hold t.shape[axis+1] == vec.shape[axis].
-    :param vec: The vector to be transformed.
-    :param axis: The axis along which the vector components of 'vec' are aligned and that is summed over.
-    :returns: The transformed vector vec_new = t * vec.
+    Transform vectors with a matrix, $\\vec{v}^\\prime = T\\vec{v}$.
+
+    :param t: The transformation matrix $T$. It must hold `t.shape[axis + 1] == vec.shape[axis]`.
+    :param vec: The vector $\\vec{v}$ to be transformed.
+    :param axis: The axis along which the vector components of `vec` are aligned and that is summed over.
+    :returns: (vec_new) The transformed vector $\\vec{v}^\\prime$.
+    :raises ValueError: If the shapes of `t` and `vec` are not compatible.
     """
     t, vec = np.asarray(t), np.asarray(vec)
     ax = axis if axis != -1 else len(vec.shape) - 1
-    # check_dimension(vec.shape[ax], ax + 1, t)
     vec = np.expand_dims(vec, ax)
     check_shape_like(t, vec)
     return np.sum(t * vec, axis=ax + 1)
@@ -904,11 +993,13 @@ def transform(t: array_like, vec: array_like, axis: int = -1) -> ndarray:
 
 def unit_vector(indexes: array_like, dim: int_like, axis: int_like = -1, dtype: type = float) -> ndarray:
     """
-    :param indexes: The indexes of the vectors that are filled with a 1.
+    Unit vectors with a 1 at the specified indexes.
+
+    :param indexes: The indexes of the vector components that are 1.
     :param dim: The dimension of the unit vectors.
-    :param axis: The axis with the dimension 'dim'.
+    :param axis: The axis with the dimension `dim`.
     :param dtype: The data type of the unit vectors.
-    :returns: Unit vectors in the specified 'indexes' with dimension 'dim' along the specified 'axis'.
+    :returns: (e) Unit vectors with 1 at the specified `indexes` and dimension `dim` along the specified `axis`.
     """
     index = np.asarray(indexes, dtype=int)
     return np.moveaxis(np.choose(np.expand_dims(index, axis=-1), np.identity(int(dim), dtype=dtype)), -1, axis)
@@ -916,9 +1007,11 @@ def unit_vector(indexes: array_like, dim: int_like, axis: int_like = -1, dtype: 
 
 def vector_to_diag_matrix(a: array_like, axis: int = -1) -> ndarray:
     """
+    Transform vectors into diagonal matrices.
+
     :param a: The vector to be transformed into a diagonal matrix.
     :param axis: The axis of the vector elements to be aligned along the diagonal of the matrix.
-    :returns: A diagonal matrix with one extra axis compared with 'a' at 'axis' + 1.
+    :returns: (diag) A diagonal matrix with one extra axis compared with `a` at `axis + 1`.
     """
     a = np.asarray(a)
 
@@ -938,14 +1031,19 @@ def vector_to_diag_matrix(a: array_like, axis: int = -1) -> ndarray:
 
 
 def e_r(theta: array_like, phi: array_like, axis: int = -1) -> ndarray:
-    """
-    :param theta: The angle theta.
-    :param phi: The angle phi.
+    r"""
+    The radial unit vector of the orthonormal system
+
+    $$
+    \hat{e}_r = \begin{pmatrix}\sin(\theta)\\ \cos(\theta)\sin(\phi)\\ \cos(\theta)\cos(\phi)\end{pmatrix},
+    $$
+
+    such that $\hat{e}_x = \hat{e}_r(\pi/2, \phi)$, $\hat{e}_y = \hat{e}_r(0, \pi/2)$ and $\hat{e}_z = \hat{e}_r(0, 0)$.
+
+    :param theta: The angle $\theta$ (rad).
+    :param phi: The angle $\phi$ (rad).
     :param axis: The axis along which the vector components are aligned.
-    :returns: The unit vector 'e_r'. Part of an orthonormal system defined by:
-        e_x = e_r(pi/2, .)
-        e_y = e_r(0, pi/2)
-        e_z = e_r(0, 0)
+    :returns: (e_r) The unit vector $\hat{e}_r$.
     """
     x = np.expand_dims(np.sin(theta), axis=axis)
     y = np.expand_dims(np.cos(theta) * np.sin(phi), axis=axis)
@@ -954,14 +1052,17 @@ def e_r(theta: array_like, phi: array_like, axis: int = -1) -> ndarray:
 
 
 def e_theta(theta: array_like, phi: array_like, axis: int = -1) -> ndarray:
-    """
-    :param theta: The angle theta.
-    :param phi: The angle phi.
+    r"""
+    The polar unit vector of the orthonormal system defined by [`e_r`]
+
+    $$
+    \hat{e}_\theta = \begin{pmatrix}\cos(\theta)\\ -\sin(\theta)\sin(\phi)\\ -\sin(\theta)\cos(\phi)\end{pmatrix}.
+    $$
+
+    :param theta: The angle $\theta$ (rad).
+    :param phi: The angle $\phi$ (rad).
     :param axis: The axis along which the vector components are aligned.
-    :returns: The unit vector 'e_theta'. Part of an orthonormal system defined by:
-        e_x = e_r(pi/2, .)
-        e_y = e_r(0, pi/2)
-        e_z = e_r(0, 0)
+    :returns: (e_theta) The unit vector $\hat{e}_\theta$.
     """
     x = np.expand_dims(np.cos(theta) * np.ones_like(phi), axis=axis)
     y = np.expand_dims(-np.sin(theta) * np.sin(phi), axis=axis)
@@ -970,14 +1071,17 @@ def e_theta(theta: array_like, phi: array_like, axis: int = -1) -> ndarray:
 
 
 def e_phi(theta: array_like, phi: array_like, axis: int = -1) -> ndarray:
-    """
-    :param theta: The angle theta.
-    :param phi: The angle phi.
+    r"""
+    The azimuthal unit vector of the orthonormal system defined by [`e_r`]
+
+    $$
+    \hat{e}_\phi = \begin{pmatrix}0\\ \cos(\phi)\\ -\sin(\phi)\end{pmatrix}.
+    $$
+
+    :param theta: The angle $\theta$ (rad).
+    :param phi: The angle $\phi$ (rad).
     :param axis: The axis along which the vector components are aligned.
-    :returns: The unit vector 'e_phi'. Part of an orthonormal system defined by:
-        e_x = e_r(pi/2, .)
-        e_y = e_r(0, pi/2)
-        e_z = e_r(0, 0)
+    :returns: (e_phi) The unit vector $\hat{e}_\phi$.
     """
     x = np.expand_dims(np.zeros_like(phi) * np.ones_like(theta), axis=axis)
     y = np.expand_dims(np.cos(phi) * np.ones_like(theta), axis=axis)
@@ -987,10 +1091,13 @@ def e_phi(theta: array_like, phi: array_like, axis: int = -1) -> ndarray:
 
 def orthonormal_rtp(r: array_like, axis: int = -1) -> tuple[ndarray, ndarray, ndarray]:
     """
+    The orthonormal system $(\\hat{e}_r, \\hat{e}_\\theta, \\hat{e}_\\phi)$, see [`e_r`],
+    with $\\hat{e}_r$ pointing in the direction of `r`.
+
     :param r: The first vector of the orthonormal system. Does not have to be normalized.
     :param axis: The axis along which the vector components are aligned.
-    :returns: The three orthonormal vectors 'e_r', 'e_theta' and 'e_phi'
-     given the vector 'r' pointing in the 'e_r' direction.
+    :returns: (e_r, e_theta, e_phi) The three orthonormal vectors.
+    :raises ValueError: If `r` does not have 3 components along the specified `axis`.
     """
     r = np.asarray(r)
     check_dimension(3, axis, r)
@@ -1009,9 +1116,12 @@ def orthonormal_rtp(r: array_like, axis: int = -1) -> tuple[ndarray, ndarray, nd
 
 def orthonormal(r: array_like, axis: int = -1) -> tuple[ndarray, ndarray, ndarray]:
     """
+    An orthonormal system with the first vector pointing in the direction of `r`.
+
     :param r: The first vector of the orthonormal system. Does not have to be normalized.
     :param axis: The axis along which the vector components are aligned.
-    :returns: Three orthonormal vectors, given the first vector 'r'.
+    :returns: (r1, r2, r3) Three orthonormal vectors.
+    :raises ValueError: If `r` does not have 3 components along the specified `axis`.
     """
     r1 = np.asarray(r, dtype=float)
     check_dimension(3, axis, r1)
@@ -1031,30 +1141,47 @@ def orthonormal(r: array_like, axis: int = -1) -> tuple[ndarray, ndarray, ndarra
 
 
 def rotation_matrix(alpha: array_like, dr: scalar_nd) -> ndarray:
+    r"""
+    The matrix of a rotation by the angle $\alpha$ about the axis $\hat{n}$ (Rodrigues' rotation formula)
+
+    $$
+    R = \cos(\alpha)\mathbb{1} + \sin(\alpha)[\hat{n}]_\times + (1 - \cos(\alpha))\hat{n}\hat{n}^T,
+    $$
+
+    where $[\hat{n}]_\times$ is the cross-product matrix of $\hat{n}$.
+
+    :param alpha: The angle $\alpha$ of the rotation (rad).
+    :param dr: The vector to rotate about. Does not have to be normalized.
+    :returns: (R) The rotation matrix $R$.
     """
-    :param alpha: The angle to rotate.
-    :param dr: The vector to rotate about.
-    :returns: The rotation matrix defined by the angle alpha and the vector dr.
-    """
-    alpha, dr = np.asarray(alpha), np.asarray(dr)
-    dr /= absolute(dr)
+    alpha = np.asarray(alpha)
+    n = np.asarray(dr, dtype=float)
+    n /= absolute(n)
     r = np.identity(3) * np.cos(alpha)
-    r += np.array([[0.0, -dr[2], dr[1]], [dr[2], 0.0, -dr[0]], [-dr[1], dr[0], 0.0]]) * np.sin(alpha)
-    r += np.einsum("i,j->ij", dr, dr) * (1.0 - np.cos(alpha))
+    r += np.array([[0.0, -n[2], n[1]], [n[2], 0.0, -n[0]], [-n[1], n[0], 0.0]]) * np.sin(alpha)
+    r += np.einsum("i,j->ij", n, n) * (1.0 - np.cos(alpha))
     return r
 
 
 class Rotation:
     """
-    An object specifying a rotation in 3d-space. The rotation is defined
-    through an angle 'alpha' and a rotational axis 'dr' by the user.
-    Additional instance attributes are the angle in degree 'alpha_deg' and the rotational matrix 'R'.
+    A rotation in 3d-space, defined by an angle and a rotation axis, see [`rotation_matrix`].
     """
+
+    alpha: scalar
+    """The angle of the rotation (rad)."""
+    alpha_deg: scalar
+    """The angle of the rotation (deg)."""
+    dr: ndarray
+    """The normalized rotation axis."""
+    R: ndarray
+    """The rotation matrix."""
 
     def __init__(self, alpha: scalar = 0.0, dr: scalar_nd | None = None) -> None:
         """
         :param alpha: The angle of the rotation (rad).
-        :param dr: The rotational axis of the rotation.
+        :param dr: The rotation axis. If `None`, the $z$-axis is used.
+        :raises ValueError: If `dr` is not a 3d-vector.
         """
         self.alpha = alpha
         self.alpha_deg = self.alpha * 180.0 / np.pi
@@ -1070,9 +1197,12 @@ class Rotation:
 
 def rotation_to_vector(x: scalar_nd, y: scalar_nd) -> Rotation:
     """
+    The rotation which rotates the direction of the vector `x` onto that of the vector `y`.
+
     :param x: The first vector.
     :param y: The second vector.
-    :returns: A Rotation object which rotates the first vector onto the second.
+    :returns: (rotation) A `Rotation` which rotates the first vector onto the second.
+    :raises ValueError: If `x` or `y` is not a 3d-vector.
     """
     _x, _y = asarray(x, y)
     check_shape((3,), _x, _y, allow_scalar=False)
@@ -1098,16 +1228,17 @@ def rotation_to_vector(x: scalar_nd, y: scalar_nd) -> Rotation:
 
 def import_iso_shifts_tilda(db: str, iso_shifts: dict) -> None:
     """
-    :param db: Location of a Tilda-compatible database.
+    Write isotope shifts into the `Combined` table of a <a href="https://github.com/lasersphere/Tilda">`TILDA`</a>
+    database.
+
+    :param db: The location of a `TILDA`-compatible database.
     :param iso_shifts: A dictionary of isotope shifts
-     with the structure {iso_str: {line_str: [val, stat_err, syst_err]}}.
-    :returns: Writes the entries of the given dict to the specified Tilda-compatible database.
+     with the structure `{iso_str: {line_str: [val, stat_err, syst_err]}}`.
     """
     con = sqlite3.connect(db)
     cur = con.cursor()
     for iso, line_dict in iso_shifts.items():
         for line, val in line_dict.items():
-            print(val)
             cur.execute("INSERT OR REPLACE INTO Combined (iso, parname, run) VALUES (?, ?, ?)", (iso, "shift", line))
             con.commit()
             cur.execute(

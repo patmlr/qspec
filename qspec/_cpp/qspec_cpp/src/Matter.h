@@ -53,7 +53,7 @@ protected:
 	std::vector<double> l;
 	std::vector<double> jj;
 	bool parity;
-	double* hyper_const;
+	std::array<double, 3> hyper_const;
 	double gj;
 	double gi;
 	std::string label;
@@ -114,7 +114,7 @@ public:
 	double get_gi();
 	void set_gi(double _gi);
 
-	std::string get_label();
+	const std::string& get_label();
 	void set_label(std::string _label);
 
 	MatrixXd get_z_matrix();
@@ -176,10 +176,12 @@ class Atom
 {
 protected:
 	std::vector<State*> states;
+	DecayMap default_decays;
 	DecayMap* decays;
 	double mass = 0;
 	size_t size = 0;
 
+	Environment default_env;
 	Environment* env;
 
 	std::vector<size_t> gs;
@@ -200,6 +202,8 @@ protected:
 public:
 
 	Atom();
+	Atom(const Atom&) = delete;
+	Atom& operator=(const Atom&) = delete;
 	~Atom();
 	void init(std::vector<State*> _states, DecayMap* _decays);
 	void add_state(State* state);

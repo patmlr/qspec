@@ -5,6 +5,7 @@ examples.tutorial_5
 Tutorial 5 from the website: Time evolution of quantum interference in fluorescence spectra.
 """
 
+# docs: simulate-0
 import numpy as np
 
 import qspec.simulate as sim
@@ -50,7 +51,9 @@ y4_master = y4_master[0, :, -1]
 sr = sim.ScatteringRate(li7, laser=laser)
 y_brown = sr.generate_y(delta, theta, phi)  # Brown et al.
 y_brown = y_brown[:, 0, 0]  # Remove (theta, phi) axes
+# docs: end
 
+# docs: simulate-1
 import matplotlib.pyplot as plt
 
 scale = 1e3
@@ -60,20 +63,20 @@ fig, (m, r) = plt.subplots(
     2, 1, sharex="all", height_ratios=[3, 1], figsize=(6, 5))
 
 m.plot(delta, y_brown * scale, "-k",
-       label=r"Brown $et\,al.$", zorder=20)
+        label=r"Brown $et\,al.$", zorder=20)
 m.plot(delta, y_rates * scale, "-C0",
-       label=r"rates, $t = 0.2\,\mu$s", zorder=0)
+        label=r"rates, $t = 0.2\,\mu$s", zorder=0)
 m.plot(delta, y_master * scale, "-C1",
-       label=r"master, $t = 0.2\,\mu$s", zorder=60)
+        label=r"master, $t = 0.2\,\mu$s", zorder=60)
 m.plot(delta, y4_master * scale, "--C3",
-       label=r"master, $t = 0.4\,\mu$s", linewidth=1.5, zorder=30)
+        label=r"master, $t = 0.4\,\mu$s", linewidth=1.5, zorder=30)
 
 r.plot(delta, (y_brown - y_rates) * scale,
-       "-k", zorder=20)
+        "-k", zorder=20)
 r.plot(delta, (y_master - y_rates) * scale,
-       "-C1", zorder=60)
+        "-C1", zorder=60)
 r.plot(delta, (y4_master - y_rates) * scale,
-       "--C3", linewidth=1.5, zorder=10)
+        "--C3", linewidth=1.5, zorder=10)
 r.hlines(0, *x_lim, "C0", "-", zorder=0)
 
 m.legend()
@@ -87,3 +90,4 @@ r.set_ylim(-(y_lim[1] - y_lim[0]) / 6, (y_lim[1] - y_lim[0]) / 6)
 
 plt.subplots_adjust(left=0.09, bottom=0.1, right=0.99, top=0.99, hspace=0.05)
 plt.show()
+# docs: end

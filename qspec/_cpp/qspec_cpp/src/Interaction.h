@@ -71,6 +71,7 @@ class Interaction
 protected:
 	Atom* atom;
 	std::vector<Laser*> lasers;
+	Environment default_env;  // Used until an environment is set. Other environments are not owned.
 	Environment* env;
 
 	double dt = 1e-3;
@@ -98,6 +99,8 @@ public:
 	int info = 0;
 
 	Interaction();
+	Interaction(const Interaction&) = delete;  // env may point to default_env.
+	Interaction& operator=(const Interaction&) = delete;
 
 	void init(Atom* _atom, std::vector<Laser*> _lasers, Environment* _env);
 

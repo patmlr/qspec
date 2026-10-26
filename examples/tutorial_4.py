@@ -5,6 +5,7 @@ examples.tutorial_4
 Tutorial 4 from the website: King plot analysis of Ca+ isotopes.
 """
 
+# docs: king-2d-0
 import qspec as qs
 
 # The mass numbers of the Ca isotopes.
@@ -24,8 +25,8 @@ x_abs = [[(755222765.66, 0.10), (761905012.53, 0.11)],  # 40Ca
          [(755223614.66, 0.10), (761905862.62, 0.09)],  # 44Ca
          [(755224063.27, 0.33), (761906311.60, 0.57)],  # 46Ca
          [(755224471.12, 0.10), (761906720.11, 0.11)],  # 48Ca
-         [(0., 0.), (0., 0.)],  # 50Ca
-         [(0., 0.), (0., 0.)]]  # 52Ca
+         [(        0.  , 0.  ), (        0.  , 0.  )],  # 50Ca
+         [(        0.  , 0.  ), (        0.  , 0.  )]]  # 52Ca
 
 # Construct a King object. Optionally specify `x_abs` here
 # to omit isotope shifts when fitting. 20 electron masses are subtracted
@@ -53,3 +54,4 @@ x, cov, cov_stat = king.get_unmodified(
 for iso, c in zip(a_unknown, cov):
     qs.printh(f"\n{iso}Ca+:")  # Print colored headline.
     qs.print_cov(c)  # Print color-coded covariance matrix.
+# docs: end

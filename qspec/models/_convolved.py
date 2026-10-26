@@ -17,15 +17,25 @@ __all__ = ["CONVOLVE", "Convolved", "GaussChi2Convolved", "GaussConvolved", "Lor
 
 
 CONVOLVE = ["None", "Gauss", "Lorentz", "GaussChi2"]
+"""The names of the convolution kernels that can be used in [`gen_model`]."""
 
 
 class Convolved(Model):
     def __init__(self, model: Model | None = None, model_1: Model | None = None) -> None:
-        """
-        A generic numerical convolution model.
+        r"""
+        A generic numerical convolution of two models $g$ and $h$
 
-        :param model_0: The first model to convolve.
-        :param model_0: The second model to convolve.
+        $$
+        f(x) = \int g(x - t)h(t)\,\mathrm{d}t,
+        $$
+
+        integrated with the trapezoidal rule over the x-axis interval of $h$.
+        The parameters of $h$ are appended with the suffix `"(conv)"`.
+        If only one of the models is specified, the convolution returns that model.
+
+        :param model: The first model $g$ to convolve.
+        :param model_1: The second model $h$ to convolve, i.e., the convolution kernel.
+        :raises ValueError: If both `model` and `model_1` are `None`.
         """
         super().__init__(model=model)
         self.type = "Convolved"
@@ -70,8 +80,7 @@ class Convolved(Model):
         :param i: The index (`int`) or the name (`str`) of the parameter.
         :param val: The new parameter value.
         :param force: Force the parameter to take exactly the new value.
-         If `False`, the parameter is converted to the correct format.
-        :returns:
+         If `False`, non-scalar values are ignored.
         """
         if isinstance(i, str):
             i = self.p[i]
@@ -85,9 +94,6 @@ class Convolved(Model):
                 self.model.set_val(i, val, force=True)
 
     def min(self) -> float:
-        """
-        :returns: A hint for an x-axis minimum for a complete display of the model.
-        """
         if self.model is None:
             if self.model_1 is None:
                 raise ValueError(CONVOLVE_IS_NONE_ERROR)
@@ -99,9 +105,6 @@ class Convolved(Model):
         return min([self.model.min(), self.model_1.min()])
 
     def max(self) -> float:
-        """
-        :returns: A hint for an x-axis maximum for a complete display of the model.
-        """
         if self.model is None:
             if self.model_1 is None:
                 raise ValueError(CONVOLVE_IS_NONE_ERROR)
@@ -113,9 +116,6 @@ class Convolved(Model):
         return max([self.model.max(), self.model_1.max()])
 
     def intervals(self) -> list[list[float]]:
-        """
-        :returns: A list of x-axis intervals for a complete display of the model.
-        """
         if self.model is None:
             if self.model_1 is None:
                 raise ValueError(CONVOLVE_IS_NONE_ERROR)
@@ -130,9 +130,6 @@ class Convolved(Model):
 
     @property
     def dx(self) -> float:
-        """
-        A hint for an x-axis step size for a smooth display of the model.
-        """
         if self.model is None:
             if self.model_1 is None:
                 raise ValueError(CONVOLVE_IS_NONE_ERROR)
@@ -147,10 +144,9 @@ class Convolved(Model):
 
     def gen_x_int(self, *args: scalar) -> None:
         """
-        Generates x-axis arrays for numerical integration.
+        Generate the x-axis array `Convolved.x_int` for the numerical integration.
 
         :param args: The function parameters.
-        :returns:
         """
         if self.model is None or self.model_1 is None:
             self.x_int = np.array([])
@@ -168,48 +164,42 @@ class Convolved(Model):
 class GaussConvolved(Convolved):
     def __init__(self, model: Model) -> None:
         """
-        A convolution with a `Gauss` kernel.
+        A convolution with a [`Gauss`] kernel, normalized to its integral.
 
         :param model: The model to convolve with a `Gauss` kernel.
         """
         super().__init__(model=model, model_1=Gauss())
         self.type = "GaussConvolved"
 
-    def evaluate(
-        self, x: ndarray, *args: scalar, **kwargs: dict
-    ) -> ndarray:  # Normalize the kernel function of the convolution to its integral.
+    def evaluate(self, x: ndarray, *args: scalar, **kwargs: dict) -> ndarray:
         return super().evaluate(x, *args, **kwargs) / (np.sqrt(2 * np.pi) * args[self.i_1])
 
 
 class LorentzConvolved(Convolved):
     def __init__(self, model: Model) -> None:
         """
-        A convolution with a `Lorentz` kernel.
+        A convolution with a [`Lorentz`] kernel, normalized to its integral.
 
         :param model: The model to convolve with a `Lorentz` kernel.
         """
         super().__init__(model=model, model_1=Lorentz())
         self.type = "LorentzConvolved"
 
-    def evaluate(
-        self, x: ndarray, *args: scalar, **kwargs: dict
-    ) -> ndarray:  # Normalize the kernel function of the convolution to its integral.
+    def evaluate(self, x: ndarray, *args: scalar, **kwargs: dict) -> ndarray:
         return super().evaluate(x, *args, **kwargs) / (0.5 * np.pi * args[self.i_1])
 
 
 class GaussChi2Convolved(Convolved):
     def __init__(self, model: Model) -> None:
         """
-        A convolution with a `GaussChi2` kernel.
+        A convolution with a [`GaussChi2`] kernel, normalized to its integral.
 
         :param model: The model to convolve with a `GaussChi2` kernel.
         """
         super().__init__(model=model, model_1=GaussChi2())
         self.type = "GaussChi2Convolved"
 
-    def evaluate(
-        self, x: ndarray, *args: scalar, **kwargs: dict
-    ) -> ndarray:  # Normalize the kernel function of the convolution to its integral.
+    def evaluate(self, x: ndarray, *args: scalar, **kwargs: dict) -> ndarray:
         return super().evaluate(x, *args, **kwargs) * source_energy_pdf(
             0, 0, args[self.i_1], args[self.i_1 + 1], collinear=True
         )

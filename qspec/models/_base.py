@@ -11,6 +11,7 @@ from qspec.qtypes import (
     Any,
     CodeType,
     Iterable,
+    Sequence,
     array_like,
     asarray,
     fix_type,
@@ -94,28 +95,45 @@ def _poly(x: ndarray, *args: scalar) -> ndarray:
 
 
 class Model:
+    """
+    The base class for all lineshape models. Models are nested: A model adopts the parameters of its submodel
+    and appends its own parameters. Calling a model as `model(x, *args)` updates the parameters `args`
+    with their expressions, see [`Model.set_fix`], and returns [`Model.evaluate`].
+    """
+
+    type: str
+    """The name of the model type."""
+    names: list[str]
+    """The names of the parameters."""
+    vals: list[float]
+    """The current values of the parameters."""
+    fixes: list[fix_type]
+    """The fix states of the parameters, see [`Model.set_fix`]."""
+    links: list[bool]
+    """Whether the parameters are linked to the parameters with the same name in a [`Linked`] model."""
+    p: dict[str, int]
+    """A map of the parameter names to their indexes."""
+
     def __init__(self, model: "Model | None" = None) -> None:
         """
-        Base class for all models.
-
         :param model: A submodel whose parameters are adopted by this model.
         """
         self.model = model
         self.type = "Model"
+        self._cast_x: bool = True if model is None else model._cast_x
 
     def __call__(self, x: array_like, *args: scalar, **kwargs: Any) -> ndarray:
-        x = np.asarray(x, dtype=float)
-        return self.evaluate(x, *self.update_args(args), **kwargs)
+        _x: Any = np.asarray(x, dtype=float) if self._cast_x else x
+        return self.evaluate(_x, *self.update_args(args), **kwargs)
 
     def evaluate(self, x: ndarray, *args: scalar, **kwargs: Any) -> ndarray:
         """
-        The main function of the model. This is executed when the model is called.
-        Reimplement this function in subclasses.
+        The function values of the model for the given parameters.
 
         :param x: The input values $x$.
         :param args: The function parameters. Must have length `Model.size`.
         :param kwargs: Additional keyword arguments.
-        :returns: The function values $y$ at the input values `x`.
+        :returns: (y) The function values $y$ at the input values `x`.
         """
         return np.zeros((), dtype=float)
 
@@ -145,12 +163,10 @@ class Model:
     @property
     def description(self) -> str:
         """
-        A description of the model hierarchy.
-
-        :returns: A `str` representing the model hierarchy.
+        A description of the model hierarchy, e.g., `"Offset.Summed[0].Hyperfine.Voigt"`.
         """
         label = ""
-        super_model = self
+        super_model: Model | None = self
         while super_model is not None:
             if isinstance(super_model, Listed):
                 label += super_model.type + "[0]."
@@ -192,12 +208,12 @@ class Model:
     def model(self, value: "Model | None") -> None:
         self._model = value
         if self._model is None:
-            self.names: list[str] = []
-            self.vals: list[float] = []
-            self.fixes: list[fix_type] = []
-            self.links: list[bool] = []
-            self.expressions = []
-            self.p: dict[str, int] = {}
+            self.names = []
+            self.vals = []
+            self.fixes = []
+            self.links = []
+            self.expressions: list[str | CodeType] = []
+            self.p = {}
             self._index = 0
             self._size = 0
             self._error = ""
@@ -216,7 +232,9 @@ class Model:
 
     def get_pars(self) -> zip:
         """
-        :returns: A zip-iterator over `(names, vals, fixes, links)`.
+        The parameters of the model.
+
+        :returns: (pars) A zip-iterator over `(names, vals, fixes, links)`.
         """
         return zip(self.names, self.vals, self.fixes, self.links)
 
@@ -224,8 +242,8 @@ class Model:
         """
         Set all `vals`, `fixes` and `links` with one nested list.
 
-        :param pars: An `Iterable` of size-3 tuples. Equivalent to shape `(self.size, 3)`.
-        :param force: The `force` parameter of the `set_val`, `set_fix` and `set_link` functions.
+        :param pars: An iterable of size-3 tuples `(val, fix, link)`. Equivalent to shape `(Model.size, 3)`.
+        :param force: The `force` parameter of [`Model.set_val`], [`Model.set_fix`] and [`Model.set_link`].
         """
         for i, p in enumerate(pars):
             self.set_val(i, p[0], force=force)
@@ -236,8 +254,8 @@ class Model:
         """
         Set all `vals` with one list.
 
-        :param vals: A list of shape (`self.size`, ).
-        :param force: The `force` parameter of the `set_val` function.
+        :param vals: A list of shape `(Model.size, )`.
+        :param force: The `force` parameter of [`Model.set_val`].
         """
         for i, val in enumerate(vals):
             self.set_val(i, val, force=force)
@@ -246,20 +264,18 @@ class Model:
         """
         Set all `fixes` with one list.
 
-        :param fixes: A list of shape (`self.size`, ).
-        :param force: The `force` parameter of the `set_fix` function.
-        :returns:
+        :param fixes: A list of shape `(Model.size, )`.
+        :param force: The `force` parameter of [`Model.set_fix`].
         """
         for i, fix in enumerate(fixes):
             self.set_fix(i, fix, force=force)
 
     def set_links(self, links: Iterable[bool], force: bool = False) -> None:
         """
-        Set all `links` with one `list`.
+        Set all `links` with one list.
 
-        :param links: A list of shape (`self.size`, ).
-        :param force: The `force` parameter of the `set_link` function.
-        :returns:
+        :param links: A list of shape `(Model.size, )`.
+        :param force: The `force` parameter of [`Model.set_link`].
         """
         for i, link in enumerate(links):
             self.set_link(i, link, force=force)
@@ -272,7 +288,7 @@ class Model:
         :param val: The new parameter value.
         :param force: Force the parameter to take exactly the new value.
          If `False`, the parameter is converted to the correct format.
-        :returns:
+        :raises ValueError: If `val` is not a scalar and `force` is `False`.
         """
         if isinstance(i, str):
             i = self.p[i]
@@ -281,22 +297,30 @@ class Model:
             if self.model is None:
                 self.vals[i] = float(val)
             else:
-                self.model.set_val(i, val, force=False)  # Set val for all submodels
-                # to ensure set_val is called for a ListedModel if one is part of the submodels.
-                # This is only needed for the vals since these may be predicted by the specific model.
-                # Everything else is handled by the top-model.
+                self.model.set_val(i, val, force=False)
         else:
             raise ValueError(f"The parameter value {val} has the wrong format. Must be a floating.")
 
     def set_fix(self, i: int_like | str, fix: fix_type, force: bool = False) -> None:
         """
-        Set a specific parameter fix state.
+        Set a specific parameter fix state. The fix state can be
+        - a `bool`, whether the parameter is fixed (`True`) or varied (`False`) in a fit.
+        - a positive `float` $\\sigma$, to vary the parameter with a Gaussian prior with the standard deviation
+          $\\sigma$ around its current value. `0` or negative values fix the parameter, `inf` varies it freely.
+        - a `str` `"val(unc)"`, e.g., `"1.5(0.2)"`, to vary the parameter with a Gaussian prior
+          with mean `val` and standard deviation `unc`.
+        - any other `str`, an expression of the other parameter names, e.g., `"2 * Al"`,
+          that defines the value of the parameter. The parameter is not varied in a fit.
+        - a list `[lower, upper]`, to vary the parameter within the bounds. An empty list is equivalent to `[0, 1]`,
+          a list with a single value to `[0, upper]`.
+
+        Invalid expressions and expressions that form loops are rejected with a printed message.
 
         :param i: The index (`int`) or the name (`str`) of the parameter.
-        :param fix: The new parameter value.
+        :param fix: The new fix state of the parameter.
         :param force: Force the parameter to take exactly the new fix state.
          If `False`, the parameter is converted to the correct format.
-        :returns:
+        :raises ValueError: If `fix` has the wrong format.
         """
         if isinstance(i, str):
             i = self.p[i]
@@ -352,7 +376,7 @@ class Model:
 
         temp_expr = self.expressions[i]
         temp_fix = self.fixes[i]
-        self.expressions[i] = compile(expr, "<string>", "eval", optimize=2)  # Compile beforehand to save time.
+        self.expressions[i] = compile(expr, "<string>", "eval", optimize=2)
         self.fixes[i] = fix
         try:
             self.update_args(self.vals)
@@ -369,7 +393,7 @@ class Model:
         :param link: The new parameter link state.
         :param force: Force the parameter to take exactly the new link state.
          If `False`, the parameter is converted to the correct format.
-        :returns:
+        :raises ValueError: If `link` is not a scalar and `force` is `False`.
         """
         if isinstance(i, str):
             i = self.p[i]
@@ -406,47 +430,59 @@ class Model:
 
     def update_args(self, args: scalar_nd) -> tuple[ndarray[floating], ...]:
         """
+        Evaluate the parameter expressions, see [`Model.set_fix`].
+
         :param args: The parameters.
-        :returns: The parameters updated with the parameter expressions.
+        :returns: (args_updated) The parameters updated with the parameter expressions.
         """
         return tuple(self._eval_zero_division(args, expr) for expr in self.expressions)
 
     def update(self) -> None:
         """
-        Updates `self.vals` with updated parameters, see self.update_args.
-
-        :returns:
+        Update `Model.vals` with the parameter expressions, see [`Model.update_args`].
         """
         self.set_vals(self.update_args(self.vals), force=False)
 
     def min(self) -> float:
         """
-        :returns: A hint for an x-axis minimum for a complete display of the model.
+        A hint for an x-axis minimum for a complete display of the model.
+
+        :returns: (x_min) The x-axis minimum.
         """
         return -1.0 if self.model is None else self.model.min()
 
     def max(self) -> float:
         """
-        :returns: A hint for an x-axis maximum for a complete display of the model.
+        A hint for an x-axis maximum for a complete display of the model.
+
+        :returns: (x_max) The x-axis maximum.
         """
         return 1.0 if self.model is None else self.model.max()
 
     def intervals(self) -> list[list[float]]:
         """
-        :returns: A list of x-axis intervals for a complete display of the model.
+        A list of x-axis intervals for a complete display of the model.
+
+        :returns: (intervals) The x-axis intervals `[[x_min, x_max], ...]`.
         """
         return [[self.min(), self.max()]] if self.model is None else self.model.intervals()
 
     def x(self) -> ndarray:
         """
-        :returns: An array of x values for a complete and smooth display of the model.
+        An array of x values for a complete and smooth display of the model.
+
+        :returns: (x) The x values in the [`Model.intervals`] with the step size `Model.dx`.
         """
         return np.concatenate([np.arange(i[0], i[1], self.dx, dtype=float) for i in self.intervals()], axis=0)
 
     def fit_prepare(self) -> tuple[list[fix_type], tuple[float | list[float], float | list[float]]]:
         """
+        Convert the fix states of the parameters into the `p0_fixed` and `bounds` parameters
+        of [`qspec.analyze.curve_fit`].
+
         :returns: (fixed, bounds) A list of `bool` values specifying which parameters are not varied in a fit
-         and a list of bounds for the fit parameters. See parameters `p0_fixed` and `bounds` of `qspec.curve_fit`.
+         and the bounds of the fit parameters.
+        :raises TypeError: If a fix state has an unsupported type.
         """
         bounds: tuple[float | list[float], float | list[float]] = (-np.inf, np.inf)
         fixed: list[fix_type] = [fix for fix in self.fixes]
@@ -482,30 +518,29 @@ class Model:
 class Empty(Model):
     def __init__(self) -> None:
         """
-        An empty model, returning `numpy.zeros_like(x)`
+        An empty model, returning `numpy.zeros_like(x)`.
         """
         super().__init__(model=None)
         self.type = "Empty"
 
     def evaluate(self, x: ndarray, *args: scalar, **kwargs: Any) -> ndarray:
-        """
-        An empty model, returning `numpy.zeros_like(x)`.
-
-        :param x: The input values $x$.
-        :param args: [].
-        :param kwargs: Additional keyword arguments.
-        :returns: The function values $y$ at the input values `x`.
-        """
         return np.zeros_like(x)
 
 
 class NPeak(Model):
     def __init__(self, model: Model, n_peaks: int_like = 1) -> None:
-        """
-        Evaluates the given `model` at the positions $x_i$ with intensities $p_i$ and `0 <= i < n_peaks`.
+        r"""
+        The submodel $g$ duplicated `n_peaks` times at the positions $x_i$ with intensities $p_i$
+
+        $$
+        f(x) = \sum\limits_{i=0}^{n - 1} p_i\,g(x - x_i).
+        $$
+
+        The parameters are named `x{i}` and `p{i}`. The position `x0` and the intensity `p0` are fixed by default.
 
         :param model: A submodel whose parameters are adopted by this model.
-        :param n_peaks: The number of times the submodel is copied.
+        :param n_peaks: The number $n$ of times the submodel is duplicated.
+        :raises ValueError: If `model` is `None`.
         """
         self.model: Model
         super().__init__(model=model)
@@ -530,23 +565,14 @@ class NPeak(Model):
         )
 
     def min(self) -> float:
-        """
-        :returns: A hint for an x-axis minimum for a complete display of the model.
-        """
         min_center = min(self.vals[self.p[f"x{n}"]] for n in range(self.n_peaks))
         return float(min_center + self.model.min())
 
     def max(self) -> float:
-        """
-        :returns: A hint for an x-axis maximum for a complete display of the model.
-        """
         max_center = max(self.vals[self.p[f"x{n}"]] for n in range(self.n_peaks))
         return float(max_center + self.model.max())
 
     def intervals(self) -> list[list[float]]:
-        """
-        :returns: A list of x-axis intervals for a complete display of the model.
-        """
         return merge_intervals(
             [
                 [i[0] + self.vals[self.model.size + 2 * n], i[1] + self.vals[self.model.size + 2 * n]]
@@ -560,13 +586,20 @@ class Offset(Model):
     def __init__(
         self, model: Model | None = None, x_cuts: array_like | None = None, offsets: array_like | None = None
     ) -> None:
-        """
-        Cuts the x-axis and adds y-axis offsets to every segment.
+        r"""
+        Cut the x-axis into intervals and add an offset polynomial to the submodel $g$ in every interval $i$
 
-        :param model: The submodel the offset will be added to. If None, the offset will be added to zero.
-        :param x_cuts: x values where to cut the x-axis.
-        :param offsets: A list of maximally considered polynomial orders for each slice.
-         The list must have length len(x_cuts) + 1.
+        $$
+        f(x) = g(x) + \sum\limits_{k=0}^{n_i} a_{ik}x^k.
+        $$
+
+        The parameters $a_{ik}$ are named `off{i}e{k}`.
+
+        :param model: The submodel $g$ the offset will be added to. If `None`, the offset will be added to zero.
+        :param x_cuts: The x values where to cut the x-axis.
+        :param offsets: A list of the maximum polynomial orders $n_i$ for each interval.
+         The list must have length `len(x_cuts) + 1`. If `None`, a single constant offset is used.
+        :raises ValueError: If `offsets` does not have length `len(x_cuts) + 1`.
         """
         super().__init__(model=model)
         self.type = "Offset"
@@ -585,12 +618,12 @@ class Offset(Model):
 
         if len(self.offsets) != len(self.x_cuts) + 1:
             raise ValueError(
-                "The parameter `offset` must be a list of size `len(x_cuts) + 1`"
+                "The parameter `offsets` must be a list of size `len(x_cuts) + 1`"
                 " and contain the maximally considered polynomial order for each slice."
             )
 
-        self.offset_map = []
-        self.offset_masks = []
+        self.offset_map: list[list[int]] = []
+        self.offset_masks: list[ndarray] = []
         self.update_on_call = True
 
         self.gen_offset_map()
@@ -606,15 +639,15 @@ class Offset(Model):
         Set the values where to cut the x-axis into intervals with individual offset parameters.
 
         :param x_cuts: A list of x values where to cut the x-axis.
+        :raises ValueError: If the number of `x_cuts` changes.
         """
         if x_cuts is None:
             x_cuts = []
-        x_cuts = np.asarray(x_cuts, dtype=float)
-        self.x_cuts = sorted(x_cuts.tolist())
+        x_cuts = np.asarray(x_cuts, dtype=float).flatten()
 
-        if len(x_cuts) != len(self.x_cuts):
+        if x_cuts.size != len(self.x_cuts):
             raise ValueError("`x_cuts` must not change its size.")
-        self.x_cuts = sorted(list(x_cuts))
+        self.x_cuts = sorted(x_cuts.tolist())
 
     def _offset(self, x: ndarray, *args: scalar) -> ndarray:
         """
@@ -642,8 +675,6 @@ class Offset(Model):
     def gen_offset_map(self) -> None:
         """
         Generate the offset parameters and a map of the interval and polynomial order to the parameter index space.
-
-        :returns:
         """
         self.offset_map = []
         for i, n in enumerate(self.offsets):
@@ -656,10 +687,9 @@ class Offset(Model):
 
     def gen_offset_masks(self, x: array_like) -> None:
         """
-        Generate the array masks corresponding to the `x_cuts`.
+        Generate the array masks of the x-axis intervals defined by `Offset.x_cuts`.
 
         :param x: The input values.
-        :returns:
         """
         x = np.asarray(x, dtype=float)
         self.offset_masks = []
@@ -669,11 +699,10 @@ class Offset(Model):
 
     def guess_offset(self, x: array_like, y: array_like) -> None:
         """
-        Guess the first two polynomial orders for a given data set (const and linear).
+        Guess the constant and linear offset parameters of every interval from the edges of a data set.
 
-        :param x: The input values.
+        :param x: The x data.
         :param y: The y data.
-        :returns:
         """
         x, y = asarray(x, y, dtype=float)
 
@@ -688,10 +717,16 @@ class Offset(Model):
 
 class Amplifier(Model):
     def __init__(self, order: int_like | None = None) -> None:
-        """
-        A polynomial of order `order`.
+        r"""
+        A polynomial of order $N$
 
-        :param order: The maximum considered order of the polynomial.
+        $$
+        f(x) = \sum\limits_{n=0}^N a_nx^n.
+        $$
+
+        The parameters $a_n$ are named `a{n}` and initialized with $a_1 = 1$ and $a_n = 0$ otherwise.
+
+        :param order: The order $N$ of the polynomial. If `None`, a linear polynomial is used.
         """
         super().__init__(model=None)
         self.type = "Amplifier"
@@ -712,33 +747,24 @@ class Amplifier(Model):
 
     @property
     def dx(self) -> float:
-        """
-        A hint for an x-axis step size for a smooth display of the model.
-        """
         return 1e-2
 
     def min(self) -> float:
-        """
-        :returns: A hint for an x-axis minimum for a complete display of the model.
-        """
         return self._min
 
     def max(self) -> float:
-        """
-        :returns: A hint for an x-axis maximum for a complete display of the model.
-        """
         return self._max
 
 
 class Custom(Model):
     def __init__(self, model: Model | None = None, parameters: Iterable[str] | None = None) -> None:
         """
-        A model with custom parameters. Without a submodel, Custom returns the user-specified parameters as an array
+        A model with custom parameters. Without a submodel, `Custom` returns the user-specified parameters as an array
         regardless of the input `x`. Otherwise, the submodel is called and the custom parameters
         can be connected to other parameters by the user.
 
         :param model: A submodel whose parameters are adopted by this model.
-        :param parameters: A list of str, representing the names of the custom parameters.
+        :param parameters: A list of `str`, representing the names of the custom parameters.
         """
         super().__init__(model=model)
         self.type = "Custom"
@@ -758,10 +784,12 @@ class Custom(Model):
 class YPars(Model):
     def __init__(self, model: Model) -> None:
         """
-        Concatenates the *Prior* parameters of the submodel, that have uncertainties as `fix` states,
-        with the y-axis array resulting from calling the submodel. This is used internally in `qspec.models.fit`.
+        Concatenate the y values of the submodel with the values of the parameters that have a Gaussian prior,
+        see [`Model.set_fix`]. This is used internally in [`qspec.models.fit`]
+        to include priors as additional data points.
 
         :param model: A submodel whose parameters are adopted by this model.
+        :raises ValueError: If `model` is `None`.
         """
         self.model: Model
         super().__init__(model=model)
@@ -789,11 +817,12 @@ class Listed(Model):
         :param models: A list of submodels whose parameters are adopted by this model.
         :param labels: A list of labels with the same length as `models`.
          The labels are appended to the parameter names of each submodel.
+         If `None`, the labels are `"__0"`, `"__1"`, ... for more than one submodel.
         """
         super().__init__(model=None)
         self.type = "Listed"
 
-        self.models = list(models)
+        self.models: Sequence[Model] = list(models)
 
         if labels is None:
             labels = [""] if len(self.models) == 1 else [f"__{i}" for i in range(len(self.models))]
@@ -820,13 +849,13 @@ class Listed(Model):
 
     def set_val(self, i: int_like | str, val: scalar, force: bool = False) -> None:
         """
-        Set a specific parameter value.
+        Set a specific parameter value. Also sets the value of the respective submodel.
 
         :param i: The index (`int`) or the name (`str`) of the parameter.
         :param val: The new parameter value.
         :param force: Force the parameter to take exactly the new value.
          If `False`, the parameter is converted to the correct format.
-        :returns:
+        :raises ValueError: If `val` is not a scalar and `force` is `False`.
         """
         if isinstance(i, str):
             i = self.p[i]
@@ -838,13 +867,14 @@ class Listed(Model):
 
     def set_fix(self, i: int_like | str, fix: fix_type, force: bool = False) -> None:
         """
-        Set a specific parameter fix state. Also sets the fix state for the respective submodel.
+        Set a specific parameter fix state, see [`Model.set_fix`].
+        Also sets the fix state of the respective submodel.
 
         :param i: The index (`int`) or the name (`str`) of the parameter.
-        :param fix: The new parameter value.
+        :param fix: The new fix state of the parameter.
         :param force: Force the parameter to take exactly the new fix state.
          If `False`, the parameter is converted to the correct format.
-        :returns:
+        :raises ValueError: If `fix` has the wrong format.
         """
         if isinstance(i, str):
             i = self.p[i]
@@ -856,13 +886,13 @@ class Listed(Model):
 
     def set_link(self, i: int_like | str, link: bool, force: bool = False) -> None:
         """
-        Set a specific parameter link state. Also sets the link state for the respective submodel.
+        Set a specific parameter link state. Also sets the link state of the respective submodel.
 
         :param i: The index (`int`) or the name (`str`) of the parameter.
         :param link: The new parameter link state.
         :param force: Force the parameter to take exactly the new link state.
          If `False`, the parameter is converted to the correct format.
-        :returns:
+        :raises ValueError: If `link` is not a scalar and `force` is `False`.
         """
         if isinstance(i, str):
             i = self.p[i]
@@ -876,8 +906,7 @@ class Listed(Model):
         """
         Inherit the parameter values of the submodels.
 
-        :param force: The `force` parameter of `self.set_val`.
-        :returns: None
+        :param force: The `force` parameter of [`Listed.set_val`].
         """
         self.set_vals([val for model in self.models for val in model.vals], force=force)
 
@@ -885,8 +914,7 @@ class Listed(Model):
         """
         Inherit the parameter fixes of the submodels.
 
-        :param force: The `force` parameter of `self.set_fix`.
-        :returns: None
+        :param force: The `force` parameter of [`Listed.set_fix`].
         """
         self.set_fixes([fix for model in self.models for fix in model.fixes], force=force)
 
@@ -894,16 +922,21 @@ class Listed(Model):
         """
         Inherit the parameter links of the submodels.
 
-        :param force: The `force` parameter of `self.set_link`.
-        :returns: None
+        :param force: The `force` parameter of [`Listed.set_link`].
         """
         self.set_links([link for model in self.models for link in model.links], force=force)
 
 
 class Summed(Listed):
     def __init__(self, models: Iterable[Model], labels: Iterable[str] | None = None) -> None:
-        """
-        A `Listed` model summing over all submodels with individual `center` and `int` parameters.
+        r"""
+        A `Listed` model summing over all submodels $g_i$ with individual positions $x_i$ and intensities $p_i$
+
+        $$
+        f(x) = \sum\limits_i p_i\,g_i(x - x_i).
+        $$
+
+        The parameters $x_i$ and $p_i$ are named `center{label}` and `int{label}`, respectively.
 
         :param models: A list of submodels whose parameters are adopted by this model.
         :param labels: A list of labels with the same length as `models`.
@@ -931,27 +964,15 @@ class Summed(Listed):
 
     @property
     def dx(self) -> float:
-        """
-        A hint for an x-axis step size for a smooth display of the model.
-        """
         return min(model.dx for model in self.models)
 
     def min(self) -> float:
-        """
-        :returns: A hint for an x-axis minimum for a complete display of the model.
-        """
         return min(model.min() for model in self.models)
 
     def max(self) -> float:
-        """
-        :returns: A hint for an x-axis maximum for a complete display of the model.
-        """
         return max(model.max() for model in self.models)
 
     def intervals(self) -> list[list[float]]:
-        """
-        :returns: A list of x-axis intervals for a complete display of the model.
-        """
         return merge_intervals(
             [
                 [i[0] + self.vals[j[0]], i[1] + self.vals[j[0]]]
@@ -964,12 +985,16 @@ class Summed(Listed):
 class Linked(Listed):
     def __init__(self, models: Iterable[Model]) -> None:
         """
-        A `Listed` model linking all `link=True` parameters of the submodels.
+        A `Listed` model to fit several data sets simultaneously. The parameters with `link=True` are linked
+        to the parameters with the same name of the first submodel that has them.
+        The model is evaluated with a list of input values, one for each submodel,
+        and returns the concatenated function values of the submodels.
 
         :param models: A list of submodels whose parameters are adopted by this model.
         """
         super().__init__(models, labels=None)
         self.type = "Linked"
+        self._cast_x = False
 
         for i, (name, val, fix, link) in enumerate(self.get_pars()):
             if link and (not fix or isinstance(fix, list) or _is_unc(fix)):
@@ -981,6 +1006,14 @@ class Linked(Listed):
                         break
 
     def evaluate(self, x: ndarray, *args: scalar, **kwargs: Any) -> ndarray:
+        """
+        The concatenated function values of the submodels for the given parameters.
+
+        :param x: A list of input values, one for each submodel.
+        :param args: The function parameters. Must have length `Model.size`.
+        :param kwargs: Additional keyword arguments.
+        :returns: (y) The concatenated function values of the submodels.
+        """
         return np.concatenate(
             tuple(
                 model.evaluate(_x, *args[_slice], **kwargs) for model, _slice, _x in zip(self.models, self.slices, x)

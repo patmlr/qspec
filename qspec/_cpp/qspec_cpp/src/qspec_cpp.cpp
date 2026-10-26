@@ -124,12 +124,12 @@ void laser_set_k(void* laser, double* k)
     return _laser->set_k(_k);
 }
 
-std::complex<double>* laser_get_kpol(void* laser, bool electric, size_t k, double* q_axis)
+void laser_get_kpol(void* laser, bool electric, size_t k, double* q_axis, std::complex<double>* kpol)
 {
     Laser* _laser = static_cast<Laser*>(laser);
 
     Vector3d _q_axis = cast_Vector3d(q_axis);
-    return _laser->get_kpol(electric, k, _q_axis).array().data();
+    Map<VectorXcd>(kpol, 2 * k + 1) = _laser->get_kpol(electric, k, _q_axis);
 }
 
 
@@ -210,7 +210,7 @@ void state_destruct(void* state)
     delete static_cast<State*>(state);
 }
 
-void state_init(void* state, double freq_0, double* s, double* l, double j, double i, double f, double m,
+int state_init(void* state, double freq_0, double* s, double* l, double j, double i, double f, double m,
     bool parity, double* jj, size_t ls_size, double* hyper_const, double gj, double gi, char* label)
 {
     State* _state = static_cast<State*>(state);
@@ -218,7 +218,14 @@ void state_init(void* state, double freq_0, double* s, double* l, double j, doub
     std::vector<double> _s = cast_samples_double(s, ls_size);
     std::vector<double> _l = cast_samples_double(l, ls_size);
     std::vector<double> _jj = cast_samples_double(jj, ls_size);
-    _state->init(freq_0, j, i, f, m, parity, _s, _l, _jj, hyper_const, gj, gi, std::string(label));
+    try {
+        _state->init(freq_0, j, i, f, m, parity, _s, _l, _jj, hyper_const, gj, gi, std::string(label));
+    }
+    catch (const std::invalid_argument& e)
+    {
+        return -1;
+    }
+    return 0;
 }
 
 void state_reset(void* state)
@@ -344,10 +351,7 @@ void state_set_gi(void* state, double gi)
 const char* state_get_label(void* state)
 {
     State* _state = static_cast<State*>(state);
-
-    char* ret = new char[_state->get_label().length() + 1];
-    std::strcpy(ret, _state->get_label().c_str());
-    return ret;
+    return _state->get_label().c_str();
 }
 
 void state_set_label(void* state, char* label)
@@ -381,20 +385,9 @@ const char* decaymap_get_label(void* decays, size_t i, size_t j)
 {
     DecayMap* _decays = static_cast<DecayMap*>(decays);
 
-    if (i == 0)
-    {
-        char* ret = new char[_decays->get_states_0()->at(j).length() + 1];
-        std::strcpy(ret, _decays->get_states_0()->at(j).c_str());
-        return ret;
-    }
-    else if (i == 1)
-    {
-        char* ret = new char[_decays->get_states_1()->at(j).length() + 1];
-        std::strcpy(ret, _decays->get_states_1()->at(j).c_str());
-        return ret;
-    }
+    if (i == 0) return _decays->get_states_0()->at(j).c_str();
+    else if (i == 1) return _decays->get_states_1()->at(j).c_str();
     else return "";
-
 }
 
 size_t decaymap_get_size(void* decays)
@@ -524,40 +517,28 @@ size_t* atom_get_gs(void* atom)
     return _atom->get_gs()->data();
 }
 
-int* atom_get_ek(void* atom, size_t k)
+void atom_get_ek(void* atom, size_t k, int* ek)
 {
     Atom* _atom = static_cast<Atom*>(atom);
-
-    MatrixXi* ek = new MatrixXi(_atom->get_size(), _atom->get_size());
-    *ek = _atom->get_ek(k);
-    return ek->data();
+    Map<MatrixXi>(ek, _atom->get_size(), _atom->get_size()) = _atom->get_ek(k);
 }
 
-int* atom_get_mk(void* atom, size_t k)
+void atom_get_mk(void* atom, size_t k, int* mk)
 {
     Atom* _atom = static_cast<Atom*>(atom);
-
-    MatrixXi* mk = new MatrixXi(_atom->get_size(), _atom->get_size());
-    *mk = _atom->get_mk(k);
-    return mk->data();
+    Map<MatrixXi>(mk, _atom->get_size(), _atom->get_size()) = _atom->get_mk(k);
 }
 
-int* atom_get_emk(void* atom, size_t k)
+void atom_get_emk(void* atom, size_t k, int* emk)
 {
     Atom* _atom = static_cast<Atom*>(atom);
-
-    MatrixXi* emk = new MatrixXi(_atom->get_size(), _atom->get_size());
-    *emk = _atom->get_emk(k);
-    return emk->data();
+    Map<MatrixXi>(emk, _atom->get_size(), _atom->get_size()) = _atom->get_emk(k);
 }
 
-double* atom_get_d_em(void* atom, size_t k)
+void atom_get_d_em(void* atom, size_t k, double* d_em)
 {
     Atom* _atom = static_cast<Atom*>(atom);
-
-    MatrixXd* d_em = new MatrixXd(_atom->get_size(), _atom->get_size());
-    *d_em = _atom->get_d_em(k);
-    return d_em->data();
+    Map<MatrixXd>(d_em, _atom->get_size(), _atom->get_size()) = _atom->get_d_em(k);
 }
 
 double* atom_get_L0(void* atom)
@@ -938,13 +919,12 @@ int* interaction_get_summap(void* interaction)
     return _interaction->get_summap()->data();
 }
 
-std::complex<double>* interaction_get_rabi(void* interaction, size_t m)
+void interaction_get_rabi(void* interaction, size_t m, std::complex<double>* rabi)
 {
     Interaction* _interaction = static_cast<Interaction*>(interaction);
 
-    MatrixXcd* rabi = new MatrixXcd(_interaction->get_atom()->get_size(), _interaction->get_atom()->get_size());
-    *rabi = _interaction->get_rabimap()->at(m) * 2;
-    return rabi->data();
+    size_t size = _interaction->get_atom()->get_size();
+    Map<MatrixXcd>(rabi, size, size) = _interaction->get_rabimap()->at(m) * 2;
 }
 
 double* interaction_get_atommap(void* interaction)
@@ -959,13 +939,12 @@ double* interaction_get_deltamap(void* interaction)
     return _interaction->get_deltamap()->data();
 }
 
-double* interaction_get_delta(void* interaction)
+void interaction_get_delta(void* interaction, double* delta)
 {
     Interaction* _interaction = static_cast<Interaction*>(interaction);
 
-    VectorXd* delta = new VectorXd(_interaction->get_atom()->get_size());
-    *delta = _interaction->get_delta(*_interaction->get_atom()->get_w0(), _interaction->gen_w());
-    return delta->data();
+    Map<VectorXd>(delta, _interaction->get_atom()->get_size())
+        = _interaction->get_delta(*_interaction->get_atom()->get_w0(), _interaction->gen_w());
 }
 
 bool interaction_get_loop(void* interaction)

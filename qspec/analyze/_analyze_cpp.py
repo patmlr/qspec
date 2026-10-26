@@ -1,34 +1,28 @@
 """
-qspec._analyze_cpp
-==================
+qspec.analyze._analyze_cpp
+==========================
 
 Classes and methods for the `analyze` module using the Python/C++ interface.
 """
 
 import numpy as np
 
-from qspec._cpp import C, c_bool, c_double_p, c_size_t, c_size_t_p, dll
+from qspec._cpp import CppClass, CppHandler, c_bool, c_double_p, c_size_t, c_size_t_p, dll
 from qspec.qtypes import array_like, floating, int_like, ndarray
 
 __all__ = ["generate_collinear_points_cpp"]
 
 
-class MultivariateNormal:
-    def __init__(
-        self,
-        mean: array_like,
-        cov: array_like,
-        instance: "MultivariateNormal | C.MultivariateNormalHandler.value | None" = None,
-    ) -> None:
-        self.instance = instance
-        if self.instance is None:
-            mean, cov = np.ascontiguousarray(mean, dtype=float), np.ascontiguousarray(cov, dtype=float)
-            self.instance = dll.multivariatenormal_construct(
-                mean.ctypes.data_as(c_double_p), cov.ctypes.data_as(c_double_p), c_size_t(mean.size)
-            )
+class MultivariateNormal(CppClass):
+    @staticmethod
+    def _destruct(instance: CppHandler) -> None:
+        dll.multivariatenormal_destruct(instance)
 
-    def __del__(self) -> None:
-        dll.multivariatenormal_destruct(self.instance)
+    def __init__(self, mean: array_like, cov: array_like) -> None:
+        mean, cov = np.ascontiguousarray(mean, dtype=float), np.ascontiguousarray(cov, dtype=float)
+        self.instance = dll.multivariatenormal_construct(
+            mean.ctypes.data_as(c_double_p), cov.ctypes.data_as(c_double_p), c_size_t(mean.size)
+        )
 
     @property
     def size(self) -> int:
@@ -57,15 +51,15 @@ def generate_collinear_points_cpp(
     :param mean: The data vectors $\vec{\mu}_i$. Must have shape `(k, n)`, where `k` is the number of data points
      and `n` is the number of dimensions of each point.
     :param cov: The covariance matrices $\mathbf{\Sigma}_i$ of the data vectors. Must have shape `(k, n, n)`.
-     Use <a href="{{ '/doc/functions/analyze/covariance_matrix.html' | relative_url }}">
-    `covariance_matrix`</a> to construct covariance matrices.
-    :param n_samples: The number of samples generated for each data point.
-     If `None` and `method == 'cpp"`, samples are generated until `n_accepted` samples get accepted.
+     Use [`covariance_matrix`] to construct covariance matrices.
+    :param n_samples: The maximum number of samples generated for each data point. If `None`, it is 100,000.
     :param n_accepted: The number of samples to be accepted for each data point.
-    :param seed: A seed for the random number generator.
+     If `None`, it is the maximum of 100,000 and `n_samples`.
+    :param seed: A seed for the random number generator. If `None`, a random seed is used.
     :param report: Whether to report the number of samples.
-    :param kwargs: Additional keyword arguments.
-    :returns: (p, n_accepted, n_samples) The generated data vectors $\vec{p}_i$ with shape `(n_accepted, k ,n)`
+    :param kwargs: Additional keyword arguments are accepted for compatibility with
+     [`generate_collinear_points_py`] and ignored.
+    :returns: (p, n_accepted, n_samples) The generated data vectors $\vec{p}_i$ with shape `(n_accepted, k, n)`
      and the number of accepted and generated samples.
     """
     mean, cov = np.ascontiguousarray(mean, dtype=float), np.ascontiguousarray(cov, dtype=float)

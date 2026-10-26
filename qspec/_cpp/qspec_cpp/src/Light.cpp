@@ -198,7 +198,7 @@ Laser::Laser()
 {
 	freq = 0.;
 	intensity = 1.;
-	polarization = new Polarization();
+	polarization = &default_polarization;
 	k << 1, 0, 0;
 }
 

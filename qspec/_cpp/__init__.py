@@ -8,6 +8,8 @@ Module for simulations of laser-atom interaction.
 from qspec._cpp.cpp import (
     POINTER,
     C,
+    CppClass,
+    CppHandler,
     c_bool,
     c_bool_p,
     c_char_p,
@@ -35,6 +37,8 @@ from qspec._cpp.cpp import (
 __all__ = [
     "POINTER",
     "C",
+    "CppClass",
+    "CppHandler",
     "c_bool",
     "c_bool_p",
     "c_char_p",

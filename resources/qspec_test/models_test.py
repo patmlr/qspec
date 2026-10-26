@@ -14,7 +14,6 @@ import qspec.models as mod
 
 
 class TestLineshapes(ut.TestCase):
-
     def test_lineshapes(self) -> None:
         shapes = ["lorentz", "gauss", "voigt"]
         _qi = [False, True]

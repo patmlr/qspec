@@ -5,6 +5,7 @@ examples.tutorial_6
 Tutorial 6 from the website: Simulation of k-multipole emission patterns
 """
 
+# docs: multipoles-0
 import matplotlib.pyplot as plt
 import numpy as np
 
@@ -29,7 +30,7 @@ states = [g, e]
 decay = sim.DecayMap(labels=[("g", "e")], a=[a_eg], k_max=int(je - jg))
 atom = sim.Atom(states=states, decay_map=decay)
 print(atom.get_multipole_types("g", "e"))
-# >>> {"e3"}
+# >>> {'e3'}
 
 intensity = 1e3
 pol_eg = sim.Polarization([1., 0, 1j], vec_as_q=False)
@@ -54,7 +55,9 @@ plt.legend()
 plt.xlabel(r"Time ($\mu$s)")
 plt.ylabel("Population")
 plt.show()
+# docs: end
 
+# docs: multipoles-1
 n_theta, n_phi = 128, 256
 theta = np.linspace(0., np.pi, n_theta)
 phi = np.linspace(0., 2 * np.pi, n_phi)
@@ -83,3 +86,4 @@ ax.set_box_aspect((1., 1., 1.))
 ax.set_axis_off()
 plt.subplots_adjust(left=0., bottom=0., right=1., top=1.)
 plt.show()
+# docs: end

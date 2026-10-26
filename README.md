@@ -2,7 +2,7 @@
 <img src="https://raw.githubusercontent.com/patmlr/qspec/main/docs/assets/img/logo.svg" width="300">
 </h1><hr>
 
-[![Static Badge](https://img.shields.io/badge/OS-Windows%20|%20Linux%20|%20macOS-gold)](https://www.microsoft.com)
+![Static Badge](https://img.shields.io/badge/OS-Windows%20|%20Linux%20|%20macOS-gold)
 [![Static Badge](https://img.shields.io/badge/Python-3.12%2B-blue?logo=python&logoColor=white)](https://www.python.org/)
 [![Static Badge](https://img.shields.io/badge/License-MIT-slateblue)](https://github.com/patmlr/qspec/blob/main/LICENSE)
 
@@ -22,6 +22,7 @@ Additional example scripts can be found in the example folder on [_GitHub_](http
 - [_NumPy_](http://www.numpy.org/)
 - [_SciPy_](http://www.scipy.org/)
 - [_SymPy_](http://www.sympy.org/)
+- [_odrpack_](https://pypi.org/project/odrpack/) (optional, for `qspec.analyze.odr_fit`, install with `pip install qspec[odr]`)
 
 ### Modules
 
