@@ -9,6 +9,7 @@ import ctypes
 import os
 import platform
 from _ctypes import CFuncPtr
+from collections.abc import Callable
 from enum import Enum
 from typing import Any
 
@@ -17,6 +18,7 @@ from numpy import ctypeslib
 __all__ = [
     "POINTER",
     "C",
+    "CppClass",
     "CppHandler",
     "c_bool",
     "c_bool_p",
@@ -185,6 +187,24 @@ type CppHandler = ctypes._Pointer[ctypes.c_char]
 """An opaque pointer to an instance of a C++ class, see [`C`]."""
 
 
+class CppClass:
+    """
+    Base class of Python wrappers of C++ classes. A wrapper owns the C++ instance it constructs.
+    """
+
+    instance: CppHandler
+    """The wrapped C++ instance."""
+
+    _destruct: Callable[[CppHandler], None]
+    """The C++ destructor of the wrapped class."""
+
+    def __del__(self) -> None:
+        # The constructor may have raised before the instance was constructed.
+        instance = getattr(self, "instance", None)
+        if instance is not None:
+            type(self)._destruct(instance)
+
+
 dll = _load_dll()
 
 
@@ -227,7 +247,7 @@ dll.laser_get_k.argtypes = (C.LaserHandler.value,)
 dll.laser_get_k.restype = vector3d_p
 dll.laser_set_k.argtypes = (C.LaserHandler.value, vector3d_p)
 
-dll.laser_get_kpol.argtypes = (C.LaserHandler.value, c_bool, c_size_t, c_double_p)
+dll.laser_get_kpol.argtypes = (C.LaserHandler.value, c_bool, c_size_t, c_double_p, c_complex_p)
 
 
 # Environment
@@ -270,8 +290,12 @@ dll.state_init.argtypes = (
     c_double,
     c_char_p,
 )
+dll.state_init.restype = c_int
 
 dll.state_reset.argtypes = (C.StateHandler.value,)
+
+dll.state_get_shift.argtypes = (C.StateHandler.value,)
+dll.state_get_shift.restype = c_double
 
 dll.state_get_freq_j.argtypes = (C.StateHandler.value,)
 dll.state_get_freq_j.restype = c_double
@@ -328,7 +352,7 @@ dll.decaymap_add_decay.argtypes = (
 dll.decaymap_get_label.argtypes = (C.DecayMapHandler.value, c_size_t, c_size_t)
 dll.decaymap_get_label.restype = c_char_p
 
-dll.decaymap_get_a_i.argtypes = (C.DecayMapHandler.value, c_char_p, c_char_p)
+dll.decaymap_get_a_i.argtypes = (C.DecayMapHandler.value, c_char_p, c_char_p, c_bool)
 dll.decaymap_get_a_i.restype = c_double
 
 dll.decaymap_get_ae_ik.argtypes = (C.DecayMapHandler.value, c_char_p, c_char_p, c_size_t)
@@ -360,7 +384,7 @@ dll.atom_get_decay_map.argtypes = (C.AtomHandler.value,)
 dll.atom_get_decay_map.restype = C.DecayMapHandler.value
 dll.atom_set_decay_map.argtypes = (C.AtomHandler.value, C.DecayMapHandler.value)
 
-dll.atom_get_gamma.argtypes = (C.DecayMapHandler.value, c_size_t)
+dll.atom_get_gamma.argtypes = (C.AtomHandler.value, c_size_t)
 dll.atom_get_gamma.restype = c_double
 
 dll.atom_get_mass.argtypes = (C.AtomHandler.value,)
@@ -371,17 +395,21 @@ dll.atom_get_size.argtypes = (C.AtomHandler.value,)
 dll.atom_get_size.restype = c_size_t
 
 dll.atom_get_gs_size.argtypes = (C.AtomHandler.value,)
-dll.atom_get_gs.restype = c_size_t
+dll.atom_get_gs_size.restype = c_size_t
 dll.atom_get_gs.argtypes = (C.AtomHandler.value,)
 dll.atom_get_gs.restype = c_size_t_p
 
-dll.atom_get_ek.argtypes = (C.AtomHandler.value, c_size_t)
+dll.atom_get_ek.argtypes = (C.AtomHandler.value, c_size_t, c_int32_p)
+dll.atom_get_ek.restype = None
 
-dll.atom_get_mk.argtypes = (C.AtomHandler.value, c_size_t)
+dll.atom_get_mk.argtypes = (C.AtomHandler.value, c_size_t, c_int32_p)
+dll.atom_get_mk.restype = None
 
-dll.atom_get_emk.argtypes = (C.AtomHandler.value, c_size_t)
+dll.atom_get_emk.argtypes = (C.AtomHandler.value, c_size_t, c_int32_p)
+dll.atom_get_emk.restype = None
 
-dll.atom_get_d_em.argtypes = (C.AtomHandler.value, c_size_t)
+dll.atom_get_d_em.argtypes = (C.AtomHandler.value, c_size_t, c_double_p)
+dll.atom_get_d_em.restype = None
 
 dll.atom_get_L0.argtypes = (C.AtomHandler.value,)
 dll.atom_get_L0.restype = c_double_p
@@ -520,6 +548,8 @@ dll.interaction_get_environment.argtypes = (C.InteractionHandler.value,)
 dll.interaction_get_environment.restype = C.EnvironmentHandler.value
 dll.interaction_set_environment.argtypes = (C.InteractionHandler.value, C.EnvironmentHandler.value)
 
+dll.interaction_get_atom.argtypes = (C.InteractionHandler.value,)
+dll.interaction_get_atom.restype = C.AtomHandler.value
 dll.interaction_set_atom.argtypes = (C.InteractionHandler.value, C.AtomHandler.value)
 
 dll.interaction_add_laser.argtypes = (C.InteractionHandler.value, C.LaserHandler.value)
@@ -569,10 +599,12 @@ dll.interaction_get_time_dependent.restype = c_bool
 dll.interaction_set_time_dependent.argtypes = (C.InteractionHandler.value, c_bool)
 
 dll.interaction_get_summap.argtypes = (C.InteractionHandler.value,)
-dll.interaction_get_rabi.argtypes = (C.InteractionHandler.value, c_size_t)
+dll.interaction_get_rabi.argtypes = (C.InteractionHandler.value, c_size_t, c_complex_p)
+dll.interaction_get_rabi.restype = None
 dll.interaction_get_atommap.argtypes = (C.InteractionHandler.value,)
 dll.interaction_get_deltamap.argtypes = (C.InteractionHandler.value,)
-dll.interaction_get_delta.argtypes = (C.InteractionHandler.value,)
+dll.interaction_get_delta.argtypes = (C.InteractionHandler.value, c_double_p)
+dll.interaction_get_delta.restype = None
 
 dll.interaction_get_hamiltonian.argtypes = (
     C.InteractionHandler.value,
@@ -646,8 +678,10 @@ dll.multivariatenormal_construct.argtypes = (c_double_p, c_double_p, c_size_t)
 dll.multivariatenormal_construct.restype = C.MultivariateNormalHandler.value
 dll.multivariatenormal_destruct.argtypes = (C.MultivariateNormalHandler.value,)
 
+dll.multivariatenormal_size.argtypes = (C.MultivariateNormalHandler.value,)
 dll.multivariatenormal_size.restype = c_size_t
-dll.multivariatenormal_rvs.restype = c_void_p
+dll.multivariatenormal_rvs.argtypes = (C.MultivariateNormalHandler.value, c_double_p)
+dll.multivariatenormal_rvs.restype = None
 
 dll.gen_collinear.argtypes = (
     c_double_p,

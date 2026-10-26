@@ -89,7 +89,7 @@ State::State()
 	l = std::vector<double>(1);
 	jj = std::vector<double>(1);
 
-	hyper_const = new double[HYPER_SIZE]{0., 0., 0.};
+	hyper_const = {0., 0., 0.};
 
 	gj = 0.;
 	gi = 0.;
@@ -101,7 +101,7 @@ State::State()
 
 State::~State()
 {
-	delete[] hyper_const;
+
 }
 
 void State::init(double _freq_j, double _j, double _i, double _f, double _m, bool _parity,
@@ -131,6 +131,7 @@ void State::init(double _freq_j, double _j, double _i, double _f, double _m, boo
 
 	double f_min = std::max(abs(m), abs(i - j));
 	double f_max = i + j;
+	if (f < f_min || f > f_max) throw std::invalid_argument("F must satisfy max(|m|, |J - I|) <= F <= J + I.");
 	size_t n = static_cast<size_t>(f_max - f_min + 1);
 	size_t index = static_cast<size_t>(f - f_min);
 	z_mix = VectorXd::Zero(n);
@@ -147,7 +148,7 @@ std::string State::repr()
 
 void State::reset()
 {
-	freq = freq_j + hyperfine(i, j, f, hyper_const);
+	freq = freq_j + hyperfine(i, j, f, hyper_const.data());
 }
 
 double State::get_shift()
@@ -262,7 +263,7 @@ void State::set_jj(std::vector<double> _jj)
 
 double* State::get_hyper_const()
 {
-	return hyper_const;
+	return hyper_const.data();
 }
 
 void State::set_hyper_const(double* _hyper_const)
@@ -293,7 +294,7 @@ void State::set_gi(double _gi)
 	gi = _gi;
 }
 
-std::string State::get_label()
+const std::string& State::get_label()
 {
 	return label;
 }
@@ -521,8 +522,8 @@ double DecayMap::get_am(std::string state_0, std::string state_1, size_t k)
 
 Atom::Atom()
 {
-	decays = new DecayMap();
-	env = new Environment();
+	decays = &default_decays;
+	env = &default_env;
 }
 
 Atom::~Atom()
@@ -743,7 +744,9 @@ void Atom::gen_multipole()
 {
 	ek.clear();
 	mk.clear();
+	a_em.clear();
 	d_em.clear();
+	A_einst.clear();
 	for (size_t ik = 0; ik < decays->get_k_em_max(); ++ik)
 	{
 		ek.push_back(MatrixXi::Zero(size, size));

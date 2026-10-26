@@ -379,7 +379,7 @@ Interaction::Interaction()
 {
 	atom = nullptr;
 	lasers = std::vector<Laser*>();
-	env = new Environment();
+	env = &default_env;
 }
 
 Atom* Interaction::get_atom()
@@ -396,6 +396,8 @@ void Interaction::set_atom(Atom* _atom)
 void Interaction::clear_lasers()
 {
 	lasers.clear();
+	lasermap.clear();
+	rabimap.clear();
 }
 
 std::vector<Laser*>* Interaction::get_lasers()
@@ -601,15 +603,14 @@ void Interaction::gen_coordinates()
 
 void Interaction::gen_rabi()
 {
-	summap.setZero();
+	// The atom size and the multipole order may have changed since the lasers were added.
+	size_t size = atom->get_size();
+	size_t q_size = 2 * atom->get_decay_map()->get_k_em_max() + 1;
+	summap = MatrixXi::Zero(size, size);
+	lasermap.assign(lasers.size(), std::vector<MatrixXi>(q_size, MatrixXi::Zero(size, size)));
+	rabimap.assign(lasers.size(), MatrixXcd::Zero(size, size));
 	for (size_t m = 0; m < lasers.size(); ++m)
 	{
-		rabimap.at(m).setZero();
-		for (size_t q = 0; q < 2 * atom->get_decay_map()->get_k_em_max() + 1; ++q)
-		{
-			lasermap.at(m).at(q).setZero();
-		}
-		
 		std::array<std::vector<VectorXcd>, 2> kpol_list;  // List of polarization-k-vector tensors in helicity basis for electric and magnetic k-multipole orders.
 		for (size_t _k = 1; _k <= atom->get_decay_map()->get_k_em_max(); ++_k)
 		{
@@ -739,6 +740,7 @@ void Interaction::gen_conlist()
 
 void Interaction::gen_deltamap()
 {
+	history.clear();
 	n_history = 0;
 	loop = false;
 	deltamap = MatrixXd::Zero(atom->get_size(), lasers.size());

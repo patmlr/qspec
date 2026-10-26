@@ -247,12 +247,14 @@ def lambda_states(
      If all times from 0 to `t` are required, use `time_resolved=True`.
     :param delta_1: The detuning of the first laser relative to the $g\rightarrow e$ transition (MHz).
     :param delta_2: The detuning of the second laser relative to the $m\rightarrow e$ transition (MHz).
-    :param a_ge: The Einstein coefficient of the $e\rightarrow g$ transition (MHz).
-    :param a_me: The Einstein coefficient of the $e\rightarrow m$ transition (MHz).
+    :param a_ge: The Einstein coefficient of the $e\rightarrow g$ transition ($2\pi\,\mathrm{MHz}$).
+    :param a_me: The Einstein coefficient of the $e\rightarrow m$ transition ($2\pi\,\mathrm{MHz}$).
     :param s_1: The saturation parameter of the $g\rightarrow e$ transition.
     :param s_2: The saturation parameter of the $m\rightarrow e$ transition.
-    :param lw_1: The frequency width of the first laser (MHz).
-    :param lw_2: The frequency width of the second laser (MHz).
+    :param lw_1: The spectral width (FWHM) of the first laser. It dephases the coherences
+     involving $|g\rangle$ but not their populations ($2\pi\,\mathrm{MHz}$).
+    :param lw_2: The spectral width (FWHM) of the second laser. It dephases the coherences
+     involving $|m\rangle$ but not their populations ($2\pi\,\mathrm{MHz}$).
     :param p0: The initial density matrix elements `[gg, mm, ee, gm, eg, em]`. Must have shape `(6, )`.
      If `None`, initially all population is in the state $|g\rangle$.
     :param time_resolved: Whether to return the complete history of the result.
@@ -364,8 +366,8 @@ def lambda_ge_rec(
      If all times from 0 to `t` are required, use `time_resolved=True`.
     :param n: The maximum number $n$ of photon recoils to consider.
     :param delta: The detuning of the laser relative to the $g\rightarrow e$ transition (MHz).
-    :param a_ge: The Einstein coefficient of the $e\rightarrow g$ transition (MHz).
-    :param a_me: The Einstein coefficient of the $e\rightarrow m$ transition (MHz).
+    :param a_ge: The Einstein coefficient of the $e\rightarrow g$ transition ($2\pi\,\mathrm{MHz}$).
+    :param a_me: The Einstein coefficient of the $e\rightarrow m$ transition ($2\pi\,\mathrm{MHz}$).
     :param s: The saturation parameter of the $g\rightarrow e$ transition.
     :param f: The transition frequency of the $g\rightarrow e$ transition (MHz).
     :param m: The mass of the atom (u).

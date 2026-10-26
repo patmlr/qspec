@@ -80,12 +80,15 @@ class Laser
 protected:
 	double freq;
 	double intensity;
+	Polarization default_polarization;  // Used until a polarization is set. Other polarizations are not owned.
 	Polarization* polarization;
 	int index = 0;
 	Vector3d k;
 
 public:
 	Laser();
+	Laser(const Laser&) = delete;  // polarization may point to default_polarization.
+	Laser& operator=(const Laser&) = delete;
 	void init(double _freq, double _intensity, Polarization* _polarization, Vector3d _k);
 	double get_detuned(const Vector3d& v);
 	double get_detuned(double delta, const Vector3d& v);

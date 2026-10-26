@@ -16,9 +16,7 @@ title: qspec.simulate.Interaction
 <em class="sig-param"><span class="n">delta_max</span><span class="o">=</span><span class="default_value"><span class="num">1000.0</span></span></em>
 ,&nbsp;
 <em class="sig-param"><span class="n">controlled</span><span class="o">=</span><span class="default_value"><span class="bool">True</span></span></em>
-,&nbsp;
-<em class="sig-param"><span class="n">instance</span><span class="o">=</span><span class="default_value">None</span></em>
-<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/simulate/_simulate_cpp.py#L1650-L2468' }}"><span class="sig-source">[source]</span></a>
+<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/simulate/_simulate_cpp.py#L1621-L2407' }}"><span class="sig-source">[source]</span></a>
 </dt>
 <dd class="field-body">
 <p>An interaction between an <code>Atom</code> and a list of <code>lasers</code> in an <code>Environment</code>.
@@ -41,8 +39,6 @@ for that transition to be considered laser-driven. The default value is <code>10
 Setting this to True is particularly useful for dynamics where a changing resolution is required.
 However, this comes at the cost of computing time.
 The default step size for the uncontrolled stepper is <code>dt = 1e-3</code> (1 ns).</p></dd>
-<dt>instance<span class="classifier"><em><a href="{{ '/doc/functions/simulate/Interaction/Interaction.html' | relative_url }}">Interaction</a> | C.InteractionHandler.value | None</em></span></dt>
-<dd class="field-desc"><p>An existing <code>Interaction</code> instance. If this is specified, the other parameters are ignored.</p></dd>
 </dl>
 </dd>
 <dt class="field-head">Attributes<span class="colon">:</span></dt>
@@ -82,6 +78,8 @@ The default step size for the uncontrolled stepper is <code>dt = 1e-3</code> (1 
 <dd class="field-desc"><p>The history of states visited during the generation of the diagonal maps.</p></dd>
 <dt>history_size<span class="classifier"><em>int</em></span></dt>
 <dd class="field-desc"><p>The length of the history of states visited during the generation of the diagonal maps.</p></dd>
+<dt>instance<span class="classifier"><em>CppHandler</em></span></dt>
+<dd class="field-desc"><p>The wrapped C++ instance.</p></dd>
 <dt>lasers<span class="classifier"><em>list[<a href="{{ '/doc/functions/simulate/Laser/Laser.html' | relative_url }}">Laser</a>]</em></span></dt>
 <dd class="field-desc"><p>The lasers of the interaction.</p></dd>
 <dt>loop<span class="classifier"><em>bool</em></span></dt>

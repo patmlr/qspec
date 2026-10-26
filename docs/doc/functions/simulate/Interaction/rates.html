@@ -18,7 +18,7 @@ title: qspec.simulate.Interaction.rates
 <em class="sig-param"><span class="n">y0</span><span class="o">=</span><span class="default_value">None</span></em>
 ,&nbsp;
 <em class="sig-param"><span class="n">analytic</span><span class="o">=</span><span class="default_value"><span class="bool">False</span></span></em>
-<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/simulate/_simulate_cpp.py#L2073-L2161' }}"><span class="sig-source">[source]</span></a>
+<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/simulate/_simulate_cpp.py#L2012-L2100' }}"><span class="sig-source">[source]</span></a>
 </dt>
 <dd class="field-body">
 <p>Solver for the rate equations</p>
@@ -35,7 +35,7 @@ R_{ij}^m &amp;= \frac{|\Omega_{ij}^m|^2\,\tilde{\Gamma}_{\!ij}}{
 a_{ij,k_{ij}}^\lambda &amp;= (-1)^{F_i + I + k_{ij} + J_j}\sqrt{(2F_i + 1)(2J_j + 1)}
 \langle F_im_ik_{ij}\lambda|F_jm_j\rangle\begin{Bmatrix}J_j &amp; J_i &amp; k_{ij} \\F_i &amp; F_j &amp; I\end{Bmatrix}\\[2ex]
 X_{\!ij} &amp;= \begin{cases}+1, &amp; \text{if electric } (\mathrm{E}k_{ij}) \\
-\ \,0, &amp; \text{if magnetic } (\mathrm{M}k_{ij})\end{cases},
+\ \,0, &amp; \text{if magnetic } (\mathrm{M}k_{ij})\end{cases}
 \end{aligned}$$</div>
 <p>where $A_{ji}^{Xk_{ij}}$ is the Einstein coefficient for the electric (magnetic)
 decay $|j\rangle\rightarrow|i\rangle$ and the rank-$k_{ij}$ multipole order,

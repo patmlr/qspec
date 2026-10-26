@@ -12,9 +12,7 @@ title: qspec.simulate.Atom
 <em class="sig-param"><span class="n">decay_map</span><span class="o">=</span><span class="default_value">None</span></em>
 ,&nbsp;
 <em class="sig-param"><span class="n">mass</span><span class="o">=</span><span class="default_value"><span class="num">0</span></span></em>
-,&nbsp;
-<em class="sig-param"><span class="n">instance</span><span class="o">=</span><span class="default_value">None</span></em>
-<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/simulate/_simulate_cpp.py#L762-L1410' }}"><span class="sig-source">[source]</span></a>
+<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/simulate/_simulate_cpp.py#L727-L1382' }}"><span class="sig-source">[source]</span></a>
 </dt>
 <dd class="field-body">
 <p>An atom and its inner structure.</p>
@@ -28,8 +26,6 @@ title: qspec.simulate.Atom
 <dd class="field-desc"><p>The <code>DecayMap</code> connecting the atomic states. If <code>None</code>, an empty <code>DecayMap</code> is used.</p></dd>
 <dt>mass<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#scalar' | relative_url }}">scalar</a></em></span></dt>
 <dd class="field-desc"><p>The mass $m$ of the atom (u).</p></dd>
-<dt>instance<span class="classifier"><em><a href="{{ '/doc/functions/simulate/Atom/Atom.html' | relative_url }}">Atom</a> | C.AtomHandler.value | None</em></span></dt>
-<dd class="field-desc"><p>An existing <code>Atom</code> instance. If this is specified, the other parameters are ignored.</p></dd>
 </dl>
 </dd>
 <dt class="field-head">Attributes<span class="colon">:</span></dt>
@@ -45,10 +41,19 @@ title: qspec.simulate.Atom
 <dd class="field-desc"><p>A map of the multipole orders of the transitions between the states.</p></dd>
 <dt>gs<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#ndarray' | relative_url }}">ndarray</a></em></span></dt>
 <dd class="field-desc"><p>The indexes of the states with the same label as the first state <code>Atom.states[0]</code>.</p></dd>
+<dt>instance<span class="classifier"><em>CppHandler</em></span></dt>
+<dd class="field-desc"><p>The wrapped C++ instance.</p></dd>
 <dt>l0<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#ndarray' | relative_url }}">ndarray</a></em></span></dt>
-<dd class="field-desc"><p>The matrix of the partial spontaneous decay rates $\Gamma_{ij}$ between the states.</p></dd>
+<dd class="field-desc"><p>The matrix $L_0$ of the partial spontaneous decay rates between the states ($2\pi\,\mathrm{MHz}$).
+$(L_0)_{ij}$ is the rate from state $j$ into state $i$, such that the column sums $\sum_i (L_0)_{ij}$
+are the total decay rates $\Gamma_j$ (see <code>Atom.get_gamma</code>).</p></dd>
 <dt>l1<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#ndarray' | relative_url }}">ndarray</a></em></span></dt>
-<dd class="field-desc"><p>The matrix of the decay rates of the coherences, derived from <code>Atom.l0</code>.</p></dd>
+<dd class="field-desc"><p>The matrix $L_1$ of the (negative) damping rates of the density-matrix elements, derived from <code>Atom.l0</code>
+($2\pi\,\mathrm{MHz}$). It holds $(L_1)_{ij} = -\frac{1}{2}(\Gamma_i + \Gamma_j)$,
+where $\Gamma_i$ is the total decay rate of state $i$. The off-diagonal elements are the decay rates
+of the coherences and the diagonal elements $-\Gamma_i$ the population losses.
+Only spontaneous decay is included, i.e., there is no additional pure dephasing. In the master equation,
+$L_1$ is multiplied element-wise with the density matrix, $\dot{\rho} \leftarrow L_1\circ\rho$.</p></dd>
 <dt>mass<span class="classifier"><em>float</em></span></dt>
 <dd class="field-desc"><p>The mass $m$ of the atom (u).</p></dd>
 <dt>mk<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#ndarray' | relative_url }}">ndarray</a></em></span></dt>

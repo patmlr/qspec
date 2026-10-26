@@ -30,9 +30,7 @@ title: qspec.simulate.State
 <em class="sig-param"><span class="n">gi</span><span class="o">=</span><span class="default_value"><span class="num">0.0</span></span></em>
 ,&nbsp;
 <em class="sig-param"><span class="n">label</span><span class="o">=</span><span class="default_value">None</span></em>
-,&nbsp;
-<em class="sig-param"><span class="n">instance</span><span class="o">=</span><span class="default_value">None</span></em>
-<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/simulate/_simulate_cpp.py#L399-L627' }}"><span class="sig-source">[source]</span></a>
+<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/simulate/_simulate_cpp.py#L381-L610' }}"><span class="sig-source">[source]</span></a>
 </dt>
 <dd class="field-body">
 <p>An atomic quantum state $|\mathrm{[label]}\pi JIFm\rangle$.</p>
@@ -72,8 +70,6 @@ If <code>hyper_const</code> is a scalar, it is assumed to be the constant $A$ an
 <dt>label<span class="classifier"><em>str | None</em></span></dt>
 <dd class="field-desc"><p>The label of the state. The label is used to link states via a <code>DecayMap</code>.
 If <code>None</code>, the label is <code>"{freq_j}({j})"</code> with <code>freq_j</code> rounded to an integer.</p></dd>
-<dt>instance<span class="classifier"><em><a href="{{ '/doc/functions/simulate/State/State.html' | relative_url }}">State</a> | C.StateHandler.value | None</em></span></dt>
-<dd class="field-desc"><p>An existing <code>State</code> instance. If this is specified, the other parameters are ignored.</p></dd>
 </dl>
 </dd>
 <dt class="field-head">Attributes<span class="colon">:</span></dt>
@@ -93,6 +89,8 @@ If <code>None</code>, the label is <code>"{freq_j}({j})"</code> with <code>freq_
 <dd class="field-desc"><p>The hyperfine-structure constants $(A, B, C)$ as a 3d-vector (MHz).</p></dd>
 <dt>i<span class="classifier"><em>float</em></span></dt>
 <dd class="field-desc"><p>The nuclear spin quantum number $I$.</p></dd>
+<dt>instance<span class="classifier"><em>CppHandler</em></span></dt>
+<dd class="field-desc"><p>The wrapped C++ instance.</p></dd>
 <dt>j<span class="classifier"><em>float</em></span></dt>
 <dd class="field-desc"><p>The electronic total angular momentum quantum number $J$.</p></dd>
 <dt>label<span class="classifier"><em>str</em></span></dt>
@@ -105,7 +103,8 @@ If <code>None</code>, the label is <code>"{freq_j}({j})"</code> with <code>freq_
 <dd class="field-par">
 <dl>
 <dt>ValueError</dt>
-<dd class="field-desc"><p>If the quantum numbers are not multiples of 1/2 or if <code>ls</code> or <code>parity</code> are invalid.</p></dd>
+<dd class="field-desc"><p>If the quantum numbers are not multiples of 1/2, if they do not form a valid state,
+or if <code>ls</code> or <code>parity</code> are invalid.</p></dd>
 </dl>
 </dd>
 </dl>

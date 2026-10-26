@@ -10,12 +10,14 @@ import numpy as np
 
 from qspec import tools
 from qspec._cpp import (
+    CppClass,
     CppHandler,
     c_bool,
     c_char_p,
     c_complex_p,
     c_double,
     c_double_p,
+    c_int32_p,
     c_size_t,
     c_size_t_p,
     dll,
@@ -23,6 +25,7 @@ from qspec._cpp import (
 )
 from qspec.physics import cast_hyper_const, g_j, get_f, get_m, h, kB
 from qspec.qtypes import (
+    Callable,
     Generator,
     Iterable,
     array_like,
@@ -99,26 +102,16 @@ def _process_q_axis(q_axis: array_like) -> ndarray:
     return q_axis
 
 
-class CppClass:
-    def __init__(self, instance: "CppClass | CppHandler | None" = None) -> None:
-        self.instance = _cast_cpp_type(instance)
-
-
-def _cast_cpp_type(instance: CppClass | CppHandler | None = None) -> CppHandler | None:
-    if instance is None:
-        return None
-    if isinstance(instance, CppClass):
-        return instance.instance
-    return instance
-
-
 class Polarization(CppClass):
+    @staticmethod
+    def _destruct(instance: CppHandler) -> None:
+        dll.polarization_destruct(instance)
+
     def __init__(
         self,
         vec: array_like | None = None,
         q_axis: array_like = 2,
         vec_as_q: bool = True,
-        instance: "Polarization | CppHandler | None" = None,
     ) -> None:
         r"""
         A polarization state of light. The property `Polarization.x` holds the polarization
@@ -133,24 +126,17 @@ class Polarization(CppClass):
          Must be an integer in `{0, 1, 2}` or a 3d-vector. The default is `q_axis = 2` (z-axis).
         :param vec_as_q: Whether `vec` is given in the helicity basis (`True`) or in Cartesian coordinates (`False`).
          The default is `True`.
-        :param instance: An existing `Polarization` instance. If this is specified, the other parameters are ignored.
         """
-        super().__init__(instance)
+        self.instance = dll.polarization_construct()
 
-        if self.instance is None:
-            self.instance = dll.polarization_construct()
+        if vec is None:
+            vec = tools.unit_vector(1, 3, dtype=complex)
+        vec = np.asarray(vec, dtype=complex)
+        if vec.shape != (3,):
+            raise ValueError("vec must be a 3d-vector.")
 
-            if vec is None:
-                vec = tools.unit_vector(1, 3, dtype=complex)
-            vec = np.asarray(vec, dtype=complex)
-            if vec.shape != (3,):
-                raise ValueError("vec must be a 3d-vector.")
-
-            q_axis = _process_q_axis(q_axis)
-            dll.polarization_init(self.instance, vec, q_axis, vec_as_q)
-
-    def __del__(self) -> None:
-        dll.polarization_destruct(self.instance)
+        q_axis = _process_q_axis(q_axis)
+        dll.polarization_init(self.instance, vec, q_axis, vec_as_q)
 
     def def_q_axis(self, q_axis: array_like = 2, q_fixed: bool = False) -> None:
         r"""
@@ -168,21 +154,21 @@ class Polarization(CppClass):
         r"""
         The quantization axis.
         """
-        return dll.polarization_get_q_axis(self.instance)
+        return dll.polarization_get_q_axis(self.instance).copy()
 
     @property
     def x(self) -> ndarray[complexfloating]:
         r"""
         The complex polarization in Cartesian coordinates $(\vec{x}, \vec{y}, \vec{z})$.
         """
-        return dll.polarization_get_x(self.instance)
+        return dll.polarization_get_x(self.instance).copy()
 
     @property
     def q(self) -> ndarray[complexfloating]:
         r"""
         The complex polarization in the helicity basis $(\vec{\sigma}^-, \vec{\pi}, \vec{\sigma}^+)$.
         """
-        return dll.polarization_get_q(self.instance)
+        return dll.polarization_get_q(self.instance).copy()
 
 
 def _cast_laser_polarization(polarization: Polarization | array_like | None) -> Polarization:
@@ -201,13 +187,16 @@ def _cast_laser_polarization(polarization: Polarization | array_like | None) -> 
 
 
 class Laser(CppClass):
+    @staticmethod
+    def _destruct(instance: CppHandler) -> None:
+        dll.laser_destruct(instance)
+
     def __init__(
         self,
         freq: scalar = 0.0,
         intensity: scalar = 1.0,
         polarization: Polarization | array_like | None = None,
         k: array_like | None = None,
-        instance: "Laser | CppHandler | None" = None,
     ) -> None:
         r"""
         A laser that has a frequency $\nu$, an intensity $I = \frac{1}{2}\varepsilon_0c\vec{E}^2$,
@@ -219,33 +208,24 @@ class Laser(CppClass):
         :param polarization: The polarization of the laser $\vec{\varepsilon}$ as a complex vector
          in Cartesian coordinates or as a `Polarization` object.
         :param k: The direction of the laser $\vec{k}$. The user input is normalized to a vector with length 1.
-        :param instance: An existing `Laser` instance. If this is specified, the other parameters are ignored.
         """
-        super().__init__(instance)
+        self.instance = dll.laser_construct()
 
-        if self.instance is None:
-            self.instance = dll.laser_construct()
+        self._polarization = _cast_laser_polarization(polarization)
 
-            self._polarization = _cast_laser_polarization(polarization)
+        if k is None:
+            k = tools.unit_vector(0, 3)
+        k = np.asarray(k, dtype=float)
+        if k.shape != (3,):
+            raise ValueError(f"'k' must be a 3d-vector, but has shape {k.shape}.")
 
-            if k is None:
-                k = tools.unit_vector(0, 3)
-            k = np.asarray(k, dtype=float)
-            if k.shape != (3,):
-                raise ValueError(f"'k' must be a 3d-vector, but has shape {k.shape}.")
-
-            dll.laser_init(
-                self.instance,
-                c_double(float(freq)),
-                c_double(float(intensity)),
-                self._polarization.instance,
-                k.ctypes.data_as(c_double_p),
-            )
-        else:
-            self._polarization = Polarization(instance=dll.laser_get_polarization(self.instance))
-
-    def __del__(self) -> None:
-        dll.laser_destruct(self.instance)
+        dll.laser_init(
+            self.instance,
+            c_double(float(freq)),
+            c_double(float(intensity)),
+            self._polarization.instance,
+            k.ctypes.data_as(c_double_p),
+        )
 
     @property
     def freq(self) -> float:
@@ -296,7 +276,7 @@ class Laser(CppClass):
         r"""
         The normalized direction of the laser $\vec{k}$. The default direction is $(1, 0, 0)$.
         """
-        return dll.laser_get_k(self.instance)
+        return dll.laser_get_k(self.instance).copy()
 
     @k.setter
     def k(self, value: array_like) -> None:
@@ -320,17 +300,26 @@ class Laser(CppClass):
          for the given quantization axis.
         """
         q_axis = _process_q_axis(q_axis)
-        vector_cd_p = np.ctypeslib.ndpointer(dtype=complex, shape=(2 * int(k) + 1,))
-        set_restype(dll.laser_get_kpol, vector_cd_p)
-        return dll.laser_get_kpol(self.instance, c_bool(electric), c_size_t(k), q_axis.ctypes.data_as(c_double_p))
+        kpol = np.zeros(2 * int(k) + 1, dtype=complex)
+        dll.laser_get_kpol(
+            self.instance,
+            c_bool(electric),
+            c_size_t(k),
+            q_axis.ctypes.data_as(c_double_p),
+            kpol.ctypes.data_as(c_complex_p),
+        )
+        return kpol
 
 
 class Environment(CppClass):
+    @staticmethod
+    def _destruct(instance: CppHandler) -> None:
+        dll.environment_destruct(instance)
+
     def __init__(
         self,
         E: array_like | None = None,
         B: array_like | None = None,
-        instance: "Environment | CppHandler | None" = None,
     ) -> None:
         r"""
         An electromagnetic environment with static electric field $\vec{E}$
@@ -341,17 +330,10 @@ class Environment(CppClass):
         :param E: A static electric field $\vec{E}$. <span style="color: #F54927;">(NOT IMPLEMENTED)</span>
         :param B: A static magnetic field $\vec{B}$ (T). A scalar sets the magnitude along the current direction,
          which is the $z$-axis by default.
-        :param instance: An existing `Environment` instance. If this is specified, the other parameters are ignored.
         """
-        super().__init__(instance)
-
-        if self.instance is None:
-            self.instance = dll.environment_construct()
-            self.E = E
-            self.B = B
-
-    def __del__(self) -> None:
-        dll.environment_destruct(self.instance)
+        self.instance = dll.environment_construct()
+        self.E = E
+        self.B = B
 
     @property
     def E(self) -> ndarray:
@@ -397,6 +379,10 @@ class Environment(CppClass):
 
 
 class State(CppClass):
+    @staticmethod
+    def _destruct(instance: CppHandler) -> None:
+        dll.state_destruct(instance)
+
     def __init__(
         self,
         freq_j: scalar,
@@ -411,7 +397,6 @@ class State(CppClass):
         gj: scalar = 0.0,
         gi: scalar = 0.0,
         label: str | None = None,
-        instance: "State | CppHandler | None" = None,
     ) -> None:
         r"""
         An atomic quantum state $|\mathrm{[label]}\pi JIFm\rangle$.
@@ -436,67 +421,64 @@ class State(CppClass):
         :param gi: The nuclear g-factor $g_I$.
         :param label: The label of the state. The label is used to link states via a `DecayMap`.
          If `None`, the label is `"{freq_j}({j})"` with `freq_j` rounded to an integer.
-        :param instance: An existing `State` instance. If this is specified, the other parameters are ignored.
-        :raises ValueError: If the quantum numbers are not multiples of 1/2 or if `ls` or `parity` are invalid.
+        :raises ValueError: If the quantum numbers are not multiples of 1/2, if they do not form a valid state,
+         or if `ls` or `parity` are invalid.
         """
-        super().__init__(instance)
+        tools.check_half_integer(j, i, f, m)
+        _j, _i, _f, _m = float(j), float(i), float(f), float(m)
+        if not abs(_j - _i) <= _f <= _j + _i or abs(_m) > _f or (_j + _i - _f) % 1 != 0 or (_f - _m) % 1 != 0:
+            raise ValueError(f"Invalid quantum numbers (J, I, F, m) = ({j}, {i}, {f}, {m}).")
 
-        if self.instance is None:
-            tools.check_half_integer(j, i, f, m)
+        if ls is None or not list(ls):
+            s = np.array([], dtype=float)
+            l = np.array([], dtype=float)
+        elif not has_getitem(ls):
+            raise ValueError(LS_FORMAT_ERROR)
+        elif has_getitem(ls) and not has_getitem(ls[0]):
+            s = np.array([ls[1]], dtype=float)
+            l = np.array([ls[0]], dtype=float)
+        elif has_getitem(ls[0]):
+            _ls = np.asarray(ls, dtype=float)
+            s = np.ascontiguousarray(_ls[:, 1])
+            l = np.ascontiguousarray(_ls[:, 0])
+        else:
+            raise ValueError(LS_FORMAT_ERROR)
+        _s, _l = s.ctypes.data_as(c_double_p), l.ctypes.data_as(c_double_p)
 
-            if ls is None or not list(ls):
-                s = np.array([], dtype=float)
-                l = np.array([], dtype=float)
-            elif not has_getitem(ls):
-                raise ValueError(LS_FORMAT_ERROR)
-            elif has_getitem(ls) and not has_getitem(ls[0]):
-                s = np.array([ls[1]], dtype=float)
-                l = np.array([ls[0]], dtype=float)
-            elif has_getitem(ls[0]):
-                _ls = np.asarray(ls, dtype=float)
-                s = np.ascontiguousarray(_ls[:, 1])
-                l = np.ascontiguousarray(_ls[:, 0])
-            else:
-                raise ValueError(LS_FORMAT_ERROR)
-            _s, _l = s.ctypes.data_as(c_double_p), l.ctypes.data_as(c_double_p)
+        jj = np.full_like(s, -1.0, dtype=float) if jj is None else np.array(jj, dtype=float, order="C").flatten()
+        _jj = jj.ctypes.data_as(c_double_p)
 
-            jj = np.full_like(s, -1.0, dtype=float) if jj is None else np.array(jj, dtype=float, order="C").flatten()
-            _jj = jj.ctypes.data_as(c_double_p)
+        if isinstance(parity, str):
+            if parity not in {"even", "e", "odd", "o"}:
+                raise ValueError("Parameter 'parity' must be either in {'even', 'e', False} or in {'odd', 'o', True}.")
+            parity = parity in {"odd", "o"}
+        else:
+            parity = bool(parity)
 
-            if isinstance(parity, str):
-                if parity not in {"even", "e", "odd", "o"}:
-                    raise ValueError(
-                        "Parameter 'parity' must be either in {'even', 'e', False} or in {'odd', 'o', True}."
-                    )
-                parity = parity in {"odd", "o"}
-            else:
-                parity = bool(parity)
+        hyper_const = cast_hyper_const(hyper_const)
+        if label is None:
+            label = f"{int(np.around(freq_j, decimals=0))}({j})"
 
-            hyper_const = cast_hyper_const(hyper_const)
-            if label is None:
-                label = f"{int(np.around(freq_j, decimals=0))}({j})"
-
-            self.instance = dll.state_construct()
-            dll.state_init(
-                self.instance,
-                c_double(float(freq_j)),
-                _s,
-                _l,
-                c_double(float(j)),
-                c_double(float(i)),
-                c_double(float(f)),
-                c_double(float(m)),
-                c_bool(parity),
-                _jj,
-                s.size,
-                hyper_const,
-                c_double(float(gj)),
-                c_double(float(gi)),
-                c_char_p(bytes(label, "utf-8")),
-            )
-
-    def __del__(self) -> None:
-        dll.state_destruct(self.instance)
+        self.instance = dll.state_construct()
+        error = dll.state_init(
+            self.instance,
+            c_double(float(freq_j)),
+            _s,
+            _l,
+            c_double(float(j)),
+            c_double(float(i)),
+            c_double(float(f)),
+            c_double(float(m)),
+            c_bool(parity),
+            _jj,
+            s.size,
+            hyper_const,
+            c_double(float(gj)),
+            c_double(float(gi)),
+            c_char_p(bytes(label, "utf-8")),
+        )
+        if error == -1:
+            raise ValueError(f"Invalid quantum numbers (J, I, F, m) = ({j}, {i}, {f}, {m}).")
 
     def __repr__(self) -> str:
         return "{}({})".format(self.label, ("{}, " * 4)[:-2]).format(
@@ -507,7 +489,7 @@ class State(CppClass):
         r"""
         Reset the frequency `State.freq` shifted by the `Environment` to a vacuum environment.
         """
-        dll.state_update(self.instance)
+        dll.state_reset(self.instance)
 
     def get_shift(self) -> float:
         r"""
@@ -573,7 +555,7 @@ class State(CppClass):
         r"""
         The hyperfine-structure constants $(A, B, C)$ as a 3d-vector (MHz).
         """
-        return dll.state_get_hyper_const(self.instance)
+        return dll.state_get_hyper_const(self.instance).copy()
 
     @hyper_const.setter
     def hyper_const(self, value: array_like) -> None:
@@ -629,12 +611,15 @@ class State(CppClass):
 
 
 class DecayMap(CppClass):
+    @staticmethod
+    def _destruct(instance: CppHandler) -> None:
+        dll.decaymap_destruct(instance)
+
     def __init__(
         self,
         labels: Iterable[tuple] | None = None,
         a: Iterable[scalar | dict] | None = None,
         k_max: int = 1,
-        instance: "DecayMap | CppHandler | None" = None,
     ) -> None:
         r"""
         A map linking sets of atomic states via Einstein-A coefficients.
@@ -643,71 +628,50 @@ class DecayMap(CppClass):
         :param labels: An iterable of pairs of labels connected via Einstein-A coefficients.
          The order of each pair is arbitrary.
         :param a: An iterable of Einstein-A coefficients $A_{if}$, where the states $|i\rangle$ and $|f\rangle$
-         have the labels specified in the list of `labels` (MHz). If `a[i]` is a single value,
+         have the labels specified in the list of `labels` ($2\pi\,\mathrm{MHz}$). If `a[i]` is a single value,
          only the lowest allowed (not necessarily the dominant!) multipole transition will be used.
          Each `a[i]` can also be a `dict` with the keys `"e"` or `"m"` to use either first allowed multipole order,
          or `"e{k}"` or `"m{k}"` to define specific rank-$k$ multipole transitions.
         :param k_max: The maximum considered multipole order $k_\mathrm{max}$. The default value is 1 (dipole).
-        :param instance: An existing `DecayMap` instance. If this is specified, the other parameters are ignored.
         """
-        super().__init__(instance)
+        self.instance = dll.decaymap_construct()
+        dll.decaymap_set_k_em_max(self.instance, c_size_t(int(k_max)))
+        if labels is None:
+            labels = []
+        self._labels = list(labels)
 
-        if self.instance is None:
-            self.instance = dll.decaymap_construct()
-            dll.decaymap_set_k_em_max(self.instance, c_size_t(int(k_max)))
-            if labels is None:
-                labels = []
-            self._labels = list(labels)
+        single_leading_order = False
+        if a is None:
+            a = []
+        for (s0, s1), _a in zip(self._labels, a):
+            if isinstance(_a, dict):
+                ae = [_a.get("e", 0.0)]
+                am = [_a.get("m", 0.0)]
+                if ae[0] == 0.0:
+                    ae = [_a.get(f"e{k + 1}", 0.0) for k in range(k_max)]
+                    if sum(ae) == 0.0:
+                        ae = [0.0]
+                if am[0] == 0.0:
+                    am = [_a.get(f"m{k + 1}", 0.0) for k in range(k_max)]
+                    if sum(am) == 0.0:
+                        am = [0.0]
+            else:
+                ae = [_a]
+                am = ae
+                single_leading_order = True
+            _ae = np.array(ae, dtype=float)
+            _am = np.array(am, dtype=float)
 
-            single_leading_order = False
-            if a is None:
-                a = []
-            for (s0, s1), _a in zip(self._labels, a):
-                if isinstance(_a, dict):
-                    ae = [_a.get("e", 0.0)]
-                    am = [_a.get("m", 0.0)]
-                    if ae[0] == 0.0:
-                        ae = [_a.get(f"e{k + 1}", 0.0) for k in range(k_max)]
-                        if sum(ae) == 0.0:
-                            ae = [0.0]
-                    if am[0] == 0.0:
-                        am = [_a.get(f"m{k + 1}", 0.0) for k in range(k_max)]
-                        if sum(am) == 0.0:
-                            am = [0.0]
-                else:
-                    ae = [_a]
-                    am = ae
-                    single_leading_order = True
-                _ae = np.array(ae, dtype=float)
-                _am = np.array(am, dtype=float)
-
-                dll.decaymap_add_decay(
-                    self.instance,
-                    c_char_p(bytes(s0, "utf-8")),
-                    c_char_p(bytes(s1, "utf-8")),
-                    _ae.ctypes.data_as(c_double_p),
-                    c_size_t(int(_ae.size)),
-                    _am.ctypes.data_as(c_double_p),
-                    c_size_t(int(_am.size)),
-                    c_bool(single_leading_order),
-                )
-        else:
-            self._labels = self._get_labels()
-
-    def __del__(self) -> None:
-        dll.decaymap_destruct(self.instance)
-
-    def _get_labels(self) -> list[tuple[str, str]]:
-        r"""
-        :returns: The labels used in the C++ class.
-        """
-        return [
-            (
-                dll.decaymap_get_label(self.instance, 0, i).decode("utf-8"),
-                dll.decaymap_get_label(self.instance, 1, i).decode("utf-8"),
+            dll.decaymap_add_decay(
+                self.instance,
+                c_char_p(bytes(s0, "utf-8")),
+                c_char_p(bytes(s1, "utf-8")),
+                _ae.ctypes.data_as(c_double_p),
+                c_size_t(int(_ae.size)),
+                _am.ctypes.data_as(c_double_p),
+                c_size_t(int(_am.size)),
+                c_bool(single_leading_order),
             )
-            for i in range(self.size)
-        ]
 
     @property
     def labels(self) -> list[tuple[str, str]]:
@@ -739,7 +703,7 @@ class DecayMap(CppClass):
         :param label_1: The label of the second state.
         :param k: The multipole order $k \geq 1$.
         :returns: (a) The Einstein-A coefficient of the tuple of states `(label_0, label_1)`
-         of electric multipole order `k` (MHz).
+         of electric multipole order `k` ($2\pi\,\mathrm{MHz}$).
         """
         return dll.decaymap_get_ae_ik(
             self.instance, c_char_p(bytes(label_0, "utf-8")), c_char_p(bytes(label_1, "utf-8")), c_size_t(int(k))
@@ -753,7 +717,7 @@ class DecayMap(CppClass):
         :param label_1: The label of the second state.
         :param k: The multipole order $k \geq 1$.
         :returns: (a) The Einstein-A coefficient of the tuple of states `(label_0, label_1)`
-         of magnetic multipole order `k` (MHz).
+         of magnetic multipole order `k` ($2\pi\,\mathrm{MHz}$).
         """
         return dll.decaymap_get_am_ik(
             self.instance, c_char_p(bytes(label_0, "utf-8")), c_char_p(bytes(label_1, "utf-8")), c_size_t(int(k))
@@ -761,12 +725,15 @@ class DecayMap(CppClass):
 
 
 class Atom(CppClass):
+    @staticmethod
+    def _destruct(instance: CppHandler) -> None:
+        dll.atom_destruct(instance)
+
     def __init__(
         self,
         states: Iterable[State] | None = None,
         decay_map: DecayMap | None = None,
         mass: scalar = 0,
-        instance: "Atom | CppHandler | None" = None,
     ) -> None:
         r"""
         An atom and its inner structure.
@@ -774,26 +741,18 @@ class Atom(CppClass):
         :param states: The states $|\mathrm{[label]}\pi JIFm\rangle$ of the atom.
         :param decay_map: The `DecayMap` connecting the atomic states. If `None`, an empty `DecayMap` is used.
         :param mass: The mass $m$ of the atom (u).
-        :param instance: An existing `Atom` instance. If this is specified, the other parameters are ignored.
         """
-        super().__init__(instance)
-
-        if self.instance is None:
-            self.instance = dll.atom_construct()
-            if states is None:
-                states = []
-            if decay_map is None:
-                decay_map = DecayMap()
-            self.states = list(states)
-            self.decay_map = decay_map
-            self.mass = mass
-            self.label_map: dict[str, ndarray] | None = None
-            self.update()
-        else:
-            self._states: list[State] | None = None
-
-    def __del__(self) -> None:
-        dll.atom_destruct(self.instance)
+        self.instance = dll.atom_construct()
+        if states is None:
+            states = []
+        if decay_map is None:
+            decay_map = DecayMap()
+        self._environment: Environment | None = None
+        self.states = list(states)
+        self.decay_map = decay_map
+        self.mass = mass
+        self.label_map: dict[str, ndarray] | None = None
+        self.update()
 
     def __iter__(self) -> Generator[State, None, None]:
         if self.states is not None:
@@ -811,6 +770,7 @@ class Atom(CppClass):
         :param env: The electromagnetic `Environment` of the atom. If `None`, the current environment is kept.
         """
         if env is not None:
+            self._environment = env  # The C++ class does not own the environment.
             dll.atom_set_env(self.instance, env.instance)
         dll.atom_update(self.instance)
         self.label_map = _gen_label_map(self)
@@ -848,7 +808,7 @@ class Atom(CppClass):
         The total spontaneous decay rate of an atomic state.
 
         :param index: The index of the atomic state.
-        :returns: (gamma) The total spontaneous decay rate $\Gamma$ of the state number `index` (MHz).
+        :returns: (gamma) The total spontaneous decay rate $\Gamma$ of the state number `index` ($2\pi\,\mathrm{MHz}$).
         """
         return dll.atom_get_gamma(self.instance, c_size_t(int(index)))
 
@@ -877,7 +837,7 @@ class Atom(CppClass):
         """
         vector_i_p = np.ctypeslib.ndpointer(dtype=c_size_t, shape=(dll.atom_get_gs_size(self.instance),))
         set_restype(dll.atom_get_gs, vector_i_p)
-        return dll.atom_get_gs(self.instance)
+        return dll.atom_get_gs(self.instance).copy()
 
     def get_multipole_types(self, label_0: str, label_1: str) -> set[str]:
         r"""
@@ -906,57 +866,68 @@ class Atom(CppClass):
                     mtypes.add(f"{'m' if _mk else 'e'}{_ek + _mk}")
         return mtypes
 
+    def _get_k_maps(self, func: Callable[..., None], dtype: type, ctype: type) -> ndarray:
+        r"""
+        :param func: The C++ function that writes the map of multipole order `k` into a buffer.
+        :param dtype: The dtype of the maps.
+        :param ctype: The ctypes pointer type of the maps.
+        :returns: The maps of all multipole orders with shape `(k_max, size, size)`, starting at `k = 1` (dipole).
+        """
+        maps: ndarray = np.zeros((self.decay_map.k_max, self.size, self.size), dtype=dtype)
+        for k in range(self.decay_map.k_max):
+            func(self.instance, c_size_t(k + 1), maps[k].ctypes.data_as(ctype))
+        return maps
+
     @property
     def d_em(self) -> ndarray:
         r"""
         Multipole transition strengths ordered by the rank $k$, starting at `k = 1` (dipole).
         """
-        matrix_d_p = np.ctypeslib.ndpointer(dtype=float, shape=(self.size, self.size))
-        set_restype(dll.atom_get_d_em, matrix_d_p)
-        return np.array([dll.atom_get_d_em(self.instance, c_size_t(k + 1)) for k in range(self.decay_map.k_max)])
+        return self._get_k_maps(dll.atom_get_d_em, float, c_double_p)
 
     @property
     def ek(self) -> ndarray:
         r"""
         A map of the electric multipole orders of the transitions between the states.
         """
-        matrix_i_p = np.ctypeslib.ndpointer(dtype=np.int32, shape=(self.size, self.size))
-        set_restype(dll.atom_get_ek, matrix_i_p)
-        return np.array([dll.atom_get_ek(self.instance, c_size_t(k + 1)) for k in range(self.decay_map.k_max)])
+        return self._get_k_maps(dll.atom_get_ek, np.int32, c_int32_p)
 
     @property
     def mk(self) -> ndarray:
         r"""
         A map of the magnetic multipole orders of the transitions between the states.
         """
-        matrix_i_p = np.ctypeslib.ndpointer(dtype=np.int32, shape=(self.size, self.size))
-        set_restype(dll.atom_get_mk, matrix_i_p)
-        return np.array([dll.atom_get_mk(self.instance, c_size_t(k + 1)) for k in range(self.decay_map.k_max)])
+        return self._get_k_maps(dll.atom_get_mk, np.int32, c_int32_p)
 
     @property
     def emk(self) -> ndarray:
         r"""
         A map of the multipole orders of the transitions between the states.
         """
-        matrix_i_p = np.ctypeslib.ndpointer(dtype=np.int32, shape=(self.size, self.size))
-        set_restype(dll.atom_get_emk, matrix_i_p)
-        return np.array([dll.atom_get_emk(self.instance, c_size_t(k + 1)) for k in range(self.decay_map.k_max)])
+        return self._get_k_maps(dll.atom_get_emk, np.int32, c_int32_p)
 
     @property
     def l0(self) -> ndarray:
         r"""
-        The matrix of the partial spontaneous decay rates $\Gamma_{ij}$ between the states.
+        The matrix $L_0$ of the partial spontaneous decay rates between the states ($2\pi\,\mathrm{MHz}$).
+        $(L_0)_{ij}$ is the rate from state $j$ into state $i$, such that the column sums $\sum_i (L_0)_{ij}$
+        are the total decay rates $\Gamma_j$ (see `Atom.get_gamma`).
         """
         a = dll.atom_get_L0(self.instance)
-        return np.ctypeslib.as_array(a, (self.size, self.size)).T
+        return np.ctypeslib.as_array(a, (self.size, self.size)).T.copy()
 
     @property
     def l1(self) -> ndarray:
         r"""
-        The matrix of the decay rates of the coherences, derived from `Atom.l0`.
+        The matrix $L_1$ of the (negative) damping rates of the density-matrix elements, derived from `Atom.l0`
+        ($2\pi\,\mathrm{MHz}$). It holds $(L_1)_{ij} = -\frac{1}{2}(\Gamma_i + \Gamma_j)$,
+        where $\Gamma_i$ is the total decay rate of state $i$. The off-diagonal elements are the decay rates
+        of the coherences and the diagonal elements $-\Gamma_i$ the population losses.
+        Only spontaneous decay is included, i.e., there is no additional pure dephasing. In the master equation,
+        $L_1$ is multiplied element-wise with the density matrix, $\dot{\rho} \leftarrow L_1\circ\rho$.
         """
         a = dll.atom_get_L1(self.instance)
-        return np.ctypeslib.as_array(a, (self.size, self.size)).T
+        return np.ctypeslib.as_array(a, (self.size, self.size)).T.copy()
 
     def get_y0(self, ground_state_labels: Iterable[str] | str | None = None) -> ndarray:
         r"""
@@ -1088,7 +1059,7 @@ class Atom(CppClass):
         a_{fi,k_{fi}}^\lambda &= (-1)^{F_f + I + k_{fi} + J_i}\sqrt{(2F_f + 1)(2J_i + 1)}
         \langle F_fm_fk_{fi}\lambda|F_im_i\rangle\begin{Bmatrix}J_i & J_f & k_{fi} \\F_f & F_i & I\end{Bmatrix}\\[3ex]
         X_{\!fi} &= \begin{cases}+1, & \text{if electric } (\mathrm{E}k_{fi}) \\
-        \ \,0, & \text{if magnetic } (\mathrm{M}k_{fi})\end{cases},
+        \ \,0, & \text{if magnetic } (\mathrm{M}k_{fi})\end{cases}
         \end{aligned}$$
 
         where $A_{if}^{Xk_{fi}}$ is the Einstein coefficient for the electric (magnetic)
@@ -1648,6 +1619,10 @@ def _cast_x_vec_str(x_vec: str) -> int:
 
 
 class Interaction(CppClass):
+    @staticmethod
+    def _destruct(instance: CppHandler) -> None:
+        dll.interaction_destruct(instance)
+
     def __init__(
         self,
         atom: Atom | None = None,
@@ -1655,7 +1630,6 @@ class Interaction(CppClass):
         environment: Environment | None = None,
         delta_max: scalar = 1e3,
         controlled: bool = True,
-        instance: "Interaction | CppHandler | None" = None,
     ) -> None:
         r"""
         An interaction between an `Atom` and a list of `lasers` in an `Environment`.
@@ -1670,63 +1644,30 @@ class Interaction(CppClass):
          Setting this to True is particularly useful for dynamics where a changing resolution is required.
          However, this comes at the cost of computing time.
          The default step size for the uncontrolled stepper is `dt = 1e-3` (1 ns).
-        :param instance: An existing `Interaction` instance. If this is specified, the other parameters are ignored.
         """
-        super().__init__(instance)
+        self.instance = dll.interaction_construct()
 
-        if self.instance is None:
-            self.instance = dll.interaction_construct()
-            self._environment = self._get_environemnt()
+        if atom is None:
+            atom = Atom()
+        self.atom = atom
 
-            if atom is None:
-                atom = Atom()
-            self.atom = atom
+        if lasers is None:
+            lasers = []
+        self.lasers = list(lasers)
 
-            if lasers is None:
-                lasers = []
-            self.lasers = list(lasers)
+        if environment is None:
+            environment = Environment()
+        self.environment = environment
 
-            if environment is None:
-                environment = Environment()
-            self.environment = environment
-
-            self.delta_max = delta_max
-            self.controlled = controlled
-            self.update()
-        else:
-            self._environment = self._get_environemnt()
-            self._atom = self._get_atom()
-            self._lasers = self._get_lasers()
-            self.update()
-
-    def __del__(self) -> None:
-        dll.interaction_destruct(self.instance)
-
-    def _get_environemnt(self) -> Environment:
-        r"""
-        :returns: The environment used in the C++ class.
-        """
-        return Environment(instance=dll.interaction_get_environment(self.instance))
-
-    def _get_atom(self) -> Atom:
-        r"""
-        :returns: The atom used in the C++ class.
-        """
-        return Atom(instance=dll.interaction_get_atom(self.instance))
-
-    def _get_lasers(self) -> list[Laser]:
-        r"""
-        :returns: The lasers used in the C++ class.
-        """
-        return [
-            Laser(0, instance=dll.interaction_get_laser(self.instance, m))
-            for m in range(dll.interaction_get_lasers_size(self.instance))
-        ]
+        self.delta_max = delta_max
+        self.controlled = controlled
+        self.update()
 
     def update(self) -> None:
         r"""
         Update the interaction, e.g., after changing the atom, the lasers or the environment.
         """
+        self._atom._environment = self._environment  # The C++ atom uses the environment of the interaction.
         error = dll.interaction_update(self.instance)
         if error == -1:
             raise ValueError("An electro-magnetic wave cannot oscillate along its k-vector.")
@@ -1890,7 +1831,7 @@ class Interaction(CppClass):
         """
         matrix_i_p = np.ctypeslib.ndpointer(dtype=np.int32, shape=(self.atom.size, self.atom.size))
         set_restype(dll.interaction_get_summap, matrix_i_p)
-        return dll.interaction_get_summap(self.instance)
+        return dll.interaction_get_summap(self.instance).copy()
 
     @property
     def atommap(self) -> ndarray:
@@ -1900,7 +1841,7 @@ class Interaction(CppClass):
         """
         matrix_d_p = np.ctypeslib.ndpointer(dtype=float, shape=(self.atom.size, self.atom.size))
         set_restype(dll.interaction_get_atommap, matrix_d_p)
-        return dll.interaction_get_atommap(self.instance).T
+        return dll.interaction_get_atommap(self.instance).T.copy()
 
     @property
     def deltamap(self) -> ndarray:
@@ -1910,7 +1851,7 @@ class Interaction(CppClass):
         """
         matrix_d_p = np.ctypeslib.ndpointer(dtype=float, shape=(len(self.lasers), self.atom.size))
         set_restype(dll.interaction_get_deltamap, matrix_d_p)
-        return dll.interaction_get_deltamap(self.instance).T
+        return dll.interaction_get_deltamap(self.instance).T.copy()
 
     @property
     def history_size(self) -> int:
@@ -1926,7 +1867,7 @@ class Interaction(CppClass):
         """
         vector_i_p = np.ctypeslib.ndpointer(dtype=c_size_t, shape=(self.history_size,))
         set_restype(dll.interaction_get_history, vector_i_p)
-        return dll.interaction_get_history(self.instance)
+        return dll.interaction_get_history(self.instance).copy()
 
     def delta(self) -> ndarray:
         r"""
@@ -1943,9 +1884,9 @@ class Interaction(CppClass):
 
         :returns: (Delta) The diagonal of the Hamiltonian without Doppler or additional laser-frequency shifts.
         """
-        vector_d_p = np.ctypeslib.ndpointer(dtype=float, shape=(self.atom.size,))
-        set_restype(dll.interaction_get_delta, vector_d_p)
-        return dll.interaction_get_delta(self.instance)
+        delta = np.zeros(self.atom.size, dtype=float)
+        dll.interaction_get_delta(self.instance, delta.ctypes.data_as(c_double_p))
+        return delta
 
     def rabi(self, m: int | None = None) -> ndarray:
         r"""
@@ -1964,7 +1905,7 @@ class Interaction(CppClass):
         \langle F_im_ik_{ij}\lambda|F_jm_j\rangle\begin{Bmatrix}J_j & J_i & k_{ij} \\F_i & F_j & I\end{Bmatrix}\\[2ex]
         X_{\!ij} &= \begin{cases}+1, & \text{if electric } (\mathrm{E}k_{ij}) \\
         \ \,0, & \text{if magnetic } (\mathrm{M}k_{ij})\end{cases}\\[2ex]
-        E_m &= \sqrt{\frac{2I_m}{\varepsilon_0c}},
+        E_m &= \sqrt{\frac{2I_m}{\varepsilon_0c}}
         \end{aligned}$$
 
         where $A_{ji}^{Xk_{ij}}$ is the Einstein coefficient for the electric (magnetic)
@@ -1983,13 +1924,11 @@ class Interaction(CppClass):
          with shape `(nl, atom.size, atom.size)`, where `nl` is the number of lasers of the `Interaction`
          ($2\pi\,\mathrm{MHz}$).
         """
-        matrix_cd_p = np.ctypeslib.ndpointer(dtype=np.complex128, shape=(self.atom.size, self.atom.size))
-        set_restype(dll.interaction_get_rabi, matrix_cd_p)
-        if m is None:
-            return np.array(
-                [dll.interaction_get_rabi(self.instance, c_size_t(_m)) for _m in range(len(self.lasers))], dtype=complex
-            )
-        return dll.interaction_get_rabi(self.instance, c_size_t(m))
+        indexes = range(len(self.lasers)) if m is None else [m]
+        rabi = np.zeros((len(indexes), self.atom.size, self.atom.size), dtype=complex)
+        for i, _m in enumerate(indexes):
+            dll.interaction_get_rabi(self.instance, c_size_t(_m), rabi[i].ctypes.data_as(c_complex_p))
+        return rabi if m is None else rabi[0]
 
     def hamiltonian(
         self, t: array_like, delta: array_like | None = None, m: int_like | None = 0, v: array_like | None = None
@@ -2095,7 +2034,7 @@ class Interaction(CppClass):
         a_{ij,k_{ij}}^\lambda &= (-1)^{F_i + I + k_{ij} + J_j}\sqrt{(2F_i + 1)(2J_j + 1)}
         \langle F_im_ik_{ij}\lambda|F_jm_j\rangle\begin{Bmatrix}J_j & J_i & k_{ij} \\F_i & F_j & I\end{Bmatrix}\\[2ex]
         X_{\!ij} &= \begin{cases}+1, & \text{if electric } (\mathrm{E}k_{ij}) \\
-        \ \,0, & \text{if magnetic } (\mathrm{M}k_{ij})\end{cases},
+        \ \,0, & \text{if magnetic } (\mathrm{M}k_{ij})\end{cases}
         \end{aligned}$$
 
         where $A_{ji}^{Xk_{ij}}$ is the Einstein coefficient for the electric (magnetic)
@@ -2249,7 +2188,7 @@ class Interaction(CppClass):
         a_{ij,k_{ij}}^\lambda &= (-1)^{F_i + I + k_{ij} + J_j}\sqrt{(2F_i + 1)(2J_j + 1)}
         \langle F_im_ik_{ij}\lambda|F_jm_j\rangle\begin{Bmatrix}J_j & J_i & k_{ij} \\F_i & F_j & I\end{Bmatrix}\\[2ex]
         X_{\!ij} &= \begin{cases}+1, & \text{if electric } (\mathrm{E}k_{ij}) \\
-        \ \,0, & \text{if magnetic } (\mathrm{M}k_{ij})\end{cases},
+        \ \,0, & \text{if magnetic } (\mathrm{M}k_{ij})\end{cases}
         \end{aligned}$$
 
         where the Hamiltonian $H$ (2&pi;&thinsp;MHz) is time-independent whenever possible, see
@@ -2331,7 +2270,7 @@ class Interaction(CppClass):
         a_{ij,k_{ij}}^\lambda &= (-1)^{F_i + I + k_{ij} + J_j}\sqrt{(2F_i + 1)(2J_j + 1)}
         \langle F_im_ik_{ij}\lambda|F_jm_j\rangle\begin{Bmatrix}J_j & J_i & k_{ij} \\F_i & F_j & I\end{Bmatrix}\\[2ex]
         X_{\!ij} &= \begin{cases}+1, & \text{if electric } (\mathrm{E}k_{ij}) \\
-        \ \,0, & \text{if magnetic } (\mathrm{M}k_{ij})\end{cases},
+        \ \,0, & \text{if magnetic } (\mathrm{M}k_{ij})\end{cases}
         \end{aligned}$$
 
         where the Hamiltonian $H$ (2&pi;&thinsp;MHz) is time-independent whenever possible, see

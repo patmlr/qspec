@@ -7,28 +7,22 @@ Classes and methods for the `analyze` module using the Python/C++ interface.
 
 import numpy as np
 
-from qspec._cpp import CppHandler, c_bool, c_double_p, c_size_t, c_size_t_p, dll
+from qspec._cpp import CppClass, CppHandler, c_bool, c_double_p, c_size_t, c_size_t_p, dll
 from qspec.qtypes import array_like, floating, int_like, ndarray
 
 __all__ = ["generate_collinear_points_cpp"]
 
 
-class MultivariateNormal:
-    def __init__(
-        self,
-        mean: array_like,
-        cov: array_like,
-        instance: "MultivariateNormal | CppHandler | None" = None,
-    ) -> None:
-        self.instance = instance
-        if self.instance is None:
-            mean, cov = np.ascontiguousarray(mean, dtype=float), np.ascontiguousarray(cov, dtype=float)
-            self.instance = dll.multivariatenormal_construct(
-                mean.ctypes.data_as(c_double_p), cov.ctypes.data_as(c_double_p), c_size_t(mean.size)
-            )
+class MultivariateNormal(CppClass):
+    @staticmethod
+    def _destruct(instance: CppHandler) -> None:
+        dll.multivariatenormal_destruct(instance)
 
-    def __del__(self) -> None:
-        dll.multivariatenormal_destruct(self.instance)
+    def __init__(self, mean: array_like, cov: array_like) -> None:
+        mean, cov = np.ascontiguousarray(mean, dtype=float), np.ascontiguousarray(cov, dtype=float)
+        self.instance = dll.multivariatenormal_construct(
+            mean.ctypes.data_as(c_double_p), cov.ctypes.data_as(c_double_p), c_size_t(mean.size)
+        )
 
     @property
     def size(self) -> int:

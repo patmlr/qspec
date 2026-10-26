@@ -1807,7 +1807,7 @@ def a_einstein_m1(
      of the lower state. Only needs to be specified if `ls` is a list of ls-pairs.
     :param jj_u: A tuple of electronic total angular momentum quantum numbers $(j_\mathrm{c}, j_\mathrm{o})$
      of the upper state. Only needs to be specified if `ls` is a list of ls-pairs.
-    :returns: (A_ul) The Einstein coefficient $A_\mathrm{ul}$ of an M1 transition (MHz).
+    :returns: (A_ul) The Einstein coefficient $A_\mathrm{ul}$ of an M1 transition ($2\pi\,\mathrm{MHz}$).
     :raises ValueError: If `mu` is `None` and `ls`, `jj_l` and `jj_u` have incompatible formats.
     """
     f = np.asarray(f, dtype=float)
@@ -1841,7 +1841,8 @@ def temperature_doppler(a: array_like) -> ndarray:
     T_\mathrm{Doppler} = \frac{\hbar \Gamma}{2k_\mathrm{B}}.
     $$
 
-    :param a: The inverse lifetime $\Gamma = 1 / \tau$ of the upper state of the cooling transition (MHz).
+    :param a: The inverse lifetime $\Gamma = 1 / \tau$ of the upper state of the cooling transition
+     ($2\pi\,\mathrm{MHz}$).
     :returns: (T_doppler) The temperature $T_\mathrm{Doppler}$ (K).
     """
     a = np.asarray(a, dtype=float)
@@ -1857,7 +1858,7 @@ def saturation_intensity(f: array_like, a: array_like) -> ndarray:
     $$
 
     :param f: The frequency $f$ of the transition $|i\rangle\rightarrow|k\rangle$ (MHz).
-    :param a: The Einstein $A_{ki}$ coefficient (MHz).
+    :param a: The Einstein $A_{ki}$ coefficient ($2\pi\,\mathrm{MHz}$).
     :returns: (sat_intensity) The saturation intensity $I_0$ (&mu;W/mm<sup>2</sup> = W/m<sup>2</sup>).
     """
     f, a = np.asarray(f, dtype=float), np.asarray(a, dtype=float)
@@ -1876,7 +1877,7 @@ def saturation(intensity: array_like, f: array_like, a: array_like) -> ndarray:
 
     :param intensity: The intensity of the laser (&mu;W/mm<sup>2</sup> = W/m<sup>2</sup>).
     :param f: The frequency $f$ of the transition $|i\rangle\rightarrow|k\rangle$ (MHz).
-    :param a: The Einstein $A_{ki}$ coefficient (MHz).
+    :param a: The Einstein $A_{ki}$ coefficient ($2\pi\,\mathrm{MHz}$).
     :returns: (s) The saturation parameter $s$.
     """
     intensity = np.asarray(intensity, dtype=float)
@@ -1891,7 +1892,7 @@ def rabi_s(a: array_like, s: array_like) -> ndarray:
     \Omega = A_{ki}\sqrt{\frac{s}{2}}.
     $$
 
-    :param a: The Einstein $A_{ki}$ coefficient (MHz).
+    :param a: The Einstein $A_{ki}$ coefficient ($2\pi\,\mathrm{MHz}$).
     :param s: The saturation parameter $s$.
     :returns: (omega) The Rabi frequency $\Omega$ (unit of `a`).
     """
@@ -1910,10 +1911,10 @@ def scattering_rate(df: array_like, a: array_like, s: array_like) -> ndarray:
 
     :param df: The frequency detuning $\Delta f$ of the absorbed light.
      This must be a difference of real frequencies, such that $\Delta\omega = 2\pi\Delta f$ (MHz).
-    :param a: The Einstein $A_{ki}$ coefficient (MHz).
+    :param a: The Einstein $A_{ki}$ coefficient ($2\pi\,\mathrm{MHz}$).
     :param s: The saturation parameter $s$.
     :returns: (Gamma) The equilibrium scattering rate $\Gamma_\mathrm{sc}$
-     of a closed two-level transition (MHz).
+     of a closed two-level transition ($2\pi\,\mathrm{MHz}$).
     """
     df, a, s = np.asarray(df), np.asarray(a), np.asarray(s)
     return 0.125 * s * a**3 / (0.25 * (1 + s) * a**2 + (2 * np.pi * df) ** 2)

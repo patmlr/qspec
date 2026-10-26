@@ -50,7 +50,7 @@ extern "C" {
     QSPEC_API void laser_set_polarization(void* laser, void* polarization);
     QSPEC_API double* laser_get_k(void* laser);
     QSPEC_API void laser_set_k(void* laser, double* k);
-    QSPEC_API std::complex<double>* laser_get_kpol(void* laser, bool electric, size_t k, double* q_axis);
+    QSPEC_API void laser_get_kpol(void* laser, bool electric, size_t k, double* q_axis, std::complex<double>* kpol);
 
     //Environment
     QSPEC_API void* environment_construct();
@@ -67,7 +67,7 @@ extern "C" {
     // State
     QSPEC_API void* state_construct();
     QSPEC_API void state_destruct(void* state);
-    QSPEC_API void state_init(void* state, double freq_0, double* s, double* l, double j, double i, double f, double m,
+    QSPEC_API int state_init(void* state, double freq_0, double* s, double* l, double j, double i, double f, double m,
         bool parity, double* jj, size_t ls_size, double* hyper_const, double gj, double gi, char* label);
     QSPEC_API void state_reset(void* state);
     QSPEC_API double state_get_shift(void* state);
@@ -120,10 +120,10 @@ extern "C" {
     QSPEC_API size_t atom_get_size(void* atom);
     QSPEC_API size_t atom_get_gs_size(void* atom);
     QSPEC_API size_t* atom_get_gs(void* atom);
-    QSPEC_API int* atom_get_ek(void* atom, size_t k);
-    QSPEC_API int* atom_get_mk(void* atom, size_t k);
-    QSPEC_API int* atom_get_emk(void* atom, size_t k);
-    QSPEC_API double* atom_get_d_em(void* atom, size_t k);
+    QSPEC_API void atom_get_ek(void* atom, size_t k, int* ek);
+    QSPEC_API void atom_get_mk(void* atom, size_t k, int* mk);
+    QSPEC_API void atom_get_emk(void* atom, size_t k, int* emk);
+    QSPEC_API void atom_get_d_em(void* atom, size_t k, double* d_em);
     QSPEC_API double* atom_get_L0(void* atom);
     QSPEC_API double* atom_get_L1(void* atom);
     QSPEC_API int atom_scattering_rate_4pi(void* atom, double* results, size_t* k, size_t k_size,
@@ -188,10 +188,10 @@ extern "C" {
     QSPEC_API double interaction_get_rtol(void* interaction);
     QSPEC_API void interaction_set_rtol(void* interaction, double rtol);
     QSPEC_API int* interaction_get_summap(void* interaction);
-    QSPEC_API std::complex<double>* interaction_get_rabi(void* interaction, size_t m);
+    QSPEC_API void interaction_get_rabi(void* interaction, size_t m, std::complex<double>* rabi);
     QSPEC_API double* interaction_get_atommap(void* interaction);
     QSPEC_API double* interaction_get_deltamap(void* interaction);
-    QSPEC_API double* interaction_get_delta(void* interaction);
+    QSPEC_API void interaction_get_delta(void* interaction, double* delta);
     QSPEC_API bool interaction_get_loop(void* interaction);
     QSPEC_API bool interaction_get_time_dependent(void* interaction);
     QSPEC_API void interaction_set_time_dependent(void* interaction, bool time_dependent);

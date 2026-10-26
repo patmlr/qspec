@@ -10,9 +10,7 @@ title: qspec.simulate.Environment
 <em class="sig-param"><span class="n">E</span><span class="o">=</span><span class="default_value">None</span></em>
 ,&nbsp;
 <em class="sig-param"><span class="n">B</span><span class="o">=</span><span class="default_value">None</span></em>
-,&nbsp;
-<em class="sig-param"><span class="n">instance</span><span class="o">=</span><span class="default_value">None</span></em>
-<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/simulate/_simulate_cpp.py#L328-L396' }}"><span class="sig-source">[source]</span></a>
+<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/simulate/_simulate_cpp.py#L314-L378' }}"><span class="sig-source">[source]</span></a>
 </dt>
 <dd class="field-body">
 <p>An electromagnetic environment with static electric field $\vec{E}$
@@ -27,8 +25,6 @@ and magnetic field $\vec{B}$. Currently implemented:</p>
 <dt>B<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#array_like' | relative_url }}">array_like</a> | None</em></span></dt>
 <dd class="field-desc"><p>A static magnetic field $\vec{B}$ (T). A scalar sets the magnitude along the current direction,
 which is the $z$-axis by default.</p></dd>
-<dt>instance<span class="classifier"><em><a href="{{ '/doc/functions/simulate/Environment/Environment.html' | relative_url }}">Environment</a> | C.EnvironmentHandler.value | None</em></span></dt>
-<dd class="field-desc"><p>An existing <code>Environment</code> instance. If this is specified, the other parameters are ignored.</p></dd>
 </dl>
 </dd>
 <dt class="field-head">Attributes<span class="colon">:</span></dt>
@@ -38,6 +34,8 @@ which is the $z$-axis by default.</p></dd>
 <dd class="field-desc"><p>The static magnetic field $\vec{B}$ (T).</p></dd>
 <dt>E<span class="classifier"><em><a href="{{ '/doc/modules/qtypes.html#ndarray' | relative_url }}">ndarray</a></em></span></dt>
 <dd class="field-desc"><p>The static electric field $\vec{E}$ (not implemented).</p></dd>
+<dt>instance<span class="classifier"><em>CppHandler</em></span></dt>
+<dd class="field-desc"><p>The wrapped C++ instance.</p></dd>
 </dl>
 </dd>
 </dl>

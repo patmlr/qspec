@@ -16,7 +16,7 @@ title: qspec.simulate.Interaction.master
 <em class="sig-param"><span class="n">v</span><span class="o">=</span><span class="default_value">None</span></em>
 ,&nbsp;
 <em class="sig-param"><span class="n">y0</span><span class="o">=</span><span class="default_value">None</span></em>
-<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/simulate/_simulate_cpp.py#L2232-L2307' }}"><span class="sig-source">[source]</span></a>
+<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/simulate/_simulate_cpp.py#L2171-L2246' }}"><span class="sig-source">[source]</span></a>
 </dt>
 <dd class="field-body">
 <p>Solver for the master equation</p>
@@ -29,7 +29,7 @@ title: qspec.simulate.Interaction.master
 a_{ij,k_{ij}}^\lambda &amp;= (-1)^{F_i + I + k_{ij} + J_j}\sqrt{(2F_i + 1)(2J_j + 1)}
 \langle F_im_ik_{ij}\lambda|F_jm_j\rangle\begin{Bmatrix}J_j &amp; J_i &amp; k_{ij} \\F_i &amp; F_j &amp; I\end{Bmatrix}\\[2ex]
 X_{\!ij} &amp;= \begin{cases}+1, &amp; \text{if electric } (\mathrm{E}k_{ij}) \\
-\ \,0, &amp; \text{if magnetic } (\mathrm{M}k_{ij})\end{cases},
+\ \,0, &amp; \text{if magnetic } (\mathrm{M}k_{ij})\end{cases}
 \end{aligned}$$</div>
 <p>where the Hamiltonian $H$ (2&pi;&thinsp;MHz) is time-independent whenever possible, see
 <a href="{{ '/doc/functions/simulate/Interaction/hamiltonian.html' | relative_url }}"><code>qspec.simulate.Interaction.hamiltonian</code></a>.

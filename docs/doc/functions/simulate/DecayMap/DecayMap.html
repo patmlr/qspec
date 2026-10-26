@@ -12,9 +12,7 @@ title: qspec.simulate.DecayMap
 <em class="sig-param"><span class="n">a</span><span class="o">=</span><span class="default_value">None</span></em>
 ,&nbsp;
 <em class="sig-param"><span class="n">k_max</span><span class="o">=</span><span class="default_value"><span class="num">1</span></span></em>
-,&nbsp;
-<em class="sig-param"><span class="n">instance</span><span class="o">=</span><span class="default_value">None</span></em>
-<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/simulate/_simulate_cpp.py#L630-L759' }}"><span class="sig-source">[source]</span></a>
+<span class="sig-paren">&nbsp;)</span><a href="{{ site.github.repository_url | append: '/blob/main/qspec/simulate/_simulate_cpp.py#L613-L724' }}"><span class="sig-source">[source]</span></a>
 </dt>
 <dd class="field-body">
 <p>A map linking sets of atomic states via Einstein-A coefficients.
@@ -28,19 +26,19 @@ The class supports all multipole orders for electric and magnetic transitions.</
 The order of each pair is arbitrary.</p></dd>
 <dt>a<span class="classifier"><em>Iterable[<a href="{{ '/doc/modules/qtypes.html#scalar' | relative_url }}">scalar</a> | dict] | None</em></span></dt>
 <dd class="field-desc"><p>An iterable of Einstein-A coefficients $A_{if}$, where the states $|i\rangle$ and $|f\rangle$
-have the labels specified in the list of <code>labels</code> (MHz). If <code>a[i]</code> is a single value,
+have the labels specified in the list of <code>labels</code> ($2\pi\,\mathrm{MHz}$). If <code>a[i]</code> is a single value,
 only the lowest allowed (not necessarily the dominant!) multipole transition will be used.
 Each <code>a[i]</code> can also be a <code>dict</code> with the keys <code>"e"</code> or <code>"m"</code> to use either first allowed multipole order,
 or <code>"e{k}"</code> or <code>"m{k}"</code> to define specific rank-$k$ multipole transitions.</p></dd>
 <dt>k_max<span class="classifier"><em>int</em></span></dt>
 <dd class="field-desc"><p>The maximum considered multipole order $k_\mathrm{max}$. The default value is 1 (dipole).</p></dd>
-<dt>instance<span class="classifier"><em><a href="{{ '/doc/functions/simulate/DecayMap/DecayMap.html' | relative_url }}">DecayMap</a> | C.DecayMapHandler.value | None</em></span></dt>
-<dd class="field-desc"><p>An existing <code>DecayMap</code> instance. If this is specified, the other parameters are ignored.</p></dd>
 </dl>
 </dd>
 <dt class="field-head">Attributes<span class="colon">:</span></dt>
 <dd class="field-par">
 <dl>
+<dt>instance<span class="classifier"><em>CppHandler</em></span></dt>
+<dd class="field-desc"><p>The wrapped C++ instance.</p></dd>
 <dt>k_max<span class="classifier"><em>int</em></span></dt>
 <dd class="field-desc"><p>The maximum considered multipole order $k_\mathrm{max}$. The default value is 1 (dipole).</p></dd>
 <dt>labels<span class="classifier"><em>list[tuple[str, str]]</em></span></dt>
