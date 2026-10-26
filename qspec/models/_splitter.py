@@ -17,6 +17,7 @@ from qspec.physics import get_f, get_m, hyper_zeeman_num, lande_f, zeeman_linear
 from qspec.qtypes import (
     Any,
     Iterable,
+    Sequence,
     array_like,
     cast,
     fix_type,
@@ -195,7 +196,7 @@ def hfm_lin_shift(
     )
 
 
-def hf_int(i: scalar, j_l: scalar, j_u: scalar, transitions: Iterable) -> list[ndarray]:
+def hf_int(i: scalar, j_l: scalar, j_u: scalar, transitions: Iterable) -> list[float]:
     r"""
     The relative line intensities (Racah intensities) of hyperfine transitions $F_l\rightarrow F_u$
 
@@ -211,8 +212,10 @@ def hf_int(i: scalar, j_l: scalar, j_u: scalar, transitions: Iterable) -> list[n
     :returns: (intensities) The relative line intensities $I_{F_lF_u}$.
     """
     return [
-        np.around(
-            (2 * f_u + 1) * (2 * f_l + 1) * (wigner_6j(j_l, f_l, i, f_u, j_u, 1, as_sympy=False) ** 2), decimals=9
+        float(
+            np.around(
+                (2 * f_u + 1) * (2 * f_l + 1) * (wigner_6j(j_l, f_l, i, f_u, j_u, 1, as_sympy=False) ** 2), decimals=9
+            )
         )
         for (f_l, f_u), *_ in transitions
     ]
@@ -242,8 +245,8 @@ class Splitter(Model):
             label = "None"
         self.label = label
 
-        self.racah_indices = []
-        self.racah_intensities = []
+        self.racah_indices: list[int] = []
+        self.racah_intensities: list[float] = []
 
     def racah(self) -> None:
         """
@@ -273,7 +276,7 @@ class SplitterSummed(Summed):
         if any(not isinstance(model, Splitter) for model in splitter_models):
             raise TypeError("All models passed to 'SplitterSummed' must have type 'Splitter'.")
 
-        self.models: list[Splitter]
+        self.models: Sequence[Splitter]
         super().__init__(
             splitter_models,
             labels=[f"({i if model.label is None else model.label})" for i, model in enumerate(splitter_models)]
@@ -668,7 +671,7 @@ class HyperfineMixed(Splitter):
 
         self.order = {s: [int(min((j // 0.5, self.i // 0.5))) for j in self.J[s]] for s in self.states}
 
-        self.hf_args_map = [[] for _ in self.transitions]
+        self.hf_args_map: list[list[int]] = [[] for _ in self.transitions]
         for s in self.states:
             if self.enabled[s] and self.i > 0:
                 for i, j in enumerate(self.J[s]):
@@ -695,18 +698,18 @@ class HyperfineMixed(Splitter):
         x0 = np.zeros(len(self.transitions))
         for s in self.states:
             if self.enabled[s]:
-                _x0 = [
+                eigs = [
                     np.linalg.eigh(
                         np.diag([np.asarray(args[self.p[f"FS_{s}{_m}({self.J[s][_m]})"]], dtype=float) for _m in m]) + w
                     )
                     for m, w in zip(self.mask_J[s], self.W[s])
                 ]
-                orders = [np.argmax(np.abs(w[1]), axis=0) for w in _x0]
+                orders = [np.argmax(np.abs(w[1]), axis=0) for w in eigs]
                 orders = [
                     np.array([j for i in range(order.size) for j, o in enumerate(order) if i == o])
-                    for w, order in zip(_x0, orders)
+                    for w, order in zip(eigs, orders)
                 ]
-                _x0 = np.concatenate(tuple(w[0][order] for w, order in zip(_x0, orders)))
+                _x0 = np.concatenate(tuple(w[0][order] for w, order in zip(eigs, orders)))
                 _x0 = self.wt_map[s] @ _x0
             else:
                 _x0 = np.array(
@@ -834,14 +837,14 @@ class HyperfineZeeman(Splitter):
         if rho_ml is None:
             self.rho_ml = [np.ones(int(2 * f + 1), dtype=float) for f in self.f_l]
         else:
-            rho_ml = [np.asarray(r, dtype=float) for r in rho_ml]
-            self.rho_ml = [r / np.sum(r) * (2 * f + 1) for f, r in zip(self.f_l, rho_ml)]
+            _rho_ml = [np.asarray(r, dtype=float) for r in rho_ml]
+            self.rho_ml = [r / np.sum(r) * (2 * f + 1) for f, r in zip(self.f_l, _rho_ml)]
 
         self.rho_as_par = rho_as_par
-        self.rho_indexes = []
+        self.rho_indexes: list[tuple[float, float]] = []
 
         self.transitions = hf_trans(self.i, self.j_l, self.j_u)
-        self.transitions_m = []
+        self.transitions_m: list[list[Any]] = []
         self._racah_intensities = hf_int(self.i, self.j_l, self.j_u, self.transitions)
         self.racah_intensities = []
 

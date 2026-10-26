@@ -369,20 +369,20 @@ def mode_lognormal(x: array_like, bins: array_like = 100) -> float:
     """
     y, edges = np.histogram(np.asarray(x), bins=bins)
     delta = np.mean(edges[1:] - edges[:-1])
-    x = edges[:-1] + 0.5 * delta
+    _x = edges[:-1] + 0.5 * delta
 
-    loc = np.min(x) - 0.1 * (np.max(x) - np.min(x))
-    scale = np.mean(x - loc)
-    s = np.std(np.log(x - loc))
+    loc = np.min(_x) - 0.1 * (np.max(_x) - np.min(_x))
+    scale = np.mean(_x - loc)
+    s = np.std(np.log(_x - loc))
     a = scale * np.max(y)
     p0 = [s, loc, scale, a]
 
-    popt, _ = curve_fit(lognormal, x, y, p0=p0)
+    popt, _ = curve_fit(lognormal, _x, y, p0=p0)
     mode = popt[1] + popt[2] * np.exp(-(popt[0] ** 2))
 
-    plt.bar(x, y, width=delta)
-    plt.plot(x, lognormal(x, *p0), "-C1")
-    plt.plot(x, lognormal(x, *popt), "-C2")
+    plt.bar(_x, y, width=delta)
+    plt.plot(_x, lognormal(_x, *p0), "-C1")
+    plt.plot(_x, lognormal(_x, *popt), "-C2")
     plt.vlines(mode, 0, np.max(y), colors="k")
     plt.show()
     return mode
@@ -485,9 +485,9 @@ def _propagate(
 
     rand_y = np.asarray(f(*rand_x))
 
-    med, per_0, per_1 = median(rand_y)
-    mean = np.average(rand_y)
-    std = np.std(rand_y, ddof=1)
+    med, per_0, per_1 = (float(p) for p in median(rand_y))
+    mean = float(np.average(rand_y))
+    std = float(np.std(rand_y, ddof=1))
 
     plt.figure(num=1, dpi=96)
     n, bins, _ = plt.hist(rand_y, bins=n_bins, density=True, label="Sample data", facecolor="lightgray")
@@ -522,11 +522,11 @@ def _propagate(
         print(f"Median(sample data): {med} (-{med - per_0} +{per_1 - med})")
         plt.plot(bins, st.norm.pdf(bins, loc=mean, scale=std), "C0", label="Est. normal")
         if ob.popt is not None:
-            med, per_0, per_1 = median(st.skewnorm.rvs(*ob.popt, size=sample_size))
+            med, per_0, per_1 = (float(p) for p in median(st.skewnorm.rvs(*ob.popt, size=sample_size)))
             print(f"Median(Fit. skew normal): {med} (-{med - per_0} +{per_1 - med})")
             plt.plot(bins, st.skewnorm.pdf(bins, *ob.popt), "C1", label="Fit. skew normal")
         if ob.est is not None:
-            med, per_0, per_1 = median(st.skewnorm.rvs(*ob.est, size=sample_size))
+            med, per_0, per_1 = (float(p) for p in median(st.skewnorm.rvs(*ob.est, size=sample_size)))
             print(f"Median(Est. skew normal): {med} (-{med - per_0} +{per_1 - med})")
             plt.plot(bins, st.skewnorm.pdf(bins, *ob.est), "C2", label="Est. skew normal")
         plt.legend(loc=1)
@@ -552,8 +552,10 @@ def propagate_fit(
     """
     x, popt, pcov = asarray(x, popt, pcov, dtype=float)
     _x = np.expand_dims(x, axis=-1)
-    _popt = np.asarray(st.multivariate_normal.rvs(mean=popt, cov=pcov, size=sample_size)).T
-    _popt = [np.expand_dims(p, axis=tuple(range(len(x.shape)))) for p in _popt]
+    _popt = [
+        np.expand_dims(p, axis=tuple(range(len(x.shape))))
+        for p in np.asarray(st.multivariate_normal.rvs(mean=popt, cov=pcov, size=sample_size)).T
+    ]
     med, per_0, per_1 = median(f(_x, *_popt), axis=-1)
     return med, per_0, per_1
 
@@ -615,8 +617,7 @@ def combined_pdf(
 
     x_range = np.linspace(left, right, 2**n + 1)
     dx = x_range[1] - x_range[0]
-    x_range = np.expand_dims(x_range, axis=0)
-    y = kernel(x_range)
+    y = kernel(np.expand_dims(x_range, axis=0))
 
     return si.romb(y, dx, axis=1)
 
@@ -738,15 +739,14 @@ def info() -> None:
     for different values of the shape parameter $\\alpha$.
     The plot shows that the ratio between the two 1-sigma percentiles cannot exceed 1.5.
     """
-    neg = []
-    pos = []
     a = np.linspace(-10, 10, 1001)
-    for val in a:
+    neg = np.zeros_like(a)
+    pos = np.zeros_like(a)
+    for i, val in enumerate(a):
         dist = st.skewnorm.rvs(val, loc=0, scale=1, size=100000)
         med = np.median(dist)
-        neg.append(med - np.percentile(dist, 15.8655254))
-        pos.append(np.percentile(dist, 84.1344746) - med)
-    neg, pos = np.array(neg), np.array(pos)
+        neg[i] = med - np.percentile(dist, 15.8655254)
+        pos[i] = np.percentile(dist, 84.1344746) - med
     plt.title("Properties of the skew normal distribution")
     plt.xlabel(r"Parameter $\alpha$")
     plt.ylabel(r"Percentiles ($\sigma$) / Ratio of Percentiles")

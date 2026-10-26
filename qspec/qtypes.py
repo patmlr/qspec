@@ -13,6 +13,7 @@ from typing import (
     SupportsFloat,
     SupportsIndex,
     TypeGuard,
+    overload,
 )
 
 from numpy import asarray as np_asarray
@@ -101,11 +102,23 @@ class quant(float):
 
         return super().__new__(cls, value)
 
+    @overload
+    def __add__(self, other: "quant") -> "quant": ...
+
+    @overload
+    def __add__(self, other: float) -> float: ...
+
     def __add__(self, other: Any) -> "float | quant":
         ret = super().__add__(other)
         if isinstance(other, quant):
             return self.__class__(ret)
         return ret
+
+    @overload
+    def __sub__(self, other: "quant") -> "quant": ...
+
+    @overload
+    def __sub__(self, other: float) -> float: ...
 
     def __sub__(self, other: Any) -> "float | quant":
         ret = super().__sub__(other)
@@ -268,7 +281,7 @@ def cast[T](*args: Any, dtype: Callable[[Any], T]) -> tuple[T, ...]:
     return tuple(dtype(arg) for arg in args)
 
 
-def cast_sympy[T](*args: sympy_scalar, as_sympy: bool = True, dtype: Callable[[Any], T] = float) -> tuple[T, ...]:
+def cast_sympy(*args: sympy_scalar, as_sympy: bool = True, dtype: Callable[[Any], Any] = float) -> tuple[Any, ...]:
     r"""
     Cast the arguments `args` to <a href="https://www.sympy.org/en/index.html">`sympy`</a> expressions
     using `sympy.nsimplify` or to the specified `dtype`.

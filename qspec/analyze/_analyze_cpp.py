@@ -7,7 +7,7 @@ Classes and methods for the `analyze` module using the Python/C++ interface.
 
 import numpy as np
 
-from qspec._cpp import C, c_bool, c_double_p, c_size_t, c_size_t_p, dll
+from qspec._cpp import CppHandler, c_bool, c_double_p, c_size_t, c_size_t_p, dll
 from qspec.qtypes import array_like, floating, int_like, ndarray
 
 __all__ = ["generate_collinear_points_cpp"]
@@ -18,7 +18,7 @@ class MultivariateNormal:
         self,
         mean: array_like,
         cov: array_like,
-        instance: "MultivariateNormal | C.MultivariateNormalHandler.value | None" = None,
+        instance: "MultivariateNormal | CppHandler | None" = None,
     ) -> None:
         self.instance = instance
         if self.instance is None:

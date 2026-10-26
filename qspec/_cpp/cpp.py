@@ -17,6 +17,7 @@ from numpy import ctypeslib
 __all__ = [
     "POINTER",
     "C",
+    "CppHandler",
     "c_bool",
     "c_bool_p",
     "c_char_p",
@@ -178,6 +179,10 @@ class C(Enum):
     AtomHandler = POINTER(ctypes.c_char)
     InteractionHandler = POINTER(ctypes.c_char)
     MultivariateNormalHandler = POINTER(ctypes.c_char)
+
+
+type CppHandler = ctypes._Pointer[ctypes.c_char]
+"""An opaque pointer to an instance of a C++ class, see [`C`]."""
 
 
 dll = _load_dll()

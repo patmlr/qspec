@@ -105,12 +105,15 @@ fallback_version = "0.0.0"
 
 [tool.mypy]
 python_version = "3.12"
-# follow_imports = "skip"
 ignore_missing_imports = false
 files = "qspec"
 exclude = [
     "qspec/_cpp/qspec_cpp",
 ]
+
+[[tool.mypy.overrides]]
+module = ["sympy.*", "mpl_toolkits.*"]
+ignore_missing_imports = true
 
 [tool.ruff]
 extend-exclude = [

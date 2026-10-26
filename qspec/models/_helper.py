@@ -99,6 +99,7 @@ def gen_model(
             raise ValueError("convolve must be a str representation of or a Convolved type.")
 
     spl = _splitter.gen_splitter_model(qi=qi, hf_mixing=hf_mixing)
+    npeaks_model: _base.Model
     if hf_mixing:
         npeaks_model = _splitter.SplitterSummed(
             [spl(model(), i, j_l, j_u, f"HF{n}", config=hf_config) for n, (i, j_l, j_u) in enumerate(_ijj)]

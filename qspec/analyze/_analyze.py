@@ -542,10 +542,10 @@ def covariance_matrix(
     :param n: The number of dimensions $n$ of each data point. It is ignored if `sigma` or `corr` is specified.
     :returns: (cov) Covariance matrices $\mathbf{\Sigma}_i$ constructed from `sigma` and `corr`.
     """
-    cov = tools.asarray_optional(cov, dtype=float)
+    _cov = tools.asarray_optional(cov, dtype=float)
     sigma, corr = tools.asarray_optional(sigma, dtype=float), tools.asarray_optional(corr, dtype=float)
 
-    if cov is None:
+    if _cov is None:
         if k is None:
             k = 1
         _k = k
@@ -578,9 +578,9 @@ def covariance_matrix(
             sigma = np.ones((_k, _n), dtype=float)
             corr = np.array([np.identity(_n) for _ in range(_k)], dtype=float)
 
-        cov = sigma[:, :, None] * sigma[:, None, :] * corr
+        _cov = sigma[:, :, None] * sigma[:, None, :] * corr
 
-    return cov
+    return _cov
 
 
 def _x0_r_from_p(p: ndarray) -> tuple[ndarray, ndarray]:
@@ -1458,7 +1458,6 @@ def curve_fit(
     p0_free = p0[~p0_fixed]
     lb, ub = lb[~p0_fixed], ub[~p0_fixed]
     func = _wrap_func_pars(f, p0, p0_fixed)
-    bounds = (lb, ub)
 
     bounded_problem = np.any((lb > -np.inf) | (ub < np.inf))
     if method is None:
@@ -1475,6 +1474,7 @@ def curve_fit(
     if y.size == 0:
         raise ValueError("`y` must not be empty!")
 
+    transform: Callable | ndarray | None = None
     if sigma is not None:
         if callable(sigma):
             transform = _wrap_func_sigma(sigma, p0, p0_fixed)
@@ -1490,8 +1490,6 @@ def curve_fit(
                     raise ValueError("`sigma` must be positive definite.") from e
             else:
                 raise ValueError("`sigma` has incorrect shape.")
-    else:
-        transform = None
 
     func = _wrap_func(func, x, y, transform)
     if callable(jac):
@@ -1502,6 +1500,7 @@ def curve_fit(
     if "args" in kwargs:
         raise ValueError("'args' is not a supported keyword argument.")
 
+    ier: int
     if method == "lm":
         if y.size != 1 and n > y.size:
             raise TypeError(f"The number of func parameters={n} must not exceed the number of data points={y.size}")
@@ -1510,7 +1509,8 @@ def curve_fit(
 
         res = leastsq(func, p0_free, Dfun=jac, full_output=True, **kwargs)
         assert len(res) == 5
-        popt, pcov, infodict, errmsg, ier = res
+        popt, pcov, _infodict, errmsg, ier = res
+        infodict: dict[str, Any] = dict(_infodict)
 
         ysize = len(infodict["fvec"])
         cost = np.sum(infodict["fvec"] ** 2)
@@ -1522,21 +1522,21 @@ def curve_fit(
 
         if jac is None:
             jac = "2-point"
-        res = least_squares(func, p0_free, jac=jac, bounds=bounds, method=method, **kwargs)
+        res_ls = least_squares(func, p0_free, jac=jac, bounds=(lb, ub), method=method, **kwargs)
 
-        if not res.success:
-            raise RuntimeError("Optimal parameters not found: " + res.message)
+        if not res_ls.success:
+            raise RuntimeError("Optimal parameters not found: " + res_ls.message)
 
-        infodict = dict(nfev=res.nfev, fvec=res.fun)
-        ier = res.status
-        errmsg = res.message
+        infodict = dict(nfev=res_ls.nfev, fvec=res_ls.fun)
+        ier = res_ls.status
+        errmsg = res_ls.message
 
-        ysize = len(res.fun)
-        cost = 2 * res.cost
-        popt = res.x
+        ysize = len(res_ls.fun)
+        cost = 2 * res_ls.cost
+        popt = res_ls.x
 
-        _, s, vt = svd(np.asarray(res.jac), full_matrices=False)
-        threshold = np.finfo(float).eps * max(res.jac.shape) * s[0]
+        _, s, vt = svd(np.asarray(res_ls.jac), full_matrices=False)
+        threshold = np.finfo(float).eps * max(res_ls.jac.shape) * s[0]
         s = s[s > threshold]
         vt = vt[: s.size]
         pcov = np.dot(vt.T / s**2, vt)
@@ -2034,7 +2034,7 @@ class King:
             np.block([[self.pcov, np.zeros((2 * dim, 2))], [np.zeros((2, 2 * dim)), np.diag([_m_mod_d**2, _x_d**2])]])
             for _m_mod_d, _x_d in zip(m_mod[:, 1], x[:, 1])
         ]
-        cov_stat = [
+        cov_x_stat = [
             np.block(
                 [
                     [np.zeros((2 * dim, 2 * dim)), np.zeros((2 * dim, 2))],
@@ -2045,7 +2045,7 @@ class King:
         ]
 
         cov = np.array([_jac @ (_cov_x @ _jac.T) for _jac, _cov_x in zip(jac, cov_x)])
-        cov_stat = np.array([_jac @ (_cov_stat @ _jac.T) for _jac, _cov_stat in zip(jac, cov_stat)])
+        cov_stat = np.array([_jac @ (_cov_stat @ _jac.T) for _jac, _cov_stat in zip(jac, cov_x_stat)])
 
         y = y_mod / m_mod[:, 0, None]
 

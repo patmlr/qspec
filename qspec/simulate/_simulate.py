@@ -401,9 +401,9 @@ def lambda_ge_rec(
         else:
             raise ValueError(f"'p0' must have size {int(3 * (n + 1) * (3 * (n + 1) + 1) / 2)}, but has size {p0.size}.")
 
-    _delta = 2 * np.pi * delta
-    rabi = a_ge * np.sqrt(s / 2.0)
-    f_rec = 2 * np.pi * f_recoil(f, m)
+    _delta = 2 * np.pi * float(delta)
+    rabi = float(a_ge * np.sqrt(s / 2.0))
+    f_rec = 2 * np.pi * float(f_recoil(f, m))
 
     def hamiltonian(_t: scalar, n1: int, n2: int) -> ndarray:
         gg, mm, ee = 0.0 + 0.0j, 0.0 + 0.0j, 0.0 + 0.0j
@@ -817,7 +817,9 @@ class ScatteringRate:
         self.laser = laser
 
         labels = self.atom.decay_map.labels[self.i_decay]
-        self.s = saturation(self.laser.intensity, self.laser.freq, self.atom.decay_map.get_ae(labels[0], labels[1], 1))
+        self.s = float(
+            saturation(self.laser.intensity, self.laser.freq, self.atom.decay_map.get_ae(labels[0], labels[1], 1))
+        )
         self.set_polarization(self.laser.polarization)
 
     def set_velocity(self, v: array_like = 0.0) -> None:
@@ -942,8 +944,9 @@ class ScatteringRate:
         :returns: (x) An array of frequencies which covers the entire spectrum (MHz).
         """
         width = float(width)
-        intervals = [[x0 - width * self.gamma / 2, x0 + width * self.gamma / 2] for x0 in self.x0_array]
-        intervals = tools.merge_intervals(intervals)
+        intervals = tools.merge_intervals(
+            [[x0 - width * self.gamma / 2, x0 + width * self.gamma / 2] for x0 in self.x0_array]
+        )
         if step is None:
             step = self.gamma / 30.0
 
@@ -1101,15 +1104,15 @@ class ScatteringRate:
         :param save: The path where to save the plot. If `None`, the plot will not be saved.
         :returns: (theta, phi, y) The angles and the fluorescence intensities.
         """
-        theta = np.linspace(-np.pi / 2.0, np.pi / 2.0, 2**n + 1) if theta is None else np.asarray(theta, dtype=float)
-        phi = np.linspace(0.0, 2.0 * np.pi, 2 ** (n + 1) + 1) if phi is None else np.asarray(phi, dtype=float)
-        y = np.squeeze(self.generate_y(self.x0[0][0] if x is None else x, theta, phi))
+        _theta = np.linspace(-np.pi / 2.0, np.pi / 2.0, 2**n + 1) if theta is None else np.asarray(theta, dtype=float)
+        _phi = np.linspace(0.0, 2.0 * np.pi, 2 ** (n + 1) + 1) if phi is None else np.asarray(phi, dtype=float)
+        y = np.squeeze(self.generate_y(self.x0[0][0] if x is None else x, _theta, _phi))
 
         if mode is None:
             mode = "2d"
 
         if mode == "3d":
-            r = np.array([[tools.transform(self.geometry.rotation.R, tools.e_r(t, p)) for p in phi] for t in theta])
+            r = np.array([[tools.transform(self.geometry.rotation.R, tools.e_r(t, p)) for p in _phi] for t in _theta])
             fig = plt.figure(num=1, figsize=(8, 8), clear=True)
             ax3d: Axes3D = fig.add_subplot(111, projection="3d", label="Surface")
 
@@ -1162,7 +1165,7 @@ class ScatteringRate:
             mpl.rc("font", **font)
 
             plt.figure(figsize=(3, 4.5))
-            theta, phi = np.meshgrid(theta, phi, indexing="ij")
+            _theta, _phi = np.meshgrid(_theta, _phi, indexing="ij")
             ax: Axes = plt.gca()
 
             ax.set_aspect("equal")
@@ -1170,7 +1173,7 @@ class ScatteringRate:
             plt.xlabel(r"$\theta$ / rad")
             plt.ylabel(r"$\varphi$ / rad")
 
-            cmesh = plt.pcolormesh(theta, phi, y[:, :], cmap="viridis")
+            cmesh = plt.pcolormesh(_theta, _phi, y[:, :], cmap="viridis")
             divider = make_axes_locatable(ax)
             cax = divider.append_axes("right", size="4%", pad=0.05)
             cbar = plt.colorbar(cmesh, cax=cax)
@@ -1186,7 +1189,7 @@ class ScatteringRate:
         plt.close()
         plt.style.use("default")
 
-        return theta, phi, y
+        return _theta, _phi, y
 
     def plot_mixed_distribution(
         self, n: int = 5, mode: str | None = None, show: bool = True, save: str | None = None
@@ -1206,8 +1209,8 @@ class ScatteringRate:
 
         y = self.generate_y(x, theta, phi)
 
-        x_theta, theta = np.meshgrid(x, theta, indexing="ij")
-        x_phi, phi = np.meshgrid(x, phi, indexing="ij")
+        x_theta, theta_grid = np.meshgrid(x, theta, indexing="ij")
+        x_phi, phi_grid = np.meshgrid(x, phi, indexing="ij")
 
         plt.xlabel(r"$\nu - \nu_0$ / MHz")
         plt.ylabel(r"$\theta$ / rad")
@@ -1222,7 +1225,7 @@ class ScatteringRate:
 
             ax3d.plot_surface(
                 x_theta,
-                theta,
+                theta_grid,
                 y[:, :, 0],
                 rcount=200 / 2,
                 ccount=200 / 2,
@@ -1246,7 +1249,7 @@ class ScatteringRate:
 
             ax3d.plot_surface(
                 x_phi,
-                phi,
+                phi_grid,
                 y[:, 2 ** (n - 1), :],
                 rcount=200 / 2,
                 ccount=200 / 2,
@@ -1261,7 +1264,7 @@ class ScatteringRate:
                 plt.show()
         else:
             ax: Axes = plt.gca()
-            cmesh = plt.pcolormesh(x_theta, theta, y[:, :, 0], cmap="viridis")
+            cmesh = plt.pcolormesh(x_theta, theta_grid, y[:, :, 0], cmap="viridis")
             divider = make_axes_locatable(ax)
             cax = divider.append_axes("right", size="4%", pad=0.1)
             cbar = plt.colorbar(cmesh, cax=cax)
@@ -1276,7 +1279,7 @@ class ScatteringRate:
             plt.xlabel(r"$\nu - \nu_0$ / MHz")
             plt.ylabel(r"$\phi$ / rad")
 
-            cmesh = plt.pcolormesh(x_phi, phi, y[:, 2 ** (n - 1), :], cmap="viridis")
+            cmesh = plt.pcolormesh(x_phi, phi_grid, y[:, 2 ** (n - 1), :], cmap="viridis")
             divider = make_axes_locatable(ax)
             cax = divider.append_axes("right", size="4%", pad=0.1)
             cbar = plt.colorbar(cmesh, cax=cax)

@@ -11,6 +11,7 @@ from qspec.qtypes import (
     Any,
     CodeType,
     Iterable,
+    Sequence,
     array_like,
     asarray,
     fix_type,
@@ -119,7 +120,7 @@ class Model:
         """
         self.model = model
         self.type = "Model"
-        self._cast_x = True if model is None else model._cast_x
+        self._cast_x: bool = True if model is None else model._cast_x
 
     def __call__(self, x: array_like, *args: scalar, **kwargs: Any) -> ndarray:
         _x: Any = np.asarray(x, dtype=float) if self._cast_x else x
@@ -165,7 +166,7 @@ class Model:
         A description of the model hierarchy, e.g., `"Offset.Summed[0].Hyperfine.Voigt"`.
         """
         label = ""
-        super_model = self
+        super_model: Model | None = self
         while super_model is not None:
             if isinstance(super_model, Listed):
                 label += super_model.type + "[0]."
@@ -211,7 +212,7 @@ class Model:
             self.vals = []
             self.fixes = []
             self.links = []
-            self.expressions = []
+            self.expressions: list[str | CodeType] = []
             self.p = {}
             self._index = 0
             self._size = 0
@@ -621,8 +622,8 @@ class Offset(Model):
                 " and contain the maximally considered polynomial order for each slice."
             )
 
-        self.offset_map = []
-        self.offset_masks = []
+        self.offset_map: list[list[int]] = []
+        self.offset_masks: list[ndarray] = []
         self.update_on_call = True
 
         self.gen_offset_map()
@@ -821,7 +822,7 @@ class Listed(Model):
         super().__init__(model=None)
         self.type = "Listed"
 
-        self.models = list(models)
+        self.models: Sequence[Model] = list(models)
 
         if labels is None:
             labels = [""] if len(self.models) == 1 else [f"__{i}" for i in range(len(self.models))]

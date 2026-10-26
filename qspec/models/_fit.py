@@ -179,7 +179,7 @@ def fit(
         _routine: Callable = odr_fit if sigma_x is not None and mc_sigma == 0 else curve_fit
     elif isinstance(routine, str) and routine in ROUTINES:
         _routine = eval(routine)
-    elif isinstance(routine, Callable) and routine.__name__ in ROUTINES:
+    elif callable(routine) and routine.__name__ in ROUTINES:
         _routine = routine
     else:
         raise ValueError(f"Specified routine {routine} is not supported.")
@@ -279,6 +279,8 @@ def fit(
             if _routine.__name__ == "odr_fit":
                 del kwargs["sigma"], kwargs["absolute_sigma"]
 
+            x_samples: list[ndarray] | ndarray
+            y_samples: list[ndarray] | ndarray
             if sigma_x is None:
                 x_samples = [x] * mc_sigma
             else:

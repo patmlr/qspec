@@ -10,7 +10,7 @@ import numpy as np
 
 from qspec import tools
 from qspec._cpp import (
-    C,
+    CppHandler,
     c_bool,
     c_char_p,
     c_complex_p,
@@ -100,11 +100,11 @@ def _process_q_axis(q_axis: array_like) -> ndarray:
 
 
 class CppClass:
-    def __init__(self, instance: "CppClass | C.CppClassHandler.value | None" = None) -> None:
+    def __init__(self, instance: "CppClass | CppHandler | None" = None) -> None:
         self.instance = _cast_cpp_type(instance)
 
 
-def _cast_cpp_type(instance: CppClass | C.CppClassHandler.value | None = None) -> C.CppClassHandler.value | None:
+def _cast_cpp_type(instance: CppClass | CppHandler | None = None) -> CppHandler | None:
     if instance is None:
         return None
     if isinstance(instance, CppClass):
@@ -118,7 +118,7 @@ class Polarization(CppClass):
         vec: array_like | None = None,
         q_axis: array_like = 2,
         vec_as_q: bool = True,
-        instance: "Polarization | C.PolarizationHandler.value | None" = None,
+        instance: "Polarization | CppHandler | None" = None,
     ) -> None:
         r"""
         A polarization state of light. The property `Polarization.x` holds the polarization
@@ -207,7 +207,7 @@ class Laser(CppClass):
         intensity: scalar = 1.0,
         polarization: Polarization | array_like | None = None,
         k: array_like | None = None,
-        instance: "Laser | C.LaserHandler.value | None" = None,
+        instance: "Laser | CppHandler | None" = None,
     ) -> None:
         r"""
         A laser that has a frequency $\nu$, an intensity $I = \frac{1}{2}\varepsilon_0c\vec{E}^2$,
@@ -330,7 +330,7 @@ class Environment(CppClass):
         self,
         E: array_like | None = None,
         B: array_like | None = None,
-        instance: "Environment | C.EnvironmentHandler.value | None" = None,
+        instance: "Environment | CppHandler | None" = None,
     ) -> None:
         r"""
         An electromagnetic environment with static electric field $\vec{E}$
@@ -411,7 +411,7 @@ class State(CppClass):
         gj: scalar = 0.0,
         gi: scalar = 0.0,
         label: str | None = None,
-        instance: "State | C.StateHandler.value | None" = None,
+        instance: "State | CppHandler | None" = None,
     ) -> None:
         r"""
         An atomic quantum state $|\mathrm{[label]}\pi JIFm\rangle$.
@@ -453,8 +453,9 @@ class State(CppClass):
                 s = np.array([ls[1]], dtype=float)
                 l = np.array([ls[0]], dtype=float)
             elif has_getitem(ls[0]):
-                s = np.array([_ls[1] for _ls in ls], dtype=float, order="C")
-                l = np.array([_ls[0] for _ls in ls], dtype=float, order="C")
+                _ls = np.asarray(ls, dtype=float)
+                s = np.ascontiguousarray(_ls[:, 1])
+                l = np.ascontiguousarray(_ls[:, 0])
             else:
                 raise ValueError(LS_FORMAT_ERROR)
             _s, _l = s.ctypes.data_as(c_double_p), l.ctypes.data_as(c_double_p)
@@ -633,7 +634,7 @@ class DecayMap(CppClass):
         labels: Iterable[tuple] | None = None,
         a: Iterable[scalar | dict] | None = None,
         k_max: int = 1,
-        instance: "DecayMap | C.DecayMapHandler.value | None" = None,
+        instance: "DecayMap | CppHandler | None" = None,
     ) -> None:
         r"""
         A map linking sets of atomic states via Einstein-A coefficients.
@@ -677,17 +678,17 @@ class DecayMap(CppClass):
                     ae = [_a]
                     am = ae
                     single_leading_order = True
-                ae = np.array(ae, dtype=float)
-                am = np.array(am, dtype=float)
+                _ae = np.array(ae, dtype=float)
+                _am = np.array(am, dtype=float)
 
                 dll.decaymap_add_decay(
                     self.instance,
                     c_char_p(bytes(s0, "utf-8")),
                     c_char_p(bytes(s1, "utf-8")),
-                    ae.ctypes.data_as(c_double_p),
-                    c_size_t(int(ae.size)),
-                    am.ctypes.data_as(c_double_p),
-                    c_size_t(int(am.size)),
+                    _ae.ctypes.data_as(c_double_p),
+                    c_size_t(int(_ae.size)),
+                    _am.ctypes.data_as(c_double_p),
+                    c_size_t(int(_am.size)),
                     c_bool(single_leading_order),
                 )
         else:
@@ -765,7 +766,7 @@ class Atom(CppClass):
         states: Iterable[State] | None = None,
         decay_map: DecayMap | None = None,
         mass: scalar = 0,
-        instance: "Atom | C.AtomHandler.value | None" = None,
+        instance: "Atom | CppHandler | None" = None,
     ) -> None:
         r"""
         An atom and its inner structure.
@@ -786,10 +787,10 @@ class Atom(CppClass):
             self.states = list(states)
             self.decay_map = decay_map
             self.mass = mass
-            self.label_map = None
+            self.label_map: dict[str, ndarray] | None = None
             self.update()
         else:
-            self._states = None
+            self._states: list[State] | None = None
 
     def __del__(self) -> None:
         dll.atom_destruct(self.instance)
@@ -1043,14 +1044,14 @@ class Atom(CppClass):
         if f is None:
             _f = set(s.f for s in self.states)
         elif is_scalar(f):
-            _f = set([f])
+            _f = {float(f)}
         else:
             _f = set(np.asarray(f, dtype=float))
 
         if m is None:
             _m = set(s.m for s in self.states)
         elif is_scalar(m):
-            _m = set([m])
+            _m = {float(m)}
         else:
             _m = set(np.asarray(m, dtype=float))
 
@@ -1370,7 +1371,7 @@ class Atom(CppClass):
 
         d = 2
         y_i = 0
-        y_dict = {}
+        y_dict: dict[tuple[str, float, float, float], int] = {}
         m_max = max(s.m for s in self.states)
         ret_x = {}
         ret_y = {}
@@ -1493,6 +1494,8 @@ def _cast_y0(y0: array_like | None, i_solver: int, atom: Atom) -> tuple[ndarray,
     """
     size = atom.size
     gs = atom.gs
+    dtype: type
+    pointer: type
 
     if i_solver == 0:
         if y0 is None:
@@ -1508,8 +1511,7 @@ def _cast_y0(y0: array_like | None, i_solver: int, atom: Atom) -> tuple[ndarray,
         if len(y0.shape) < 2:
             y0 = np.expand_dims(y0, axis=0)
         elif len(y0.shape) > 2:
-            shape = (sum(y0.shape[:-1]), y0.shape[-1])
-            y0 = y0.reshape(shape, order="C")
+            y0 = y0.reshape((-1, y0.shape[-1]), order="C")
         y0 /= np.sum(y0, axis=-1)[:, None]
         dtype, pointer = float, c_double_p
 
@@ -1528,8 +1530,7 @@ def _cast_y0(y0: array_like | None, i_solver: int, atom: Atom) -> tuple[ndarray,
             y0 = np.expand_dims(y0, axis=0)
 
         elif len(y0.shape) > 2:
-            shape = (sum(y0.shape[:-1]), y0.shape[-1])
-            y0 = y0.reshape(shape, order="C")
+            y0 = y0.reshape((-1, y0.shape[-1]), order="C")
 
         y0 /= tools.absolute_complex(y0, axis=-1)[:, None]
 
@@ -1558,8 +1559,7 @@ def _cast_y0(y0: array_like | None, i_solver: int, atom: Atom) -> tuple[ndarray,
             y0 = np.array([np.diag(_y0) for _y0 in np.asarray(y0)])
 
         elif len(y0.shape) > 2:
-            shape = (sum(y0.shape[:-2]), y0.shape[-2], y0.shape[-1])
-            y0 = y0.reshape(shape, order="C")
+            y0 = y0.reshape((-1, y0.shape[-2], y0.shape[-1]), order="C")
             y0 /= np.sum(np.diagonal(y0, axis1=-2, axis2=-1), axis=-1)[:, None, None]
 
         else:
@@ -1655,7 +1655,7 @@ class Interaction(CppClass):
         environment: Environment | None = None,
         delta_max: scalar = 1e3,
         controlled: bool = True,
-        instance: "Interaction | C.InteractionHandler.value | None" = None,
+        instance: "Interaction | CppHandler | None" = None,
     ) -> None:
         r"""
         An interaction between an `Atom` and a list of `lasers` in an `Environment`.

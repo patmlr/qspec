@@ -442,7 +442,7 @@ def floor_log10(x: array_like) -> ndarray:
     return np.floor(np.log10(np.abs(x))).astype(int)
 
 
-def round_to_n(x: scalar, n: int_like) -> tuple[scalar, int]:
+def round_to_n(x: scalar, n: int_like) -> tuple[float, int]:
     """
     Round a value to `n` significant decimal places.
 
@@ -457,6 +457,7 @@ def round_to_n(x: scalar, n: int_like) -> tuple[scalar, int]:
         if isinstance(x, list):
             raise TypeError("Only `scalar` types are supported.")
 
+    _f: type[float] | type[int]
     if isinstance(x, (float, floating)):
         _f = float
     elif isinstance(x, (int, integer)):
@@ -514,13 +515,7 @@ def in_nested(a: object, nested: object) -> bool:
     if a in nested:
         return True
 
-    ret = False
-    for el in nested:
-        ret += in_nested(a, el)
-        if ret:
-            return True
-
-    return bool(ret)
+    return any(in_nested(a, el) for el in nested)
 
 
 def check_iterable(arg: object, dtype: type = str) -> list:
@@ -893,7 +888,7 @@ def merge_intervals(intervals: Iterable[Iterable[scalar]]) -> ndarray:
         n += m + 1
 
     if inter.shape[0] == 1 or inter[-1, 0] > inter[-2, 1]:
-        new_inter.append(inter[-1, :])
+        new_inter.append(list(inter[-1, :]))
 
     return np.asarray(new_inter)
 
@@ -1159,11 +1154,12 @@ def rotation_matrix(alpha: array_like, dr: scalar_nd) -> ndarray:
     :param dr: The vector to rotate about. Does not have to be normalized.
     :returns: (R) The rotation matrix $R$.
     """
-    alpha, dr = np.asarray(alpha), np.asarray(dr)
-    dr /= absolute(dr)
+    alpha = np.asarray(alpha)
+    n = np.asarray(dr, dtype=float)
+    n /= absolute(n)
     r = np.identity(3) * np.cos(alpha)
-    r += np.array([[0.0, -dr[2], dr[1]], [dr[2], 0.0, -dr[0]], [-dr[1], dr[0], 0.0]]) * np.sin(alpha)
-    r += np.einsum("i,j->ij", dr, dr) * (1.0 - np.cos(alpha))
+    r += np.array([[0.0, -n[2], n[1]], [n[2], 0.0, -n[0]], [-n[1], n[0], 0.0]]) * np.sin(alpha)
+    r += np.einsum("i,j->ij", n, n) * (1.0 - np.cos(alpha))
     return r
 
 
